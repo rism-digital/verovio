@@ -318,7 +318,7 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
 {
     assert(element);
 
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+    Measure *measure = static_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
     Alignment *alignment = element->GetAlignment();
@@ -327,7 +327,7 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
     Layer *layer = NULL;
     Staff *staff = element->GetCrossStaff(layer);
     if (!staff) {
-        staff = dynamic_cast<Staff *>(element->GetFirstAncestor(STAFF));
+        staff = static_cast<Staff *>(element->GetFirstAncestor(STAFF));
     }
     // At this stage we have the parent or the cross-staff
     assert(staff);

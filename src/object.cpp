@@ -749,6 +749,17 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
     }
 }
 
+Object* Object::GetFirstChildNot(const ClassId classId)
+{
+    for (const auto child : m_children) {
+        if (!child->Is(classId)) {
+            return child;
+        }
+    }
+
+    return NULL;
+}
+
 bool Object::HasEditorialContent()
 {
     ListOfObjects editorial;
@@ -1737,7 +1748,7 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
 int Object::FindNextChildByComparison(FunctorParams *functorparams)
 {
-    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
+    FindChildByComparisonParams *params = static_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
 
     // we are reaching the start of the range
@@ -1762,7 +1773,7 @@ int Object::FindNextChildByComparison(FunctorParams *functorparams)
 
 int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
 {
-    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
+    FindChildByComparisonParams *params = static_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
     // this guy works by going from the start and replacing the return element with every nearer element
     // until you get to the 'start' element

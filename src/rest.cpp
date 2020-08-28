@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -127,7 +128,7 @@ int Rest::GetRestLocOffset(int loc)
 
 int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
 {
-    Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *parentLayer = static_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!layer) return defaultLocation;
     const int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
@@ -136,7 +137,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     staff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer(dynamic_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
+    const bool isTopLayer(static_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
 
     // find best rest location relative to elements on other layers
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
@@ -159,21 +160,21 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfObjects &layersList, Layer *currentLayer)
 {
     if (!currentLayer) return { VRV_UNSET, "noAccidental" };
-    const bool isTopLayer(dynamic_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
+    const bool isTopLayer(static_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
 
     // Get iterator to another layer. We're going to find coliding elements there
     auto layerIter = std::find_if(layersList.begin(), layersList.end(),
-        [&](Object *foundLayer) { return dynamic_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
+        [&](Object *foundLayer) { return static_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
     if (layerIter == layersList.end()) return { VRV_UNSET, "noAccidental" };
-    auto collidingElementsList = dynamic_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
+    auto collidingElementsList = static_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
     
     std::pair<int, std::string> finalElementInfo = { VRV_UNSET, "noAccidental" };
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
-        auto currentElementInfo = GetElementLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
+        auto currentElementInfo = GetElementLocation(object, static_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
 		//  If note on other layer is not on the same x position as rest - ignore its accidental
-        if (GetAlignment()->GetTime() != dynamic_cast<LayerElement*>(object)->GetAlignment()->GetTime()) {
+        if (GetAlignment()->GetTime() != static_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = "noAccidental";
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
@@ -192,18 +193,21 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
     Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
     GetRelativeLayerElementParams getRelativeLayerElementParams(GetIdx(), BACKWARD, false);
 
+    Object *previousElement = NULL;
+    Object *nextElement = NULL;
     // Get previous and next elements from the current layer
-    currentLayer->Process(
-        &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-    Object *previousElement
-        = getRelativeLayerElementParams.m_relativeElement;
-    // reset and search in other direction
-    getRelativeLayerElementParams.m_relativeElement = NULL;
-    getRelativeLayerElementParams.m_searchDirection = FORWARD;
-    getRelativeLayerElement.m_returnCode = FUNCTOR_CONTINUE;
-    currentLayer->Process(
-        &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD);
-    Object *nextElement = getRelativeLayerElementParams.m_relativeElement;
+    if (currentLayer->GetFirstChildNot(REST)) {
+        currentLayer->Process(
+            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+        previousElement = getRelativeLayerElementParams.m_relativeElement;
+        // reset and search in other direction
+        getRelativeLayerElementParams.m_relativeElement = NULL;
+        getRelativeLayerElementParams.m_searchDirection = FORWARD;
+        getRelativeLayerElement.m_returnCode = FUNCTOR_CONTINUE;
+        currentLayer->Process(
+            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD);
+        nextElement = getRelativeLayerElementParams.m_relativeElement;
+    }
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
     // That way we'll get bottom chord note for top layer and top chord note for bottom layer
@@ -222,30 +226,28 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
 
 int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer)
 {
-    // current doc
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
-    assert(doc);
+    // current system
+    System *system = static_cast<System*>(GetFirstAncestor(SYSTEM));
+    assert(system);
     // current measure
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+    Measure *measure = static_cast<Measure *>(GetFirstAncestor(MEASURE));
     assert(measure);
 
-    ClassIdComparison ac(MEASURE);
-    Measure *relativeMeasure = dynamic_cast<Measure *>(
-        isPrevious ? doc->FindPreviousChild(&ac, measure) : doc->FindNextChild(&ac, measure));
-
-    if (!relativeMeasure) return VRV_UNSET;
+    const int index = system->GetChildIndex(measure);
+    Object *relativeMeasure = system->GetChild(isPrevious? index - 1 : index + 1);
+    if (!relativeMeasure || !relativeMeasure->Is(MEASURE)) return VRV_UNSET;
 
     // Find staff with the same N as current staff
     AttNIntegerComparison snc(STAFF, currentStaff->GetN());
-    Staff *previousStaff = dynamic_cast<Staff *>(relativeMeasure->FindDescendantByComparison(&snc));
+    Staff *previousStaff = static_cast<Staff *>(relativeMeasure->FindDescendantByComparison(&snc));
     if (!previousStaff) return VRV_UNSET;
 
     // Compare number of layers in the next/previous staff and if it's the same - find layer with same N
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     previousStaff->FindAllDescendantByComparison(&layers, &matchType);
-    auto layerIter = std::find_if(layers.begin(), layers.end(), [&](Object *foundLayer) {
-        return dynamic_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
+    auto layerIter = std::find_if(layers.begin(), layers.end(),
+        [&](Object *foundLayer) { return static_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
     });
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
@@ -256,7 +258,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
 
     Object *lastLayerElement = getRelativeLayerElementParams.m_relativeElement;
     if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
-        return GetElementLocation(lastLayerElement, dynamic_cast<Layer *>(*layerIter), !isTopLayer).first;
+        return GetElementLocation(lastLayerElement, static_cast<Layer *>(*layerIter), !isTopLayer).first;
     }
 
     return VRV_UNSET;
@@ -266,18 +268,18 @@ std::pair<int, std::string> Rest::GetElementLocation(Object *object, Layer *laye
 {
     AttConverter converter;
     if (object->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(object);
+        Note *note = static_cast<Note *>(object);
         assert(note);
         Accid* accid = note->GetDrawingAccid();
-        return { PitchInterface::CalcLoc(note, dynamic_cast<Layer *>(layer), note),
+        return { PitchInterface::CalcLoc(note, layer, note),
             (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid()) : "noAccidental" };
     }
     if (object->Is(CHORD)) {
-        Chord* chord = dynamic_cast<Chord *>(object);
+        Chord *chord = static_cast<Chord *>(object);
         assert(chord);
         Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
         Accid* accid = relevantNote->GetDrawingAccid();
-        return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), relevantNote, isTopLayer),
+        return { PitchInterface::CalcLoc(chord, layer, relevantNote, isTopLayer),
             (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid())
                                               : "noAccidental" };
     }
@@ -295,7 +297,7 @@ std::pair<int, std::string> Rest::GetElementLocation(Object *object, Layer *laye
 int Rest::GetRestOffsetFromOptions(
     const std::string &layer, const std::pair<int, std::string>& location, bool isTopLayer) const
 {
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    Doc *doc = static_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     std::vector<std::string> jsonNodePath{ layer };

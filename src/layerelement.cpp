@@ -1613,10 +1613,10 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 
 int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
 {
-    LayerElementsInTimeSpanParams *params = dynamic_cast<LayerElementsInTimeSpanParams *>(functorParams);
+    LayerElementsInTimeSpanParams *params = static_cast<LayerElementsInTimeSpanParams *>(functorParams);
     assert(params);
 
-    Layer *currentLayer = dynamic_cast<Layer *>(GetFirstAncestor(LAYER));
+    Layer *currentLayer = static_cast<Layer *>(GetFirstAncestor(LAYER));
     if (!currentLayer || (currentLayer != params->m_layer) || IsScoreDefElement() || Is(MREST)) 
         return FUNCTOR_SIBLINGS;
     if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink())
@@ -1624,7 +1624,7 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
 
     const double duration = !GetParent()->Is(CHORD)
         ? GetAlignmentDuration(params->m_mensur, params->m_meterSig)
-        : dynamic_cast<Chord *>(GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+        : static_cast<Chord *>(GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
         
     const double time = m_alignment->GetTime();
 
@@ -1805,7 +1805,7 @@ int LayerElement::ResetDrawing(FunctorParams *functorParams)
 
 int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
 {
-    GetRelativeLayerElementParams *params = dynamic_cast<GetRelativeLayerElementParams *>(functorParams);
+    GetRelativeLayerElementParams *params = static_cast<GetRelativeLayerElementParams *>(functorParams);
     assert(params);
 
     // Do not check for index of the element if we're looking into neighboring layer or if nested element is being 

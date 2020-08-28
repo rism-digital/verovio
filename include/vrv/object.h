@@ -457,6 +457,11 @@ public:
     Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1);
 
     /**
+     * Return the first child that is NOT of the specified type.
+     */
+    Object *GetFirstChildNot(const ClassId classId);
+
+    /**
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
