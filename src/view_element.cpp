@@ -451,7 +451,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STEMMODIFIER stemMod;
-    int drawingDur;
+    int drawingDur = 0;
     LayerElement *childElement = NULL;
     Note *childNote = NULL;
     Point stemPoint;
@@ -496,6 +496,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
 
+    // conlude from logical attributes
     if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
         int slashDur = bTrem->GetUnitdur() - drawingDur;
         if (drawingDur < DUR_4) slashDur = bTrem->GetUnitdur() - DUR_4;
@@ -542,7 +543,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Idem as above
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false)
                 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+            x = stemPoint.x;
         }
         else {
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
@@ -562,12 +563,17 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += (stemDir == STEMDIRECTION_down) ? beamStep : -beamStep;
     }
 
-    int s;
     // by default draw 3 slashes (e.g., for a temolo on a whole note)
     if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
-    for (s = 1; s < stemMod; ++s) {
-        DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
-        y += step;
+    if (stemMod == STEMMODIFIER_z) {
+        if (stemDir == STEMDIRECTION_down) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x, y, SMUFL_E22A_buzzRoll, staff->m_drawingStaffSize, false);
+    }
+    else {
+        for (int s = 1; s < stemMod; ++s) {
+            DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
+            y += step;
+        }
     }
 
     dc->EndGraphic(element, this);
@@ -1350,26 +1356,41 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else {
             // Whole notes
             wchar_t fontNo;
-            if (drawingDur == DUR_1) {
-                if (note->GetColored() == BOOLEAN_true) {
-                    fontNo = SMUFL_E0FA_noteheadWholeFilled;
-                }
-                else {
-                    fontNo = SMUFL_E0A2_noteheadWhole;
-                }
+            if (note->GetColored() == BOOLEAN_true) {
+                fontNo = (drawingDur == DUR_1) ? SMUFL_E0FA_noteheadWholeFilled : SMUFL_E0A3_noteheadHalf;
             }
-            // Other values
             else {
-                if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
-                    fontNo = SMUFL_E0A3_noteheadHalf;
-                }
-                else {
-                    fontNo = SMUFL_E0A4_noteheadBlack;
-                }
+                fontNo = note->GetNoteheadGlyph(drawingDur);
             }
 
             dc->StartCustomGraphic("notehead");
+
             DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+
+            // handle notehead enclosure
+            if (note->HasHeadMod()) {
+                switch (note->GetHeadMod()) {
+                    case NOTEHEADMODIFIER_paren: {
+                        DrawSmuflCode(dc, noteX - note->GetDrawingRadius(m_doc), noteY, 
+                            SMUFL_E26A_accidentalParensLeft, staff->m_drawingStaffSize, drawingCueSize, true);
+                        DrawSmuflCode(dc, noteX + note->GetDrawingRadius(m_doc) * 2, noteY,
+                            SMUFL_E26B_accidentalParensRight, staff->m_drawingStaffSize, drawingCueSize, true);
+                        break;
+                    }
+                    case NOTEHEADMODIFIER_slash:
+                    case NOTEHEADMODIFIER_backslash:
+                    case NOTEHEADMODIFIER_vline: 
+                    case NOTEHEADMODIFIER_hline: {
+                        // TODO: Handle other headmodifiers whenever they become available
+                        //wchar_t glyphCode = note->GetNoteheadModifierGlyph();
+                        //int offset = (m_doc->GetGlyphWidth - note->GetDrawingRadius(m_doc) * 2) / 2;
+                        //DrawSmuflCode(dc, noteX - offset, noteY, glyphCode, staff->m_drawingStaffSize, drawingCueSize, true);
+                        break;
+                    }
+                    default: break;
+                }
+            }
+
             dc->EndCustomGraphic();
         }
     }

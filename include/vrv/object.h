@@ -287,8 +287,8 @@ public:
      * Returns NULL is not found
      */
     ///@{
-    Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
-    Object *GetPrevious(Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetNext(const Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetPrevious(const Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
