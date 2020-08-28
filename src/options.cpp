@@ -696,11 +696,13 @@ Options::Options()
     m_justificationSystem.Init(1., 0., 10.);
     this->Register(&m_justificationSystem, "justificationSystem", &m_generalLayout);
 
-    m_justificationBracketGroup.SetInfo("Spacing bracket group justification", "Space between staves inside a bracketed group justification");
+    m_justificationBracketGroup.SetInfo(
+        "Spacing bracket group justification", "Space between staves inside a bracketed group justification");
     m_justificationBracketGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBracketGroup, "justificationBracketGroup", &m_generalLayout);
 
-    m_justificationBraceGroup.SetInfo("Spacing brace group justification", "Space between staves inside a braced group ijustification");
+    m_justificationBraceGroup.SetInfo(
+        "Spacing brace group justification", "Space between staves inside a braced group ijustification");
     m_justificationBraceGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
 
@@ -765,11 +767,13 @@ Options::Options()
     m_slurThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
 
-    m_spacingBraceGroup.SetInfo("Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
+    m_spacingBraceGroup.SetInfo(
+        "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
     m_spacingBraceGroup.Init(12, 0, 36);
     this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
 
-    m_spacingBracketGroup.SetInfo("Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
+    m_spacingBracketGroup.SetInfo(
+        "Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
     m_spacingBracketGroup.Init(12, 0, 36);
     this->Register(&m_spacingBracketGroup, "spacingBracketGroup", &m_generalLayout);
 

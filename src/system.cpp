@@ -565,7 +565,8 @@ int System::AlignSystems(FunctorParams *functorParams)
 
     int systemMargin = this->GetIdx() ? params->m_systemMargin : 0;
     if (systemMargin) {
-        const int margin = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
+        const int margin
+            = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
         params->m_shift -= margin > 0 ? margin : 0;
     }
 
@@ -660,7 +661,7 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
     AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
-    
+
     params->m_inBetween = false;
 
     AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
