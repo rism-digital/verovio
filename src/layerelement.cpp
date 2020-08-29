@@ -481,6 +481,9 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         else
             code = SMUFL_E0A4_noteheadBlack;
     }
+    else if (this->Is(REST)) {
+        code = SMUFL_E0A4_noteheadBlack;
+    }
 
     // Mensural note shorter than DUR_BR
     if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
