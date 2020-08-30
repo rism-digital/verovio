@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Aug 22 18:16:35 PDT 2020
+// Last Modified: Sat Aug 29 16:44:50 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5989,6 +5989,38 @@ class Tool_filter : public HumTool {
 };
 
 
+class Tool_flipper : public HumTool {
+	public:
+		         Tool_flipper      (void);
+		        ~Tool_flipper      () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+
+		void     processLine        (HumdrumFile& infile, int index);
+		void     checkForFlipChanges(HumdrumFile& infile, int index);
+		bool     flipSubspines      (vector<vector<HTp>>& flipees);
+		void     flipSpineTokens    (vector<HTp>& subtokens);
+		void     extractFlipees     (vector<vector<HTp>>& flipees,
+		                             HumdrumFile& infile, int index);
+
+	private:
+		bool     m_allQ    = false;
+		bool     m_keepQ   = false;
+		bool     m_kernQ   = false;
+		std::string m_interp;
+		std::vector<bool> m_flipState;
+		std::vector<bool> m_fliplines;
+
+};
+
+
 class HPNote {
 	public:
 		int track = -1;
@@ -6996,6 +7028,7 @@ class Tool_musicxml2hum : public HumTool {
 		std::string cleanSpacesAndColons(const std::string& input);
 		void setEditorialAccidental  (int accidental, GridSlice* slice,
 		                              int partindex, int staffindex, int voiceindex);
+		void moveBreaksToEndOfPreviousMeasure(HumGrid& outdata);
 
 		bool convert          (ostream& out);
 		bool convertPart      (ostream& out, const std::string& partname,
