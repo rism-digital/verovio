@@ -644,6 +644,7 @@ protected:
     void markAdjacentNullsWithClef(hum::HTp clef);
     void markOtherClefsAsChange(hum::HTp clef);
     int getCurrentLayerCount(hum::HTp token);
+    void checkForBreak(hum::HumdrumFile& infile, int line);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

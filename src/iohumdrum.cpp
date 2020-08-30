@@ -719,27 +719,7 @@ bool HumdrumInput::convertHumdrum()
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
         m_measureIndex++;
         status &= convertSystemMeasure(line);
-        if ((line < infile.getLineCount() - 1) && (infile[line + 1].isGlobalComment())) {
-            // Check for page/system break, and add <sb/> if found.
-            // (currently mapping page breaks to system breaks.)
-            hum::HTp token = infile.token(line + 1, 0);
-            if (token->compare(0, 12, "!!linebreak:") == 0) {
-                Sb *sb = new Sb;
-                m_sections.back()->AddChild(sb);
-                if (token->find("original")) {
-                    // maybe allow other types of system breaks here
-                    addType(sb, "original");
-                }
-            }
-            else if (token->compare(0, 12, "!!pagebreak:") == 0) {
-                Sb *sb = new Sb;
-                m_sections.back()->AddChild(sb);
-                if (token->find("original")) {
-                    // maybe allow other types of page breaks here
-                    addType(sb, "original");
-                }
-            }
-        }
+        checkForBreak(infile, line);
     }
     processHangingTieStarts();
 
@@ -761,6 +741,100 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForBreak -- Search for a linebreak or a pagebreak marker,
+//     such as:
+//          !!linebreak:
+//          !!pagebreak:
+// There are also layout parameters for barlines that function as line breaks.
+// This one is primarily from MusicXML conversion, and can be removed or converted
+// to the layout system as need.  Search for a break message anywhere
+// around the barline but before any data is found.
+//
+
+void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
+{
+    if (line >= infile.getLineCount() - 1) {
+        return;
+    }
+    hum::HumNum timestamp = infile[line].getDurationFromStart();
+    hum::HumNum ts2;
+    int linebreaki = -1;
+    int pagebreaki = -1;
+
+    for (int i = line; i < infile.getLineCount(); i++) {
+        if (infile[i].isData()) {
+            break;
+        }
+        if (!infile[i].isGlobalComment()) {
+            continue;
+        }
+        ts2 = infile[i].getDurationFromStart();
+        if (ts2 != timestamp) {
+            break;
+        }
+        hum::HTp token = infile[i].token(0);
+        if (token->compare(0, 12, "!!linebreak:") == 0) {
+            linebreaki = i;
+            break;
+        }
+        else if (token->compare(0, 12, "!!pagebreak:") == 0) {
+            pagebreaki = i;
+            break;
+        }
+    }
+
+    if ((linebreaki == -1) && (pagebreaki == -1)) {
+        for (int i = line - 1; i > 0; i--) {
+            if (infile[i].isData()) {
+                break;
+            }
+            if (!infile[i].isGlobalComment()) {
+                continue;
+            }
+            ts2 = infile[i].getDurationFromStart();
+            if (ts2 != timestamp) {
+                break;
+            }
+            hum::HTp token = infile[i].token(0);
+            if (token->compare(0, 12, "!!linebreak:") == 0) {
+                linebreaki = i;
+                break;
+            }
+            else if (token->compare(0, 12, "!!pagebreak:") == 0) {
+                pagebreaki = i;
+                break;
+            }
+        }
+    }
+
+    if ((linebreaki == -1) && (pagebreaki == -1)) {
+        return;
+    }
+
+    if (linebreaki > 0) {
+        hum::HTp token = infile[linebreaki].token(0);
+        Sb *sb = new Sb;
+        m_sections.back()->AddChild(sb);
+        // Maybe allow other types of line breaks here, but
+        // typically break groups should be done with !LO: system.
+        if (token->find("original") != std::string::npos) {
+            addType(sb, "original");
+        }
+    }
+    else if (pagebreaki > 0) {
+        hum::HTp token = infile[pagebreaki].token(0);
+        Sb *sb = new Sb;
+        m_sections.back()->AddChild(sb);
+        // Maybe allow other types of line breaks here, but
+        // typically break groups should be done with !LO: system.
+        if (token->find("original") != std::string::npos) {
+            addType(sb, "original page");
+        }
+    }
 }
 
 //////////////////////////////
@@ -17924,8 +17998,15 @@ bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
 //   $[Ss]?[Ss]? = inverted turn
 //
 //   These are not used anymore:
-//   SS = turn centered between two notes
-//   $$ = inverted turn centered between two notes
+//   SS = turn centered between two notes.  Now a turn starting with
+//        S or $ will be centered.
+//   $$ = inverted turn centered between two notes.
+//   To uncenter a turn (attach to a note), prefix the turn
+//   with lower-case s, such as sSSS, each character meaning:
+//       s = do not center turn
+//       S = regular turn
+//       S = Major second interval above turn note
+//       S = Major second interval below turn note
 //
 
 void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
