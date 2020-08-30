@@ -517,9 +517,9 @@ protected:
     void splitSyllableBySpaces(vector<std::string> &vtext, char spacer = ' ');
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
-    bool leftmostSystemArpeggio(hum::HTp token);
+    bool isLowestSystemArpeggio(hum::HTp token);
     bool leftmostStaffArpeggio(hum::HTp token);
-    hum::HTp getRightmostSystemArpeggio(hum::HTp token);
+    hum::HTp getHighestSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
         int staffindex, int justification = 0, const std::string &color = "");
@@ -644,7 +644,9 @@ protected:
     void markAdjacentNullsWithClef(hum::HTp clef);
     void markOtherClefsAsChange(hum::HTp clef);
     int getCurrentLayerCount(hum::HTp token);
-    void checkForBreak(hum::HumdrumFile& infile, int line);
+    void checkForBreak(hum::HumdrumFile &infile, int line);
+    int getLowestDiatonicPitch(hum::HTp token, const string &requirement);
+    int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

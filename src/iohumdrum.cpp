@@ -17815,11 +17815,11 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
     bool staffQ = false;
     hum::HTp earp = NULL;
     if (token->find("::") != string::npos) {
-        if (!leftmostSystemArpeggio(token)) {
+        if (!isLowestSystemArpeggio(token)) {
             return;
         }
         systemQ = true;
-        earp = getRightmostSystemArpeggio(token);
+        earp = getHighestSystemArpeggio(token);
         if (earp == NULL) {
             // no system arpeggio actually found
             return;
@@ -17934,52 +17934,144 @@ bool HumdrumInput::leftmostStaffArpeggio(hum::HTp token)
 
 //////////////////////////////
 //
-// HumdrumInput::getRightmostSystemArpeggio -- Assuming a single contiguous
+// HumdrumInput::getHighestSystemArpeggio -- Assuming a single contiguous
 //     arpeggio across all staves from first to last marker.  Will probably have
 //     to adjust for layers (which are ordered reversed compared to staves).
 //
 
-hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
+hum::HTp HumdrumInput::getHighestSystemArpeggio(hum::HTp token)
 {
-    hum::HTp output = NULL;
-    if (token->find("::") != std::string::npos) {
-        output = token;
+    hum::HTp highesttok = token;
+    int tpitch = getHighestDiatonicPitch(token, "::");
+    if (tpitch > 1000) {
+        return highesttok;
     }
-    token = token->getNextFieldToken();
-    while (token != NULL) {
-        if (!token->isKern()) {
-            token = token->getNextFieldToken();
+    int highest = tpitch;
+
+    hum::HLp line = token->getLine();
+    for (int i = 0; i < line->getFieldCount(); i++) {
+        hum::HTp tok2 = line->token(i);
+        if (!tok2->isKern()) {
             continue;
         }
-        if (token->find("::") != std::string::npos) {
-            output = token;
+        if (tok2->find("::") == std::string::npos) {
+            continue;
         }
-        token = token->getNextFieldToken();
+        int dpitch = getHighestDiatonicPitch(tok2, "::");
+        if (dpitch >= highest) {
+            highest = dpitch;
+            highesttok = tok2;
+        }
     }
-    return output;
+
+    if (tpitch <= highest) {
+        return highesttok;
+    }
+    else {
+        return token;
+    }
 }
 
 //////////////////////////////
 //
-// HumdrumInput::leftmostSystemArpeggio -- Not checking for contiguous staves
+// HumdrumInput::isLowestSystemArpeggio -- Not checking for contiguous staves
 //  (i.e., only one cross-staff arpeggio is allowed at a time for now).  Will
 //  probably have to adjust for layers (which are ordered reverse of staves).
+//  maybe limit to +1/-1 one staff, but there will still be complications
+//  with adjacent grand staff parts.
 //
 
-bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
+bool HumdrumInput::isLowestSystemArpeggio(hum::HTp token)
 {
-    token = token->getPreviousFieldToken();
-    while (token != NULL) {
-        if (!token->isKern()) {
-            token = token->getPreviousFieldToken();
+    int tpitch = getLowestDiatonicPitch(token, "::");
+    if (tpitch > 1000) {
+        return false;
+    }
+    int lowest = tpitch;
+
+    hum::HLp line = token->getLine();
+    for (int i = 0; i < line->getFieldCount(); i++) {
+        hum::HTp tok2 = line->token(i);
+        if (!tok2->isKern()) {
             continue;
         }
-        if (token->find("::") != std::string::npos) {
-            return false;
+        if (tok2->find("::") == std::string::npos) {
+            continue;
         }
-        token = token->getPreviousFieldToken();
+        int dpitch = getLowestDiatonicPitch(tok2, "::");
+        if (dpitch < lowest) {
+            lowest = dpitch;
+        }
     }
-    return true;
+
+    if (tpitch == lowest) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLowestDiatonicPitch -- Returns 123456789 if nothing.
+//
+
+int HumdrumInput::getLowestDiatonicPitch(hum::HTp token, const string &requirement)
+{
+    int dpitch = 123456789;
+    if (!token->isData()) {
+        return dpitch;
+    }
+    if (token->isRest()) {
+        return dpitch;
+    }
+    if (token->find(requirement) == std::string::npos) {
+        return dpitch;
+    }
+    std::vector<std::string> subtokens;
+    subtokens = token->getSubtokens();
+    for (int j = 0; j < (int)subtokens.size(); j++) {
+        if (subtokens[j].find(requirement) == std::string::npos) {
+            continue;
+        }
+        int tpitch = hum::Convert::kernToBase7(subtokens[j]);
+        if (tpitch < dpitch) {
+            dpitch = tpitch;
+        }
+    }
+    return dpitch;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getHighestDiatonicPitch -- Returns -123456789 if nothing.
+//
+
+int HumdrumInput::getHighestDiatonicPitch(hum::HTp token, const string &requirement)
+{
+    int dpitch = -123456789;
+    if (!token->isData()) {
+        return dpitch;
+    }
+    if (token->isRest()) {
+        return dpitch;
+    }
+    if (token->find(requirement) == std::string::npos) {
+        return dpitch;
+    }
+    std::vector<std::string> subtokens;
+    subtokens = token->getSubtokens();
+    for (int j = 0; j < (int)subtokens.size(); j++) {
+        if (subtokens[j].find(requirement) == std::string::npos) {
+            continue;
+        }
+        int tpitch = hum::Convert::kernToBase7(subtokens[j]);
+        if (tpitch > dpitch) {
+            dpitch = tpitch;
+        }
+    }
+    return dpitch;
 }
 
 //////////////////////////////
