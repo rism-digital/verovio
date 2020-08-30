@@ -818,6 +818,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     if (linebreaki > 0) {
         hum::HTp token = infile[linebreaki].token(0);
         Sb *sb = new Sb;
+        setLocationId(sb, token);
         m_sections.back()->AddChild(sb);
         // Maybe allow other types of line breaks here, but
         // typically break groups should be done with !LO: system.
@@ -828,6 +829,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     else if (pagebreaki > 0) {
         hum::HTp token = infile[pagebreaki].token(0);
         Sb *sb = new Sb;
+        setLocationId(sb, token);
         m_sections.back()->AddChild(sb);
         // Maybe allow other types of line breaks here, but
         // typically break groups should be done with !LO: system.
