@@ -5460,6 +5460,7 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 void HumdrumInput::checkForLayoutBreak(int line)
 {
     hum::HumdrumFile &infile = m_infiles[0];
+
     if (line >= infile.getLineCount()) {
         return;
     }
@@ -5473,7 +5474,12 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
-        m_sections.back()->AddChild(sb);
+        if (m_currentending) {
+            m_currentending->AddChild(sb);
+        }
+        else {
+            m_sections.back()->AddChild(sb);
+        }
         addType(sb, tstring);
         return;
     }
@@ -5482,7 +5488,12 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
-        m_sections.back()->AddChild(sb);
+        if (m_currentending) {
+            //            m_currentending->AddChild(sb);
+        }
+        else {
+            m_sections.back()->AddChild(sb);
+        }
         addType(sb, tstring);
         return;
     }
@@ -19220,6 +19231,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
     else if (newsection) {
         // start a new section
+        m_currentending = NULL;
         m_currentsection = new Section;
         m_currentsection->AddChild(m_measure);
         m_currentsection->SetUuid(m_lastsection);
@@ -19228,6 +19240,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
     else {
         // outside of an ending
+        m_currentending = NULL;
         m_sections.back()->AddChild(m_measure);
     }
     m_endingnum = endnum;
