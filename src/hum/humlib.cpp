@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Aug 29 16:44:50 PDT 2020
+// Last Modified: Sun Aug 30 15:32:00 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -70504,6 +70504,10 @@ void Tool_msearch::fillMusicQueryRhythm(vector<MSearchQueryToken>& query,
 			i--;
 		}
 		if ((i > 1) && (output[i] == '4') && (output[i-1] == ' ') && (output[i-2] == '6')) {
+			output.erase(i-1, 1);
+			i--;
+		}
+      if ((i > 0) && (output[i] == '.')) {
 			output.erase(i-1, 1);
 			i--;
 		}
