@@ -828,13 +828,13 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     }
     else if (pagebreaki > 0) {
         hum::HTp token = infile[pagebreaki].token(0);
-        Sb *sb = new Sb;
-        setLocationId(sb, token);
-        m_sections.back()->AddChild(sb);
+        Pb *pb = new Pb;
+        setLocationId(pb, token);
+        m_sections.back()->AddChild(pb);
         // Maybe allow other types of line breaks here, but
         // typically break groups should be done with !LO: system.
         if (token->find("original") != std::string::npos) {
-            addType(sb, "original page");
+            addType(pb, "original");
         }
     }
 }
@@ -5480,6 +5480,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
         else {
             m_sections.back()->AddChild(sb);
         }
+        setLocationId(sb, token);
         addType(sb, tstring);
         return;
     }
@@ -5487,14 +5488,15 @@ void HumdrumInput::checkForLayoutBreak(int line)
     group = token->getLayoutParameter("PB", "g");
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
-        Sb *sb = new Sb;
+        Pb *pb = new Pb;
         if (m_currentending) {
-            //            m_currentending->AddChild(sb);
+            m_currentending->AddChild(pb);
         }
         else {
-            m_sections.back()->AddChild(sb);
+            m_sections.back()->AddChild(pb);
         }
-        addType(sb, tstring);
+        setLocationId(pb, token);
+        addType(pb, tstring);
         return;
     }
 }
