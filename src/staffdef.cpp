@@ -105,7 +105,7 @@ bool StaffDef::IsSupportedChild(Object *child)
 
 int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 {
-    ReplaceDrawingValuesInStaffDefParams *params = dynamic_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
+    ReplaceDrawingValuesInStaffDefParams *params = static_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
     assert(params);
 
     if (params->m_clef) {
@@ -126,7 +126,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 
 int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
 {
-    SetStaffDefRedrawFlagsParams *params = dynamic_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
+    SetStaffDefRedrawFlagsParams *params = static_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
     assert(params);
 
     if (params->m_clef || params->m_applyToAll) {

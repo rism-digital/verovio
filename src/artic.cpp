@@ -248,7 +248,7 @@ void ArticPart::AddSlurPositioner(FloatingCurvePositioner *positioner, bool star
 
 int Artic::CalcArtic(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = static_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     /************** Get the parent and the stem direction **************/
@@ -272,9 +272,9 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = static_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
@@ -458,7 +458,7 @@ int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = static_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;

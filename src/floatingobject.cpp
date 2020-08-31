@@ -156,19 +156,19 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         m_place = STAFFREL_above;
     }
     else if (object->Is(BREATH)) {
-        Breath *breath = dynamic_cast<Breath *>(object);
+        Breath *breath = static_cast<Breath *>(object);
         assert(breath);
         // breath above by default
         m_place = (breath->GetPlace() != STAFFREL_NONE) ? breath->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(DIR)) {
-        Dir *dir = dynamic_cast<Dir *>(object);
+        Dir *dir = static_cast<Dir *>(object);
         assert(dir);
         // dir below by default
         m_place = (dir->GetPlace() != STAFFREL_NONE) ? dir->GetPlace() : STAFFREL_below;
     }
     else if (object->Is(DYNAM)) {
-        Dynam *dynam = dynamic_cast<Dynam *>(object);
+        Dynam *dynam = static_cast<Dynam *>(object);
         assert(dynam);
         // dynam below by default
         m_place = (dynam->GetPlace() != STAFFREL_NONE) ? dynam->GetPlace() : STAFFREL_below;
@@ -178,68 +178,68 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         m_place = STAFFREL_above;
     }
     else if (object->Is(FERMATA)) {
-        Fermata *fermata = dynamic_cast<Fermata *>(object);
+        Fermata *fermata = static_cast<Fermata *>(object);
         assert(fermata);
         // fermata above by default
         m_place = (fermata->GetPlace() != STAFFREL_NONE) ? fermata->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(FING)) {
-        Fing *fing = dynamic_cast<Fing *>(object);
+        Fing *fing = static_cast<Fing *>(object);
         assert(fing);
         // fing above by default
         m_place = (fing->GetPlace() != STAFFREL_NONE) ? fing->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(HAIRPIN)) {
-        Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
+        Hairpin *hairpin = static_cast<Hairpin *>(object);
         assert(hairpin);
         // haripin below by default;
         m_place = (hairpin->GetPlace() != STAFFREL_NONE) ? hairpin->GetPlace() : STAFFREL_below;
     }
     else if (object->Is(HARM)) {
-        Harm *harm = dynamic_cast<Harm *>(object);
+        Harm *harm = static_cast<Harm *>(object);
         assert(harm);
         // harm above by default
         m_place = (harm->GetPlace() != STAFFREL_NONE) ? harm->GetPlace() : STAFFREL_above;
         if ((harm->GetPlace() == STAFFREL_NONE) && object->GetFirst()->Is(FB)) m_place = STAFFREL_below;
     }
     else if (object->Is(MORDENT)) {
-        Mordent *mordent = dynamic_cast<Mordent *>(object);
+        Mordent *mordent = static_cast<Mordent *>(object);
         assert(mordent);
         // mordent above by default;
         m_place = (mordent->GetPlace() != STAFFREL_NONE) ? mordent->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(OCTAVE)) {
-        Octave *octave = dynamic_cast<Octave *>(object);
+        Octave *octave = static_cast<Octave *>(object);
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_above : STAFFREL_below;
     }
     else if (object->Is(PEDAL)) {
-        Pedal *pedal = dynamic_cast<Pedal *>(object);
+        Pedal *pedal = static_cast<Pedal *>(object);
         assert(pedal);
         // pedal below by default
         m_place = (pedal->GetPlace() != STAFFREL_NONE) ? pedal->GetPlace() : STAFFREL_below;
     }
     else if (object->Is(REH)) {
-        Reh *reh = dynamic_cast<Reh *>(object);
+        Reh *reh = static_cast<Reh *>(object);
         assert(reh);
         // reh above by default
         m_place = (reh->GetPlace() != STAFFREL_NONE) ? reh->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(TEMPO)) {
-        Tempo *tempo = dynamic_cast<Tempo *>(object);
+        Tempo *tempo = static_cast<Tempo *>(object);
         assert(tempo);
         // tempo above by default;
         m_place = (tempo->GetPlace() != STAFFREL_NONE) ? tempo->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(TRILL)) {
-        Trill *trill = dynamic_cast<Trill *>(object);
+        Trill *trill = static_cast<Trill *>(object);
         assert(trill);
         // trill above by default;
         m_place = (trill->GetPlace() != STAFFREL_NONE) ? trill->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(TURN)) {
-        Turn *turn = dynamic_cast<Turn *>(object);
+        Turn *turn = static_cast<Turn *>(object);
         assert(turn);
         // turn above by default;
         m_place = (turn->GetPlace() != STAFFREL_NONE) ? turn->GetPlace() : STAFFREL_above;

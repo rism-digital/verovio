@@ -165,7 +165,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
 
     this->ClearClusters();
 
-    Note *curNote, *lastNote = dynamic_cast<Note *>(*iter);
+    Note *curNote, *lastNote = static_cast<Note *>(*iter);
     assert(lastNote);
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
@@ -176,7 +176,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
     Layer *layer2 = NULL;
 
     while (iter != childList->end()) {
-        curNote = dynamic_cast<Note *>(*iter);
+        curNote = static_cast<Note *>(*iter);
         assert(curNote);
         curPitch = curNote->GetDiatonicPitch();
 
@@ -244,7 +244,7 @@ Note *Chord::GetTopNote()
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
-    Note *topNote = dynamic_cast<Note *>(childList->back());
+    Note *topNote = static_cast<Note *>(childList->back());
     assert(topNote);
     return topNote;
 }
@@ -255,7 +255,7 @@ Note *Chord::GetBottomNote()
     assert(childList->size() > 0);
 
     // The first note is the bottom
-    Note *bottomNote = dynamic_cast<Note *>(childList->front());
+    Note *bottomNote = static_cast<Note *>(childList->front());
     assert(bottomNote);
     return bottomNote;
 }
@@ -389,7 +389,7 @@ bool Chord::IsVisible()
     assert(notes);
 
     for (auto &iter : *notes) {
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = static_cast<Note *>(iter);
         assert(note);
         if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
             return true;
@@ -405,7 +405,7 @@ bool Chord::HasNoteWithDots()
     assert(notes);
 
     for (auto &iter : *notes) {
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = static_cast<Note *>(iter);
         assert(note);
         if (note->GetDots() > 0) {
             return true;
@@ -421,7 +421,7 @@ bool Chord::HasNoteWithDots()
 
 int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = static_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
@@ -440,7 +440,7 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 
 int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = static_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     assert(!params->m_currentChord);
@@ -458,7 +458,7 @@ int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
 int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = static_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (params->m_permanent) {
@@ -473,7 +473,7 @@ int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 
 int Chord::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = static_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     // Set them to NULL in any case
@@ -492,9 +492,9 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = static_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -543,7 +543,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
 int Chord::CalcDots(FunctorParams *functorParams)
 {
-    CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
+    CalcDotsParams *params = static_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
     // if the chord isn't visible, stop here
@@ -560,7 +560,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
         }
     }
 
-    Dots *dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *dots = static_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
     params->m_chordDots = dots;
@@ -575,7 +575,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetBottomNote());
 
     for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
-        Note *note = dynamic_cast<Note *>(*rit);
+        Note *note = static_cast<Note *>(*rit);
         assert(note);
 
         if (note->GetDots() == 0) {
@@ -675,7 +675,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         assert((*it)->Is(NOTE));
-        Note *note = dynamic_cast<Note *>(*it);
+        Note *note = static_cast<Note *>(*it);
         assert(note);
         note->SetDrawingStem(currentStem);
     }
@@ -708,7 +708,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    CalcOnsetOffsetParams *params = static_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();

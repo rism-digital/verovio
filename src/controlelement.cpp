@@ -68,7 +68,7 @@ data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment()
 
 int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
 {
-    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    AdjustXOverflowParams *params = static_cast<AdjustXOverflowParams *>(functorParams);
     assert(params);
 
     if (!this->Is({ DIR, DYNAM, TEMPO })) {

@@ -168,13 +168,13 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     // otherwise copy the content to the corresponding existing measure
     else {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
-        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
+        Measure *existingMeasure = static_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         for (auto current : *measure->GetChildren()) {
             if (!current->Is(STAFF)) {
                 continue;
             }
-            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
+            Staff *staff = static_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
         }
@@ -226,7 +226,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         if (!item->Is(STAFF)) {
             continue;
         }
-        Staff *staff = dynamic_cast<Staff *>(item);
+        Staff *staff = static_cast<Staff *>(item);
         assert(staff);
         for (auto layer : *staff->GetChildren()) {
             assert(layer);
@@ -247,7 +247,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         staffNum = 1;
     }
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
+    Staff *staff = static_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     return SelectLayer(layerNum, staff);
 }
@@ -255,7 +255,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
 {
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
+    Staff *staff = static_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);
@@ -1421,7 +1421,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1));
+        Staff *staff = static_cast<Staff *>(measure->GetChild(staffNum - 1));
         assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
@@ -1572,7 +1572,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
     assert(node);
     assert(measure);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->GetFirst(STAFF));
+    Staff *staff = static_cast<Staff *>(measure->GetFirst(STAFF));
     assert(staff);
 
     std::string barStyle = GetContentOfChild(node, "bar-style");
@@ -2242,7 +2242,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(layer);
     m_prevLayer = layer;
 
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     bool isChord = node.select_node("chord");

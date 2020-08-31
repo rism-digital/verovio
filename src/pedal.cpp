@@ -68,7 +68,7 @@ void Pedal::Reset()
 
 int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = static_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     // Sameas not taken into account for now
@@ -98,7 +98,7 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
 
 int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = static_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (this->HasVgrp()) {

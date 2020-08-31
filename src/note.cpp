@@ -188,7 +188,7 @@ Accid *Note::GetDrawingAccid()
 bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
 {
     if (!staff) {
-        staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
         assert(staff);
     }
 
@@ -357,7 +357,7 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         return 0;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
@@ -440,7 +440,7 @@ bool Note::IsVisible()
     }
     // if the chord doens't have it, see if all the children are invisible
     else if (GetParent() && GetParent()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(GetParent());
+        Chord *chord = static_cast<Chord *>(GetParent());
         assert(chord);
         return chord->IsVisible();
     }
@@ -592,7 +592,7 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
 
 int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = static_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     /****** ties ******/
@@ -648,7 +648,7 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
 int Note::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = static_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
@@ -677,9 +677,9 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = static_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -724,10 +724,10 @@ int Note::CalcStem(FunctorParams *functorParams)
 
 int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = static_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     // Nothing to do for notes that are not in a cluster
@@ -776,7 +776,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
 int Note::CalcDots(FunctorParams *functorParams)
 {
-    CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
+    CalcDotsParams *params = static_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
     // We currently have no dots object with mensural notes
@@ -787,7 +787,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -817,7 +817,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     }
     else if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
-        dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+        dots = static_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
         params->m_chordDrawingX = this->GetDrawingX();
 
@@ -849,14 +849,14 @@ int Note::CalcDots(FunctorParams *functorParams)
 
 int Note::CalcLedgerLines(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = static_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (this->GetVisible() == BOOLEAN_false) {
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (!this->IsVisible()) {
@@ -983,7 +983,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Note::PrepareLyrics(FunctorParams *functorParams)
 {
-    PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
+    PrepareLyricsParams *params = static_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
 
     params->m_lastButOneNote = params->m_lastNote;
@@ -997,7 +997,7 @@ int Note::PreparePointersByLayer(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::PreparePointersByLayer(functorParams);
 
-    PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
+    PreparePointersByLayerParams *params = static_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
     params->m_currentNote = this;
@@ -1030,10 +1030,10 @@ int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int Note::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = static_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    Note *note = dynamic_cast<Note *>(this->ThisOrSameasAsLink());
+    Note *note = static_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
     // If the note is a secondary tied note, then ignore it
@@ -1096,10 +1096,10 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
 
 int Note::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    GenerateTimemapParams *params = static_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
-    Note *note = dynamic_cast<Note *>(this->ThisOrSameasAsLink());
+    Note *note = static_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
     double realTimeStart = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOnsetMilliseconds();
@@ -1129,7 +1129,7 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
 
 int Note::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = static_cast<TransposeParams *>(functorParams);
     assert(params);
 
     if (!this->HasPname()) return FUNCTOR_SIBLINGS;

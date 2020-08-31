@@ -48,7 +48,7 @@ void MRpt::Reset()
 
 int MRpt::GenerateMIDI(FunctorParams *functorParams)
 {
-    // GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    // GenerateMIDIParams *params = static_cast<GenerateMIDIParams *>(functorParams);
     // assert(params);
 
     LogWarning("MRpt produces empty MIDI output");
@@ -58,7 +58,7 @@ int MRpt::GenerateMIDI(FunctorParams *functorParams)
 
 int MRpt::PrepareRpt(FunctorParams *functorParams)
 {
-    PrepareRptParams *params = dynamic_cast<PrepareRptParams *>(functorParams);
+    PrepareRptParams *params = static_cast<PrepareRptParams *>(functorParams);
     assert(params);
 
     // If multiNumber is not true, nothing needs to be done

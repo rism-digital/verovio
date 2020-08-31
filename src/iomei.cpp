@@ -201,7 +201,7 @@ bool MEIOutput::Export()
             }
             Pages *pages = m_doc->GetPages();
             assert(pages);
-            Page *page = dynamic_cast<Page *>(pages->GetChild(m_page));
+            Page *page = static_cast<Page *>(pages->GetChild(m_page));
             assert(page);
             if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
@@ -3239,7 +3239,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
 bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
 {
     // If we allow <app> between <page> elements
-    // assert(dynamic_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
+    // assert(static_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
     assert(dynamic_cast<Page *>(parent));
 
     pugi::xml_node current;
@@ -3273,7 +3273,7 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
 bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
 {
     // If we allow <app> between <page> elements
-    // assert(dynamic_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
+    // assert(static_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
     assert(dynamic_cast<Page *>(parent));
 
     System *vrvSystem = new System();
@@ -3325,7 +3325,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is(SYSTEM)) {
-                    System *system = dynamic_cast<System *>(parent);
+                    System *system = static_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
                     m_doc->SetMensuralMusicOnly(true);
@@ -3474,7 +3474,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
     assert(dynamic_cast<Pages *>(parent) || dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent)
         || dynamic_cast<System *>(parent) || dynamic_cast<Ending *>(parent)
-        || dynamic_cast<EditorialElement *>(parent));
+        || static_cast<EditorialElement *>(parent));
     // assert(dynamic_cast<Pages *>(parent));
 
     ScoreDef *vrvScoreDef;
@@ -6001,7 +6001,7 @@ bool MEIInput::ReadBeamSpanAsBeam(Measure *measure, pugi::xml_node beamSpan)
         return false;
     }
 
-    Layer *parentLayer = dynamic_cast<Layer *>(startChild->GetParent());
+    Layer *parentLayer = static_cast<Layer *>(startChild->GetParent());
     assert(parentLayer);
 
     int startIdx = startChild->GetIdx();
@@ -6103,7 +6103,7 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
         return false;
     }
 
-    Layer *parentLayer = dynamic_cast<Layer *>(startChild->GetParent());
+    Layer *parentLayer = static_cast<Layer *>(startChild->GetParent());
     assert(parentLayer);
 
     int startIdx = startChild->GetIdx();
@@ -6352,7 +6352,7 @@ void MEIInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
     if (system->m_systemRightMar == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
 
-    Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
+    Page *page = static_cast<Page *>(system->GetFirstAncestor(PAGE));
     assert(page);
     measure->m_xAbs = system->m_systemLeftMar;
     measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;

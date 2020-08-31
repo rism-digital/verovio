@@ -68,7 +68,7 @@ void Mensur::Reset()
 
 int Mensur::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = static_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     params->m_mensur = this;

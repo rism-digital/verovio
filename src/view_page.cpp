@@ -123,7 +123,7 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     // longest key signature of the staffDefs
     const ArrayOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
     for (ArrayOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
+        StaffDef *staffDef = static_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
         KeySig *keySig = staffDef->GetKeySig();
@@ -286,7 +286,7 @@ void View::DrawStaffGrp(
     StaffDef *firstDef = NULL;
     ArrayOfObjects::const_iterator iter;
     for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+        StaffDef *staffDef = static_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
             firstDef = staffDef;
@@ -297,7 +297,7 @@ void View::DrawStaffGrp(
     StaffDef *lastDef = NULL;
     ArrayOfObjects::const_reverse_iterator riter;
     for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
+        StaffDef *staffDef = static_cast<StaffDef *>(*riter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
             lastDef = staffDef;
@@ -692,7 +692,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         StaffDef *firstDef = NULL;
         ArrayOfObjects::const_iterator iter;
         for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
-            StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+            StaffDef *staffDef = static_cast<StaffDef *>(*iter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
                 firstDef = staffDef;
@@ -703,7 +703,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         StaffDef *lastDef = NULL;
         ArrayOfObjects::const_reverse_iterator riter;
         for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
-            StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
+            StaffDef *staffDef = static_cast<StaffDef *>(*riter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
                 lastDef = staffDef;
@@ -916,7 +916,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // Draw the barlines only with measured music
     if (measure->IsMeasuredMusic()) {
-        System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        System *system = static_cast<System *>(measure->GetFirstAncestor(SYSTEM));
         assert(system);
         if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
             DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetLeftBarLine()->GetDrawingX(),
@@ -1199,7 +1199,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
     assert(layer);
     assert(octave);
 
-    Staff *parentStaff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    Staff *parentStaff = static_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(parentStaff); // Pointer to parent has to be a staff
 
     static int touches[]
@@ -1329,7 +1329,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
         if (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_left_right) {
             // Right divider is not taken into account in the layout calculation and can collision with the music
             // content
-            Measure *lastMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+            Measure *lastMeasure = static_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
             assert(lastMeasure);
             int x4 = lastMeasure->GetDrawingX() + lastMeasure->GetRightBarLineRight();
             int x3 = x4 - m_doc->GetDrawingUnit(100) * 6;
@@ -1359,7 +1359,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is(SCOREDEF)) {
             // nothing to do, then
-            ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(current);
+            ScoreDef *scoreDef = static_cast<ScoreDef *>(current);
             assert(scoreDef);
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
@@ -1678,7 +1678,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
         dc->StartGraphic(element, "", element->GetUuid());
     }
 
-    Annot *annot = dynamic_cast<Annot *>(element);
+    Annot *annot = static_cast<Annot *>(element);
     assert(annot);
     dc->AddDescription(UTF16to8(annot->GetText(annot)));
 

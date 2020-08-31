@@ -100,7 +100,7 @@ NeumeGroup Neume::GetNeumeGroup()
     std::string key = "";
 
     for (; iter != children.end(); iter++) {
-        Nc *current = dynamic_cast<Nc *>(*iter);
+        Nc *current = static_cast<Nc *>(*iter);
         assert(current);
 
         int pitchDifference = current->PitchDifferenceTo(previous);
@@ -134,7 +134,7 @@ std::vector<int> Neume::GetPitchDifferences()
     iter++;
 
     for (; iter != ncChildren.end(); iter++) {
-        Nc *current = dynamic_cast<Nc *>(*iter);
+        Nc *current = static_cast<Nc *>(*iter);
         assert(current);
         pitchDifferences.push_back(current->PitchDifferenceTo(previous));
         previous = current;
@@ -156,7 +156,7 @@ bool Neume::GenerateChildMelodic()
 
     // Iterate on second to last neume component and add intm value
     for (; iter != children.end(); iter++) {
-        Nc *current = dynamic_cast<Nc *>(*iter);
+        Nc *current = static_cast<Nc *>(*iter);
         assert(current);
         std::string intmValue;
 
@@ -188,7 +188,7 @@ PitchInterface *Neume::GetHighestPitch()
     PitchInterface *max = (*it)->GetPitchInterface();
     if (!max) return NULL;
     for (it++; it != pitchChildren.end(); it++) {
-        PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
+        PitchInterface *pi = static_cast<PitchInterface *>((*it)->GetPitchInterface());
         assert(pi);
         if (pi->PitchDifferenceTo(max) > 0) {
             max = pi;
@@ -207,7 +207,7 @@ PitchInterface *Neume::GetLowestPitch()
     PitchInterface *min = (*it)->GetPitchInterface();
     if (!min) return NULL;
     for (it++; it != pitchChildren.end(); it++) {
-        PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
+        PitchInterface *pi = static_cast<PitchInterface *>((*it)->GetPitchInterface());
         assert(pi);
         if (pi->PitchDifferenceTo(min) < 0) {
             min = pi;

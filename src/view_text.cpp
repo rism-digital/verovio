@@ -167,27 +167,27 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
     assert(element);
 
     if (element->Is(FIGURE)) {
-        F *f = dynamic_cast<F *>(element);
+        F *f = static_cast<F *>(element);
         assert(f);
         DrawF(dc, f, params);
     }
     else if (element->Is(LB)) {
-        Lb *lb = dynamic_cast<Lb *>(element);
+        Lb *lb = static_cast<Lb *>(element);
         assert(lb);
         DrawLb(dc, lb, params);
     }
     else if (element->Is(NUM)) {
-        Num *num = dynamic_cast<Num *>(element);
+        Num *num = static_cast<Num *>(element);
         assert(num);
         DrawNum(dc, num, params);
     }
     else if (element->Is(REND)) {
-        Rend *rend = dynamic_cast<Rend *>(element);
+        Rend *rend = static_cast<Rend *>(element);
         assert(rend);
         DrawRend(dc, rend, params);
     }
     else if (element->Is(TEXT)) {
-        Text *text = dynamic_cast<Text *>(element);
+        Text *text = static_cast<Text *>(element);
         assert(text);
         DrawText(dc, text, params);
     }

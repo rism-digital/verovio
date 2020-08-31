@@ -89,7 +89,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         }
         // also remove notes within chords
         if ((*iter)->Is(NOTE)) {
-            Note *note = dynamic_cast<Note *>(*iter);
+            Note *note = static_cast<Note *>(*iter);
             assert(note);
             if (note->IsChordTone()) {
                 iter = childList->erase(iter);
@@ -99,7 +99,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     InitCoords(childList, staff, BEAMPLACE_NONE);
@@ -163,7 +163,7 @@ void FTrem::InitCoords(ArrayOfObjects *childList)
 
 int FTrem::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = static_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     const ArrayOfObjects *fTremChildren = this->GetList(this);
@@ -180,9 +180,9 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
     this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = static_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    Staff *staff = static_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, this);
@@ -204,10 +204,10 @@ int FTrem::ResetDrawing(FunctorParams *functorParams)
 
 int FTrem::GenerateMIDI(FunctorParams *functorParams)
 {
-    // GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    // GenerateMIDIParams *params = static_cast<GenerateMIDIParams *>(functorParams);
     // assert(params);
 
-    FTrem *fTrem = dynamic_cast<FTrem *>(this);
+    FTrem *fTrem = static_cast<FTrem *>(this);
     assert(fTrem);
 
     if (!fTrem->HasUnitdur()) {
