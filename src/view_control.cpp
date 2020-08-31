@@ -198,6 +198,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
     // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
+        if (element->Is(PEDAL) && (static_cast<Pedal *>(element)->GetDir() == pedalLog_DIR_up)) return;
         // we use the start measure
         measure = interface->GetStartMeasure();
         if (!Check(measure)) return;
