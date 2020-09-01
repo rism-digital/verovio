@@ -80,7 +80,7 @@ BarLineAttr::~BarLineAttr() {}
 
 int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = static_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     assert(m_alignment);

@@ -41,6 +41,8 @@ namespace vrv {
 
 enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, MEI_5_0_0_dev };
 
+#define vrv_cast static_cast
+
 //----------------------------------------------------------------------------
 // Default midi values
 //----------------------------------------------------------------------------

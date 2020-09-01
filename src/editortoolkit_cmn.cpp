@@ -283,7 +283,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         return false;
     }
 
-    Measure *measure = static_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
@@ -330,7 +330,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
 
     /*
-    Measure *measure = static_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
@@ -431,7 +431,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
     }
 
     if (object->Is(CHORD)) {
-        Chord *currentChord = static_cast<Chord *>(object);
+        Chord *currentChord = vrv_cast<Chord *>(object);
         assert(currentChord);
         Note *note = new Note();
         currentChord->AddChild(note);
@@ -439,7 +439,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         return true;
     }
     else if (object->Is(NOTE)) {
-        Note *currentNote = static_cast<Note *>(object);
+        Note *currentNote = vrv_cast<Note *>(object);
         assert(currentNote);
 
         Chord *currentChord = currentNote->IsChordTone();
@@ -493,7 +493,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         return true;
     }
     else if (object->Is(REST)) {
-        Rest *rest = static_cast<Rest *>(object);
+        Rest *rest = vrv_cast<Rest *>(object);
         assert(rest);
         Note *note = new Note();
         note->DurationInterface::operator=(*rest);

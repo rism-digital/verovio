@@ -55,7 +55,7 @@ bool Fig::IsSupportedChild(Object *child)
 
 int Fig::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = static_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     Svg *svg = dynamic_cast<Svg *>(this->FindDescendantByType(SVG));

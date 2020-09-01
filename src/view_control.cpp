@@ -78,71 +78,71 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         system->AddToDrawingList(element);
     }
     else if (element->Is(ARPEG)) {
-        Arpeg *arpeg = static_cast<Arpeg *>(element);
+        Arpeg *arpeg = vrv_cast<Arpeg *>(element);
         assert(arpeg);
         DrawArpeg(dc, arpeg, measure, system);
     }
     else if (element->Is(BREATH)) {
-        Breath *breath = static_cast<Breath *>(element);
+        Breath *breath = vrv_cast<Breath *>(element);
         assert(breath);
         DrawBreath(dc, breath, measure, system);
     }
     else if (element->Is(DIR)) {
-        Dir *dir = static_cast<Dir *>(element);
+        Dir *dir = vrv_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
         system->AddToDrawingListIfNeccessary(dir);
     }
     else if (element->Is(DYNAM)) {
-        Dynam *dynam = static_cast<Dynam *>(element);
+        Dynam *dynam = vrv_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
         system->AddToDrawingListIfNeccessary(dynam);
     }
     else if (element->Is(FERMATA)) {
-        Fermata *fermata = static_cast<Fermata *>(element);
+        Fermata *fermata = vrv_cast<Fermata *>(element);
         assert(fermata);
         DrawFermata(dc, fermata, measure, system);
     }
     else if (element->Is(FING)) {
-        Fing *fing = static_cast<Fing *>(element);
+        Fing *fing = vrv_cast<Fing *>(element);
         assert(fing);
         DrawFing(dc, fing, measure, system);
     }
     else if (element->Is(HARM)) {
-        Harm *harm = static_cast<Harm *>(element);
+        Harm *harm = vrv_cast<Harm *>(element);
         assert(harm);
         DrawHarm(dc, harm, measure, system);
     }
     else if (element->Is(MORDENT)) {
-        Mordent *mordent = static_cast<Mordent *>(element);
+        Mordent *mordent = vrv_cast<Mordent *>(element);
         assert(mordent);
         DrawMordent(dc, mordent, measure, system);
     }
     else if (element->Is(PEDAL)) {
-        Pedal *pedal = static_cast<Pedal *>(element);
+        Pedal *pedal = vrv_cast<Pedal *>(element);
         assert(pedal);
         DrawPedal(dc, pedal, measure, system);
         system->AddToDrawingListIfNeccessary(pedal);
     }
     else if (element->Is(REH)) {
-        Reh *reh = static_cast<Reh *>(element);
+        Reh *reh = vrv_cast<Reh *>(element);
         assert(reh);
         DrawReh(dc, reh, measure, system);
     }
     else if (element->Is(TEMPO)) {
-        Tempo *tempo = static_cast<Tempo *>(element);
+        Tempo *tempo = vrv_cast<Tempo *>(element);
         assert(tempo);
         DrawTempo(dc, tempo, measure, system);
     }
     else if (element->Is(TRILL)) {
-        Trill *trill = static_cast<Trill *>(element);
+        Trill *trill = vrv_cast<Trill *>(element);
         assert(trill);
         DrawTrill(dc, trill, measure, system);
         system->AddToDrawingListIfNeccessary(trill);
     }
     else if (element->Is(TURN)) {
-        Turn *turn = static_cast<Turn *>(element);
+        Turn *turn = vrv_cast<Turn *>(element);
         assert(turn);
         DrawTurn(dc, turn, measure, system);
     }
@@ -155,7 +155,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     assert(system);
 
     if (dc->Is(BBOX_DEVICE_CONTEXT)) {
-        BBoxDeviceContext *bBoxDC = static_cast<BBoxDeviceContext *>(dc);
+        BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
             if (element->Is({ BRACKETSPAN, HAIRPIN, PHRASE, OCTAVE, SLUR, TIE })) return;
@@ -911,7 +911,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     assert(tie->GetCurrentFloatingPositioner());
     FloatingPositioner *positioner = tie->GetCurrentFloatingPositioner();
     assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
-    FloatingCurvePositioner *curve = static_cast<FloatingCurvePositioner *>(positioner);
+    FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
     curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
 
@@ -1217,9 +1217,9 @@ void View::DrawSylConnector(
         // If we do not want to show hyphens at the start of a system and the end is at time 0.0
         if (m_options->m_lyricNoStartHyphen.GetValue() && (syl->GetEnd()->GetAlignment()->GetTime() == 0.0)) {
             // Return but only if the end is in the first measure of the system...
-            Measure *measure = static_cast<Measure *>(syl->GetEnd()->GetFirstAncestor(MEASURE));
+            Measure *measure = vrv_cast<Measure *>(syl->GetEnd()->GetFirstAncestor(MEASURE));
             assert(measure);
-            System *system = static_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+            System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
             assert(system);
             if (measure == dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE))) {
                 return;
@@ -1333,7 +1333,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int bottom = bottomNote->GetDrawingY();
 
     // We arbitrarily look at the top note
-    Staff *staff = static_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
     assert(staff);
     bool drawingCueSize = topNote->GetDrawingCueSize();
 
@@ -2320,7 +2320,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
     assert(system);
 
     if (element->Is(BOUNDARY_END)) {
-        BoundaryEnd *boundaryEnd = static_cast<BoundaryEnd *>(element);
+        BoundaryEnd *boundaryEnd = vrv_cast<BoundaryEnd *>(element);
         assert(boundaryEnd);
         assert(boundaryEnd->GetStart());
         dc->StartGraphic(element, boundaryEnd->GetStart()->GetUuid(), element->GetUuid());
@@ -2354,7 +2354,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     assert(system);
 
     if (dc->Is(BBOX_DEVICE_CONTEXT)) {
-        BBoxDeviceContext *bBoxDC = static_cast<BBoxDeviceContext *>(dc);
+        BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
             return;

@@ -113,7 +113,7 @@ void RunningElement::FilterList(ArrayOfObjects *childList)
         AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
         assert(interface);
         pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = static_cast<TextElement *>(*iter);
+        TextElement *text = vrv_cast<TextElement *>(*iter);
         assert(text);
         m_cells[pos].push_back(text);
     }
@@ -402,7 +402,7 @@ int RunningElement::SaveEnd(FunctorParams *functorParams)
 
 int RunningElement::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = static_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     params->m_pageWidth = this->GetWidth();

@@ -54,6 +54,7 @@
 #include "attdef.h"
 #include "atttypes.h"
 #include "vrv.h"
+#include "vrvdef.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -162,7 +163,7 @@ data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW() const
 
 data_PITCHNAME TransPitch::GetPitchName() const
 {
-    return static_cast<data_PITCHNAME>(m_pname + PITCHNAME_c);
+    return vrv_cast<data_PITCHNAME>(m_pname + PITCHNAME_c);
 }
 
 std::wstring TransPitch::GetPitchString() const

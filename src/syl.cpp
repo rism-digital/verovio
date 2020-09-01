@@ -128,7 +128,7 @@ int Syl::GetDrawingHeight() const
 
 int Syl::PrepareLyrics(FunctorParams *functorParams)
 {
-    PrepareLyricsParams *params = static_cast<PrepareLyricsParams *>(functorParams);
+    PrepareLyricsParams *params = vrv_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
 
     Verse *verse = dynamic_cast<Verse *>(this->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));

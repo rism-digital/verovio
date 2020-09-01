@@ -129,7 +129,7 @@ int Rest::GetRestLocOffset(int loc)
 
 int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = static_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (this->HasFermata()) {
@@ -168,7 +168,7 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Rest::CalcDots(FunctorParams *functorParams)
 {
-    CalcDotsParams *params = static_cast<CalcDotsParams *>(functorParams);
+    CalcDotsParams *params = vrv_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
     // We currently have no dots object with mensural rests
@@ -181,7 +181,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = static_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -190,7 +190,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     int staffSize = staff->m_drawingStaffSize;
 
     // For single rests we need here to set the dot loc
-    Dots *dots = static_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
     std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);

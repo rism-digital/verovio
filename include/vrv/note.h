@@ -374,7 +374,7 @@ public:
     bool operator()(const Object *first, const Object *second) const
     {
         const Note *n1 = dynamic_cast<const Note *>(first);
-        const Note *n2 = static_cast<const Note *>(second);
+        const Note *n2 = vrv_cast<const Note *>(second);
         assert(n1 && n2);
         return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
     }

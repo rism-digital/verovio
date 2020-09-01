@@ -52,7 +52,7 @@ void SystemElement::Reset()
 
 int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = static_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
@@ -62,7 +62,7 @@ int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
 
 int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = static_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     assert(params->m_targetSystem);
@@ -73,7 +73,7 @@ int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
 
 int SystemElement::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = static_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -89,7 +89,7 @@ int SystemElement::CastOffSystems(FunctorParams *functorParams)
 
 int SystemElement::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = static_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);

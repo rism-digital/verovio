@@ -140,7 +140,7 @@ void TupletBracket::Reset()
 
 int TupletBracket::GetDrawingXLeft()
 {
-    Tuplet *tuplet = static_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
     return tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
@@ -148,7 +148,7 @@ int TupletBracket::GetDrawingXLeft()
 
 int TupletBracket::GetDrawingXRight()
 {
-    Tuplet *tuplet = static_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
     return tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
@@ -156,7 +156,7 @@ int TupletBracket::GetDrawingXRight()
 
 int TupletBracket::GetDrawingYLeft()
 {
-    Tuplet *tuplet = static_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -173,7 +173,7 @@ int TupletBracket::GetDrawingYLeft()
 
 int TupletBracket::GetDrawingYRight()
 {
-    Tuplet *tuplet = static_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -231,7 +231,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         return xLeft + ((xRight - xLeft) / 2);
     }
     else {
-        Tuplet *tuplet = static_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+        Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
         assert(tuplet && tuplet->GetDrawingLeft() && tuplet->GetDrawingRight());
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
         int xRight = tuplet->GetDrawingRight()->GetDrawingX();
@@ -368,7 +368,7 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int Stem::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = static_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     assert(params->m_staff);
@@ -428,7 +428,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
-        flag = static_cast<Flag *>(this->FindDescendantByType(FLAG));
+        flag = vrv_cast<Flag *>(this->FindDescendantByType(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
         slashFactor += (params->m_dur > DUR_8) ? 2 : 1;

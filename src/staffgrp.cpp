@@ -111,7 +111,7 @@ int StaffGrp::GetMaxStaffSize()
 
     StaffDef *staffDef = NULL;
     for (auto &child : *childList) {
-        staffDef = static_cast<StaffDef *>(child);
+        staffDef = vrv_cast<StaffDef *>(child);
         assert(staffDef);
         if (staffDef->HasScale() && staffDef->GetScale() >= max) {
             max = staffDef->GetScale();
@@ -130,14 +130,14 @@ int StaffGrp::GetMaxStaffSize()
 
 int StaffGrp::OptimizeScoreDefEnd(FunctorParams *)
 {
-    // OptimizeScoreDefParams *params = static_cast<OptimizeScoreDefParams *>(functorParams);
+    // OptimizeScoreDefParams *params = vrv_cast<OptimizeScoreDefParams *>(functorParams);
     // assert(params);
 
     this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
     for (auto &child : m_children) {
         if (child->Is(STAFFDEF)) {
-            StaffDef *staffDef = static_cast<StaffDef *>(child);
+            StaffDef *staffDef = vrv_cast<StaffDef *>(child);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
                 this->SetDrawingVisibility(OPTIMIZATION_SHOW);
@@ -145,7 +145,7 @@ int StaffGrp::OptimizeScoreDefEnd(FunctorParams *)
             }
         }
         else if (child->Is(STAFFGRP)) {
-            StaffGrp *staffGrp = static_cast<StaffGrp *>(child);
+            StaffGrp *staffGrp = vrv_cast<StaffGrp *>(child);
             assert(staffGrp);
             if (staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
                 this->SetDrawingVisibility(OPTIMIZATION_SHOW);
@@ -157,7 +157,7 @@ int StaffGrp::OptimizeScoreDefEnd(FunctorParams *)
     if ((this->GetSymbol() == staffGroupingSym_SYMBOL_brace) && (this->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) {
         for (auto &child : m_children) {
             if (child->Is(STAFFDEF)) {
-                StaffDef *staffDef = static_cast<StaffDef *>(child);
+                StaffDef *staffDef = vrv_cast<StaffDef *>(child);
                 assert(staffDef);
                 staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
             }

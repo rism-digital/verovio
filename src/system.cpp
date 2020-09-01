@@ -184,17 +184,17 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     ListOfObjects children;
     this->FindAllDescendantBetween(&children, &matchType, start, end);
 
-    Layer *layerStart = static_cast<Layer *>(start->GetFirstAncestor(LAYER));
+    Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
-    Staff *staffStart = static_cast<Staff *>(layerStart->GetFirstAncestor(STAFF));
+    Staff *staffStart = vrv_cast<Staff *>(layerStart->GetFirstAncestor(STAFF));
     assert(staffStart);
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     for (auto &child : children) {
-        Layer *layer = static_cast<Layer *>((child)->GetFirstAncestor(LAYER));
+        Layer *layer = vrv_cast<Layer *>((child)->GetFirstAncestor(LAYER));
         assert(layer);
-        Staff *staff = static_cast<Staff *>((child)->GetFirstAncestor(STAFF));
+        Staff *staff = vrv_cast<Staff *>((child)->GetFirstAncestor(STAFF));
         assert(staff);
 
         // If the slur is spanning over several measure, the the children list will include note and chords
@@ -230,28 +230,28 @@ void System::AddToDrawingListIfNeccessary(Object *object)
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {
-        Dir *dir = static_cast<Dir *>(object);
+        Dir *dir = vrv_cast<Dir *>(object);
         assert(dir);
         if (dir->GetEnd() || (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true))) {
             this->AddToDrawingList(dir);
         }
     }
     else if (object->Is(DYNAM)) {
-        Dynam *dynam = static_cast<Dynam *>(object);
+        Dynam *dynam = vrv_cast<Dynam *>(object);
         assert(dynam);
         if (dynam->GetEnd() || (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true))) {
             this->AddToDrawingList(dynam);
         }
     }
     else if (object->Is(PEDAL)) {
-        Pedal *pedal = static_cast<Pedal *>(object);
+        Pedal *pedal = vrv_cast<Pedal *>(object);
         assert(pedal);
         if (pedal->GetEnd()) {
             this->AddToDrawingList(pedal);
         }
     }
     else if (object->Is(TRILL)) {
-        Trill *trill = static_cast<Trill *>(object);
+        Trill *trill = vrv_cast<Trill *>(object);
         assert(trill);
         if (trill->GetEnd() && (trill->GetExtender() != BOOLEAN_false)) {
             this->AddToDrawingList(trill);
@@ -277,7 +277,7 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
 int System::OptimizeScoreDef(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = static_cast<OptimizeScoreDefParams *>(functorParams);
+    OptimizeScoreDefParams *params = vrv_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
 
     this->IsDrawingOptimized(true);
@@ -297,7 +297,7 @@ int System::OptimizeScoreDef(FunctorParams *functorParams)
 
 int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = static_cast<OptimizeScoreDefParams *>(functorParams);
+    OptimizeScoreDefParams *params = vrv_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
@@ -326,7 +326,7 @@ int System::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int System::ApplyPPUFactor(FunctorParams *functorParams)
 {
-    ApplyPPUFactorParams *params = static_cast<ApplyPPUFactorParams *>(functorParams);
+    ApplyPPUFactorParams *params = vrv_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
@@ -339,7 +339,7 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
 
 int System::AlignHorizontally(FunctorParams *functorParams)
 {
-    AlignHorizontallyParams *params = static_cast<AlignHorizontallyParams *>(functorParams);
+    AlignHorizontallyParams *params = vrv_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
     // since we are starting a new system its first scoreDef will need to be a SYSTEM_SCOREDEF
@@ -350,7 +350,7 @@ int System::AlignHorizontally(FunctorParams *functorParams)
 
 int System::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = static_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     params->m_systemAligner = &m_systemAligner;
@@ -360,7 +360,7 @@ int System::AlignVertically(FunctorParams *functorParams)
 
 int System::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = static_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     params->m_cumulatedShift = 0;
@@ -373,7 +373,7 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
 
 int System::AdjustXOverflow(FunctorParams *functorParams)
 {
-    AdjustXOverflowParams *params = static_cast<AdjustXOverflowParams *>(functorParams);
+    AdjustXOverflowParams *params = vrv_cast<AdjustXOverflowParams *>(functorParams);
     assert(params);
 
     params->m_currentSystem = this;
@@ -385,7 +385,7 @@ int System::AdjustXOverflow(FunctorParams *functorParams)
 
 int System::AdjustXOverflowEnd(FunctorParams *functorParams)
 {
-    AdjustXOverflowParams *params = static_cast<AdjustXOverflowParams *>(functorParams);
+    AdjustXOverflowParams *params = vrv_cast<AdjustXOverflowParams *>(functorParams);
     assert(params);
 
     // Continue if no measure of not widest element
@@ -422,7 +422,7 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
 
 int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 {
-    AdjustHarmGrpsSpacingParams *params = static_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    AdjustHarmGrpsSpacingParams *params = vrv_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
     assert(params);
 
     // reset it, but not the current grpId!
@@ -437,7 +437,7 @@ int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 
 int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
 {
-    AdjustHarmGrpsSpacingParams *params = static_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    AdjustHarmGrpsSpacingParams *params = vrv_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
     assert(params);
 
     // End of the first pass - loop over for each group id
@@ -477,7 +477,7 @@ int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
 
 int System::AdjustSylSpacing(FunctorParams *functorParams)
 {
-    AdjustSylSpacingParams *params = static_cast<AdjustSylSpacingParams *>(functorParams);
+    AdjustSylSpacingParams *params = vrv_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
     // reset it
@@ -492,7 +492,7 @@ int System::AdjustSylSpacing(FunctorParams *functorParams)
 
 int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
 {
-    AdjustSylSpacingParams *params = static_cast<AdjustSylSpacingParams *>(functorParams);
+    AdjustSylSpacingParams *params = vrv_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
     if (!params->m_previousMeasure) {
@@ -520,7 +520,7 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
 
 int System::AdjustYPos(FunctorParams *functorParams)
 {
-    AdjustYPosParams *params = static_cast<AdjustYPosParams *>(functorParams);
+    AdjustYPosParams *params = vrv_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
     // We need to call this explicitly because changing the YRel of the StaffAligner (below in the functor)
@@ -536,7 +536,7 @@ int System::AdjustYPos(FunctorParams *functorParams)
 
 int System::AlignMeasures(FunctorParams *functorParams)
 {
-    AlignMeasuresParams *params = static_cast<AlignMeasuresParams *>(functorParams);
+    AlignMeasuresParams *params = vrv_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
     SetDrawingXRel(this->m_systemLeftMar + this->GetDrawingLabelsWidth());
@@ -548,7 +548,7 @@ int System::AlignMeasures(FunctorParams *functorParams)
 
 int System::AlignMeasuresEnd(FunctorParams *functorParams)
 {
-    AlignMeasuresParams *params = static_cast<AlignMeasuresParams *>(functorParams);
+    AlignMeasuresParams *params = vrv_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
     m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
@@ -559,7 +559,7 @@ int System::AlignMeasuresEnd(FunctorParams *functorParams)
 
 int System::AlignSystems(FunctorParams *functorParams)
 {
-    AlignSystemsParams *params = static_cast<AlignSystemsParams *>(functorParams);
+    AlignSystemsParams *params = vrv_cast<AlignSystemsParams *>(functorParams);
     assert(params);
     assert(m_systemAligner.GetBottomAlignment());
 
@@ -587,7 +587,7 @@ int System::AlignSystems(FunctorParams *functorParams)
 
 int System::JustifyX(FunctorParams *functorParams)
 {
-    JustifyXParams *params = static_cast<JustifyXParams *>(functorParams);
+    JustifyXParams *params = vrv_cast<JustifyXParams *>(functorParams);
     assert(params);
 
     assert(GetParent());
@@ -625,7 +625,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
 int System::JustifyY(FunctorParams *functorParams)
 {
-    JustifyYParams *params = static_cast<JustifyYParams *>(functorParams);
+    JustifyYParams *params = vrv_cast<JustifyYParams *>(functorParams);
     assert(params);
 
     const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
@@ -648,7 +648,7 @@ int System::JustifyY(FunctorParams *functorParams)
 
 int System::AdjustStaffOverlap(FunctorParams *functorParams)
 {
-    AdjustStaffOverlapParams *params = static_cast<AdjustStaffOverlapParams *>(functorParams);
+    AdjustStaffOverlapParams *params = vrv_cast<AdjustStaffOverlapParams *>(functorParams);
     assert(params);
 
     params->m_previous = NULL;
@@ -659,7 +659,7 @@ int System::AdjustStaffOverlap(FunctorParams *functorParams)
 
 int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPositionersParams *params = static_cast<AdjustFloatingPositionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = vrv_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
     params->m_inBetween = false;
@@ -781,7 +781,7 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 int System::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
 {
     AdjustFloatingPositionersBetweenParams *params
-        = static_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
+        = vrv_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
     assert(params);
 
     params->m_previousStaffPositioners = NULL;
@@ -793,7 +793,7 @@ int System::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
 
 int System::AdjustSlurs(FunctorParams *functorParams)
 {
-    AdjustSlursParams *params = static_cast<AdjustSlursParams *>(functorParams);
+    AdjustSlursParams *params = vrv_cast<AdjustSlursParams *>(functorParams);
     assert(params);
 
     m_systemAligner.Process(params->m_functor, params);
@@ -803,7 +803,7 @@ int System::AdjustSlurs(FunctorParams *functorParams)
 
 int System::CastOffPages(FunctorParams *functorParams)
 {
-    CastOffPagesParams *params = static_cast<CastOffPagesParams *>(functorParams);
+    CastOffPagesParams *params = vrv_cast<CastOffPagesParams *>(functorParams);
     assert(params);
 
     int currentShift = params->m_shift;
@@ -831,7 +831,7 @@ int System::CastOffPages(FunctorParams *functorParams)
     // We want to move the system to the currentPage. However, we cannot use DetachChild
     // from the contentPage because this screws up the iterator. Relinquish gives up
     // the ownership of the system - the contentPage itself will be deleted afterwards.
-    System *system = static_cast<System *>(params->m_contentPage->Relinquish(this->GetIdx()));
+    System *system = vrv_cast<System *>(params->m_contentPage->Relinquish(this->GetIdx()));
     assert(system);
     params->m_currentPage->AddChild(system);
 
@@ -840,7 +840,7 @@ int System::CastOffPages(FunctorParams *functorParams)
 
 int System::UnCastOff(FunctorParams *functorParams)
 {
-    UnCastOffParams *params = static_cast<UnCastOffParams *>(functorParams);
+    UnCastOffParams *params = vrv_cast<UnCastOffParams *>(functorParams);
     assert(params);
 
     // Just move all the content of the system to the continous one (parameter)
@@ -853,7 +853,7 @@ int System::UnCastOff(FunctorParams *functorParams)
 
 int System::CastOffSystemsEnd(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = static_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     if (params->m_pendingObjects.empty()) return FUNCTOR_STOP;

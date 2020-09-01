@@ -237,7 +237,7 @@ std::wstring Dynam::GetSymbolStr(const std::wstring &str)
 
 int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = static_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (this->HasVgrp()) {

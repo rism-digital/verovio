@@ -1478,9 +1478,9 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         if (!m_doc.HasMidiTimemap()) {
             LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
         }
-        Note *note = static_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
-        Measure *measure = static_cast<Measure *>(note->GetFirstAncestor(MEASURE));
+        Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
         // For now ignore repeats and access always the first
         timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
@@ -1500,7 +1500,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 
     jsonxx::Object o;
     if (element->Is(NOTE)) {
-        Note *note = static_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
         int timeOfElement = this->GetTimeForElement(xmlId);
         int pitchOfElement = note->GetMIDIPitch();

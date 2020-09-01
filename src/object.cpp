@@ -767,21 +767,21 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     bool processChildren = true;
     if (functor->m_visibleOnly) {
         if (this->IsEditorialElement()) {
-            EditorialElement *editorialElement = static_cast<EditorialElement *>(this);
+            EditorialElement *editorialElement = vrv_cast<EditorialElement *>(this);
             assert(editorialElement);
             if (editorialElement->m_visibility == Hidden) {
                 processChildren = false;
             }
         }
         else if (this->Is(MDIV)) {
-            Mdiv *mdiv = static_cast<Mdiv *>(this);
+            Mdiv *mdiv = vrv_cast<Mdiv *>(this);
             assert(mdiv);
             if (mdiv->m_visibility == Hidden) {
                 processChildren = false;
             }
         }
         else if (this->IsSystemElement()) {
-            SystemElement *systemElement = static_cast<SystemElement *>(this);
+            SystemElement *systemElement = vrv_cast<SystemElement *>(this);
             assert(systemElement);
             if (systemElement->m_visibility == Hidden) {
                 processChildren = false;
@@ -813,7 +813,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                 ClassId classId = iter->GetClassId();
                 ArrayOfComparisons::iterator comparisonIter
                     = std::find_if(filters->begin(), filters->end(), [classId](Comparison *iter) -> bool {
-                          ClassIdComparison *attComparison = static_cast<ClassIdComparison *>(iter);
+                          ClassIdComparison *attComparison = vrv_cast<ClassIdComparison *>(iter);
                           assert(attComparison);
                           return classId == attComparison->GetType();
                       });
@@ -1008,7 +1008,7 @@ std::wstring TextListInterface::GetText(Object *node)
         if ((*it)->Is(LB)) {
             continue;
         }
-        Text *text = static_cast<Text *>(*it);
+        Text *text = vrv_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
     }
@@ -1026,7 +1026,7 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
             concatText.clear();
             continue;
         }
-        Text *text = static_cast<Text *>(*it);
+        Text *text = vrv_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
     }
@@ -1078,7 +1078,7 @@ void Functor::Call(Object *ptr, FunctorParams *functorParams)
 
 int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
 {
-    AddLayerElementToFlatListParams *params = static_cast<AddLayerElementToFlatListParams *>(functorParams);
+    AddLayerElementToFlatListParams *params = vrv_cast<AddLayerElementToFlatListParams *>(functorParams);
     assert(params);
 
     params->m_flatList->push_back(this);
@@ -1089,7 +1089,7 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
 
 int Object::FindByUuid(FunctorParams *functorParams)
 {
-    FindByUuidParams *params = static_cast<FindByUuidParams *>(functorParams);
+    FindByUuidParams *params = vrv_cast<FindByUuidParams *>(functorParams);
     assert(params);
 
     if (params->m_element) {
@@ -1108,7 +1108,7 @@ int Object::FindByUuid(FunctorParams *functorParams)
 
 int Object::FindByComparison(FunctorParams *functorParams)
 {
-    FindByComparisonParams *params = static_cast<FindByComparisonParams *>(functorParams);
+    FindByComparisonParams *params = vrv_cast<FindByComparisonParams *>(functorParams);
     assert(params);
 
     if (params->m_element) {
@@ -1128,7 +1128,7 @@ int Object::FindByComparison(FunctorParams *functorParams)
 
 int Object::FindExtremeByComparison(FunctorParams *functorParams)
 {
-    FindExtremeByComparisonParams *params = static_cast<FindExtremeByComparisonParams *>(functorParams);
+    FindExtremeByComparisonParams *params = vrv_cast<FindExtremeByComparisonParams *>(functorParams);
     assert(params);
 
     // evaluate by applying the Comparison operator()
@@ -1141,7 +1141,7 @@ int Object::FindExtremeByComparison(FunctorParams *functorParams)
 
 int Object::FindAllByComparison(FunctorParams *functorParams)
 {
-    FindAllByComparisonParams *params = static_cast<FindAllByComparisonParams *>(functorParams);
+    FindAllByComparisonParams *params = vrv_cast<FindAllByComparisonParams *>(functorParams);
     assert(params);
 
     // evaluate by applying the Comparison operator()
@@ -1154,7 +1154,7 @@ int Object::FindAllByComparison(FunctorParams *functorParams)
 
 int Object::FindAllBetween(FunctorParams *functorParams)
 {
-    FindAllBetweenParams *params = static_cast<FindAllBetweenParams *>(functorParams);
+    FindAllBetweenParams *params = vrv_cast<FindAllBetweenParams *>(functorParams);
     assert(params);
 
     // We are reaching the start of the range
@@ -1183,7 +1183,7 @@ int Object::FindAllBetween(FunctorParams *functorParams)
 
 int Object::FindAllReferencedObjects(FunctorParams *functorParams)
 {
-    FindAllReferencedObjectsParams *params = static_cast<FindAllReferencedObjectsParams *>(functorParams);
+    FindAllReferencedObjectsParams *params = vrv_cast<FindAllReferencedObjectsParams *>(functorParams);
     assert(params);
 
     if (this->HasInterface(INTERFACE_LINKING)) {
@@ -1218,7 +1218,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
 
 int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = static_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     assert(m_parent);
@@ -1235,7 +1235,7 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 
 int Object::PrepareFacsimile(FunctorParams *functorParams)
 {
-    PrepareFacsimileParams *params = static_cast<PrepareFacsimileParams *>(functorParams);
+    PrepareFacsimileParams *params = vrv_cast<PrepareFacsimileParams *>(functorParams);
     assert(params);
 
     if (this->HasInterface(INTERFACE_FACSIMILE)) {
@@ -1260,7 +1260,7 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
 
 int Object::PrepareLinking(FunctorParams *functorParams)
 {
-    PrepareLinkingParams *params = static_cast<PrepareLinkingParams *>(functorParams);
+    PrepareLinkingParams *params = vrv_cast<PrepareLinkingParams *>(functorParams);
     assert(params);
 
     if (params->m_fillList && this->HasInterface(INTERFACE_LINKING)) {
@@ -1292,7 +1292,7 @@ int Object::PrepareLinking(FunctorParams *functorParams)
 
 int Object::PreparePlist(FunctorParams *functorParams)
 {
-    PreparePlistParams *params = static_cast<PreparePlistParams *>(functorParams);
+    PreparePlistParams *params = vrv_cast<PreparePlistParams *>(functorParams);
     assert(params);
 
     if (params->m_fillList && this->HasInterface(INTERFACE_PLIST)) {
@@ -1314,14 +1314,14 @@ int Object::PreparePlist(FunctorParams *functorParams)
 
 int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
 {
-    SetCautionaryScoreDefParams *params = static_cast<SetCautionaryScoreDefParams *>(functorParams);
+    SetCautionaryScoreDefParams *params = vrv_cast<SetCautionaryScoreDefParams *>(functorParams);
     assert(params);
 
     assert(params->m_currentScoreDef);
 
     // starting a new staff
     if (this->Is(STAFF)) {
-        Staff *staff = static_cast<Staff *>(this);
+        Staff *staff = vrv_cast<Staff *>(this);
         assert(staff);
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         return FUNCTOR_CONTINUE;
@@ -1329,7 +1329,7 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
 
     // starting a new layer
     if (this->Is(LAYER)) {
-        Layer *layer = static_cast<Layer *>(this);
+        Layer *layer = vrv_cast<Layer *>(this);
         assert(layer);
         layer->SetDrawingCautionValues(params->m_currentStaffDef);
         return FUNCTOR_SIBLINGS;
@@ -1340,14 +1340,14 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
 
 int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 {
-    SetCurrentScoreDefParams *params = static_cast<SetCurrentScoreDefParams *>(functorParams);
+    SetCurrentScoreDefParams *params = vrv_cast<SetCurrentScoreDefParams *>(functorParams);
     assert(params);
 
     assert(params->m_upcomingScoreDef);
 
     // starting a new page
     if (this->Is(PAGE)) {
-        Page *page = static_cast<Page *>(this);
+        Page *page = vrv_cast<Page *>(this);
         assert(page);
         if (page->GetParent()->GetChildIndex(page) == 0) {
             params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
@@ -1359,7 +1359,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new system
     if (this->Is(SYSTEM)) {
-        System *system = static_cast<System *>(this);
+        System *system = vrv_cast<System *>(this);
         assert(system);
         // This is the only thing we do for now - we need to wait until we reach the first measure
         params->m_currentSystem = system;
@@ -1368,7 +1368,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new measure
     if (this->Is(MEASURE)) {
-        Measure *measure = static_cast<Measure *>(this);
+        Measure *measure = vrv_cast<Measure *>(this);
         assert(measure);
         bool systemBreak = false;
         bool scoreDefInsert = false;
@@ -1406,7 +1406,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new scoreDef
     if (this->Is(SCOREDEF)) {
-        ScoreDef *scoreDef = static_cast<ScoreDef *>(this);
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(this);
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
@@ -1416,14 +1416,14 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new staffDef
     if (this->Is(STAFFDEF)) {
-        StaffDef *staffDef = static_cast<StaffDef *>(this);
+        StaffDef *staffDef = vrv_cast<StaffDef *>(this);
         assert(staffDef);
         params->m_upcomingScoreDef->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
     if (this->Is(STAFF)) {
-        Staff *staff = static_cast<Staff *>(this);
+        Staff *staff = vrv_cast<Staff *>(this);
         assert(staff);
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
@@ -1438,7 +1438,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new layer
     if (this->Is(LAYER)) {
-        Layer *layer = static_cast<Layer *>(this);
+        Layer *layer = vrv_cast<Layer *>(this);
         assert(layer);
         if (params->m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
@@ -1446,9 +1446,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new clef
     if (this->Is(CLEF)) {
-        LayerElement *element = static_cast<LayerElement *>(this);
+        LayerElement *element = vrv_cast<LayerElement *>(this);
         assert(element);
-        Clef *clef = static_cast<Clef *>(element->ThisOrSameasAsLink());
+        Clef *clef = vrv_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
         if (clef->IsScoreDefElement()) {
             return FUNCTOR_CONTINUE;
@@ -1463,7 +1463,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new keysig
     if (this->Is(KEYSIG)) {
-        KeySig *keySig = static_cast<KeySig *>(this);
+        KeySig *keySig = vrv_cast<KeySig *>(this);
         assert(keySig);
         if (keySig->IsScoreDefElement()) {
             return FUNCTOR_CONTINUE;
@@ -1481,7 +1481,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
-    GetAlignmentLeftRightParams *params = static_cast<GetAlignmentLeftRightParams *>(functorParams);
+    GetAlignmentLeftRightParams *params = vrv_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
@@ -1499,12 +1499,12 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
 int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = static_cast<SetOverflowBBoxesParams *>(functorParams);
+    SetOverflowBBoxesParams *params = vrv_cast<SetOverflowBBoxesParams *>(functorParams);
     assert(params);
 
     // starting a new staff
     if (this->Is(STAFF)) {
-        Staff *currentStaff = static_cast<Staff *>(this);
+        Staff *currentStaff = vrv_cast<Staff *>(this);
         assert(currentStaff);
 
         if (!currentStaff->DrawingIsVisible()) {
@@ -1517,7 +1517,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     // starting new layer
     if (this->Is(LAYER)) {
-        Layer *currentLayer = static_cast<Layer *>(this);
+        Layer *currentLayer = vrv_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
@@ -1578,7 +1578,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     assert(params->m_staffAlignment);
 
-    LayerElement *current = static_cast<LayerElement *>(this);
+    LayerElement *current = vrv_cast<LayerElement *>(this);
     assert(current);
 
     bool skipAbove = false;
@@ -1616,12 +1616,12 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
 int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = static_cast<SetOverflowBBoxesParams *>(functorParams);
+    SetOverflowBBoxesParams *params = vrv_cast<SetOverflowBBoxesParams *>(functorParams);
     assert(params);
 
     // starting new layer
     if (this->Is(LAYER)) {
-        Layer *currentLayer = static_cast<Layer *>(this);
+        Layer *currentLayer = vrv_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetCautionStaffDefClef()) {
@@ -1642,7 +1642,7 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
 
 int Object::Save(FunctorParams *functorParams)
 {
-    SaveParams *params = static_cast<SaveParams *>(functorParams);
+    SaveParams *params = vrv_cast<SaveParams *>(functorParams);
     assert(params);
 
     if (!params->m_output->WriteObject(this)) {
@@ -1653,7 +1653,7 @@ int Object::Save(FunctorParams *functorParams)
 
 int Object::SaveEnd(FunctorParams *functorParams)
 {
-    SaveParams *params = static_cast<SaveParams *>(functorParams);
+    SaveParams *params = vrv_cast<SaveParams *>(functorParams);
     assert(params);
 
     if (!params->m_output->WriteObjectEnd(this)) {
@@ -1737,7 +1737,7 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
 int Object::FindNextChildByComparison(FunctorParams *functorparams)
 {
-    FindChildByComparisonParams *params = static_cast<FindChildByComparisonParams *>(functorparams);
+    FindChildByComparisonParams *params = vrv_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
 
     // we are reaching the start of the range
@@ -1762,7 +1762,7 @@ int Object::FindNextChildByComparison(FunctorParams *functorparams)
 
 int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
 {
-    FindChildByComparisonParams *params = static_cast<FindChildByComparisonParams *>(functorparams);
+    FindChildByComparisonParams *params = vrv_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
     // this guy works by going from the start and replacing the return element with every nearer element
     // until you get to the 'start' element

@@ -46,7 +46,7 @@ void Sb::Reset()
 
 int Sb::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = static_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     params->m_currentSystem = new System();

@@ -225,7 +225,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
     // If the starting point is a chord we need to select the appropriate extreme staff
     Staff *startStaff = NULL;
     if (this->GetStart()->Is(CHORD)) {
-        Chord *chord = static_cast<Chord *>(this->GetStart());
+        Chord *chord = vrv_cast<Chord *>(this->GetStart());
         assert(chord);
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
@@ -238,7 +238,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
     // Same for the end point
     Staff *endStaff = NULL;
     if (this->GetEnd()->Is(CHORD)) {
-        Chord *chord = static_cast<Chord *>(this->GetEnd());
+        Chord *chord = vrv_cast<Chord *>(this->GetEnd());
         assert(chord);
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
@@ -279,7 +279,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 
 int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimestampsParams *params = static_cast<PrepareTimestampsParams *>(functorParams);
+    PrepareTimestampsParams *params = vrv_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
     // First we check if the object has already a mapped @startid (it should not)
@@ -308,7 +308,7 @@ int TimePointInterface::InterfaceResetDrawing(FunctorParams *functorParams, Obje
 
 int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimePointingParams *params = static_cast<PrepareTimePointingParams *>(functorParams);
+    PrepareTimePointingParams *params = vrv_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
 
     if (!this->HasStartid()) return FUNCTOR_CONTINUE;
@@ -321,7 +321,7 @@ int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParam
 
 int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimeSpanningParams *params = static_cast<PrepareTimeSpanningParams *>(functorParams);
+    PrepareTimeSpanningParams *params = vrv_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
     if (!this->HasStartid() && !this->HasEndid()) {
@@ -340,7 +340,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
 
 int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimestampsParams *params = static_cast<PrepareTimestampsParams *>(functorParams);
+    PrepareTimestampsParams *params = vrv_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
     // First we check if the object has already a mapped @endid (it should not)
@@ -368,7 +368,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
 
 int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    FillStaffCurrentTimeSpanningParams *params = static_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    FillStaffCurrentTimeSpanningParams *params = vrv_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     if (this->IsSpanningMeasures()) {

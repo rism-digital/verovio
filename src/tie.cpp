@@ -73,7 +73,7 @@ int Tie::ResolveMIDITies(FunctorParams *)
 
 int Tie::FindSpannedLayerElements(FunctorParams *functorParams)
 {
-    FindSpannedLayerElementsParams *params = static_cast<FindSpannedLayerElementsParams *>(functorParams);
+    FindSpannedLayerElementsParams *params = vrv_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
     FloatingPositioner *positioner = params->m_slur->GetCorrespFloatingPositioner(this);

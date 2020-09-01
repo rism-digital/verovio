@@ -44,7 +44,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(staff);
     assert(measure);
 
-    Note *note = static_cast<Note *>(element);
+    Note *note = vrv_cast<Note *>(element);
     assert(note);
 
     int yNote = element->GetDrawingY();
@@ -110,7 +110,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
 
     wchar_t charCode;
 
-    Rest *rest = static_cast<Rest *>(element);
+    Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
 
     bool drawingCueSize = rest->GetDrawingCueSize();
@@ -140,7 +140,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Mensur *mensur = static_cast<Mensur *>(element);
+    Mensur *mensur = vrv_cast<Mensur *>(element);
     assert(mensur);
 
     if (!mensur->HasSign()) {
@@ -310,7 +310,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     assert(layer);
     assert(staff);
 
-    Note *note = static_cast<Note *>(element);
+    Note *note = vrv_cast<Note *>(element);
     assert(note);
 
     bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
@@ -375,7 +375,7 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(layer);
     assert(staff);
 
-    Ligature *ligature = static_cast<Ligature *>(element);
+    Ligature *ligature = vrv_cast<Ligature *>(element);
     assert(ligature);
 
     dc->StartGraphic(ligature, "", ligature->GetUuid());
@@ -393,10 +393,10 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(layer);
     assert(staff);
 
-    Note *note = static_cast<Note *>(element);
+    Note *note = vrv_cast<Note *>(element);
     assert(note);
 
-    Ligature *ligature = static_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
+    Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
     Note *prevNote = dynamic_cast<Note *>(ligature->GetListPrevious(note));
