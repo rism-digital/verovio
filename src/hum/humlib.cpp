@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Aug 30 23:38:48 PDT 2020
+// Last Modified: Tue Sep  1 09:38:07 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -60522,7 +60522,7 @@ void Tool_filter::splitPipeline(vector<string>& clist, const string& command) {
 		}
 
 		if (ch == '|') {
-			if (inSingleQuotes || inDoubleQuotes) {
+			if ((inSingleQuotes > -1) || (inDoubleQuotes > -1)) {
 				// pipe character
 				clist.back() += ch;
 				continue;
@@ -60533,12 +60533,10 @@ void Tool_filter::splitPipeline(vector<string>& clist, const string& command) {
 			}
 		}
 
-		if (isspace(ch) && (!inSingleQuotes) && (!inDoubleQuotes)) {
+		if (isspace(ch) && (!(inSingleQuotes > -1)) && (!(inDoubleQuotes > -1))) {
 			if (isspace(lastch)) {
 				// don't repeat spaces outside of quotes.
 				continue;
-			} else {
-				clist.back() += ' ';
 			}
 		}
 
@@ -60552,6 +60550,7 @@ void Tool_filter::splitPipeline(vector<string>& clist, const string& command) {
 		hre.replaceDestructive(clist[i], "", "^\\s+");
 		hre.replaceDestructive(clist[i], "", "\\s+$");
 	}
+
 }
 
 
