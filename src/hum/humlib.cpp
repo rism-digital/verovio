@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Aug 30 15:32:00 PDT 2020
+// Last Modified: Sun Aug 30 23:38:48 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -70097,7 +70097,15 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 			tok = tok->getNextToken();
 			continue;
 		}
-		text = tok->getText() + m_marker;
+		text = tok->getText();
+		size_t pos = text.find(' ');
+		if (pos == string::npos) {
+			// append to end of non-chord token
+			text += m_marker;
+		} else {
+			// insert marker after first note:
+			text.insert(pos, "@");
+		}
 		tok->setText(text);
 		tok = tok->getNextToken();
 		if (tok && !tok->isKern()) {

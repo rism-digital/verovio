@@ -11008,77 +11008,21 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpins.push_back(tok[i]);
             }
         }
+        hum::HumRegex hre;
 
-        if (letters == "p") {
-            dynamic = "p";
+        if (hre.search(letters, "^[sr]?f+z?$")) {
+            dynamic = letters;
         }
-        else if (letters == "pp") {
-            dynamic = "pp";
+        else if (hre.search(letters, "^p+$")) {
+            dynamic = letters;
         }
-        else if (letters == "ppp") {
-            dynamic = "ppp";
+        else if (hre.search(letters, "^m?(f|p)$")) {
+            dynamic = letters;
         }
-        else if (letters == "pppp") {
-            dynamic = "pppp";
+        else if (hre.search(letters, "^s?f+p+$")) {
+            dynamic = letters;
         }
-        else if (letters == "f") {
-            dynamic = "f";
-        }
-        else if (letters == "ff") {
-            dynamic = "ff";
-        }
-        else if (letters == "fff") {
-            dynamic = "fff";
-        }
-        else if (letters == "ffff") {
-            dynamic = "ffff";
-        }
-        else if (letters == "mp") {
-            dynamic = "mp";
-        }
-        else if (letters == "mf") {
-            dynamic = "mf";
-        }
-        else if (letters == "fz") {
-            dynamic = "fz";
-        }
-        else if (letters == "ffz") {
-            dynamic = "ffz";
-        }
-        else if (letters == "fffz") {
-            dynamic = "fffz";
-        }
-        else if (letters == "fp") {
-            dynamic = "fp";
-        }
-        else if (letters == "ffp") {
-            dynamic = "ffp";
-        }
-        else if (letters == "sfp") {
-            dynamic = "sfp";
-        }
-        else if (letters == "sf") {
-            // for a sf which is shared betwee staves in piano music;
-            // otherwise "z" on **kern notes is probably better.
-            dynamic = "sf";
-        }
-        else if (letters == "sfz") {
-            // for a sf which is shared betwee staves in piano music;
-            // otherwise "zz" on **kern notes is probably better.
-            dynamic = "sfz";
-        }
-        else if (letters == "sff") {
-            dynamic = "sff";
-        }
-        else if (letters == "rf") {
-            dynamic = "rf";
-        }
-        else if (letters == "rfz") {
-            dynamic = "rfz";
-        }
-
         if (!dynamic.empty()) {
-
             belowadj = 0;
 
             std::string dyntext = getLayoutParameter(dyntok, "DY", "t", "", "");
