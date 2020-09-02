@@ -1118,17 +1118,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 }
             }
             else if (hasMultipleLayer) {
-                Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-                assert(parentLayer);
-                int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
-                if (layerCount > 1) {
-                    Layer *firstLayer = vrv_cast<Layer *>(staffY->FindDescendantByType(LAYER));
-                    assert(firstLayer);
-                    if (firstLayer->GetN() == layerY->GetN())
-                        loc += 2;
-                    else
-                        loc -= 2;
-                }
+                loc = rest->GetOptimalLayerLocation(staffY, layerY, loc);
             }
         }
         loc = rest->GetRestLocOffset(loc);
@@ -1622,6 +1612,34 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
     return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
+int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
+{
+    LayerElementsInTimeSpanParams *params = vrv_params_cast<LayerElementsInTimeSpanParams *>(functorParams);
+    assert(params);
+
+    Layer *currentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
+    if (!currentLayer || (currentLayer != params->m_layer) || IsScoreDefElement() || Is(MREST)) 
+        return FUNCTOR_SIBLINGS;
+    if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink())
+        return FUNCTOR_CONTINUE;
+
+    const double duration = !GetParent()->Is(CHORD)
+        ? GetAlignmentDuration(params->m_mensur, params->m_meterSig)
+        : vrv_cast<Chord *>(GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+        
+    const double time = m_alignment->GetTime();
+
+    // The event is starting after the end of the element
+    if ((time + duration) <= params->m_time) return FUNCTOR_CONTINUE;
+    // The element is starting after the event end - we can stop here
+    if (time >= (params->m_time + params->m_duration)) return FUNCTOR_STOP;
+
+    params->m_elements.push_back(this);
+
+    // Not need to recurse for chords
+    return Is(CHORD)? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
+}
+
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 {
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
@@ -1782,6 +1800,29 @@ int LayerElement::ResetDrawing(FunctorParams *functorParams)
     LinkingInterface *interface = this->GetLinkingInterface();
     assert(interface);
     interface->InterfaceResetDrawing(functorParams, this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
+{
+    GetRelativeLayerElementParams *params = vrv_params_cast<GetRelativeLayerElementParams *>(functorParams);
+    assert(params);
+
+    // Do not check for index of the element if we're looking into neighboring layer or if nested element is being 
+    // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that 
+    // has been passed inside this functor)
+    if (!params->m_isInNeighboringLayer && GetParent()->Is(LAYER)) {
+        if (params->m_searchDirection == FORWARD && (GetIdx() < params->m_initialElementId)) return FUNCTOR_SIBLINGS;
+        if (params->m_searchDirection == BACKWARD && (GetIdx() > params->m_initialElementId)) return FUNCTOR_SIBLINGS;
+    }
+
+    if (Is({ NOTE, CHORD, FTREM })) {
+        params->m_relativeElement = this;
+        return FUNCTOR_STOP;
+    }
+
+    if (Is(REST)) return params->m_isInNeighboringLayer ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
