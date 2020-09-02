@@ -285,7 +285,7 @@ int Rest::GetRestLocOffset(int loc)
 
 int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
 {
-    Layer *parentLayer = static_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!layer) return defaultLocation;
     const int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
@@ -294,7 +294,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     staff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer(static_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
+    const bool isTopLayer(vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
 
     // find best rest location relative to elements on other layers
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
@@ -318,21 +318,21 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
     const ListOfObjects &layersList, Layer *currentLayer)
 {
     if (!currentLayer) return { VRV_UNSET, RA_none };
-    const bool isTopLayer(static_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
+    const bool isTopLayer(vrv_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
 
     // Get iterator to another layer. We're going to find coliding elements there
     auto layerIter = std::find_if(layersList.begin(), layersList.end(),
-        [&](Object *foundLayer) { return static_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
+        [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
     if (layerIter == layersList.end()) return { VRV_UNSET, RA_none };
-    auto collidingElementsList = static_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
+    auto collidingElementsList = vrv_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
     
     std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
-        auto currentElementInfo = GetElementLocation(object, static_cast<Layer *>(*layerIter), isTopLayer);
+        auto currentElementInfo = GetElementLocation(object, vrv_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
 		//  If note on other layer is not on the same x position as rest - ignore its accidental
-        if (GetAlignment()->GetTime() != static_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
+        if (GetAlignment()->GetTime() != vrv_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = RA_none;
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
@@ -385,10 +385,10 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
 int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer)
 {
     // current system
-    System *system = static_cast<System*>(GetFirstAncestor(SYSTEM));
+    System *system = vrv_cast<System *>(GetFirstAncestor(SYSTEM));
     assert(system);
     // current measure
-    Measure *measure = static_cast<Measure *>(GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(GetFirstAncestor(MEASURE));
     assert(measure);
 
     const int index = system->GetChildIndex(measure);
@@ -397,7 +397,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
 
     // Find staff with the same N as current staff
     AttNIntegerComparison snc(STAFF, currentStaff->GetN());
-    Staff *previousStaff = static_cast<Staff *>(relativeMeasure->FindDescendantByComparison(&snc));
+    Staff *previousStaff = vrv_cast<Staff *>(relativeMeasure->FindDescendantByComparison(&snc));
     if (!previousStaff) return VRV_UNSET;
 
     // Compare number of layers in the next/previous staff and if it's the same - find layer with same N
@@ -405,7 +405,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     ClassIdComparison matchType(LAYER);
     previousStaff->FindAllDescendantByComparison(&layers, &matchType);
     auto layerIter = std::find_if(layers.begin(), layers.end(),
-        [&](Object *foundLayer) { return static_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
+        [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
     });
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
@@ -416,7 +416,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
 
     Object *lastLayerElement = getRelativeLayerElementParams.m_relativeElement;
     if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
-        return GetElementLocation(lastLayerElement, static_cast<Layer *>(*layerIter), !isTopLayer).first;
+        return GetElementLocation(lastLayerElement, vrv_cast<Layer *>(*layerIter), !isTopLayer).first;
     }
 
     return VRV_UNSET;
@@ -426,14 +426,14 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
 {
     AttConverter converter;
     if (object->Is(NOTE)) {
-        Note *note = static_cast<Note *>(object);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
         Accid* accid = note->GetDrawingAccid();
         return { PitchInterface::CalcLoc(note, layer, note),
             (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
     if (object->Is(CHORD)) {
-        Chord *chord = static_cast<Chord *>(object);
+        Chord *chord = vrv_cast<Chord *>(object);
         assert(chord);
         Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
         Accid* accid = relevantNote->GetDrawingAccid();

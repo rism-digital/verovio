@@ -1308,6 +1308,32 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// GetRelativeLayerElementParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the next/previous relevant layer element
+ * member 1: Id of the layer element that is being compared to (starting point)
+ * member 2: direction of search - BACKWARD is for previous element, FORWARD - next
+ * member 3: flag to indicate whether search is done in the same layer as element Id, or in neighboring one
+ **/
+
+class GetRelativeLayerElementParams : public FunctorParams {
+public:
+    GetRelativeLayerElementParams(const int elementId, bool searchDirection, bool anotherLayer)
+    {
+        m_relativeElement = NULL;
+        m_initialElementId = elementId;
+        m_searchDirection = searchDirection;
+        m_isInNeighboringLayer = anotherLayer;
+    }
+    Object *m_relativeElement;
+    int m_initialElementId;
+    bool m_searchDirection;
+    bool m_isInNeighboringLayer;
+};
+
+//----------------------------------------------------------------------------
 // JustifyXParams
 //----------------------------------------------------------------------------
 
@@ -1957,32 +1983,6 @@ class UnsetCurrentScoreDefParams : public FunctorParams {
 public:
     UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// GetRelativeLayerElementParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the next/previous relevant layer element
- * member 1: Id of the layer element that is being compared to (starting point)
- * member 2: direction of search - BACKWARD is for previous element, FORWARD - next
- * member 3: flag to indicate whether search is done in the same layer as element Id, or in neighboring one
- **/
-
-class GetRelativeLayerElementParams : public FunctorParams {
-public:
-    GetRelativeLayerElementParams(const int elementId, bool searchDirection, bool anotherLayer)
-    {
-        m_relativeElement = NULL;
-        m_initialElementId = elementId;
-        m_searchDirection = searchDirection;
-        m_isInNeighboringLayer = anotherLayer;
-    }
-    Object *m_relativeElement;
-    int m_initialElementId;
-    bool m_searchDirection;
-    bool m_isInNeighboringLayer;
 };
 
 } // namespace vrv

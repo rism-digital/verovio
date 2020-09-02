@@ -20,7 +20,6 @@
 
 #include "attalternates.h"
 #include "atttypes.h"
-#include "jsonxx.h"
 
 //----------------------------------------------------------------------------
 
@@ -71,7 +70,7 @@ enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDI
 class Option {
 public:
     // constructors and destructors
-    Option() : m_isSet(false) {}
+    Option() {}
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
 
@@ -89,8 +88,6 @@ public:
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
 
-    bool isSet() const { return m_isSet; }
-
 public:
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
@@ -104,7 +101,6 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
-    bool m_isSet;
 
 private:
     std::string m_key;

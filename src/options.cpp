@@ -11,7 +11,6 @@
 
 #include <assert.h>
 #include <fstream>
-#include <functional>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -140,7 +139,6 @@ std::string OptionBool::GetDefaultStrValue() const
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
-    m_isSet = true;
     return true;
 }
 
@@ -191,7 +189,6 @@ bool OptionDbl::SetValue(double value)
         return false;
     }
     m_value = value;
-    m_isSet =  true;
     return true;
 }
 
@@ -253,7 +250,6 @@ bool OptionInt::SetValue(int value)
         return false;
     }
     m_value = value;
-    m_isSet = true;
     return true;
 }
 
@@ -277,7 +273,6 @@ void OptionString::Init(const std::string &defaultValue)
 bool OptionString::SetValue(const std::string &value)
 {
     m_value = value;
-    m_isSet = true;
     return true;
 }
 
@@ -301,7 +296,6 @@ void OptionArray::Init()
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
-    m_isSet = true;
     // m_values.erase(std::remove_if(m_values.begin(), m_values.end(),
     //                                       [](const std::string &s) { return s.empty(); }),
     //                        m_values.end());
@@ -313,7 +307,6 @@ bool OptionArray::SetValue(const std::string &value)
     // Passing a single value to an array option adds it to the values and to not replace them
     if (!value.empty()) {
         m_values.push_back(value);
-        m_isSet =  true;
     }
     return true;
 }
@@ -347,7 +340,6 @@ std::string OptionArray::GetDefaultStrValue() const
 bool OptionArray::SetValue(std::vector<std::string> const &values)
 {
     m_values = values;
-    m_isSet = true;
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
     return true;
@@ -388,7 +380,6 @@ bool OptionIntMap::SetValue(const std::string &value)
     for (it = m_values->begin(); it != m_values->end(); ++it)
         if (it->second == value) {
             m_value = it->first;
-            m_isSet = true;
             return true;
         }
     LogError("Parameter '%s' not valid for '%s'", value.c_str(), GetKey().c_str());
@@ -417,7 +408,6 @@ bool OptionIntMap::SetValue(int value)
     assert(m_values->count(value));
 
     m_value = value;
-    m_isSet = true;
 
     return true;
 }
@@ -479,7 +469,6 @@ bool OptionStaffrel::SetValue(const std::string &value)
         return false;
     }
     m_value = staffrel;
-    m_isSet = true;
     return true;
 }
 
