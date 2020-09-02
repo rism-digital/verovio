@@ -970,6 +970,10 @@ void View::DrawPedalLine(
         DrawFilledRectangle(dc, x2 - bracketSize / 2, y, x2, y + lineWidth);
         DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
     }
+    if (spanningType == SPANNING_MIDDLE) {
+        const int position = pedal->GetCurrentFloatingPositioner()->GetDrawingYRel() + bracketSize - lineWidth;
+        pedal->GetCurrentFloatingPositioner()->SetDrawingYRel(position);
+    }
     DrawFilledRectangle(dc, x1 + bracketSize / 2, y, x2 - bracketSize / 2, y + lineWidth);
 
     if (graphic) {

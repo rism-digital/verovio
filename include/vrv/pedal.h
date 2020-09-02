@@ -80,6 +80,11 @@ public:
      */
     virtual int GenerateMIDI(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResolveSpanningPedals
+     */
+    virtual int ResolveSpanningPedals(FunctorParams *);
+
 private:
     /**
      * Flag indicating if following pedal mark is a bounce
