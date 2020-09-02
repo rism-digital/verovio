@@ -1100,7 +1100,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
 int Beam::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = vrv_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     const ArrayOfObjects *beamChildren = this->GetList(this);

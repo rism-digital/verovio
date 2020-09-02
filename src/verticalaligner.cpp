@@ -529,7 +529,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
 
 int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPositionersParams *params = vrv_cast<AdjustFloatingPositionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = vrv_params_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
     int staffSize = this->GetStaffSize();
@@ -646,7 +646,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
 {
     AdjustFloatingPositionersBetweenParams *params
-        = vrv_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
+        = vrv_params_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
     assert(params);
 
     // int staffSize = this->GetStaffSize();
@@ -709,7 +709,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
 
 int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 {
-    AdjustFloatingPositionerGrpsParams *params = vrv_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);
+    AdjustFloatingPositionerGrpsParams *params = vrv_params_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);
     assert(params);
 
     ArrayOfFloatingPositioners positioners;
@@ -787,7 +787,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 
 int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 {
-    AdjustSlursParams *params = vrv_cast<AdjustSlursParams *>(functorParams);
+    AdjustSlursParams *params = vrv_params_cast<AdjustSlursParams *>(functorParams);
     assert(params);
 
     ArrayOfFloatingPositioners::iterator iter;
@@ -815,7 +815,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 
 int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
 {
-    AdjustStaffOverlapParams *params = vrv_cast<AdjustStaffOverlapParams *>(functorParams);
+    AdjustStaffOverlapParams *params = vrv_params_cast<AdjustStaffOverlapParams *>(functorParams);
     assert(params);
 
     // This is the bottom alignment (or something is wrong)
@@ -856,7 +856,7 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
 
 int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     if (m_spacingType != SystemAligner::SpacingType::System) {
@@ -873,7 +873,7 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 
 int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 {
-    AdjustYPosParams *params = vrv_cast<AdjustYPosParams *>(functorParams);
+    AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
     const int defaultSpacing = GetMinimumSpacing(params->m_doc);
@@ -893,7 +893,7 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 
 int StaffAlignment::JustifyY(FunctorParams *functorParams)
 {
-    JustifyYParams *params = vrv_cast<JustifyYParams *>(functorParams);
+    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
 
     // Skip bottom aligner and first staff

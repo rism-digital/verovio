@@ -385,7 +385,7 @@ int ScoreDef::GetMaxStaffSize()
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = vrv_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     // Move itself to the pageBasedSystem - do not process children
@@ -396,7 +396,7 @@ int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 
 int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = vrv_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -420,7 +420,7 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 
 int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = vrv_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);

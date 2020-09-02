@@ -106,7 +106,7 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
 
 int Verse::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     // this gets (or creates) the measureAligner for the measure
@@ -122,7 +122,7 @@ int Verse::AlignVertically(FunctorParams *functorParams)
 
 int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 {
-    AdjustSylSpacingParams *params = vrv_cast<AdjustSylSpacingParams *>(functorParams);
+    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
     /****** find label / labelAbbr */
@@ -234,7 +234,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
 int Verse::PrepareProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = vrv_cast<PrepareProcessingListsParams *>(functorParams);
+    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
     assert(params);
     // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 

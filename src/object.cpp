@@ -1078,7 +1078,7 @@ void Functor::Call(Object *ptr, FunctorParams *functorParams)
 
 int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
 {
-    AddLayerElementToFlatListParams *params = vrv_cast<AddLayerElementToFlatListParams *>(functorParams);
+    AddLayerElementToFlatListParams *params = vrv_params_cast<AddLayerElementToFlatListParams *>(functorParams);
     assert(params);
 
     params->m_flatList->push_back(this);
@@ -1089,7 +1089,7 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
 
 int Object::FindByUuid(FunctorParams *functorParams)
 {
-    FindByUuidParams *params = vrv_cast<FindByUuidParams *>(functorParams);
+    FindByUuidParams *params = vrv_params_cast<FindByUuidParams *>(functorParams);
     assert(params);
 
     if (params->m_element) {
@@ -1108,7 +1108,7 @@ int Object::FindByUuid(FunctorParams *functorParams)
 
 int Object::FindByComparison(FunctorParams *functorParams)
 {
-    FindByComparisonParams *params = vrv_cast<FindByComparisonParams *>(functorParams);
+    FindByComparisonParams *params = vrv_params_cast<FindByComparisonParams *>(functorParams);
     assert(params);
 
     if (params->m_element) {
@@ -1128,7 +1128,7 @@ int Object::FindByComparison(FunctorParams *functorParams)
 
 int Object::FindExtremeByComparison(FunctorParams *functorParams)
 {
-    FindExtremeByComparisonParams *params = vrv_cast<FindExtremeByComparisonParams *>(functorParams);
+    FindExtremeByComparisonParams *params = vrv_params_cast<FindExtremeByComparisonParams *>(functorParams);
     assert(params);
 
     // evaluate by applying the Comparison operator()
@@ -1141,7 +1141,7 @@ int Object::FindExtremeByComparison(FunctorParams *functorParams)
 
 int Object::FindAllByComparison(FunctorParams *functorParams)
 {
-    FindAllByComparisonParams *params = vrv_cast<FindAllByComparisonParams *>(functorParams);
+    FindAllByComparisonParams *params = vrv_params_cast<FindAllByComparisonParams *>(functorParams);
     assert(params);
 
     // evaluate by applying the Comparison operator()
@@ -1154,7 +1154,7 @@ int Object::FindAllByComparison(FunctorParams *functorParams)
 
 int Object::FindAllBetween(FunctorParams *functorParams)
 {
-    FindAllBetweenParams *params = vrv_cast<FindAllBetweenParams *>(functorParams);
+    FindAllBetweenParams *params = vrv_params_cast<FindAllBetweenParams *>(functorParams);
     assert(params);
 
     // We are reaching the start of the range
@@ -1183,7 +1183,7 @@ int Object::FindAllBetween(FunctorParams *functorParams)
 
 int Object::FindAllReferencedObjects(FunctorParams *functorParams)
 {
-    FindAllReferencedObjectsParams *params = vrv_cast<FindAllReferencedObjectsParams *>(functorParams);
+    FindAllReferencedObjectsParams *params = vrv_params_cast<FindAllReferencedObjectsParams *>(functorParams);
     assert(params);
 
     if (this->HasInterface(INTERFACE_LINKING)) {
@@ -1218,7 +1218,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
 
 int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = vrv_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     assert(m_parent);
@@ -1235,7 +1235,7 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 
 int Object::PrepareFacsimile(FunctorParams *functorParams)
 {
-    PrepareFacsimileParams *params = vrv_cast<PrepareFacsimileParams *>(functorParams);
+    PrepareFacsimileParams *params = vrv_params_cast<PrepareFacsimileParams *>(functorParams);
     assert(params);
 
     if (this->HasInterface(INTERFACE_FACSIMILE)) {
@@ -1260,7 +1260,7 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
 
 int Object::PrepareLinking(FunctorParams *functorParams)
 {
-    PrepareLinkingParams *params = vrv_cast<PrepareLinkingParams *>(functorParams);
+    PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
     assert(params);
 
     if (params->m_fillList && this->HasInterface(INTERFACE_LINKING)) {
@@ -1292,7 +1292,7 @@ int Object::PrepareLinking(FunctorParams *functorParams)
 
 int Object::PreparePlist(FunctorParams *functorParams)
 {
-    PreparePlistParams *params = vrv_cast<PreparePlistParams *>(functorParams);
+    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
     assert(params);
 
     if (params->m_fillList && this->HasInterface(INTERFACE_PLIST)) {
@@ -1314,7 +1314,7 @@ int Object::PreparePlist(FunctorParams *functorParams)
 
 int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
 {
-    SetCautionaryScoreDefParams *params = vrv_cast<SetCautionaryScoreDefParams *>(functorParams);
+    SetCautionaryScoreDefParams *params = vrv_params_cast<SetCautionaryScoreDefParams *>(functorParams);
     assert(params);
 
     assert(params->m_currentScoreDef);
@@ -1340,7 +1340,7 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
 
 int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 {
-    SetCurrentScoreDefParams *params = vrv_cast<SetCurrentScoreDefParams *>(functorParams);
+    SetCurrentScoreDefParams *params = vrv_params_cast<SetCurrentScoreDefParams *>(functorParams);
     assert(params);
 
     assert(params->m_upcomingScoreDef);
@@ -1481,7 +1481,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
-    GetAlignmentLeftRightParams *params = vrv_cast<GetAlignmentLeftRightParams *>(functorParams);
+    GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
@@ -1499,7 +1499,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
 int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_cast<SetOverflowBBoxesParams *>(functorParams);
+    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
     assert(params);
 
     // starting a new staff
@@ -1616,7 +1616,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
 int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_cast<SetOverflowBBoxesParams *>(functorParams);
+    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
     assert(params);
 
     // starting new layer
@@ -1642,7 +1642,7 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
 
 int Object::Save(FunctorParams *functorParams)
 {
-    SaveParams *params = vrv_cast<SaveParams *>(functorParams);
+    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
     assert(params);
 
     if (!params->m_output->WriteObject(this)) {
@@ -1653,7 +1653,7 @@ int Object::Save(FunctorParams *functorParams)
 
 int Object::SaveEnd(FunctorParams *functorParams)
 {
-    SaveParams *params = vrv_cast<SaveParams *>(functorParams);
+    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
     assert(params);
 
     if (!params->m_output->WriteObjectEnd(this)) {

@@ -163,7 +163,7 @@ void FTrem::InitCoords(ArrayOfObjects *childList)
 
 int FTrem::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = vrv_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     const ArrayOfObjects *fTremChildren = this->GetList(this);
@@ -204,7 +204,7 @@ int FTrem::ResetDrawing(FunctorParams *functorParams)
 
 int FTrem::GenerateMIDI(FunctorParams *functorParams)
 {
-    // GenerateMIDIParams *params = vrv_cast<GenerateMIDIParams *>(functorParams);
+    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     // assert(params);
 
     FTrem *fTrem = vrv_cast<FTrem *>(this);

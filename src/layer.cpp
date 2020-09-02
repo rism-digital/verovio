@@ -414,7 +414,7 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 
 int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = vrv_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     params->m_contentLayer = this;
@@ -432,7 +432,7 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
 
 int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToUnCastOffMensuralParams *params = vrv_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
 
     if (params->m_contentLayer == NULL) {
@@ -485,7 +485,7 @@ int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int Layer::AlignHorizontally(FunctorParams *functorParams)
 {
-    AlignHorizontallyParams *params = vrv_cast<AlignHorizontallyParams *>(functorParams);
+    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
     params->m_currentMensur = GetCurrentMensur();
@@ -523,7 +523,7 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
 
 int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
 {
-    AlignHorizontallyParams *params = vrv_cast<AlignHorizontallyParams *>(functorParams);
+    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
     params->m_scoreDefRole = SCOREDEF_CAUTIONARY;
@@ -562,7 +562,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
 
 int Layer::PrepareProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = vrv_cast<PrepareProcessingListsParams *>(functorParams);
+    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
     assert(params);
 
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -577,7 +577,7 @@ int Layer::PrepareProcessingLists(FunctorParams *functorParams)
 
 int Layer::PrepareRpt(FunctorParams *functorParams)
 {
-    PrepareRptParams *params = vrv_cast<PrepareRptParams *>(functorParams);
+    PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
     assert(params);
 
     // If we have encountered a mRpt before and there is none is this layer, reset it to NULL
@@ -589,7 +589,7 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
 
 int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_cast<CalcOnsetOffsetParams *>(functorParams);
+    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreTime = 0.0;
@@ -604,7 +604,7 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 /*
 int Layer::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = vrv_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     if (this->HasSameasLink()) {
@@ -617,7 +617,7 @@ int Layer::GenerateMIDI(FunctorParams *functorParams)
 
 int Layer::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateTimemapParams *params = vrv_cast<GenerateTimemapParams *>(functorParams);
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
     if (this->HasSameasLink()) {

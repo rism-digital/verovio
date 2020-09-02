@@ -187,7 +187,7 @@ int Arpeg::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 {
-    AdjustArpegParams *params = vrv_cast<AdjustArpegParams *>(functorParams);
+    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
     assert(params);
 
     Note *topNote = NULL;

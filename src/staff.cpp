@@ -316,7 +316,7 @@ void LedgerLine::AddDash(int left, int right)
 
 int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = vrv_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     params->m_targetStaff = new Staff(*this);
@@ -339,7 +339,7 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
 int Staff::OptimizeScoreDef(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_cast<OptimizeScoreDefParams *>(functorParams);
+    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
 
     assert(params->m_currentScoreDef);
@@ -391,7 +391,7 @@ int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int Staff::ApplyPPUFactor(FunctorParams *functorParams)
 {
-    ApplyPPUFactorParams *params = vrv_cast<ApplyPPUFactorParams *>(functorParams);
+    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
@@ -401,7 +401,7 @@ int Staff::ApplyPPUFactor(FunctorParams *functorParams)
 
 int Staff::AlignHorizontally(FunctorParams *functorParams)
 {
-    AlignHorizontallyParams *params = vrv_cast<AlignHorizontallyParams *>(functorParams);
+    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
     assert(this->m_drawingStaffDef);
@@ -418,7 +418,7 @@ int Staff::AlignHorizontally(FunctorParams *functorParams)
 
 int Staff::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     if (!this->DrawingIsVisible()) {
@@ -451,7 +451,7 @@ int Staff::AlignVertically(FunctorParams *functorParams)
 
 int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
@@ -479,7 +479,7 @@ int Staff::ResetDrawing(FunctorParams *functorParams)
 
 int Staff::PrepareRpt(FunctorParams *functorParams)
 {
-    PrepareRptParams *params = vrv_cast<PrepareRptParams *>(functorParams);
+    PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
     assert(params);
 
     // If multiNumber is set, we already know that nothing needs to be done
@@ -502,7 +502,7 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
 
 int Staff::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_cast<CalcOnsetOffsetParams *>(functorParams);
+    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
     assert(this->m_drawingStaffDef);
@@ -559,7 +559,7 @@ int Staff::CalcStem(FunctorParams *)
 
 int Staff::AdjustSylSpacing(FunctorParams *functorParams)
 {
-    AdjustSylSpacingParams *params = vrv_cast<AdjustSylSpacingParams *>(functorParams);
+    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
     // Set the staff size for this pass

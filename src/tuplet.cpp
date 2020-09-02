@@ -312,7 +312,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     // Nothing to do if there is no number
@@ -395,7 +395,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 
 int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     // Nothing to do if there is no number

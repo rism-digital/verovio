@@ -130,7 +130,7 @@ int StaffGrp::GetMaxStaffSize()
 
 int StaffGrp::OptimizeScoreDefEnd(FunctorParams *)
 {
-    // OptimizeScoreDefParams *params = vrv_cast<OptimizeScoreDefParams *>(functorParams);
+    // OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
     // assert(params);
 
     this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);

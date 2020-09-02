@@ -649,7 +649,7 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
 
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
 {
-    ApplyPPUFactorParams *params = vrv_cast<ApplyPPUFactorParams *>(functorParams);
+    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     params->m_page = this;
@@ -686,7 +686,7 @@ int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     params->m_cumulatedShift = 0;
@@ -711,7 +711,7 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 
 int Page::AlignSystems(FunctorParams *functorParams)
 {
-    AlignSystemsParams *params = vrv_cast<AlignSystemsParams *>(functorParams);
+    AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
     params->m_justificationSum = 0;
@@ -735,7 +735,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
 
 int Page::AlignSystemsEnd(FunctorParams *functorParams)
 {
-    AlignSystemsParams *params = vrv_cast<AlignSystemsParams *>(functorParams);
+    AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
     this->m_drawingJustifiableHeight = params->m_shift;

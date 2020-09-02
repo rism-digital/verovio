@@ -740,7 +740,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 
 int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_cast<SetAlignmentXPosParams *>(functorParams);
+    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // We start a new MeasureAligner
@@ -753,7 +753,7 @@ int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 
 int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
-    JustifyXParams *params = vrv_cast<JustifyXParams *>(functorParams);
+    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
     params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
@@ -764,7 +764,7 @@ int MeasureAligner::JustifyX(FunctorParams *functorParams)
 
 int Alignment::AdjustArpeg(FunctorParams *functorParams)
 {
-    AdjustArpegParams *params = vrv_cast<AdjustArpegParams *>(functorParams);
+    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
     assert(params);
 
     // An array of Alignment / Arpeg / staffN / bool (for indicating if we have reached the aligment yet)
@@ -815,7 +815,7 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
 
 int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    AdjustGraceXPosParams *params = vrv_cast<AdjustGraceXPosParams *>(functorParams);
+    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
     // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
@@ -897,7 +897,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 
 int Alignment::AdjustGraceXPosEnd(FunctorParams *functorParams)
 {
-    AdjustGraceXPosParams *params = vrv_cast<AdjustGraceXPosParams *>(functorParams);
+    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
     if (params->m_graceUpcomingMaxPos != -VRV_UNSET) {
@@ -911,7 +911,7 @@ int Alignment::AdjustGraceXPosEnd(FunctorParams *functorParams)
 
 int Alignment::AdjustXPos(FunctorParams *functorParams)
 {
-    AdjustXPosParams *params = vrv_cast<AdjustXPosParams *>(functorParams);
+    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     // LogDebug("Alignment type %d", m_type);
@@ -927,7 +927,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
 
 int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
 {
-    AdjustXPosParams *params = vrv_cast<AdjustXPosParams *>(functorParams);
+    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     if (params->m_upcomingMinPos != VRV_UNSET) {
@@ -948,7 +948,7 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
 
 int Alignment::AdjustAccidX(FunctorParams *functorParams)
 {
-    AdjustAccidXParams *params = vrv_cast<AdjustAccidXParams *>(functorParams);
+    AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
     assert(params);
 
     MapOfIntGraceAligners::const_iterator iter;
@@ -972,7 +972,7 @@ int Alignment::HorizontalSpaceForDuration(
 
 int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_cast<SetAlignmentXPosParams *>(functorParams);
+    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // Do not set an x pos for anything before the barline (including it)
@@ -1006,7 +1006,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 
 int Alignment::JustifyX(FunctorParams *functorParams)
 {
-    JustifyXParams *params = vrv_cast<JustifyXParams *>(functorParams);
+    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
     if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
@@ -1035,7 +1035,7 @@ int Alignment::JustifyX(FunctorParams *functorParams)
 
 int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
 {
-    AdjustLayersParams *params = vrv_cast<AdjustLayersParams *>(functorParams);
+    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
     if (!this->HasMultipleLayer()) return FUNCTOR_SIBLINGS;
@@ -1051,7 +1051,7 @@ int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
 
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    AdjustGraceXPosParams *params = vrv_cast<AdjustGraceXPosParams *>(functorParams);
+    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
     ArrayOfObjects::iterator childrenIter;
@@ -1068,7 +1068,7 @@ int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 
 int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 {
-    AdjustAccidXParams *params = vrv_cast<AdjustAccidXParams *>(functorParams);
+    AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
     assert(params);
 
     if (m_accidSpace.empty()) return FUNCTOR_SIBLINGS;

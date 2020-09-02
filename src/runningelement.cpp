@@ -402,7 +402,7 @@ int RunningElement::SaveEnd(FunctorParams *functorParams)
 
 int RunningElement::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = vrv_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     params->m_pageWidth = this->GetWidth();

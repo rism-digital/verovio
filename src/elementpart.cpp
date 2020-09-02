@@ -368,7 +368,7 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int Stem::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = vrv_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     assert(params->m_staff);

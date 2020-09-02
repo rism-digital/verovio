@@ -421,7 +421,7 @@ bool Chord::HasNoteWithDots()
 
 int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
@@ -440,7 +440,7 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 
 int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = vrv_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     assert(!params->m_currentChord);
@@ -458,7 +458,7 @@ int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
 int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = vrv_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (params->m_permanent) {
@@ -473,7 +473,7 @@ int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 
 int Chord::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = vrv_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     // Set them to NULL in any case
@@ -543,7 +543,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
 int Chord::CalcDots(FunctorParams *functorParams)
 {
-    CalcDotsParams *params = vrv_cast<CalcDotsParams *>(functorParams);
+    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
     // if the chord isn't visible, stop here
@@ -708,7 +708,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_cast<CalcOnsetOffsetParams *>(functorParams);
+    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();

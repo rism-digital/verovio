@@ -113,7 +113,7 @@ int Ligature::GetDrawingNoteShape(Note *note)
 
 int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     m_drawingShapes.clear();

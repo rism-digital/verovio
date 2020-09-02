@@ -304,7 +304,7 @@ int KeySig::GetFifthsInt()
 
 int KeySig::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = vrv_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
     LogDebug("Transposing keySig");

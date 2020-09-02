@@ -129,7 +129,7 @@ int Rest::GetRestLocOffset(int loc)
 
 int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = vrv_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (this->HasFermata()) {
@@ -168,7 +168,7 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Rest::CalcDots(FunctorParams *functorParams)
 {
-    CalcDotsParams *params = vrv_cast<CalcDotsParams *>(functorParams);
+    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
     // We currently have no dots object with mensural rests

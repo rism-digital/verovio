@@ -155,7 +155,7 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 
 int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = vrv_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     std::string n = this->GetN();
@@ -176,7 +176,7 @@ int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 
 int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 {
-    AdjustHarmGrpsSpacingParams *params = vrv_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
     assert(params);
 
     // If the harm is empty, do not adjust spacing
@@ -282,7 +282,7 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 
 int Harm::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = vrv_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
     LogDebug("Transposing harm");

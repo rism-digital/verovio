@@ -108,7 +108,7 @@ bool EditorialElement::IsSupportedChild(Object *child)
 
 int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = vrv_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
@@ -118,7 +118,7 @@ int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
 
 int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = vrv_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     if (this->m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
@@ -146,7 +146,7 @@ int EditorialElement::ResetDrawing(FunctorParams *functorParams)
 
 int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = vrv_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -167,7 +167,7 @@ int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 
 int EditorialElement::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = vrv_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);

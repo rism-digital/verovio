@@ -663,7 +663,7 @@ int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
 {
-    ApplyPPUFactorParams *params = vrv_cast<ApplyPPUFactorParams *>(functorParams);
+    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -675,7 +675,7 @@ int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
 
 int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 {
-    AlignHorizontallyParams *params = vrv_cast<AlignHorizontallyParams *>(functorParams);
+    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
     // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
@@ -877,7 +877,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 
 int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 {
-    SetAlignmentPitchPosParams *params = vrv_cast<SetAlignmentPitchPosParams *>(functorParams);
+    SetAlignmentPitchPosParams *params = vrv_params_cast<SetAlignmentPitchPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1138,7 +1138,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 
 int LayerElement::AdjustLayers(FunctorParams *functorParams)
 {
-    AdjustLayersParams *params = vrv_cast<AdjustLayersParams *>(functorParams);
+    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1258,7 +1258,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
 int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    AdjustGraceXPosParams *params = vrv_cast<AdjustGraceXPosParams *>(functorParams);
+    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1297,7 +1297,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
 int LayerElement::AdjustXPos(FunctorParams *functorParams)
 {
-    AdjustXPosParams *params = vrv_cast<AdjustXPosParams *>(functorParams);
+    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1422,7 +1422,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 
 int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
-    PrepareCrossStaffParams *params = vrv_cast<PrepareCrossStaffParams *>(functorParams);
+    PrepareCrossStaffParams *params = vrv_params_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1491,7 +1491,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 
 int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 {
-    PrepareCrossStaffParams *params = vrv_cast<PrepareCrossStaffParams *>(functorParams);
+    PrepareCrossStaffParams *params = vrv_params_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1512,7 +1512,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 
 int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
 {
-    PreparePointersByLayerParams *params = vrv_cast<PreparePointersByLayerParams *>(functorParams);
+    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1531,7 +1531,7 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
 
 int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 {
-    PrepareTimePointingParams *params = vrv_cast<PrepareTimePointingParams *>(functorParams);
+    PrepareTimePointingParams *params = vrv_params_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1555,7 +1555,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 
 int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
-    PrepareTimeSpanningParams *params = vrv_cast<PrepareTimeSpanningParams *>(functorParams);
+    PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1579,7 +1579,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 
 int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    LayerCountInTimeSpanParams *params = vrv_cast<LayerCountInTimeSpanParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1621,7 +1621,7 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 {
-    FindSpannedLayerElementsParams *params = vrv_cast<FindSpannedLayerElementsParams *>(functorParams);
+    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1656,7 +1656,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
 int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_cast<CalcOnsetOffsetParams *>(functorParams);
+    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1743,7 +1743,7 @@ int LayerElement::ResolveMIDITies(FunctorParams *)
 
 int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = vrv_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1758,7 +1758,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 
 int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateTimemapParams *params = vrv_cast<GenerateTimemapParams *>(functorParams);
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;

@@ -248,7 +248,7 @@ void ArticPart::AddSlurPositioner(FloatingCurvePositioner *positioner, bool star
 
 int Artic::CalcArtic(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     /************** Get the parent and the stem direction **************/
@@ -458,7 +458,7 @@ int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;

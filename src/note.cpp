@@ -592,7 +592,7 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
 
 int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = vrv_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     /****** ties ******/
@@ -648,7 +648,7 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
 int Note::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = vrv_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
@@ -724,7 +724,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
 int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
@@ -776,7 +776,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
 int Note::CalcDots(FunctorParams *functorParams)
 {
-    CalcDotsParams *params = vrv_cast<CalcDotsParams *>(functorParams);
+    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
     // We currently have no dots object with mensural notes
@@ -849,7 +849,7 @@ int Note::CalcDots(FunctorParams *functorParams)
 
 int Note::CalcLedgerLines(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (this->GetVisible() == BOOLEAN_false) {
@@ -983,7 +983,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Note::PrepareLyrics(FunctorParams *functorParams)
 {
-    PrepareLyricsParams *params = vrv_cast<PrepareLyricsParams *>(functorParams);
+    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
 
     params->m_lastButOneNote = params->m_lastNote;
@@ -997,7 +997,7 @@ int Note::PreparePointersByLayer(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::PreparePointersByLayer(functorParams);
 
-    PreparePointersByLayerParams *params = vrv_cast<PreparePointersByLayerParams *>(functorParams);
+    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
     params->m_currentNote = this;
@@ -1030,7 +1030,7 @@ int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int Note::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = vrv_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
@@ -1096,7 +1096,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
 
 int Note::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateTimemapParams *params = vrv_cast<GenerateTimemapParams *>(functorParams);
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
     Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
@@ -1129,7 +1129,7 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
 
 int Note::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = vrv_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
     if (!this->HasPname()) return FUNCTOR_SIBLINGS;

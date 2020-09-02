@@ -1749,7 +1749,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
 int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 {
-    PrepareLyricsParams *params = vrv_cast<PrepareLyricsParams *>(functorParams);
+    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
     if (!params->m_currentSyl) {
         return FUNCTOR_STOP; // early return
@@ -1772,7 +1772,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 
 int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
 {
-    PrepareTimestampsParams *params = vrv_cast<PrepareTimestampsParams *>(functorParams);
+    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
     if (!m_options->m_openControlEvents.GetValue() || params->m_timeSpanningInterfaces.empty()) {
