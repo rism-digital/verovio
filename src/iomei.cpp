@@ -3325,7 +3325,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is(SYSTEM)) {
-                    System *system = dynamic_cast<System *>(parent);
+                    System *system = vrv_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
                     m_doc->SetMensuralMusicOnly(true);
@@ -6352,7 +6352,7 @@ void MEIInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
     if (system->m_systemRightMar == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
 
-    Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
+    Page *page = vrv_cast<Page *>(system->GetFirstAncestor(PAGE));
     assert(page);
     measure->m_xAbs = system->m_systemLeftMar;
     measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;

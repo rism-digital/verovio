@@ -349,7 +349,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        ArticPart *articPart = dynamic_cast<ArticPart *>(object);
+        ArticPart *articPart = vrv_cast<ArticPart *>(object);
         assert(articPart);
         return (articPart->GetType() == m_type);
     }
@@ -375,7 +375,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Alignment *alignment = dynamic_cast<Alignment *>(object);
+        Alignment *alignment = vrv_cast<Alignment *>(object);
         assert(alignment);
         return (alignment->GetType() == m_type);
     }
@@ -401,7 +401,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Measure *measure = dynamic_cast<Measure *>(object);
+        Measure *measure = vrv_cast<Measure *>(object);
         assert(measure);
         return (measure->EnclosesTime(m_time) > 0);
     }
@@ -427,7 +427,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Note *note = dynamic_cast<Note *>(object);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
         return ((m_time >= note->GetRealTimeOnsetMilliseconds()) && (m_time <= note->GetRealTimeOffsetMilliseconds()));
     }

@@ -72,7 +72,7 @@ bool Section::IsSupportedChild(Object *child)
 
 int Section::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
@@ -82,7 +82,7 @@ int Section::ConvertToPageBased(FunctorParams *functorParams)
 
 int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
@@ -92,7 +92,7 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
 int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
 
     params->m_contentMeasure = NULL;

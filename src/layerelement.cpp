@@ -135,7 +135,7 @@ bool LayerElement::IsGraceNote()
 {
     // For note, we need to look at it or at the parent chord
     if (this->Is(NOTE)) {
-        Note const *note = dynamic_cast<Note const *>(this);
+        Note const *note = vrv_cast<Note const *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord)
@@ -144,7 +144,7 @@ bool LayerElement::IsGraceNote()
             return (note->HasGrace());
     }
     else if (this->Is(CHORD)) {
-        Chord const *chord = dynamic_cast<Chord const *>(this);
+        Chord const *chord = vrv_cast<Chord const *>(this);
         assert(chord);
         return (chord->HasGrace());
     }
@@ -243,7 +243,7 @@ int LayerElement::GetDrawingX() const
 {
     // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingX
     if (this->HasFacs()) {
-        Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingX();
@@ -291,7 +291,7 @@ int LayerElement::GetDrawingY() const
 {
     // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingY
     if (this->HasFacs()) {
-        Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingY();
@@ -377,7 +377,7 @@ void LayerElement::CenterDrawingX()
 
     SetDrawingXRel(0);
 
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
     SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
@@ -395,7 +395,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
             if (this->Is(CHORD)) {
                 int yChordMax = 0, yChordMin = 0;
-                Chord *chord = dynamic_cast<Chord *>(this);
+                Chord *chord = vrv_cast<Chord *>(this);
                 assert(chord);
                 chord->GetYExtremes(yChordMax, yChordMin);
                 return yChordMax + doc->GetDrawingUnit(staffSize);
@@ -428,7 +428,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
             if (this->Is(CHORD)) {
                 int yChordMax = 0, yChordMin = 0;
-                Chord *chord = dynamic_cast<Chord *>(this);
+                Chord *chord = vrv_cast<Chord *>(this);
                 assert(chord);
                 chord->GetYExtremes(yChordMax, yChordMin);
                 return yChordMin - doc->GetDrawingUnit(staffSize);
@@ -457,10 +457,10 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
 
     wchar_t code = 0;
     int dur = DUR_4;
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
+        Note *note = vrv_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
         if (note->IsMensuralDur() && !isInLigature) {
@@ -471,7 +471,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         code = note->GetNoteheadGlyph(dur);
     }
     else if (this->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this);
+        Chord *chord = vrv_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
         if (dur == DUR_1)
@@ -507,7 +507,7 @@ double LayerElement::GetAlignmentDuration(
     }
 
     if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
-        LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+        LayerElement *sameas = vrv_cast<LayerElement *>(this->GetSameasLink());
         assert(sameas);
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
@@ -545,14 +545,14 @@ double LayerElement::GetAlignmentDuration(
         return durationValue;
     }
     else if (this->Is(BEATRPT)) {
-        BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
+        BeatRpt *beatRpt = vrv_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
-        TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
+        TimestampAttr *timestampAttr = vrv_cast<TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
@@ -584,7 +584,7 @@ double LayerElement::GetSameAsContentAlignmentDuration(
         return 0.0;
     }
 
-    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    LayerElement *sameas = vrv_cast<LayerElement *>(this->GetSameasLink());
     assert(sameas);
 
     return sameas->GetContentAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
@@ -604,7 +604,7 @@ double LayerElement::GetContentAlignmentDuration(
         if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH) != NULL)) {
             continue;
         }
-        LayerElement *element = dynamic_cast<LayerElement *>(child);
+        LayerElement *element = vrv_cast<LayerElement *>(child);
         assert(element);
         duration += element->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
@@ -666,7 +666,7 @@ int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
 {
-    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -678,7 +678,7 @@ int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
 
 int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 {
-    AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
+    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
     // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
@@ -709,7 +709,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (ligatureParent && this->Is(NOTE)) {
         // Ligature notes are all aligned with the first note
-        Note *note = dynamic_cast<Note *>(this);
+        Note *note = vrv_cast<Note *>(this);
         assert(note);
         Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetList(ligatureParent)->front());
         if (firstNote && (firstNote != note)) {
@@ -759,7 +759,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_SCOREDEF_CAUTION_MENSUR;
         else {
             // replace the current mensur
-            params->m_currentMensur = dynamic_cast<Mensur *>(this);
+            params->m_currentMensur = vrv_cast<Mensur *>(this);
             assert(params->m_currentMensur);
             type = ALIGNMENT_MENSUR;
         }
@@ -771,7 +771,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_SCOREDEF_CAUTION_METERSIG;
         else {
             // replace the current meter signature
-            params->m_currentMeterSig = dynamic_cast<MeterSig *>(this);
+            params->m_currentMeterSig = vrv_cast<MeterSig *>(this);
             assert(params->m_currentMeterSig);
             // type = ALIGNMENT_METERSIG
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
@@ -786,7 +786,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_FULLMEASURE2;
     }
     else if (this->Is(DOT)) {
-        Dot *dot = dynamic_cast<Dot *>(this);
+        Dot *dot = vrv_cast<Dot *>(this);
         assert(dot);
         if (dot->m_drawingNote) {
             m_alignment = dot->m_drawingNote->GetAlignment();
@@ -802,26 +802,26 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is({ ARTIC, ARTIC_PART })) {
         // Refer to the note parent
-        Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE));
+        Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
     }
     else if (this->Is(SYL)) {
-        Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
         assert(staff);
 
         if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
             type = ALIGNMENT_DEFAULT;
         }
         else {
-            Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE));
+            Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
             assert(note);
             m_alignment = note->GetAlignment();
         }
     }
     else if (this->Is(VERSE)) {
         // Idem
-        Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE));
+        Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
     }
@@ -858,7 +858,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else {
         assert(this->IsGraceNote());
         if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
-            Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
             assert(staff);
             int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
             GraceAligner *graceAligner = m_alignment->GetGraceAligner(graceAlignerId);
@@ -880,15 +880,15 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 
 int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 {
-    SetAlignmentPitchPosParams *params = dynamic_cast<SetAlignmentPitchPosParams *>(functorParams);
+    SetAlignmentPitchPosParams *params = vrv_params_cast<SetAlignmentPitchPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     LayerElement *layerElementY = this;
-    Staff *staffY = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staffY = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staffY);
-    Layer *layerY = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layerY = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layerY);
 
     if (m_crossStaff && m_crossLayer) {
@@ -899,7 +899,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 
     // Adjust m_drawingYRel for notes and rests, etc.
     if (this->Is(ACCID)) {
-        Accid *accid = dynamic_cast<Accid *>(this);
+        Accid *accid = vrv_cast<Accid *>(this);
         assert(accid);
         Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE));
         // We should probably also avoid to add editorial accidentals to the accid space
@@ -926,7 +926,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, interface->CalcDrawingLoc(layerY, layerElementY)));
     }
     else if (this->Is(CUSTOS)) {
-        Custos *custos = dynamic_cast<Custos *>(this);
+        Custos *custos = vrv_cast<Custos *>(this);
         assert(custos);
         int loc = 0;
         if (custos->HasPname()) {
@@ -937,7 +937,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         this->SetDrawingYRel(yRel);
     }
     else if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
+        Note *note = vrv_cast<Note *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
         int loc = 0;
@@ -953,7 +953,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         this->SetDrawingYRel(yRel);
     }
     else if (this->Is(MREST)) {
-        MRest *mRest = dynamic_cast<MRest *>(this);
+        MRest *mRest = vrv_cast<MRest *>(this);
         assert(mRest);
         int loc = 0;
         if (mRest->HasPloc() && mRest->HasOloc()) {
@@ -965,14 +965,14 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         // Automatically calculate rest position
         else {
             // set default location to the middle of the staff
-            Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
-                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindDescendantByType(LAYER));
+                Layer *firstLayer = vrv_cast<Layer *>(staffY->FindDescendantByType(LAYER));
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN())
                     loc += 2;
@@ -989,7 +989,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is(REST)) {
-        Rest *rest = dynamic_cast<Rest *>(this);
+        Rest *rest = vrv_cast<Rest *>(this);
         assert(rest);
         int loc = 0;
         if (rest->HasPloc() && rest->HasOloc()) {
@@ -1001,7 +1001,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         // Automatically calculate rest position
         else {
             // set default location to the middle of the staff
-            Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
 
@@ -1024,7 +1024,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 // iterate through the elements from the rest to the beginning of the beam
                 // until we hit a note or chord, which we will use to determine where the rest should be placed
                 for (; rit != beamList->rend(); ++rit) {
-                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*rit);
+                    LayerElement *layerElement = vrv_cast<LayerElement *>(*rit);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
                         leftLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
@@ -1045,7 +1045,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 // iterate through the elements from the rest to the end of the beam
                 // until we hit a note or chord, which we will use to determine where the rest should be placed
                 for (; it != beamList->end(); ++it) {
-                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*it);
+                    LayerElement *layerElement = vrv_cast<LayerElement *>(*it);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
                         rightLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
@@ -1131,7 +1131,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 
 int LayerElement::AdjustLayers(FunctorParams *functorParams)
 {
-    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
+    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1155,19 +1155,19 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
 
     if (this->Is(NOTE)) {
-        params->m_currentNote = dynamic_cast<Note *>(this);
+        params->m_currentNote = vrv_cast<Note *>(this);
         assert(params->m_currentNote);
         if (!params->m_currentNote->IsChordTone()) params->m_currentChord = NULL;
     }
     else if (this->Is(CHORD)) {
-        params->m_currentChord = dynamic_cast<Chord *>(this);
+        params->m_currentChord = vrv_cast<Chord *>(this);
         assert(params->m_currentChord);
     }
 
     // Eventually we also want to have stem for overlapping voices
     if (this->Is({ NOTE, DOTS })) {
 
-        Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
         assert(staff);
 
         std::vector<LayerElement *>::iterator iter;
@@ -1178,7 +1178,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
             if (this->Is(NOTE) && (*iter)->Is(NOTE)) {
                 assert(params->m_currentNote);
-                Note *previousNote = dynamic_cast<Note *>(*iter);
+                Note *previousNote = vrv_cast<Note *>(*iter);
                 assert(previousNote);
                 // Unisson, look at the duration for the note heads
                 if (params->m_currentNote->IsUnissonWith(previousNote, false)) {
@@ -1251,7 +1251,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
 int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
+    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1290,7 +1290,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
 int LayerElement::AdjustXPos(FunctorParams *functorParams)
 {
-    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
+    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1377,7 +1377,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For note, we also need to look at the parent chord
     else if (this->Is(NOTE)) {
-        Note const *note = dynamic_cast<Note const *>(this);
+        Note const *note = vrv_cast<Note const *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
@@ -1391,7 +1391,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
     else if (this->Is(ACCID)) {
-        Accid const *accid = dynamic_cast<Accid *>(this);
+        Accid const *accid = vrv_cast<Accid *>(this);
         assert(accid);
         if ((accid->GetFunc() == accidLog_FUNC_edit) && !accid->HasEnclose())
             m_drawingCueSize = true;
@@ -1415,7 +1415,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 
 int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
-    PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
+    PrepareCrossStaffParams *params = vrv_params_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1447,7 +1447,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *parentStaff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *parentStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(parentStaff);
     // Check if we have a cross-staff to itself...
     if (m_crossStaff == parentStaff) {
@@ -1457,7 +1457,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(parentLayer);
     // Now try to get the corresponding layer - for now look for the same layer @n
     int layerN = parentLayer->GetN();
@@ -1484,7 +1484,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 
 int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 {
-    PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
+    PrepareCrossStaffParams *params = vrv_params_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1505,7 +1505,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 
 int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
 {
-    PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
+    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1524,7 +1524,7 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
 
 int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 {
-    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
+    PrepareTimePointingParams *params = vrv_params_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1548,7 +1548,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 
 int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
-    PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
+    PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1572,7 +1572,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 
 int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1642,7 +1642,7 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
 
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 {
-    FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
+    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1677,7 +1677,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
 int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1694,7 +1694,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     else if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
 
         // For now just ignore grace notes
@@ -1737,7 +1737,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         }
     }
     else if (element->Is(BEATRPT)) {
-        BeatRpt *rpt = dynamic_cast<BeatRpt *>(element);
+        BeatRpt *rpt = vrv_cast<BeatRpt *>(element);
         assert(rpt);
 
         incrementScoreTime = rpt->GetAlignmentDuration(
@@ -1764,7 +1764,7 @@ int LayerElement::ResolveMIDITies(FunctorParams *)
 
 int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -1779,7 +1779,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 
 int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;

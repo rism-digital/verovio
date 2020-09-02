@@ -76,7 +76,7 @@ Measure *LinkingInterface::GetNextMeasure()
 
 int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Object *object)
 {
-    PrepareLinkingParams *params = dynamic_cast<PrepareLinkingParams *>(functorParams);
+    PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
     assert(params);
 
     // This should not happen?
@@ -98,7 +98,7 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
 
 int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     // Only Dir and Dynam can be spanning with @next (extender)

@@ -78,7 +78,7 @@ double FacsimileInterface::GetDrawingRotate() const
 int FacsimileInterface::GetSurfaceY() const
 {
     assert(m_zone);
-    Surface *surface = dynamic_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
+    Surface *surface = vrv_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
     assert(surface);
     if (surface->HasLry()) {
         return surface->GetLry();
