@@ -924,7 +924,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
         if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
-            Measure *measure = vrv_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+            Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
             assert(measure);
             // move as pending since we want it not to be broken with the next measure
             params->m_pendingObjects.push_back(measure);
@@ -957,7 +957,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     params->m_pendingObjects.clear();
 
     // Special case where we use the Relinquish method.
-    Measure *measure = vrv_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(measure);
     params->m_currentSystem->AddChild(measure);
 

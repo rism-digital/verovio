@@ -98,7 +98,7 @@ std::string Option::GetDefaultStrValue() const
 
 void OptionBool::CopyTo(Option *option)
 {
-    OptionBool *child = vrv_cast<OptionBool *>(option);
+    OptionBool *child = dynamic_cast<OptionBool *>(option);
     assert(child);
     *child = *this;
 }
@@ -147,7 +147,7 @@ bool OptionBool::SetValue(bool value)
 
 void OptionDbl::CopyTo(Option *option)
 {
-    OptionDbl *child = vrv_cast<OptionDbl *>(option);
+    OptionDbl *child = dynamic_cast<OptionDbl *>(option);
     assert(child);
     *child = *this;
 }
@@ -197,7 +197,7 @@ bool OptionDbl::SetValue(double value)
 
 void OptionInt::CopyTo(Option *option)
 {
-    OptionInt *child = vrv_cast<OptionInt *>(option);
+    OptionInt *child = dynamic_cast<OptionInt *>(option);
     assert(child);
     *child = *this;
 }
@@ -258,7 +258,7 @@ bool OptionInt::SetValue(int value)
 
 void OptionString::CopyTo(Option *option)
 {
-    OptionString *child = vrv_cast<OptionString *>(option);
+    OptionString *child = dynamic_cast<OptionString *>(option);
     assert(child);
     *child = *this;
 }
@@ -281,7 +281,7 @@ bool OptionString::SetValue(const std::string &value)
 
 void OptionArray::CopyTo(Option *option)
 {
-    OptionArray *child = vrv_cast<OptionArray *>(option);
+    OptionArray *child = dynamic_cast<OptionArray *>(option);
     assert(child);
     *child = *this;
 }
@@ -358,7 +358,7 @@ OptionIntMap::OptionIntMap()
 
 void OptionIntMap::CopyTo(Option *option)
 {
-    OptionIntMap *child = vrv_cast<OptionIntMap *>(option);
+    OptionIntMap *child = dynamic_cast<OptionIntMap *>(option);
     assert(child);
     *child = *this;
 }
@@ -448,7 +448,7 @@ std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
 
 void OptionStaffrel::CopyTo(Option *option)
 {
-    OptionStaffrel *child = vrv_cast<OptionStaffrel *>(option);
+    OptionStaffrel *child = dynamic_cast<OptionStaffrel *>(option);
     assert(child);
     *child = *this;
 }

@@ -163,7 +163,7 @@ data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW() const
 
 data_PITCHNAME TransPitch::GetPitchName() const
 {
-    return vrv_cast<data_PITCHNAME>(m_pname + PITCHNAME_c);
+    return static_cast<data_PITCHNAME>(m_pname + PITCHNAME_c);
 }
 
 std::wstring TransPitch::GetPitchString() const

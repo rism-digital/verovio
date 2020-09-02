@@ -525,7 +525,7 @@ void Page::JustifyVertically()
         }
         int idx = this->GetIdx();
         if (idx > 0) {
-            Page *penultimatePage = vrv_cast<Page *>(pages->GetPrevious(this));
+            Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
             assert(penultimatePage);
 
             if (penultimatePage->m_drawingJustifiableHeight < this->m_drawingJustifiableHeight) {
@@ -574,7 +574,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = vrv_cast<System *>(m_children.back());
+    System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
