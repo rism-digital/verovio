@@ -2000,7 +2000,7 @@ void PAEInput::parseNote(pae::Note *note)
 
     // note in a chord
     if (note->chord) {
-        Note *mnote = vrv_cast<Note *>(element);
+        Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         // first note?
         if (!m_is_in_chord) {
@@ -2036,7 +2036,7 @@ void PAEInput::parseNote(pae::Note *note)
 
     // last note of a chord
     if (!note->chord && m_is_in_chord) {
-        Note *mnote = vrv_cast<Note *>(element);
+        Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->ResetAugmentDots();
         mnote->ResetDurationLogical();

@@ -647,7 +647,7 @@ void ABCInput::parseKey(std::string keyString)
 
         std::string keySig;
         unsigned long posStart = 0;
-        auto posEnd = vrv_cast<unsigned long>(abs(accidNum));
+        auto posEnd = static_cast<unsigned long>(abs(accidNum));
 
         if (accidNum < 0) {
             keySig = StringFormat("%df", abs(accidNum));
@@ -1171,7 +1171,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 note->AddChild(accid);
             }
 
-            if (keyPitchAlter.find(vrv_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
+            if (keyPitchAlter.find(static_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
                 auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();

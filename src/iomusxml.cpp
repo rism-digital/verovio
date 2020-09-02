@@ -174,7 +174,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
             if (!current->Is(STAFF)) {
                 continue;
             }
-            Staff *staff = vrv_cast<Staff *>(measure->Relinquish(current->GetIdx()));
+            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
         }
@@ -226,7 +226,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         if (!item->Is(STAFF)) {
             continue;
         }
-        Staff *staff = vrv_cast<Staff *>(item);
+        Staff *staff = dynamic_cast<Staff *>(item);
         assert(staff);
         for (auto layer : *staff->GetChildren()) {
             assert(layer);
@@ -1421,7 +1421,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum - 1));
+        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1));
         assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
