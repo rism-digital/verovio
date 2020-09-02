@@ -4891,12 +4891,65 @@ template <class ELEMENT>
 void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok)
 {
 
-    Mensur *vrvmensur = getMensur(element);
+    Mensur *vrvmensur = getMensur(element, mensurtok);
     if (!vrvmensur) {
         return;
     }
     if (mensurtok) {
         setLocationId(vrvmensur, mensurtok);
+    }
+
+    if (metersig == "*met(C)" || metersig == "C") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        return;
+    }
+    if (metersig == "*met(C|)" || metersig == "C|") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(O)" || metersig == "O") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        return;
+    }
+    if (metersig == "*met(O|)" || metersig == "O|") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(O.)" || metersig == "O.") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        return;
+    }
+    if (metersig == "*met(O.|)" || metersig == "O.|") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(C.)" || metersig == "C.") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        return;
+    }
+    if (metersig == "*met(C.|)" || metersig == "C.|") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(C|3/2)" || metersig == "C|3/2") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        vrvmensur->SetNum(3);
+        vrvmensur->SetNumbase(2);
+        vrvmensur->SetSlash(1);
+        return;
     }
 
     if (metersig.find('C') != std::string::npos) {
@@ -5576,11 +5629,27 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (index >= 0) {
             setLocationId(tempo, infile.token(index, 0));
         }
-        m_measure->AddChildBack(tempo);
+        addChildBackMeasureOrSection(tempo);
         setTempoContent(tempo, value);
         tempo->SetTstamp(1.0);
         setStaff(tempo, 1);
         m_omd = infile[index].getDurationFromStart();
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addChildBackMeasureOrSection -- Add to the current measure, or add to section
+//     if there is not measure.
+//
+
+template <class ELEMENT> void HumdrumInput::addChildBackMeasureOrSection(ELEMENT element)
+{
+    if (m_measure) {
+        m_measure->AddChildBack(element);
+    }
+    else {
+        m_sections.back()->AddChild(element);
     }
 }
 
@@ -5799,7 +5868,7 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
     std::vector<Staff *> stafflist(staffstarts.size());
     for (i = 0; i < (int)staffstarts.size(); ++i) {
         stafflist[i] = new Staff();
-        m_measure->AddChild(stafflist[i]);
+        addChildMeasureOrSection(stafflist[i]);
     }
 
     checkForOmd(startline, endline);
@@ -5902,7 +5971,7 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
         current = current->getPreviousFieldToken();
     }
 
-    m_measure->AddChild(harm);
+    addChildMeasureOrSection(harm);
     int staffindex = 0;
     if (kerntrack >= 0) {
         staffindex = m_rkern[kerntrack];
@@ -5912,6 +5981,21 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
     setStaff(harm, staffindex + 1);
     setLocationId(harm, token);
     setLocationId(fb, token);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addChildMeasureOrSection -- Add element to measure if exists; otherwise, add to section.
+//
+
+template <class ELEMENT> void HumdrumInput::addChildMeasureOrSection(ELEMENT element)
+{
+    if (m_measure) {
+        m_measure->AddChild(element);
+    }
+    else {
+        m_sections.back()->AddChild(element);
+    }
 }
 
 //////////////////////////////
@@ -6080,7 +6164,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                 }
             }
 
-            m_measure->AddChild(harm);
+            addChildMeasureOrSection(harm);
             int staffindex = m_rkern[kerntrack];
             if (m_placement.at(spinetrack)) {
                 m_fbstates.at(staffindex) = m_placement.at(spinetrack);
@@ -6196,7 +6280,7 @@ void HumdrumInput::insertFingerNumberInMeasure(
     else {
         setPlace(dir, "below");
     }
-    m_measure->AddChild(dir);
+    addChildMeasureOrSection(dir);
     setLocationId(dir, token);
 
     // Previously used @tstamp, now use @startid of note/chord;
@@ -6311,7 +6395,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
             content = cleanStringString(*token);
             text->SetText(content);
             harm->AddChild(text);
-            m_measure->AddChild(harm);
+            addChildMeasureOrSection(harm);
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             harm->SetTstamp(tstamp.getFloat());
             appendTypeTag(harm, "string");
@@ -6381,7 +6465,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             Harm *harm = new Harm;
             Text *text = new Text;
 
-            m_measure->AddChild(harm);
+            addChildMeasureOrSection(harm);
 
             int line = token->getLineIndex();
             int field = token->getFieldIndex();
@@ -8029,6 +8113,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         setLocationId(clef, layerdata[i]);
                     }
                 }
+                if (layerdata[i]->isMensurationSymbol() && (layerdata[i]->getDurationFromStart() > 0)) {
+                    // add mensuration change to layer.
+                    setMensurationSymbol(m_layer, *layerdata[i], layerdata[i]);
+                }
             }
             else if (forceClefChange || (layerdata[i]->getDurationFromStart() != 0)) {
                 if (layerdata[i]->isClef()) {
@@ -8544,12 +8632,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         // styling here...
         if ((layerdata.back()->find(":|") != std::string::npos)
             || (layerdata.back()->find(":!") != std::string::npos)) {
-            m_measure->SetRight(BARRENDITION_rptend);
+            if (m_measure) {
+                m_measure->SetRight(BARRENDITION_rptend);
+            }
         }
     }
     if ((layerindex == 0) && (!layerdata.empty()) && (layerdata[0]->at(0) == '=')) {
         if ((layerdata[0]->find("|:") != std::string::npos) || (layerdata[0]->find("!:") != std::string::npos)) {
-            m_measure->SetLeft(BARRENDITION_rptstart);
+            if (m_measure) {
+                m_measure->SetLeft(BARRENDITION_rptstart);
+            }
         }
     }
 
@@ -8764,9 +8856,7 @@ void HumdrumInput::handleLigature(hum::HTp token)
     ligature->SetLform(LINEFORM_solid);
     ligature->SetFunc("ligature");
 
-    if (m_measure) {
-        m_measure->AddChild(ligature);
-    }
+    addChildMeasureOrSection(ligature);
 }
 
 //////////////////////////////
@@ -8849,9 +8939,7 @@ void HumdrumInput::handleColoration(hum::HTp token)
     // coloration->SetLwidth(lw);
     coloration->SetFunc("coloration");
 
-    if (m_measure) {
-        m_measure->AddChild(coloration);
-    }
+    addChildMeasureOrSection(coloration);
 }
 
 //////////////////////////////
@@ -10073,14 +10161,14 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 
     if (placement == "above") {
         setPlace(dir, "above");
-        m_measure->AddChildBack(dir);
+        addChildBackMeasureOrSection(dir);
     }
     else if (placement == "below") {
         setPlace(dir, "below");
-        m_measure->AddChild(dir);
+        addChildMeasureOrSection(dir);
     }
     else {
-        m_measure->AddChild(dir);
+        addChildMeasureOrSection(dir);
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
@@ -10467,7 +10555,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         addType(dir, typevalue);
     }
 
-    m_measure->AddChild(dir);
+    addChildMeasureOrSection(dir);
     if (placement == "above") {
         setPlace(dir, "above");
     }
@@ -10534,7 +10622,7 @@ bool HumdrumInput::addTempoDirection(const string &text, const string &placement
 
     bool status = setTempoContent(tempo, text);
     if (status) {
-        m_measure->AddChild(tempo);
+        addChildMeasureOrSection(tempo);
         return true;
     }
     else {
@@ -10761,7 +10849,7 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         addType(dir, typevalue);
     }
 
-    m_measure->AddChild(dir);
+    addChildMeasureOrSection(dir);
     if (placement == "above") {
         setPlace(dir, "above");
     }
@@ -10899,7 +10987,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
 
         Dynam *dynam = new Dynam;
-        m_measure->AddChild(dynam);
+        addChildMeasureOrSection(dynam);
         setStaff(dynam, m_currentstaff + belowadj);
 
         if (needsrend) {
@@ -11090,11 +11178,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (editorial) {
                 Supplied *supplied = new Supplied;
                 appendElement(supplied, dynam);
-                m_measure->AddChild(supplied);
+                addChildMeasureOrSection(supplied);
                 addType(dynam, "editorial");
             }
             else {
-                m_measure->AddChild(dynam);
+                addChildMeasureOrSection(dynam);
             }
             setStaff(dynam, m_currentstaff + belowadj);
             setLocationId(dynam, dyntok, -1);
@@ -11217,7 +11305,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
                 addType(hairpin, "endbar03");
-                m_measure->AddChild(hairpin);
+                addChildMeasureOrSection(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
@@ -11247,7 +11335,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 // no endpoint so print as the word "cresc."
                 Dir *dir = new Dir;
-                m_measure->AddChild(dir);
+                addChildMeasureOrSection(dir);
                 setStaff(dir, m_currentstaff + belowadj);
                 setLocationId(dir, dyntok);
                 hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
@@ -11328,7 +11416,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
                 addType(hairpin, "endbar03");
-                m_measure->AddChild(hairpin);
+                addChildMeasureOrSection(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
@@ -11358,7 +11446,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 // no endpoint so print as the word "decresc."
                 Dir *dir = new Dir;
-                m_measure->AddChild(dir);
+                addChildMeasureOrSection(dir);
                 setStaff(dir, m_currentstaff + belowadj);
                 setLocationId(dir, dyntok);
                 bool aboveQ = hasAboveParameter(dyntok, "HP");
@@ -12837,8 +12925,14 @@ template <class ELEMENT> Clef *HumdrumInput::getClef(ELEMENT element)
 //   return a pointer to it. ELEMENT can be ScoreDef or StaffDef.
 //
 
-template <class ELEMENT> Mensur *HumdrumInput::getMensur(ELEMENT element)
+template <class ELEMENT> Mensur *HumdrumInput::getMensur(ELEMENT element, hum::HTp token)
 {
+    if (token && (token->getDurationFromStart() > 0)) {
+        Mensur *layermensuration = new Mensur;
+        element->AddChild(layermensuration);
+        return layermensuration;
+    }
+
     Mensur *output = (Mensur *)element->FindDescendantByType(ClassId::MENSUR);
     if (!output) {
         output = new Mensur;
@@ -15393,7 +15487,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         // turn on pedal
         Pedal *pedal = new Pedal;
         setLocationId(pedal, token);
-        m_measure->AddChild(pedal);
+        addChildMeasureOrSection(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         if (durtobar == 0) {
             tstamp -= barbuffer;
@@ -15413,7 +15507,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
     else if (*token == "*Xped") {
         Pedal *pedal = new Pedal;
         setLocationId(pedal, token);
-        m_measure->AddChild(pedal);
+        addChildMeasureOrSection(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
         if (durtobar == 0) {
             tstamp -= barbuffer;
@@ -15815,7 +15909,13 @@ bool HumdrumInput::hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::Hum
 
 template <class PARENT, class CHILD> void HumdrumInput::appendElement(PARENT parent, CHILD child)
 {
-    parent->AddChild(child);
+    if (parent == NULL) {
+        // probably a NULL measure, so store in section
+        m_sections.back()->AddChild(child);
+    }
+    else {
+        parent->AddChild(child);
+    }
 }
 
 /////////////////////////////
@@ -18668,7 +18768,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
         addTieLineStyle(tie, token, subindex);
 
-        m_measure->AddChild(tie);
+        addChildMeasureOrSection(tie);
         int endsubindex = endnumber - 1;
         if (endsubindex < 0) {
             endsubindex = 0;
@@ -19008,7 +19108,7 @@ Tie *HumdrumInput::tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum m
 {
     Tie *tie = new Tie;
     addTieLineStyle(tie, token, subindex);
-    m_measure->AddChild(tie);
+    addChildMeasureOrSection(tie);
     hum::HTp starttoken = token->getOwner()->getTrackStart(token->getTrack());
     hum::HTp current = token->getPreviousToken();
     while (current) {
@@ -19121,7 +19221,12 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         currentsection = "";
     }
 
-    m_measure = new Measure();
+    if (hasMensuralStaff(&infile[startline])) {
+        m_measure = NULL;
+    }
+    else {
+        m_measure = new Measure();
+    }
 
     int endnum = 0;
     bool ending = false;
@@ -19179,7 +19284,9 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         // start a new section
         m_currentending = NULL;
         m_currentsection = new Section;
-        m_currentsection->AddChild(m_measure);
+        if (m_measure) {
+            m_currentsection->AddChild(m_measure);
+        }
         m_currentsection->SetUuid(m_lastsection);
         m_sections.back()->AddChild(m_currentsection);
         m_sections.push_back(m_currentsection);
@@ -19187,30 +19294,57 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     else {
         // outside of an ending
         m_currentending = NULL;
-        m_sections.back()->AddChild(m_measure);
+        if (m_measure) {
+            m_sections.back()->AddChild(m_measure);
+        }
     }
     m_endingnum = endnum;
     m_measures.push_back(m_measure);
 
     if (m_leftbarstyle != BARRENDITION_NONE) {
-        m_measure->SetLeft(m_leftbarstyle);
+        if (m_measure) {
+            m_measure->SetLeft(m_leftbarstyle);
+        }
         m_leftbarstyle = BARRENDITION_NONE;
     }
 
-    setLocationId(m_measure, startline, -1, -1);
+    if (m_measure) {
+        setLocationId(m_measure, startline, -1, -1);
+    }
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {
-        setN(m_measure, measurenumber);
+        if (m_measure) {
+            setN(m_measure, measurenumber);
+        }
     }
 
     if (m_doc->GetOptions()->m_humType.GetValue()) {
-        stringstream measuretag;
-        measuretag << "m-" << measurenumber;
-        appendTypeTag(m_measure, measuretag.str());
+        if (m_measure) {
+            stringstream measuretag;
+            measuretag << "m-" << measurenumber;
+            appendTypeTag(m_measure, measuretag.str());
+        }
     }
 
-    setSystemMeasureStyle(startline, endline);
+    if (m_measure) {
+        setSystemMeasureStyle(startline, endline);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasMensuralStaff --  Return true if any **mens spines.
+//
+
+bool HumdrumInput::hasMensuralStaff(hum::HLp line)
+{
+    for (int i = 0; i < line->getFieldCount(); i++) {
+        if (line->token(i)->isMens()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -19265,7 +19399,7 @@ void HumdrumInput::checkForRehearsal(int line)
         std::wstring wtext = UTF8to16(tvalue);
         text->SetText(wtext);
         reh->AddChild(text);
-        m_measure->AddChildBack(reh);
+        addChildMeasureOrSection(reh);
         // Add to top staff for now, but add to top of
         // each instrumentalgoup probably in the future.
         setStaff(reh, 1);
@@ -19288,7 +19422,7 @@ void HumdrumInput::addFTremSlurs()
         return;
     }
     for (int i = 0; i < (int)m_ftrem_slurs.size(); i++) {
-        m_measure->AddChildBack(m_ftrem_slurs.at(i));
+        addChildBackMeasureOrSection(m_ftrem_slurs.at(i));
     }
     m_ftrem_slurs.clear();
 }

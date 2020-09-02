@@ -647,6 +647,7 @@ protected:
     void checkForBreak(hum::HumdrumFile &infile, int line);
     int getLowestDiatonicPitch(hum::HTp token, const string &requirement);
     int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
+    bool hasMensuralStaff(hum::HLp line);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -676,7 +677,7 @@ protected:
     template <class ELEMENT> KeySig *getKeySig(ELEMENT element);
     template <class ELEMENT> MeterSig *getMeterSig(ELEMENT element);
     template <class ELEMENT> Clef *getClef(ELEMENT element);
-    template <class ELEMENT> Mensur *getMensur(ELEMENT element);
+    template <class ELEMENT> Mensur *getMensur(ELEMENT element, hum::HTp token = NULL);
     template <class ELEMENT>
     void insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp phraseend, Measure *startmeasure,
         std::vector<pair<int, int> > &endchordsorted, std::vector<std::pair<int, int> > &startchordsorted,
@@ -686,6 +687,8 @@ protected:
     template <class ELEMENT> void convertVerses(ELEMENT element, hum::HTp token);
     template <class ELEMENT>
     void setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex);
+    template <class ELEMENT> void addChildBackMeasureOrSection(ELEMENT element);
+    template <class ELEMENT> void addChildMeasureOrSection(ELEMENT element);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
