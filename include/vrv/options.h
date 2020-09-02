@@ -387,41 +387,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// OptionJson
-//----------------------------------------------------------------------------
-
-/**
- * This class is for Json input params
- */
-
-class OptionJson : public Option {
-    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
-
-public:
-    //
-    OptionJson() = default;
-    virtual ~OptionJson() = default;
-    virtual void Init(const std::string &defaultValue);
-
-    virtual bool SetValue(const std::string &jsonFilePath);
-    //virtual std::string GetStrValue() const;
-
-    int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
-    double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
-    //
-    bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
-    //
-protected:
-    JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
-    //
-private:
-    jsonxx::Object m_values;
-    jsonxx::Object m_defaultValues;
-    std::string m_defaultJsonNode;
-};
-
-
-//----------------------------------------------------------------------------
 // OptionGrp
 //----------------------------------------------------------------------------
 
@@ -570,7 +535,6 @@ public:
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
     OptionDbl m_tieThickness;
-    OptionJson m_restLayerOffsets;
 
     /**
      * Selectors

@@ -36,33 +36,6 @@ std::map<int, std::string> Option::s_measureNumber
 std::map<int, std::string> Option::s_systemDivider
     = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
-// default offsets setting for rest location
-constexpr const char *defaultRestLayerOffsets 
-    = R"({'otherLayer':{'noAccidental':{'restOnTopLayer':{'noteInSpace':{'1':3,'2':3,'4':5,'8':5,'16':7,'32':7,'64':9,
-    '128':9,'long':5,'breve':5},'noteOnLine':{'1':2,'2':4,'4':6,'8':4,'16':6,'32':6,'64':8,'128':8,'long':6,'breve'
-    :4}},'restOnBottomLayer':{'noteInSpace':{'1':-5,'2':-5,'4':-5,'8':-5,'16':-5,'32':-7,'64':-7,'128':-9,'long':-5
-    ,'breve':-5},'noteOnLine':{'1':-6,'2':-6,'4':-6,'8':-4,'16':-4,'32':-6,'64':-6,'128':-8,'long':-6,'breve':-6}}}
-    ,'s':{'restOnTopLayer':{'noteInSpace':{'1':3,'2':5,'4':7,'8':5,'16':7,'32':7,'64':9,'128':9,'long':5,'breve':5}
-    ,'noteOnLine':{'1':2,'2':4,'4':6,'8':6,'16':8,'32':8,'64':10,'128':10,'long':6,'breve':4}},'restOnBottomLayer':
-    {'noteInSpace':{'1':-5,'2':-5,'4':-5,'8':-5,'16':-5,'32':-7,'64':-7,'128':-9,'long':-5,'breve':-5},'noteOnLine'
-    :{'1':-6,'2':-6,'4':-6,'8':-6,'16':-6,'32':-6,'64':-6,'128':-8,'long':-6,'breve':-6}}},'f':{'restOnTopLayer':{
-    'noteInSpace':{'1':3,'2':5,'4':5,'8':5,'16':7,'32':7,'64':9,'128':9,'long':5,'breve':5},'noteOnLine':{'1':4,'2'
-    :4,'4':6,'8':6,'16':8,'32':8,'64':10,'128':10,'long':6,'breve':4}},'restOnBottomLayer':{'noteInSpace':{'1':-5,
-    '2':-5,'4':-5,'8':-5,'16':-5,'32':-7,'64':-7,'128':-9,'long':-5,'breve':-5},'noteOnLine':{'1':-6,'2':-6,'4':-6,
-    '8':-4,'16':-4,'32':-6,'64':-6,'128':-8,'long':-6,'breve':-6}}},'x':{'restOnTopLayer':{'noteInSpace':{'1':3,'2'
-    :3,'4':5,'8':5,'16':7,'32':7,'64':9,'128':9,'long':5,'breve':5},'noteOnLine':{'1':2,'2':4,'4':6,'8':6,'16':8,
-    '32':8,'64':10,'128':10,'long':6,'breve':4}},'restOnBottomLayer':{'noteInSpace':{'1':-5,'2':-5,'4':-5,'8':-5,
-    '16':-5,'32':-7,'64':-7,'128':-9,'long':-5,'breve':-5},'noteOnLine':{'1':-6,'2':-4,'4':-6,'8':-4,'16':-4,'32':
-    -6,'64':-6,'128':-8,'long':-6,'breve':-6}}},'n':{'restOnTopLayer':{'noteInSpace':{'1':3,'2':3,'4':5,'8':5,'16':
-    7,'32':7,'64':9,'128':9,'long':5,'breve':5},'noteOnLine':{'1':2,'2':6,'4':6,'8':6,'16':8,'32':8,'64':10,'128':10
-    ,'long':6,'breve':4}},'restOnBottomLayer':{'noteInSpace':{'1':-7,'2':-5,'4':-7,'8':-5,'16':-5,'32':-7,'64':-7,
-    '128':-9,'long':-5,'breve':-5},'noteOnLine':{'1':-6,'2':-6,'4':-6,'8':-6,'16':-6,'32':-6,'64':-6,'128':-8,'long'
-    :-6,'breve':-6}}}},'sameLayer':{'restOnTopLayer':{'noteInSpace':{'1':-1,'2':1,'4':3,'8':1,'16':3,'32':3,'64':5,
-    '128':5,'long':3,'breve':1},'noteOnLine':{'1':0,'2':0,'4':2,'8':2,'16':2,'32':2,'64':4,'128':4,'long':2,'breve':
-    2}},'restOnBottomLayer':{'noteInSpace':{'1':-3,'2':-1,'4':-3,'8':-1,'16':-1,'32':-3,'64':-3,'128':-5,'long':-3,
-    'breve':-3},'noteOnLine':{'1':-2,'2':-2,'4':-4,'8':-2,'16':-2,'32':-4,'64':-4,'128':-6,'long':-2,'breve':-2}}}})";
-
-
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
@@ -523,108 +496,6 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 }
 
 //----------------------------------------------------------------------------
-// OptionJson
-//----------------------------------------------------------------------------
-
-void OptionJson::Init(const std::string &defaultValue)
-{
-    m_defaultValues.parse(defaultValue);
-    m_isSet = false;
-}
-
-bool OptionJson::SetValue(const std::string &jsonFilePath)
-{
-    std::ifstream in(jsonFilePath.c_str());
-    if (!in.is_open()) {
-        return false;
-    }
-
-    jsonxx::Object newValues;
-    if (!newValues.parse(in)) {
-        LogError("Input file '%s' is not valid or contains errors", jsonFilePath.c_str());
-        return false;
-    }
-
-    m_values = newValues;
-    m_isSet = true;
-
-    in.close();
-    return true;
-}
-
-
-int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
-{
-    return static_cast<int>(GetDoubleValue(jsonNodePath, getDefault));
-}
-
-double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
-{
-    JsonPath path = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath)
-                               : StringPath2NodePath(m_values, jsonNodePath);
-
-    if (path.size() != jsonNodePath.size() && !getDefault) {
-        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
-    }
-
-    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>())
-        return 0;
-
-    return path.back().get().get<jsonxx::Number>();
-}
-
-bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value)
-{
-    if (jsonNodePath.empty()) {
-        return false;
-    }
-
-    JsonPath path = StringPath2NodePath(m_values, jsonNodePath);
-    if (path.size() != jsonNodePath.size()) {
-        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
-    }
-
-    if (path.size() != jsonNodePath.size()) {
-        return false;
-    }
-
-    path.back().get().parse(value);
-    return true;
-}
-
-OptionJson::JsonPath OptionJson::StringPath2NodePath(
-    const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
-{
-    JsonPath path;
-    if (jsonNodePath.empty() || !obj.has<jsonxx::Value>(jsonNodePath.front())) {
-        return path;
-    }
-    path.reserve(jsonNodePath.size());
-    path.push_back(const_cast<jsonxx::Value &>(obj.get<jsonxx::Value>(jsonNodePath.front())));
-    for (auto iter = jsonNodePath.begin() + 1; iter != jsonNodePath.end(); ++iter) {
-        jsonxx::Value &val = path.back();
-        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(*iter)) {
-            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
-        }
-        else if (val.is<jsonxx::Array>()) {
-            try {
-                const int index = std::stoi(*iter);
-                if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index))
-                    break;
-
-                path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
-            }
-            catch (const std::logic_error &) {
-                // invalid index, leaving
-                break;
-            }
-        }
-    }
-
-    return path;
-}
-
-//----------------------------------------------------------------------------
 // Options
 //----------------------------------------------------------------------------
 
@@ -957,11 +828,6 @@ Options::Options()
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
-
-    m_restLayerOffsets.SetInfo("Rest layer offsets",
-        "Path to json file describing offsets for rest location in relation to elements on other/same layers");
-    m_restLayerOffsets.Init(defaultRestLayerOffsets);
-    this->Register(&m_restLayerOffsets, "restLayerOffsets", &m_generalLayout);
 
     /********* selectors *********/
 

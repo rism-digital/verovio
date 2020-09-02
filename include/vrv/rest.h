@@ -15,6 +15,14 @@
 
 namespace vrv {
 
+enum RestLayer { RL_UNSET = -1, RL_sameLayer, RL_otherLayer };
+
+enum RestAccidental { RA_UNSET = -1, RA_none, RA_s, RA_f, RA_x, RA_n };
+
+enum RestLayerPlace { RLP_UNSET = -1, RLP_restOnTopLayer, RLP_restOnBottomLayer };
+
+enum RestNotePlace { RNP_UNSET = -1, RNP_noteInSpace, RNP_noteOnLine };
+
 //----------------------------------------------------------------------------
 // Rest
 //----------------------------------------------------------------------------
@@ -114,7 +122,8 @@ private:
     /**
      * Get the rest vertical location relative to location of elements placed on other layers
      */
-    std::pair<int, std::string> GetLocationRelativeToOtherLayers(const ListOfObjects &layersList, Layer *currentLayer);
+    std::pair<int, RestAccidental> GetLocationRelativeToOtherLayers(
+        const ListOfObjects &layersList, Layer *currentLayer);
 
     /**
      * Get the rest vertical location relative to location of elements placed on current layers
@@ -129,17 +138,20 @@ private:
     /**
      * Get location of the object on the layer if it's note, chord or ftrem
      */
-    std::pair<int, std::string> GetElementLocation(Object *object, Layer *layer, bool isTopLayer);
+    std::pair<int, RestAccidental> GetElementLocation(Object *object, Layer *layer, bool isTopLayer);
 
     /**
      * Get correct offset for the rest from the options based on layer and location
      */
-    int GetRestOffsetFromOptions(const std::string &layer, const std::pair<int, std::string>& location, bool isTopLayer) const;
+    int GetRestOffsetFromOptions(
+        RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const;
 
 public:
     //
 private:
 };
+
+
 
 } // namespace vrv
 

@@ -27,6 +27,163 @@
 
 namespace vrv {
 
+typedef std::map<RestLayer,
+    std::map<RestAccidental, std::map<RestLayerPlace, std::map<RestNotePlace, std::map<int, int> > > > >
+    RestOffsets;
+
+RestOffsets g_defaultRests{
+    { RL_sameLayer,
+        { { RA_none,
+            { { RLP_restOnTopLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
+                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 4 }, { DUR_16, 6 }, { DUR_32, 6 }, 
+                      { DUR_64, 8 }, { DUR_128, 8 }, { DUR_LG, 6 }, { DUR_BR, 4 }
+                    } }
+                } },
+              { RLP_restOnBottomLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
+                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 }, { DUR_32, -6 }, 
+                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
+                    } }
+                } }
+            } },
+          { RA_s,
+            { { RLP_restOnTopLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 7 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
+                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
+                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
+                    } }
+                } },
+              { RLP_restOnBottomLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
+                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 }, { DUR_32, -6 }, 
+                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
+                    } }
+                } }
+            } },
+          { RA_f,
+            { { RLP_restOnTopLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
+                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, 4 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
+                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
+                    } }
+                } },
+              { RLP_restOnBottomLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
+                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 }, { DUR_32, -6 }, 
+                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
+                    } }
+                } }
+            } },
+          { RA_x,
+            { { RLP_restOnTopLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
+                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
+                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
+                    } }
+                } },
+              { RLP_restOnBottomLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
+                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, -6 }, { DUR_2, -4 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 }, { DUR_32, -6 }, 
+                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
+                    } }
+                } }
+            } },
+          { RA_x,
+            { { RLP_restOnTopLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
+                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, 2 }, { DUR_2, 6 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
+                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
+                    } }
+                } },
+              { RLP_restOnBottomLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, -7 }, { DUR_2, -5 }, { DUR_4, -7 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
+                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 }, { DUR_32, -6 }, 
+                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
+                    } }
+                } }
+            } }
+        } 
+    },
+    { RL_otherLayer,
+        { { RA_none,
+            { { RLP_restOnTopLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 3 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 }, 
+                      { DUR_64, 5 }, { DUR_128, 5 }, { DUR_LG, 3 }, { DUR_BR, 1 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, 0 }, { DUR_2, 0 }, { DUR_4, 2 }, { DUR_8, 2 }, { DUR_16, 2 }, { DUR_32, 2 }, 
+                      { DUR_64, 4 }, { DUR_128, 4 }, { DUR_LG, 2 }, { DUR_BR, 2 }
+                    } }
+                } },
+              { RLP_restOnBottomLayer,
+                { { RNP_noteInSpace,
+                    { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -3 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 }, 
+                      { DUR_64, -3 }, { DUR_128, -5 }, { DUR_LG, -3 }, { DUR_BR, -3 }
+                    } },
+                  { RNP_noteOnLine,
+                    { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -4 }, { DUR_8, -2 }, { DUR_16, -2 }, { DUR_32, -4 }, 
+                      { DUR_64, -4 }, { DUR_128, -6 }, { DUR_LG, -2 }, { DUR_BR, -2 }
+                    } }
+                } }
+            } }
+        } 
+    }
+};
+
+// helper function for conversion
+RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental) 
+{
+    switch (accidental) {
+        case ACCIDENTAL_WRITTEN_s: return RA_s;
+        case ACCIDENTAL_WRITTEN_f: return RA_f;
+        case ACCIDENTAL_WRITTEN_x: return RA_x;
+        case ACCIDENTAL_WRITTEN_n: return RA_n;
+        default: return RA_none;
+    }
+}
+
 //----------------------------------------------------------------------------
 // Rest
 //----------------------------------------------------------------------------
@@ -143,39 +300,40 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
-        + GetRestOffsetFromOptions("otherLayer", otherLayerRelativeLocationInfo, isTopLayer);
+        + GetRestOffsetFromOptions(RL_otherLayer, otherLayerRelativeLocationInfo, isTopLayer);
     if (currentLayerRelativeLocation == VRV_UNSET) {
         currentLayerRelativeLocation = defaultLocation;
     }
     else {
-        std::pair<int, std::string> currentLayerRelativeLocationInfo(currentLayerRelativeLocation, "noAccidental");
+        std::pair<int, RestAccidental> currentLayerRelativeLocationInfo(currentLayerRelativeLocation, RA_none);
         currentLayerRelativeLocation
-            += GetRestOffsetFromOptions("sameLayer", currentLayerRelativeLocationInfo, isTopLayer);
+            += GetRestOffsetFromOptions(RL_sameLayer, currentLayerRelativeLocationInfo, isTopLayer);
     }
 
     return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
                       : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
 }
 
-std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfObjects &layersList, Layer *currentLayer)
+std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
+    const ListOfObjects &layersList, Layer *currentLayer)
 {
-    if (!currentLayer) return { VRV_UNSET, "noAccidental" };
+    if (!currentLayer) return { VRV_UNSET, RA_none };
     const bool isTopLayer(static_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
 
     // Get iterator to another layer. We're going to find coliding elements there
     auto layerIter = std::find_if(layersList.begin(), layersList.end(),
         [&](Object *foundLayer) { return static_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
-    if (layerIter == layersList.end()) return { VRV_UNSET, "noAccidental" };
+    if (layerIter == layersList.end()) return { VRV_UNSET, RA_none };
     auto collidingElementsList = static_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
     
-    std::pair<int, std::string> finalElementInfo = { VRV_UNSET, "noAccidental" };
+    std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
         auto currentElementInfo = GetElementLocation(object, static_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
 		//  If note on other layer is not on the same x position as rest - ignore its accidental
         if (GetAlignment()->GetTime() != static_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
-            currentElementInfo.second = "noAccidental";
+            currentElementInfo.second = RA_none;
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
             || (!isTopLayer && (finalElementInfo.first > currentElementInfo.first))) {
@@ -264,7 +422,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     return VRV_UNSET;
 }
 
-std::pair<int, std::string> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer)
+std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer)
 {
     AttConverter converter;
     if (object->Is(NOTE)) {
@@ -272,7 +430,7 @@ std::pair<int, std::string> Rest::GetElementLocation(Object *object, Layer *laye
         assert(note);
         Accid* accid = note->GetDrawingAccid();
         return { PitchInterface::CalcLoc(note, layer, note),
-            (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid()) : "noAccidental" };
+            (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
     if (object->Is(CHORD)) {
         Chord *chord = static_cast<Chord *>(object);
@@ -280,32 +438,28 @@ std::pair<int, std::string> Rest::GetElementLocation(Object *object, Layer *laye
         Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
         Accid* accid = relevantNote->GetDrawingAccid();
         return { PitchInterface::CalcLoc(chord, layer, relevantNote, isTopLayer),
-            (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid())
-                                              : "noAccidental" };
+            (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
     if (object->Is(FTREM)) {
-        std::vector<std::pair<int, std::string> > btremElements;
+        std::vector<std::pair<int, RestAccidental> > btremElements;
         for (int i = 0; i < object->GetChildCount(); ++i) {
             btremElements.emplace_back(GetElementLocation(object->GetChild(i), layer, isTopLayer));
         }
         return isTopLayer ? *std::max_element(btremElements.begin(), btremElements.end())
                           : *std::min_element(btremElements.begin(), btremElements.end());
     }
-    return { VRV_UNSET, "noAccidental" };
+    return { VRV_UNSET, RA_none };
 }
 
 int Rest::GetRestOffsetFromOptions(
-    const std::string &layer, const std::pair<int, std::string>& location, bool isTopLayer) const
+    RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
-    Doc *doc = static_cast<Doc *>(this->GetFirstAncestor(DOC));
-    assert(doc);
-
-    std::vector<std::string> jsonNodePath{ layer };
-    if (layer == "otherLayer") jsonNodePath.emplace_back(location.second);
-    jsonNodePath.insert(jsonNodePath.end(),
-        { isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location.first % 2 ? "noteOnLine" : "noteInSpace",
-            this->AttDurationLogical::DurationToStr(data_DURATION(GetActualDur())) });
-    return doc->GetOptions()->m_restLayerOffsets.GetIntValue(jsonNodePath);
+    if (RL_otherLayer == layer)
+    return g_defaultRests.at(layer)
+        .at(RL_sameLayer == layer? location.second : RA_none)
+        .at(isTopLayer ? RLP_restOnTopLayer : RLP_restOnBottomLayer)
+        .at(0 == location.first % 2 ? RNP_noteOnLine : RNP_noteInSpace)
+        .at(GetActualDur());
 }
 
 //----------------------------------------------------------------------------
