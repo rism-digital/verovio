@@ -391,7 +391,7 @@ Object *Object::GetNext()
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
 }
 
-Object *Object::GetNext(Object *child, const ClassId classId)
+Object *Object::GetNext(const Object *child, const ClassId classId)
 {
     ArrayOfObjects::iterator iteratorEnd, iteratorCurrent;
     iteratorEnd = m_children.end();
@@ -403,7 +403,7 @@ Object *Object::GetNext(Object *child, const ClassId classId)
     return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;
 }
 
-Object *Object::GetPrevious(Object *child, const ClassId classId)
+Object *Object::GetPrevious(const Object *child, const ClassId classId)
 {
     ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
     riteratorEnd = m_children.rend();

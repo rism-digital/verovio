@@ -219,31 +219,31 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
     return (loc - staffLocOffset) * doc->GetDrawingUnit(this->m_drawingStaffSize);
 }
 
-void Staff::AddLegerLineAbove(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineAbove(int count, int left, int right, bool cueSize)
 {
     if (cueSize) {
         if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesAboveCue, count, left, right);
+        AddLedgerLines(m_ledgerLinesAboveCue, count, left, right);
     }
     else {
         if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesAbove, count, left, right);
+        AddLedgerLines(m_ledgerLinesAbove, count, left, right);
     }
 }
 
-void Staff::AddLegerLineBelow(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineBelow(int count, int left, int right, bool cueSize)
 {
     if (cueSize) {
         if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesBelowCue, count, left, right);
+        AddLedgerLines(m_ledgerLinesBelowCue, count, left, right);
     }
     else {
         if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesBelow, count, left, right);
+        AddLedgerLines(m_ledgerLinesBelow, count, left, right);
     }
 }
 
-void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right)
+void Staff::AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right)
 {
     assert(lines);
 

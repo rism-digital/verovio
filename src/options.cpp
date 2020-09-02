@@ -672,10 +672,6 @@ Options::Options()
     m_justifyIncludeLastPage.Init(false);
     this->Register(&m_justifyIncludeLastPage, "justifyIncludeLastPage", &m_general);
 
-    m_justifySystemsOnly.SetInfo("Justify systems only", "Justify systems only and not staves");
-    m_justifySystemsOnly.Init(false);
-    this->Register(&m_justifySystemsOnly, "justifySystemsOnly", &m_general);
-
     m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
     m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
@@ -833,6 +829,24 @@ Options::Options()
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
 
+    m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
+    m_justificationStaff.Init(1., 0., 10.);
+    this->Register(&m_justificationStaff, "justificationStaff", &m_generalLayout);
+
+    m_justificationSystem.SetInfo("Spacing system justification", "The system spacing justification");
+    m_justificationSystem.Init(1., 0., 10.);
+    this->Register(&m_justificationSystem, "justificationSystem", &m_generalLayout);
+
+    m_justificationBracketGroup.SetInfo(
+        "Spacing bracket group justification", "Space between staves inside a bracketed group justification");
+    m_justificationBracketGroup.Init(1., 0., 10.);
+    this->Register(&m_justificationBracketGroup, "justificationBracketGroup", &m_generalLayout);
+
+    m_justificationBraceGroup.SetInfo(
+        "Spacing brace group justification", "Space between staves inside a braced group ijustification");
+    m_justificationBraceGroup.Init(1., 0., 10.);
+    this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
+
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
@@ -894,6 +908,16 @@ Options::Options()
     m_slurThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
 
+    m_spacingBraceGroup.SetInfo(
+        "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
+    m_spacingBraceGroup.Init(12, 0, 36);
+    this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
+
+    m_spacingBracketGroup.SetInfo(
+        "Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
+    m_spacingBracketGroup.Init(12, 0, 36);
+    this->Register(&m_spacingBracketGroup, "spacingBracketGroup", &m_generalLayout);
+
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
     m_spacingDurDetection.Init(false);
     this->Register(&m_spacingDurDetection, "spacingDurDetection", &m_generalLayout);
@@ -907,11 +931,11 @@ Options::Options()
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
 
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
-    m_spacingStaff.Init(8, 0, 24);
+    m_spacingStaff.Init(12, 0, 36);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
 
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
-    m_spacingSystem.Init(3, 0, 12);
+    m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");

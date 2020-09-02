@@ -203,8 +203,9 @@ public:
 
 /**
  * member 0: the classId
- * member 1: the doc
- * member 2: a pointer to the functor for passing it to the system aligner
+ * member 1: a flag indicating we are processing floating object to be put in between
+ * member 2: the doc
+ * member 3: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustFloatingPositionersParams : public FunctorParams {
@@ -212,10 +213,36 @@ public:
     AdjustFloatingPositionersParams(Doc *doc, Functor *functor)
     {
         m_classId = OBJECT;
+        m_inBetween = false;
         m_doc = doc;
         m_functor = functor;
     }
     ClassId m_classId;
+    bool m_inBetween;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// AdjustFloatingPositionersBetweenParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 2: the doc
+ * member 3: a pointer to the functor for passing it to the system aligner
+ **/
+
+class AdjustFloatingPositionersBetweenParams : public FunctorParams {
+public:
+    AdjustFloatingPositionersBetweenParams(Doc *doc, Functor *functor)
+    {
+        m_previousStaffPositioners = NULL;
+        m_previousStaffAlignment = NULL;
+        m_doc = doc;
+        m_functor = functor;
+    }
+    ArrayOfFloatingPositioners *m_previousStaffPositioners;
+    StaffAlignment *m_previousStaffAlignment;
     Doc *m_doc;
     Functor *m_functor;
 };
@@ -466,26 +493,19 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the previous staff height
- * member 1: the extra staff height
- * member 2  the previous verse count
- * member 3: the cumulated shift
- * member 4: the doc
- * member 5: the functor to be redirected to SystemAligner
+ * member 0: the cumulated shift
+ * member 1: the doc
+ * member 2: the functor to be redirected to SystemAligner
  **/
 
 class AdjustYPosParams : public FunctorParams {
 public:
     AdjustYPosParams(Doc *doc, Functor *functor)
     {
-        m_previousOverflowBelow = 0;
-        m_previousVerseCount = 0;
         m_cumulatedShift = 0;
         m_doc = doc;
         m_functor = functor;
     }
-    int m_previousOverflowBelow;
-    int m_previousVerseCount;
     int m_cumulatedShift;
     Doc *m_doc;
     Functor *m_functor;
@@ -563,7 +583,9 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the system margin
- * member 2: the doc
+ * member 2: the overflow below of previous system
+ * member 3: the sum of justification factors per page
+ * member 4: the doc
  **/
 
 class AlignSystemsParams : public FunctorParams {
@@ -572,14 +594,14 @@ public:
     {
         m_shift = 0;
         m_systemMargin = 0;
-        m_justifiableSystems = 0;
-        m_justifiableStaves = 0;
+        m_prevBottomOverflow = 0;
+        m_justificationSum = 0.;
         m_doc = doc;
     }
     int m_shift;
     int m_systemMargin;
-    int m_justifiableSystems;
-    int m_justifiableStaves;
+    int m_prevBottomOverflow;
+    double m_justificationSum;
     Doc *m_doc;
 };
 
@@ -592,9 +614,11 @@ public:
  * member 1: the staffIdx
  * member 2: the staffN
  * member 3: the cumulated shift for the default alignment
- * member 4: the functor (for redirecting from page running elements)
- * member 4: the end functor (for redirecting from measure)
- * member 5: the doc
+ * member 4: the sum of justification factors per page
+ * member 5: the page width
+ * member 6: the functor (for redirecting from page running elements)
+ * member 7: the end functor (for redirecting from measure)
+ * member 8: the doc
  **/
 
 class AlignVerticallyParams : public FunctorParams {
@@ -605,6 +629,7 @@ public:
         m_staffIdx = 0;
         m_staffN = 0;
         m_cumulatedShift = 0;
+        m_justificationSum = 0.;
         m_pageWidth = 0;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -614,6 +639,7 @@ public:
     int m_staffIdx;
     int m_staffN;
     int m_cumulatedShift;
+    int m_justificationSum;
     int m_pageWidth;
     Functor *m_functor;
     Functor *m_functorEnd;
@@ -1320,24 +1346,27 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the justification ratio
- * member 4: the functor to be redirected to the MeasureAligner
- * member 5: the doc
+ * member 0: the cumulated shift
+ * member 1: the amount of space for distribution
+ * member 2: the sum of justification factors per page
+ * member 3: the functor to be redirected to the MeasureAligner
+ * member 4: the doc
  **/
 
 class JustifyYParams : public FunctorParams {
 public:
     JustifyYParams(Functor *functor, Doc *doc)
     {
-        m_stepSize = 0;
-        m_stepCount = 0;
-        m_stepCountStaff = 0;
+        m_cumulatedShift = 0;
+        m_spaceToDistribute = 0;
+        m_justificationSum = 0.;
         m_functor = functor;
         m_doc = doc;
     }
-    int m_stepSize;
-    int m_stepCount;
-    int m_stepCountStaff;
+
+    int m_cumulatedShift;
+    int m_spaceToDistribute;
+    double m_justificationSum;
     Functor *m_functor;
     Doc *m_doc;
 };

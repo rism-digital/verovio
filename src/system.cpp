@@ -301,6 +301,7 @@ int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
     assert(params);
 
     params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
+    m_systemAligner.SetSpacing(params->m_currentScoreDef);
 
     return FUNCTOR_CONTINUE;
 }
@@ -362,11 +363,7 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    if (this->GetIdx() > 0) {
-        params->m_cumulatedShift
-            = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
-    }
-
+    params->m_cumulatedShift = 0;
     params->m_staffIdx = 0;
 
     m_systemAligner.Process(params->m_functorEnd, params);
@@ -530,8 +527,6 @@ int System::AdjustYPos(FunctorParams *functorParams)
     // will not trigger it
     this->ResetCachedDrawingY();
 
-    params->m_previousOverflowBelow = 0;
-    params->m_previousVerseCount = 0;
     params->m_cumulatedShift = 0;
 
     m_systemAligner.Process(params->m_functor, params);
@@ -566,25 +561,26 @@ int System::AlignSystems(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
+    assert(m_systemAligner.GetBottomAlignment());
+
+    int systemMargin = this->GetIdx() ? params->m_systemMargin : 0;
+    if (systemMargin) {
+        const int margin
+            = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
+        params->m_shift -= margin > 0 ? margin : 0;
+    }
 
     SetDrawingYRel(params->m_shift);
 
-    assert(m_systemAligner.GetBottomAlignment());
+    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel();
 
-    int systemMargin = params->m_systemMargin;
-    if (params->m_doc->GetOptions()->m_justifyVertically.GetValue()) {
-        assert(GetParent());
-        // Check if we are on the last system: last system should stick to the footer.
-        // No margin required.
-        if (this->GetIdx() == GetParent()->GetChildCount() - 1) {
-            systemMargin = 0;
-        }
+    params->m_justificationSum += m_systemAligner.GetJustificationSum(params->m_doc);
+    if (!this->GetIdx()) {
+        // remove extra system justification factor to get exaclty (systemsCount-1)*justificationSystem
+        params->m_justificationSum -= params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     }
 
-    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel() - systemMargin;
-    params->m_justifiableSystems++;
-    // -1 because of the bottom aligner
-    params->m_justifiableStaves += m_systemAligner.GetChildCount() - 1;
+    params->m_prevBottomOverflow = m_systemAligner.GetOverflowBelow(params->m_doc);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -632,21 +628,20 @@ int System::JustifyY(FunctorParams *functorParams)
     JustifyYParams *params = dynamic_cast<JustifyYParams *>(functorParams);
     assert(params);
 
-    bool systemOnly = params->m_doc->GetOptions()->m_justifySystemsOnly.GetValue();
+    const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
+    const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
 
-    if (!systemOnly) {
-        params->m_stepCount += params->m_stepCountStaff;
+    if (this->GetIdx()) {
+        params->m_cumulatedShift += shift;
     }
 
-    this->SetDrawingYRel(this->GetDrawingY() - params->m_stepSize * params->m_stepCount);
+    const int currentSystemShift = params->m_cumulatedShift;
+    this->SetDrawingYRel(this->GetDrawingY() - currentSystemShift);
 
-    if (systemOnly) {
-        params->m_stepCount++;
-    }
-    else {
-        params->m_stepCountStaff = 0;
-        m_systemAligner.Process(params->m_functor, params);
-    }
+    params->m_cumulatedShift = 0;
+    m_systemAligner.Process(params->m_functor, params);
+
+    params->m_cumulatedShift += currentSystemShift;
 
     return FUNCTOR_CONTINUE;
 }
@@ -666,6 +661,8 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
     AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
+
+    params->m_inBetween = false;
 
     AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
     Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
@@ -768,6 +765,27 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
+    m_systemAligner.Process(params->m_functor, params);
+
+    /**** Process elements that needs to be put in between ****/
+
+    params->m_inBetween = true;
+    // All of them with no particular processing order.
+    // The resulting layout order will correspond to the order in the encoding.
+    params->m_classId = OBJECT;
+    m_systemAligner.Process(params->m_functor, params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int System::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
+{
+    AdjustFloatingPositionersBetweenParams *params
+        = dynamic_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
+    assert(params);
+
+    params->m_previousStaffPositioners = NULL;
+    params->m_previousStaffAlignment = NULL;
     m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;

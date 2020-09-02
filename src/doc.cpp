@@ -1462,6 +1462,11 @@ int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
     return lineHeight;
 }
 
+int Doc::GetTextXHeight(FontInfo *font, bool graceSize) const
+{
+    return this->GetTextGlyphHeight('x', font, graceSize);
+}
+
 int Doc::GetDrawingUnit(int staffSize) const
 {
     return m_options->m_unit.GetValue() * staffSize / 100;
