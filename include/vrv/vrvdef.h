@@ -42,6 +42,18 @@ namespace vrv {
 enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, MEI_5_0_0_dev };
 
 //----------------------------------------------------------------------------
+// Cast redefinition
+//----------------------------------------------------------------------------
+
+// Can be changed between static and dynamic for debug purposes
+
+// To be used for all cases where type is cheched through Object::m_type
+#define vrv_cast static_cast
+
+// To be used for all FunctorParams casts withi Functors
+#define vrv_params_cast static_cast
+
+//----------------------------------------------------------------------------
 // Default midi values
 //----------------------------------------------------------------------------
 
