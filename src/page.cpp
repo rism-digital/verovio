@@ -531,7 +531,7 @@ void Page::JustifyVertically()
 
             const int childSystems = GetChildCount(SYSTEM);
             const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
-            if ((childSystems <= 2) || (maxSystemsPerPage && childSystems < maxSystemsPerPage)) {
+            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
                 m_justificationSum = penultimatePage->m_justificationSum;
             }
         }
