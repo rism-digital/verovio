@@ -34,146 +34,106 @@ typedef std::map<RestLayer,
 RestOffsets g_defaultRests{
     { RL_otherLayer,
         { { RA_none,
-            { { RLP_restOnTopLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
-                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 4 }, { DUR_16, 6 }, { DUR_32, 6 }, 
-                      { DUR_64, 8 }, { DUR_128, 8 }, { DUR_LG, 6 }, { DUR_BR, 4 }
-                    } }
-                } },
-              { RLP_restOnBottomLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
-                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 }, { DUR_32, -6 }, 
-                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
-                    } }
-                } }
-            } },
-          { RA_s,
-            { { RLP_restOnTopLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 7 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
-                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
-                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
-                    } }
-                } },
-              { RLP_restOnBottomLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
-                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 }, { DUR_32, -6 }, 
-                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
-                    } }
-                } }
-            } },
-          { RA_f,
-            { { RLP_restOnTopLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
-                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, 4 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
-                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
-                    } }
-                } },
-              { RLP_restOnBottomLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
-                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 }, { DUR_32, -6 }, 
-                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
-                    } }
-                } }
-            } },
-          { RA_x,
-            { { RLP_restOnTopLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
-                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
-                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
-                    } }
-                } },
-              { RLP_restOnBottomLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
-                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, -6 }, { DUR_2, -4 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 }, { DUR_32, -6 }, 
-                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
-                    } }
-                } }
-            } },
-          { RA_x,
-            { { RLP_restOnTopLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 }, 
-                      { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, 2 }, { DUR_2, 6 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 }, 
-                      { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 }
-                    } }
-                } },
-              { RLP_restOnBottomLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, -7 }, { DUR_2, -5 }, { DUR_4, -7 }, { DUR_8, -5 }, { DUR_16, -5 }, { DUR_32, -7 }, 
-                      { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 }, { DUR_32, -6 }, 
-                      { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 }, { DUR_BR, -6 }
-                    } }
-                } }
-            } }
-        } 
-    },
+              { { RLP_restOnTopLayer,
+                    { { RNP_noteInSpace,
+                          { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
+                              { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                        { RNP_noteOnLine,
+                            { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 4 }, { DUR_16, 6 }, { DUR_32, 6 },
+                                { DUR_64, 8 }, { DUR_128, 8 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                  { RLP_restOnBottomLayer,
+                      { { RNP_noteInSpace,
+                            { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
+                                { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                          { RNP_noteOnLine,
+                              { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
+                                  { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
+                                  { DUR_BR, -6 } } } } } } },
+            { RA_s,
+                { { RLP_restOnTopLayer,
+                      { { RNP_noteInSpace,
+                            { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 7 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
+                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                          { RNP_noteOnLine,
+                              { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
+                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                    { RLP_restOnBottomLayer,
+                        { { RNP_noteInSpace,
+                              { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
+                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                            { RNP_noteOnLine,
+                                { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 },
+                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
+                                    { DUR_BR, -6 } } } } } } },
+            { RA_f,
+                { { RLP_restOnTopLayer,
+                      { { RNP_noteInSpace,
+                            { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
+                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                          { RNP_noteOnLine,
+                              { { DUR_1, 4 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
+                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                    { RLP_restOnBottomLayer,
+                        { { RNP_noteInSpace,
+                              { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
+                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                            { RNP_noteOnLine,
+                                { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
+                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
+                                    { DUR_BR, -6 } } } } } } },
+            { RA_x,
+                { { RLP_restOnTopLayer,
+                      { { RNP_noteInSpace,
+                            { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
+                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                          { RNP_noteOnLine,
+                              { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
+                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                    { RLP_restOnBottomLayer,
+                        { { RNP_noteInSpace,
+                              { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
+                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                            { RNP_noteOnLine,
+                                { { DUR_1, -6 }, { DUR_2, -4 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
+                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
+                                    { DUR_BR, -6 } } } } } } },
+            { RA_x,
+                { { RLP_restOnTopLayer,
+                      { { RNP_noteInSpace,
+                            { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
+                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                          { RNP_noteOnLine,
+                              { { DUR_1, 2 }, { DUR_2, 6 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
+                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                    { RLP_restOnBottomLayer,
+                        { { RNP_noteInSpace,
+                              { { DUR_1, -7 }, { DUR_2, -5 }, { DUR_4, -7 }, { DUR_8, -5 }, { DUR_16, -5 },
+                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                            { RNP_noteOnLine,
+                                { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 },
+                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
+                                    { DUR_BR, -6 } } } } } } } } },
     { RL_sameLayer,
         { { RA_none,
             { { RLP_restOnTopLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 3 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 }, 
-                      { DUR_64, 5 }, { DUR_128, 5 }, { DUR_LG, 3 }, { DUR_BR, 1 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, 0 }, { DUR_2, 0 }, { DUR_4, 2 }, { DUR_8, 2 }, { DUR_16, 2 }, { DUR_32, 2 }, 
-                      { DUR_64, 4 }, { DUR_128, 4 }, { DUR_LG, 2 }, { DUR_BR, 2 }
-                    } }
-                } },
-              { RLP_restOnBottomLayer,
-                { { RNP_noteInSpace,
-                    { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -3 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 }, 
-                      { DUR_64, -3 }, { DUR_128, -5 }, { DUR_LG, -3 }, { DUR_BR, -3 }
-                    } },
-                  { RNP_noteOnLine,
-                    { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -4 }, { DUR_8, -2 }, { DUR_16, -2 }, { DUR_32, -4 }, 
-                      { DUR_64, -4 }, { DUR_128, -6 }, { DUR_LG, -2 }, { DUR_BR, -2 }
-                    } }
-                } }
-            } }
-        } 
-    }
+                  { { RNP_noteInSpace,
+                        { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 3 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 },
+                            { DUR_64, 5 }, { DUR_128, 5 }, { DUR_LG, 3 }, { DUR_BR, 1 } } },
+                      { RNP_noteOnLine,
+                          { { DUR_1, 0 }, { DUR_2, 0 }, { DUR_4, 2 }, { DUR_8, 2 }, { DUR_16, 2 }, { DUR_32, 2 },
+                              { DUR_64, 4 }, { DUR_128, 4 }, { DUR_LG, 2 }, { DUR_BR, 2 } } } } },
+                { RLP_restOnBottomLayer,
+                    { { RNP_noteInSpace,
+                          { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -3 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 },
+                              { DUR_64, -3 }, { DUR_128, -5 }, { DUR_LG, -3 }, { DUR_BR, -3 } } },
+                        { RNP_noteOnLine,
+                            { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -4 }, { DUR_8, -2 }, { DUR_16, -2 },
+                                { DUR_32, -4 }, { DUR_64, -4 }, { DUR_128, -6 }, { DUR_LG, -2 },
+                                { DUR_BR, -2 } } } } } } } } }
 };
 
 // helper function for conversion
-RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental) 
+RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental)
 {
     switch (accidental) {
         case ACCIDENTAL_WRITTEN_s: return RA_s;
@@ -325,13 +285,13 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
         [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
     if (layerIter == layersList.end()) return { VRV_UNSET, RA_none };
     auto collidingElementsList = vrv_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
-    
+
     std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
         auto currentElementInfo = GetElementLocation(object, vrv_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
-		//  If note on other layer is not on the same x position as rest - ignore its accidental
+        //  If note on other layer is not on the same x position as rest - ignore its accidental
         if (GetAlignment()->GetTime() != vrv_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = RA_none;
         }
@@ -347,7 +307,7 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
 int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentLayer, bool isTopLayer)
 {
     if (!currentStaff || !currentLayer) return VRV_UNSET;
-        
+
     Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
     GetRelativeLayerElementParams getRelativeLayerElementParams(GetIdx(), BACKWARD, false);
 
@@ -369,7 +329,7 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
     // That way we'll get bottom chord note for top layer and top chord note for bottom layer
-    const int previousElementLoc = previousElement 
+    const int previousElementLoc = previousElement
         ? GetElementLocation(previousElement, currentLayer, !isTopLayer).first
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, true, isTopLayer);
     const int nextElementLoc = nextElement
@@ -392,7 +352,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     assert(measure);
 
     const int index = system->GetChildIndex(measure);
-    Object *relativeMeasure = system->GetChild(isPrevious? index - 1 : index + 1);
+    Object *relativeMeasure = system->GetChild(isPrevious ? index - 1 : index + 1);
     if (!relativeMeasure || !relativeMeasure->Is(MEASURE)) return VRV_UNSET;
 
     // Find staff with the same N as current staff
@@ -405,14 +365,14 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     ClassIdComparison matchType(LAYER);
     previousStaff->FindAllDescendantByComparison(&layers, &matchType);
     auto layerIter = std::find_if(layers.begin(), layers.end(),
-        [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
-    });
+        [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN(); });
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
     Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
     GetRelativeLayerElementParams getRelativeLayerElementParams(GetIdx(), !isPrevious, true);
-    (*layerIter)->Process(&getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, !isPrevious);
+    (*layerIter)
+        ->Process(&getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, !isPrevious);
 
     Object *lastLayerElement = getRelativeLayerElementParams.m_relativeElement;
     if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
@@ -427,15 +387,15 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
     if (object->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(object);
         assert(note);
-        Accid* accid = note->GetDrawingAccid();
+        Accid *accid = note->GetDrawingAccid();
         return { PitchInterface::CalcLoc(note, layer, note),
             (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
     if (object->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(object);
         assert(chord);
-        Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
-        Accid* accid = relevantNote->GetDrawingAccid();
+        Note *relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
+        Accid *accid = relevantNote->GetDrawingAccid();
         return { PitchInterface::CalcLoc(chord, layer, relevantNote, isTopLayer),
             (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
@@ -454,7 +414,7 @@ int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
     return g_defaultRests.at(layer)
-        .at(RL_sameLayer == layer? location.second : RA_none)
+        .at(RL_sameLayer == layer ? location.second : RA_none)
         .at(isTopLayer ? RLP_restOnTopLayer : RLP_restOnBottomLayer)
         .at(0 == location.first % 2 ? RNP_noteOnLine : RNP_noteInSpace)
         .at(GetActualDur());
