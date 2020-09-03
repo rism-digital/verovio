@@ -296,6 +296,11 @@ public:
     virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
 
     /**
+     * See Object::LayerElementsInTimeSpan
+     */
+    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams);
+
+    /**
      * See Object::CalcOnsetOffset
      */
     ///@{
@@ -325,6 +330,11 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::GetRelativeLayerElement
+     */
+    virtual int GetRelativeLayerElement(FunctorParams *functorParams);
 
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);

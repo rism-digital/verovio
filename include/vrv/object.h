@@ -457,6 +457,11 @@ public:
     Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1);
 
     /**
+     * Return the first child that is NOT of the specified type.
+     */
+    Object *GetFirstChildNot(const ClassId classId);
+
+    /**
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
@@ -572,6 +577,11 @@ public:
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
      */
     virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Look for all the layer elements that overlap with the time / duration within certain layer passed as parameter
+     */
+    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the layer elements spanned by two points
@@ -1055,6 +1065,13 @@ public:
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
     virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Go through all layer elements of the layer and return next/previous element relative to the specified
+     * layer element. It will search recursively through children elements until note, chord or ftrem is found.
+     * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
+     */
+    virtual int GetRelativeLayerElement(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

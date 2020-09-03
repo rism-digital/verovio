@@ -314,6 +314,45 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
     return (int)layerCountInTimeSpanParams.m_layers.size();
 }
 
+ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element) 
+{
+    assert(element);
+
+    Measure *measure = static_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+    assert(measure);
+
+    Alignment *alignment = element->GetAlignment();
+    assert(alignment);
+
+    Layer *layer = NULL;
+    Staff *staff = element->GetCrossStaff(layer);
+    if (!staff) {
+        staff = static_cast<Staff *>(element->GetFirstAncestor(STAFF));
+    }
+    // At this stage we have the parent or the cross-staff
+    assert(staff);
+
+    return GetLayerElementsInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+}
+
+ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Measure* measure, int staff)
+{
+    assert(measure);
+
+    Functor layerElementsInTimeSpan(&Object::LayerElementsInTimeSpan);
+    LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(GetCurrentMeterSig(), GetCurrentMensur(), this);
+    layerElementsInTimeSpanParams.m_time = time;
+    layerElementsInTimeSpanParams.m_duration = duration;
+
+    ArrayOfComparisons filters;
+    AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
+    filters.push_back(&matchStaff);
+
+    measure->m_measureAligner.Process(&layerElementsInTimeSpan, &layerElementsInTimeSpanParams, NULL, &filters);
+
+    return layerElementsInTimeSpanParams.m_elements;
+}
+
 Clef *Layer::GetCurrentClef() const
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
