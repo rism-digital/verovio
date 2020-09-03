@@ -2195,7 +2195,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
         if (HasAttributeWithValue(kind.node(), "use-symbols", "yes")) {
             harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
         }
-        else if (kind.node().attribute("text")) {
+        else if (kind.node().attribute("text") && std::strcmp(kind.node().text().as_string(), "none")) {
             harmText = harmText + kind.node().attribute("text").as_string();
         }
         else {
