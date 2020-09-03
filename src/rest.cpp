@@ -32,7 +32,7 @@ typedef std::map<RestLayer,
     RestOffsets;
 
 RestOffsets g_defaultRests{
-    { RL_sameLayer,
+    { RL_otherLayer,
         { { RA_none,
             { { RLP_restOnTopLayer,
                 { { RNP_noteInSpace,
@@ -145,7 +145,7 @@ RestOffsets g_defaultRests{
             } }
         } 
     },
-    { RL_otherLayer,
+    { RL_sameLayer,
         { { RA_none,
             { { RLP_restOnTopLayer,
                 { { RNP_noteInSpace,
@@ -454,7 +454,6 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
 int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
-    if (RL_otherLayer == layer)
     return g_defaultRests.at(layer)
         .at(RL_sameLayer == layer? location.second : RA_none)
         .at(isTopLayer ? RLP_restOnTopLayer : RLP_restOnBottomLayer)
