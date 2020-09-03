@@ -424,7 +424,6 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
 
 std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer)
 {
-    AttConverter converter;
     if (object->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(object);
         assert(note);
