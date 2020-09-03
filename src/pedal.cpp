@@ -129,19 +129,25 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
 
     if (!this->HasDir()) return FUNCTOR_CONTINUE;
 
-    if (params->m_pedalLine && (this->GetDir() != pedalLog_DIR_down)) {
-        params->m_pedalLine->SetEnd(GetStart());
+    if (this->GetDir() != pedalLog_DIR_down) {
+        auto pairedWithThis = std::find_if(params->m_pedalLines.begin(), params->m_pedalLines.end(), [this](const Pedal *p) -> bool {
+            return p->GetStaff() == GetStaff();
+        });
 
-        SetEnd(GetStart());
-        SetStart(params->m_pedalLine->GetStart());
-        if (this->GetDir() == pedalLog_DIR_bounce) {
-            params->m_pedalLine->EndsWithBounce(true);
+        if (pairedWithThis != params->m_pedalLines.end()) {
+            (*pairedWithThis)->SetEnd(GetStart());
+
+            SetEnd(GetStart());
+            SetStart((*pairedWithThis)->GetStart());
+            if (this->GetDir() == pedalLog_DIR_bounce) {
+                (*pairedWithThis)->EndsWithBounce(true);
+            }
+            params->m_pedalLines.erase(pairedWithThis);
         }
-        params->m_pedalLine = NULL;
     }
 
     if ((this->GetDir() != pedalLog_DIR_up) && (this->GetForm() == pedalVis_FORM_line)) {
-        params->m_pedalLine = this;
+        params->m_pedalLines.push_back(this);
     }
 
     return FUNCTOR_CONTINUE;
