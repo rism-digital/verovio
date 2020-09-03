@@ -106,7 +106,7 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
 
 int Verse::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     // this gets (or creates) the measureAligner for the measure
@@ -122,7 +122,7 @@ int Verse::AlignVertically(FunctorParams *functorParams)
 
 int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 {
-    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
     /****** find label / labelAbbr */
@@ -159,7 +159,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     ListOfObjects::iterator iter = syls.begin();
     while (iter != syls.end()) {
         if ((*iter)->HasContentHorizontalBB()) {
-            Syl *syl = dynamic_cast<Syl *>(*iter);
+            Syl *syl = vrv_cast<Syl *>(*iter);
             assert(syl);
             syl->SetDrawingXRel(previousSylShift);
             previousSylShift += syl->GetContentX2() + syl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
@@ -172,11 +172,11 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     if (syls.empty()) return FUNCTOR_CONTINUE;
 
-    Syl *firstSyl = dynamic_cast<Syl *>(syls.front());
+    Syl *firstSyl = vrv_cast<Syl *>(syls.front());
     assert(firstSyl);
     // We keep a pointer to the last syl because we move it (when more than one) and the verse content bounding box is
     // not updated
-    Syl *lastSyl = dynamic_cast<Syl *>(syls.back());
+    Syl *lastSyl = vrv_cast<Syl *>(syls.back());
     assert(lastSyl);
 
     // Not much to do when we hit the first syllable of the system
@@ -234,12 +234,12 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
 int Verse::PrepareProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = dynamic_cast<PrepareProcessingListsParams *>(functorParams);
+    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
     assert(params);
-    // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
+    // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(staff && layer);
 
     params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];

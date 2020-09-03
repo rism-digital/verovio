@@ -228,6 +228,11 @@ public:
     virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustFloatingPositionersBetween
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustSlurs
      */
     virtual int AdjustSlurs(FunctorParams *functorParams);

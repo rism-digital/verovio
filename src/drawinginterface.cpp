@@ -70,7 +70,10 @@ BeamDrawingInterface::BeamDrawingInterface()
     Reset();
 }
 
-BeamDrawingInterface::~BeamDrawingInterface() {}
+BeamDrawingInterface::~BeamDrawingInterface()
+{
+    ClearCoords();
+}
 
 void BeamDrawingInterface::Reset()
 {
@@ -467,7 +470,7 @@ Point StemmedDrawingInterface::GetDrawingStemEnd(Object *object)
         if (!m_drawingStem) {
             // Somehow arbitrary for chord - stem end it the bottom with no stem
             if (object->Is(CHORD)) {
-                Chord *chord = dynamic_cast<Chord *>(object);
+                Chord *chord = vrv_cast<Chord *>(object);
                 assert(chord);
                 return Point(object->GetDrawingX(), chord->GetYBottom());
             }

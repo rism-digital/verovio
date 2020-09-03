@@ -134,11 +134,6 @@ public:
      */
     int GetContentWidth() const;
 
-    /**
-     * Calculate the justification step for a page according.
-     */
-    int CalcJustificationStepSize(bool systemsOnly) const;
-
     //----------//
     // Functors //
     //----------//
@@ -214,14 +209,10 @@ public:
     int m_drawingJustifiableHeight;
 
     /**
-     * The number of systems to justify in the page
+     * the sum of justification factors for each type of spacing in between
+     * systems and staves (staff, brace group, bracket group)
      */
-    int m_drawingJustifiableStaves;
-
-    /**
-     * The numberof staves to justify in the page
-     */
-    int m_drawingJustifiableSystems;
+    double m_justificationSum;
 
 private:
     /**

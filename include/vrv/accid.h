@@ -109,13 +109,16 @@ public:
 
     bool operator()(const Accid *first, const Accid *second) const
     {
-        if (first->GetDrawingY() < second->GetDrawingY())
+        if (first->GetDrawingY() < second->GetDrawingY()) {
             return true;
-        else if (first->GetDrawingY() > second->GetDrawingY())
+        }
+        else if (first->GetDrawingY() > second->GetDrawingY()) {
             return false;
-        // with unissons, look at the layer @n
-        else
-            return (first->GetAlignmentLayerN() < second->GetAlignmentLayerN());
+        }
+        // with unissons, natural should always be the last accidental
+        else {
+            return (first->GetAccid() != ACCIDENTAL_WRITTEN_n);
+        }
     }
 };
 
