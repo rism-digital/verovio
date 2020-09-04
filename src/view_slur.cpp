@@ -45,7 +45,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     FloatingPositioner *positioner = slur->GetCurrentFloatingPositioner();
     assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
-    FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(positioner);
+    FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
 
     if (curve->GetDir() == curvature_CURVEDIR_NONE) {
@@ -118,24 +118,24 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     }
 
     if (start->Is(NOTE)) {
-        startNote = dynamic_cast<Note *>(start);
+        startNote = vrv_cast<Note *>(start);
         assert(startNote);
         startParentChord = startNote->IsChordTone();
         startStemDir = startNote->GetDrawingStemDir();
     }
     else if (start->Is(CHORD)) {
-        startChord = dynamic_cast<Chord *>(start);
+        startChord = vrv_cast<Chord *>(start);
         assert(startChord);
         startStemDir = startChord->GetDrawingStemDir();
     }
     if (end->Is(NOTE)) {
-        endNote = dynamic_cast<Note *>(end);
+        endNote = vrv_cast<Note *>(end);
         assert(endNote);
         endParentChord = endNote->IsChordTone();
         endStemDir = endNote->GetDrawingStemDir();
     }
     else if (end->Is(CHORD)) {
-        endChord = dynamic_cast<Chord *>(end);
+        endChord = vrv_cast<Chord *>(end);
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
     }
@@ -158,7 +158,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     assert(layer);
 
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
-        System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
+        System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
         assert(system);
         // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
         // situations
@@ -246,7 +246,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     bool isShortSlur = false;
     if (x2 - x1 < 1 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
 
-    int yChordMax, yChordMin;
+    int yChordMax = 0, yChordMin = 0;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
         if (startParentChord) {
@@ -434,7 +434,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         start->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (auto &object : artics) {
-            Artic *artic = dynamic_cast<Artic *>(object);
+            Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
@@ -452,7 +452,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         end->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (auto &object : artics) {
-            Artic *artic = dynamic_cast<Artic *>(object);
+            Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
@@ -491,7 +491,7 @@ float View::CalcInitialSlur(
 
     /************** content **************/
 
-    System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
+    System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
     assert(system);
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
     findSpannedLayerElementsParams.m_minPos = p1.x;

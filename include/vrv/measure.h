@@ -202,6 +202,12 @@ public:
     Staff *GetTopVisibleStaff();
 
     /**
+     * Return the botoom (last) visible staff in the measure (if any).
+     * Takes into account system optimization
+     */
+    Staff *GetBottomVisibleStaff();
+
+    /**
      * Check if the measure encloses the given time (in millisecond)
      * Return the playing repeat time (1-based), 0 otherwise
      */

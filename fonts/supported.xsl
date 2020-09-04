@@ -191,9 +191,9 @@
             <!--<glyph glyph-code="E0B2" smufl-name="noteheadCircleXHalf"/>-->
             <!--<glyph glyph-code="E0B3" smufl-name="noteheadCircleX"/>-->
             <!--<glyph glyph-code="E0B4" smufl-name="noteheadDoubleWholeWithX"/>-->
-            <!--<glyph glyph-code="E0B5" smufl-name="noteheadWholeWithX"/>-->
-            <!--<glyph glyph-code="E0B6" smufl-name="noteheadHalfWithX"/>-->
-            <!--<glyph glyph-code="E0B7" smufl-name="noteheadVoidWithX"/>-->
+            <glyph glyph-code="E0B5" smufl-name="noteheadWholeWithX"/>
+            <glyph glyph-code="E0B6" smufl-name="noteheadHalfWithX"/>
+            <glyph glyph-code="E0B7" smufl-name="noteheadVoidWithX"/>
             <!--<glyph glyph-code="E0B8" smufl-name="noteheadSquareWhite"/>-->
             <!--<glyph glyph-code="E0B9" smufl-name="noteheadSquareBlack"/>-->
             <!--<glyph glyph-code="E0BA" smufl-name="noteheadTriangleUpDoubleWhole"/>-->
@@ -564,7 +564,7 @@
             <!--<glyph glyph-code="E227" smufl-name="tremoloFingered3"/>-->
             <!--<glyph glyph-code="E228" smufl-name="tremoloFingered4"/>-->
             <!--<glyph glyph-code="E229" smufl-name="tremoloFingered5"/>-->
-            <!--<glyph glyph-code="E22A" smufl-name="buzzRoll"/>-->
+            <glyph glyph-code="E22A" smufl-name="buzzRoll"/>
             <!--<glyph glyph-code="E22B" smufl-name="pendereckiTremolo"/>-->
             <!--<glyph glyph-code="E22C" smufl-name="unmeasuredTremolo"/>-->
             <!--<glyph glyph-code="E22D" smufl-name="unmeasuredTremoloSimple"/>-->

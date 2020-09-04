@@ -63,7 +63,7 @@ void Mdiv::MakeVisible()
 {
     m_visibility = Visible;
     if (GetParent() && GetParent()->Is(MDIV)) {
-        Mdiv *parent = dynamic_cast<Mdiv *>(GetParent());
+        Mdiv *parent = vrv_cast<Mdiv *>(GetParent());
         assert(parent);
         parent->MakeVisible();
     }

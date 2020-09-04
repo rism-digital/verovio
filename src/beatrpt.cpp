@@ -71,7 +71,7 @@ double BeatRpt::GetScoreTimeOnset()
 
 int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     // Sameas not taken into account for now

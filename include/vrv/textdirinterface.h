@@ -35,6 +35,11 @@ public:
     virtual InterfaceId IsInterface() { return INTERFACE_TEXT_DIR; }
     ///@}
 
+    /**
+     * Return the number of lines in the text object by counting <lb> children
+     */
+    int GetNumberOfLines(Object *object);
+
 private:
     //
 public:
