@@ -166,6 +166,7 @@ enum ClassId : uint16_t {
     CONTROL_ELEMENT,
     ANCHOREDTEXT,
     ARPEG,
+    BEAMSPAN,
     BRACKETSPAN,
     BREATH,
     CAESURA,
