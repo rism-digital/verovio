@@ -144,6 +144,8 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
                 (*pairedWithThis)->EndsWithBounce(true);
             }
             params->m_pedalLines.erase(pairedWithThis);
+        } else {
+            LogMessage("Pedal %s doesn't have start pair", GetUuid().c_str());
         }
     }
 
@@ -158,29 +160,33 @@ int Pedal::ResolveSpanningPedals(FunctorParams *functorParams)
 {
     if (!this->HasDir() || (this->GetDir() != pedalLog_DIR_up)) return FUNCTOR_SIBLINGS;
 
-    Object *startSystem = GetStart()->GetFirstAncestor(SYSTEM);
-    Object *endSystem = GetEnd()->GetFirstAncestor(SYSTEM);
-    assert(startSystem && endSystem);
+    LayerElement *startElement = GetStart();
+    LayerElement *endElement = GetEnd();
+    if (startElement!=NULL&&endElement!=NULL) {
+        Object* startSystem = startElement->GetFirstAncestor(SYSTEM);
+        Object* endSystem = endElement->GetFirstAncestor(SYSTEM);
+        assert(startSystem&&endSystem);
 
-    const int startSystemIndex = startSystem->GetIdx();
-    const int endSystemIndex = endSystem->GetIdx();
-    // make sure that start and end are not in the neighboring systems or same system
-    if ((startSystem == endSystem) || (startSystemIndex == endSystemIndex - 1)) return FUNCTOR_SIBLINGS;
+        const int startSystemIndex = startSystem->GetIdx();
+        const int endSystemIndex = endSystem->GetIdx();
+        // make sure that start and end are not in the neighboring systems or same system
+        if ((startSystem==endSystem)||(startSystemIndex==endSystemIndex-1)) return FUNCTOR_SIBLINGS;
 
-    Object *pedalPage = startSystem->GetFirstAncestor(PAGE);
-    if (!pedalPage) return FUNCTOR_SIBLINGS;
+        Object* pedalPage = startSystem->GetFirstAncestor(PAGE);
+        if (!pedalPage) return FUNCTOR_SIBLINGS;
 
-    // add current pedal as child to all systems in between starting and ending system
-    for (int i = startSystemIndex + 1; i < endSystemIndex; ++i) {
-        Object *system = pedalPage->GetChild(i);
-        if (!system->Is(SYSTEM)) continue;
+        // add current pedal as child to all systems in between starting and ending system
+        for (int i = startSystemIndex+1; i<endSystemIndex; ++i) {
+            Object* system = pedalPage->GetChild(i);
+            if (!system->Is(SYSTEM)) continue;
 
-        Object *systemMeasure = system->GetFirst(MEASURE);
-        if (!systemMeasure) continue;
+            Object* systemMeasure = system->GetFirst(MEASURE);
+            if (!systemMeasure) continue;
 
-        Object *pedal = Clone();
+            Object* pedal = Clone();
 
-        systemMeasure->AddChild(pedal);
+            systemMeasure->AddChild(pedal);
+        }
     }
 
     return FUNCTOR_SIBLINGS;
