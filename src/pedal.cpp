@@ -162,31 +162,31 @@ int Pedal::ResolveSpanningPedals(FunctorParams *functorParams)
 
     LayerElement *startElement = GetStart();
     LayerElement *endElement = GetEnd();
-    if (startElement!=NULL&&endElement!=NULL) {
-        Object* startSystem = startElement->GetFirstAncestor(SYSTEM);
-        Object* endSystem = endElement->GetFirstAncestor(SYSTEM);
-        assert(startSystem&&endSystem);
+    if (!startElement || !endElement) return FUNCTOR_SIBLINGS;
 
-        const int startSystemIndex = startSystem->GetIdx();
-        const int endSystemIndex = endSystem->GetIdx();
-        // make sure that start and end are not in the neighboring systems or same system
-        if ((startSystem==endSystem)||(startSystemIndex==endSystemIndex-1)) return FUNCTOR_SIBLINGS;
+    Object *startSystem = startElement->GetFirstAncestor(SYSTEM);
+    Object *endSystem = endElement->GetFirstAncestor(SYSTEM);
+    assert(startSystem && endSystem);
 
-        Object* pedalPage = startSystem->GetFirstAncestor(PAGE);
-        if (!pedalPage) return FUNCTOR_SIBLINGS;
+    const int startSystemIndex = startSystem->GetIdx();
+    const int endSystemIndex = endSystem->GetIdx();
+    // make sure that start and end are not in the neighboring systems or same system
+    if ((startSystem == endSystem) || (startSystemIndex == endSystemIndex - 1)) return FUNCTOR_SIBLINGS;
 
-        // add current pedal as child to all systems in between starting and ending system
-        for (int i = startSystemIndex+1; i<endSystemIndex; ++i) {
-            Object* system = pedalPage->GetChild(i);
-            if (!system->Is(SYSTEM)) continue;
+    Object *pedalPage = startSystem->GetFirstAncestor(PAGE);
+    if (!pedalPage) return FUNCTOR_SIBLINGS;
 
-            Object* systemMeasure = system->GetFirst(MEASURE);
-            if (!systemMeasure) continue;
+    // add current pedal as child to all systems in between starting and ending system
+    for (int i = startSystemIndex + 1; i < endSystemIndex; ++i) {
+        Object *system = pedalPage->GetChild(i);
+        if (!system->Is(SYSTEM)) continue;
 
-            Object* pedal = Clone();
+        Object *systemMeasure = system->GetFirst(MEASURE);
+        if (!systemMeasure) continue;
 
-            systemMeasure->AddChild(pedal);
-        }
+        Object *pedal = Clone();
+
+        systemMeasure->AddChild(pedal);
     }
 
     return FUNCTOR_SIBLINGS;
