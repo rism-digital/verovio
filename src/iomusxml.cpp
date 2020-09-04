@@ -1658,7 +1658,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     const pugi::xpath_node staffNode = node.select_node("staff");
-    // const int staffNum = staffNode ? staffNode.node().text().as_int() + staffOffset : -1;
 
     const std::string placeStr = node.attribute("placement").as_string();
     const int offset = node.select_node("offset").node().text().as_int();
@@ -3127,16 +3126,16 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     // in case note is a start of both beam and tuplet - need to figure which one is longer
     if (beamStart && tupletStart) {
         pugi::xml_node beamEnd
-            = node.select_single_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
+            = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
         pugi::xml_node tupletEnd
-            = node.select_single_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
         const auto beamEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), beamEnd);
         const auto tupletEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), tupletEnd);
 
         // find distance between iterator, i.e. whether beam or tuplet ends first.
         // Negative number - beam ends first, positive - tuplet, zero - both are of the same length
-        const int distance = std::distance(beamEndIterator, tupletEndIterator);
+        const int distance = static_cast<int>(std::distance(beamEndIterator, tupletEndIterator));
         if (distance > 0) {
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
             ReadMusicXmlBeamStart(node, beamStart.node(), layer);
@@ -3149,13 +3148,12 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of  
     // the whole duration of this beam
     else if (beamStart) {
-        pugi::xml_node beamEnd
-            = node.select_single_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
+        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
         // find whether there is a tuplet that starts during the span of the beam
         pugi::xpath_node nextTupletStart
-            = node.select_single_node("./following-sibling::note[notations[tuplet[@type='start']]]").node();
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='start']]]").node();
         pugi::xml_node tupletEnd
-            = node.select_single_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
         // find start and end of the beam
         const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
