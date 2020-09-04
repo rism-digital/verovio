@@ -555,26 +555,25 @@ int Rest::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int Rest::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
     if ((!HasOloc() || !HasPloc()) && !HasLoc()) return FUNCTOR_SIBLINGS;
 
     // Find whether current layer is top, middle (either one if multiple) or bottom
-    Staff *parentStaff = dynamic_cast<Staff *>(GetFirstAncestor(STAFF));
+    Staff *parentStaff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(parentStaff);
 
-    const int layerCount = parentStaff->GetChildCount(LAYER);
-
-    Layer *parentLayer = dynamic_cast<Layer *>(GetFirstAncestor(LAYER));
+    Layer *parentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
     assert(parentLayer);
 
     ListOfObjects objects;
     ClassIdComparison matchClassId(LAYER);
     parentStaff->FindAllDescendantByComparison(&objects, &matchClassId);
+    const int layerCount = objects.size();
 
-    Layer *firstLayer = dynamic_cast<Layer *>(objects.front());
-    Layer *lastLayer = dynamic_cast<Layer *>(objects.back());
+    Layer *firstLayer = vrv_cast<Layer *>(objects.front());
+    Layer *lastLayer = vrv_cast<Layer *>(objects.back());
 
     const bool isTopLayer = (firstLayer->GetN() == parentLayer->GetN());
     const bool isBottomLayer = (lastLayer->GetN() == parentLayer->GetN());
