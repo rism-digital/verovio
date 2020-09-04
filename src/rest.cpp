@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -273,8 +274,12 @@ int Rest::Transpose(FunctorParams *functorParams)
     Layer *parentLayer = dynamic_cast<Layer *>(GetFirstAncestor(LAYER));
     assert(parentLayer);
 
-    Layer *firstLayer = dynamic_cast<Layer *>(parentStaff->GetFirst());
-    Layer *lastLayer = dynamic_cast<Layer *>(parentStaff->GetLast());
+    ListOfObjects objects;
+    ClassIdComparison matchClassId(LAYER);
+    parentStaff->FindAllDescendantByComparison(&objects, &matchClassId);
+
+    Layer *firstLayer = dynamic_cast<Layer *>(objects.front());
+    Layer *lastLayer = dynamic_cast<Layer *>(objects.back());
 
     const bool isTopLayer = (firstLayer->GetN() == parentLayer->GetN());
     const bool isBottomLayer = (lastLayer->GetN() == parentLayer->GetN());
