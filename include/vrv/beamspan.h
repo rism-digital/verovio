@@ -9,6 +9,7 @@
 #define __VRV_BEAMSPAN_H__
 
 #include "atts_cmn.h"
+#include "beam.h"
 #include "controlelement.h"
 #include "drawinginterface.h"
 #include "timeinterface.h"
@@ -23,6 +24,7 @@ namespace vrv {
  * This class models the MEI <beamSpan> element.
  */
 class BeamSpan : public ControlElement,
+                 public TimePointInterface, 
                  public TimeSpanningInterface,
                  public BeamDrawingInterface,
                  public AttColor,
@@ -46,6 +48,8 @@ private:
     //
 public:
     //
+    BeamSegment m_beamSegment;
+
 private:
     //
 };

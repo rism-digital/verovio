@@ -940,6 +940,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
     m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
+    params->m_classId = BEAMSPAN;
+    m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = BRACKETSPAN;
     m_systemAligner.Process(params->m_functor, params);
 

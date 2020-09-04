@@ -23,6 +23,7 @@ class Arpeg;
 class BarLine;
 class Beam;
 class BeamSegment;
+class BeamSpan;
 class BracketSpan;
 class Breath;
 class Chord;
