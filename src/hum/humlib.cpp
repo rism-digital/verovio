@@ -47832,8 +47832,7 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 	// Now identify notes that should be beamed together
 	// (using lazy beaming for now).
 	HumNum eighthnote(1, 2);
-	int beat1;
-	int beat2;
+	int beat1 = 0;
 	#define INVALID -1000000
 	int beamstart = INVALID;
 	for (int i=0; i<(int)measure.size(); i++) {
@@ -47856,7 +47855,7 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 			continue;
 		}
 
-		beat2 = (int)beatpos[i].getFloat();
+		int beat2 = (int)beatpos[i].getFloat();
 		if (beat1 == beat2) {
 			// note should be added to current beam, but could
 			// be beams to notes after it, so continue on to next note.
