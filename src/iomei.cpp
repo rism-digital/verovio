@@ -1310,7 +1310,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     assert(pedal);
 
     WriteControlElement(currentNode, pedal);
-    WriteTimePointInterface(currentNode, pedal);
+    WriteTimeSpanningInterface(currentNode, pedal);
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
@@ -4188,7 +4188,7 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     Pedal *vrvPedal = new Pedal();
     ReadControlElement(pedal, vrvPedal);
 
-    ReadTimePointInterface(pedal, vrvPedal);
+    ReadTimeSpanningInterface(pedal, vrvPedal);
     vrvPedal->ReadColor(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPedalVis(pedal);
