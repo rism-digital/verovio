@@ -74,7 +74,7 @@ private:
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
-    void CalcSetValues(const int &elementCount);
+    void CalcSetValues();
 
 public:
     // values set by CalcBeam
@@ -202,7 +202,7 @@ public:
     data_STEMDIRECTION GetStemDir();
 
     void SetDrawingStemDir(
-        data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
+        data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface, bool isLast);
 
     int m_x;
     int m_yBeam; // y value of stem top position
