@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Sep  1 09:38:07 PDT 2020
+// Last Modified: Sun Sep  6 19:35:05 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -69645,6 +69645,47 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 
 
 
+//////////////////////////////
+//
+// SonorityDatabase::buildDatabase --
+//
+
+void SonorityDatabase::buildDatabase(HLp line) {
+	clear();
+	if (line == NULL) {
+		return;
+	}
+	m_line = line;
+	bool nullQ = false;
+	if (!line->isData()) {
+		return;
+	}
+	for (int i=0; i<line->getFieldCount(); i++) {
+		HTp token = m_line->token(i);
+		if (!token->isKern()) {
+			continue;
+		}
+		if (token->isRest()) {
+			// ignoring rests, at least for now
+			continue;
+		}
+		if (token->isNull()) {
+			nullQ = true;
+			token = token->resolveNull();
+		}
+		if (token->isNull()) {
+			continue;
+		}
+		int scount = token->getSubtokenCount();
+		for (int j=0; j<scount; j++) {
+			expandList();
+			m_notes.back().setToken(token, nullQ, j);
+		}
+	}
+}
+
+
+
 /////////////////////////////////
 //
 // Tool_msearch::Tool_msearch -- Set the recognized options for the tool.
@@ -69705,6 +69746,7 @@ bool Tool_msearch::run(HumdrumFile& infile, ostream& out) {
 
 
 bool Tool_msearch::run(HumdrumFile& infile) {
+	m_sonorities.resize(infile.getLineCount());
 	m_debugQ = getBoolean("debug");
 	m_quietQ = getBoolean("quiet");
 	m_nooverlapQ = getBoolean("no-overlap");
@@ -69722,7 +69764,9 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 	if (m_text.empty()) {
 		vector<MSearchQueryToken> query;
 		fillMusicQuery(query);
-		doMusicSearch(infile, grid, query);
+		if (!query.empty()) {
+			doMusicSearch(infile, grid, query);
+		}
 	} else {
 		vector<MSearchTextQuery> query;
 		fillTextQuery(query, getString("text"));
@@ -70227,11 +70271,11 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 
 		//////////////////////////////
 		//
-		// INTERVAL
+		// INTERVALS
 		//
 
 		if (query[i].dinterval > -1000) {
-			// match to a specific interval to the next note
+			// match to a specific diatonic interval to the next note
 
 			double currpitch;
 			double nextpitch;
@@ -70247,6 +70291,26 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 			int interval = nextpitch - currpitch;
 
 			if (interval != query[i].dinterval) {
+				match.clear();
+				return false;
+			}
+		} else if (query[i].cinterval > -1000) {
+			// match to a specific chromatic interval to the next note
+
+			double currpitch;
+			double nextpitch;
+
+			currpitch = notes[currindex]->getAbsBase40Pitch();
+
+			if (nextindex >= 0) {
+				nextpitch = notes[nextindex]->getAbsBase40Pitch();
+			} else {
+				nextpitch = -123456789.0;
+			}
+
+			int interval = nextpitch - currpitch;
+
+			if (interval != query[i].cinterval) {
 				match.clear();
 				return false;
 			}
@@ -70374,6 +70438,13 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 			}
 		}
 
+		if (!query[i].harmonic.empty()) {
+			bool match = doHarmonicSearch(query[i], notes[currindex]->getToken());
+			if (!match) {
+				return false;
+			}
+		}
+
 		// All requirements for the note were matched, so store note
 		// and continue to next note if needed.
 		match.push_back(notes[currindex]);
@@ -70387,6 +70458,55 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 	}
 
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// doHarmonicSearch --
+//
+
+bool Tool_msearch::doHarmonicSearch(MSearchQueryToken& query, HTp token) {
+	if (query.harmonic.empty()) {
+		return true;
+	}
+
+
+	bool isChromatic = false;
+	if (query.harmonic.find("n") != string::npos) {
+		isChromatic = true;
+	} else if (query.harmonic.find("-") != string::npos) {
+		isChromatic = true;
+	} else if (query.harmonic.find("#") != string::npos) {
+		isChromatic = true;
+	}
+	
+	int lindex = token->getLineIndex();
+	SonorityDatabase& sonorities = m_sonorities[lindex];
+	if (sonorities.isEmpty()) {
+		sonorities.buildDatabase(token->getLine());
+	}
+
+	if (isChromatic) {
+		int cpitch = Convert::kernToBase40(query.harmonic);
+		int cpc = cpitch % 40;
+		for (int i=0; i<sonorities.getCount(); i++) {
+			if (cpc == sonorities[i].getBase40Pc()) {
+				return true;
+			}
+		}
+	} else {
+		int dpitch = Convert::kernToBase7(query.harmonic);
+		int dpc = dpitch % 7;
+		for (int i=0; i<sonorities.getCount(); i++) {
+			if (dpc == sonorities[i].getBase7Pc()) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 
@@ -70466,6 +70586,12 @@ void Tool_msearch::fillMusicQuery(vector<MSearchQueryToken>& query) {
 		fillMusicQueryInterval(query, iinput);
 	}
 
+	if (query.size() == 1) {
+		if (query[0].anything) {
+			query.clear();
+		}
+	}
+
 }
 
 
@@ -70528,11 +70654,126 @@ void Tool_msearch::fillMusicQueryRhythm(vector<MSearchQueryToken>& query,
 
 //////////////////////////////
 //
+// Tool_msearch::convertPitchesToIntervals --
+//
+
+string Tool_msearch::convertPitchesToIntervals(const string& input) {
+	if (input.empty()) {
+		return "";
+	}
+	for (int i=0; i<(int)input.size(); i++) {
+		if (isdigit(input[i])) {
+			return input;
+		}
+		if (tolower(input[i] == 'r')) {
+			// not allowing rests for now
+			return input;
+		}
+	}
+	vector<string> pitches;
+	
+	for (int i=0; i<(int)input.size(); i++) {
+		char ch = tolower(input[i]);
+		if (ch >= 'a' && ch <= 'g') {
+			string val;
+			val += ch;
+			pitches.push_back(val);
+			if (i > 0) {
+				if (input[i-1] == '^') {
+					pitches.back().insert(0, "^");
+				}
+				if (input[i-1] == 'v') {
+					pitches.back().insert(0, "v");
+				}
+			}
+			continue;
+		}
+		if (!pitches.empty()) {
+			if (ch == 'n') {
+				pitches.back() += 'n';
+			} else if (ch == '-') {
+				pitches.back() += '-';
+			} else if (ch == '#') {
+				pitches.back() += '#';
+			}
+		}
+	}
+
+	if (pitches.size() <= 1) {
+		return "";
+	}
+
+	vector<bool> chromatic(pitches.size(), false);
+	for (int i=0; i<(int)pitches.size(); i++) {
+		for (int j=(int)pitches[i].size()-1; j>0; j--) {
+			int ch = pitches[i][j];
+			if ((ch == 'n') || (ch == '-') || (ch == '#')) {
+				chromatic[i] = true;
+				break;
+			}
+		}
+	}
+
+	string output;
+	int p1;
+	int p2;
+	int base40;
+	int base7;
+	int sign;
+	for (int i=0; i<(int)pitches.size() - 1; i++) {
+		if (chromatic[i] && chromatic[i+1]) {
+			p1 = Convert::kernToBase40(pitches[i]);
+			p2 = Convert::kernToBase40(pitches[i+1]);
+			base40 = p2 - p1;
+			sign = base40 < 0 ? -1 : +1;
+			if (sign < 0) {
+				base40 = -base40;
+			}
+			string value = "";
+			if (sign < 0) {
+				value += "-";
+			}
+			value += Convert::base40ToIntervalAbbr(base40);
+			output += value;
+			output += " ";
+		} else {
+			p1 = Convert::kernToBase7(pitches[i]);
+			p2 = Convert::kernToBase7(pitches[i+1]);
+			base7 = p2 - p1;
+			sign = base7 < 0 ? -1 : +1;
+			if (sign < 0) {
+				base7 = -base7;
+			}
+			string value = "";
+			if (sign < 0) {
+				value += "-";
+			}
+			value += to_string(base7 + 1);
+			output += value;
+			output += " ";
+		}
+	}
+
+	if (output.size() > 0) {
+		if (output.back() == ' ') {
+			output.resize((int)output.size() - 1);
+		}
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_msearch::fillMusicQueryInterval --
 //
 
 void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 		const string& input) {
+
+	string newinput = convertPitchesToIntervals(input);
 
 	char ch;
 	int counter = 0;
@@ -70545,13 +70786,47 @@ void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 		// what is this for?
 	}
 
-	for (int i=0; i<(int)input.size(); i++) {
-		ch = tolower(input[i]);
-
+	int sign = 1;
+	string alteration;
+	for (int i=0; i<(int)newinput.size(); i++) {
+		ch = newinput[i];
 		if (ch == ' ') {
 			// skip over spaces
 			continue;
 		}
+		if ((ch == 'P') ||  (ch == 'p')) {
+			alteration = "P";
+			continue;
+		}
+		if ((ch == 'd') ||  (ch == 'D')) {
+			if ((!alteration.empty()) && (alteration[0] == 'd')) {
+				alteration += "d";
+			} else {
+				alteration = "d";
+			}
+			continue;
+		}
+		if ((ch == 'A') ||  (ch == 'a')) {
+			if ((!alteration.empty()) && (alteration[0] == 'A')) {
+				alteration += "A";
+			} else {
+				alteration = "A";
+			}
+			continue;
+		}
+		if ((ch == 'M') ||  (ch == 'm')) {
+			alteration = ch;
+			continue;
+		}
+		if (ch == '-') {
+			sign = -1;
+			continue;
+		}
+		if (ch == '+') {
+			sign = +1;
+			continue;
+		}
+		ch = tolower(ch);
 
 		if (!isdigit(ch)) {
 			// skip over non-digits (sign of interval
@@ -70565,10 +70840,18 @@ void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 		active->anything = false;
 		active->anyinterval = false;
 		// active->direction = 1;
-		active->dinterval = (ch - '0') - 1; // zero-indexed interval
-		if ((i>0) && (input[i-1] == '-')) {
-			active->dinterval *= -1;
+
+		if (alteration.empty()) {
+			// store a diatonic interval
+			active->dinterval = (ch - '0') - 1; // zero-indexed interval
+			active->dinterval *= sign;
+		} else {
+			active->cinterval = makeBase40Interval((ch - '0') - 1, alteration);
+			active->cinterval *= sign;
 		}
+		sign = 1;
+		alteration.clear();
+
 		if (active == &temp) {
 			query.push_back(temp);
 			temp.clear();
@@ -70597,6 +70880,106 @@ void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 
 
 
+//////////////////////////////
+//
+// Tool_msearch::makeBase40Interval --
+//
+
+int Tool_msearch::makeBase40Interval(int diatonic, const string& alteration) {
+	int sign = 1;
+	if (diatonic < 0) {
+		sign = -1;
+		diatonic = -diatonic;
+	}
+	bool perfectQ = false;
+	int base40 = 0;
+	switch (diatonic) {
+		case 0:  // unison
+			base40 = 0;
+			perfectQ = true;
+			break;
+		case 1:  // second
+			base40 = 6;
+			perfectQ = false;
+			break;
+		case 2:  // third
+			base40 = 12;
+			perfectQ = false;
+			break;
+		case 3:  // fourth
+			base40 = 17;
+			perfectQ = true;
+			break;
+		case 4:  // fifth
+			base40 = 23;
+			perfectQ = true;
+			break;
+		case 5:  // sixth
+			base40 = 29;
+			perfectQ = false;
+			break;
+		case 6:  // seventh
+			base40 = 35;
+			perfectQ = false;
+			break;
+		case 7:  // octave
+			base40 = 40;
+			perfectQ = true;
+			break;
+		case 8:  // ninth
+			base40 = 46;
+			perfectQ = false;
+			break;
+		case 9:  // tenth
+			base40 = 52;
+			perfectQ = false;
+			break;
+		default:
+			cerr << "cannot handle this interval yet.  Setting to unison" << endl;
+			base40 = 0;
+			perfectQ = 1;
+	}
+
+	if (perfectQ) {
+		if (alteration == "P") {
+			// do nothing since the interval is already perfect
+		} else if ((!alteration.empty()) && (alteration[0] == 'd')) {
+			if (alteration.size() <= 2) {
+				base40 -= (int)alteration.size();
+			} else {
+				cerr << "TOO MUCH DIMINISHED, IGNORING" << endl;
+			}
+		} else if ((!alteration.empty()) && (alteration[0] == 'A')) {
+			if (alteration.size() <= 2) {
+				base40 += (int)alteration.size();
+			} else {
+				cerr << "TOO MUCH AUGMENTED, IGNORING" << endl;
+			}
+		}
+	} else {
+		if (alteration == "M") {
+			// do nothing since the interval is already major
+		} else if (alteration == "m") {
+			base40--;
+		} else if ((!alteration.empty()) && (alteration[0] == 'd')) {
+			if (alteration.size() <= 2) {
+				base40 -= (int)alteration.size() + 1;
+			} else {
+				cerr << "TOO MUCH DIMINISHED, IGNORING" << endl;
+			}
+		} else if ((!alteration.empty()) && (alteration[0] == 'A')) {
+			if (alteration.size() <= 2) {
+				base40 += (int)alteration.size();
+			} else {
+				cerr << "TOO MUCH AUGMENTED, IGNORING" << endl;
+			}
+		}
+	}
+	base40 *= sign;
+	return base40;
+}
+
+
 
 //////////////////////////////
 //
@@ -70606,10 +70989,12 @@ void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 		const string& input, bool rhythmQ) {
 
+	string newinput = input;
 	char ch;
 	int counter = 0;
 	MSearchQueryToken temp;
 	MSearchQueryToken *active = &temp;
+	string paren;
 
 	if (query.size() > 0) {
 		active = &query.at(counter);
@@ -70617,13 +71002,46 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 		// what is this for?
 	}
 
-	for (int i=0; i<(int)input.size(); i++) {
-		ch = tolower(input[i]);
+	for (int i=0; i<(int)newinput.size(); i++) {
+		paren.clear();
+		ch = tolower(newinput[i]);
+		if (ch == '(') {
+			newinput[i] = ' ';
+			// A harmonic search initiated
+			int j = i;
+			bool keepQ = true;
+			bool diatonicQ = false;
+			for (j=i+1; j<(int)newinput.size(); j++) {
+				char ch2 = tolower(newinput[j]);
+				if (ch2 == ')') {
+					newinput[j] = ' ';
+					break;
+				}
+				if (ch2 >= 'a' && ch2 <= 'g') {
+					if (diatonicQ) {
+						keepQ = false;
+					} else {
+						diatonicQ = true;
+					}
+				}
+				if (keepQ) {
+					continue;
+				} else {
+					paren += newinput[j];
+					newinput[j] = ' ';
+				}
+			}
+			if (!paren.empty()) {
+				active->harmonic = paren;
+				paren.clear();
+			}
+			continue;
+		}
 
 		if (ch == ' ') {
 			// skip over multiple spaces
 			if (i > 0) {
-            if (input[i-1] == ' ') {
+            if (newinput[i-1] == ' ') {
 					continue;
 				}
 			}
@@ -70647,8 +71065,8 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 			active->anything = false;
 			active->anyrhythm = false;
 			active->rhythm += ch;
-			if (i < (int)input.size() - 1) {
-				if (input[i+1] == ' ') {
+			if (i < (int)newinput.size() - 1) {
+				if (newinput[i+1] == ' ') {
 					if (active == &temp) {
 						query.push_back(temp);
 						temp.clear();
@@ -70812,8 +71230,12 @@ ostream& operator<<(ostream& out, MSearchQueryToken& item) {
 	out << "\tBASE:\t\t"      << item.base        << endl;
 	out << "\tDIRECTION:\t"   << item.direction   << endl;
 	out << "\tDINTERVAL:\t"   << item.dinterval   << endl;
+	out << "\tCINTERVAL:\t"   << item.cinterval   << endl;
 	out << "\tRHYTHM:\t\t"    << item.rhythm      << endl;
 	out << "\tDURATION:\t"    << item.duration    << endl;
+	if (!item.harmonic.empty()) {
+		out << "\tHARMONIC:\t" << item.harmonic    << endl;
+	}
 	return out;
 }
 
@@ -77154,9 +77576,12 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 	int printed = 0;
 	int mcount = 0;
 	int measurestart = 1;
+	int lastbarnum = -1;
+	int barnum = -1;
 	int datastart = 0;
 	int bartextcount = 0;
 	for (h=0; h<(int)outmeasures.size(); h++) {
+		barnum = outmeasures[h].num;
 		measurestart = 1;
 		printed = 0;
 		counter = 0;
@@ -77197,7 +77622,7 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 						m_humdrum_text << "!!LO:TX:Z=20:X=-90:t=" << barline << endl;
 					}
 				}
-			} else if (doubleQ && measurestart) {
+			} else if (doubleQ && (lastbarnum > -1) && (fabs(barnum - lastbarnum) > 1)) {
 				printDoubleBarline(infile, i);
 				measurestart = 0;
 			} else if (measurestart && infile[i].isBarline()) {
@@ -77215,6 +77640,7 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 			}
 			lastline = i;
 		}
+		lastbarnum = barnum;
 	}
 
 	HumRegex hre;
@@ -88612,7 +89038,7 @@ void Tool_tremolo::expandTremolo(HTp token) {
 	if (hre.search(token, "@(\\d+)@")) {
 		value = hre.getMatchInt(1);
 		duration = Convert::recipToDuration(token);
-		HumNum count = value / duration;
+		HumNum count = duration * value / 4;
 		if (!count.isInteger()) {
 			cerr << "Error: non-integer number of tremolo notes: " << token << endl;
 			return;
