@@ -1658,7 +1658,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     const pugi::xpath_node staffNode = node.select_node("staff");
-    // const int staffNum = staffNode ? staffNode.node().text().as_int() + staffOffset : -1;
 
     const std::string placeStr = node.attribute("placement").as_string();
     const int offset = node.select_node("offset").node().text().as_int();
@@ -2329,41 +2328,10 @@ void MusicXmlInput::ReadMusicXmlNote(
     std::string typeStr = GetContentOfChild(node, "type");
     int dots = (int)node.select_nodes("dot").size();
 
+    ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
+
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart && !(notations.node().select_node("ornaments/tremolo[@type='start']"))) {
-        Beam *beam = new Beam();
-        AddLayerElement(layer, beam);
-        m_elementStackMap.at(layer).push_back(beam);
-    }
-
-    // tuplet start
-    // For now tuplet with beam if starting at the same time. However, this will
-    // quite likely not work if we have a tuplet over serveral beams. We would need to check which
-    // one is ending first in order to determine which one is on top of the hierarchy.
-    // Also, it is not 100% sure that we can represent them as tuplet and beam elements.
-    pugi::xpath_node tupletStart = notations.node().select_node("tuplet[@type='start']");
-    if (tupletStart && !isChord) {
-        Tuplet *tuplet = new Tuplet();
-        AddLayerElement(layer, tuplet);
-        m_elementStackMap.at(layer).push_back(tuplet);
-        int num = node.select_node("time-modification/actual-notes").node().text().as_int();
-        int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
-        if (tupletStart.node().first_child()) {
-            num = tupletStart.node().select_node("tuplet-actual/tuplet-number").node().text().as_int();
-            numbase = tupletStart.node().select_node("tuplet-normal/tuplet-number").node().text().as_int();
-        }
-        if (num) tuplet->SetNum(num);
-        if (numbase) tuplet->SetNumbase(numbase);
-        tuplet->SetNumPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetBracketPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
-        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
-        tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
-    }
-
     // tremolos
     pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = -1;
@@ -3130,7 +3098,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (std::get<0>(*iter) == 0) std::get<0>(*iter) = staff->GetN();
         }
     }
-} // namespace vrv
+}
 
 void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 {
@@ -3146,6 +3114,100 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
         Pb *pb = new Pb();
         section->AddChild(pb);
     }
+}
+
+void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
+{
+    pugi::xpath_node beamStart = node.select_node("beam[@number='1'][text()='begin']");
+    pugi::xpath_node tupletStart = node.select_node("notations/tuplet[@type='start']");
+
+    const auto measureNodeChildren = node.select_node("../.").node().children();
+    std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
+    // in case note is a start of both beam and tuplet - need to figure which one is longer
+    if (beamStart && tupletStart) {
+        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
+        pugi::xml_node tupletEnd
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+
+        const auto beamEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), beamEnd);
+        const auto tupletEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), tupletEnd);
+
+        // find distance between iterator, i.e. whether beam or tuplet ends first.
+        // Negative number - beam ends first, positive - tuplet, zero - both are of the same length
+        const int distance = static_cast<int>(std::distance(beamEndIterator, tupletEndIterator));
+        if (distance > 0) {
+            if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+        }
+        else {
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
+        }
+    }
+    // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of
+    // the whole duration of this beam
+    else if (beamStart) {
+        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
+        // find whether there is a tuplet that starts during the span of the beam
+        pugi::xpath_node nextTupletStart
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='start']]]").node();
+        pugi::xml_node tupletEnd
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+
+        // find start and end of the beam
+        const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
+        const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
+        // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
+        std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
+        bool isTupletStartInBeam
+            = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
+        bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
+        // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
+        if ((tupletEnd != beamEnd)
+            && ((isTupletStartInBeam && !isTupletEndInBeam) || (!isTupletStartInBeam && isTupletEndInBeam))) {
+            // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
+            // before this case can be handled correctly
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+        }
+        else {
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+        }
+    }
+    // no special logic needed if we have just tupletStart - just read it as is
+    else if (tupletStart) {
+        if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
+    }
+}
+
+void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer)
+{
+    if (!tupletStart) return;
+
+    Tuplet *tuplet = new Tuplet();
+    AddLayerElement(layer, tuplet);
+    m_elementStackMap.at(layer).push_back(tuplet);
+    int num = node.select_node("time-modification/actual-notes").node().text().as_int();
+    int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
+    if (tupletStart.first_child()) {
+        num = tupletStart.select_node("tuplet-actual/tuplet-number").node().text().as_int();
+        numbase = tupletStart.select_node("tuplet-normal/tuplet-number").node().text().as_int();
+    }
+    if (num) tuplet->SetNum(num);
+    if (numbase) tuplet->SetNumbase(numbase);
+    tuplet->SetNumPlace(tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
+    tuplet->SetBracketPlace(tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
+    tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.attribute("show-number").as_string()));
+    if (HasAttributeWithValue(tupletStart, "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
+    tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.attribute("bracket").as_string()));
+}
+
+void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer)
+{
+    if (!beamStart || (node.select_node("notations/ornaments/tremolo[@type='start']"))) return;
+
+    Beam *beam = new Beam();
+    AddLayerElement(layer, beam);
+    m_elementStackMap.at(layer).push_back(beam);
 }
 
 //////////////////////////////////////////////////////////////////////////////
