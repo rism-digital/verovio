@@ -3125,8 +3125,7 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
     // in case note is a start of both beam and tuplet - need to figure which one is longer
     if (beamStart && tupletStart) {
-        pugi::xml_node beamEnd
-            = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
+        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
         pugi::xml_node tupletEnd
             = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
@@ -3145,7 +3144,7 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
         }
     }
-    // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of  
+    // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of
     // the whole duration of this beam
     else if (beamStart) {
         pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
@@ -3170,8 +3169,7 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             // before this case can be handled correctly
             ReadMusicXmlBeamStart(node, beamStart.node(), layer);
         }
-        else
-        {
+        else {
             ReadMusicXmlBeamStart(node, beamStart.node(), layer);
         }
     }
@@ -3196,16 +3194,14 @@ void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pu
     }
     if (num) tuplet->SetNum(num);
     if (numbase) tuplet->SetNumbase(numbase);
-    tuplet->SetNumPlace(
-        tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
-    tuplet->SetBracketPlace(
-        tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
+    tuplet->SetNumPlace(tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
+    tuplet->SetBracketPlace(tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
     tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.attribute("show-number").as_string()));
     if (HasAttributeWithValue(tupletStart, "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
     tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.attribute("bracket").as_string()));
 }
 
-void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node& node, const pugi::xml_node& beamStart, Layer* layer)
+void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer)
 {
     if (!beamStart || (node.select_node("notations/ornaments/tremolo[@type='start']"))) return;
 
