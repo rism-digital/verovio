@@ -23,14 +23,12 @@ namespace vrv {
 
 BeamSpan::BeamSpan()
     : ControlElement("beamspan-")
-    , TimePointInterface()
     , TimeSpanningInterface()
     , BeamDrawingInterface()
     , AttColor()
     , AttBeamedWith()
     , AttBeamRend()
 {
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);

@@ -432,6 +432,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("arpeg");
         this->WriteArpeg(m_currentNode, vrv_cast<Arpeg *>(object));
     }
+    else if (object->Is(BEAMSPAN)) {
+        m_currentNode = m_currentNode.append_child("beamSpan");
+        WriteBeamSpan(m_currentNode, dynamic_cast<BeamSpan *>(object));
+    }
     else if (object->Is(BRACKETSPAN)) {
         m_currentNode = m_currentNode.append_child("bracketSpan");
         this->WriteBracketSpan(m_currentNode, vrv_cast<BracketSpan *>(object));
@@ -4778,9 +4782,7 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadArpeg(parent, current);
         }
         else if (std::string(current.name()) == "beamSpan") {
-            if (!ReadBeamSpanAsBeam(dynamic_cast<Measure *>(parent), current)) {
-                LogWarning("<beamSpan> is not readable as <beam> and will be ignored");
-            }
+            ReadBeamSpan(parent, current);
         }
         else if (std::string(current.name()) == "bracketSpan") {
             success = this->ReadBracketSpan(parent, current);
@@ -4954,7 +4956,6 @@ bool MEIInput::ReadBeamSpan(Object *parent, pugi::xml_node beamSpan)
     BeamSpan *vrvBeamSpan = new BeamSpan();
     ReadControlElement(beamSpan, vrvBeamSpan);
 
-    ReadTimePointInterface(beamSpan, vrvBeamSpan);
     ReadTimeSpanningInterface(beamSpan, vrvBeamSpan);
     vrvBeamSpan->ReadColor(beamSpan);
     vrvBeamSpan->ReadBeamedWith(beamSpan);

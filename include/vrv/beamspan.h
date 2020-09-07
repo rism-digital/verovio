@@ -24,7 +24,6 @@ namespace vrv {
  * This class models the MEI <beamSpan> element.
  */
 class BeamSpan : public ControlElement,
-                 public TimePointInterface, 
                  public TimeSpanningInterface,
                  public BeamDrawingInterface,
                  public AttColor,
@@ -43,6 +42,14 @@ public:
     virtual std::string GetClassName() const { return "BeamSpan"; }
     virtual ClassId GetClassId() const { return BEAMSPAN; }
     ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    ////@}
 
 private:
     //
