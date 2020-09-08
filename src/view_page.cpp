@@ -490,20 +490,20 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
 
-    int x1, x2, offset;
+    const int offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
+    const int beamWidth = m_doc->GetDrawingBeamWidth(staffSize, false);
 
     const int bracketThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
 
-    x2 = x - bracketThickness;
-    x1 = x2 - bracketThickness;
-    offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
+    const int x2 = x - bracketThickness;
+    const int x1 = x2 - bracketThickness;
 
     dc->StartCustomGraphic("grpSym");
 
-    DrawSmuflCode(dc, x1, y1 + offset, SMUFL_E003_bracketTop, staffSize, false);
-    DrawSmuflCode(dc, x1, y2 - offset, SMUFL_E004_bracketBottom, staffSize, false);
+    DrawSmuflCode(dc, x1, y1 + offset + bracketThickness/2, SMUFL_E003_bracketTop, staffSize, false);
+    DrawSmuflCode(dc, x1, y2 - offset - bracketThickness/2, SMUFL_E004_bracketBottom, staffSize, false);
 
-    DrawFilledRectangle(dc, x1, y1 + 2 * offset, x2, y2 - 2 * offset);
+    DrawFilledRectangle(dc, x1, y1 + 2 * offset + beamWidth / 2, x2, y2 - 2 * offset - beamWidth / 2);
 
     dc->EndCustomGraphic();
 
