@@ -344,7 +344,7 @@ void ABCInput::AddTuplet()
     m_noteStack.clear();
 }
 
-void ABCInput::AddAnnot(std::string remark)
+void const ABCInput::AddAnnot(std::string remark)
 {
     // remarks
     Annot *annot = new Annot();
@@ -535,7 +535,7 @@ void ABCInput::parseDecoration(std::string decorationString)
 // parse information fields
 //
 
-void ABCInput::parseInstruction(std::string instruction)
+void const ABCInput::parseInstruction(std::string instruction)
 {
     if (!strncmp(instruction.c_str(), "abc-include", 11)) {
         LogWarning("ABC input: Include field is ignored");
@@ -556,7 +556,7 @@ void ABCInput::parseInstruction(std::string instruction)
     }
 }
 
-void ABCInput::parseKey(std::string keyString)
+void const ABCInput::parseKey(std::string keyString)
 {
     int i = 0;
     m_ID = "";
@@ -713,7 +713,7 @@ void ABCInput::parseKey(std::string keyString)
     }
 }
 
-void ABCInput::parseUnitNoteLength(std::string unitNoteLength)
+void const ABCInput::parseUnitNoteLength(std::string unitNoteLength)
 {
     if (unitNoteLength.find('/'))
         m_unitDur = atoi(&unitNoteLength[unitNoteLength.find('/') + 1]);
@@ -734,7 +734,7 @@ void ABCInput::parseUnitNoteLength(std::string unitNoteLength)
     // m_doc->m_scoreDef.SetDurDefault(m_durDefault);
 }
 
-void ABCInput::parseMeter(std::string meterString)
+void const ABCInput::parseMeter(std::string meterString)
 {
     m_meter = new MeterSig();
     if (meterString.find('C') != std::string::npos) {
@@ -760,7 +760,7 @@ void ABCInput::parseMeter(std::string meterString)
     }
 }
 
-void ABCInput::parseTempo(std::string tempoString)
+void const ABCInput::parseTempo(std::string tempoString)
 {
     Tempo *tempo = new Tempo();
     if (tempoString.find('=') != std::string::npos) {
@@ -782,13 +782,13 @@ void ABCInput::parseTempo(std::string tempoString)
     LogWarning("ABC input: Tempo definitions are not fully supported yet");
 }
 
-void ABCInput::parseReferenceNumber(std::string referenceNumberString)
+void const ABCInput::parseReferenceNumber(std::string referenceNumberString)
 {
     // The X: field is also used to indicate the start of the tune
     m_mdiv = new Mdiv();
     m_mdiv->m_visibility = Visible;
     if (!referenceNumberString.empty()) {
-        int mdivNum = atoi(referenceNumberString.c_str());
+        const int mdivNum = atoi(referenceNumberString.c_str());
         if (mdivNum < 1) {
             LogError("ABC input: reference number should be a positive integer");
         }
