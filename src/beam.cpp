@@ -192,7 +192,7 @@ void BeamSegment::CalcBeamInit(
     assert(!m_beamElementCoordRefs.empty());
 
     /******************************************************************/
-    // initialization
+    // Calculate the extreme values
 
     int yMax = 0, yMin = 0;
     int nbRests = 0;
