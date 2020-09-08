@@ -217,7 +217,7 @@ void BeamSegment::CalcBeamInit(
         }
 
         if (coord->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>(coord->m_element);
+            Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
             chord->GetYExtremes(yMax, yMin);
 
@@ -237,7 +237,7 @@ void BeamSegment::CalcBeamInit(
             }
         }
         else if (coord->m_element->Is(NOTE)) {
-            Note *note = dynamic_cast<Note *>(coord->m_element);
+            Note *note = vrv_cast<Note *>(coord->m_element);
             assert(note);
             m_avgY += note->GetDrawingY();
 
@@ -267,14 +267,14 @@ void BeamSegment::CalcBeamInit(
 
     Note *firstNote = NULL, *lastNote = NULL;
     if (m_firstNoteOrChord->m_element->Is(NOTE)) {
-        firstNote = dynamic_cast<Note *>(m_firstNoteOrChord->m_element);
+        firstNote = vrv_cast<Note *>(m_firstNoteOrChord->m_element);
     } else if (m_firstNoteOrChord->m_element->Is(CHORD)){
-        firstNote = dynamic_cast<Chord *>(m_firstNoteOrChord->m_element)->GetBottomNote();
+        firstNote = vrv_cast<Chord *>(m_firstNoteOrChord->m_element)->GetBottomNote();
     }
     if (m_lastNoteOrChord->m_element->Is(NOTE)) {
-        lastNote = dynamic_cast<Note *>(m_lastNoteOrChord->m_element);
+        lastNote = vrv_cast<Note *>(m_lastNoteOrChord->m_element);
     } else if (m_lastNoteOrChord->m_element->Is(CHORD)){
-        lastNote = dynamic_cast<Chord *>(m_lastNoteOrChord->m_element)->GetBottomNote();
+        lastNote = vrv_cast<Chord *>(m_lastNoteOrChord->m_element)->GetBottomNote();
     }
 
     if (firstNote && lastNote) {
