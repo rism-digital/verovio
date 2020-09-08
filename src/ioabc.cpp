@@ -756,6 +756,7 @@ void ABCInput::parseMeter(std::string meterString)
         // this is a little "hack", until libMEI is fixed
         m_meter->SetCount(atoi(meterCount.c_str()));
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
+        m_meter->IsAttribute(true);
     }
 }
 
