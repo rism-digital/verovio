@@ -26,17 +26,17 @@ Mordent::Mordent()
     : ControlElement("mordent-")
     , TimePointInterface()
     , AttColor()
+    , AttExtSym()
     , AttOrnamentAccid()
     , AttPlacement()
     , AttMordentLog()
-    , AttExtSym()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
     RegisterAttClass(ATT_MORDENTLOG);
-    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -48,10 +48,10 @@ void Mordent::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
+    ResetExtSym();
     ResetOrnamentAccid();
     ResetPlacement();
     ResetMordentLog();
-    ResetExtSym();
 }
 
 wchar_t Mordent::GetMordentGlyph() const
@@ -64,8 +64,8 @@ wchar_t Mordent::GetMordentGlyph() const
 
     // Handle glyph based on other attributes
     if (GetLong() == BOOLEAN_true) {
-        // We need ornamentTremblementInverted, so for the time being return same result here
-        return GetForm() == mordentLog_FORM_upper ? SMUFL_E56E_ornamentTremblement : SMUFL_E56E_ornamentTremblement;
+        return GetForm() == mordentLog_FORM_upper ? SMUFL_E56E_ornamentTremblement
+                                                  : SMUFL_E5BD_ornamentPrecompTrillWithMordent;
     }
     return GetForm() == mordentLog_FORM_upper ? SMUFL_E56C_ornamentMordent : SMUFL_E56D_ornamentMordentInverted;
 }

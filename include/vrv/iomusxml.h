@@ -309,7 +309,7 @@ private:
      */
     ///@{
     ///@}
-    std::string GetOrnamentGlyphNumber(const std::string &attributes) const;
+    std::string GetOrnamentGlyphNumber(int attributes) const;
 
     /*
      * @name Methods for converting MusicXML string values to MEI attributes.

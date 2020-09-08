@@ -27,21 +27,21 @@ Trill::Trill()
     , TimeSpanningInterface()
     , AttColor()
     , AttExtender()
+    , AttExtSym()
     , AttLineRend()
     , AttNNumberLike()
     , AttOrnamentAccid()
     , AttPlacement()
-    , AttExtSym()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_EXTENDER);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
-    RegisterAttClass(ATT_EXTSYM);
-
+    
     Reset();
 }
 
@@ -53,11 +53,12 @@ void Trill::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetExtender();
+    ResetExtSym();
     ResetLineRend();
     ResetNNumberLike();
     ResetOrnamentAccid();
     ResetPlacement();
-    ResetExtSym();
+    
 }
 
 wchar_t Trill::GetTrillGlyph() const

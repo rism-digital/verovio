@@ -27,11 +27,11 @@ class Trill : public ControlElement,
               public TimeSpanningInterface,
               public AttColor,
               public AttExtender,
+              public AttExtSym,
               public AttLineRend,
               public AttNNumberLike,
               public AttOrnamentAccid,
-              public AttPlacement,
-              public AttExtSym {
+              public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

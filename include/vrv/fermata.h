@@ -28,9 +28,9 @@ class ConvertMarkupAnalyticalParams;
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
+                public AttExtSym,
                 public AttFermataVis,
-                public AttPlacement,
-                public AttExtSym {
+                public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

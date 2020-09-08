@@ -79,6 +79,18 @@
 
 namespace vrv {
 
+// Using flags mordent can be easily visualised with the value. E.g.
+// 0x212 - approach and depart are both below and form is normal
+// APPR_Below | FORM_Normal | DEP_Below
+enum MordentExtSymbolFlags {
+    APPR_Above = 0x100,
+    APPR_Below = 0x200,
+    FORM_Normal = 0x10,
+    FORM_Inverted = 0x20,
+    DEP_Above = 0x1,
+    DEP_Below = 0x2
+};
+
 //----------------------------------------------------------------------------
 // MusicXmlInput
 //----------------------------------------------------------------------------
@@ -2863,34 +2875,41 @@ void MusicXmlInput::ReadMusicXmlNote(
             mordent->SetForm(mordentLog_FORM_upper);
         }
         if (BOOLEAN_true == mordent->GetLong()) {
-            std::string mordent_attributes;
-            if (mordentLog_FORM_upper == mordent->GetForm()) {
-                mordent_attributes += "inverted_";
-            }
+            int mordentFlags = (mordentLog_FORM_upper == mordent->GetForm()) ? FORM_Inverted : FORM_Normal;
             if (xmlMordent.node().attribute("approach")) {
-                mordent_attributes += std::string("approach_") + xmlMordent.node().attribute("approach").as_string();
+                mordentFlags |= (std::string(xmlMordent.node().attribute("approach").as_string()) == "above")
+                    ? APPR_Above
+                    : APPR_Below;
             }
-            else if (xmlMordent.node().attribute("departure")) {
-                mordent_attributes += std::string("departure_") + xmlMordent.node().attribute("departure").as_string();
+            if (xmlMordent.node().attribute("departure")) {
+                mordentFlags |= (std::string(xmlMordent.node().attribute("departure").as_string()) == "above")
+                    ? DEP_Above
+                    : DEP_Below;
             }
-            mordent->SetExternalsymbols(mordent, "glyph.num",
-                mordent_attributes.empty() ? "U+E5BD" : GetOrnamentGlyphNumber(mordent_attributes));
-            mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
+            const std::string smuflCode = GetOrnamentGlyphNumber(mordentFlags);
+            if (!smuflCode.empty())
+            {
+                mordent->SetExternalsymbols(mordent, "glyph.num", smuflCode);
+                mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
+            }
         }
     }
 
-    // schleifer (counts as mordent with different glyph)
-    pugi::xpath_node xmlSchleifer = notations.node().select_node("ornaments/*[contains(name(), 'schleifer')]");
-    if (xmlSchleifer) {
+    // schleifer/haydn (counts as mordent with different glyph)
+    pugi::xpath_node xmlExtOrnament
+        = notations.node().select_node("ornaments/*[contains(name(), 'schleifer') or contains(name(), 'haydn')]");
+    if (xmlExtOrnament) {
         Mordent *mordent = new Mordent();
         m_controlElements.push_back(std::make_pair(measureNum, mordent));
         mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         mordent->SetStartid(m_ID);
         // color
-        mordent->SetColor(xmlSchleifer.node().attribute("color").as_string());
+        mordent->SetColor(xmlExtOrnament.node().attribute("color").as_string());
         // place
-        mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlSchleifer.node().attribute("placement").as_string()));
-        mordent->SetExternalsymbols(mordent, "glyph.num", "U+E587");
+        mordent->SetPlace(
+            mordent->AttPlacement::StrToStaffrel(xmlExtOrnament.node().attribute("placement").as_string()));
+        bool isHaydn = std::string(xmlExtOrnament.node().name()) == "haydn";
+        mordent->SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E5B0");
         mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
     }
 
@@ -3706,15 +3725,19 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
     }
 }
 
-std::string MusicXmlInput::GetOrnamentGlyphNumber(const std::string &attributes) const
+std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
 {
-    static std::map<std::string, std::string> precomposedNames = {
-        { "inverted_approach_above", "U+E5C6"},
-        { "inverted_approach_below", "U+E5B5" },
-        { "approach_above", "U+E5C7" },
-        { "approach_below", "U+E5B8" }, 
-        { "inverted_departure_above", "U+E5BB" },
-        { "inverted_departure_below", "U+E5C8" }
+    static std::map<int, std::string> precomposedNames = { { APPR_Above | FORM_Inverted, "U+E5C6" },
+        { APPR_Below | FORM_Inverted, "U+E5B5" }, { APPR_Above | FORM_Normal, "U+E5C7" },
+        { APPR_Below | FORM_Normal, "U+E5B8" }, { FORM_Inverted | DEP_Above, "U+E5BB" },
+        { FORM_Inverted | DEP_Below, "U+E5C8" }
+        // these values need to be matched with proper SMuFL codes first
+        /*, { FORM_Normal | DEP_Above, "U+????" },
+        { FORM_Normal | DEP_Below, "U+????" }, { APPR_Above | FORM_Normal | DEP_Above, "U+????" },
+        { APPR_Above | FORM_Normal | DEP_Above, "U+????" }, { APPR_Above | FORM_Normal | DEP_Below, "U+????" },
+        { APPR_Below | FORM_Normal | DEP_Above, "U+????" }, { APPR_Below | FORM_Normal | DEP_Below, "U+????" },
+        { APPR_Above | FORM_Inverted | DEP_Above, "U+????" }, { APPR_Above | FORM_Inverted | DEP_Below, "U+????" },
+        { APPR_Below | FORM_Inverted | DEP_Above, "U+????" }, { APPR_Below | FORM_Inverted | DEP_Below, "U+????" }*/
     };
 
     return precomposedNames.end() != precomposedNames.find(attributes) ? precomposedNames[attributes] : "";

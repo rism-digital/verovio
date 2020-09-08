@@ -33,10 +33,10 @@ Turn::Turn()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
     RegisterAttClass(ATT_TURNLOG);
-    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -48,10 +48,10 @@ void Turn::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
+    ResetExtSym();
     ResetOrnamentAccid();
     ResetPlacement();
     ResetTurnLog();
-    ResetExtSym();
 }
 
 wchar_t Turn::GetTurnGlyph() const
