@@ -17,6 +17,8 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "beamspan.h"
+#include "comparison.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "ftrem.h"
@@ -416,6 +418,34 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
 
         } // end of while
     } // end of drawing partial bars
+}
+
+void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure)
+{
+    assert(dc);
+    assert(beamSpan);
+    assert(measure);
+
+    Layer *layer = vrv_cast<Layer *>(beamSpan->GetStart()->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>(beamSpan->GetStart()->GetFirstAncestor(STAFF));
+    if (!layer || !staff) return;
+
+    // find all elements between startId and endId of the beamSpan
+    ClassIdsComparison classIds({ NOTE, CHORD });
+    ListOfObjects objects;
+    layer->FindAllDescendantBetween(&objects, &classIds, beamSpan->GetStart(), beamSpan->GetEnd(), true, false);
+
+    // Initialize coordinates and caclculate beam segment based on the array of element for beamSpan
+    ArrayOfObjects beamSpanElements(objects.begin(), objects.end());
+    beamSpan->InitCoords(&beamSpanElements, staff, beamSpan->GetPlace());
+    beamSpan->m_beamSegment.InitCoordRefs(&beamSpan->m_beamElementCoords);
+    beamSpan->m_drawingPlace = beamSpan->GetPlace();
+    beamSpan->m_beamSegment.CalcBeam(layer, staff, m_doc, beamSpan, beamSpan->GetPlace());
+    
+    // Draw corresponding beam segment
+    dc->StartGraphic(beamSpan, "", beamSpan->GetUuid());
+    DrawBeamSegment(dc, &beamSpan->m_beamSegment, beamSpan, layer, staff, measure);
+    dc->EndGraphic(beamSpan, this);
 }
 
 } // namespace vrv

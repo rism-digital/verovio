@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "barline.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
@@ -236,6 +237,7 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
+
 int LayerElement::GetOriginalLayerN()
 {
     int layerN = this->GetAlignmentLayerN();
@@ -243,6 +245,37 @@ int LayerElement::GetOriginalLayerN()
         layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
     }
     return layerN;
+
+bool LayerElement::IsInBeamSpan() const
+{
+    if (!this->Is({ CHORD, NOTE })) return false;
+
+    Measure *parentMeasure = vrv_cast<Measure *>(GetFirstAncestor(MEASURE));
+    if (!parentMeasure) return false;
+
+    Layer *parentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
+    if (!parentLayer) return false;
+
+    // find all beamspans within current measure, stop processing if there are none
+    ClassIdComparison beamSpanId(BEAMSPAN);
+    ListOfObjects beamSpanElements;
+    parentMeasure->FindAllDescendantByComparison(&beamSpanElements, &beamSpanId);
+
+    if (beamSpanElements.empty()) return false;
+
+    // try to figure whether current element belongs to any of the beamSpans
+    for (auto object : beamSpanElements) {
+        BeamSpan *beamSpan = vrv_cast<BeamSpan *>(object);
+        if (!beamSpan) continue;
+
+        ClassIdsComparison classIds({ NOTE, CHORD });
+        ListOfObjects elements;
+        parentLayer->FindAllDescendantBetween(
+            &elements, &classIds, beamSpan->GetStart(), beamSpan->GetEnd(), true, false);
+        if (std::find(elements.begin(), elements.end(), this) != elements.end()) return true;
+    }
+
+    return false;
 }
 
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const

@@ -1423,6 +1423,7 @@ int Object::FindAllBetween(FunctorParams *functorParams)
     // evaluate by applying the Comparison operator()
     if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
+        if ((params->m_end != this) && !params->m_includeChildren) return FUNCTOR_SIBLINGS;
     }
 
     // We have reached the end of the range
