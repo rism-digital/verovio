@@ -47,18 +47,13 @@ public:
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoordRefs();
+    ArrayOfBeamElementCoords &GetElementCoordRefs();
 
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
     void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
-
-    /**
-     * Clear the m_beamElementCoords vector and delete all the objects.
-     */
-    void ClearCoordRefs();
 
 private:
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
@@ -67,7 +62,7 @@ private:
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
 
     void CalcAdjustSlope(
-        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step, const int &elementCount);
+        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
 
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
