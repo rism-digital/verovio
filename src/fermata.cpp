@@ -61,7 +61,6 @@ void Fermata::ConvertFromAnalyticalMarkup(
     params->m_controlEvents.push_back(this);
 }
 
-
 wchar_t Fermata::GetFermataGlyph() const
 {
     // If there is glyph.num, prioritize it, otherwise check other attributes

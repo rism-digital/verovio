@@ -27,9 +27,9 @@ Turn::Turn()
     , TimePointInterface()
     , AttColor()
     , AttOrnamentAccid()
+    , AttExtSym()
     , AttPlacement()
     , AttTurnLog()
-    , AttExtSym()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -62,7 +62,7 @@ wchar_t Turn::GetTurnGlyph() const
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
-    return (GetForm() == turnLog_FORM_lower)? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
+    return (GetForm() == turnLog_FORM_lower) ? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
 }
 
 //----------------------------------------------------------------------------
