@@ -837,13 +837,13 @@ Options::Options()
     m_justificationBraceGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
 
-    m_legerLineThickness.SetInfo("Leger line thickness", "The thickness of the leger lines");
-    m_legerLineThickness.Init(0.15, 0.10, 0.30);
-    this->Register(&m_legerLineThickness, "legerLineThickness", &m_generalLayout);
+    m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
+    m_ledgerLineThickness.Init(0.15, 0.10, 0.30);
+    this->Register(&m_ledgerLineThickness, "ledgerLineThickness", &m_generalLayout);
 
-    m_legerLineExtension.SetInfo("Leger line extension", "The amount by which a leger line should extend either side of a notehead");
-    m_legerLineExtension.Init(0.20, 0.10, 0.50);
-    this->Register(&m_legerLineExtension, "legerLineExtension", &m_generalLayout);
+    m_ledgerLineExtension.SetInfo("Ledger line extension", "The amount by which a ledger line should extend either side of a notehead");
+    m_ledgerLineExtension.Init(0.20, 0.10, 0.50);
+    this->Register(&m_ledgerLineExtension, "ledgerLineExtension", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
@@ -1230,8 +1230,8 @@ void Options::Sync()
             { "tupletBracketThickness", &m_tupletBracketThickness },
             { "subBracketThickness", &m_subBracketThickness },
             { "bracketThickness", &m_bracketThickness },
-            { "legerLineThickness", &m_legerLineThickness },
-            { "legerLineExtension", &m_legerLineExtension }
+            { "legerLineThickness", &m_ledgerLineThickness },
+            { "legerLineExtension", &m_ledgerLineExtension }
     };
 
     for (auto &pair : engravingDefaults) {

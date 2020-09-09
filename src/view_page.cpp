@@ -1106,7 +1106,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->StartCustomGraphic("ledgerLines", gClass);
 
     const int optionLegerWidth
-        = m_doc->GetOptions()->m_legerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int lineWidth = optionLegerWidth * 1.75;
     if (cueSize) lineWidth = optionLegerWidth * 1.25;
 

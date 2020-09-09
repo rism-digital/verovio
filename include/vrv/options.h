@@ -548,8 +548,8 @@ public:
     OptionDbl m_justificationBracketGroup;
     OptionDbl m_justificationStaff;
     OptionDbl m_justificationSystem;
-    OptionDbl m_legerLineThickness;
-    OptionDbl m_legerLineExtension;
+    OptionDbl m_ledgerLineThickness;
+    OptionDbl m_ledgerLineExtension;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
