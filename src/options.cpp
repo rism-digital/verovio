@@ -1184,8 +1184,9 @@ Options::~Options() {}
 
 void Options::sync()
 {
+    if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, const OptionDbl *>> engravingDefaults
+    std::list<std::pair<std::string, OptionDbl *>> engravingDefaults
         = { { "thinBarlineThickness", &m_barLineWidth },
             { "lyricLineThickness", &m_lyricLineThickness },
             { "slurMidpointThickness", &m_slurThickness },
@@ -1193,12 +1194,11 @@ void Options::sync()
             { "stemThickness", &m_stemWidth },
             { "tieMidpointThickness", &m_tieThickness } };
 
-    for (const auto &pair : engravingDefaults) {
-        if (pair.second->isSet()) {
-            const std::string value = std::to_string(pair.second->GetValue() / 2.0);
-            const bool success = m_engravingDefaults.UpdateNodeValue({ "engravingDefaults", pair.first }, value);
-            if (!success) LogWarning("Unable to update %s engraving default with value %s.", pair.first.c_str(), value.c_str());
-        }
+    for (auto &pair : engravingDefaults) {
+        if (pair.second->isSet()) continue;
+
+        const double jsonValue = m_engravingDefaults.GetDoubleValue({ "engravingDefaults", pair.first });
+        pair.second->SetValueDbl(jsonValue * 2);
     }
 }
 

@@ -419,7 +419,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     points[3] = Point(x2, y2);
 
     float angle = CalcInitialSlur(curve, slur, staff, layer->GetN(), drawingCurveDir, points);
-    int thickness = m_doc->GetDrawingElementDefaultSize("slurMidpointThickness", staff->m_drawingStaffSize);
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
 
     curve->UpdateCurveParams(points, angle, thickness, drawingCurveDir);
 
