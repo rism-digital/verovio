@@ -742,7 +742,7 @@ Options::Options()
     m_slurControlPoints.SetInfo(
         "Slur control points", "Slur control points - higher value means more curved at the end");
     m_slurControlPoints.Init(5, 1, 10);
-    this->Register(&m_slurControlPoints, "slurControlPointsr", &m_generalLayout);
+    this->Register(&m_slurControlPoints, "slurControlPoints", &m_generalLayout);
 
     m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
     m_slurCurveFactor.Init(10, 1, 100);
@@ -761,7 +761,7 @@ Options::Options()
     this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
-    m_slurMaxSlope.Init(20, 0, 45);
+    m_slurMaxSlope.Init(20, 0, 60);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
