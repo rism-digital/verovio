@@ -544,12 +544,10 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             }
             this->m_chainedId = chord->GetUuid();
             delete chord;
-            return true;
         }
         else if (count > 2) {
             chord->DeleteChild(note);
             this->m_chainedId = chord->GetUuid();
-            return true;
         }
         // Handle cases of chords with one single note
         else {
@@ -559,16 +557,16 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             assert(parent);
             parent->ReplaceChild(chord, rest);
             delete chord;
-            return true;
         }
+        return true;
     }
     else if (beam) {
-        if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
+        if (beam->m_beamSegment.GetElementCoordRefs().size() == 2) {
             bool insertBefore = true;
-            LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
+            LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs().back()->m_element;
             if (note == otherElement) {
                 insertBefore = false;
-                otherElement = beam->m_beamSegment.GetElementCoordRefs()->front()->m_element;
+                otherElement = beam->m_beamSegment.GetElementCoordRefs().front()->m_element;
             }
             assert(otherElement && (otherElement != note));
             Rest *rest = new Rest();

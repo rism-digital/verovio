@@ -166,19 +166,21 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ArrayOfObjects *fTremChildren = this->GetList(this);
+    const ArrayOfBeamElementCoords *fTremChildren = GetElementCoords();
 
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {
         return FUNCTOR_CONTINUE;
     }
 
-    if (GetElementCoords()->size() != 2) {
+    if (fTremChildren->size() != 2) {
         LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
         return FUNCTOR_STOP;
     }
 
-    this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
+    this->m_beamSegment.InitCoordRefs(fTremChildren);
+    this->m_beamSegment.m_firstNoteOrChord = (*fTremChildren)[0];
+    this->m_beamSegment.m_lastNoteOrChord = (*fTremChildren)[1];
 
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
