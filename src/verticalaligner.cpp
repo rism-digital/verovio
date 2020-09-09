@@ -790,23 +790,44 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     AdjustSlursParams *params = vrv_params_cast<AdjustSlursParams *>(functorParams);
     assert(params);
 
+    std::vector<FloatingCurvePositioner *> positioners;
     ArrayOfFloatingPositioners::iterator iter;
-    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        assert((*iter)->GetObject());
-        if (!(*iter)->GetObject()->Is({ PHRASE, SLUR })) continue;
-        Slur *slur = vrv_cast<Slur *>((*iter)->GetObject());
+    for (FloatingPositioner* iter:m_floatingPositioners) {
+        assert(iter->GetObject());
+        if (!iter->GetObject()->Is({PHRASE, SLUR})) continue;
+        Slur* slur = vrv_cast<Slur*>(iter->GetObject());
         assert(slur);
 
-        assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
-        FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(*iter);
+        assert(iter->Is(FLOATING_CURVE_POSITIONER));
+        FloatingCurvePositioner* curve = vrv_cast<FloatingCurvePositioner*>(iter);
         assert(curve);
 
         // Skip if no content bounding box is available
         if (!curve->HasContentBB()) continue;
+        positioners.push_back(curve);
 
         bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
         if (adjusted) {
             params->m_adjusted = true;
+        }
+    }
+
+    auto staff = GetStaff();
+    if (staff) {
+        const int slurShift = staff->m_drawingStaffSize / 2;
+        for (size_t i = 0; i+1<positioners.size(); i++) {
+            Slur* firstSlur = vrv_cast<Slur*>(positioners[i]->GetObject());
+            for (auto j = i+1; j<positioners.size(); j++) {
+                Slur* secondSlur = vrv_cast<Slur*>(positioners[j]->GetObject());
+                Point points1[4], points2[4];
+                positioners[i]->GetPoints(points1);
+                positioners[j]->GetPoints(points2);
+                if (firstSlur->GetStart() == secondSlur->GetStart()) {
+                    positioners[points1[2].x > points2[2].x ? i : j]->MoveFrontDownward(slurShift);
+                } else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
+                    positioners[points1[0].x < points2[0].x ? i : j]->MoveBackDownward(slurShift);
+                }
+            }
         }
     }
 
