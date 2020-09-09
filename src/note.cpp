@@ -878,13 +878,13 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
 
     // HARDCODED
-    const int legerLineExtension
+    const int ledgerLineExtension
         = params->m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * params->m_doc->GetDrawingUnit(staffSize);
-    int leftExtender = 2.5 * legerLineExtension;
-    int rightExtender = 2.5 * legerLineExtension;
+    int leftExtender = 2.5 * ledgerLineExtension;
+    int rightExtender = 2.5 * ledgerLineExtension;
     if (drawingCueSize || (this->GetDrawingDur() >= DUR_8)) {
-        leftExtender = 1.75 * legerLineExtension;
-        rightExtender = 1.25 * legerLineExtension;
+        leftExtender = 1.75 * ledgerLineExtension;
+        rightExtender = 1.25 * ledgerLineExtension;
     }
 
     if (drawingCueSize) {
