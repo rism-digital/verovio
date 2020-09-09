@@ -786,7 +786,7 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
-    m_bracketThickness.SetInfo("Bracket thikness", "The thickness of the system bracket");
+    m_bracketThickness.SetInfo("Bracket thickness", "The thickness of the system bracket");
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
 
@@ -815,7 +815,7 @@ Options::Options()
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
 
-    m_hairpinThickness.SetInfo("Hairpin thikness", "The thickness of the hairpin");
+    m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
 
@@ -836,6 +836,14 @@ Options::Options()
         "Spacing brace group justification", "Space between staves inside a braced group ijustification");
     m_justificationBraceGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
+
+    m_legerLineThickness.SetInfo("Leger line thickness", "The thickness of the leger lines");
+    m_legerLineThickness.Init(0.15, 0.10, 0.30);
+    this->Register(&m_legerLineThickness, "legerLineThickness", &m_generalLayout);
+
+    m_legerLineExtension.SetInfo("Leger line extension", "The amount by which a leger line should extend either side of a notehead");
+    m_legerLineExtension.Init(0.20, 0.10, 0.50);
+    this->Register(&m_legerLineExtension, "legerLineExtension", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
@@ -1222,6 +1230,8 @@ void Options::Sync()
             { "tupletBracketThickness", &m_tupletBracketThickness },
             { "subBracketThickness", &m_subBracketThickness },
             { "bracketThickness", &m_bracketThickness },
+            { "legerLineThickness", &m_legerLineThickness },
+            { "legerLineExtension", &m_legerLineExtension }
     };
 
     for (auto &pair : engravingDefaults) {
