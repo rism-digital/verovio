@@ -1286,7 +1286,6 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
 {
     assert(dc);
     assert(system);
-    assert(firstMeasure);
 
     // Draw system divider (from the second one) if scoreDef is optimized
     if (!firstMeasure || (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_none)) return;
@@ -1297,13 +1296,14 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
         Object *previousSystem = currentPage->GetPrevious(system);
         if (previousSystem) {
             Measure *previousSystemMeasure = dynamic_cast<Measure *>(previousSystem->FindDescendantByType(MEASURE, 1));
-
-            Staff *bottomStaff = previousSystemMeasure->GetBottomVisibleStaff();
-            // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
-            // substract offset of the system divider symbol itself (added to y2 and y4)
-            previousSystemBottomMarginY = bottomStaff->GetDrawingY()
-                - (bottomStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
-                - m_doc->GetDrawingUnit(100) * 5;
+            if (previousSystemMeasure) {
+                Staff *bottomStaff = previousSystemMeasure->GetBottomVisibleStaff();
+                // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
+                // substract offset of the system divider symbol itself (added to y2 and y4)
+                previousSystemBottomMarginY = bottomStaff->GetDrawingY()
+                    - (bottomStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
+                    - m_doc->GetDrawingUnit(100) * 5;
+            }
         }
     }
 
