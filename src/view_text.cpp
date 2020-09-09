@@ -422,5 +422,4 @@ void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
 
     dc->EndGraphic(svg, this);
 }
-
 } // namespace vrv
