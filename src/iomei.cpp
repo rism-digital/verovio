@@ -1218,9 +1218,9 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     WriteControlElement(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
+    fermata->WriteExtSym(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacement(currentNode);
-    fermata->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
@@ -1288,10 +1288,10 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
     WriteControlElement(currentNode, mordent);
     WriteTimePointInterface(currentNode, mordent);
     mordent->WriteColor(currentNode);
+    mordent->WriteExtSym(currentNode);
     mordent->WriteOrnamentAccid(currentNode);
     mordent->WritePlacement(currentNode);
     mordent->WriteMordentLog(currentNode);
-    mordent->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
@@ -1314,6 +1314,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     WriteControlElement(currentNode, pedal);
     WriteTimeSpanningInterface(currentNode, pedal);
     pedal->WriteColor(currentNode);
+    pedal->WriteExtSym(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
@@ -1397,11 +1398,11 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
     trill->WriteExtender(currentNode);
+    trill->WriteExtSym(currentNode);
     trill->WriteLineRend(currentNode);
     trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
-    trill->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
@@ -1411,10 +1412,10 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     WriteControlElement(currentNode, turn);
     WriteTimePointInterface(currentNode, turn);
     turn->WriteColor(currentNode);
+    turn->WriteExtSym(currentNode);
     turn->WriteOrnamentAccid(currentNode);
     turn->WritePlacement(currentNode);
     turn->WriteTurnLog(currentNode);
-    turn->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteLayer(pugi::xml_node currentNode, Layer *layer)
@@ -4065,9 +4066,9 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
 
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
-    vrvFermata->ReadFermataVis(fermata);
-    vrvFermata->ReadPlacement(fermata);
     vrvFermata->ReadExtSym(fermata);
+    vrvFermata->ReadFermataVis(fermata);
+    vrvFermata->ReadPlacement(fermata); 
 
     parent->AddChild(vrvFermata);
     ReadUnsupportedAttr(fermata, vrvFermata);
@@ -4162,10 +4163,10 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
+    vrvMordent->ReadExtSym(mordent);
     vrvMordent->ReadOrnamentAccid(mordent);
     vrvMordent->ReadPlacement(mordent);
     vrvMordent->ReadMordentLog(mordent);
-    vrvMordent->ReadExtSym(mordent);
 
     parent->AddChild(vrvMordent);
     ReadUnsupportedAttr(mordent, vrvMordent);
@@ -4196,6 +4197,7 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
 
     ReadTimeSpanningInterface(pedal, vrvPedal);
     vrvPedal->ReadColor(pedal);
+    vrvPedal->ReadExtSym(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPedalVis(pedal);
     vrvPedal->ReadPlacement(pedal);
@@ -4291,11 +4293,11 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadExtender(trill);
+    vrvTrill->ReadExtSym(trill);
     vrvTrill->ReadLineRend(trill);
     vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
-    vrvTrill->ReadExtSym(trill);
 
     parent->AddChild(vrvTrill);
     ReadUnsupportedAttr(trill, vrvTrill);
@@ -4313,10 +4315,10 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
+    vrvTurn->ReadExtSym(turn);
     vrvTurn->ReadOrnamentAccid(turn);
     vrvTurn->ReadPlacement(turn);
     vrvTurn->ReadTurnLog(turn);
-    vrvTurn->ReadExtSym(turn);
 
     parent->AddChild(vrvTurn);
     ReadUnsupportedAttr(turn, vrvTurn);
