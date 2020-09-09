@@ -192,7 +192,7 @@ void BeamSegment::CalcBeam(
             }
 
             if (coord->m_element->Is(CHORD)) {
-                Chord *chord = dynamic_cast<Chord *>(coord->m_element);
+                Chord *chord = vrv_cast<Chord *>(coord->m_element);
                 assert(chord);
                 int yMax, yMin;
                 chord->GetYExtremes(yMax, yMin);
@@ -246,9 +246,9 @@ void BeamSegment::CalcBeamInit(
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
+    beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false)
         - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
+    beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, true)
         - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -277,7 +277,7 @@ void BeamSegment::CalcBeamInit(
         }
 
         if (coord->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>(coord->m_element);
+            Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
             chord->GetYExtremes(yMax, yMin);
 
@@ -297,7 +297,7 @@ void BeamSegment::CalcBeamInit(
             }
         }
         else if (coord->m_element->Is(NOTE)) {
-            Note *note = dynamic_cast<Note *>(coord->m_element);
+            Note *note = vrv_cast<Note *>(coord->m_element);
             assert(note);
             this->m_avgY += note->GetDrawingY();
 
@@ -840,7 +840,7 @@ void Beam::FilterList(ArrayOfObjects *childList)
             continue;
         }
         else {
-            LayerElement *element = dynamic_cast<LayerElement *>(*iter);
+            LayerElement *element = vrv_cast<LayerElement *>(*iter);
             assert(element);
             // if we are at the beginning of the beam
             // and the note is cueSize
@@ -857,7 +857,7 @@ void Beam::FilterList(ArrayOfObjects *childList)
             }
             // also remove notes within chords
             if (element->Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(element);
+                Note *note = vrv_cast<Note *>(element);
                 assert(note);
                 if (note->IsChordTone()) {
                     iter = childList->erase(iter);
@@ -868,11 +868,11 @@ void Beam::FilterList(ArrayOfObjects *childList)
         }
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     Staff *beamStaff = staff;
     if (this->HasBeamWith()) {
-        Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+        Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
         assert(measure);
         if (this->GetBeamWith() == OTHERSTAFF_below) {
             beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
@@ -899,7 +899,7 @@ int Beam::GetPosition(LayerElement *element)
     int position = this->GetListIndex(element);
     // Check if this is a note in the chord
     if ((position == -1) && (element->Is(NOTE))) {
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord) position = this->GetListIndex(chord);
@@ -999,7 +999,7 @@ void BeamElementCoord::SetDrawingStemDir(
     if (stemDir == STEMDIRECTION_up) {
         this->m_x += interface->m_stemXAbove[interface->m_cueSize];
         if (this->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>(this->m_element);
+            Chord *chord = vrv_cast<Chord *>(this->m_element);
             assert(chord);
             m_closestNote = chord->GetTopNote();
         }
@@ -1012,7 +1012,7 @@ void BeamElementCoord::SetDrawingStemDir(
     else {
         this->m_x += interface->m_stemXBelow[interface->m_cueSize];
         if (this->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>(this->m_element);
+            Chord *chord = vrv_cast<Chord *>(this->m_element);
             assert(chord);
             m_closestNote = chord->GetBottomNote();
         }
@@ -1100,7 +1100,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
 int Beam::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     const ArrayOfObjects *beamChildren = this->GetList(this);
@@ -1112,9 +1112,9 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
     this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());

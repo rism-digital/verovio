@@ -115,6 +115,18 @@ public:
      */
     int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
 
+    /**
+     * Get the list of the layer elements for the duration of an element
+     * Takes into account cross-staff situations.
+     */
+    ListOfObjects GetLayerElementsForTimeSpanOf(LayerElement *element);
+
+    /**
+     * Get the list of the layer elements used within a time span.
+     * Takes into account cross-staff situations.
+     */
+    ListOfObjects GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff);
+
     Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig() const;
     Mensur *GetCurrentMensur() const;

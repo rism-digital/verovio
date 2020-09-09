@@ -82,7 +82,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
     for (int i = 0; i < this->GetChildCount(); ++i) {
-        alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
+        alignment = vrv_cast<StaffAlignment *>(m_children.at(i));
         assert(alignment);
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
@@ -99,7 +99,7 @@ void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *posi
 
     StaffAlignment *alignment = NULL;
     for (const auto child : m_children) {
-        alignment = dynamic_cast<StaffAlignment *>(child);
+        alignment = vrv_cast<StaffAlignment *>(child);
         assert(alignment);
         FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
         if (positioner && (positioner->GetObject() == object)) {
@@ -113,7 +113,7 @@ void SystemAligner::FindAllIntersectionPoints(
 {
     StaffAlignment *alignment = NULL;
     for (const auto child : m_children) {
-        alignment = dynamic_cast<StaffAlignment *>(child);
+        alignment = vrv_cast<StaffAlignment *>(child);
         assert(alignment);
         alignment->FindAllIntersectionPoints(line, boundingBox, classIds, margin);
     }
@@ -121,20 +121,18 @@ void SystemAligner::FindAllIntersectionPoints(
 
 int SystemAligner::GetOverflowAbove(const Doc *) const
 {
-    if (!GetChildCount() || GetChild(0) == m_bottomAlignment)
-        return 0;
+    if (!GetChildCount() || GetChild(0) == m_bottomAlignment) return 0;
 
-    StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(0));
+    StaffAlignment *alignment = vrv_cast<StaffAlignment *>(GetChild(0));
     assert(alignment);
     return alignment->GetOverflowAbove();
 }
 
 int SystemAligner::GetOverflowBelow(const Doc *doc) const
 {
-    if (!GetChildCount() || GetChild(0) == m_bottomAlignment)
-        return 0;
+    if (!GetChildCount() || GetChild(0) == m_bottomAlignment) return 0;
 
-    StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(GetChildCount() - 2));
+    StaffAlignment *alignment = vrv_cast<StaffAlignment *>(GetChild(GetChildCount() - 2));
     assert(alignment);
     return alignment->GetOverflowBelow() + doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(alignment->GetStaffSize());
 }
@@ -161,17 +159,16 @@ void SystemAligner::SetSpacing(ScoreDef *scoreDef)
     for (auto iter = childList->begin(); iter != childList->end(); ++iter) {
         // It should be staffDef only, but double check.
         if (!(*iter)->Is(STAFFDEF)) continue;
-        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+        StaffDef *staffDef = vrv_cast<StaffDef *>(*iter);
         assert(staffDef);
 
         m_spacingTypes[staffDef->GetN()] = CalculateSpacingAbove(staffDef);
     }
 }
 
-SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(Staff* staff)
+SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(Staff *staff)
 {
-    if (!staff)
-        return SpacingType::None;
+    if (!staff) return SpacingType::None;
 
     if (m_spacingTypes.empty()) {
         System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
@@ -206,15 +203,10 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffD
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
                 if (staffGrp && staffGrp->HasSymbol()) {
                     switch (staffGrp->GetSymbol()) {
-                        case staffGroupingSym_SYMBOL_brace:
-                            spacingType = SpacingType::Brace;
-                            break;
+                        case staffGroupingSym_SYMBOL_brace: spacingType = SpacingType::Brace; break;
                         case staffGroupingSym_SYMBOL_bracket:
-                        case staffGroupingSym_SYMBOL_bracketsq:
-                            spacingType = SpacingType::Bracket;
-                            break;
-                        default:
-                            spacingType = SpacingType::None;
+                        case staffGroupingSym_SYMBOL_bracketsq: spacingType = SpacingType::Bracket; break;
+                        default: spacingType = SpacingType::None;
                     }
                 }
             }
@@ -320,7 +312,7 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
     double justificationFactor = 0.;
     if (m_staff) {
         switch (m_spacingType) {
-            case SystemAligner::SpacingType::System :
+            case SystemAligner::SpacingType::System:
                 justificationFactor = doc->GetOptions()->m_justificationSystem.GetValue();
                 break;
             case SystemAligner::SpacingType::Staff:
@@ -335,8 +327,7 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
             case SystemAligner::SpacingType::None: break;
             default: assert(false);
         }
-        if (m_spacingType != SystemAligner::SpacingType::System)
-            justificationFactor *= GetStaffSize() / 100.0;
+        if (m_spacingType != SystemAligner::SpacingType::System) justificationFactor *= GetStaffSize() / 100.0;
     }
 
     return justificationFactor;
@@ -345,7 +336,7 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
 int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
 {
     if (box->Is(FLOATING_POSITIONER)) {
-        FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
+        FloatingPositioner *positioner = vrv_cast<FloatingPositioner *>(box);
         assert(positioner);
         return positioner->GetContentTop() - this->GetYRel();
     }
@@ -355,7 +346,7 @@ int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
 int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
 {
     if (box->Is(FLOATING_POSITIONER)) {
-        FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
+        FloatingPositioner *positioner = vrv_cast<FloatingPositioner *>(box);
         assert(positioner);
         return -(positioner->GetContentBottom() + m_staffHeight - this->GetYRel());
     }
@@ -374,22 +365,16 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
         }
         else {
             switch (m_spacingType) {
-                case SystemAligner::SpacingType::System:
-                    spacing = doc->GetOptions()->m_spacingSystem.GetValue();
-                    break;
-                case SystemAligner::SpacingType::Staff:
-                    spacing = doc->GetOptions()->m_spacingStaff.GetValue();
-                    break;
+                case SystemAligner::SpacingType::System: spacing = doc->GetOptions()->m_spacingSystem.GetValue(); break;
+                case SystemAligner::SpacingType::Staff: spacing = doc->GetOptions()->m_spacingStaff.GetValue(); break;
                 case SystemAligner::SpacingType::Brace:
                     spacing = doc->GetOptions()->m_spacingBraceGroup.GetValue();
                     break;
                 case SystemAligner::SpacingType::Bracket:
                     spacing = doc->GetOptions()->m_spacingBracketGroup.GetValue();
                     break;
-                case SystemAligner::SpacingType::None:
-                    break;
-                default:
-                    assert(false);
+                case SystemAligner::SpacingType::None: break;
+                default: assert(false);
             }
         }
 
@@ -419,7 +404,8 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     int overflowSum = 0;
     if (prevAlignment->GetVerseCount() > 0) {
         overflowSum = prevAlignment->GetOverflowBelow() + GetOverflowAbove();
-    } else {
+    }
+    else {
         // The maximum between the overflow below of the previous staff and the overflow above of the current
         overflowSum = std::max(prevAlignment->GetOverflowBelow(), GetOverflowAbove());
         // add overlap if there any
@@ -543,7 +529,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
 
 int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = vrv_params_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
     int staffSize = this->GetStaffSize();
@@ -584,19 +570,19 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         if ((params->m_classId == PHRASE) || (params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
             assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
-            FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+            FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(*iter);
             assert(curve);
 
             bool skipAbove = false;
             bool skipBelow = false;
 
             if ((*iter)->GetObject()->Is({ PHRASE, SLUR })) {
-                Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
+                Slur *slur = vrv_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
                 slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
             else if ((*iter)->GetObject()->Is(TIE)) {
-                Tie *tie = dynamic_cast<Tie *>((*iter)->GetObject());
+                Tie *tie = vrv_cast<Tie *>((*iter)->GetObject());
                 assert(tie);
                 tie->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
@@ -660,7 +646,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
 {
     AdjustFloatingPositionersBetweenParams *params
-        = dynamic_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
+        = vrv_params_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
     assert(params);
 
     // int staffSize = this->GetStaffSize();
@@ -686,23 +672,33 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
         // Skip if no content bounding box is available
         if (!positioner->HasContentBB()) continue;
 
-        positioner->SetDrawingYRel(centerYRel);
-
-        /*
+        int diffY = centerYRel - positioner->GetDrawingYRel();
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowAboveBBoxes;
         auto i = overflowBoxes->begin();
         auto end = overflowBoxes->end();
+        bool adjusted = false;
         while (i != end) {
+
             // find all the overflowing elements from the staff that overlap horizonatally
-            i = std::find_if(i, end, [positioner](BoundingBox *elem) { return
-        positioner->HorizontalContentOverlap(elem); }); if (i != end) {
+            i = std::find_if(
+                i, end, [positioner](BoundingBox *elem) { return positioner->HorizontalContentOverlap(elem); });
+            if (i != end) {
                 // update the yRel accordingly
-                //(*iter)->CalcDrawingYRel(params->m_doc, this, *i);
+                int y = positioner->GetSpaceBelow(params->m_doc, this, *i);
+                if (y < diffY) {
+                    diffY = y;
+                    adjusted = true;
+                }
                 i++;
             }
         }
-        */
+        if (!adjusted) {
+            positioner->SetDrawingYRel(centerYRel);
+        }
+        else {
+            positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
+        }
     }
 
     params->m_previousStaffPositioners = &m_floatingPositioners;
@@ -713,7 +709,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
 
 int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 {
-    AdjustFloatingPositionerGrpsParams *params = dynamic_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);
+    AdjustFloatingPositionerGrpsParams *params = vrv_params_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);
     assert(params);
 
     ArrayOfFloatingPositioners positioners;
@@ -791,18 +787,18 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 
 int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 {
-    AdjustSlursParams *params = dynamic_cast<AdjustSlursParams *>(functorParams);
+    AdjustSlursParams *params = vrv_params_cast<AdjustSlursParams *>(functorParams);
     assert(params);
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         assert((*iter)->GetObject());
         if (!(*iter)->GetObject()->Is({ PHRASE, SLUR })) continue;
-        Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
+        Slur *slur = vrv_cast<Slur *>((*iter)->GetObject());
         assert(slur);
 
         assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
-        FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+        FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(*iter);
         assert(curve);
 
         // Skip if no content bounding box is available
@@ -819,7 +815,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 
 int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
 {
-    AdjustStaffOverlapParams *params = dynamic_cast<AdjustStaffOverlapParams *>(functorParams);
+    AdjustStaffOverlapParams *params = vrv_params_cast<AdjustStaffOverlapParams *>(functorParams);
     assert(params);
 
     // This is the bottom alignment (or something is wrong)
@@ -860,7 +856,7 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
 
 int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     if (m_spacingType != SystemAligner::SpacingType::System) {
@@ -877,7 +873,7 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 
 int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 {
-    AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
+    AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
     const int defaultSpacing = GetMinimumSpacing(params->m_doc);
@@ -897,7 +893,7 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 
 int StaffAlignment::JustifyY(FunctorParams *functorParams)
 {
-    JustifyYParams *params = dynamic_cast<JustifyYParams *>(functorParams);
+    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
 
     // Skip bottom aligner and first staff

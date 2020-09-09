@@ -209,9 +209,9 @@ public:
     int m_drawingJustifiableHeight;
 
     /**
-    * the sum of justification factors for each type of spacing in between
-    * systems and staves (staff, brace group, bracket group)
-    */
+     * the sum of justification factors for each type of spacing in between
+     * systems and staves (staff, brace group, bracket group)
+     */
     double m_justificationSum;
 
 private:

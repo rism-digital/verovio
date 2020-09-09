@@ -79,6 +79,18 @@
 
 namespace vrv {
 
+// Using flags mordent can be easily visualised with the value. E.g.
+// 0x212 - approach and depart are both below and form is normal
+// APPR_Below | FORM_Normal | DEP_Below
+enum MordentExtSymbolFlags {
+    APPR_Above = 0x100,
+    APPR_Below = 0x200,
+    FORM_Normal = 0x10,
+    FORM_Inverted = 0x20,
+    DEP_Above = 0x1,
+    DEP_Below = 0x2
+};
+
 //----------------------------------------------------------------------------
 // MusicXmlInput
 //----------------------------------------------------------------------------
@@ -168,7 +180,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     // otherwise copy the content to the corresponding existing measure
     else {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
-        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
+        Measure *existingMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         for (auto current : *measure->GetChildren()) {
             if (!current->Is(STAFF)) {
@@ -187,11 +199,6 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
             m_endingStack.back().first.push_back(measure);
         }
     }
-}
-
-void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
-{
-    AddLayerElement(layer, element, 0);
 }
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int duration)
@@ -252,7 +259,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         staffNum = 1;
     }
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
+    Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     return SelectLayer(layerNum, staff);
 }
@@ -260,7 +267,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
 {
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
+    Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);
@@ -1414,7 +1421,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 }
 
 void MusicXmlInput::ReadMusicXmlAttributes(
-    pugi::xml_node node, Section *section, Measure *measure, std::string measureNum)
+    pugi::xml_node node, Section *section, Measure *measure, const std::string &measureNum)
 {
     assert(node);
     assert(section);
@@ -1564,7 +1571,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     }
 }
 
-void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, const std::string &measureNum)
 {
     assert(node);
     assert(measure);
@@ -1572,12 +1579,12 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     m_durTotal -= atoi(GetContentOfChild(node, "duration").c_str());
 }
 
-void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, const std::string &measureNum)
 {
     assert(node);
     assert(measure);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->GetFirst(STAFF));
+    Staff *staff = vrv_cast<Staff *>(measure->GetFirst(STAFF));
     assert(staff);
 
     std::string barStyle = GetContentOfChild(node, "bar-style");
@@ -1663,7 +1670,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     const pugi::xpath_node staffNode = node.select_node("staff");
-    // const int staffNum = staffNode ? staffNode.node().text().as_int() + staffOffset : -1;
 
     const std::string placeStr = node.attribute("placement").as_string();
     const int offset = node.select_node("offset").node().text().as_int();
@@ -2141,7 +2147,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 }
 
-void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, const std::string &measureNum)
 {
     assert(node);
     assert(measure);
@@ -2177,7 +2183,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
     }
 }
 
-void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, const std::string &measureNum)
 {
     assert(node);
     assert(measure);
@@ -2185,7 +2191,7 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, s
     m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
 }
 
-void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, const std::string &measureNum)
 {
     assert(node);
     assert(measure);
@@ -2200,7 +2206,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
         if (HasAttributeWithValue(kind.node(), "use-symbols", "yes")) {
             harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
         }
-        else if (kind.node().attribute("text")) {
+        else if (kind.node().attribute("text") && std::strcmp(kind.node().text().as_string(), "none")) {
             harmText = harmText + kind.node().attribute("text").as_string();
         }
         else {
@@ -2232,7 +2238,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
 }
 
 void MusicXmlInput::ReadMusicXmlNote(
-    pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset, Section *section)
+    pugi::xml_node node, Measure *measure, const std::string &measureNum, const int staffOffset, Section *section)
 {
     assert(node);
     assert(measure);
@@ -2247,7 +2253,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(layer);
     m_prevLayer = layer;
 
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     bool isChord = node.select_node("chord");
@@ -2334,41 +2340,10 @@ void MusicXmlInput::ReadMusicXmlNote(
     std::string typeStr = GetContentOfChild(node, "type");
     int dots = (int)node.select_nodes("dot").size();
 
+    ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
+
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart && !(notations.node().select_node("ornaments/tremolo[@type='start']"))) {
-        Beam *beam = new Beam();
-        AddLayerElement(layer, beam);
-        m_elementStackMap.at(layer).push_back(beam);
-    }
-
-    // tuplet start
-    // For now tuplet with beam if starting at the same time. However, this will
-    // quite likely not work if we have a tuplet over serveral beams. We would need to check which
-    // one is ending first in order to determine which one is on top of the hierarchy.
-    // Also, it is not 100% sure that we can represent them as tuplet and beam elements.
-    pugi::xpath_node tupletStart = notations.node().select_node("tuplet[@type='start']");
-    if (tupletStart && !isChord) {
-        Tuplet *tuplet = new Tuplet();
-        AddLayerElement(layer, tuplet);
-        m_elementStackMap.at(layer).push_back(tuplet);
-        int num = node.select_node("time-modification/actual-notes").node().text().as_int();
-        int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
-        if (tupletStart.node().first_child()) {
-            num = tupletStart.node().select_node("tuplet-actual/tuplet-number").node().text().as_int();
-            numbase = tupletStart.node().select_node("tuplet-normal/tuplet-number").node().text().as_int();
-        }
-        if (num) tuplet->SetNum(num);
-        if (numbase) tuplet->SetNumbase(numbase);
-        tuplet->SetNumPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetBracketPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
-        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
-        tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
-    }
-
     // tremolos
     pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = -1;
@@ -2899,6 +2874,43 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!std::strncmp(xmlMordent.node().name(), "inverted", 7)) {
             mordent->SetForm(mordentLog_FORM_upper);
         }
+        if (BOOLEAN_true == mordent->GetLong()) {
+            int mordentFlags = (mordentLog_FORM_upper == mordent->GetForm()) ? FORM_Inverted : FORM_Normal;
+            if (xmlMordent.node().attribute("approach")) {
+                mordentFlags |= (std::string(xmlMordent.node().attribute("approach").as_string()) == "above")
+                    ? APPR_Above
+                    : APPR_Below;
+            }
+            if (xmlMordent.node().attribute("departure")) {
+                mordentFlags |= (std::string(xmlMordent.node().attribute("departure").as_string()) == "above")
+                    ? DEP_Above
+                    : DEP_Below;
+            }
+            const std::string smuflCode = GetOrnamentGlyphNumber(mordentFlags);
+            if (!smuflCode.empty())
+            {
+                mordent->SetExternalsymbols(mordent, "glyph.num", smuflCode);
+                mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
+            }
+        }
+    }
+
+    // schleifer/haydn (counts as mordent with different glyph)
+    pugi::xpath_node xmlExtOrnament
+        = notations.node().select_node("ornaments/*[contains(name(), 'schleifer') or contains(name(), 'haydn')]");
+    if (xmlExtOrnament) {
+        Mordent *mordent = new Mordent();
+        m_controlElements.push_back(std::make_pair(measureNum, mordent));
+        mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        mordent->SetStartid(m_ID);
+        // color
+        mordent->SetColor(xmlExtOrnament.node().attribute("color").as_string());
+        // place
+        mordent->SetPlace(
+            mordent->AttPlacement::StrToStaffrel(xmlExtOrnament.node().attribute("placement").as_string()));
+        bool isHaydn = std::string(xmlExtOrnament.node().name()) == "haydn";
+        mordent->SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E5B0");
+        mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
     }
 
     // trill
@@ -3135,7 +3147,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (std::get<0>(*iter) == 0) std::get<0>(*iter) = staff->GetN();
         }
     }
-} // namespace vrv
+}
 
 void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 {
@@ -3153,124 +3165,199 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 }
 
+void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
+{
+    pugi::xpath_node beamStart = node.select_node("beam[@number='1'][text()='begin']");
+    pugi::xpath_node tupletStart = node.select_node("notations/tuplet[@type='start']");
+
+    const auto measureNodeChildren = node.select_node("../.").node().children();
+    std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
+    // in case note is a start of both beam and tuplet - need to figure which one is longer
+    if (beamStart && tupletStart) {
+        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
+        pugi::xml_node tupletEnd
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+
+        const auto beamEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), beamEnd);
+        const auto tupletEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), tupletEnd);
+
+        // find distance between iterator, i.e. whether beam or tuplet ends first.
+        // Negative number - beam ends first, positive - tuplet, zero - both are of the same length
+        const int distance = static_cast<int>(std::distance(beamEndIterator, tupletEndIterator));
+        if (distance > 0) {
+            if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+        }
+        else {
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
+        }
+    }
+    // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of
+    // the whole duration of this beam
+    else if (beamStart) {
+        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
+        // find whether there is a tuplet that starts during the span of the beam
+        pugi::xpath_node nextTupletStart
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='start']]]").node();
+        pugi::xml_node tupletEnd
+            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+
+        // find start and end of the beam
+        const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
+        const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
+        // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
+        std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
+        bool isTupletStartInBeam
+            = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
+        bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
+        // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
+        if ((tupletEnd != beamEnd)
+            && ((isTupletStartInBeam && !isTupletEndInBeam) || (!isTupletStartInBeam && isTupletEndInBeam))) {
+            // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
+            // before this case can be handled correctly
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+        }
+        else {
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+        }
+    }
+    // no special logic needed if we have just tupletStart - just read it as is
+    else if (tupletStart) {
+        if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
+    }
+}
+
+void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer)
+{
+    if (!tupletStart) return;
+
+    Tuplet *tuplet = new Tuplet();
+    AddLayerElement(layer, tuplet);
+    m_elementStackMap.at(layer).push_back(tuplet);
+    int num = node.select_node("time-modification/actual-notes").node().text().as_int();
+    int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
+    if (tupletStart.first_child()) {
+        num = tupletStart.select_node("tuplet-actual/tuplet-number").node().text().as_int();
+        numbase = tupletStart.select_node("tuplet-normal/tuplet-number").node().text().as_int();
+    }
+    if (num) tuplet->SetNum(num);
+    if (numbase) tuplet->SetNumbase(numbase);
+    tuplet->SetNumPlace(tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
+    tuplet->SetBracketPlace(tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.attribute("placement").as_string()));
+    tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.attribute("show-number").as_string()));
+    if (HasAttributeWithValue(tupletStart, "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
+    tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.attribute("bracket").as_string()));
+}
+
+void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer)
+{
+    if (!beamStart || (node.select_node("notations/ornaments/tremolo[@type='start']"))) return;
+
+    Beam *beam = new Beam();
+    AddLayerElement(layer, beam);
+    m_elementStackMap.at(layer).push_back(beam);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // String to attribute converters
 
-data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(std::string value)
+data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::string &value)
 {
-    if (value == "sharp")
-        return ACCIDENTAL_WRITTEN_s;
-    else if (value == "natural")
-        return ACCIDENTAL_WRITTEN_n;
-    else if (value == "flat")
-        return ACCIDENTAL_WRITTEN_f;
-    else if (value == "double-sharp")
-        return ACCIDENTAL_WRITTEN_x;
-    else if (value == "sharp-sharp")
-        return ACCIDENTAL_WRITTEN_ss;
-    else if (value == "flat-flat")
-        return ACCIDENTAL_WRITTEN_ff;
-    else if (value == "natural-sharp")
-        return ACCIDENTAL_WRITTEN_ns;
-    else if (value == "natural-flat")
-        return ACCIDENTAL_WRITTEN_nf;
-    else if (value == "quarter-flat")
-        return ACCIDENTAL_WRITTEN_1qf;
-    else if (value == "quarter-sharp")
-        return ACCIDENTAL_WRITTEN_1qs;
-    else if (value == "three-quarters-flat")
-        return ACCIDENTAL_WRITTEN_3qf;
-    else if (value == "three-quarters-sharp")
-        return ACCIDENTAL_WRITTEN_3qs;
-    else if (value == "sharp-down")
-        return ACCIDENTAL_WRITTEN_sd;
-    else if (value == "sharp-up")
-        return ACCIDENTAL_WRITTEN_su;
-    else if (value == "natural-down")
-        return ACCIDENTAL_WRITTEN_nd;
-    else if (value == "natural-up")
-        return ACCIDENTAL_WRITTEN_nu;
-    else if (value == "flat-down")
-        return ACCIDENTAL_WRITTEN_fd;
-    else if (value == "flat-up")
-        return ACCIDENTAL_WRITTEN_fu;
-    else if (value == "triple-sharp")
-        return ACCIDENTAL_WRITTEN_ts;
-    else if (value == "triple-flat")
-        return ACCIDENTAL_WRITTEN_tf;
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> Accidental2Accid{
+        { "sharp", ACCIDENTAL_WRITTEN_s }, //
+        { "natural", ACCIDENTAL_WRITTEN_n }, //
+        { "flat", ACCIDENTAL_WRITTEN_f }, //
+        { "double-sharp", ACCIDENTAL_WRITTEN_x }, //
+        { "sharp-sharp", ACCIDENTAL_WRITTEN_ss }, //
+        { "flat-flat", ACCIDENTAL_WRITTEN_ff }, //
+        { "natural-sharp", ACCIDENTAL_WRITTEN_ns }, //
+        { "natural-flat", ACCIDENTAL_WRITTEN_nf }, //
+        { "quarter-flat", ACCIDENTAL_WRITTEN_1qf }, //
+        { "quarter-sharp", ACCIDENTAL_WRITTEN_1qs }, //
+        { "three-quarters-flat", ACCIDENTAL_WRITTEN_3qf }, //
+        { "three-quarters-sharp", ACCIDENTAL_WRITTEN_3qs }, //
+        { "sharp-down", ACCIDENTAL_WRITTEN_sd }, //
+        { "sharp-up", ACCIDENTAL_WRITTEN_su }, //
+        { "natural-down", ACCIDENTAL_WRITTEN_nd }, //
+        { "natural-up", ACCIDENTAL_WRITTEN_nu }, //
+        { "flat-down", ACCIDENTAL_WRITTEN_fd }, //
+        { "flat-up", ACCIDENTAL_WRITTEN_fu }, //
+        { "triple-sharp", ACCIDENTAL_WRITTEN_ts }, //
+        { "triple-flat", ACCIDENTAL_WRITTEN_tf } //
+    };
+
+    const auto result = Accidental2Accid.find(value);
+    if (result != Accidental2Accid.end()) {
+        return result->second;
+    }
+
     LogWarning("MusicXML import: Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
 }
 
-data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(float value)
+data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
 {
-    if (value == -2) return ACCIDENTAL_GESTURAL_ff;
-    if (value == -1.5) return ACCIDENTAL_GESTURAL_fd;
-    if (value == -1) return ACCIDENTAL_GESTURAL_f;
-    if (value == -0.5) return ACCIDENTAL_GESTURAL_fu;
-    if (value == 0) return ACCIDENTAL_GESTURAL_n;
-    if (value == 0.5) return ACCIDENTAL_GESTURAL_sd;
-    if (value == 1) return ACCIDENTAL_GESTURAL_s;
-    if (value == 1.5) return ACCIDENTAL_GESTURAL_su;
-    if (value == 2) return ACCIDENTAL_GESTURAL_ss;
+    static const std::map<float, data_ACCIDENTAL_GESTURAL> Alter2Accid{
+        { -2, ACCIDENTAL_GESTURAL_ff }, //
+        { -1.5, ACCIDENTAL_GESTURAL_fd }, //
+        { -1, ACCIDENTAL_GESTURAL_f }, //
+        { -0.5, ACCIDENTAL_GESTURAL_fu }, //
+        { 0, ACCIDENTAL_GESTURAL_n }, //
+        { 0.5, ACCIDENTAL_GESTURAL_sd }, //
+        { 1, ACCIDENTAL_GESTURAL_s }, //
+        { 1.5, ACCIDENTAL_GESTURAL_su }, //
+        { 2, ACCIDENTAL_GESTURAL_ss } //
+    };
+
+    const auto result = Alter2Accid.find(value);
+    if (result != Alter2Accid.end()) {
+        return result->second;
+    }
+
     LogWarning("MusicXML import: Unsupported alter value '%.1f'", value);
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
-data_ARTICULATION MusicXmlInput::ConvertArticulations(std::string value)
+data_ARTICULATION MusicXmlInput::ConvertArticulations(const std::string &value)
 {
-    // articulations
-    if (value == "accent")
-        return ARTICULATION_acc;
-    else if (value == "detached-legato")
-        return ARTICULATION_NONE;
-    else if (value == "doit")
-        return ARTICULATION_doit;
-    else if (value == "falloff")
-        return ARTICULATION_fall;
-    else if (value == "plop")
-        return ARTICULATION_plop;
-    else if (value == "scoop")
-        return ARTICULATION_scoop;
-    else if (value == "spiccato")
-        return ARTICULATION_spicc;
-    else if (value == "staccatissimo")
-        return ARTICULATION_stacciss;
-    else if (value == "staccato")
-        return ARTICULATION_stacc;
-    else if (value == "strong-accent")
-        return ARTICULATION_marc;
-    else if (value == "tenuto")
-        return ARTICULATION_ten;
-    // technical
-    else if (value == "bend")
-        return ARTICULATION_bend;
-    else if (value == "double-tongue")
-        return ARTICULATION_dbltongue;
-    else if (value == "down-bow")
-        return ARTICULATION_dnbow;
-    else if (value == "fingernails")
-        return ARTICULATION_fingernail;
-    else if (value == "harmonic")
-        return ARTICULATION_harm;
-    else if (value == "heel")
-        return ARTICULATION_heel;
-    else if (value == "open-string")
-        return ARTICULATION_open;
-    else if (value == "snap-pizzicato")
-        return ARTICULATION_snap;
-    else if (value == "stopped")
-        return ARTICULATION_stop;
-    else if (value == "toe")
-        return ARTICULATION_toe;
-    else if (value == "triple-tongue")
-        return ARTICULATION_trpltongue;
-    else if (value == "up-bow")
-        return ARTICULATION_upbow;
+    static const std::map<std::string, data_ARTICULATION> Articulations2Id{
+        // articulations
+        { "accent", ARTICULATION_acc }, //
+        { "detached-legato", ARTICULATION_NONE }, //
+        { "doit", ARTICULATION_doit }, //
+        { "falloff", ARTICULATION_fall }, //
+        { "plop", ARTICULATION_plop }, //
+        { "scoop", ARTICULATION_scoop }, //
+        { "spiccato", ARTICULATION_spicc }, //
+        { "staccatissimo", ARTICULATION_stacciss }, //
+        { "staccato", ARTICULATION_stacc }, //
+        { "strong-accent", ARTICULATION_marc }, //
+        { "tenuto", ARTICULATION_ten }, //
+        // technical
+        { "bend", ARTICULATION_bend }, //
+        { "double-tongue", ARTICULATION_dbltongue }, //
+        { "down-bow", ARTICULATION_dnbow }, //
+        { "fingernails", ARTICULATION_fingernail }, //
+        { "harmonic", ARTICULATION_harm }, //
+        { "heel", ARTICULATION_heel }, //
+        { "open-string", ARTICULATION_open }, //
+        { "snap-pizzicato", ARTICULATION_snap }, //
+        { "stopped", ARTICULATION_stop }, //
+        { "toe", ARTICULATION_toe }, //
+        { "triple-tongue", ARTICULATION_trpltongue }, //
+        { "up-bow", ARTICULATION_upbow } //
+    };
+
+    const auto result = Articulations2Id.find(value);
+    if (result != Articulations2Id.end()) {
+        return result->second;
+    }
+
     return ARTICULATION_NONE;
 }
 
-data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repeat)
+data_BARRENDITION MusicXmlInput::ConvertStyleToRend(const std::string &value, const bool repeat)
 {
     if (value == "dashed") return BARRENDITION_dashed;
     if (value == "dotted") return BARRENDITION_dotted;
@@ -3288,378 +3375,325 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     return BARRENDITION_NONE;
 }
 
-data_BOOLEAN MusicXmlInput::ConvertWordToBool(std::string value)
+data_BOOLEAN MusicXmlInput::ConvertWordToBool(const std::string &value)
 {
-    if (value == "yes")
-        return BOOLEAN_true;
-    else if (value == "no")
-        return BOOLEAN_false;
-    else
-        return BOOLEAN_NONE;
+    if (value == "yes") return BOOLEAN_true;
+    if (value == "no") return BOOLEAN_false;
+
+    return BOOLEAN_NONE;
 }
 
-data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
+data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
 {
-    if (value == "maxima")
-        return DURATION_maxima; // this is a mensural MEI value
-    else if (value == "long")
-        return DURATION_long; // mensural MEI value longa isn't supported
-    else if (value == "breve")
-        return DURATION_breve;
-    else if (value == "whole")
-        return DURATION_1;
-    else if (value == "half")
-        return DURATION_2;
-    else if (value == "quarter")
-        return DURATION_4;
-    else if (value == "eighth")
-        return DURATION_8;
-    else if (value == "16th")
-        return DURATION_16;
-    else if (value == "32nd")
-        return DURATION_32;
-    else if (value == "64th")
-        return DURATION_64;
-    else if (value == "128th")
-        return DURATION_128;
-    else if (value == "256th")
-        return DURATION_256;
-    else {
-        LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
-        return DURATION_NONE;
+    static const std::map<std::string, data_DURATION> Type2Dur{
+        { "maxima", DURATION_maxima }, // this is a mensural MEI value
+        { "long", DURATION_long }, // mensural MEI value longa isn't supported
+        { "breve", DURATION_breve }, //
+        { "whole", DURATION_1 }, //
+        { "half", DURATION_2 }, //
+        { "quarter", DURATION_4 }, //
+        { "eighth", DURATION_8 }, //
+        { "16th", DURATION_16 }, //
+        { "32nd", DURATION_32 }, //
+        { "64th", DURATION_64 }, //
+        { "128th", DURATION_128 }, //
+        { "256th", DURATION_256 } //
+    };
+
+    const auto result = Type2Dur.find(value);
+    if (result != Type2Dur.end()) {
+        return result->second;
     }
+
+    LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
+    return DURATION_NONE;
 }
 
-data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(std::string value)
+data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
 {
-    if (value == "rectangle")
-        return TEXTRENDITION_box;
-    else if (value == "square")
-        return TEXTRENDITION_box;
-    else if (value == "oval")
-        return TEXTRENDITION_circle;
-    else if (value == "circle")
-        return TEXTRENDITION_circle;
-    else if (value == "triangle")
-        return TEXTRENDITION_tbox;
-    else if (value == "diamond")
-        return TEXTRENDITION_dbox;
-    else if (value == "none")
-        return TEXTRENDITION_none;
+    static const std::map<std::string, data_TEXTRENDITION> Enclosure2Id{
+        { "rectangle", TEXTRENDITION_box }, //
+        { "square", TEXTRENDITION_box }, //
+        { "oval", TEXTRENDITION_circle }, //
+        { "circle", TEXTRENDITION_circle }, //
+        { "triangle", TEXTRENDITION_tbox }, //
+        { "diamond", TEXTRENDITION_dbox }, //
+        { "none", TEXTRENDITION_none } //
+    };
+
+    const auto result = Enclosure2Id.find(value);
+    if (result != Enclosure2Id.end()) {
+        return result->second;
+    }
 
     return TEXTRENDITION_box;
 }
 
-std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
+std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 {
-    if (value == "breve")
-        return L"\xE1D1";
-    else if (value == "whole")
-        return L"\xE1D2";
-    else if (value == "half")
-        return L"\xE1D3";
-    else if (value == "quarter")
-        return L"\xE1D5";
-    else if (value == "eighth")
-        return L"\xE1D7";
-    else if (value == "16th")
-        return L"\xE1D9";
-    else if (value == "32nd")
-        return L"\xE1DB";
-    else if (value == "64th")
-        return L"\xE1DD";
-    else if (value == "128th")
-        return L"\xE1DF";
-    else if (value == "256th")
-        return L"\xE1E1";
-    else if (value == "512th")
-        return L"\xE1E3";
-    else if (value == "1024th")
-        return L"\xE1E5";
-    else {
-        LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
-        return L"";
+    static const std::map<std::string, std::wstring> Type2VerovioText{
+        { "breve", L"\xE1D1" }, //
+        { "whole", L"\xE1D2" }, //
+        { "half", L"\xE1D3" }, //
+        { "quarter", L"\xE1D5" }, //
+        { "eighth", L"\xE1D7" }, //
+        { "16th", L"\xE1D9" }, //
+        { "32nd", L"\xE1DB" }, //
+        { "64th", L"\xE1DD" }, //
+        { "128th", L"\xE1DF" }, //
+        { "256th", L"\xE1E1" }, //
+        { "512th", L"\xE1E3" }, //
+        { "1024th", L"\xE1E5" } //
+    };
+
+    const auto result = Type2VerovioText.find(value);
+    if (result != Type2VerovioText.end()) {
+        return result->second;
     }
+
+    LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
+    return std::wstring();
 }
 
-data_HEADSHAPE MusicXmlInput::ConvertNotehead(std::string value)
+data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
 {
-    if (value == "slash")
-        return HEADSHAPE_slash;
-    else if (value == "triangle")
-        return HEADSHAPE_rtriangle;
-    else if (value == "diamond")
-        return HEADSHAPE_diamond;
-    else if (value == "square")
-        return HEADSHAPE_square;
-    else if (value == "cross")
-        return HEADSHAPE_plus;
-    else if (value == "x")
-        return HEADSHAPE_slash;
-    else if (value == "circle-x")
-        return HEADSHAPE_slash;
-    else if (value == "inverted triangle")
-        return HEADSHAPE_slash;
-    else if (value == "arrow down")
-        return HEADSHAPE_slash;
-    else if (value == "arrow up")
-        return HEADSHAPE_slash;
-    else if (value == "circle dot")
-        return HEADSHAPE_circle;
-    else
-        return HEADSHAPE_NONE;
-}
+    static const std::map<std::string, data_HEADSHAPE> Notehead2Id{
+        { "slash", HEADSHAPE_slash }, //
+        { "triangle", HEADSHAPE_rtriangle }, //
+        { "diamond", HEADSHAPE_diamond }, //
+        { "square", HEADSHAPE_square }, //
+        { "cross", HEADSHAPE_plus }, //
+        { "x", HEADSHAPE_slash }, //
+        { "circle-x", HEADSHAPE_slash }, //
+        { "inverted triangle", HEADSHAPE_slash }, //
+        { "arrow down", HEADSHAPE_slash }, //
+        { "arrow up", HEADSHAPE_slash }, //
+        { "circle dot", HEADSHAPE_circle } //
+    };
 
-data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(std::string value)
-{
-    if (value == "up")
-        return LINESTARTENDSYMBOL_angleup;
-    else if (value == "down")
-        return LINESTARTENDSYMBOL_angledown;
-    else if (value == "arrow")
-        return LINESTARTENDSYMBOL_arrow;
-    else if (value == "Hauptstimme")
-        return LINESTARTENDSYMBOL_H;
-    else if (value == "Nebenstimme")
-        return LINESTARTENDSYMBOL_N;
-    else if (value == "none")
-        return LINESTARTENDSYMBOL_none;
-    else if (value == "plain")
-        return LINESTARTENDSYMBOL_NONE;
-    else {
-        return LINESTARTENDSYMBOL_NONE;
+    const auto result = Notehead2Id.find(value);
+    if (result != Notehead2Id.end()) {
+        return result->second;
     }
+
+    return HEADSHAPE_NONE;
 }
 
-data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
+data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(const std::string &value)
 {
-    if (value == "C")
-        return PITCHNAME_c;
-    else if (value == "D")
-        return PITCHNAME_d;
-    else if (value == "E")
-        return PITCHNAME_e;
-    else if (value == "F")
-        return PITCHNAME_f;
-    else if (value == "G")
-        return PITCHNAME_g;
-    else if (value == "A")
-        return PITCHNAME_a;
-    else if (value == "B")
-        return PITCHNAME_b;
-    else {
-        LogWarning("MusicXML import: Unsupported pitch name '%s'", value.c_str());
-        return PITCHNAME_NONE;
+    static const std::map<std::string, data_LINESTARTENDSYMBOL> LineEndSymbol2Id{
+        { "up", LINESTARTENDSYMBOL_angleup }, //
+        { "down", LINESTARTENDSYMBOL_angledown }, //
+        { "arrow", LINESTARTENDSYMBOL_arrow }, //
+        { "Hauptstimme", LINESTARTENDSYMBOL_H }, //
+        { "Nebenstimme", LINESTARTENDSYMBOL_N }, //
+        { "none", LINESTARTENDSYMBOL_none }, //
+        { "plain", LINESTARTENDSYMBOL_NONE } //
+    };
+
+    const auto result = LineEndSymbol2Id.find(value);
+    if (result != LineEndSymbol2Id.end()) {
+        return result->second;
     }
+
+    return LINESTARTENDSYMBOL_NONE;
 }
 
-curvature_CURVEDIR MusicXmlInput::InferCurvedir(pugi::xml_node slurOrTie)
+data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
 {
-    std::string orientation = slurOrTie.attribute("orientation").as_string();
+    static const std::map<std::string, data_PITCHNAME> Step2PitchName{
+        { "C", PITCHNAME_c }, //
+        { "D", PITCHNAME_d }, //
+        { "E", PITCHNAME_e }, //
+        { "F", PITCHNAME_f }, //
+        { "G", PITCHNAME_g }, //
+        { "A", PITCHNAME_a }, //
+        { "B", PITCHNAME_b } //
+    };
+
+    const auto result = Step2PitchName.find(value);
+    if (result != Step2PitchName.end()) {
+        return result->second;
+    }
+
+    LogWarning("MusicXML import: Unsupported pitch name '%s'", value.c_str());
+    return PITCHNAME_NONE;
+}
+
+curvature_CURVEDIR MusicXmlInput::InferCurvedir(const pugi::xml_node slurOrTie)
+{
+    const std::string orientation = slurOrTie.attribute("orientation").as_string();
     if (orientation == "over") return curvature_CURVEDIR_above;
     if (orientation == "under") return curvature_CURVEDIR_below;
 
-    std::string placement = slurOrTie.attribute("placement").as_string();
+    const std::string placement = slurOrTie.attribute("placement").as_string();
     if (placement == "above") return curvature_CURVEDIR_above;
     if (placement == "below") return curvature_CURVEDIR_below;
 
     return curvature_CURVEDIR_NONE;
 }
 
-fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(std::string value)
+fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(const std::string &value)
 {
-    if (value == "normal")
-        return fermataVis_SHAPE_curved;
-    else if (value == "angled")
-        return fermataVis_SHAPE_angular;
-    else if (value == "square")
-        return fermataVis_SHAPE_square;
-    else
-        return fermataVis_SHAPE_NONE;
-}
+    static const std::map<std::string, fermataVis_SHAPE> FermataShape2Id{
+        { "normal", fermataVis_SHAPE_curved }, //
+        { "angled", fermataVis_SHAPE_angular }, //
+        { "square", fermataVis_SHAPE_square } //
+    };
 
-pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
-{
-    if (value == "start")
-        return pedalLog_DIR_down;
-    else if (value == "stop")
-        return pedalLog_DIR_up;
-    else if (value == "sostenuto")
-        return pedalLog_DIR_down;
-    else if (value == "change")
-        return pedalLog_DIR_bounce;
-    else {
-        LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
-        return pedalLog_DIR_NONE;
+    const auto result = FermataShape2Id.find(value);
+    if (result != FermataShape2Id.end()) {
+        return result->second;
     }
+
+    return fermataVis_SHAPE_NONE;
 }
 
-tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
+pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(const std::string &value)
 {
-    if (value == "actual")
-        return tupletVis_NUMFORMAT_count;
-    else if (value == "both")
-        return tupletVis_NUMFORMAT_ratio;
-    else
-        return tupletVis_NUMFORMAT_NONE;
+    static const std::map<std::string, pedalLog_DIR> PedalType2Dir{
+        { "start", pedalLog_DIR_down }, //
+        { "stop", pedalLog_DIR_up }, //
+        { "sostenuto", pedalLog_DIR_down }, //
+        { "change", pedalLog_DIR_bounce } //
+    };
+
+    const auto result = PedalType2Dir.find(value);
+    if (result != PedalType2Dir.end()) {
+        return result->second;
+    }
+
+    LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
+    return pedalLog_DIR_NONE;
 }
 
-std::string MusicXmlInput::ConvertAlterToSymbol(std::string value)
+tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(const std::string &value)
 {
-    if (value == "-2")
-        return "𝄫";
-    else if (value == "-1")
-        return "♭";
-    else if (value == "0")
-        return "♮";
-    else if (value == "1")
-        return "♯";
-    else if (value == "2")
-        return "𝄪";
-    else
-        return "";
+    if (value == "actual") return tupletVis_NUMFORMAT_count;
+    if (value == "both") return tupletVis_NUMFORMAT_ratio;
+    return tupletVis_NUMFORMAT_NONE;
 }
 
-std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
+std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value)
 {
-    if (value == "major")
-        return ""; // Use no symbol to avoid ambiguity of "C△".
-    else if (value == "minor")
-        return "-";
-    else if (value == "augmented")
-        return "+";
-    else if (value == "diminished")
-        return "°";
-    else if (value == "dominant")
-        return "7";
-    else if (value == "major-seventh")
-        return "△7";
-    else if (value == "minor-seventh")
-        return "-7";
-    else if (value == "diminished-seventh")
-        return "°7";
-    else if (value == "augmented-seventh")
-        return "+7";
-    else if (value == "half-diminished")
-        return "ø";
-    else if (value == "major-minor")
-        return "-△7";
-    else if (value == "major-sixth")
-        return "6";
-    else if (value == "minor-sixth")
-        return "-6";
-    else if (value == "dominant-ninth")
-        return "9";
-    else if (value == "major-ninth")
-        return "△9";
-    else if (value == "minor-ninth")
-        return "-9";
-    else if (value == "dominant-11th")
-        return "11";
-    else if (value == "major-11th")
-        return "△11";
-    else if (value == "minor-11th")
-        return "-11";
-    else if (value == "dominant-13th")
-        return "13";
-    else if (value == "major-13th")
-        return "△13";
-    else if (value == "minor-13th")
-        return "-13";
-    else if (value == "suspended-second")
-        return "sus2";
-    else if (value == "suspended-fourth")
-        return "sus4";
-    // Skipping "functional sixths": Neapolitan, Italian, French, German.
-    // Skipping pedal (pedal-point bass)
-    else if (value == "power")
-        return "5";
-    // Skipping Tristan
-    else
-        return "";
+    static const std::map<std::string, std::string> Alter2Symbol{
+        { "-2", "𝄫" }, //
+        { "-1", "♭" }, //
+        { "0", "♮" }, //
+        { "1", "♯" }, //
+        { "2", "𝄪" } //
+    };
+
+    const auto result = Alter2Symbol.find(value);
+    if (result != Alter2Symbol.end()) {
+        return result->second;
+    }
+
+    return std::string();
 }
 
-std::string MusicXmlInput::ConvertKindToText(std::string value)
+std::string MusicXmlInput::ConvertKindToSymbol(const std::string &value)
 {
-    if (value == "major")
-        return "";
-    else if (value == "minor")
-        return "m";
-    else if (value == "augmented")
-        return "aug";
-    else if (value == "diminished")
-        return "dim";
-    else if (value == "dominant")
-        return "7";
-    else if (value == "major-seventh")
-        return "Maj7";
-    else if (value == "minor-seventh")
-        return "m7";
-    else if (value == "diminished-seventh")
-        return "dim7";
-    else if (value == "augmented-seventh")
-        return "aug7";
-    else if (value == "half-diminished")
-        return "m7♭5";
-    else if (value == "major-minor")
-        return "mMaj7";
-    else if (value == "major-sixth")
-        return "6";
-    else if (value == "minor-sixth")
-        return "m6";
-    else if (value == "dominant-ninth")
-        return "9";
-    else if (value == "major-ninth")
-        return "Maj9";
-    else if (value == "minor-ninth")
-        return "m9";
-    else if (value == "dominant-11th")
-        return "11";
-    else if (value == "major-11th")
-        return "Maj11";
-    else if (value == "minor-11th")
-        return "m11";
-    else if (value == "dominant-13th")
-        return "13";
-    else if (value == "major-13th")
-        return "Maj13";
-    else if (value == "minor-13th")
-        return "m13";
-    else if (value == "suspended-second")
-        return "sus2";
-    else if (value == "suspended-fourth")
-        return "sus4";
-    // Skipping "functional sixths": Neapolitan, Italian, French, German.
-    // Skipping pedal (pedal-point bass)
-    else if (value == "power")
-        return "5";
-    // Skipping Tristan
-    else
-        return "";
+    static const std::map<std::string, std::string> Kind2Symbol{
+        { "major", "" }, // Use no symbol to avoid ambiguity of "C△".
+        { "minor", "-" }, //
+        { "augmented", "+" }, //
+        { "diminished", "°" }, //
+        { "dominant", "7" }, //
+        { "major-seventh", "△7" }, //
+        { "minor-seventh", "-7" }, //
+        { "diminished-seventh", "°7" }, //
+        { "augmented-seventh", "+7" }, //
+        { "half-diminished", "ø" }, //
+        { "major-minor", "-△7" }, //
+        { "major-sixth", "6" }, //
+        { "minor-sixth", "-6" }, //
+        { "dominant-ninth", "9" }, //
+        { "major-ninth", "△9" }, //
+        { "minor-ninth", "-9" }, //
+        { "dominant-11th", "11" }, //
+        { "major-11th", "△11" }, //
+        { "minor-11th", "-11" }, //
+        { "dominant-13th", "13" }, //
+        { "major-13th", "△13" }, //
+        { "minor-13th", "-13" }, //
+        { "suspended-second", "sus2" }, //
+        { "suspended-fourth", "sus4" }, //
+        // Skipping "functional sixths": Neapolitan, Italian, French, German.
+        // Skipping pedal (pedal-point bass)
+        { "power", "5" } //
+        // Skipping Tristan
+    };
+
+    const auto result = Kind2Symbol.find(value);
+    if (result != Kind2Symbol.end()) {
+        return result->second;
+    }
+
+    return std::string();
 }
 
-std::string MusicXmlInput::ConvertFigureGlyph(std::string value)
+std::string MusicXmlInput::ConvertKindToText(const std::string &value)
 {
-    if (value == "sharp")
-        return "♯";
-    else if (value == "flat")
-        return "♭";
-    else if (value == "natural")
-        return "♮";
-    else if (value == "double-sharp")
-        return "𝄪";
-    else if (value == "flat-flat")
-        return "𝄫";
-    else if (value == "sharp-sharp")
-        return "♯♯";
-    else if (value == "backslash")
-        return "\u20E5";
-    else if (value == "slash")
-        return "\u0338";
-    else if (value == "cross")
-        return "+";
-    else
-        return "";
+    static const std::map<std::string, std::string> Kind2Text{
+        { "major", "" }, //
+        { "minor", "m" }, //
+        { "augmented", "aug" }, //
+        { "diminished", "dim" }, //
+        { "dominant", "7" }, //
+        { "major-seventh", "Maj7" }, //
+        { "minor-seventh", "m7" }, //
+        { "diminished-seventh", "dim7" }, //
+        { "augmented-seventh", "aug7" }, //
+        { "half-diminished", "m7♭5" }, //
+        { "major-minor", "mMaj7" }, //
+        { "major-sixth", "6" }, //
+        { "minor-sixth", "m6" }, //
+        { "dominant-ninth", "9" }, //
+        { "major-ninth", "Maj9" }, //
+        { "minor-ninth", "m9" }, //
+        { "dominant-11th", "11" }, //
+        { "major-11th", "Maj11" }, //
+        { "minor-11th", "m11" }, //
+        { "dominant-13th", "13" }, //
+        { "major-13th", "Maj13" }, //
+        { "minor-13th", "m13" }, //
+        { "suspended-second", "sus2" }, //
+        { "suspended-fourth", "sus4" }, //
+        // Skipping "functional sixths": Neapolitan, Italian, French, German.
+        // Skipping pedal (pedal-point bass)
+        { "power", "5" } //
+        // Skipping Tristan
+    };
+
+    const auto result = Kind2Text.find(value);
+    if (result != Kind2Text.end()) {
+        return result->second;
+    }
+
+    return std::string();
+}
+
+std::string MusicXmlInput::ConvertFigureGlyph(const std::string &value)
+{
+    static const std::map<std::string, std::string> FigureGlyphMap{
+        { "sharp", "♯" }, //
+        { "flat", "♭" }, //
+        { "natural", "♮" }, //
+        { "double-sharp", "𝄪" }, //
+        { "flat-flat", "𝄫" }, //
+        { "sharp-sharp", "♯♯" }, //
+        { "backslash", "\u20E5" }, //
+        { "slash", "\u0338" }, //
+        { "cross", "+" } //
+    };
+
+    const auto result = FigureGlyphMap.find(value);
+    if (result != FigureGlyphMap.end()) {
+        return result->second;
+    }
+
+    return std::string();
 }
 
 bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
@@ -3689,6 +3723,24 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
         fermata->SetForm(fermataVis_FORM_norm);
         fermata->SetPlace(STAFFREL_above);
     }
+}
+
+std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
+{
+    static std::map<int, std::string> precomposedNames = { { APPR_Above | FORM_Inverted, "U+E5C6" },
+        { APPR_Below | FORM_Inverted, "U+E5B5" }, { APPR_Above | FORM_Normal, "U+E5C7" },
+        { APPR_Below | FORM_Normal, "U+E5B8" }, { FORM_Inverted | DEP_Above, "U+E5BB" },
+        { FORM_Inverted | DEP_Below, "U+E5C8" }
+        // these values need to be matched with proper SMuFL codes first
+        /*, { FORM_Normal | DEP_Above, "U+????" },
+        { FORM_Normal | DEP_Below, "U+????" }, { APPR_Above | FORM_Normal | DEP_Above, "U+????" },
+        { APPR_Above | FORM_Normal | DEP_Above, "U+????" }, { APPR_Above | FORM_Normal | DEP_Below, "U+????" },
+        { APPR_Below | FORM_Normal | DEP_Above, "U+????" }, { APPR_Below | FORM_Normal | DEP_Below, "U+????" },
+        { APPR_Above | FORM_Inverted | DEP_Above, "U+????" }, { APPR_Above | FORM_Inverted | DEP_Below, "U+????" },
+        { APPR_Below | FORM_Inverted | DEP_Above, "U+????" }, { APPR_Below | FORM_Inverted | DEP_Below, "U+????" }*/
+    };
+
+    return precomposedNames.end() != precomposedNames.find(attributes) ? precomposedNames[attributes] : "";
 }
 
 } // namespace vrv

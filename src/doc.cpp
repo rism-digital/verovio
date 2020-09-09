@@ -162,7 +162,7 @@ bool Doc::GenerateDocumentScoreDef()
     m_mdivScoreDef.Reset();
     StaffGrp *staffGrp = new StaffGrp();
     for (auto &object : staves) {
-        Staff *staff = dynamic_cast<Staff *>(object);
+        Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
         StaffDef *staffDef = new StaffDef();
         staffDef->SetN(staff->GetN());
@@ -345,7 +345,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
             if (!instrdef) {
-                StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
+                StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
                 instrdef = dynamic_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
             }
@@ -357,7 +357,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             // set MIDI track name
             Label *label = dynamic_cast<Label *>(staffDef->FindDescendantByType(LABEL, 1));
             if (!label) {
-                StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
+                StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
                 label = dynamic_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
             }
@@ -756,7 +756,7 @@ void Doc::PrepareDrawing()
 
         // Add default syl zone if one is not present.
         for (auto &it : prepareFacsimileParams.m_zonelessSyls) {
-            Syl *syl = dynamic_cast<Syl *>(it);
+            Syl *syl = vrv_cast<Syl *>(it);
             assert(syl);
             syl->CreateDefaultZone(this);
         }
@@ -833,7 +833,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     assert(contentPage);
     contentPage->LayOutHorizontally();
 
-    System *contentSystem = dynamic_cast<System *>(contentPage->DetachChild(0));
+    System *contentSystem = vrv_cast<System *>(contentPage->DetachChild(0));
     assert(contentSystem);
 
     System *currentSystem = new System();
@@ -965,7 +965,7 @@ void Doc::CastOffEncodingDoc()
 
     contentPage->LayOutHorizontally();
 
-    System *contentSystem = dynamic_cast<System *>(contentPage->FindDescendantByType(SYSTEM));
+    System *contentSystem = vrv_cast<System *>(contentPage->FindDescendantByType(SYSTEM));
     assert(contentSystem);
 
     // Detach the contentPage
@@ -1013,7 +1013,7 @@ void Doc::ConvertToPageBasedDoc()
     score->ClearRelinquishedChildren();
     assert(score->GetChildCount() == 0);
 
-    Mdiv *mdiv = dynamic_cast<Mdiv *>(score->GetParent());
+    Mdiv *mdiv = vrv_cast<Mdiv *>(score->GetParent());
     assert(mdiv);
 
     mdiv->ReplaceChild(score, pages);
@@ -1128,7 +1128,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
-    System *contentSystem = dynamic_cast<System *>(contentPage->FindDescendantByType(SYSTEM));
+    System *contentSystem = vrv_cast<System *>(contentPage->FindDescendantByType(SYSTEM));
     assert(contentSystem);
 
     // Detach the contentPage
@@ -1650,7 +1650,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     }
     Pages *pages = this->GetPages();
     assert(pages);
-    m_drawingPage = dynamic_cast<Page *>(pages->GetChild(pageIdx));
+    m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
     int glyph_size;
@@ -1755,7 +1755,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
 int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 {
-    PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
+    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
     if (!params->m_currentSyl) {
         return FUNCTOR_STOP; // early return
@@ -1766,8 +1766,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     else if (m_options->m_openControlEvents.GetValue()) {
         sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();
         if ((wordpos == sylLog_WORDPOS_i) || (wordpos == sylLog_WORDPOS_m)) {
-            Measure *lastMeasure
-                = dynamic_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+            Measure *lastMeasure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
             assert(lastMeasure);
             params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
         }
@@ -1778,7 +1777,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 
 int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
 {
-    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
     if (!m_options->m_openControlEvents.GetValue() || params->m_timeSpanningInterfaces.empty()) {

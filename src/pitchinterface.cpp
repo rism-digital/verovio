@@ -142,13 +142,13 @@ int PitchInterface::CalcLoc(
     assert(layerElement);
 
     if (layerElement->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(layerElement);
+        Chord *chord = vrv_cast<Chord *>(layerElement);
         assert(chord);
         Note *note = (topChordNote) ? chord->GetTopNote() : chord->GetBottomNote();
         return CalcLoc(note, layer, crossStaffElement);
     }
     else if (layerElement->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(layerElement);
+        Note *note = vrv_cast<Note *>(layerElement);
         assert(note);
         if (note->HasLoc()) {
             return note->GetLoc();
@@ -156,7 +156,7 @@ int PitchInterface::CalcLoc(
         return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(crossStaffElement));
     }
     else if (layerElement->Is(CUSTOS)) {
-        Custos *custos = dynamic_cast<Custos *>(layerElement);
+        Custos *custos = vrv_cast<Custos *>(layerElement);
         assert(custos);
         if (custos->HasLoc()) {
             return custos->GetLoc();

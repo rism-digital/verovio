@@ -1308,6 +1308,32 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// GetRelativeLayerElementParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the next/previous relevant layer element
+ * member 1: Id of the layer element that is being compared to (starting point)
+ * member 2: direction of search - BACKWARD is for previous element, FORWARD - next
+ * member 3: flag to indicate whether search is done in the same layer as element Id, or in neighboring one
+ **/
+
+class GetRelativeLayerElementParams : public FunctorParams {
+public:
+    GetRelativeLayerElementParams(const int elementId, bool searchDirection, bool anotherLayer)
+    {
+        m_relativeElement = NULL;
+        m_initialElementId = elementId;
+        m_searchDirection = searchDirection;
+        m_isInNeighboringLayer = anotherLayer;
+    }
+    Object *m_relativeElement;
+    int m_initialElementId;
+    bool m_searchDirection;
+    bool m_isInNeighboringLayer;
+};
+
+//----------------------------------------------------------------------------
 // JustifyXParams
 //----------------------------------------------------------------------------
 
@@ -1400,6 +1426,38 @@ public:
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;
+
+};
+
+//----------------------------------------------------------------------------
+// LayerElementsInTimeSpanParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the time of the event
+ * member 1: the duration of the event
+ * member 2: the list of layer elements found
+ * member 3: the current meter signature
+ * member 4: the current mensur
+ * member 5: layer to process elements on
+ **/
+
+class LayerElementsInTimeSpanParams : public FunctorParams {
+public:
+    LayerElementsInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Layer *layer)
+    {
+        m_time = 0.0;
+        m_duration = 0.0;
+        m_meterSig = meterSig;
+        m_mensur = mensur;
+        m_layer = layer;
+    }
+    double m_time;
+    double m_duration;
+    ListOfObjects m_elements;
+    MeterSig *m_meterSig;
+    Mensur *m_mensur;
+    Layer *m_layer;
 };
 
 //----------------------------------------------------------------------------

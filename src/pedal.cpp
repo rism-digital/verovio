@@ -32,6 +32,7 @@ Pedal::Pedal()
     : ControlElement("pedal-")
     , TimeSpanningInterface()
     , AttColor()
+    , AttExtSym()
     , AttPedalLog()
     , AttPedalVis()
     , AttPlacement()
@@ -39,6 +40,7 @@ Pedal::Pedal()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PEDALLOG);
     RegisterAttClass(ATT_PEDALVIS);
     RegisterAttClass(ATT_PLACEMENT);
@@ -54,6 +56,7 @@ void Pedal::Reset()
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
     ResetColor();
+    ResetExtSym();
     ResetPedalLog();
     ResetPedalVis();
     ResetPlacement();
@@ -68,7 +71,7 @@ void Pedal::Reset()
 
 int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     // Sameas not taken into account for now
@@ -98,7 +101,7 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
 
 int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (this->HasVgrp()) {
