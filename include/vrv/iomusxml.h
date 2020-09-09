@@ -196,6 +196,9 @@ private:
     void ReadMusicXmlNote(
         pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
+    void ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer* layer, bool isChord);
+    void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
+    void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     ///@}
 
     /*
@@ -300,6 +303,13 @@ private:
     ///@{
     ///@}
     void ShapeFermata(Fermata *fermata, pugi::xml_node node);
+
+    /*
+     * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
+     */
+    ///@{
+    ///@}
+    std::string GetOrnamentGlyphNumber(int attributes) const;
 
     /*
      * @name Methods for converting MusicXML string values to MEI attributes.

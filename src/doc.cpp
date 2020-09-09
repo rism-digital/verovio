@@ -1760,8 +1760,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     else if (m_options->m_openControlEvents.GetValue()) {
         sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();
         if ((wordpos == sylLog_WORDPOS_i) || (wordpos == sylLog_WORDPOS_m)) {
-            Measure *lastMeasure
-                = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+            Measure *lastMeasure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
             assert(lastMeasure);
             params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
         }

@@ -9,6 +9,7 @@
 #define __VRV_PEDAL_H__
 
 #include "atts_cmn.h"
+#include "atts_externalsymbols.h"
 #include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
@@ -25,6 +26,7 @@ namespace vrv {
 class Pedal : public ControlElement,
               public TimeSpanningInterface,
               public AttColor,
+              public AttExtSym,
               public AttPedalLog,
               public AttPedalVis,
               public AttPlacement,

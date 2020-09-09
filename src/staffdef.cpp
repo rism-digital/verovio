@@ -105,7 +105,8 @@ bool StaffDef::IsSupportedChild(Object *child)
 
 int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 {
-    ReplaceDrawingValuesInStaffDefParams *params = vrv_params_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
+    ReplaceDrawingValuesInStaffDefParams *params
+        = vrv_params_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
     assert(params);
 
     if (params->m_clef) {
