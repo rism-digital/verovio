@@ -749,7 +749,7 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
     }
 }
 
-Object* Object::GetFirstChildNot(const ClassId classId)
+Object *Object::GetFirstChildNot(const ClassId classId)
 {
     for (const auto child : m_children) {
         if (!child->Is(classId)) {

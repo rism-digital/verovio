@@ -1615,25 +1615,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
     // for a start always put fermatas up
-    int code = SMUFL_E4C0_fermataAbove;
-    // check for shape
-    if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-            code = SMUFL_E4C5_fermataShortBelow;
-        else
-            code = SMUFL_E4C4_fermataShortAbove;
-    }
-    else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-            code = SMUFL_E4C7_fermataLongBelow;
-        else
-            code = SMUFL_E4C6_fermataLongAbove;
-    }
-    else if (fermata->GetForm() == fermataVis_FORM_inv
-        || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-        code = SMUFL_E4C1_fermataBelow;
+    int code = fermata->GetFermataGlyph();
 
     std::wstring str;
     str.push_back(code);
@@ -1881,10 +1863,8 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
-    // set norm as default
-    int code = SMUFL_E56D_ornamentMordentInverted;
-    if (mordent->GetForm() == mordentLog_FORM_upper) code = SMUFL_E56C_ornamentMordent;
-    if (mordent->GetLong() == BOOLEAN_true) code = SMUFL_E56E_ornamentTremblement;
+    // set mordent glyph
+    int code = mordent->GetMordentGlyph();
 
     std::wstring str;
     str.push_back(code);
@@ -2190,7 +2170,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     }
 
     // for a start always put trill up
-    int code = SMUFL_E566_ornamentTrill;
+    int code = trill->GetTrillGlyph();
     std::wstring str;
 
     if (trill->GetLstartsym() != LINESTARTENDSYMBOL_none) {
@@ -2256,8 +2236,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     if (turn->GetDelayed() == BOOLEAN_true && !turn->HasTstamp()) LogWarning("delayed turns not supported");
 
     // set norm as default
-    int code = SMUFL_E567_ornamentTurn;
-    if (turn->GetForm() == turnLog_FORM_lower) code = SMUFL_E568_ornamentTurnInverted;
+    int code = turn->GetTurnGlyph();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the turn only with @startid

@@ -314,7 +314,7 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
     return (int)layerCountInTimeSpanParams.m_layers.size();
 }
 
-ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element) 
+ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
 {
     assert(element);
 
@@ -335,7 +335,7 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
     return GetLayerElementsInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
 }
 
-ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Measure* measure, int staff)
+ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff)
 {
     assert(measure);
 

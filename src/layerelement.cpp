@@ -1618,15 +1618,13 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     assert(params);
 
     Layer *currentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
-    if (!currentLayer || (currentLayer != params->m_layer) || IsScoreDefElement() || Is(MREST)) 
-        return FUNCTOR_SIBLINGS;
-    if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink())
-        return FUNCTOR_CONTINUE;
+    if (!currentLayer || (currentLayer != params->m_layer) || IsScoreDefElement() || Is(MREST)) return FUNCTOR_SIBLINGS;
+    if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink()) return FUNCTOR_CONTINUE;
 
     const double duration = !GetParent()->Is(CHORD)
         ? GetAlignmentDuration(params->m_mensur, params->m_meterSig)
         : vrv_cast<Chord *>(GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
-        
+
     const double time = m_alignment->GetTime();
 
     // The event is starting after the end of the element
@@ -1637,7 +1635,7 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     params->m_elements.push_back(this);
 
     // Not need to recurse for chords
-    return Is(CHORD)? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
+    return Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
@@ -1809,8 +1807,8 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
     GetRelativeLayerElementParams *params = vrv_params_cast<GetRelativeLayerElementParams *>(functorParams);
     assert(params);
 
-    // Do not check for index of the element if we're looking into neighboring layer or if nested element is being 
-    // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that 
+    // Do not check for index of the element if we're looking into neighboring layer or if nested element is being
+    // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that
     // has been passed inside this functor)
     if (!params->m_isInNeighboringLayer && GetParent()->Is(LAYER)) {
         if (params->m_searchDirection == FORWARD && (GetIdx() < params->m_initialElementId)) return FUNCTOR_SIBLINGS;
