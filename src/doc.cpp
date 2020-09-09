@@ -1549,12 +1549,6 @@ int Doc::GetCueSize(int value) const
     return value * this->m_options->m_graceFactor.GetValue();
 }
 
-int Doc::GetDrawingElementDefaultSize(const std::string& engravingElement, int staffSize) const 
-{
-    return m_options->m_engravingDefaults.GetDoubleValue({ "engravingDefaults", engravingElement })
-        * GetDrawingUnit(staffSize) * 2;
-}
-
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
 {
     m_drawingSmuflFont.SetFaceName(m_options->m_font.GetValue().c_str());

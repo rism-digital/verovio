@@ -149,7 +149,6 @@ public:
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
     int GetCueSize(int value) const;
-    int GetDrawingElementDefaultSize(const std::string &engravingElement, int staffSize) const;
     ///@}
 
     Point ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const;

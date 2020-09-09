@@ -589,10 +589,10 @@ void View::DrawHairpin(
         dc->StartGraphic(hairpin, "", hairpin->GetUuid(), false);
     // dc->DeactivateGraphic();
 
-    DrawObliquePolygon(dc, x1, y1 - startY / 2, x2, y2 - endY / 2,
-        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize));
-    DrawObliquePolygon(dc, x1, y1 + startY / 2, x2, y2 + endY / 2,
-        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize));
+    const double hairpinThickness
+        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_hairpinThickness.GetValue();
+    DrawObliquePolygon(dc, x1, y1 - startY / 2, x2, y2 - endY / 2, hairpinThickness);
+    DrawObliquePolygon(dc, x1, y1 + startY / 2, x2, y2 + endY / 2, hairpinThickness);
 
     // dc->ReactivateGraphic();
     if (graphic)

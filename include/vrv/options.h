@@ -536,11 +536,14 @@ public:
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
+    OptionDbl m_bracketThickness;
+    OptionJson m_engravingDefaults;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
+    OptionDbl m_hairpinThickness;
     OptionDbl m_justificationBraceGroup;
     OptionDbl m_justificationBracketGroup;
     OptionDbl m_justificationStaff;
@@ -569,10 +572,12 @@ public:
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
+    OptionDbl m_subBracketThickness;
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
-    OptionDbl m_tieThickness;
-    OptionJson m_engravingDefaults;
+    OptionDbl m_thickBarlineThickness;
+    OptionDbl m_tieThickness;    
+    OptionDbl m_tupletBracketThickness;
 
     /**
      * Selectors

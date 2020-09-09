@@ -344,7 +344,8 @@ void View::DrawStaffGrp(
     }
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
-        const int lineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
+        const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
+
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
         x -= 2 * lineWidth;
     }
@@ -491,8 +492,7 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     int x1, x2, offset;
 
-    const int bracketThickness
-        = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
+    const int bracketThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
 
     x2 = x - bracketThickness;
     x1 = x2 - bracketThickness;
@@ -516,7 +516,7 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 
     int offset;
 
-    const int bracketWidth = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize);
+    const int bracketWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
     x -= bracketWidth;
     offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
 
@@ -777,7 +777,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
 
     int x = barLine->GetDrawingX();
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-    const int barLineThickWidth = m_doc->GetDrawingElementDefaultSize("thickBarlineThickness", staffSize);
+    const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
     int x1 = x - barLineThickWidth - barLineWidth;
     int x2 = x + barLineThickWidth + barLineWidth;
 

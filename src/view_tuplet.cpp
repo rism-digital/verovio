@@ -98,7 +98,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     }
 
     data_STAFFREL_basic position = tuplet->GetDrawingBracketPos();
-    int lineWidth = m_doc->GetDrawingElementDefaultSize("tupletBracketThickness", staff->m_drawingStaffSize);
+    int lineWidth = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tupletBracketThickness.GetValue();
 
     dc->ResumeGraphic(tupletBracket, tupletBracket->GetUuid());
 

@@ -786,6 +786,15 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
+    m_bracketThickness.SetInfo("Bracket thikness", "The thickness of the system bracket");
+    m_bracketThickness.Init(1.0, 0.5, 2.0);
+    this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
+
+    m_engravingDefaults.SetInfo(
+        "Engraving defaults", "Path to json file describing defaults for engraving SMuFL elements");
+    m_engravingDefaults.Init(engravingDefaults);
+    this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
+
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
@@ -805,6 +814,10 @@ Options::Options()
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
+
+    m_hairpinThickness.SetInfo("Hairpin thikness", "The thickness of the hairpin");
+    m_hairpinThickness.Init(0.2, 0.1, 0.8);
+    this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
 
     m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
     m_justificationStaff.Init(1., 0., 10.);
@@ -923,6 +936,10 @@ Options::Options()
     m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
 
+    m_subBracketThickness.SetInfo("Sub bracket thickness", "The thickness of system sub-bracket");
+    m_subBracketThickness.Init(1.0, 0.5, 2.0);
+    this->Register(&m_subBracketThickness, "subBracketThickness", &m_generalLayout);
+
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
     m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
@@ -931,14 +948,17 @@ Options::Options()
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
+    m_thickBarlineThickness.SetInfo("Thick barline thickness", "The thickness of the thick barline");
+    m_thickBarlineThickness.Init(1.0, 0.5, 2.0);
+    this->Register(&m_thickBarlineThickness, "thickBarlineThickness", &m_generalLayout);
+
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
 
-    m_engravingDefaults.SetInfo("Engraving defaults",
-        "Path to json file describing defaults for engraving SMuFL elements");
-    m_engravingDefaults.Init(engravingDefaults);
-    this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
+    m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
+    m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
+    this->Register(&m_tupletBracketThickness, "tupletBracketThickness", &m_generalLayout);
 
     /********* selectors *********/
 
@@ -1196,7 +1216,13 @@ void Options::Sync()
             { "slurMidpointThickness", &m_slurThickness },
             { "staffLineThickness", &m_staffLineWidth },
             { "stemThickness", &m_stemWidth },
-            { "tieMidpointThickness", &m_tieThickness } };
+            { "tieMidpointThickness", &m_tieThickness },
+            { "hairpinThickness", &m_hairpinThickness },
+            { "thickBarlineThickness", &m_thickBarlineThickness },
+            { "tupletBracketThickness", &m_tupletBracketThickness },
+            { "subBracketThickness", &m_subBracketThickness },
+            { "bracketThickness", &m_bracketThickness },
+    };
 
     for (auto &pair : engravingDefaults) {
         if (pair.second->isSet()) continue;
