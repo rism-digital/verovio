@@ -474,7 +474,7 @@ public:
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
 
     // post processing of parameters
-    void sync();
+    void Sync();
 
 private:
     void Register(Option *option, const std::string &key, OptionGrp *grp);

@@ -1186,7 +1186,7 @@ Options &Options::operator=(const Options &options)
 
 Options::~Options() {}
 
-void Options::sync()
+void Options::Sync()
 {
     if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
