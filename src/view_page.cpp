@@ -337,15 +337,17 @@ void View::DrawStaffGrp(
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+        //int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
         int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
         x += barLineWidth / 2;
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
-        DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * m_doc->GetDrawingBeamWidth(staffSize, false),
-            m_doc->GetDrawingBeamWidth(staffSize, false));
-        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
+        const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
+
+        DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
+        x -= 2 * lineWidth;
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
         DrawBrace(dc, x, yTop, yBottom, staffSize);
@@ -490,8 +492,10 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     int x1, x2, offset;
 
-    x2 = x - m_doc->GetDrawingBeamWidth(staffSize, false);
-    x1 = x2 - m_doc->GetDrawingBeamWidth(staffSize, false);
+    const int bracketThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
+
+    x2 = x - bracketThickness;
+    x1 = x2 - bracketThickness;
     offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
 
     dc->StartCustomGraphic("grpSym");
@@ -512,14 +516,15 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 
     int offset;
 
-    x -= m_doc->GetDrawingBeamWidth(staffSize, false);
+    const int bracketWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
+    x -= bracketWidth;
     offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
 
     dc->StartCustomGraphic("grpSym");
 
-    DrawFilledRectangle(dc, x - 3 * offset, y1 + offset, x + 3 * offset, y2 - offset);
-    DrawFilledRectangle(dc, x, y1 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y1 - offset);
-    DrawFilledRectangle(dc, x, y2 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y2 - offset);
+    DrawFilledRectangle(dc, x, y1 + offset, x - bracketWidth, y2 - offset); // left
+    DrawFilledRectangle(dc, x, y1 + offset, x + bracketWidth, y1 - offset); // top
+    DrawFilledRectangle(dc, x, y2 + offset, x + bracketWidth, y2 - offset); // bottom
 
     dc->EndCustomGraphic();
 
@@ -771,10 +776,10 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
 
     int x = barLine->GetDrawingX();
-    int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-    int barLineThickWidth = m_doc->GetDrawingBeamWidth(staffSize, false);
-    int x1 = x - m_doc->GetDrawingBeamWidth(staffSize, false) - barLineWidth;
-    int x2 = x + m_doc->GetDrawingBeamWidth(staffSize, false) + barLineWidth;
+    const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+    const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
+    int x1 = x - barLineThickWidth - barLineWidth;
+    int x2 = x + barLineThickWidth + barLineWidth;
 
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(staffSize) * 16 / 13;
@@ -1100,9 +1105,10 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
 
     dc->StartCustomGraphic("ledgerLines", gClass);
 
-    // HARDCODED
-    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.75;
-    if (cueSize) lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.25;
+    const int optionLedgerWidth
+        = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int lineWidth = optionLedgerWidth * 1.75;
+    if (cueSize) lineWidth = optionLedgerWidth * 1.25;
 
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);

@@ -20,6 +20,7 @@
 
 #include "attalternates.h"
 #include "atttypes.h"
+#include "jsonxx.h"
 
 //----------------------------------------------------------------------------
 
@@ -70,7 +71,7 @@ enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDI
 class Option {
 public:
     // constructors and destructors
-    Option() {}
+    Option() : m_isSet(false) {}
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
 
@@ -88,6 +89,8 @@ public:
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
 
+    bool isSet() const { return m_isSet; }
+
 public:
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
@@ -101,6 +104,7 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
+    bool m_isSet;
 
 private:
     std::string m_key;
@@ -383,6 +387,40 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// OptionJson
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for Json input params
+ */
+
+class OptionJson : public Option {
+    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
+
+public:
+    //
+    OptionJson() = default;
+    virtual ~OptionJson() = default;
+    virtual void Init(const std::string &defaultValue);
+
+    virtual bool SetValue(const std::string &jsonFilePath);
+    //virtual std::string GetStrValue() const;
+
+    int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
+    double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
+    //
+    bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
+    //
+protected:
+    JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
+    //
+private:
+    jsonxx::Object m_values;
+    jsonxx::Object m_defaultValues;
+};
+
+
+//----------------------------------------------------------------------------
 // OptionGrp
 //----------------------------------------------------------------------------
 
@@ -434,6 +472,9 @@ public:
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
+
+    // post processing of parameters
+    void Sync();
 
 private:
     void Register(Option *option, const std::string &key, OptionGrp *grp);
@@ -495,15 +536,20 @@ public:
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
+    OptionDbl m_bracketThickness;
+    OptionJson m_engravingDefaults;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
+    OptionDbl m_hairpinThickness;
     OptionDbl m_justificationBraceGroup;
     OptionDbl m_justificationBracketGroup;
     OptionDbl m_justificationStaff;
     OptionDbl m_justificationSystem;
+    OptionDbl m_ledgerLineThickness;
+    OptionDbl m_ledgerLineExtension;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
@@ -528,9 +574,12 @@ public:
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
+    OptionDbl m_subBracketThickness;
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
-    OptionDbl m_tieThickness;
+    OptionDbl m_thickBarlineThickness;
+    OptionDbl m_tieThickness;    
+    OptionDbl m_tupletBracketThickness;
 
     /**
      * Selectors
