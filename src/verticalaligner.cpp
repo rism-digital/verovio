@@ -791,15 +791,14 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     assert(params);
 
     std::vector<FloatingCurvePositioner *> positioners;
-    ArrayOfFloatingPositioners::iterator iter;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
         if (!positioner->GetObject()->Is({PHRASE, SLUR})) continue;
-        Slur* slur = vrv_cast<Slur*>(positioner->GetObject());
+        Slur *slur = vrv_cast<Slur *>(positioner->GetObject());
         assert(slur);
 
         assert(positioner->Is(FLOATING_CURVE_POSITIONER));
-        FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner*>(positioner);
+        FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(positioner);
         assert(curve);
 
         // Skip if no content bounding box is available
@@ -816,9 +815,9 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     if (staff) {
         const int slurShift = staff->m_drawingStaffSize / 2;
         for (size_t i = 0; i + 1 < positioners.size(); i++) {
-            Slur* firstSlur = vrv_cast<Slur*>(positioners[i]->GetObject());
+            Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
             for (auto j = i + 1; j < positioners.size(); j++) {
-                Slur* secondSlur = vrv_cast<Slur*>(positioners[j]->GetObject());
+                Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
                 Point points1[4], points2[4];
                 positioners[i]->GetPoints(points1);
                 positioners[j]->GetPoints(points2);
