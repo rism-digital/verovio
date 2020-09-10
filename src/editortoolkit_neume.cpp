@@ -928,6 +928,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         m_infoObject.import("uuid", custos->GetUuid());
     }
     else {
+        delete zone;
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Unsupported type '" + elementType + "' for insertion.");
