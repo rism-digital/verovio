@@ -12,9 +12,13 @@
 #include "beam.h"
 #include "controlelement.h"
 #include "drawinginterface.h"
+#include "plistinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
+
+class Layer;
+class Staff;
 
 //----------------------------------------------------------------------------
 // BeamSpan
@@ -24,11 +28,12 @@ namespace vrv {
  * This class models the MEI <beamSpan> element.
  */
 class BeamSpan : public ControlElement,
-                 public TimeSpanningInterface,
                  public BeamDrawingInterface,
-                 public AttColor,
+                 public PlistInterface,
+                 public TimeSpanningInterface,
                  public AttBeamedWith,
-                 public AttBeamRend {
+                 public AttBeamRend,
+                 public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -47,9 +52,12 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ////@}
+
+    ArrayOfObjects GetBeamSpanElementList(Layer* layer, Staff* staff);
 
     //----------//
     // Functors //
@@ -60,6 +68,11 @@ public:
      */
     virtual int CalcStem(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResolveBeamSpanElements
+     */
+    virtual int ResolveBeamSpanElements(FunctorParams *);
+
 private:
     //
 public:
@@ -68,6 +81,7 @@ public:
 
 private:
     //
+    ArrayOfObjects m_beamedElements;
 };
 
 } // namespace vrv

@@ -1575,6 +1575,16 @@ int Object::PreparePlist(FunctorParams *functorParams)
         return interface->InterfacePreparePlist(functorParams, this);
     }
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::ProcessPlist(FunctorParams* functorParams)
+{
+    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
+    assert(params);
+
+    if (!IsLayerElement()) return FUNCTOR_CONTINUE;
+
     std::string uuid = this->GetUuid();
     auto i = std::find_if(params->m_interfaceUuidPairs.begin(), params->m_interfaceUuidPairs.end(),
         [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });

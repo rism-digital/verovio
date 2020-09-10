@@ -548,10 +548,11 @@ void Doc::PrepareDrawing()
     Functor preparePlist(&Object::PreparePlist);
     this->Process(&preparePlist, &preparePlistParams);
 
-    // If we have some left process again backward.
+    // Process plist after all pairs has been collected
     if (!preparePlistParams.m_interfaceUuidPairs.empty()) {
         preparePlistParams.m_fillList = false;
-        this->Process(&preparePlist, &preparePlistParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+        Functor processPlist(&Object::ProcessPlist);
+        this->Process(&processPlist, &preparePlistParams);
     }
 
     // If some are still there, then it is probably an issue in the encoding
@@ -567,6 +568,12 @@ void Doc::PrepareDrawing()
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
     Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
     this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
+
+    /************ Resolve beamspan elements ***********/
+
+    FunctorDocParams functorDocParams(this);
+    Functor resolveBeamSpanElements(&Object::ResolveBeamSpanElements);
+    this->Process(&resolveBeamSpanElements, &functorDocParams);
 
     /************ Prepare processing by staff/layer/verse ************/
 

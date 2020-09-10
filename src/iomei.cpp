@@ -1719,11 +1719,11 @@ void MEIOutput::WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan)
     assert(beamSpan);
 
     WriteControlElement(currentNode, beamSpan);
-    WriteTimePointInterface(currentNode, beamSpan);
+    WritePlistInterface(currentNode, beamSpan);
     WriteTimeSpanningInterface(currentNode, beamSpan);
-    beamSpan->WriteColor(currentNode);
     beamSpan->WriteBeamedWith(currentNode);
     beamSpan->WriteBeamRend(currentNode);
+    beamSpan->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
@@ -4956,10 +4956,11 @@ bool MEIInput::ReadBeamSpan(Object *parent, pugi::xml_node beamSpan)
     BeamSpan *vrvBeamSpan = new BeamSpan();
     ReadControlElement(beamSpan, vrvBeamSpan);
 
+    ReadPlistInterface(beamSpan, vrvBeamSpan);
     ReadTimeSpanningInterface(beamSpan, vrvBeamSpan);
-    vrvBeamSpan->ReadColor(beamSpan);
     vrvBeamSpan->ReadBeamedWith(beamSpan);
     vrvBeamSpan->ReadBeamRend(beamSpan);
+    vrvBeamSpan->ReadColor(beamSpan);
 
     parent->AddChild(vrvBeamSpan);
     ReadUnsupportedAttr(beamSpan, vrvBeamSpan);
