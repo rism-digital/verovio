@@ -195,8 +195,6 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
     partialHeight = ceil(tmp / (double)glyph->GetUnitsPerEm());
     tmp = y * m_fontStack.top()->GetPointSize();
     y = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    tmp = x * m_fontStack.top()->GetPointSize();
-    x = ceil(tmp / (double)glyph->GetUnitsPerEm());
 
     advX = glyph->GetHorizAdvX();
     tmp = advX * m_fontStack.top()->GetPointSize();
