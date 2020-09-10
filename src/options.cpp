@@ -1219,19 +1219,21 @@ void Options::Sync()
     if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
     std::list<std::pair<std::string, OptionDbl *>> engravingDefaults
-        = { { "thinBarlineThickness", &m_barLineWidth },
-            { "lyricLineThickness", &m_lyricLineThickness },
-            { "slurMidpointThickness", &m_slurThickness },
-            { "staffLineThickness", &m_staffLineWidth },
+        = { { "staffLineThickness", &m_staffLineWidth },
             { "stemThickness", &m_stemWidth },
-            { "tieMidpointThickness", &m_tieThickness },
-            { "hairpinThickness", &m_hairpinThickness },
-            { "thickBarlineThickness", &m_thickBarlineThickness },
-            { "tupletBracketThickness", &m_tupletBracketThickness },
-            { "subBracketThickness", &m_subBracketThickness },
-            { "bracketThickness", &m_bracketThickness },
             { "legerLineThickness", &m_ledgerLineThickness },
-            { "legerLineExtension", &m_ledgerLineExtension }
+            { "legerLineExtension", &m_ledgerLineExtension },
+            { "slurMidpointThickness", &m_slurThickness },
+            { "tieMidpointThickness", &m_tieThickness },
+            { "thinBarlineThickness", &m_barLineWidth },
+            { "thickBarlineThickness", &m_thickBarlineThickness },
+            { "barlineSeparation", &m_barlineSeparation },
+            { "bracketThickness", &m_bracketThickness },
+            { "subBracketThickness", &m_subBracketThickness },
+            { "hairpinThickness", &m_hairpinThickness },
+            { "repeatEndingLineThickness", &m_repeatEndingLineThickness },
+            { "lyricLineThickness", &m_lyricLineThickness },
+            { "tupletBracketThickness", &m_tupletBracketThickness }
     };
 
     for (auto &pair : engravingDefaults) {
