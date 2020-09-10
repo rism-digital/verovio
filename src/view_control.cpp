@@ -2471,7 +2471,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->ResetFont();
 
         const int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
-        const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
+        const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue()
+            * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
 
         DrawFilledRectangle(dc, x1, y2, x2, y2 + lineWidth);
         if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {

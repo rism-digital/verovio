@@ -41,7 +41,7 @@ Trill::Trill()
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
-    
+
     Reset();
 }
 
@@ -58,7 +58,6 @@ void Trill::Reset()
     ResetNNumberLike();
     ResetOrnamentAccid();
     ResetPlacement();
-    
 }
 
 wchar_t Trill::GetTrillGlyph() const
