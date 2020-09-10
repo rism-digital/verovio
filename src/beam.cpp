@@ -282,10 +282,13 @@ void BeamSegment::CalcBeamInit(
         const wchar_t lastSmuflCode = lastNote->GetNoteheadGlyph(lastNote->GetDrawingDur());
         // x-offset values for stem bases, dx[y] where y = element->m_cueSize
         int drawingStemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+        const bool graceGroop = firstNote->GetFirstAncestor(GRACEGRP);
+        const bool firstGrace = graceGroop || firstNote->HasGrace();
+        const bool lastGrace = graceGroop || lastNote->HasGrace();
         beamInterface->m_stemXAbove[0] =
-            doc->GetGlyphWidth(firstSmuflCode, staff->m_drawingStaffSize, false) - drawingStemWidth;
+            doc->GetGlyphWidth(firstSmuflCode, staff->m_drawingStaffSize, firstGrace) - drawingStemWidth;
         beamInterface->m_stemXAbove[1] =
-            doc->GetGlyphWidth(lastSmuflCode, staff->m_drawingStaffSize, false) - drawingStemWidth;
+            doc->GetGlyphWidth(lastSmuflCode, staff->m_drawingStaffSize, lastGrace) - drawingStemWidth;
         beamInterface->m_stemXBelow[0] = beamInterface->m_stemXBelow[1] = drawingStemWidth;
     }
 
