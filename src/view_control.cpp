@@ -2432,7 +2432,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             continue;
         }
 
-        int y1 = ending->GetDrawingY();
+        const int y1 = ending->GetDrawingY();
 
         FontInfo currentFont = *m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize);
         // currentFont.SetWeight(FONTWEIGHT_bold);
@@ -2470,15 +2470,16 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         dc->ResetFont();
 
-        int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
+        const int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
+        const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
 
-        DrawFilledRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize));
+        DrawFilledRectangle(dc, x1, y2, x2, y2 + lineWidth);
         if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-            DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y2);
+            DrawFilledRectangle(dc, x1, y1, x1 + lineWidth, y2);
         }
         if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END))
             && (ending->GetLendsym() != LINESTARTENDSYMBOL_none)) {
-            DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y1, x2, y2);
+            DrawFilledRectangle(dc, x2 - lineWidth, y1, x2, y2);
         }
     }
 

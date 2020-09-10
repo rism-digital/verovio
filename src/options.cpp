@@ -39,7 +39,7 @@ std::map<int, std::string> Option::s_systemDivider
 constexpr const char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
     "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
     "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
-    "'bracketThickness':0.5}}";
+    "'bracketThickness':0.5,'repeatEndingLineThickness':0.15}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -877,6 +877,11 @@ Options::Options()
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
 
+    m_repeatEndingLineThickness.SetInfo(
+        "Repeat ending line thickness", "Repeat and ending line thickness");
+    m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
+    this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
+
     m_slurControlPoints.SetInfo(
         "Slur control points", "Slur control points - higher value means more curved at the end");
     m_slurControlPoints.Init(5, 1, 10);
@@ -1227,7 +1232,6 @@ void Options::Sync()
             { "tieMidpointThickness", &m_tieThickness },
             { "thinBarlineThickness", &m_barLineWidth },
             { "thickBarlineThickness", &m_thickBarlineThickness },
-            { "barlineSeparation", &m_barlineSeparation },
             { "bracketThickness", &m_bracketThickness },
             { "subBracketThickness", &m_subBracketThickness },
             { "hairpinThickness", &m_hairpinThickness },
