@@ -521,6 +521,7 @@ void Page::JustifyVertically()
     assert(pages);
     if (pages->GetLast() == this) {
         int idx = this->GetIdx();
+        const int childSystems = GetChildCount(SYSTEM);
         if (idx > 0) {
             Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
             assert(penultimatePage);
@@ -529,11 +530,14 @@ void Page::JustifyVertically()
                 this->m_drawingJustifiableHeight = penultimatePage->m_drawingJustifiableHeight;
             }
 
-            const int childSystems = GetChildCount(SYSTEM);
             const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
             if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
                 m_justificationSum = penultimatePage->m_justificationSum;
             }
+        }
+        else {
+            const int stavesPerSystem = m_drawingScoreDef.GetChildCount(STAFFDEF, UNLIMITED_DEPTH);
+            if (childSystems * stavesPerSystem < 8) return;
         }
     }
 
