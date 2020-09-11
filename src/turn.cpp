@@ -27,9 +27,9 @@ Turn::Turn()
     , TimePointInterface()
     , AttColor()
     , AttOrnamentAccid()
+    , AttExtSym()
     , AttPlacement()
     , AttTurnLog()
-    , AttExtSym()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);

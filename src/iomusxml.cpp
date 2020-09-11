@@ -2968,14 +2968,21 @@ void MusicXmlInput::ReadMusicXmlNote(
         // place
         turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
         turn->SetForm(turnLog_FORM_upper);
-        if (std::string(xmlTurn.node().name()).find("inverted") != std::string::npos) {
+        if (!std::strncmp(xmlTurn.node().name(), "inverted", 8)) {
             turn->SetForm(turnLog_FORM_lower);
+            if (std::string(xmlTurn.node().name()).find("vertical") != std::string::npos) {
+                turn->SetType("vertical");
+                turn->SetExternalsymbols(turn, "glyph.auth", "smufl");
+                turn->SetExternalsymbols(turn, "glyph.num", "U+E56B");
+            }
         }
         if (!std::strncmp(xmlTurn.node().name(), "delayed", 7)) {
             turn->SetDelayed(BOOLEAN_true);
         }
         if (!std::strncmp(xmlTurn.node().name(), "vertical", 8)) {
             turn->SetType("vertical");
+            turn->SetExternalsymbols(turn, "glyph.auth", "smufl");
+            turn->SetExternalsymbols(turn, "glyph.num", "U+E56A");
         }
     }
 
