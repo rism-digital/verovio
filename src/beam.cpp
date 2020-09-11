@@ -328,10 +328,9 @@ bool BeamSegment::CalcBeamSlope(
 
     // This can happen with two notes with 32sd or 64th notes and a diatonic step
     // Force the noteSlope to be considered instead
-    if (m_beamSlope == 0.0) {
-        m_beamSlope = noteSlope;
-        return false;
-    }
+    if (m_beamSlope == 0.0) m_beamSlope = noteSlope;
+
+    if (m_beamSlope == 0.0) return false;
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Default (maximum) step is two stave-spaces (4 units)
