@@ -3626,7 +3626,7 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
 
 bool MusicXmlInput::IsMultirestMeasure(int index) const
 {
-    for (auto multiRest : m_multiRests) {
+    for (const auto multiRest : m_multiRests) {
         if (index <= multiRest.first) return false;
         if (index > multiRest.second) continue;
         return true;
@@ -3637,7 +3637,7 @@ bool MusicXmlInput::IsMultirestMeasure(int index) const
 int MusicXmlInput::GetMrestMeasuresCountBeforeIndex(int index) const 
 {
     int count = 0;
-    for (auto multiRest : m_multiRests) {
+    for (const auto multiRest : m_multiRests) {
         if (index <= multiRest.first) break;
         count += multiRest.second - multiRest.first;
     }
