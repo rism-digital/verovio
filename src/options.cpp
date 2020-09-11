@@ -1222,14 +1222,21 @@ void Options::Sync()
 {
     if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = { { "staffLineThickness", &m_staffLineWidth },
-        { "stemThickness", &m_stemWidth }, { "legerLineThickness", &m_ledgerLineThickness },
-        { "legerLineExtension", &m_ledgerLineExtension }, { "slurMidpointThickness", &m_slurThickness },
-        { "tieMidpointThickness", &m_tieThickness }, { "thinBarlineThickness", &m_barLineWidth },
-        { "thickBarlineThickness", &m_thickBarlineThickness }, { "bracketThickness", &m_bracketThickness },
-        { "subBracketThickness", &m_subBracketThickness }, { "hairpinThickness", &m_hairpinThickness },
-        { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, { "lyricLineThickness", &m_lyricLineThickness },
-        { "tupletBracketThickness", &m_tupletBracketThickness } };
+    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults
+        = { { "staffLineThickness", &m_staffLineWidth }, //
+              { "stemThickness", &m_stemWidth }, //
+              { "legerLineThickness", &m_ledgerLineThickness }, //
+              { "legerLineExtension", &m_ledgerLineExtension }, //
+              { "slurMidpointThickness", &m_slurThickness }, //
+              { "tieMidpointThickness", &m_tieThickness }, //
+              { "thinBarlineThickness", &m_barLineWidth }, //
+              { "thickBarlineThickness", &m_thickBarlineThickness }, //
+              { "bracketThickness", &m_bracketThickness }, //
+              { "subBracketThickness", &m_subBracketThickness }, //
+              { "hairpinThickness", &m_hairpinThickness }, //
+              { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
+              { "lyricLineThickness", &m_lyricLineThickness }, //
+              { "tupletBracketThickness", &m_tupletBracketThickness } };
 
     for (auto &pair : engravingDefaults) {
         if (pair.second->isSet()) continue;
