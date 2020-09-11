@@ -42,7 +42,7 @@ BeamSegment::BeamSegment()
     Reset();
 }
 
-BeamSegment::~BeamSegment(){ }
+BeamSegment::~BeamSegment() {}
 
 void BeamSegment::Reset()
 {
@@ -127,8 +127,8 @@ void BeamSegment::CalcBeam(
 
         for (BeamElementCoord *coord : m_beamElementCoordRefs) {
             if (coord->m_stem) {
-                if ((beamInterface->m_drawingPlace == BEAMPLACE_above && maxLength < coord->m_yBeam)||
-                    (beamInterface->m_drawingPlace == BEAMPLACE_below && maxLength > coord->m_yBeam)) {
+                if ((beamInterface->m_drawingPlace == BEAMPLACE_above && maxLength < coord->m_yBeam)
+                    || (beamInterface->m_drawingPlace == BEAMPLACE_below && maxLength > coord->m_yBeam)) {
                     maxLength = coord->m_yBeam;
                 }
             }
@@ -145,7 +145,7 @@ void BeamSegment::CalcBeam(
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
-        if (el->Is({NOTE, CHORD})) {
+        if (el->Is({ NOTE, CHORD })) {
             StemmedDrawingInterface *stemmedInterface = el->GetStemmedDrawingInterface();
             assert(beamInterface);
 
@@ -210,7 +210,8 @@ void BeamSegment::CalcBeamInit(
         if (coord->m_element->Is({ CHORD, NOTE })) {
             if (m_firstNoteOrChord) {
                 m_lastNoteOrChord = coord;
-            } else{
+            }
+            else {
                 m_firstNoteOrChord = coord;
             }
             m_nbNotesOrChords++;
@@ -268,12 +269,14 @@ void BeamSegment::CalcBeamInit(
     Note *firstNote = NULL, *lastNote = NULL;
     if (m_firstNoteOrChord->m_element->Is(NOTE)) {
         firstNote = vrv_cast<Note *>(m_firstNoteOrChord->m_element);
-    } else if (m_firstNoteOrChord->m_element->Is(CHORD)){
+    }
+    else if (m_firstNoteOrChord->m_element->Is(CHORD)) {
         firstNote = vrv_cast<Chord *>(m_firstNoteOrChord->m_element)->GetBottomNote();
     }
     if (m_lastNoteOrChord->m_element->Is(NOTE)) {
         lastNote = vrv_cast<Note *>(m_lastNoteOrChord->m_element);
-    } else if (m_lastNoteOrChord->m_element->Is(CHORD)){
+    }
+    else if (m_lastNoteOrChord->m_element->Is(CHORD)) {
         lastNote = vrv_cast<Chord *>(m_lastNoteOrChord->m_element)->GetBottomNote();
     }
 
@@ -285,10 +288,10 @@ void BeamSegment::CalcBeamInit(
         const bool graceGroop = firstNote->GetFirstAncestor(GRACEGRP);
         const bool firstGrace = graceGroop || firstNote->HasGrace();
         const bool lastGrace = graceGroop || lastNote->HasGrace();
-        beamInterface->m_stemXAbove[0] =
-            doc->GetGlyphWidth(firstSmuflCode, staff->m_drawingStaffSize, firstGrace) - drawingStemWidth;
-        beamInterface->m_stemXAbove[1] =
-            doc->GetGlyphWidth(lastSmuflCode, staff->m_drawingStaffSize, lastGrace) - drawingStemWidth;
+        beamInterface->m_stemXAbove[0]
+            = doc->GetGlyphWidth(firstSmuflCode, staff->m_drawingStaffSize, firstGrace) - drawingStemWidth;
+        beamInterface->m_stemXAbove[1]
+            = doc->GetGlyphWidth(lastSmuflCode, staff->m_drawingStaffSize, lastGrace) - drawingStemWidth;
         beamInterface->m_stemXBelow[0] = beamInterface->m_stemXBelow[1] = drawingStemWidth;
     }
 
@@ -938,8 +941,8 @@ data_STEMDIRECTION BeamElementCoord::GetStemDir()
     return stemInterface->GetStemDir();
 }
 
-void BeamElementCoord::SetDrawingStemDir(
-    data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface, bool isLast)
+void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment,
+    BeamDrawingInterface *interface, bool isLast)
 {
     assert(staff);
     assert(doc);

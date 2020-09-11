@@ -36,10 +36,11 @@ std::map<int, std::string> Option::s_measureNumber
 std::map<int, std::string> Option::s_systemDivider
     = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
-constexpr const char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
-    "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
-    "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
-    "'bracketThickness':0.5}}";
+constexpr const char *engravingDefaults
+    = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
+      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
+      "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
+      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -196,7 +197,7 @@ bool OptionDbl::SetValue(double value)
         return false;
     }
     m_value = value;
-    m_isSet =  true;
+    m_isSet = true;
     return true;
 }
 
@@ -318,7 +319,7 @@ bool OptionArray::SetValue(const std::string &value)
     // Passing a single value to an array option adds it to the values and to not replace them
     if (!value.empty()) {
         m_values.push_back(value);
-        m_isSet =  true;
+        m_isSet = true;
     }
     return true;
 }
@@ -537,15 +538,14 @@ int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool g
 
 double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    JsonPath path = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath)
-                               : StringPath2NodePath(m_values, jsonNodePath);
+    JsonPath path
+        = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath) : StringPath2NodePath(m_values, jsonNodePath);
 
     if (path.size() != jsonNodePath.size() && !getDefault) {
         path = StringPath2NodePath(m_defaultValues, jsonNodePath);
     }
 
-    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>())
-        return 0;
+    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>()) return 0;
 
     return path.back().get().get<jsonxx::Number>();
 }
@@ -586,8 +586,7 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
         else if (val.is<jsonxx::Array>()) {
             try {
                 const int index = std::stoi(*iter);
-                if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index))
-                    break;
+                if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
 
                 path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
             }
@@ -841,7 +840,8 @@ Options::Options()
     m_ledgerLineThickness.Init(0.15, 0.10, 0.30);
     this->Register(&m_ledgerLineThickness, "ledgerLineThickness", &m_generalLayout);
 
-    m_ledgerLineExtension.SetInfo("Ledger line extension", "The amount by which a ledger line should extend either side of a notehead");
+    m_ledgerLineExtension.SetInfo(
+        "Ledger line extension", "The amount by which a ledger line should extend either side of a notehead");
     m_ledgerLineExtension.Init(0.20, 0.10, 0.50);
     this->Register(&m_ledgerLineExtension, "ledgerLineExtension", &m_generalLayout);
 
@@ -876,6 +876,10 @@ Options::Options()
     m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
+
+    m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
+    m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
+    this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
 
     m_slurControlPoints.SetInfo(
         "Slur control points", "Slur control points - higher value means more curved at the end");
@@ -1218,21 +1222,21 @@ void Options::Sync()
 {
     if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, OptionDbl *>> engravingDefaults
-        = { { "thinBarlineThickness", &m_barLineWidth },
-            { "lyricLineThickness", &m_lyricLineThickness },
-            { "slurMidpointThickness", &m_slurThickness },
-            { "staffLineThickness", &m_staffLineWidth },
-            { "stemThickness", &m_stemWidth },
-            { "tieMidpointThickness", &m_tieThickness },
-            { "hairpinThickness", &m_hairpinThickness },
-            { "thickBarlineThickness", &m_thickBarlineThickness },
-            { "tupletBracketThickness", &m_tupletBracketThickness },
-            { "subBracketThickness", &m_subBracketThickness },
-            { "bracketThickness", &m_bracketThickness },
-            { "legerLineThickness", &m_ledgerLineThickness },
-            { "legerLineExtension", &m_ledgerLineExtension }
-    };
+    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults
+        = { { "staffLineThickness", &m_staffLineWidth }, //
+              { "stemThickness", &m_stemWidth }, //
+              { "legerLineThickness", &m_ledgerLineThickness }, //
+              { "legerLineExtension", &m_ledgerLineExtension }, //
+              { "slurMidpointThickness", &m_slurThickness }, //
+              { "tieMidpointThickness", &m_tieThickness }, //
+              { "thinBarlineThickness", &m_barLineWidth }, //
+              { "thickBarlineThickness", &m_thickBarlineThickness }, //
+              { "bracketThickness", &m_bracketThickness }, //
+              { "subBracketThickness", &m_subBracketThickness }, //
+              { "hairpinThickness", &m_hairpinThickness }, //
+              { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
+              { "lyricLineThickness", &m_lyricLineThickness }, //
+              { "tupletBracketThickness", &m_tupletBracketThickness } };
 
     for (auto &pair : engravingDefaults) {
         if (pair.second->isSet()) continue;

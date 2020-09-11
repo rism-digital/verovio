@@ -207,7 +207,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 }
 
 void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDrawingInterface *beamInterface,
-                           Layer *layer, Staff *staff, Measure *measure)
+    Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(beamSegment);
@@ -300,7 +300,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                 int nextIdx = noteIndexes.at(i + 1);
 
                 bool breakSec = (beamElementCoords.at(idx)->m_breaksec
-                                 && (testDur - DUR_8 >= beamElementCoords.at(idx)->m_breaksec));
+                    && (testDur - DUR_8 >= beamElementCoords.at(idx)->m_breaksec));
                 beamElementCoords.at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_NONE;
                 // partial is needed
                 if (beamElementCoords.at(idx)->m_dur >= (char)testDur) {
@@ -322,7 +322,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                             }
                             // if the previous level underneath was a partial through, put it left
                             else if (beamElementCoords.at(noteIndexes.at(i - 1))->m_partialFlags[testDur - 1 - DUR_8]
-                                     == PARTIAL_THROUGH) {
+                                == PARTIAL_THROUGH) {
                                 beamElementCoords.at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                             }
                             // if the level underneath was not left (right or through), put it right
@@ -350,8 +350,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
             // partial is needed
             if ((beamElementCoords.at(idx)->m_dur >= (char)testDur)) {
                 // and the previous one had no partial - put it left
-                if ((noteCount == 1) || (beamElementCoords.at(noteIndexes.at(i - 1))->m_dur < (char)testDur)
-                    || start) {
+                if ((noteCount == 1) || (beamElementCoords.at(noteIndexes.at(i - 1))->m_dur < (char)testDur) || start) {
                     beamElementCoords.at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                 }
             }
@@ -367,7 +366,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                     y2 = beamElementCoords.at(noteIndexes.at(i + 1))->m_yBeam + barY;
                     polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, beamElementCoords.at(idx)->m_x, y1,
-                                       beamElementCoords.at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
+                        beamElementCoords.at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
                 }
                 else if (beamElementCoords.at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = beamElementCoords.at(idx)->m_yBeam + barY;

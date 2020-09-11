@@ -533,6 +533,7 @@ public:
      */
     OptionGrp m_generalLayout;
 
+    OptionDbl m_barlineSeparation;
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
@@ -558,6 +559,7 @@ public:
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
+    OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
     OptionInt m_slurCurveFactor;
     OptionInt m_slurHeightFactor;
