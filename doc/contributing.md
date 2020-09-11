@@ -19,6 +19,16 @@ Please use the "Pull Request" mechanism for proposing contributions to the code 
  5. We will then review your submission. If you are asked to make changes, you can push these changes to your original branch and the pull request will be automatically updated.
  6. Once the changes have gone through our review process, we will merge your changes into our repository. You may then delete your dedicated branch.
  
+### Making Pull Requests
+
+When you make a Pull Request (PR), please make sure that:
+
+* the PR solves an issue previously raised with a reference to the issue number,
+* for issues labelled as 'feature request', the PR always includes a minimal test MEI file illustrating the new feature and the implemented rendering,
+* for issues labelled as 'enhancement', the PR always includes the rendering before and after that changes, and a minimal test MEI file if it is not available elswhere.
+
+## Changes to the website or to the tutorial
+ 
 For proposing changes to the `verovio:gh-pages` branch of Verovio (e.g., its website), follow the same workflow but make the pull request to the `rism-ch/verovio:gh-pages-develop` branch.
 
 For updating the tutorial fork the submodule [verovio-tutorial](https://github.com/rism-ch/verovio-tutorial), make a PR there (on its main branch `verovio-tutorial:gh-pages`) and wait for a merge. Afterwards create a pull request in the parent module (i.e. `verovio:gh-pages`) to point to the latest commit of the submodule by doing the following: 
