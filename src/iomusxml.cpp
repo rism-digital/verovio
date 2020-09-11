@@ -3628,8 +3628,7 @@ bool MusicXmlInput::IsMultirestMeasure(int index) const
 {
     for (const auto multiRest : m_multiRests) {
         if (index <= multiRest.first) return false;
-        if (index > multiRest.second) continue;
-        return true;
+        if (index <= multiRest.second) return true;
     }
     return false;
 }
