@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Sep 10 22:20:59 PDT 2020
+// Last Modified: Sat Sep 12 13:13:02 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -69936,7 +69936,7 @@ void SonorityDatabase::buildDatabase(HLp line) {
 			expandList();
 			m_notes.back().setToken(token, nullQ, j);
 			if (m_notes.back().getBase12() < lowest12) {
-				lowesti = m_notes.size() - 1;
+				lowesti = (int)m_notes.size() - 1;
 				lowest12 = m_notes.back().getBase12();
 			}
 		}
@@ -70632,7 +70632,8 @@ bool Tool_msearch::checkForMusicMatch(vector<NoteCell*>& notes, int index,
 				nextpitch = -123456789.0;
 			}
 
-			int interval = nextpitch - currpitch;
+			// maybe be careful of rests getting into this calculation:
+			int interval = (int)(nextpitch - currpitch);
 
 			if (interval != query[i].dinterval) {
 				match.clear();
@@ -70652,7 +70653,8 @@ bool Tool_msearch::checkForMusicMatch(vector<NoteCell*>& notes, int index,
 				nextpitch = -123456789.0;
 			}
 
-			int interval = nextpitch - currpitch;
+			// maybe be careful of rests getting into this calculation:
+			int interval = (int)(nextpitch - currpitch);
 
 			if (interval != query[i].cinterval) {
 				match.clear();
@@ -73716,7 +73718,7 @@ bool Tool_musicxml2hum::insertMeasure(HumGrid& outdata, int mnum,
 		// end rather than the start of the note.
 		vector<MxmlEvent*>& events = measuredata[i]->getEventList();
 		xml_node hairpin = xml_node(NULL);
-		for (int j=events.size() - 1; j >= 0; j--) {
+		for (int j=(int)events.size() - 1; j >= 0; j--) {
 			if (events[j]->getElementName() == "note") {
 				if (hairpin) {
 					events[j]->setHairpinEnding(hairpin);
@@ -74598,7 +74600,7 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 
 	if (interpQ) {
 		if (afterQ) {
-			int voicecount = slice->at(partindex)->at(staffindex)->size();
+			int voicecount = (int)slice->at(partindex)->at(staffindex)->size();
 			if (voiceindex >= voicecount) {
 				// Adding voices in the new slice.  It might be
 				// better to first check for a previous text line
