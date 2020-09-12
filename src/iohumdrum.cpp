@@ -11545,7 +11545,6 @@ template <class ELEMENT>
 void HumdrumInput::addTextElement(
     ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer)
 {
-    Text *text = new Text;
     std::string data = content;
     if (element->GetClassName() == "Syl") {
         // Approximate centering of single-letter text on noteheads.
@@ -11564,7 +11563,11 @@ void HumdrumInput::addTextElement(
     std::vector<std::string> pieces;
     hre.split(pieces, data, "\\\\n");
 
-    for (int i = 0; i < (int)pieces.size(); i++) {
+    const size_t piecesSize = pieces.size();
+
+    Text *text = piecesSize > 0 ? new Text : NULL;
+
+    for (size_t i = 0; i < piecesSize; i++) {
         data = pieces[i];
         text->SetText(UTF8to16(data));
 
@@ -11591,7 +11594,7 @@ void HumdrumInput::addTextElement(
             }
         }
 
-        if (i < (int)pieces.size() - 1) {
+        if (i < piecesSize - 1) {
             // Need to add another text element, but add lb before it.
             Lb *lb = new Lb;
             element->AddChild(lb);
