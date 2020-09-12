@@ -57,7 +57,7 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(element);
+    Tuplet *tuplet = vrv_cast<Tuplet *>(element);
     assert(tuplet);
 
     // We do it here because we have no dedicated functor to do it (which would be an overkill)
@@ -81,7 +81,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     assert(staff);
     assert(measure);
 
-    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(element);
+    TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(element);
     assert(tupletBracket);
 
     if (tupletBracket->GetBracketVisible() == BOOLEAN_false) {
@@ -89,7 +89,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         return;
     }
 
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletBracket->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(tupletBracket->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
     if (!tuplet->GetDrawingLeft() || !tuplet->GetDrawingRight()) {
@@ -98,7 +98,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     }
 
     data_STAFFREL_basic position = tuplet->GetDrawingBracketPos();
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    int lineWidth = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tupletBracketThickness.GetValue();
 
     dc->ResumeGraphic(tupletBracket, tupletBracket->GetUuid());
 
@@ -145,10 +145,10 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     assert(staff);
     assert(measure);
 
-    TupletNum *tupletNum = dynamic_cast<TupletNum *>(element);
+    TupletNum *tupletNum = vrv_cast<TupletNum *>(element);
     assert(tupletNum);
 
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletNum->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(tupletNum->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
     if (!tuplet->HasNum() || (tuplet->GetNumVisible() == BOOLEAN_false)) {

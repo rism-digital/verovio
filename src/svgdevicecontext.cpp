@@ -176,7 +176,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
 
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
-        Staff *staff = dynamic_cast<Staff *>(object);
+        Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
 
         assert(staff->m_drawingStaffDef);
@@ -985,7 +985,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
         if (object->IsFloatingObject()) {
-            FloatingObject *floatingObject = dynamic_cast<FloatingObject *>(object);
+            FloatingObject *floatingObject = vrv_cast<FloatingObject *>(object);
             assert(floatingObject);
             box = floatingObject->GetCurrentFloatingPositioner();
             // No bounding box found, ignore the object - this happens when the @staff is missing because the element is

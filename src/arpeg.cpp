@@ -122,7 +122,7 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
     if (front == back) {
         // It has to be a chord in this case
         if (front->Is(NOTE)) return;
-        Chord *chord = dynamic_cast<Chord *>(front);
+        Chord *chord = vrv_cast<Chord *>(front);
         assert(chord);
         top = chord->GetTopNote();
         bottom = chord->GetBottomNote();
@@ -136,19 +136,19 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 
     // Get the first and second chord or note
     if (front->Is(CHORD)) {
-        chord1 = dynamic_cast<Chord *>(front);
+        chord1 = vrv_cast<Chord *>(front);
         assert(chord1);
     }
     else {
-        note1 = dynamic_cast<Note *>(front);
+        note1 = vrv_cast<Note *>(front);
         assert(note1);
     }
     if (back->Is(CHORD)) {
-        chord2 = dynamic_cast<Chord *>(back);
+        chord2 = vrv_cast<Chord *>(back);
         assert(chord2);
     }
     else {
-        note2 = dynamic_cast<Note *>(back);
+        note2 = vrv_cast<Note *>(back);
         assert(note2);
     }
 
@@ -187,7 +187,7 @@ int Arpeg::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 {
-    AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
+    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
     assert(params);
 
     Note *topNote = NULL;
@@ -201,10 +201,10 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     // We should have call DrawArpeg before
     assert(this->GetCurrentFloatingPositioner());
 
-    Staff *topStaff = dynamic_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
+    Staff *topStaff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
     assert(topStaff);
 
-    Staff *bottomStaff = dynamic_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
+    Staff *bottomStaff = vrv_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
     assert(bottomStaff);
 
     int minTopLeft, maxTopRight;

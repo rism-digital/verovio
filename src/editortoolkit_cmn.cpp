@@ -283,7 +283,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         return false;
     }
 
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
@@ -330,7 +330,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
 
     /*
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
@@ -431,7 +431,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
     }
 
     if (object->Is(CHORD)) {
-        Chord *currentChord = dynamic_cast<Chord *>(object);
+        Chord *currentChord = vrv_cast<Chord *>(object);
         assert(currentChord);
         Note *note = new Note();
         currentChord->AddChild(note);
@@ -439,7 +439,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         return true;
     }
     else if (object->Is(NOTE)) {
-        Note *currentNote = dynamic_cast<Note *>(object);
+        Note *currentNote = vrv_cast<Note *>(object);
         assert(currentNote);
 
         Chord *currentChord = currentNote->IsChordTone();
@@ -493,7 +493,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         return true;
     }
     else if (object->Is(REST)) {
-        Rest *rest = dynamic_cast<Rest *>(object);
+        Rest *rest = vrv_cast<Rest *>(object);
         assert(rest);
         Note *note = new Note();
         note->DurationInterface::operator=(*rest);
@@ -544,12 +544,10 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             }
             this->m_chainedId = chord->GetUuid();
             delete chord;
-            return true;
         }
         else if (count > 2) {
             chord->DeleteChild(note);
             this->m_chainedId = chord->GetUuid();
-            return true;
         }
         // Handle cases of chords with one single note
         else {
@@ -559,16 +557,16 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             assert(parent);
             parent->ReplaceChild(chord, rest);
             delete chord;
-            return true;
         }
+        return true;
     }
     else if (beam) {
-        if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
+        if (beam->m_beamSegment.GetElementCoordRefs().size() == 2) {
             bool insertBefore = true;
-            LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
+            LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs().back()->m_element;
             if (note == otherElement) {
                 insertBefore = false;
-                otherElement = beam->m_beamSegment.GetElementCoordRefs()->front()->m_element;
+                otherElement = beam->m_beamSegment.GetElementCoordRefs().front()->m_element;
             }
             assert(otherElement && (otherElement != note));
             Rest *rest = new Rest();

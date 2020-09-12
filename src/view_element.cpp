@@ -229,7 +229,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Accid *accid = dynamic_cast<Accid *>(element);
+    Accid *accid = vrv_cast<Accid *>(element);
     assert(accid);
 
     // This can happen with accid within note with only accid.ges
@@ -284,7 +284,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Artic *artic = dynamic_cast<Artic *>(element);
+    Artic *artic = vrv_cast<Artic *>(element);
     assert(artic);
 
     /************** draw the artic **************/
@@ -304,7 +304,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     assert(staff);
     assert(measure);
 
-    ArticPart *articPart = dynamic_cast<ArticPart *>(element);
+    ArticPart *articPart = vrv_cast<ArticPart *>(element);
     assert(articPart);
 
     /************** draw the artic **************/
@@ -385,7 +385,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(staff);
     assert(measure);
 
-    BarLine *barLine = dynamic_cast<BarLine *>(element);
+    BarLine *barLine = vrv_cast<BarLine *>(element);
     assert(barLine);
 
     if (barLine->GetForm() == BARRENDITION_invis) {
@@ -410,7 +410,7 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(staff);
     assert(measure);
 
-    BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(element);
+    BeatRpt *beatRpt = vrv_cast<BeatRpt *>(element);
     assert(beatRpt);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -446,12 +446,12 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    BTrem *bTrem = dynamic_cast<BTrem *>(element);
+    BTrem *bTrem = vrv_cast<BTrem *>(element);
     assert(bTrem);
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STEMMODIFIER stemMod;
-    int drawingDur;
+    int drawingDur = 0;
     LayerElement *childElement = NULL;
     Note *childNote = NULL;
     Point stemPoint;
@@ -496,6 +496,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
 
+    // conlude from logical attributes
     if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
         int slashDur = bTrem->GetUnitdur() - drawingDur;
         if (drawingDur < DUR_4) slashDur = bTrem->GetUnitdur() - DUR_4;
@@ -542,7 +543,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Idem as above
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false)
                 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+            x = stemPoint.x;
         }
         else {
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
@@ -562,12 +563,17 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += (stemDir == STEMDIRECTION_down) ? beamStep : -beamStep;
     }
 
-    int s;
     // by default draw 3 slashes (e.g., for a temolo on a whole note)
     if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
-    for (s = 1; s < stemMod; ++s) {
-        DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
-        y += step;
+    if (stemMod == STEMMODIFIER_z) {
+        if (stemDir == STEMDIRECTION_down) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x, y, SMUFL_E22A_buzzRoll, staff->m_drawingStaffSize, false);
+    }
+    else {
+        for (int s = 1; s < stemMod; ++s) {
+            DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
+            y += step;
+        }
     }
 
     dc->EndGraphic(element, this);
@@ -581,7 +587,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Chord *chord = dynamic_cast<Chord *>(element);
+    Chord *chord = vrv_cast<Chord *>(element);
     assert(chord);
 
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
@@ -601,7 +607,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Clef *clef = dynamic_cast<Clef *>(element);
+    Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
     int x, y;
     if (m_doc->GetType() == Facs && clef->HasFacs()) {
@@ -737,7 +743,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Custos *custos = dynamic_cast<Custos *>(element);
+    Custos *custos = vrv_cast<Custos *>(element);
     assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -824,7 +830,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     assert(staff);
     assert(measure);
 
-    Dot *dot = dynamic_cast<Dot *>(element);
+    Dot *dot = vrv_cast<Dot *>(element);
     assert(dot);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -858,7 +864,7 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Dots *dots = dynamic_cast<Dots *>(element);
+    Dots *dots = vrv_cast<Dots *>(element);
     assert(dots);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -914,10 +920,10 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Flag *flag = dynamic_cast<Flag *>(element);
+    Flag *flag = vrv_cast<Flag *>(element);
     assert(flag);
 
-    Stem *stem = dynamic_cast<Stem *>(flag->GetFirstAncestor(STEM));
+    Stem *stem = vrv_cast<Stem *>(flag->GetFirstAncestor(STEM));
     assert(stem);
 
     int x = flag->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
@@ -955,7 +961,7 @@ void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
-    HalfmRpt *halfmRpt = dynamic_cast<HalfmRpt *>(element);
+    HalfmRpt *halfmRpt = vrv_cast<HalfmRpt *>(element);
     assert(halfmRpt);
 
     int x = halfmRpt->GetDrawingX();
@@ -976,7 +982,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    KeySig *keySig = dynamic_cast<KeySig *>(element);
+    KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
     int x, y, i;
@@ -1101,7 +1107,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(element);
+    MeterSig *meterSig = vrv_cast<MeterSig *>(element);
     assert(meterSig);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1138,7 +1144,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    MRest *mRest = dynamic_cast<MRest *>(element);
+    MRest *mRest = vrv_cast<MRest *>(element);
     assert(mRest);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1167,7 +1173,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    MRpt *mRpt = dynamic_cast<MRpt *>(element);
+    MRpt *mRpt = vrv_cast<MRpt *>(element);
     assert(mRpt);
 
     mRpt->CenterDrawingX();
@@ -1187,7 +1193,7 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    MRpt2 *mRpt2 = dynamic_cast<MRpt2 *>(element);
+    MRpt2 *mRpt2 = vrv_cast<MRpt2 *>(element);
     assert(mRpt2);
 
     mRpt2->CenterDrawingX();
@@ -1207,7 +1213,7 @@ void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    // MSpace *mSpace = dynamic_cast<MSpace *>(element);
+    // MSpace *mSpace = vrv_cast<MSpace *>(element);
     // assert(mSpace);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1223,7 +1229,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     assert(staff);
     assert(measure);
 
-    MultiRest *multiRest = dynamic_cast<MultiRest *>(element);
+    MultiRest *multiRest = vrv_cast<MultiRest *>(element);
     assert(multiRest);
 
     multiRest->CenterDrawingX();
@@ -1303,7 +1309,7 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
-    MultiRpt *multiRpt = dynamic_cast<MultiRpt *>(element);
+    MultiRpt *multiRpt = vrv_cast<MultiRpt *>(element);
     assert(multiRpt);
 
     multiRpt->CenterDrawingX();
@@ -1325,7 +1331,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Note *note = dynamic_cast<Note *>(element);
+    Note *note = vrv_cast<Note *>(element);
     assert(note);
 
     if (note->IsMensuralDur()) {
@@ -1350,26 +1356,42 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else {
             // Whole notes
             wchar_t fontNo;
-            if (drawingDur == DUR_1) {
-                if (note->GetColored() == BOOLEAN_true) {
-                    fontNo = SMUFL_E0FA_noteheadWholeFilled;
-                }
-                else {
-                    fontNo = SMUFL_E0A2_noteheadWhole;
-                }
+            if (note->GetColored() == BOOLEAN_true) {
+                fontNo = (drawingDur == DUR_1) ? SMUFL_E0FA_noteheadWholeFilled : SMUFL_E0A3_noteheadHalf;
             }
-            // Other values
             else {
-                if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
-                    fontNo = SMUFL_E0A3_noteheadHalf;
-                }
-                else {
-                    fontNo = SMUFL_E0A4_noteheadBlack;
-                }
+                fontNo = note->GetNoteheadGlyph(drawingDur);
             }
 
             dc->StartCustomGraphic("notehead");
+
             DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+
+            // handle notehead enclosure
+            if (note->HasHeadMod()) {
+                switch (note->GetHeadMod()) {
+                    case NOTEHEADMODIFIER_paren: {
+                        DrawSmuflCode(dc, noteX - note->GetDrawingRadius(m_doc), noteY, SMUFL_E26A_accidentalParensLeft,
+                            staff->m_drawingStaffSize, drawingCueSize, true);
+                        DrawSmuflCode(dc, noteX + note->GetDrawingRadius(m_doc) * 2, noteY,
+                            SMUFL_E26B_accidentalParensRight, staff->m_drawingStaffSize, drawingCueSize, true);
+                        break;
+                    }
+                    case NOTEHEADMODIFIER_slash:
+                    case NOTEHEADMODIFIER_backslash:
+                    case NOTEHEADMODIFIER_vline:
+                    case NOTEHEADMODIFIER_hline: {
+                        // TODO: Handle other headmodifiers whenever they become available
+                        // wchar_t glyphCode = note->GetNoteheadModifierGlyph();
+                        // int offset = (m_doc->GetGlyphWidth - note->GetDrawingRadius(m_doc) * 2) / 2;
+                        // DrawSmuflCode(dc, noteX - offset, noteY, glyphCode, staff->m_drawingStaffSize,
+                        // drawingCueSize, true);
+                        break;
+                    }
+                    default: break;
+                }
+            }
+
             dc->EndCustomGraphic();
         }
     }
@@ -1387,7 +1409,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Rest *rest = dynamic_cast<Rest *>(element);
+    Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
 
     if (rest->IsMensuralDur()) {
@@ -1439,7 +1461,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Stem *stem = dynamic_cast<Stem *>(element);
+    Stem *stem = vrv_cast<Stem *>(element);
     assert(stem);
 
     // Do not draw virtual (e.g., whole note) stems
@@ -1454,12 +1476,12 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (stem->HasStemMod()) {
         if (stem->GetStemMod() == STEMMODIFIER_sprech) {
             int yShift = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            Note *note = dynamic_cast<Note *>(stem->GetParent());
+            Note *note = vrv_cast<Note *>(stem->GetParent());
             assert(note);
             if ((note->GetDrawingLoc() % 2) != 0) {
                 yShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
-            yShift *= (stem->GetDrawingStemLen() > 0)? -1 : 1;
+            yShift *= (stem->GetDrawingStemLen() > 0) ? -1 : 1;
             yShift -= m_doc->GetGlyphHeight(SMUFL_E645_vocalSprechgesang, staff->m_drawingStaffSize, false) / 2;
             DrawSmuflCode(dc, stem->GetDrawingX(), note->GetDrawingY() + yShift, SMUFL_E645_vocalSprechgesang,
                 staff->m_drawingStaffSize, false);
@@ -1479,7 +1501,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
 void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
-    Syl *syl = dynamic_cast<Syl *>(element);
+    Syl *syl = vrv_cast<Syl *>(element);
     assert(syl);
 
     bool isNeume = (staff->m_drawingNotationType == NOTATIONTYPE_neume);
@@ -1558,7 +1580,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Verse *verse = dynamic_cast<Verse *>(element);
+    Verse *verse = vrv_cast<Verse *>(element);
     assert(verse);
 
     Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));

@@ -87,7 +87,7 @@ bool Rend::IsSupportedChild(Object *child)
 
 int Rend::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     if (this->GetHalign()) {
