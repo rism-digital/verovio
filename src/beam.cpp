@@ -195,7 +195,7 @@ void BeamSegment::CalcBeamInit(
     // Calculate the extreme values
 
     int yMax = 0, yMin = 0;
-    int nbRests = 0;
+    size_t nbRests = 0;
 
     m_avgY = 0;
     m_nbNotesOrChords = 0;
@@ -250,7 +250,7 @@ void BeamSegment::CalcBeamInit(
             }
         }
         else {
-            nbRests++;
+            ++nbRests;
         }
     }
 
