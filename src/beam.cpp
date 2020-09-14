@@ -321,11 +321,11 @@ bool BeamSegment::CalcBeamSlope(
         Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
 
     int noteStep = 0;
-    double noteSlope = 0.0;
     if (m_firstNoteOrChord->m_closestNote && m_lastNoteOrChord->m_closestNote) {
-        noteSlope
-            = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_closestNote->GetDrawingY()),
-                Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_closestNote->GetDrawingY()));
+        if (m_beamSlope == 0.0)
+            m_beamSlope
+                = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_closestNote->GetDrawingY()),
+                    Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_closestNote->GetDrawingY()));
         noteStep
             = abs(m_firstNoteOrChord->m_closestNote->GetDrawingY() - m_lastNoteOrChord->m_closestNote->GetDrawingY());
     }
@@ -334,10 +334,8 @@ bool BeamSegment::CalcBeamSlope(
 
     // This can happen with two notes with 32sd or 64th notes and a diatonic step
     // Force the noteSlope to be considered instead
-    if (m_beamSlope == 0.0) {
-        m_beamSlope = noteSlope;
-        return false;
-    }
+
+    if (m_beamSlope == 0.0) return false;
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Default (maximum) step is two stave-spaces (4 units)
