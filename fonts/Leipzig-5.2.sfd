@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1600086227
+ModificationTime: 1600086573
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -3918,6 +3918,7 @@ SplineSet
  646 13 644 20 644 27 c 0
  644 42 653 50 671 50 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE655
@@ -17215,8 +17216,10 @@ SplineSet
  194 109 190 101 190 96 c 1
  199 87 205 76 208 63 c 128
  211 50 223 40 244 35 c 1
- 261 40 274.235080899 43.6151971246 280 50 c 128
- 373 153 275.660506536 7.24991305213 267 0 c 1
+ 261 40 274 44 280 50 c 128
+ 304 77 315 87 319 87 c 0
+ 320 87 320 86 320 85 c 0
+ 320 74 273 5 267 0 c 1
   Spiro
     267 0 v
     190 0 v
@@ -17370,6 +17373,7 @@ SplineSet
     0 0 z
   EndSpiro
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE65A
@@ -17389,7 +17393,7 @@ SplineSet
  146 255 193 307 268 307 c 0
  322 307 378 291 378 190 c 0
  378 54 289 0 236 -0 c 0
- 190.317887669 0 141.125387569 31.9059593234 109 56 c 0
+ 190 0 141 32 109 56 c 0
  96 66 74 79 64 79 c 0
  41 79 30 44 19 11 c 0
  16 3 18 -14 8 -14 c 0
@@ -17412,6 +17416,7 @@ SplineSet
  298 522 293 526 293 529 c 0
  293 532 296 534 302 535 c 0
 EndSplineSet
+Validated: 1
 EndChar
 EndChars
 EndSplineFont
