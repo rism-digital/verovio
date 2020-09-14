@@ -2022,7 +2022,17 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
-            if (pedalType == "sostenuto") pedal->SetFunc("sostenuto");
+            if (xmlPedal.node().attribute("abbreviated")) {
+                pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                pedal->SetExternalsymbols(pedal, "glyph.num", "U+E651");
+            }
+            if (pedalType == "sostenuto") {
+                pedal->SetFunc("sostenuto");
+                if (xmlPedal.node().attribute("abbreviated")) {
+                    pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                    pedal->SetExternalsymbols(pedal, "glyph.num", "U+E65A");
+                }
+            }
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
