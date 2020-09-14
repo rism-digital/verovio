@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1599495543
+ModificationTime: 1600085582
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,12 +50,12 @@ NameList: Adobe Glyph List
 DisplaySize: -128
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 58797 9 4
+WinInfo: 58734 9 4
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
 AnchorClass2: "stemUpSE"""  "stemDownNW"""  "cutOutNW"""  "cutOutSW"""  "cutOutSE"""  "cutOutNE""" 
-BeginChars: 1114115 333
+BeginChars: 1114115 334
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -17103,6 +17103,53 @@ SplineSet
  37 40 l 2
  37 28 35 4 22 4 c 0
  3 4 0 36 0 55 c 0
+EndSplineSet
+Validated: 1
+EndChar
+
+StartChar: uniE587
+Encoding: 58759 58759 333
+Width: 1000
+VWidth: 2048
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 21 m 1
+ 0 80 l 1
+ 129 230 l 1
+ 146 240 l 1
+ 153 240 157 238 158 234 c 1
+ 264 141 l 1
+ 281 131 l 1
+ 292 137 l 1
+ 372 230 l 1
+ 390 240 l 1
+ 391 240 l 2
+ 396 240 400 238 403 234 c 1
+ 508 141 l 2
+ 513 137 518 133 524 129 c 1
+ 659 231 713 274 786 304 c 0
+ 907 353 974 372 993 372 c 0
+ 997 372 999 372 999 370 c 0
+ 999 361 935 328 816 284 c 1
+ 728 239 616 147 483 15 c 1
+ 477 8 l 1
+ 468 1 461 -2 457 -2 c 2
+ 456 -2 l 2
+ 453 -2 449 0 446 4 c 2
+ 341 98 l 2
+ 335 103 329 105 322 105 c 0
+ 318 105 315 104 313 102 c 2
+ 232 8 l 2
+ 225 1 218 -2 213 -2 c 2
+ 212 -2 l 2
+ 209 -2 205 0 202 4 c 2
+ 202 5 l 1
+ 98 98 l 2
+ 92 104 85 107 78 107 c 0
+ 75 107 71 105 68 102 c 2
+ 0 21 l 1
 EndSplineSet
 Validated: 1
 EndChar
