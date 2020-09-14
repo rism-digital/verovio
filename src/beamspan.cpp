@@ -122,29 +122,45 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
 
 int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams) 
 {
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
     if (!m_beamedElements.empty()) return FUNCTOR_CONTINUE;
+
+    Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
+    if (!layer || !staff) return FUNCTOR_SIBLINGS;
 
     if (HasPlist()) {
         m_beamedElements = *GetRefs();
     }
     else {
-        Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
-        Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
-        if (!layer || !staff) return FUNCTOR_SIBLINGS;
-        
         m_beamedElements = GetBeamSpanElementList(layer, staff);
+    }
+
+    // Find whether this beamSpan is crossStaff - if there are beamed elements that belong
+    // to differen staffs we can consider this beamSpan as such
+    bool isCrossStaff = false;
+    for (const auto element : m_beamedElements) {
+        if (element->GetFirstAncestor(STAFF) != staff) {
+            isCrossStaff = true;
+            break;
+        }
     }
 
     // set current beamSpan as referencedElement for all beamed elemenents (for the
     // sake of figuring if corresponding element is in beamSpan)
-    for (auto element : m_beamedElements) {
+    for (const auto element : m_beamedElements) {
         LayerElement *layerElem = vrv_cast<LayerElement *>(element);
         if (!layerElem) continue;
 
         layerElem->m_referencedElement = this;
+
+        if (isCrossStaff) {
+            Layer *elementLayer = vrv_cast<Layer *>(layerElem->GetFirstAncestor(LAYER));
+            Staff *elementStaff = vrv_cast<Staff *>(layerElem->GetFirstAncestor(STAFF));
+            if (!layer || !staff || layerElem->m_crossStaff) continue;
+
+            layerElem->m_crossStaff = elementStaff;
+            layerElem->m_crossLayer = elementLayer;
+        }
     }
 
     return FUNCTOR_CONTINUE;

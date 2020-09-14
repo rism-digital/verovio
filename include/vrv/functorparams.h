@@ -2079,7 +2079,7 @@ public:
 class PreparePlistParams : public FunctorParams {
 public:
     PreparePlistParams() { m_fillList = true; }
-    ArrayOfPlistInterfaceUuidPairs m_interfaceUuidPairs;
+    ArrayOfPlistInterfaceUuidTuples m_interfaceUuidTuples;
     bool m_fillList;
 };
 

@@ -13,6 +13,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <tuple>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -328,7 +329,7 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuid
 
 typedef std::map<std::string, Note *> MapOfNoteUuidPairs;
 
-typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceUuidPairs;
+typedef std::vector<std::tuple<PlistInterface *, std::string, Object *> > ArrayOfPlistInterfaceUuidTuples;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 

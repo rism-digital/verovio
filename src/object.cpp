@@ -1586,11 +1586,10 @@ int Object::ProcessPlist(FunctorParams* functorParams)
     if (!IsLayerElement()) return FUNCTOR_CONTINUE;
 
     std::string uuid = this->GetUuid();
-    auto i = std::find_if(params->m_interfaceUuidPairs.begin(), params->m_interfaceUuidPairs.end(),
-        [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });
-    if (i != params->m_interfaceUuidPairs.end()) {
-        i->first->SetRef(this);
-        params->m_interfaceUuidPairs.erase(i);
+    auto i = std::find_if(params->m_interfaceUuidTuples.begin(), params->m_interfaceUuidTuples.end(),
+        [uuid](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == uuid); });
+    if (i != params->m_interfaceUuidTuples.end()) {
+        std::get<2>(*i) = this;
     }
 
     return FUNCTOR_CONTINUE;
