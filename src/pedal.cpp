@@ -16,6 +16,7 @@
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layerelement.h"
+#include "smufl.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -63,6 +64,17 @@ void Pedal::Reset()
     ResetVerticalGroup();
 
     m_endsWithBounce = false;
+}
+
+wchar_t Pedal::GetPedalGlyph() const
+{
+    // If there is glyph.num, prioritize it, otherwise check other attributes
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    return (GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
 }
 
 //----------------------------------------------------------------------------
