@@ -2917,8 +2917,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // place
         mordent->SetPlace(
             mordent->AttPlacement::StrToStaffrel(xmlExtOrnament.node().attribute("placement").as_string()));
-        bool isHaydn = std::string(xmlExtOrnament.node().name()) == "haydn";
-        mordent->SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E5B0");
+        const bool isHaydn = std::string(xmlExtOrnament.node().name()) == "haydn";
+        mordent->SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E587");
         mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
     }
 
