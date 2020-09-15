@@ -1990,20 +1990,11 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         if (bounceStar && (pedal->GetDir() == pedalLog_DIR_bounce)) {
             str.push_back(code);
             // Get the staff size of the first staff
-            int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
-            TextExtend bounceOffset;
-            dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
-            dc->GetSmuflTextExtent(str, &bounceOffset);
-            dc->ResetFont();
-            x -= bounceOffset.m_width;
+            const int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
+            x -= m_doc->GetGlyphWidth(SMUFL_E655_keyboardPedalUp, staffSize, false);
         }
         if (pedal->GetDir() != pedalLog_DIR_up) {
-            if (pedal->GetFunc() == "sostenuto") {
-                code = SMUFL_E659_keyboardPedalSost;
-            }
-            else {
-                code = SMUFL_E650_keyboardPedalPed;
-            }
+            code = pedal->GetPedalGlyph();
         }
         str.push_back(code);
 
@@ -2012,7 +2003,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
                 continue;
             }
             // Basic method that use bounding box
-            int y = pedal->GetDrawingY();
+            const int y = pedal->GetDrawingY();
 
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
