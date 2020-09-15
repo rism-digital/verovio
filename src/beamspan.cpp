@@ -128,12 +128,7 @@ int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
     if (!layer || !staff) return FUNCTOR_SIBLINGS;
 
-    if (HasPlist()) {
-        m_beamedElements = *GetRefs();
-    }
-    else {
-        m_beamedElements = GetBeamSpanElementList(layer, staff);
-    }
+    m_beamedElements = HasPlist() ? *GetRefs() : GetBeamSpanElementList(layer, staff);
 
     // Find whether this beamSpan is crossStaff - if there are beamed elements that belong
     // to differen staffs we can consider this beamSpan as such
