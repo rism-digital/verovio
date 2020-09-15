@@ -1195,6 +1195,24 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
             // Add the measure to the system - if already there from a previous part we'll just merge the content
             AddMeasure(section, measure, i);
         }
+        else {
+            // Handle barline parsing for the multirests (where barline would be defined in last measure of the mRest)
+            // If this is last measure, find starting measure of the mRest (based on the Id) and add barline to it
+            auto lastElementIter = std::find_if(m_multiRests.begin(), m_multiRests.end(),
+                [i](const std::pair<int, int> &elem) { return i == elem.second; });
+            if (lastElementIter != m_multiRests.end()) {
+                auto measureIter = std::find_if(m_measureCounts.begin(), m_measureCounts.end(),
+                    [lastElementIter](
+                        const std::pair<Measure *, int> &elem) { return lastElementIter->first == elem.second; });
+                if (measureIter != m_measureCounts.end()) {
+                    for (auto it = xmlMeasure.node().begin(); it != xmlMeasure.node().end(); ++it) {
+                        if (IsElement(*it, "barline")) {
+                            ReadMusicXmlBarLine(*it, measureIter->first, std::to_string(lastElementIter->first));
+                        }
+                    }
+                }
+            }
+        }
         i++;
     }
 
