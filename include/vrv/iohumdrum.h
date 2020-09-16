@@ -142,6 +142,7 @@ namespace humaux {
         bool force;
         hum::HTp token;
         hum::HumNum duration;
+        hum::HumNum durationnodots;
 
         HumdrumBeamAndTuplet() { clear(); }
         ~HumdrumBeamAndTuplet() { clear(); }
@@ -155,6 +156,8 @@ namespace humaux {
             gbeamstart = gbeamend = 0;
             force = false;
             priority = ' ';
+            duration = 0;
+            durationnodots = 0;
             token = NULL;
         }
     };
@@ -514,9 +517,9 @@ protected:
     void splitSyllableBySpaces(vector<std::string> &vtext, char spacer = ' ');
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
-    bool leftmostSystemArpeggio(hum::HTp token);
+    bool isLowestSystemArpeggio(hum::HTp token);
     bool leftmostStaffArpeggio(hum::HTp token);
-    hum::HTp getRightmostSystemArpeggio(hum::HTp token);
+    hum::HTp getHighestSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
         int staffindex, int justification = 0, const std::string &color = "");
@@ -635,6 +638,16 @@ protected:
         std::vector<hum::HumNum> &durations, std::vector<bool> &durforce);
     bool hasLayoutParameter(hum::HTp token, const std::string &category, const std::string &param);
     void assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
+    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &catkey,
+        const string &trueString, const string &falseString = "");
+    void analyzeClefNulls(hum::HumdrumFile &infile);
+    void markAdjacentNullsWithClef(hum::HTp clef);
+    void markOtherClefsAsChange(hum::HTp clef);
+    int getCurrentLayerCount(hum::HTp token);
+    void checkForBreak(hum::HumdrumFile &infile, int line);
+    int getLowestDiatonicPitch(hum::HTp token, const string &requirement);
+    int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
+    bool hasMensuralStaff(hum::HLp line);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -664,7 +677,7 @@ protected:
     template <class ELEMENT> KeySig *getKeySig(ELEMENT element);
     template <class ELEMENT> MeterSig *getMeterSig(ELEMENT element);
     template <class ELEMENT> Clef *getClef(ELEMENT element);
-    template <class ELEMENT> Mensur *getMensur(ELEMENT element);
+    template <class ELEMENT> Mensur *getMensur(ELEMENT element, hum::HTp token = NULL);
     template <class ELEMENT>
     void insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp phraseend, Measure *startmeasure,
         std::vector<pair<int, int> > &endchordsorted, std::vector<std::pair<int, int> > &startchordsorted,
@@ -674,6 +687,8 @@ protected:
     template <class ELEMENT> void convertVerses(ELEMENT element, hum::HTp token);
     template <class ELEMENT>
     void setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex);
+    template <class ELEMENT> void addChildBackMeasureOrSection(ELEMENT element);
+    template <class ELEMENT> void addChildMeasureOrSection(ELEMENT element);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
@@ -694,6 +709,7 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
+    template <class ELEMENT> void addType(ELEMENT element, const std::string &aType);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

@@ -345,6 +345,7 @@ int main(int argc, char **argv)
             default: break;
         }
     }
+    options->Sync();
 
     if (show_version) {
         display_version();

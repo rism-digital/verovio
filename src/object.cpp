@@ -624,9 +624,12 @@ bool Object::IsSupportedChild(Object *child)
 
 void Object::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+    if (!((child->GetClassName() == "Staff") && (this->GetClassName() == "Section"))) {
+        // temporarily allowing staff in section for issue https://github.com/MeasuringPolyphony/mp_editor/issues/62
+        if (!this->IsSupportedChild(child)) {
+            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+            return;
+        }
     }
 
     child->SetParent(this);
@@ -749,7 +752,7 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
     }
 }
 
-Object* Object::GetFirstChildNot(const ClassId classId)
+Object *Object::GetFirstChildNot(const ClassId classId)
 {
     for (const auto child : m_children) {
         if (!child->Is(classId)) {

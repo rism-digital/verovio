@@ -1282,13 +1282,13 @@
             <glyph glyph-code="E566" smufl-name="ornamentTrill"/>
             <glyph glyph-code="E567" smufl-name="ornamentTurn"/>
             <glyph glyph-code="E568" smufl-name="ornamentTurnInverted"/>
-            <!--<glyph glyph-code="E569" smufl-name="ornamentTurnSlash"/>-->
+            <glyph glyph-code="E569" smufl-name="ornamentTurnSlash"/>
             <glyph glyph-code="E56A" smufl-name="ornamentTurnUp"/>
             <glyph glyph-code="E56B" smufl-name="ornamentTurnUpS"/>
             <glyph glyph-code="E56C" smufl-name="ornamentMordent"/>
             <glyph glyph-code="E56D" smufl-name="ornamentMordentInverted"/>
             <glyph glyph-code="E56E" smufl-name="ornamentTremblement"/>
-            <!--<glyph glyph-code="E56F" smufl-name="ornamentHaydn"/>-->
+            <glyph glyph-code="E56F" smufl-name="ornamentHaydn"/>
             <range_end>U+E56F</range_end>
             <range_start>U+E560</range_start>
         </commonOrnaments>
@@ -1355,33 +1355,31 @@
         </combiningStrokesForTrillsAndMordents>
         <precomposedTrillsAndMordents>
             <description>Precomposed trills and mordents</description>
-            <!--<glyph glyph-code="E5B0" smufl-name="ornamentPrecompSlide"/>-->
-            <!--<glyph glyph-code="E5B1" smufl-name="ornamentPrecompDescendingSlide"/>-->
-            <!--<glyph glyph-code="E5B2" smufl-name="ornamentPrecompAppoggTrill"/>-->
-            <!--<glyph glyph-code="E5B3" smufl-name="ornamentPrecompAppoggTrillSuffix"/>-->
-            <!--<glyph glyph-code="E5B4" smufl-name="ornamentPrecompTurnTrillDAnglebert"/>-->
-            <!--<glyph glyph-code="E5B5" smufl-name="ornamentPrecompSlideTrillDAnglebert"/>-->
-            <!--<glyph glyph-code="E5B6" smufl-name="ornamentPrecompSlideTrillMarpurg"/>-->
-            <!--<glyph glyph-code="E5B7" smufl-name="ornamentPrecompTurnTrillBach"/>-->
-            <!--<glyph glyph-code="E5B8" smufl-name="ornamentPrecompSlideTrillBach"/>-->
-            <!--<glyph glyph-code="E5B9" smufl-name="ornamentPrecompSlideTrillMuffat"/>-->
-            <!--<glyph glyph-code="E5BA" smufl-name="ornamentPrecompSlideTrillSuffixMuffat"/>-->
-            <!--<glyph glyph-code="E5BB" smufl-name="ornamentPrecompTrillSuffixDandrieu"/>-->
-            <!--<glyph glyph-code="E5BC" smufl-name="ornamentPrecompPortDeVoixMordent"/>-->
-            <!--<glyph glyph-code="E5BD" smufl-name="ornamentPrecompTrillWithMordent"/>-->
-            <!--<glyph glyph-code="E5BE" smufl-name="ornamentPrecompCadence"/>-->
-            <!--<glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn "/>-->
-            <!--<glyph glyph-code="E5C0" smufl-name="ornamentPrecompDoubleCadenceLowerPrefix"/>-->
-            <!--<glyph glyph-code="E5C1" smufl-name="ornamentPrecompCadenceUpperPrefix "/>-->
-            <!--<glyph glyph-code="E5C2" smufl-name="ornamentPrecompCadenceUpperPrefixTurn"/>-->
-            <!--<glyph glyph-code="E5C3" smufl-name="ornamentPrecompDoubleCadenceUpperPrefix "/>-->
-            <!--<glyph glyph-code="E5C4"
-                smufl-name="ornamentPrecompDoubleCadenceUpperPrefixTurn"/>-->
-            <!--<glyph glyph-code="E5C5" smufl-name="ornamentPrecompMordentRelease"/>-->
-            <!--<glyph glyph-code="E5C6" smufl-name="ornamentPrecompMordentUpperPrefix"/>-->
-            <!--<glyph glyph-code="E5C7"
-                smufl-name="ornamentPrecompInvertedMordentUpperPrefix"/>-->
-            <!--<glyph glyph-code="E5C8" smufl-name="ornamentPrecompTrillLowerSuffix"/>-->
+            <glyph glyph-code="E5B0" smufl-name="ornamentPrecompSlide"/>
+            <glyph glyph-code="E5B1" smufl-name="ornamentPrecompDescendingSlide"/>
+            <glyph glyph-code="E5B2" smufl-name="ornamentPrecompAppoggTrill"/>
+            <glyph glyph-code="E5B3" smufl-name="ornamentPrecompAppoggTrillSuffix"/>
+            <glyph glyph-code="E5B4" smufl-name="ornamentPrecompTurnTrillDAnglebert"/>
+            <glyph glyph-code="E5B5" smufl-name="ornamentPrecompSlideTrillDAnglebert"/>
+            <glyph glyph-code="E5B6" smufl-name="ornamentPrecompSlideTrillMarpurg"/>
+            <glyph glyph-code="E5B7" smufl-name="ornamentPrecompTurnTrillBach"/>
+            <glyph glyph-code="E5B8" smufl-name="ornamentPrecompSlideTrillBach"/>
+            <glyph glyph-code="E5B9" smufl-name="ornamentPrecompSlideTrillMuffat"/>
+            <glyph glyph-code="E5BA" smufl-name="ornamentPrecompSlideTrillSuffixMuffat"/>
+            <glyph glyph-code="E5BB" smufl-name="ornamentPrecompTrillSuffixDandrieu"/>
+            <glyph glyph-code="E5BC" smufl-name="ornamentPrecompPortDeVoixMordent"/>
+            <glyph glyph-code="E5BD" smufl-name="ornamentPrecompTrillWithMordent"/>
+            <glyph glyph-code="E5BE" smufl-name="ornamentPrecompCadence"/>
+            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn "/>
+            <glyph glyph-code="E5C0" smufl-name="ornamentPrecompDoubleCadenceLowerPrefix"/>
+            <glyph glyph-code="E5C1" smufl-name="ornamentPrecompCadenceUpperPrefix "/>
+            <glyph glyph-code="E5C2" smufl-name="ornamentPrecompCadenceUpperPrefixTurn"/>
+            <glyph glyph-code="E5C3" smufl-name="ornamentPrecompDoubleCadenceUpperPrefix"/>
+            <glyph glyph-code="E5C4" smufl-name="ornamentPrecompDoubleCadenceUpperPrefixTurn"/>
+            <glyph glyph-code="E5C5" smufl-name="ornamentPrecompMordentRelease"/>
+            <glyph glyph-code="E5C6" smufl-name="ornamentPrecompMordentUpperPrefix"/>
+            <glyph glyph-code="E5C7" smufl-name="ornamentPrecompInvertedMordentUpperPrefix"/>
+            <glyph glyph-code="E5C8" smufl-name="ornamentPrecompTrillLowerSuffix"/>
             <range_end>U+E5CF</range_end>
             <range_start>U+E5B0</range_start>
         </precomposedTrillsAndMordents>

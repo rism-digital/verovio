@@ -15,6 +15,9 @@
 
 namespace vrv {
 
+
+class TransPitch;
+
 enum RestLayer { RL_UNSET = -1, RL_sameLayer, RL_otherLayer };
 
 enum RestAccidental { RA_UNSET = -1, RA_none, RA_s, RA_f, RA_x, RA_n };
@@ -113,12 +116,22 @@ public:
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *);
+
+    /**
      * Get the vertical location for the rests that are located on other layers
      */
     int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
 
 private:
-    //
+
+     /**
+     * Helper function to update rest oloc/ploc based on the input TransPitch
+     */
+    void UpdateFromTransLoc(const TransPitch &tp);
+
     /**
      * Get the rest vertical location relative to location of elements placed on other layers
      */

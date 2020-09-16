@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Aug  4 22:27:48 PDT 2020
+// Last Modified: Sat Sep 12 19:49:01 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5573,6 +5573,34 @@ class Tool_cint : public HumTool {
 };
 
 
+class Tool_colortriads : public HumTool {
+	public:
+		         Tool_colortriads  (void);
+		        ~Tool_colortriads  () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		int      getDiatonicTransposition(HumdrumFile& infile);
+
+	private:
+		std::vector<bool> m_colorState;
+		std::vector<std::string> m_color;
+		std::vector<std::string> m_searches;
+		std::vector<std::string> m_marks;
+		bool m_filtersQ  = false;
+		bool m_commandsQ = false;
+		bool m_relativeQ = false;
+		std::string m_key;
+
+};
+
+
 class Tool_composite : public HumTool {
 	public:
 		       	   Tool_composite      (void);
@@ -5980,10 +6008,43 @@ class Tool_filter : public HumTool {
 		void     initialize         (HumdrumFile& infile);
 		void     removeGlobalFilterLines    (HumdrumFile& infile);
 		void     removeUniversalFilterLines (HumdrumFileSet& infiles);
+		void     splitPipeline      (vector<string>& clist, const string& command);
 
 	private:
 		string   m_variant;        // used with -v option.
 		bool     m_debugQ = false; // used with --debug option
+
+};
+
+
+class Tool_flipper : public HumTool {
+	public:
+		         Tool_flipper      (void);
+		        ~Tool_flipper      () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+
+		void     processLine        (HumdrumFile& infile, int index);
+		void     checkForFlipChanges(HumdrumFile& infile, int index);
+		bool     flipSubspines      (vector<vector<HTp>>& flipees);
+		void     flipSpineTokens    (vector<HTp>& subtokens);
+		void     extractFlipees     (vector<vector<HTp>>& flipees,
+		                             HumdrumFile& infile, int index);
+
+	private:
+		bool     m_allQ    = false;
+		bool     m_keepQ   = false;
+		bool     m_kernQ   = false;
+		std::string m_interp;
+		std::vector<bool> m_flipState;
+		std::vector<bool> m_fliplines;
 
 };
 
@@ -6692,49 +6753,241 @@ class Tool_metlev : public HumTool {
 
 
 
+
+class SonorityNoteData {
+	public:
+
+		SonorityNoteData(void) {
+			clear();
+		}
+
+		void clear(void) {
+			m_token = NULL;
+			m_tok.clear();
+			m_accidentalQ = false;
+			m_upperQ = false;
+			m_attackQ = false;
+			m_index = 0;
+			m_base7 = -1;
+			m_base12 = -1;
+			m_base40 = -1;
+		}
+
+		ostream& print(ostream& out) {
+			out << "NOTE:\t"   << m_token   << endl;
+			out << "\tINDEX:\t"  << m_index   << endl;
+			out << "\tSTRING:\t" << m_tok     << endl;
+			out << "\tATTACK:\t" << m_attackQ << endl;
+			out << "\tBASE7:\t"  << m_base7   << endl;
+			out << "\tBASE40:\t" << m_base40  << endl;
+			return out;
+		}
+
+		void setToken(HTp token, bool nullQ, int index) {
+			m_attackQ = true;
+			if (nullQ) {
+				m_attackQ = false;
+			}
+			m_token = token;
+			m_index = index;
+			if (token->isChord()) {
+				m_tok = token->getSubtoken(index);
+			} else {
+				m_tok = *token;
+				m_index = 0;
+			}
+			if (m_tok.find('_') != string::npos) {
+				m_attackQ = false;
+			}
+			if (m_tok.find(']') != string::npos) {
+				m_attackQ = false;
+			}
+			m_base7 = Convert::kernToBase7(m_tok);
+			m_base12 = Convert::kernToBase12(m_tok);
+			m_base40 = Convert::kernToBase40(m_tok);
+		}
+
+		void setString(std::string tok) {
+			// tok cannot be a chord or a null token
+			// This version is for vertical queries not for searching data.
+			m_attackQ = true;
+			m_token = NULL;
+			m_index = 0;
+			m_tok = tok;
+			if (m_tok.find('_') != string::npos) {
+				m_attackQ = false;
+			}
+			if (m_tok.find(']') != string::npos) {
+				m_attackQ = false;
+			}
+			m_base7 = Convert::kernToBase7(m_tok);
+			m_base12 = Convert::kernToBase12(m_tok);
+			m_base40 = Convert::kernToBase40(m_tok);
+
+			if (m_tok.find('n') != string::npos) {
+				m_accidentalQ = true;
+			} if (m_tok.find('-') != string::npos) {
+				m_accidentalQ = true;
+			} if (m_tok.find('#') != string::npos) {
+				m_accidentalQ = true;
+			}
+			for (int i=0; i<(int)m_tok.size(); i++) {
+				if (isupper(m_tok[i])) {
+					m_upperQ = true;
+				}
+				break;
+			}
+		}
+	
+		bool hasAccidental(void) {
+			// Set only with setText() input.
+			return m_accidentalQ;
+		}
+
+		bool hasUpperCase(void) {
+			// Set only with setText() input.
+			return m_upperQ;
+		}
+
+		bool isValid(void)     { return m_token != NULL;    }
+		HTp  getToken(void)    { return m_token;            }
+		std::string getText(void) { return m_tok;           }
+		int  getIndex(void)    { return m_index;            }
+		bool isAttack(void)    { return m_attackQ;          }
+		bool isSustain(void)   { return !m_attackQ;         }
+		int  getBase12(void)   { return (int)m_base12;      }
+		int  getBase12Pc(void) { return (int)m_base12 % 7;  }
+		int  getBase7(void)    { return (int)m_base7;       }
+		int  getBase7Pc(void)  { return (int)m_base7 % 7;   }
+		int  getBase40(void)   { return (int)m_base40;      }
+		int  getBase40Pc(void) { return (int)m_base40 % 40; }
+
+	private:
+		HTp m_token;
+		string m_tok;       // note string from token
+		bool m_accidentalQ; // note contains an accidental
+		bool m_upperQ;      // Diatonic note name contains an upper case letter
+		bool m_attackQ;     // true if note is an attack
+		char m_index;       // chord index of note (zero offset)
+		char m_base7;       // pitch in base-7 representation
+		char m_base12;      // pitch in base-12 representation
+		short int m_base40; // pitch in base-40 representation
+};
+
+
+
+class SonorityDatabase {
+	public:
+		SonorityDatabase(void) { clear(); }
+		void clear(void)       { m_notes.clear(); m_line = NULL; }
+		int getCount(void)     { return (int)m_notes.size(); }
+		int getNoteCount(void) { return (int)m_notes.size(); }
+		int getSize(void)      { return (int)m_notes.size(); }
+		bool isEmpty(void)     { return m_notes.empty(); }
+		HLp getLine(void)      { return m_line; }
+		SonorityNoteData& getLowest(void) { return m_lowest; };
+		void addNote          (const std::string& text);
+		void buildDatabase     (HLp line);
+		SonorityNoteData& operator[](int index) {
+			return m_notes.at(index);
+		}
+	protected:
+		void expandList(void) {
+			m_notes.resize(m_notes.size() + 1);
+		}
+
+	private:
+		SonorityNoteData m_lowest;
+		std::vector<SonorityNoteData> m_notes;
+		HLp m_line = NULL;
+};
+
+
+//////////////////////////////
+//
+// MSearchQueryToken -- one element of the music search.  This is a combined
+//    search of pitch, interval, rhythm and harmony.
+//
+
 class MSearchQueryToken {
 	public:
 		MSearchQueryToken(void) {
 			clear();
 		}
 		MSearchQueryToken(const MSearchQueryToken& token) {
-			anypitch  = false;
-			pc        = token.pc;
-			base      = token.base;
-			direction = token.direction;
-			duration  = token.duration;
-			rhythm    = token.rhythm;
-			anything  = token.anything;
+			anything    = token.anything;
+			anypitch    = token.anypitch;
+			anyinterval = token.anyinterval;
+			anyrhythm   = token.anyrhythm;
+			pc          = token.pc;
+			base        = token.base;
+			direction   = token.direction;
+			dinterval   = token.dinterval;
+			cinterval   = token.cinterval;
+			duration    = token.duration;
+			rhythm      = token.rhythm;
+			harmonic    = token.harmonic;
+			hpieces     = token.hpieces;
+			hquery      = token.hquery;
 		}
 		MSearchQueryToken& operator=(const MSearchQueryToken& token) {
 			if (this == &token) {
 				return *this;
 			}
-			pc        = token.pc;
-			base      = token.base;
-			direction = token.direction;
-			duration  = token.duration;
-			rhythm    = token.rhythm;
-			anything  = token.anything;
+			anything    = token.anything;
+			anypitch    = token.anypitch;
+			anyinterval = token.anyinterval;
+			anyrhythm   = token.anyrhythm;
+			pc          = token.pc;
+			base        = token.base;
+			direction   = token.direction;
+			dinterval   = token.dinterval;
+			harmonic    = token.harmonic;
+			hpieces     = token.hpieces;
+			hquery      = token.hquery;
+			cinterval   = token.cinterval;
+			duration    = token.duration;
+			rhythm      = token.rhythm;
 			return *this;
 		}
 		void clear(void) {
-			anypitch  = false;
-			pc        = NAN;
-			base      = 0;
-			direction = 0;
-			duration  = -1;
-			rhythm    = "";
-			anything  = false;
+			anything     = true;
+			anypitch     = true;
+			anyrhythm    = true;
+			anyinterval  = true;
+			pc           = NAN;
+			base         = 0;
+			direction    = -123456789; // interval direction
+			dinterval    = -123456789; // diatonic interval
+			cinterval    = -123456789; // chromatic interval
+			duration     = -1;
+			harmonic     = "";
+			hpieces.clear();
+			hquery.clear();
+			rhythm       = "";
 		}
+		void parseHarmonicQuery(void);
 
-		bool   anypitch;
+		bool   anything    = true;  // element can match any note/rest
+		bool   anypitch    = true;  // element can match any pitch class
+		bool   anyrhythm   = true;  // element can match any rhythm
+		bool   anyinterval = true;  // element can match any interval
+
+		// pitch features
 		double pc;           // NAN = rest
 		int    base;
-		int    direction;
+
+		// interval features:
+		int    direction;   // which melodic direction for interval?
+		int    dinterval;   // diatonic interval
+		int    cinterval;   // chromatic interval (base-40; up to 2 sharps/flats)
+		std::string harmonic; // harmonic query
+		std::vector<std::string> hpieces;
+		std::vector<SonorityNoteData> hquery;
+
+		// rhythm features:
 		HumNum duration;
-		string rhythm;
-		bool   anything;
+		std::string rhythm;
 };
 
 
@@ -6761,7 +7014,7 @@ class MSearchTextQuery {
 			word.clear();
 			link = false;
 		}
-		string word;
+		std::string word;
 		bool link = false;
 };
 
@@ -6790,7 +7043,7 @@ class TextInfo {
 			starttoken = NULL;
 			nexttoken = NULL;
 		}
-		string fullword;
+		std::string fullword;
 		HTp starttoken;
 		HTp nexttoken;
 };
@@ -6810,6 +7063,7 @@ class Tool_msearch : public HumTool {
 		void    initialize         (void);
 		void    doMusicSearch      (HumdrumFile& infile, NoteGrid& grid,
 		                            vector<MSearchQueryToken>& query);
+		bool    doHarmonicPitchSearch(MSearchQueryToken& query, HTp token);
 		void    doTextSearch       (HumdrumFile& infile, NoteGrid& grid,
 		                            vector<MSearchTextQuery>& query);
 		void    fillMusicQuery     (vector<MSearchQueryToken>& query);
@@ -6823,7 +7077,7 @@ class Tool_msearch : public HumTool {
 		                            const std::string& input);
 		void    fillTextQuery      (vector<MSearchTextQuery>& query,
 		                            const std::string& input);
-		bool    checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
+		bool    checkForMusicMatch(vector<NoteCell*>& notes, int index,
 		                            vector<MSearchQueryToken>& dpcQuery,
 		                            vector<NoteCell*>& match);
 		void    markMatch          (HumdrumFile& infile,
@@ -6834,12 +7088,27 @@ class Tool_msearch : public HumTool {
 		void    fillWordsForTrack  (vector<TextInfo*>& words,
 		                            HTp starttoken);
 		void    printQuery         (vector<MSearchQueryToken>& query);
+		void    addMusicSearchSummary(HumdrumFile& infile, int mcount, const std::string& marker);
+		void    addTextSearchSummary(HumdrumFile& infile, int mcount, const std::string& marker);
+		int     makeBase40Interval (int diatonic, const std::string& alteration);
+		std::string convertPitchesToIntervals(const std::string& input);
+		void    markNote           (HTp token, int index);
+		int     checkHarmonicPitchMatch (SonorityNoteData& query,
+		                           SonorityDatabase& sonorities, bool suppressQ);
+		bool    checkVerticalOnly  (const string& input);
 
 	private:
 	 	vector<HTp> m_kernspines;
 		string      m_text;
 		string      m_marker;
-		bool        m_debugQ = false;
+		bool        m_verticalOnlyQ = false;
+		bool        m_markQ      = false;
+		bool        m_quietQ     = false;
+		bool        m_debugQ     = false;
+		bool        m_nooverlapQ = false;
+		std::vector<SonorityDatabase> m_sonorities;
+		std::vector<bool> m_sonoritiesChecked;
+		std::vector<pair<HTp, int>> m_tomark;
 };
 
 
@@ -6971,6 +7240,7 @@ class Tool_musicxml2hum : public HumTool {
 		std::string cleanSpacesAndColons(const std::string& input);
 		void setEditorialAccidental  (int accidental, GridSlice* slice,
 		                              int partindex, int staffindex, int voiceindex);
+		void moveBreaksToEndOfPreviousMeasure(HumGrid& outdata);
 
 		bool convert          (ostream& out);
 		bool convertPart      (ostream& out, const std::string& partname,
@@ -7183,6 +7453,8 @@ class MeasureInfo {
 			tracks = tcount;
 		}
 		int num;          // measure number
+		string stopStyle;  // styling for end of last measure
+		string startStyle; // styling for start of first measure
 		int seg;          // measure segment
 		int start;        // starting line of segment
 		int stop;         // ending line of segment
@@ -7263,6 +7535,7 @@ class Tool_myank : public HumTool {
 		void      getSectionString     (string& sstring, HumdrumFile& infile,
 		                                int sec);
 		void      collapseSpines       (HumdrumFile& infile, int line);
+		void      printMeasureStart    (HumdrumFile& infile, int line, const string& style);
 
 	private:
 		int    debugQ      = 0;             // used with --debug option

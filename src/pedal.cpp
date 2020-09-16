@@ -32,6 +32,7 @@ Pedal::Pedal()
     : ControlElement("pedal-")
     , TimeSpanningInterface()
     , AttColor()
+    , AttExtSym()
     , AttPedalLog()
     , AttPedalVis()
     , AttPlacement()
@@ -39,6 +40,7 @@ Pedal::Pedal()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PEDALLOG);
     RegisterAttClass(ATT_PEDALVIS);
     RegisterAttClass(ATT_PLACEMENT);
@@ -54,6 +56,7 @@ void Pedal::Reset()
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
     ResetColor();
+    ResetExtSym();
     ResetPedalLog();
     ResetPedalVis();
     ResetPlacement();

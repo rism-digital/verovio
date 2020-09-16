@@ -589,10 +589,10 @@ void View::DrawHairpin(
         dc->StartGraphic(hairpin, "", hairpin->GetUuid(), false);
     // dc->DeactivateGraphic();
 
-    DrawObliquePolygon(
-        dc, x1, y1 - startY / 2, x2, y2 - endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
-    DrawObliquePolygon(
-        dc, x1, y1 + startY / 2, x2, y2 + endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    const double hairpinThickness
+        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_hairpinThickness.GetValue();
+    DrawObliquePolygon(dc, x1, y1 - startY / 2, x2, y2 - endY / 2, hairpinThickness);
+    DrawObliquePolygon(dc, x1, y1 + startY / 2, x2, y2 + endY / 2, hairpinThickness);
 
     // dc->ReactivateGraphic();
     if (graphic)
@@ -1076,12 +1076,12 @@ void View::DrawControlElementConnector(
         }
     }
 
-    int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // the length of the dash and the space between them - can be made a parameter
-    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
-    int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
-    int halfDashLength = dashLength / 2;
+    const int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
+    const int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
+    const int halfDashLength = dashLength / 2;
 
     int dist = x2 - x1;
     int nbDashes = dist / dashSpace;
@@ -1615,25 +1615,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
     // for a start always put fermatas up
-    int code = SMUFL_E4C0_fermataAbove;
-    // check for shape
-    if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-            code = SMUFL_E4C5_fermataShortBelow;
-        else
-            code = SMUFL_E4C4_fermataShortAbove;
-    }
-    else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-            code = SMUFL_E4C7_fermataLongBelow;
-        else
-            code = SMUFL_E4C6_fermataLongAbove;
-    }
-    else if (fermata->GetForm() == fermataVis_FORM_inv
-        || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-        code = SMUFL_E4C1_fermataBelow;
+    int code = fermata->GetFermataGlyph();
 
     std::wstring str;
     str.push_back(code);
@@ -1881,10 +1863,8 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
-    // set norm as default
-    int code = SMUFL_E56D_ornamentMordentInverted;
-    if (mordent->GetForm() == mordentLog_FORM_upper) code = SMUFL_E56C_ornamentMordent;
-    if (mordent->GetLong() == BOOLEAN_true) code = SMUFL_E56E_ornamentTremblement;
+    // set mordent glyph
+    int code = mordent->GetMordentGlyph();
 
     std::wstring str;
     str.push_back(code);
@@ -2190,7 +2170,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     }
 
     // for a start always put trill up
-    int code = SMUFL_E566_ornamentTrill;
+    int code = trill->GetTrillGlyph();
     std::wstring str;
 
     if (trill->GetLstartsym() != LINESTARTENDSYMBOL_none) {
@@ -2256,8 +2236,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     if (turn->GetDelayed() == BOOLEAN_true && !turn->HasTstamp()) LogWarning("delayed turns not supported");
 
     // set norm as default
-    int code = SMUFL_E567_ornamentTurn;
-    if (turn->GetForm() == turnLog_FORM_lower) code = SMUFL_E568_ornamentTurnInverted;
+    int code = turn->GetTurnGlyph();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the turn only with @startid
@@ -2453,7 +2432,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             continue;
         }
 
-        int y1 = ending->GetDrawingY();
+        const int y1 = ending->GetDrawingY();
 
         FontInfo currentFont = *m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize);
         // currentFont.SetWeight(FONTWEIGHT_bold);
@@ -2491,15 +2470,17 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         dc->ResetFont();
 
-        int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
+        const int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
+        const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue()
+            * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
 
-        DrawFilledRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize));
+        DrawFilledRectangle(dc, x1, y2, x2, y2 + lineWidth);
         if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-            DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y2);
+            DrawFilledRectangle(dc, x1, y1, x1 + lineWidth, y2);
         }
         if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END))
             && (ending->GetLendsym() != LINESTARTENDSYMBOL_none)) {
-            DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y1, x2, y2);
+            DrawFilledRectangle(dc, x2 - lineWidth, y1, x2, y2);
         }
     }
 
