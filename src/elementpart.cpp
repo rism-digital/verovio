@@ -346,7 +346,9 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
     if (GetDrawingStemDir() == STEMDIRECTION_down) {
         const int noteheadMargin = GetDrawingStemLen() - (glyphHeight + note->GetDrawingRadius(doc));
         if ((duration > DURATION_8) && (noteheadMargin < 0)) {
-            const int heightToAdjust = (noteheadMargin / adjustmentStep) * adjustmentStep;
+            int offset = 0;
+            if (noteheadMargin % adjustmentStep < -(adjustmentStep / 3 * 2)) offset = adjustmentStep / 2;
+            const int heightToAdjust = (noteheadMargin / adjustmentStep) * adjustmentStep - offset;
             SetDrawingStemLen(GetDrawingStemLen() - heightToAdjust);
             flag->SetDrawingYRel(-GetDrawingStemLen());
         }
