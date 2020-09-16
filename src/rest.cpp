@@ -570,7 +570,7 @@ int Rest::Transpose(FunctorParams *functorParams)
     ListOfObjects objects;
     ClassIdComparison matchClassId(LAYER);
     parentStaff->FindAllDescendantByComparison(&objects, &matchClassId);
-    const int layerCount = objects.size();
+    const int layerCount = (int)objects.size();
 
     Layer *firstLayer = vrv_cast<Layer *>(objects.front());
     Layer *lastLayer = vrv_cast<Layer *>(objects.back());
