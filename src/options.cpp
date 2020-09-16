@@ -644,10 +644,6 @@ Options::Options()
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
 
-    m_justifyIncludeLastPage.SetInfo("Justify including the last page", "Justify including the last page");
-    m_justifyIncludeLastPage.Init(false);
-    this->Register(&m_justifyIncludeLastPage, "justifyIncludeLastPage", &m_general);
-
     m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
     m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
