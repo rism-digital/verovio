@@ -173,7 +173,8 @@ private:
      */
     ///@{
     bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
-    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset);
+    bool ReadMusicXmlMeasure(
+        pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset, int index);
     ///@}
 
     /*
@@ -297,6 +298,21 @@ private:
     ///@}
     void GenerateUuid(pugi::xml_node node);
 
+     /*
+     * @name Helper method for multirests. Returns number of measure hidden by MRest before
+     * measure with certain index
+     */
+    ///@{
+    int GetMrestMeasuresCountBeforeIndex(int index) const;
+    ///@}
+
+    /*
+     * @name Helper method for multirests. Checks whether measure should be hidden as part of MRest
+     */
+    ///@{
+    bool IsMultirestMeasure(int index) const;
+    ///@}
+
     /*
      * @name Helper method for styling fermatas
      */
@@ -343,8 +359,6 @@ private:
     bool m_mRpt = false;
     /* measure repeats */
     bool m_slash = false;
-    /* measure rests */
-    int m_multiRest = 0;
     /* MIDI ticks */
     int m_ppq;
     /* measure time */
@@ -400,6 +414,8 @@ private:
     std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> > m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */
     std::map<Measure *, int> m_measureCounts;
+    /* measure rests */
+    std::map<int, int> m_multiRests;
 };
 
 } // namespace vrv

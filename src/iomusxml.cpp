@@ -174,7 +174,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     assert(i >= 0);
 
     // we just need to add a measure
-    if (section->GetChildCount(MEASURE) <= i) {
+    if (section->GetChildCount(MEASURE) <= i - GetMrestMeasuresCountBeforeIndex(i)) {
         section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
@@ -1200,15 +1200,30 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     int i = 0;
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
-        if (m_multiRest != 0) {
-            m_multiRest--;
-        }
-        else {
+        if (!IsMultirestMeasure(i)) {
             Measure *measure = new Measure();
             m_measureCounts[measure] = i;
-            ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
+            ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset, i);
             // Add the measure to the system - if already there from a previous part we'll just merge the content
             AddMeasure(section, measure, i);
+        }
+        else {
+            // Handle barline parsing for the multirests (where barline would be defined in last measure of the mRest)
+            // If this is last measure, find starting measure of the mRest (based on the Id) and add barline to it
+            auto lastElementIter = std::find_if(m_multiRests.begin(), m_multiRests.end(),
+                [i](const std::pair<int, int> &elem) { return i == elem.second; });
+            if (lastElementIter != m_multiRests.end()) {
+                auto measureIter = std::find_if(m_measureCounts.begin(), m_measureCounts.end(),
+                    [lastElementIter](
+                        const std::pair<Measure *, int> &elem) { return lastElementIter->first == elem.second; });
+                if (measureIter != m_measureCounts.end()) {
+                    for (auto it = xmlMeasure.node().begin(); it != xmlMeasure.node().end(); ++it) {
+                        if (IsElement(*it, "barline")) {
+                            ReadMusicXmlBarLine(*it, measureIter->first, std::to_string(lastElementIter->first));
+                        }
+                    }
+                }
+            }
         }
         i++;
     }
@@ -1275,7 +1290,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
 }
 
 bool MusicXmlInput::ReadMusicXmlMeasure(
-    pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset)
+    pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset, int index)
 {
     assert(node);
     assert(measure);
@@ -1309,17 +1324,30 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // reset measure time
     m_durTotal = 0;
 
+    const auto mrestPositonIter = m_multiRests.find(index);
+    bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
+    int multiRestStaffNumber = 1;
+
     // read the content of the measure
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // first check if there is a multi measure rest
         if (it->select_node(".//multiple-rest")) {
-            m_multiRest = it->select_node(".//multiple-rest").node().text().as_int();
+            const int multiRestLength = it->select_node(".//multiple-rest").node().text().as_int();
             MultiRest *multiRest = new MultiRest;
-            multiRest->SetNum(m_multiRest);
+            multiRest->SetNum(multiRestLength);
             Layer *layer = SelectLayer(1, measure);
             AddLayerElement(layer, multiRest);
-            --m_multiRest;
+            m_multiRests[index] = index + multiRestLength - 1;
             break;
+        }
+        else if (isMRestInOtherSystem) {
+            if ((multiRestStaffNumber > 1) && !IsElement(*it, "backup")) continue;
+            MultiRest *multiRest = new MultiRest;
+            multiRest->SetNum(mrestPositonIter->second - mrestPositonIter->first + 1);
+            Layer *layer = SelectLayer(multiRestStaffNumber, measure);
+            AddLayerElement(layer, multiRest);
+            if (multiRestStaffNumber < nbStaves) multiRestStaffNumber++;
+            continue;
         }
         if (IsElement(*it, "attributes")) {
             ReadMusicXmlAttributes(*it, section, measure, measureNum);
@@ -3739,6 +3767,25 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
         fermata->SetForm(fermataVis_FORM_norm);
         fermata->SetPlace(STAFFREL_above);
     }
+}
+
+bool MusicXmlInput::IsMultirestMeasure(int index) const
+{
+    for (const auto &multiRest : m_multiRests) {
+        if (index <= multiRest.first) return false;
+        if (index <= multiRest.second) return true;
+    }
+    return false;
+}
+
+int MusicXmlInput::GetMrestMeasuresCountBeforeIndex(int index) const
+{
+    int count = 0;
+    for (const auto &multiRest : m_multiRests) {
+        if (index <= multiRest.first) break;
+        count += multiRest.second - multiRest.first;
+    }
+    return count;
 }
 
 std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
