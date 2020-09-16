@@ -223,6 +223,7 @@ enum {
     SMUFL_E56D_ornamentMordentInverted = 0xE56D,
     SMUFL_E56E_ornamentTremblement = 0xE56E,
     SMUFL_E56F_ornamentHaydn = 0xE56F,
+    SMUFL_E587_ornamentSchleifer = 0xE587,
     SMUFL_E59D_ornamentZigZagLineNoRightEnd = 0xE59D,
     SMUFL_E59E_ornamentZigZagLineWithRightEnd = 0xE59E,
     SMUFL_E5B0_ornamentPrecompSlide = 0xE5B0,
@@ -257,8 +258,10 @@ enum {
     SMUFL_E614_stringsHarmonic = 0xE614,
     SMUFL_E645_vocalSprechgesang = 0xE645,
     SMUFL_E650_keyboardPedalPed = 0xE650,
+    SMUFL_E651_keyboardPedalP = 0xE651,
     SMUFL_E655_keyboardPedalUp = 0xE655,
     SMUFL_E659_keyboardPedalSost = 0xE659,
+    SMUFL_E65A_keyboardPedalS = 0xE65A,
     SMUFL_E880_tuplet0 = 0xE880,
     SMUFL_E881_tuplet1 = 0xE881,
     SMUFL_E882_tuplet2 = 0xE882,
@@ -355,7 +358,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 330
+#define SMUFL_COUNT 333
 
 } // namespace vrv
 
