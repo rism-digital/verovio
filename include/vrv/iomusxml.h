@@ -303,15 +303,15 @@ private:
      * measure with certain index
      */
     ///@{
-    ///@}
     int GetMrestMeasuresCountBeforeIndex(int index) const;
+    ///@}
 
     /*
-     * @name Helper method for multirests. Checks wheter measure should be hidden as part of MRest
+     * @name Helper method for multirests. Checks whether measure should be hidden as part of MRest
      */
     ///@{
-    ///@}
     bool IsMultirestMeasure(int index) const;
+    ///@}
 
     /*
      * @name Helper method for styling fermatas
