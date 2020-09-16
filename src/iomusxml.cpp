@@ -2022,7 +2022,17 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
-            if (pedalType == "sostenuto") pedal->SetFunc("sostenuto");
+            if (xmlPedal.node().attribute("abbreviated")) {
+                pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                pedal->SetExternalsymbols(pedal, "glyph.num", "U+E651");
+            }
+            if (pedalType == "sostenuto") {
+                pedal->SetFunc("sostenuto");
+                if (xmlPedal.node().attribute("abbreviated")) {
+                    pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                    pedal->SetExternalsymbols(pedal, "glyph.num", "U+E65A");
+                }
+            }
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -2033,7 +2043,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
             pedal->SetTstamp(timeStamp);
-            if (pedalLine && (pedalType == "stop")) pedal->SetTstamp(timeStamp - 0.1);
+            if (pedalType == "stop") pedal->SetTstamp(timeStamp - 0.1);
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -2907,8 +2917,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // place
         mordent->SetPlace(
             mordent->AttPlacement::StrToStaffrel(xmlExtOrnament.node().attribute("placement").as_string()));
-        bool isHaydn = std::string(xmlExtOrnament.node().name()) == "haydn";
-        mordent->SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E5B0");
+        const bool isHaydn = std::string(xmlExtOrnament.node().name()) == "haydn";
+        mordent->SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E587");
         mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
     }
 
