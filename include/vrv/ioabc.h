@@ -67,7 +67,7 @@ private:
 
     // parse information fields
     void parseInstruction(const std::string &keyString); // I:
-    void parseKey(std::string keyString); // K:
+    void parseKey(std::string &keyString); // K:
     void parseUnitNoteLength(const std::string &unitNoteLength); // L:
     void parseMeter(const std::string &meterString); // M:
     void parseTempo(const std::string &tempoString); // Q:

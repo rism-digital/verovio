@@ -556,7 +556,7 @@ void ABCInput::parseInstruction(const std::string &instruction)
     }
 }
 
-void ABCInput::parseKey(std::string keyString)
+void ABCInput::parseKey(std::string &keyString)
 {
     int i = 0;
     m_ID = "";
