@@ -58,7 +58,7 @@ private:
     // parsing functions
     int SetBarLine(const std::string &musicCode, int index);
     void CalcUnitNoteLength();
-    void AddAnnot(std::string remark);
+    void AddAnnot(const std::string remark);
     void AddBeam();
     void AddTuplet();
     void AddTie();
@@ -68,10 +68,10 @@ private:
     // parse information fields
     void parseInstruction(std::string keyString); // I:
     void parseKey(std::string keyString); // K:
-    void parseUnitNoteLength(std::string unitNoteLength); // L:
-    void parseMeter(std::string meterString); // M:
-    void parseTempo(std::string tempoString); // Q:
-    void parseReferenceNumber(std::string referenceNumberString); // X:
+    void parseUnitNoteLength(const std::string unitNoteLength); // L:
+    void parseMeter(const std::string meterString); // M:
+    void parseTempo(const std::string tempoString); // Q:
+    void parseReferenceNumber(const std::string referenceNumberString); // X:
 
     // input functions
     void readInformationField(char dataKey, std::string dataValue);
