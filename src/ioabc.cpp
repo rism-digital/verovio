@@ -344,7 +344,7 @@ void ABCInput::AddTuplet()
     m_noteStack.clear();
 }
 
-void ABCInput::AddAnnot(const std::string remark)
+void ABCInput::AddAnnot(const std::string &remark)
 {
     // remarks
     Annot *annot = new Annot();
@@ -474,7 +474,7 @@ void ABCInput::EndSlur()
     LogWarning("ABC input: Closing slur for element '%s' could not be matched", m_ID.c_str());
 }
 
-void ABCInput::parseDecoration(const std::string decorationString)
+void ABCInput::parseDecoration(const std::string &decorationString)
 {
     // shorthand decorations hard-coded !
     if (isdigit(decorationString[0])) {
@@ -535,7 +535,7 @@ void ABCInput::parseDecoration(const std::string decorationString)
 // parse information fields
 //
 
-void ABCInput::parseInstruction(const std::string instruction)
+void ABCInput::parseInstruction(const std::string &instruction)
 {
     if (!strncmp(instruction.c_str(), "abc-include", 11)) {
         LogWarning("ABC input: Include field is ignored");
@@ -713,7 +713,7 @@ void ABCInput::parseKey(std::string keyString)
     }
 }
 
-void ABCInput::parseUnitNoteLength(const std::string unitNoteLength)
+void ABCInput::parseUnitNoteLength(const std::string &unitNoteLength)
 {
     if (unitNoteLength.find('/'))
         m_unitDur = atoi(&unitNoteLength[unitNoteLength.find('/') + 1]);
@@ -734,7 +734,7 @@ void ABCInput::parseUnitNoteLength(const std::string unitNoteLength)
     // m_doc->m_scoreDef.SetDurDefault(m_durDefault);
 }
 
-void ABCInput::parseMeter(const std::string meterString)
+void ABCInput::parseMeter(const std::string &meterString)
 {
     m_meter = new MeterSig();
     if (meterString.find('C') != std::string::npos) {
@@ -760,7 +760,7 @@ void ABCInput::parseMeter(const std::string meterString)
     }
 }
 
-void ABCInput::parseTempo(const std::string tempoString)
+void ABCInput::parseTempo(const std::string &tempoString)
 {
     Tempo *tempo = new Tempo();
     if (tempoString.find('=') != std::string::npos) {
@@ -782,7 +782,7 @@ void ABCInput::parseTempo(const std::string tempoString)
     LogWarning("ABC input: Tempo definitions are not fully supported yet");
 }
 
-void ABCInput::parseReferenceNumber(const std::string referenceNumberString)
+void ABCInput::parseReferenceNumber(const std::string &referenceNumberString)
 {
     // The X: field is also used to indicate the start of the tune
     m_mdiv = new Mdiv();
@@ -957,7 +957,7 @@ void ABCInput::CreateWorkEntry()
 // followed by a single colon
 //
 
-void ABCInput::readInformationField(char dataKey, std::string value)
+void ABCInput::readInformationField(const char &dataKey, std::string value)
 {
     // remove comments and trim
     if (dataKey == '%' || dataKey == '\0')
