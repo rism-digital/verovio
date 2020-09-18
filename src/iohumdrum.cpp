@@ -604,6 +604,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeRScale();
     infile.analyzeCrossStaffStemDirections();
     infile.analyzeBarlines();
+    analyzeClefNulls(infile);
     if (infile.hasDifferentBarlines()) {
         adjustMeasureTimings(infile);
     }
@@ -718,27 +719,7 @@ bool HumdrumInput::convertHumdrum()
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
         m_measureIndex++;
         status &= convertSystemMeasure(line);
-        if ((line < infile.getLineCount() - 1) && (infile[line + 1].isGlobalComment())) {
-            // Check for page/system break, and add <sb/> if found.
-            // (currently mapping page breaks to system breaks.)
-            hum::HTp token = infile.token(line + 1, 0);
-            if (token->compare(0, 12, "!!linebreak:") == 0) {
-                Sb *sb = new Sb;
-                m_sections.back()->AddChild(sb);
-                if (token->find("original")) {
-                    // maybe allow other types of system breaks here
-                    sb->SetType("original");
-                }
-            }
-            else if (token->compare(0, 12, "!!pagebreak:") == 0) {
-                Sb *sb = new Sb;
-                m_sections.back()->AddChild(sb);
-                if (token->find("original")) {
-                    // maybe allow other types of page breaks here
-                    sb->SetType("original");
-                }
-            }
-        }
+        checkForBreak(infile, line);
     }
     processHangingTieStarts();
 
@@ -760,6 +741,102 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForBreak -- Search for a linebreak or a pagebreak marker,
+//     such as:
+//          !!linebreak:
+//          !!pagebreak:
+// There are also layout parameters for barlines that function as line breaks.
+// This one is primarily from MusicXML conversion, and can be removed or converted
+// to the layout system as need.  Search for a break message anywhere
+// around the barline but before any data is found.
+//
+
+void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
+{
+    if (line >= infile.getLineCount() - 1) {
+        return;
+    }
+    hum::HumNum timestamp = infile[line].getDurationFromStart();
+    hum::HumNum ts2;
+    int linebreaki = -1;
+    int pagebreaki = -1;
+
+    for (int i = line; i < infile.getLineCount(); i++) {
+        if (infile[i].isData()) {
+            break;
+        }
+        if (!infile[i].isGlobalComment()) {
+            continue;
+        }
+        ts2 = infile[i].getDurationFromStart();
+        if (ts2 != timestamp) {
+            break;
+        }
+        hum::HTp token = infile[i].token(0);
+        if (token->compare(0, 12, "!!linebreak:") == 0) {
+            linebreaki = i;
+            break;
+        }
+        else if (token->compare(0, 12, "!!pagebreak:") == 0) {
+            pagebreaki = i;
+            break;
+        }
+    }
+
+    if ((linebreaki == -1) && (pagebreaki == -1)) {
+        for (int i = line - 1; i > 0; i--) {
+            if (infile[i].isData()) {
+                break;
+            }
+            if (!infile[i].isGlobalComment()) {
+                continue;
+            }
+            ts2 = infile[i].getDurationFromStart();
+            if (ts2 != timestamp) {
+                break;
+            }
+            hum::HTp token = infile[i].token(0);
+            if (token->compare(0, 12, "!!linebreak:") == 0) {
+                linebreaki = i;
+                break;
+            }
+            else if (token->compare(0, 12, "!!pagebreak:") == 0) {
+                pagebreaki = i;
+                break;
+            }
+        }
+    }
+
+    if ((linebreaki == -1) && (pagebreaki == -1)) {
+        return;
+    }
+
+    if (linebreaki > 0) {
+        hum::HTp token = infile[linebreaki].token(0);
+        Sb *sb = new Sb;
+        setLocationId(sb, token);
+        m_sections.back()->AddChild(sb);
+        // Maybe allow other types of line breaks here, but
+        // typically break groups should be done with !LO: system.
+        if (token->find("original") != std::string::npos) {
+            addType(sb, "original");
+        }
+    }
+    else if (pagebreaki > 0) {
+        hum::HTp token = infile[pagebreaki].token(0);
+        Pb *pb = new Pb;
+        setLocationId(pb, token);
+        m_sections.back()->AddChild(pb);
+        // Maybe allow other types of line breaks here, but
+        // typically break groups should be done with !LO: system.
+        if (token->find("original") != std::string::npos) {
+            addType(pb, "original");
+        }
+    }
 }
 
 //////////////////////////////
@@ -801,11 +878,11 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
     if (scordur == tobegin + duration) {
         // This is a hanging tie the goes off of the end of the music
         Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
-        tie->SetType("hanging-terminal");
+        addType(tie, "hanging-terminal");
     }
     else if (atEndingBoundaryEnd(token)) {
         Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
-        tie->SetType("hanging-terminal-ending");
+        addType(tie, "hanging-terminal-ending");
     }
     else {
         // This is a hanging tie for no apparent reason.  Display it, but make
@@ -815,7 +892,7 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         }
         else {
             Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
-            tie->SetType("hanging");
+            addType(tie, "hanging");
             tie->SetColor("red");
         }
     }
@@ -877,6 +954,12 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
     tie->SetTstamp2(ts2); // attach start to beginning of measure
     tie->SetStartid("#" + startid);
 
+    int track = token->getTrack();
+    std::vector<int> &rkern = m_rkern;
+    int staffindex = rkern[track];
+    int staffnum = staffindex + 1;
+    setStaff(tie, staffnum);
+
     return tie;
 }
 
@@ -888,11 +971,12 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
 void HumdrumInput::processHangingTieEnd(
     Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit)
 {
+    Tie *tie = NULL;
     hum::HumNum position = token->getDurationFromStart();
     if (position == 0) {
         // Hanging tie at start of music.
-        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
-        tie->SetType("hanging-initial");
+        tie = tieToPreviousItem(token, subindex, meterunit);
+        addType(tie, "hanging-initial");
     }
     else if (atEndingBoundaryStart(token)) {
         // The note is at the start of a secondary ending, and
@@ -900,15 +984,23 @@ void HumdrumInput::processHangingTieEnd(
         // measure before the first ending.  Also need to force
         // a tie split across ending boundaries (currently they will
         // automatically merge).
-        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
-        tie->SetType("hanging-initial-ending");
+        tie = tieToPreviousItem(token, subindex, meterunit);
+        addType(tie, "hanging-initial-ending");
     }
     else {
         // This is a hanging tie for no apparent reason.  Display it, but make
         // it red. L.v. will be handled differently as an ornament.
-        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
-        tie->SetType("hanging");
+        tie = tieToPreviousItem(token, subindex, meterunit);
+        addType(tie, "hanging");
         tie->SetColor("red");
+    }
+
+    if (tie != NULL) {
+        int track = token->getTrack();
+        std::vector<int> &rkern = m_rkern;
+        int staffindex = rkern[track];
+        int staffnum = staffindex + 1;
+        setStaff(tie, staffnum);
     }
 }
 
@@ -4096,6 +4188,21 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HTp part = partstart;
     while (part && !part->getLine()->isData()) {
         if (part->compare(0, 5, "*clef") == 0) {
+
+            if (cleftok) {
+                if (clef == *part) {
+                    // there is already a clef found, and it is the same
+                    // as this one, so ignore the second one.
+                }
+                else {
+                    // mark clef as a clef change to print in the layer
+                    part->setValue("auto", "clefChange", 1);
+                    markOtherClefsAsChange(part);
+                }
+                part = part->getNextToken();
+                continue;
+            }
+
             if (hre.search(part, 5, "\\d")) {
                 clef = *part;
                 cleftok = part;
@@ -4784,12 +4891,65 @@ template <class ELEMENT>
 void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok)
 {
 
-    Mensur *vrvmensur = getMensur(element);
+    Mensur *vrvmensur = getMensur(element, mensurtok);
     if (!vrvmensur) {
         return;
     }
     if (mensurtok) {
         setLocationId(vrvmensur, mensurtok);
+    }
+
+    if (metersig == "*met(C)" || metersig == "C") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        return;
+    }
+    if (metersig == "*met(C|)" || metersig == "C|") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(O)" || metersig == "O") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        return;
+    }
+    if (metersig == "*met(O|)" || metersig == "O|") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(O.)" || metersig == "O.") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        return;
+    }
+    if (metersig == "*met(O.|)" || metersig == "O.|") {
+        vrvmensur->SetTempus(TEMPUS_3);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(C.)" || metersig == "C.") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        return;
+    }
+    if (metersig == "*met(C.|)" || metersig == "C.|") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_3);
+        vrvmensur->SetSlash(1);
+        return;
+    }
+    if (metersig == "*met(C|3/2)" || metersig == "C|3/2") {
+        vrvmensur->SetTempus(TEMPUS_2);
+        vrvmensur->SetProlatio(PROLATIO_2);
+        vrvmensur->SetNum(3);
+        vrvmensur->SetNumbase(2);
+        vrvmensur->SetSlash(1);
+        return;
     }
 
     if (metersig.find('C') != std::string::npos) {
@@ -5353,6 +5513,7 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 void HumdrumInput::checkForLayoutBreak(int line)
 {
     hum::HumdrumFile &infile = m_infiles[0];
+
     if (line >= infile.getLineCount()) {
         return;
     }
@@ -5366,17 +5527,29 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
-        m_sections.back()->AddChild(sb);
-        sb->SetType(tstring);
+        if (m_currentending) {
+            m_currentending->AddChild(sb);
+        }
+        else {
+            m_sections.back()->AddChild(sb);
+        }
+        setLocationId(sb, token);
+        addType(sb, tstring);
         return;
     }
 
     group = token->getLayoutParameter("PB", "g");
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
-        Sb *sb = new Sb;
-        m_sections.back()->AddChild(sb);
-        sb->SetType(tstring);
+        Pb *pb = new Pb;
+        if (m_currentending) {
+            m_currentending->AddChild(pb);
+        }
+        else {
+            m_sections.back()->AddChild(pb);
+        }
+        setLocationId(pb, token);
+        addType(pb, tstring);
         return;
     }
 }
@@ -5456,11 +5629,27 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (index >= 0) {
             setLocationId(tempo, infile.token(index, 0));
         }
-        m_measure->AddChildBack(tempo);
+        addChildBackMeasureOrSection(tempo);
         setTempoContent(tempo, value);
         tempo->SetTstamp(1.0);
         setStaff(tempo, 1);
         m_omd = infile[index].getDurationFromStart();
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addChildBackMeasureOrSection -- Add to the current measure, or add to section
+//     if there is not measure.
+//
+
+template <class ELEMENT> void HumdrumInput::addChildBackMeasureOrSection(ELEMENT element)
+{
+    if (m_measure) {
+        m_measure->AddChildBack(element);
+    }
+    else {
+        m_sections.back()->AddChild(element);
     }
 }
 
@@ -5515,8 +5704,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     lt.clear();
     lt.resize(staffstarts.size());
 
-    int i, j;
-    for (i = 0; i < (int)staffstarts.size(); ++i) {
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
         lt[i].clear();
     }
 
@@ -5524,12 +5712,51 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     int track = -1;
     int staffindex = -1;
     int layerindex = 0;
-    for (i = startline; i <= endline; ++i) {
+
+    // First need to pre-allocate layer information so that clefs can
+    // be inserted into partial layers (which otherwise may not have
+    // been created before the clef needs to be inserted).
+
+    for (int i = startline; i <= endline; ++i) {
+        if ((i > startline) || (i < endline)) {
+            if (infile[i].isData() && infile[i - 1].isData()) {
+                // spining cannot change between data lines
+                // so do not bother to check.
+                continue;
+            }
+        }
+        // check for the maximum size of each spine (check staff
+        // for maximum layer count):
+        lasttrack = -1;
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            hum::HTp token = infile[i].token(j);
+            if (!token->isStaff()) {
+                continue;
+            }
+            track = token->getTrack();
+            if (track != lasttrack) {
+                layerindex = 0;
+            }
+            else {
+                layerindex++;
+            }
+            if (track != lasttrack) {
+                lasttrack = track;
+                continue;
+            }
+            staffindex = rkern[track];
+            if ((int)lt[staffindex].size() < layerindex + 1) {
+                lt[staffindex].resize(lt[staffindex].size() + 1);
+            }
+        }
+    }
+
+    for (int i = startline; i <= endline; ++i) {
         if (!infile[i].hasSpines()) {
             continue;
         }
         lasttrack = -1;
-        for (j = 0; j < infile[i].getFieldCount(); ++j) {
+        for (int j = 0; j < infile[i].getFieldCount(); ++j) {
             hum::HTp token = infile[i].token(j);
             track = token->getTrack();
             if (track < 1) {
@@ -5570,10 +5797,15 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 }
             }
             lt[staffindex][layerindex].push_back(token);
+
             if ((layerindex == 0) && (token->isClef())) {
+
+                int layercount = getCurrentLayerCount(token);
+
                 // Duplicate clef in all layers (needed for cases when
                 // a secondary layer ends before the end of a measure.
-                for (int k = 1; k < (int)lt[staffindex].size(); k++) {
+
+                for (int k = layercount; k < (int)lt[staffindex].size(); k++) {
                     lt[staffindex][k].push_back(token);
                 }
             }
@@ -5583,6 +5815,29 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     if (m_debug) {
         printMeasureTokens();
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getCurrentLayerCount -- Given a token in layer 1
+//    of a staff, count how many active layers there are at the
+//    same time.
+//
+
+int HumdrumInput::getCurrentLayerCount(hum::HTp token)
+{
+    int output = 1;
+    int ttrack = token->getTrack();
+    hum::HTp current = token->getNextFieldToken();
+    while (current) {
+        int track = current->getTrack();
+        if (track != ttrack) {
+            break;
+        }
+        output++;
+        current = current->getNextFieldToken();
+    }
+    return output;
 }
 
 //////////////////////////////
@@ -5613,7 +5868,7 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
     std::vector<Staff *> stafflist(staffstarts.size());
     for (i = 0; i < (int)staffstarts.size(); ++i) {
         stafflist[i] = new Staff();
-        m_measure->AddChild(stafflist[i]);
+        addChildMeasureOrSection(stafflist[i]);
     }
 
     checkForOmd(startline, endline);
@@ -5716,7 +5971,7 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
         current = current->getPreviousFieldToken();
     }
 
-    m_measure->AddChild(harm);
+    addChildMeasureOrSection(harm);
     int staffindex = 0;
     if (kerntrack >= 0) {
         staffindex = m_rkern[kerntrack];
@@ -5726,6 +5981,21 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
     setStaff(harm, staffindex + 1);
     setLocationId(harm, token);
     setLocationId(fb, token);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addChildMeasureOrSection -- Add element to measure if exists; otherwise, add to section.
+//
+
+template <class ELEMENT> void HumdrumInput::addChildMeasureOrSection(ELEMENT element)
+{
+    if (m_measure) {
+        m_measure->AddChild(element);
+    }
+    else {
+        m_sections.back()->AddChild(element);
+    }
 }
 
 //////////////////////////////
@@ -5894,7 +6164,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                 }
             }
 
-            m_measure->AddChild(harm);
+            addChildMeasureOrSection(harm);
             int staffindex = m_rkern[kerntrack];
             if (m_placement.at(spinetrack)) {
                 m_fbstates.at(staffindex) = m_placement.at(spinetrack);
@@ -6010,7 +6280,7 @@ void HumdrumInput::insertFingerNumberInMeasure(
     else {
         setPlace(dir, "below");
     }
-    m_measure->AddChild(dir);
+    addChildMeasureOrSection(dir);
     setLocationId(dir, token);
 
     // Previously used @tstamp, now use @startid of note/chord;
@@ -6125,7 +6395,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
             content = cleanStringString(*token);
             text->SetText(content);
             harm->AddChild(text);
-            m_measure->AddChild(harm);
+            addChildMeasureOrSection(harm);
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             harm->SetTstamp(tstamp.getFloat());
             appendTypeTag(harm, "string");
@@ -6195,7 +6465,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             Harm *harm = new Harm;
             Text *text = new Text;
 
-            m_measure->AddChild(harm);
+            addChildMeasureOrSection(harm);
 
             int line = token->getLineIndex();
             int field = token->getFieldIndex();
@@ -7790,7 +8060,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             addSpace(elements, pointers, prespace.at(i));
         }
         if (layerdata[i]->isData() && layerdata[i]->isNull()) {
-            // print any global text directions attacked to the null token
+            // print any global text directions attached to the null token
             // and then skip to next token.
             processDirections(layerdata[i], staffindex);
             continue;
@@ -7828,6 +8098,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
             }
+
+            bool forceClefChange = false;
+            if (layerdata[i]->isClef()) {
+                if (layerdata[i]->getValueBool("auto", "clefChange")) {
+                    forceClefChange = true;
+                }
+            }
+
             if (layerdata[i]->isMens()) {
                 if (layerdata[i]->isClef()) {
                     if (ss.at(m_currentstaff - 1).last_clef != *layerdata[i]) {
@@ -7835,18 +8113,27 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         setLocationId(clef, layerdata[i]);
                     }
                 }
+                if (layerdata[i]->isMensurationSymbol() && (layerdata[i]->getDurationFromStart() > 0)) {
+                    // add mensuration change to layer.
+                    setMensurationSymbol(m_layer, *layerdata[i], layerdata[i]);
+                }
             }
-            else if (layerdata[i]->getDurationFromStart() != 0) {
+            else if (forceClefChange || (layerdata[i]->getDurationFromStart() != 0)) {
                 if (layerdata[i]->isClef()) {
                     int subtrack = layerdata[i]->getSubtrack();
                     if (subtrack) {
                         subtrack--;
                     }
-                    if (subtrack) {
-                        // ignore clef changes in subtracks and only
-                        // use the one in the primary track
-                        continue;
-                    }
+
+                    // this code is no longer needed, since it can ignore
+                    // clef changes in partial layers.
+                    // if (subtrack) {
+                    //		cerr << "IGNORING CLEF IN SUBTRACK " << subtrack << endl;
+                    //     // ignore clef changes in subtracks and only
+                    //    // use the one in the primary track
+                    //   continue;
+                    // }
+
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
 
                     setLocationId(clef, layerdata[i]);
@@ -8345,12 +8632,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         // styling here...
         if ((layerdata.back()->find(":|") != std::string::npos)
             || (layerdata.back()->find(":!") != std::string::npos)) {
-            m_measure->SetRight(BARRENDITION_rptend);
+            if (m_measure) {
+                m_measure->SetRight(BARRENDITION_rptend);
+            }
         }
     }
     if ((layerindex == 0) && (!layerdata.empty()) && (layerdata[0]->at(0) == '=')) {
         if ((layerdata[0]->find("|:") != std::string::npos) || (layerdata[0]->find("!:") != std::string::npos)) {
-            m_measure->SetLeft(BARRENDITION_rptstart);
+            if (m_measure) {
+                m_measure->SetLeft(BARRENDITION_rptstart);
+            }
         }
     }
 
@@ -8440,7 +8731,7 @@ void HumdrumInput::addSlur(FTrem *ftrem, hum::HTp start, hum::HTp ending)
     slur->SetStartid("#" + firstid);
     // check for slur direction here
 
-    slur->SetType("ftrem");
+    addType(slur, "ftrem");
     setStaff(slur, m_currentstaff);
     m_ftrem_slurs.push_back(slur);
 }
@@ -8565,9 +8856,7 @@ void HumdrumInput::handleLigature(hum::HTp token)
     ligature->SetLform(LINEFORM_solid);
     ligature->SetFunc("ligature");
 
-    if (m_measure) {
-        m_measure->AddChild(ligature);
-    }
+    addChildMeasureOrSection(ligature);
 }
 
 //////////////////////////////
@@ -8589,7 +8878,7 @@ void HumdrumInput::handleColoration(hum::HTp token)
         if (colend->compare("*Xcol") == 0) {
             break;
         }
-        if (colend->isNote()) {
+        if (colend->isNote() || colend->isRest()) {
             if (!firstnote) {
                 firstnote = colend;
             }
@@ -8627,9 +8916,22 @@ void HumdrumInput::handleColoration(hum::HTp token)
     coloration->SetUuid(id);
 
     // not considering if notes are in chords (which they should not)
-    std::string startid = getLocationId("note", firstnote);
+    std::string startid;
+    if (firstnote->isNote()) {
+        startid = getLocationId("note", firstnote);
+    }
+    else {
+        startid = getLocationId("rest", firstnote);
+    }
     coloration->SetStartid("#" + startid);
-    std::string endid = getLocationId("note", lastnote);
+
+    std::string endid;
+    if (lastnote->isNote()) {
+        endid = getLocationId("note", lastnote);
+    }
+    else {
+        endid = getLocationId("rest", lastnote);
+    }
     coloration->SetEndid("#" + endid);
 
     // data_LINEWIDTH lw;
@@ -8637,9 +8939,7 @@ void HumdrumInput::handleColoration(hum::HTp token)
     // coloration->SetLwidth(lw);
     coloration->SetFunc("coloration");
 
-    if (m_measure) {
-        m_measure->AddChild(coloration);
-    }
+    addChildMeasureOrSection(coloration);
 }
 
 //////////////////////////////
@@ -9371,13 +9671,13 @@ void HumdrumInput::colorVerse(Verse *verse, std::string &token)
 template <class ELEMENT> void HumdrumInput::appendTypeTag(ELEMENT *note, const std::string &tag)
 {
     if (note->GetType().empty()) {
-        note->SetType(tag); // Allow type to be set from data later.
+        addType(note, tag); // Allow type to be set from data later.
     }
     else {
         std::string newtag = note->GetType();
         newtag += " ";
         newtag += tag;
-        note->SetType(newtag);
+        addType(note, newtag);
     }
 }
 
@@ -9861,14 +10161,14 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 
     if (placement == "above") {
         setPlace(dir, "above");
-        m_measure->AddChildBack(dir);
+        addChildBackMeasureOrSection(dir);
     }
     else if (placement == "below") {
         setPlace(dir, "below");
-        m_measure->AddChild(dir);
+        addChildMeasureOrSection(dir);
     }
     else {
-        m_measure->AddChild(dir);
+        addChildMeasureOrSection(dir);
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
@@ -10070,6 +10370,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     string key;
     string value;
     string typevalue;
+    string verboseType;
+    string ovalue;
+    string svalue;
 
     for (int i = 0; i < hps->getCount(); ++i) {
         key = hps->getParameterName(i);
@@ -10124,6 +10427,13 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
         if (key == "v") {
             verboseQ = true;
+            verboseType = value;
+        }
+        if (key == "o") {
+            ovalue = value;
+        }
+        if (key == "s") {
+            svalue = value;
         }
         if (key == "problem") {
             problemQ = true;
@@ -10169,7 +10479,20 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (sicQ) {
-        text = "S";
+        if (verboseType == "text") {
+            if (!ovalue.empty()) {
+                text = ovalue;
+            }
+            else if (!svalue.empty()) {
+                text = svalue;
+            }
+            else {
+                text = "S";
+            }
+        }
+        else {
+            text = "S";
+        }
     }
 
     int maxstaff = (int)m_staffstarts.size() - 1;
@@ -10221,24 +10544,18 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     // bool sicQ = false;
 
     if (problemQ) {
-        dir->SetType("problem");
+        addType(dir, "problem");
     }
 
     if (sicQ) {
-        dir->SetType("sic");
+        addType(dir, "sic");
     }
 
     if (!typevalue.empty()) {
-        dir->SetType(typevalue);
-    }
-    else if (problemQ) {
-        dir->SetType("problem");
-    }
-    else if (sicQ) {
-        dir->SetType("sic");
+        addType(dir, typevalue);
     }
 
-    m_measure->AddChild(dir);
+    addChildMeasureOrSection(dir);
     if (placement == "above") {
         setPlace(dir, "above");
     }
@@ -10305,7 +10622,7 @@ bool HumdrumInput::addTempoDirection(const string &text, const string &placement
 
     bool status = setTempoContent(tempo, text);
     if (status) {
-        m_measure->AddChild(tempo);
+        addChildMeasureOrSection(tempo);
         return true;
     }
     else {
@@ -10516,23 +10833,23 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     std::string problem = token->getLayoutParameter("TX", "problem");
     if (problem == "true") {
         problemQ = true;
-        dir->SetType("problem");
+        addType(dir, "problem");
     }
 
     bool sicQ = false;
     std::string sic = token->getLayoutParameter("SIC", "sic");
     if (sic == "true") {
         sicQ = true;
-        dir->SetType("sic");
+        addType(dir, "sic");
     }
 
     // convert to HPS input value in the future:
     std::string typevalue = token->getLayoutParameter("TX", "type");
     if (!typevalue.empty()) {
-        dir->SetType(typevalue);
+        addType(dir, typevalue);
     }
 
-    m_measure->AddChild(dir);
+    addChildMeasureOrSection(dir);
     if (placement == "above") {
         setPlace(dir, "above");
     }
@@ -10670,7 +10987,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
 
         Dynam *dynam = new Dynam;
-        m_measure->AddChild(dynam);
+        addChildMeasureOrSection(dynam);
         setStaff(dynam, m_currentstaff + belowadj);
 
         if (needsrend) {
@@ -10723,13 +11040,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool active = true;
     for (int i = startfield; i < line->getFieldCount(); ++i) {
         belowadj = 0;
-        string exinterp = line->token(i)->getDataType();
+        hum::HTp dyntok = line->token(i);
+        string exinterp = dyntok->getDataType();
         if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
             active = false;
         }
-        if (line->token(i)->isKern()) {
+        if (dyntok->isKern()) {
             active = true;
-            ttrack = line->token(i)->getTrack();
+            ttrack = dyntok->getTrack();
             if (ttrack != track) {
                 if (ttrack != lasttrack) {
                     trackdiff++;
@@ -10743,30 +11061,30 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
             }
             // Break if this is not the last layer for the current spine
-            if (!line->token(i)->isNull()) {
+            if (!dyntok->isNull()) {
                 break;
             }
         }
         if (!active) {
             continue;
         }
-        if (!(line->token(i)->isDataType("**dynam") || line->token(i)->isDataType("**dyn"))) {
+        if (!(dyntok->isDataType("**dynam") || dyntok->isDataType("**dyn"))) {
             continue;
         }
         // Don't skip NULL tokens, because this algorithm only prints dynamics
         // after the last layer, and there could be notes in earlier layer
         // that need the dynamic.
-        // if (line->token(i)->isNull()) {
+        // if (dyntok->isNull()) {
         //     continue;
         // }
 
         std::string tok = *line->token(i);
-        if (line->token(i)->getValueBool("auto", "DY", "processed")) {
+        if (dyntok->getValueBool("auto", "DY", "processed")) {
             return;
         }
-        line->token(i)->setValue("auto", "DY", "processed", "true");
+        dyntok->setValue("auto", "DY", "processed", "true");
 
-        // int pcount = line->token(i)->getLinkedParameterSetCount();
+        // int pcount = dyntok->getLinkedParameterSetCount();
 
         std::string hairpins;
         std::string letters;
@@ -10778,76 +11096,32 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpins.push_back(tok[i]);
             }
         }
+        hum::HumRegex hre;
 
-        if (letters == "p") {
-            dynamic = "p";
+        if (hre.search(letters, "^[sr]?f+z?$")) {
+            dynamic = letters;
         }
-        else if (letters == "pp") {
-            dynamic = "pp";
+        else if (hre.search(letters, "^p+$")) {
+            dynamic = letters;
         }
-        else if (letters == "ppp") {
-            dynamic = "ppp";
+        else if (hre.search(letters, "^m?(f|p)$")) {
+            dynamic = letters;
         }
-        else if (letters == "pppp") {
-            dynamic = "pppp";
+        else if (hre.search(letters, "^s?f+p+$")) {
+            dynamic = letters;
         }
-        else if (letters == "f") {
-            dynamic = "f";
-        }
-        else if (letters == "ff") {
-            dynamic = "ff";
-        }
-        else if (letters == "fff") {
-            dynamic = "fff";
-        }
-        else if (letters == "ffff") {
-            dynamic = "ffff";
-        }
-        else if (letters == "mp") {
-            dynamic = "mp";
-        }
-        else if (letters == "mf") {
-            dynamic = "mf";
-        }
-        else if (letters == "fz") {
-            dynamic = "fz";
-        }
-        else if (letters == "ffz") {
-            dynamic = "ffz";
-        }
-        else if (letters == "fffz") {
-            dynamic = "fffz";
-        }
-        else if (letters == "fp") {
-            dynamic = "fp";
-        }
-        else if (letters == "ffp") {
-            dynamic = "ffp";
-        }
-        else if (letters == "sfp") {
-            dynamic = "sfp";
-        }
-        else if (letters == "sf") {
-            // for a sf which is shared betwee staves in piano music;
-            // otherwise "z" on **kern notes is probably better.
-            dynamic = "sf";
-        }
-        else if (letters == "sfz") {
-            // for a sf which is shared betwee staves in piano music;
-            // otherwise "zz" on **kern notes is probably better.
-            dynamic = "sfz";
-        }
-        else if (letters == "rf") {
-            dynamic = "rf";
-        }
-        else if (letters == "rfz") {
-            dynamic = "rfz";
-        }
-
         if (!dynamic.empty()) {
             belowadj = 0;
-            bool aboveQ = hasAboveParameter(line->token(i), "DY");
-            bool belowQ = hasBelowParameter(line->token(i), "DY", belowadj);
+
+            std::string dyntext = getLayoutParameter(dyntok, "DY", "t", "", "");
+            if (!dyntext.empty()) {
+                hum::HumRegex hre;
+                hre.replaceDestructive(dyntext, dynamic, "%s", "g");
+                dynamic = dyntext;
+            }
+
+            bool aboveQ = hasAboveParameter(dyntok, "DY");
+            bool belowQ = hasBelowParameter(dyntok, "DY", belowadj);
             if (belowQ && belowadj) {
                 belowadj--;
             }
@@ -10862,17 +11136,56 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             // See https://github.com/music-encoding/music-encoding/issues/540
 
             int justification = 0;
-            if (line->token(i)->getLayoutParameter("DY", "rj") == "true") {
+            if (dyntok->getLayoutParameter("DY", "rj") == "true") {
                 justification = 1;
             }
 
-            std::string dcolor = line->token(i)->getLayoutParameter("DY", "color");
+            bool editorial = false;
+            string editstr = getLayoutParameter(dyntok, "DY", "ed", "true");
+            if (!editstr.empty()) {
+                editorial = true;
+                string newdynamic;
+                if (editstr.find("brack") != std::string::npos) {
+                    newdynamic = "[ ";
+                    newdynamic += dynamic;
+                    newdynamic += " ]";
+                    dynamic = newdynamic;
+                }
+                else if (editstr.find("paren") != std::string::npos) {
+                    newdynamic = "( ";
+                    newdynamic += dynamic;
+                    newdynamic += " )";
+                    dynamic = newdynamic;
+                }
+                else if (editstr.find("curly") != std::string::npos) {
+                    newdynamic = "{ ";
+                    newdynamic += dynamic;
+                    newdynamic += " }";
+                    dynamic = newdynamic;
+                }
+                else if (editstr.find("angle") != std::string::npos) {
+                    newdynamic = "< ";
+                    newdynamic += dynamic;
+                    newdynamic += " >";
+                    dynamic = newdynamic;
+                }
+            }
+
+            std::string dcolor = dyntok->getLayoutParameter("DY", "color");
             int needsrend = justification || dcolor.size();
 
             Dynam *dynam = new Dynam;
-            m_measure->AddChild(dynam);
+            if (editorial) {
+                Supplied *supplied = new Supplied;
+                appendElement(supplied, dynam);
+                addChildMeasureOrSection(supplied);
+                addType(dynam, "editorial");
+            }
+            else {
+                addChildMeasureOrSection(dynam);
+            }
             setStaff(dynam, m_currentstaff + belowadj);
-            setLocationId(dynam, line->token(i), -1);
+            setLocationId(dynam, dyntok, -1);
 
             if (needsrend) {
                 Rend *rend = new Rend;
@@ -10915,7 +11228,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 dynam->SetTstamp(barstamp.getFloat());
             }
 
-            std::string verticalgroup = line->token(i)->getLayoutParameter("DY", "vg");
+            std::string verticalgroup = dyntok->getLayoutParameter("DY", "vg");
             if (verticalgroup.empty()) {
                 // 100 is the default group for dynamics:
                 dynam->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -10954,11 +11267,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endline = true;
             }
             else {
-                endtok = getCrescendoEnd(line->token(i));
+                endtok = getCrescendoEnd(dyntok);
             }
             belowadj = 0;
-            bool aboveQ = hasAboveParameter(line->token(i), "HP");
-            bool belowQ = hasBelowParameter(line->token(i), "HP", belowadj);
+            bool aboveQ = hasAboveParameter(dyntok, "HP");
+            bool belowQ = hasBelowParameter(dyntok, "HP", belowadj);
             if (belowQ && belowadj) {
                 belowadj--;
             }
@@ -10969,11 +11282,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (endtok != NULL) {
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff + belowadj);
-                setLocationId(hairpin, line->token(i), -1);
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                setLocationId(hairpin, dyntok, -1);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 hum::HumNum tstamp2;
                 if (duration > 0) {
-                    tstamp2 = getMeasureTstamp(line->token(i), duration, staffindex);
+                    tstamp2 = getMeasureTstamp(dyntok, duration, staffindex);
                 }
                 else {
                     tstamp2 = getMeasureTstamp(endtok, staffindex);
@@ -10983,7 +11296,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
                     tstamp2 += endtok->getLine()->getDuration() * mfactor;
                 }
-                int measures = getMeasureDifference(line->token(i), endtok);
+                int measures = getMeasureDifference(dyntok, endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
                 // See issue https://github.com/rism-ch/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
@@ -10991,10 +11304,10 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
-                hairpin->SetType("endbar03");
-                m_measure->AddChild(hairpin);
+                addType(hairpin, "endbar03");
+                addChildMeasureOrSection(hairpin);
 
-                std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
+                std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
                     // 100 is the default group for dynamics:
                     hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -11022,17 +11335,26 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 // no endpoint so print as the word "cresc."
                 Dir *dir = new Dir;
-                m_measure->AddChild(dir);
+                addChildMeasureOrSection(dir);
                 setStaff(dir, m_currentstaff + belowadj);
-                setLocationId(dir, line->token(i));
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                setLocationId(dir, dyntok);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 dir->SetTstamp(tstamp.getFloat());
                 std::string fontstyle;
                 std::string content = "cresc.";
+
                 if (!m_signifiers.cresctext.empty()) {
                     content = m_signifiers.cresctext;
                     fontstyle = m_signifiers.crescfontstyle;
                 }
+
+                std::string pintext = getLayoutParameter(dyntok, "HP", "t", "", "");
+                if (!pintext.empty()) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(pintext, content, "%s", "g");
+                    content = pintext;
+                }
+
                 addTextElement(dir, content, fontstyle);
                 if (aboveQ) {
                     setPlace(dir, "above");
@@ -11058,12 +11380,12 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endline = true;
             }
             else {
-                endtok = getDecrescendoEnd(line->token(i));
+                endtok = getDecrescendoEnd(dyntok);
             }
 
             belowadj = 0;
-            bool aboveQ = hasAboveParameter(line->token(i), "HP");
-            bool belowQ = hasBelowParameter(line->token(i), "HP", belowadj);
+            bool aboveQ = hasAboveParameter(dyntok, "HP");
+            bool belowQ = hasBelowParameter(dyntok, "HP", belowadj);
             if (belowQ && belowadj) {
                 belowadj--;
             }
@@ -11073,11 +11395,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (endtok != NULL) {
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff + belowadj);
-                setLocationId(hairpin, line->token(i), -1);
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                setLocationId(hairpin, dyntok, -1);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 hum::HumNum tstamp2;
                 if (duration > 0) {
-                    tstamp2 = getMeasureTstamp(line->token(i), duration, staffindex);
+                    tstamp2 = getMeasureTstamp(dyntok, duration, staffindex);
                 }
                 else {
                     tstamp2 = getMeasureTstamp(endtok, staffindex);
@@ -11085,7 +11407,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 if ((duration == 0) && (endline || (endtok->find("]]") != std::string::npos))) {
                     tstamp2 += endtok->getLine()->getDuration();
                 }
-                int measures = getMeasureDifference(line->token(i), endtok);
+                int measures = getMeasureDifference(dyntok, endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
                 // See issue https://github.com/rism-ch/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
@@ -11093,10 +11415,10 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
-                hairpin->SetType("endbar03");
-                m_measure->AddChild(hairpin);
+                addType(hairpin, "endbar03");
+                addChildMeasureOrSection(hairpin);
 
-                std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
+                std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
                     // 100 is the default group for dynamics:
                     hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -11124,14 +11446,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 // no endpoint so print as the word "decresc."
                 Dir *dir = new Dir;
-                m_measure->AddChild(dir);
+                addChildMeasureOrSection(dir);
                 setStaff(dir, m_currentstaff + belowadj);
-                setLocationId(dir, line->token(i));
-                bool aboveQ = hasAboveParameter(line->token(i), "HP");
+                setLocationId(dir, dyntok);
+                bool aboveQ = hasAboveParameter(dyntok, "HP");
                 if (aboveQ) {
                     setPlace(dir, "above");
                 }
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 dir->SetTstamp(tstamp.getFloat());
                 std::string fontstyle = "";
                 std::string content = "decresc.";
@@ -11139,6 +11461,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     content = m_signifiers.decresctext;
                     fontstyle = m_signifiers.decrescfontstyle;
                 }
+
+                std::string pintext = getLayoutParameter(dyntok, "HP", "t", "", "");
+                if (!pintext.empty()) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(pintext, content, "%s", "g");
+                    content = pintext;
+                }
+
                 addTextElement(dir, content, fontstyle);
                 if (aboveQ) {
                     setPlace(dir, "above");
@@ -11277,6 +11607,52 @@ bool HumdrumInput::hasAboveParameter(hum::HTp token, const std::string &category
         }
     }
     return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLayoutParameter -- Get an attached layout parameter
+//   for a token.  Move this variant into HumdrumToken class at some point.
+//
+//     trueString = value to return if there is a parameter but the
+//                  value is empty.
+//     falseString = value to return if there is no parameter.
+//                   default value = ""
+//
+
+string HumdrumInput::getLayoutParameter(hum::HTp token, const std::string &category, const std::string &catkey,
+    const string &trueString, const string &falseString)
+{
+    int lcount = token->getLinkedParameterSetCount();
+    if (lcount == 0) {
+        return falseString;
+    }
+
+    for (int p = 0; p < token->getLinkedParameterSetCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); ++q) {
+            string key = hps->getParameterName(q);
+            if (key == catkey) {
+                string value = hps->getParameterValue(q);
+                if (value.empty()) {
+                    return trueString;
+                }
+                else {
+                    return value;
+                }
+            }
+        }
+    }
+    return falseString;
 }
 
 //////////////////////////////
@@ -12066,7 +12442,7 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     std::vector<int> &endpitches, std::vector<bool> &indexused)
 {
 
-    phrase->SetType("phrase");
+    addType(phrase, "phrase");
 
     string style = m_signifiers.phrase_style;
 
@@ -12549,8 +12925,14 @@ template <class ELEMENT> Clef *HumdrumInput::getClef(ELEMENT element)
 //   return a pointer to it. ELEMENT can be ScoreDef or StaffDef.
 //
 
-template <class ELEMENT> Mensur *HumdrumInput::getMensur(ELEMENT element)
+template <class ELEMENT> Mensur *HumdrumInput::getMensur(ELEMENT element, hum::HTp token)
 {
+    if (token && (token->getDurationFromStart() > 0)) {
+        Mensur *layermensuration = new Mensur;
+        element->AddChild(layermensuration);
+        return layermensuration;
+    }
+
     Mensur *output = (Mensur *)element->FindDescendantByType(ClassId::MENSUR);
     if (!output) {
         output = new Mensur;
@@ -13084,7 +13466,7 @@ Clef *HumdrumInput::insertClefElement(
     if (sameas) {
         // make 100% transparent red in case sameas method changes:
         clef->SetColor("#ff000000");
-        // clef->SetType("sameas");
+        // addType(clef, "sameas");
     }
 
     if (iseditorial) {
@@ -13097,7 +13479,7 @@ Clef *HumdrumInput::insertClefElement(
         else {
             clef->SetColor(color);
         }
-        clef->SetType("editorial");
+        addType(clef, "editorial");
     }
     else {
         appendElement(elements, pointers, clef);
@@ -13746,7 +14128,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         return;
     }
 
-    // durationswithdots == full duration of the note/rest including augmentation dots.
+    // durationwithdots == full duration of the note/rest including augmentation dots.
     std::vector<hum::HumNum> durationwithdots(duritems.size());
 
     // dursum = a cumulative sum of the full durs, starting at 0 for
@@ -13994,6 +14376,11 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         hum::HumNum value = dotlessdur[i] / nextpowoftwo;
         tuptop[i] = value.getDenominator();
         tupbot[i] = value.getNumerator();
+
+        // Reference tuplet breve to breve rather than whole.
+        if ((dotlessdur[i].getNumerator() == 4) && (dotlessdur[i].getDenominator() == 3)) {
+            tupbot[i] = 2;
+        }
     }
 
     // adjust tupletgroups based on tuptop and tupbot changes
@@ -14048,6 +14435,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (indexmapping2[i] < 0) {
             // this is a non-durational layer item or a non-tuplet note.
             tgs.at(i).duration = 0;
+            tgs.at(i).durationnodots = 0;
             tgs.at(i).group = -1;
             tgs.at(i).bracket = -1;
             tgs.at(i).num = -1;
@@ -14065,6 +14453,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         else {
             // this is a tuplet note (with duration)
             tgs.at(i).duration = layerdata[i]->getDuration();
+            tgs.at(i).durationnodots = layerdata[i]->getDurationNoDots();
             tgs.at(i).group = tupletgroups.at(indexmapping2.at(i));
             tgs.at(i).bracket = tupletbracket.at(indexmapping2.at(i));
             tgs.at(i).num = tuptop.at(indexmapping2.at(i));
@@ -14163,7 +14552,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
 
     std::map<hum::HumNum, int> durcounts;
     for (int i = 0; i < (int)tggroup.size(); i++) {
-        durcounts[tggroup[i]->duration]++;
+        durcounts[tggroup[i]->durationnodots]++;
     }
 
     // All durations are the same, so set the scale to the multiple of how
@@ -14196,6 +14585,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
         }
     }
 
+    /*
     // Use the most common duration for the tuplet scaling:
     // (this could be refined for dotted durations)
     hum::HumNum maxcountdur = 0;
@@ -14206,13 +14596,13 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
             maxcountdur = it.first;
         }
     }
+    */
 
     // Select the longest duration if there is a tie.
+    hum::HumNum maxcountdur = 0;
     for (auto it : durcounts) {
-        if (it.second == maxcount) {
-            if (it.first > maxcountdur) {
-                maxcountdur = it.first;
-            }
+        if (it.first > maxcountdur) {
+            maxcountdur = it.first;
         }
     }
 
@@ -15097,7 +15487,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         // turn on pedal
         Pedal *pedal = new Pedal;
         setLocationId(pedal, token);
-        m_measure->AddChild(pedal);
+        addChildMeasureOrSection(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         if (durtobar == 0) {
             tstamp -= barbuffer;
@@ -15117,7 +15507,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
     else if (*token == "*Xped") {
         Pedal *pedal = new Pedal;
         setLocationId(pedal, token);
-        m_measure->AddChild(pedal);
+        addChildMeasureOrSection(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
         if (durtobar == 0) {
             tstamp -= barbuffer;
@@ -15402,6 +15792,17 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
         if (layerdata.at(i)->isData()) {
             dataindex.push_back(i);
         }
+        else if (layerdata.at(i)->isInterpretation()) {
+            if (layerdata.at(i)->isClef()) {
+                dataindex.push_back(i);
+            }
+            else if (*layerdata.at(i) == "*") {
+                std::string ctext = layerdata.at(i)->getValue("auto", "clef");
+                if (ctext.compare(0, 5, "*clef") == 0) {
+                    dataindex.push_back(i);
+                }
+            }
+        }
     }
 
     std::vector<hum::HumNum> startdur(dataindex.size(), 0);
@@ -15508,7 +15909,13 @@ bool HumdrumInput::hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::Hum
 
 template <class PARENT, class CHILD> void HumdrumInput::appendElement(PARENT parent, CHILD child)
 {
-    parent->AddChild(child);
+    if (parent == NULL) {
+        // probably a NULL measure, so store in section
+        m_sections.back()->AddChild(child);
+    }
+    else {
+        parent->AddChild(child);
+    }
 }
 
 /////////////////////////////
@@ -15732,14 +16139,11 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
     // then color the rest (may change later, or be done with a label).
     bool phraseStart = token->find('{') != string::npos ? true : false;
     bool phraseStop = token->find('}') != string::npos ? true : false;
-    if (phraseStart && phraseStop) {
-        rest->SetType("phraseStop phraseStart");
+    if (phraseStart) {
+        addType(rest, "phraseStart");
     }
-    else if (phraseStart) {
-        rest->SetType("phraseStart");
-    }
-    else if (phraseStop) {
-        rest->SetType("phraseStop");
+    if (phraseStop) {
+        addType(rest, "phraseStop");
     }
 
     token->setValue("MEI", "xml:id", rest->GetUuid());
@@ -15884,6 +16288,13 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             // if there is a rhythm).
             note->SetDur(DURATION_8);
         }
+    }
+
+    if (tstring.find("P") != std::string::npos) {
+        addType(note, "appoggiatura-start");
+    }
+    if (tstring.find("p") != std::string::npos) {
+        addType(note, "appoggiatura-stop");
     }
 
     // Add the pitch information
@@ -16312,12 +16723,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     // handle ties
-    if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
-        processTieStart(note, token, tstring, subtoken);
-    }
+    if (!token->isDataType("**mens")) {
+        if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
+            processTieStart(note, token, tstring, subtoken);
+        }
 
-    if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
-        processTieEnd(note, token, tstring, subtoken);
+        if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
+            processTieEnd(note, token, tstring, subtoken);
+        }
     }
 
     if (m_signifiers.above) {
@@ -16364,14 +16777,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     // then color the note (may change later, or be done with a label).
     bool phraseStart = token->find('{') != string::npos ? true : false;
     bool phraseStop = token->find('}') != string::npos ? true : false;
-    if (phraseStart && phraseStop) {
-        note->SetType("phraseStart phraseStop");
+    if (phraseStart) {
+        addType(note, "phraseStart");
     }
-    else if (phraseStart) {
-        note->SetType("phraseStart");
-    }
-    else if (phraseStop) {
-        note->SetType("phraseStop");
+    if (phraseStop) {
+        addType(note, "phraseStop");
     }
 
     if (!scordaturaGes.empty()) {
@@ -16399,12 +16809,26 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                 case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
             }
         }
-        std::string notetype = note->GetType();
-        if (!notetype.empty()) {
-            notetype += " ";
-        }
-        notetype += "scordatura";
-        note->SetType(notetype);
+        addType(note, "scoredatura");
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addType -- add a type to an MEI element.  Appends to the
+//    current type if there is already any type contents.
+//
+
+template <class ELEMENT> void HumdrumInput::addType(ELEMENT element, const std::string &aType)
+{
+    std::string currentType = element->GetType();
+    if (currentType.empty()) {
+        element->SetType(aType);
+    }
+    else {
+        currentType += " ";
+        currentType += aType;
+        element->SetType(currentType);
     }
 }
 
@@ -17448,11 +17872,11 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
     bool staffQ = false;
     hum::HTp earp = NULL;
     if (token->find("::") != string::npos) {
-        if (!leftmostSystemArpeggio(token)) {
+        if (!isLowestSystemArpeggio(token)) {
             return;
         }
         systemQ = true;
-        earp = getRightmostSystemArpeggio(token);
+        earp = getHighestSystemArpeggio(token);
         if (earp == NULL) {
             // no system arpeggio actually found
             return;
@@ -17567,52 +17991,144 @@ bool HumdrumInput::leftmostStaffArpeggio(hum::HTp token)
 
 //////////////////////////////
 //
-// HumdrumInput::getRightmostSystemArpeggio -- Assuming a single contiguous
+// HumdrumInput::getHighestSystemArpeggio -- Assuming a single contiguous
 //     arpeggio across all staves from first to last marker.  Will probably have
 //     to adjust for layers (which are ordered reversed compared to staves).
 //
 
-hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
+hum::HTp HumdrumInput::getHighestSystemArpeggio(hum::HTp token)
 {
-    hum::HTp output = NULL;
-    if (token->find("::") != std::string::npos) {
-        output = token;
+    hum::HTp highesttok = token;
+    int tpitch = getHighestDiatonicPitch(token, "::");
+    if (tpitch > 1000) {
+        return highesttok;
     }
-    token = token->getNextFieldToken();
-    while (token != NULL) {
-        if (!token->isKern()) {
-            token = token->getNextFieldToken();
+    int highest = tpitch;
+
+    hum::HLp line = token->getLine();
+    for (int i = 0; i < line->getFieldCount(); i++) {
+        hum::HTp tok2 = line->token(i);
+        if (!tok2->isKern()) {
             continue;
         }
-        if (token->find("::") != std::string::npos) {
-            output = token;
+        if (tok2->find("::") == std::string::npos) {
+            continue;
         }
-        token = token->getNextFieldToken();
+        int dpitch = getHighestDiatonicPitch(tok2, "::");
+        if (dpitch >= highest) {
+            highest = dpitch;
+            highesttok = tok2;
+        }
     }
-    return output;
+
+    if (tpitch <= highest) {
+        return highesttok;
+    }
+    else {
+        return token;
+    }
 }
 
 //////////////////////////////
 //
-// HumdrumInput::leftmostSystemArpeggio -- Not checking for contiguous staves
+// HumdrumInput::isLowestSystemArpeggio -- Not checking for contiguous staves
 //  (i.e., only one cross-staff arpeggio is allowed at a time for now).  Will
 //  probably have to adjust for layers (which are ordered reverse of staves).
+//  maybe limit to +1/-1 one staff, but there will still be complications
+//  with adjacent grand staff parts.
 //
 
-bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
+bool HumdrumInput::isLowestSystemArpeggio(hum::HTp token)
 {
-    token = token->getPreviousFieldToken();
-    while (token != NULL) {
-        if (!token->isKern()) {
-            token = token->getPreviousFieldToken();
+    int tpitch = getLowestDiatonicPitch(token, "::");
+    if (tpitch > 1000) {
+        return false;
+    }
+    int lowest = tpitch;
+
+    hum::HLp line = token->getLine();
+    for (int i = 0; i < line->getFieldCount(); i++) {
+        hum::HTp tok2 = line->token(i);
+        if (!tok2->isKern()) {
             continue;
         }
-        if (token->find("::") != std::string::npos) {
-            return false;
+        if (tok2->find("::") == std::string::npos) {
+            continue;
         }
-        token = token->getPreviousFieldToken();
+        int dpitch = getLowestDiatonicPitch(tok2, "::");
+        if (dpitch < lowest) {
+            lowest = dpitch;
+        }
     }
-    return true;
+
+    if (tpitch == lowest) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLowestDiatonicPitch -- Returns 123456789 if nothing.
+//
+
+int HumdrumInput::getLowestDiatonicPitch(hum::HTp token, const string &requirement)
+{
+    int dpitch = 123456789;
+    if (!token->isData()) {
+        return dpitch;
+    }
+    if (token->isRest()) {
+        return dpitch;
+    }
+    if (token->find(requirement) == std::string::npos) {
+        return dpitch;
+    }
+    std::vector<std::string> subtokens;
+    subtokens = token->getSubtokens();
+    for (int j = 0; j < (int)subtokens.size(); j++) {
+        if (subtokens[j].find(requirement) == std::string::npos) {
+            continue;
+        }
+        int tpitch = hum::Convert::kernToBase7(subtokens[j]);
+        if (tpitch < dpitch) {
+            dpitch = tpitch;
+        }
+    }
+    return dpitch;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getHighestDiatonicPitch -- Returns -123456789 if nothing.
+//
+
+int HumdrumInput::getHighestDiatonicPitch(hum::HTp token, const string &requirement)
+{
+    int dpitch = -123456789;
+    if (!token->isData()) {
+        return dpitch;
+    }
+    if (token->isRest()) {
+        return dpitch;
+    }
+    if (token->find(requirement) == std::string::npos) {
+        return dpitch;
+    }
+    std::vector<std::string> subtokens;
+    subtokens = token->getSubtokens();
+    for (int j = 0; j < (int)subtokens.size(); j++) {
+        if (subtokens[j].find(requirement) == std::string::npos) {
+            continue;
+        }
+        int tpitch = hum::Convert::kernToBase7(subtokens[j]);
+        if (tpitch > dpitch) {
+            dpitch = tpitch;
+        }
+    }
+    return dpitch;
 }
 
 //////////////////////////////
@@ -17633,8 +18149,15 @@ bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
 //   $[Ss]?[Ss]? = inverted turn
 //
 //   These are not used anymore:
-//   SS = turn centered between two notes
-//   $$ = inverted turn centered between two notes
+//   SS = turn centered between two notes.  Now a turn starting with
+//        S or $ will be centered.
+//   $$ = inverted turn centered between two notes.
+//   To uncenter a turn (attach to a note), prefix the turn
+//   with lower-case s, such as sSSS, each character meaning:
+//       s = do not center turn
+//       S = regular turn
+//       S = Major second interval above turn note
+//       S = Major second interval below turn note
 //
 
 void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
@@ -17690,10 +18213,13 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
             turnstart = i;
             turnend = i;
             for (int j = i + 1; j < (int)tok.size(); j++) {
-                if (!((tok[i] == 's') || (tok[i] == 'S') || (tok[i] == '$'))) {
+                if (!((tok[j] == 's') || (tok[j] == 'S') || (tok[j] == '$'))) {
+                    turnend = j - 1;
                     break;
                 }
-                turnend = j;
+                else {
+                    turnend = j;
+                }
             }
             break;
         }
@@ -17743,10 +18269,10 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     }
 
     if (invertedQ) {
-        turn->SetForm(turnLog_FORM_upper);
+        turn->SetForm(turnLog_FORM_lower);
     }
     else {
-        turn->SetForm(turnLog_FORM_lower);
+        turn->SetForm(turnLog_FORM_upper);
     }
 
     setLocationId(turn, token);
@@ -18214,6 +18740,9 @@ void HumdrumInput::addTrill(hum::HTp token)
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    if (token->isDataType("**mens")) {
+        return;
+    }
     std::string endtag = "tieEnd";
     if (subindex >= 0) {
         endtag += to_string(subindex + 1);
@@ -18239,7 +18768,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
         addTieLineStyle(tie, token, subindex);
 
-        m_measure->AddChild(tie);
+        addChildMeasureOrSection(tie);
         int endsubindex = endnumber - 1;
         if (endsubindex < 0) {
             endsubindex = 0;
@@ -18333,6 +18862,9 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
 void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    if (token->isDataType("**mens")) {
+        return;
+    }
     std::string starttag = "tieStart";
     if (token->isChord()) {
         starttag += to_string(subindex + 1);
@@ -18574,10 +19106,9 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
 
 Tie *HumdrumInput::tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum meterunit)
 {
-
     Tie *tie = new Tie;
     addTieLineStyle(tie, token, subindex);
-    m_measure->AddChild(tie);
+    addChildMeasureOrSection(tie);
     hum::HTp starttoken = token->getOwner()->getTrackStart(token->getTrack());
     hum::HTp current = token->getPreviousToken();
     while (current) {
@@ -18603,9 +19134,6 @@ Tie *HumdrumInput::tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum m
     setTieLocationId(tie, starttoken, -1, token, subindex);
 
     std::string endid = getLocationId("note", token);
-    if (token->isChord()) {
-        endid += "S" + to_string(subindex + 1);
-    }
     if (token->isChord()) {
         int endnumber = subindex + 1;
         if (endnumber > 0) {
@@ -18693,7 +19221,12 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         currentsection = "";
     }
 
-    m_measure = new Measure();
+    if (hasMensuralStaff(&infile[startline])) {
+        m_measure = NULL;
+    }
+    else {
+        m_measure = new Measure();
+    }
 
     int endnum = 0;
     bool ending = false;
@@ -18749,38 +19282,69 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
     else if (newsection) {
         // start a new section
+        m_currentending = NULL;
         m_currentsection = new Section;
-        m_currentsection->AddChild(m_measure);
+        if (m_measure) {
+            m_currentsection->AddChild(m_measure);
+        }
         m_currentsection->SetUuid(m_lastsection);
         m_sections.back()->AddChild(m_currentsection);
         m_sections.push_back(m_currentsection);
     }
     else {
         // outside of an ending
-        m_sections.back()->AddChild(m_measure);
+        m_currentending = NULL;
+        if (m_measure) {
+            m_sections.back()->AddChild(m_measure);
+        }
     }
     m_endingnum = endnum;
     m_measures.push_back(m_measure);
 
     if (m_leftbarstyle != BARRENDITION_NONE) {
-        m_measure->SetLeft(m_leftbarstyle);
+        if (m_measure) {
+            m_measure->SetLeft(m_leftbarstyle);
+        }
         m_leftbarstyle = BARRENDITION_NONE;
     }
 
-    setLocationId(m_measure, startline, -1, -1);
+    if (m_measure) {
+        setLocationId(m_measure, startline, -1, -1);
+    }
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {
-        setN(m_measure, measurenumber);
+        if (m_measure) {
+            setN(m_measure, measurenumber);
+        }
     }
 
     if (m_doc->GetOptions()->m_humType.GetValue()) {
-        stringstream measuretag;
-        measuretag << "m-" << measurenumber;
-        appendTypeTag(m_measure, measuretag.str());
+        if (m_measure) {
+            stringstream measuretag;
+            measuretag << "m-" << measurenumber;
+            appendTypeTag(m_measure, measuretag.str());
+        }
     }
 
-    setSystemMeasureStyle(startline, endline);
+    if (m_measure) {
+        setSystemMeasureStyle(startline, endline);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasMensuralStaff --  Return true if any **mens spines.
+//
+
+bool HumdrumInput::hasMensuralStaff(hum::HLp line)
+{
+    for (int i = 0; i < line->getFieldCount(); i++) {
+        if (line->token(i)->isMens()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -18835,7 +19399,7 @@ void HumdrumInput::checkForRehearsal(int line)
         std::wstring wtext = UTF8to16(tvalue);
         text->SetText(wtext);
         reh->AddChild(text);
-        m_measure->AddChildBack(reh);
+        addChildMeasureOrSection(reh);
         // Add to top staff for now, but add to top of
         // each instrumentalgoup probably in the future.
         setStaff(reh, 1);
@@ -18858,7 +19422,7 @@ void HumdrumInput::addFTremSlurs()
         return;
     }
     for (int i = 0; i < (int)m_ftrem_slurs.size(); i++) {
-        m_measure->AddChildBack(m_ftrem_slurs.at(i));
+        addChildBackMeasureOrSection(m_ftrem_slurs.at(i));
     }
     m_ftrem_slurs.clear();
 }
@@ -20553,6 +21117,105 @@ void HumdrumInput::hideBarlinesInTiedGroup(hum::HTp startnote)
             break;
         }
         current = current->getNextToken();
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeClefNulls -- Mark all null interpretations
+//    that are in the same track as a clef interpretation.
+//
+
+void HumdrumInput::analyzeClefNulls(hum::HumdrumFile &infile)
+{
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isInterpretation()) {
+            continue;
+        }
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            hum::HTp token = infile[i].token(j);
+            if (!token->isKern()) {
+                continue;
+            }
+            if (!token->isClef()) {
+                continue;
+            }
+            markAdjacentNullsWithClef(token);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::markAdjacentNullsWithClef -- Input is a clef token,
+//     and all null interpretations in the same spine will be marked
+//     as being the same clef, since verovio/MEI requires clef changes
+//     to be present in all layers.
+//
+
+void HumdrumInput::markAdjacentNullsWithClef(hum::HTp clef)
+{
+    int ctrack = clef->getTrack();
+    int track;
+
+    hum::HTp current = clef->getNextFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        if (*current == "*") {
+            current->setValue("auto", "clef", *clef);
+        }
+        current = current->getNextFieldToken();
+    }
+
+    current = clef->getPreviousFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        if (*current == "*") {
+            current->setValue("auto", "clef", *clef);
+        }
+        current = current->getPreviousFieldToken();
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::markOtherClefsAsChange -- There is a case
+//     where spine splits at the start of the music miss a clef
+//     change that needs to be added to a secondary layer.  This
+//     function will mark the secondary clefs so that they will
+//     be converted as clef changes.
+//
+
+void HumdrumInput::markOtherClefsAsChange(hum::HTp clef)
+{
+
+    int ctrack = clef->getTrack();
+    int track;
+
+    hum::HTp current = clef->getNextFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        current->setValue("auto", "clefChange", 1);
+        current = current->getNextFieldToken();
+    }
+
+    current = clef->getPreviousFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        current->setValue("auto", "clefChange", 1);
+        current = current->getPreviousFieldToken();
     }
 }
 

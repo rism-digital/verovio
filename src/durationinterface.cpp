@@ -184,7 +184,7 @@ int DurationInterface::GetNoteOrChordDur(LayerElement *element)
         return this->GetActualDur();
     }
     else if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord && !this->HasDur())

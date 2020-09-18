@@ -99,7 +99,7 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
     // Look for identical accidentals that needs to remain superimposed
     if (element->Is(ACCID) && (this->GetDrawingY() == element->GetDrawingY())) {
-        Accid *accid = dynamic_cast<Accid *>(element);
+        Accid *accid = vrv_cast<Accid *>(element);
         assert(accid);
         if (this->GetSymbolStr() == accid->GetSymbolStr()) {
             // There is the same accidental, so we leave it a the same place

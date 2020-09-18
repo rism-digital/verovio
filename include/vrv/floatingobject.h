@@ -187,6 +187,8 @@ public:
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
+    int GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
+
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     /**

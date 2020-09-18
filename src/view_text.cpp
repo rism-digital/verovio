@@ -167,27 +167,27 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
     assert(element);
 
     if (element->Is(FIGURE)) {
-        F *f = dynamic_cast<F *>(element);
+        F *f = vrv_cast<F *>(element);
         assert(f);
         DrawF(dc, f, params);
     }
     else if (element->Is(LB)) {
-        Lb *lb = dynamic_cast<Lb *>(element);
+        Lb *lb = vrv_cast<Lb *>(element);
         assert(lb);
         DrawLb(dc, lb, params);
     }
     else if (element->Is(NUM)) {
-        Num *num = dynamic_cast<Num *>(element);
+        Num *num = vrv_cast<Num *>(element);
         assert(num);
         DrawNum(dc, num, params);
     }
     else if (element->Is(REND)) {
-        Rend *rend = dynamic_cast<Rend *>(element);
+        Rend *rend = vrv_cast<Rend *>(element);
         assert(rend);
         DrawRend(dc, rend, params);
     }
     else if (element->Is(TEXT)) {
-        Text *text = dynamic_cast<Text *>(element);
+        Text *text = vrv_cast<Text *>(element);
         assert(text);
         DrawText(dc, text, params);
     }
@@ -422,5 +422,4 @@ void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
 
     dc->EndGraphic(svg, this);
 }
-
 } // namespace vrv
