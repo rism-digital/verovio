@@ -1317,7 +1317,7 @@
             <!--<glyph glyph-code="E584" smufl-name="ornamentShakeMuffat1"/>-->
             <!--<glyph glyph-code="E585" smufl-name="glissandoUp"/>-->
             <!--<glyph glyph-code="E586" smufl-name="glissandoDown"/>-->
-            <!--<glyph glyph-code="E587" smufl-name="ornamentSchleifer"/>-->
+            <glyph glyph-code="E587" smufl-name="ornamentSchleifer"/>
             <!--<glyph glyph-code="E588" smufl-name="ornamentPinceCouperin"/>-->
             <!--<glyph glyph-code="E589" smufl-name="ornamentTremblementCouperin"/>-->
             <range_end>U+E58F</range_end>
@@ -1507,7 +1507,7 @@
         <keyboardTechniques>
             <description>Keyboard techniques</description>
             <glyph glyph-code="E650" smufl-name="keyboardPedalPed"/>
-            <!--<glyph glyph-code="E651" smufl-name="keyboardPedalP"/>-->
+            <glyph glyph-code="E651" smufl-name="keyboardPedalP"/>
             <!--<glyph glyph-code="E652" smufl-name="keyboardPedalE"/>-->
             <!--<glyph glyph-code="E653" smufl-name="keyboardPedalD"/>-->
             <!--<glyph glyph-code="E654" smufl-name="keyboardPedalDot"/>-->
@@ -1516,7 +1516,7 @@
             <!--<glyph glyph-code="E657" smufl-name="keyboardPedalUpNotch"/>-->
             <!--<glyph glyph-code="E658" smufl-name="keyboardPedalHyphen"/>-->
             <glyph glyph-code="E659" smufl-name="keyboardPedalSost"/>
-            <!--<glyph glyph-code="E65A" smufl-name="keyboardPedalS"/>-->
+            <glyph glyph-code="E65A" smufl-name="keyboardPedalS"/>
             <!--<glyph glyph-code="E65B" smufl-name="keyboardPedalHalf2"/>-->
             <!--<glyph glyph-code="E65C" smufl-name="keyboardPedalHalf3"/>-->
             <!--<glyph glyph-code="E65D" smufl-name="keyboardPedalUpSpecial"/>-->

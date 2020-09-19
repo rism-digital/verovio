@@ -497,7 +497,6 @@ public:
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
-    OptionBool m_justifyIncludeLastPage;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;

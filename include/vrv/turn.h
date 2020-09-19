@@ -52,7 +52,7 @@ public:
     ///@}
 
     /**
-     * Get the SMuFL glyph for the trun based on form or glyph.num
+     * Get the SMuFL glyph for the turn based on form or glyph.num
      */
     wchar_t GetTurnGlyph() const;
 
