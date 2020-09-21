@@ -236,8 +236,7 @@ TransPitch &TransPitch::operator++()
     if (m_pname != dpc_B) {
         m_pname++;
     }
-    else
-    {
+    else {
         m_pname = dpc_C;
         m_oct++;
     }
