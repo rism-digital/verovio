@@ -293,8 +293,9 @@ void BeamSegment::CalcBeamInit(
     }
 
     // Only if not only rests. (Will produce non-sense output anyway)
-    if (m_beamElementCoordRefs.size() != nbRests) {
-        this->m_avgY /= (m_beamElementCoordRefs.size() - nbRests);
+    const auto elementCount = static_cast<decltype(m_avgY)>(m_beamElementCoordRefs.size());
+    if (elementCount != nbRests) {
+        m_avgY /= elementCount - nbRests;
     }
 }
 
