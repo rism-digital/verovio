@@ -109,6 +109,8 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
+    if (!GetStart()) return FUNCTOR_CONTINUE;
+
     Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
 
@@ -122,7 +124,7 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
 
 int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
 {
-    if (!m_beamedElements.empty()) return FUNCTOR_CONTINUE;
+    if (!m_beamedElements.empty() || !GetStart()) return FUNCTOR_CONTINUE;
 
     Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
