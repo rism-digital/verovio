@@ -1578,7 +1578,7 @@ int Object::PreparePlist(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::ProcessPlist(FunctorParams* functorParams)
+int Object::ProcessPlist(FunctorParams *functorParams)
 {
     PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
     assert(params);

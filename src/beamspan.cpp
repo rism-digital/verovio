@@ -59,7 +59,7 @@ void BeamSpan::Reset()
     ResetPlist();
 }
 
-ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff) 
+ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
 {
     // find all elements between startId and endId of the beamSpan
     ClassIdsComparison classIds({ NOTE, CHORD });
@@ -120,7 +120,7 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams) 
+int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
 {
     if (!m_beamedElements.empty()) return FUNCTOR_CONTINUE;
 
