@@ -1363,6 +1363,8 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
         angle = 90;
     }
 
+    if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
+
     Point orig(x, y);
 
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
