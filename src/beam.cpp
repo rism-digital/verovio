@@ -859,13 +859,14 @@ void Beam::FilterList(ArrayOfObjects *childList)
             // if we are at the beginning of the beam
             // and the note is cueSize
             // assume all the beam is of grace notes
+            const bool isInGraceGroup = element->GetFirstAncestor(GRACEGRP);
             if (childList->begin() == iter) {
-                if (element->IsGraceNote()) firstNoteGrace = true;
+                if (element->IsGraceNote() || isInGraceGroup) firstNoteGrace = true;
             }
             // if the first note in beam was NOT a grace
             // we have grace notes embedded in a beam
             // drop them
-            if (!firstNoteGrace && element->IsGraceNote()) {
+            if (!firstNoteGrace && (element->IsGraceNote() || isInGraceGroup)) {
                 iter = childList->erase(iter);
                 continue;
             }
@@ -1041,8 +1042,13 @@ void BeamElementCoord::SetDrawingStemDir(
 
     if (!m_closestNote) return;
 
+    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
+    
+    if (m_element->IsGraceNote() || isInGraceGroup) segment->m_uniformStemLength *= 0.75;
     this->m_centered = segment->m_uniformStemLength % 2;
     this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+
+    if (m_element->IsGraceNote() || isInGraceGroup) return;
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
