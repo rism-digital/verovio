@@ -584,7 +584,7 @@ int Rest::Transpose(FunctorParams *functorParams)
         TransPitch restLoc(GetPloc() - PITCHNAME_c, 0, GetOloc());
         params->m_transposer->Transpose(restLoc);
         const bool isRestOnSpace = static_cast<bool>((restLoc.m_oct * 7 + restLoc.m_pname) % 2);
-        // on outer layers move rest on odd locations one line further 
+        // on outer layers move rest on odd locations one line further
         // in middle layers tolerate even locations to not risk collisions
         if (layerCount > 1) {
             if (isTopLayer && isRestOnSpace) {
@@ -597,7 +597,7 @@ int Rest::Transpose(FunctorParams *functorParams)
                 restLoc = centralLocation;
             }
         }
-        
+
         UpdateFromTransLoc(restLoc);
     }
     // transpose based on @loc
