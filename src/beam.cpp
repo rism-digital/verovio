@@ -265,6 +265,9 @@ void BeamSegment::CalcBeamInit(
     }
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
+    if (!m_firstNoteOrChord) return;
+    if (!m_lastNoteOrChord) m_lastNoteOrChord = m_firstNoteOrChord;
+
     Note *firstNote = NULL, *lastNote = NULL;
     if (m_firstNoteOrChord->m_element->Is(NOTE)) {
         firstNote = vrv_cast<Note *>(m_firstNoteOrChord->m_element);
