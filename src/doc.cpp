@@ -554,7 +554,7 @@ void Doc::PrepareDrawing()
         Functor processPlist(&Object::ProcessPlist);
         this->Process(&processPlist, &preparePlistParams);
 
-        for (const auto [plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
+        for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
             plistInterface->SetRef(objectReference);
         }
         preparePlistParams.m_interfaceUuidTuples.clear();
