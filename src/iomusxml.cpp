@@ -2708,9 +2708,16 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xpath_node startTie = notations.node().select_node("tied[@type='start']");
         pugi::xpath_node endTie = notations.node().select_node("tied[@type='stop']");
         if (endTie) { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
-            m_tieStopStack.push_back(note);
+            if (!m_tieStack.empty() && note->GetPname() == m_tieStack.back().second->GetPname()
+                && note->GetOct() == m_tieStack.back().second->GetOct()) {
+                m_tieStack.back().first->SetEndid("#" + note->GetUuid());
+                m_tieStack.pop_back();
+            }
+            else {
+                m_tieStopStack.push_back(note);
+            }
         }
-        else {
+        else if (m_tieStack.empty()) {
             CloseTie(note);
         }
         if (startTie) {

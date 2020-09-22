@@ -196,8 +196,8 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
     tmp = y * m_fontStack.top()->GetPointSize();
     y = ceil(tmp / (double)glyph->GetUnitsPerEm());
     // Following lines were commented out because result of these assignemens were not used (dead store)
-    //tmp = x * m_fontStack.top()->GetPointSize();
-    //x = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    // tmp = x * m_fontStack.top()->GetPointSize();
+    // x = ceil(tmp / (double)glyph->GetUnitsPerEm());
 
     advX = glyph->GetHorizAdvX();
     tmp = advX * m_fontStack.top()->GetPointSize();
