@@ -463,16 +463,16 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_cachedMinMaxY = VRV_UNSET;
 }
 
-void FloatingCurvePositioner::MoveFrontDownward(int distance)
+void FloatingCurvePositioner::MoveFrontVertical(int distance)
 {
-    m_points[0].y -= distance;
-    m_points[1].y -= distance;
+    m_points[0].y += distance;
+    m_points[1].y += distance;
 }
 
-void FloatingCurvePositioner::MoveBackDownward(int distance)
+void FloatingCurvePositioner::MoveBackVertical(int distance)
 {
-    m_points[2].y -= distance;
-    m_points[3].y -= distance;
+    m_points[2].y += distance;
+    m_points[3].y += distance;
 }
 
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])

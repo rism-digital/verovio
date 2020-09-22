@@ -822,9 +822,11 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
                 positioners[i]->GetPoints(points1);
                 positioners[j]->GetPoints(points2);
                 if (firstSlur->GetStart() == secondSlur->GetStart()) {
-                    positioners[points1[2].x > points2[2].x ? i : j]->MoveFrontDownward(slurShift);
+                    FloatingCurvePositioner *positioner = positioners[points1[2].x > points2[2].x ? i : j];
+                    positioner->MoveFrontVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
                 } else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
-                    positioners[points1[0].x < points2[0].x ? i : j]->MoveBackDownward(slurShift);
+                    FloatingCurvePositioner *positioner = positioners[points1[0].x < points2[0].x ? i : j];
+                    positioner->MoveBackVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
                 }
             }
         }

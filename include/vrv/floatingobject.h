@@ -269,8 +269,8 @@ public:
     /**
      * Moves bounding points vertically by a specified distance downward
     */
-    void MoveFrontDownward(int distance);
-    void MoveBackDownward(int distance);
+    void MoveFrontVertical(int distance);
+    void MoveBackVertical(int distance);
 
     /**
      * Calculate the min or max Y for a set of points
