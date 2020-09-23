@@ -152,6 +152,16 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustBeams
+     */
+    virtual int AdjustBeams(FunctorParams *);
+
+    /**
+     * See Object::AdjustBeamsEnd
+     */
+    virtual int AdjustBeamsEnd(FunctorParams *);
+
+    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
@@ -196,6 +206,7 @@ public:
         m_element = NULL;
         m_closestNote = NULL;
         m_stem = NULL;
+        m_overlapMargin = 0;
     }
     virtual ~BeamElementCoord();
 
@@ -214,6 +225,7 @@ public:
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration
     int m_breaksec;
+    int m_overlapMargin;
     bool m_centered; // beam is centered on the line
     bool m_shortened; // stem is shortened because pointing oustide the staff
     char m_partialFlags[MAX_DURATION_PARTIALS];

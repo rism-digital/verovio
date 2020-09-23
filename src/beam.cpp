@@ -1063,6 +1063,8 @@ void BeamElementCoord::SetDrawingStemDir(
     else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
+
+    this->m_yBeam += m_overlapMargin;
 }
 
 int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
@@ -1109,6 +1111,54 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Beam::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    // process highest-level beam
+    if (!params->m_beam) {
+        params->m_beam = this;
+        params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
+        params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
+        return FUNCTOR_CONTINUE;
+    }
+
+    const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+
+    const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
+    const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
+
+    const int overlapMargin = std::max(leftMargin * directionBias, rightMargin * directionBias);
+    if (overlapMargin >= params->m_overlapMargin) {
+        Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+        assert(staff);
+        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params->m_overlapMargin = (overlapMargin + staffOffset) * directionBias;
+    }
+    return FUNCTOR_SIBLINGS;
+}
+
+
+int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (params->m_beam != this) return FUNCTOR_CONTINUE;
+
+    // set overlap margin for each coord in the beam
+    if (params->m_overlapMargin) {
+        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+            [overlap = params->m_overlapMargin](BeamElementCoord *coord) { coord->m_overlapMargin = overlap; });
+    }
+    params->m_beam = NULL;
+    params->m_overlapMargin = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
 
 int Beam::CalcStem(FunctorParams *functorParams)
 {

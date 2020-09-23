@@ -1129,6 +1129,39 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    // ignore elements that are not in the beam or are direct children of the beam
+    if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetParent() == params->m_beam) && !IsGraceNote()))
+        return FUNCTOR_SIBLINGS;
+
+    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    assert(staff);
+
+    // check if top/bottom of the element overlaps with beam coordinates
+    const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+    int leftMargin = 0, rightMargin = 0;
+    if (directionBias > 0) {
+        leftMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1;
+        rightMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2;
+    }
+    else {
+        leftMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1;
+        rightMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2;
+    }
+    
+    const int overlapMargin = std::max(leftMargin * directionBias, rightMargin * directionBias);
+    if (overlapMargin >= directionBias * params->m_overlapMargin) {
+        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params->m_overlapMargin = (overlapMargin + staffOffset) * directionBias;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::AdjustLayers(FunctorParams *functorParams)
 {
     AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);

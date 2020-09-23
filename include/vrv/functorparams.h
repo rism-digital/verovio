@@ -150,6 +150,36 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustBeamParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the beam that should be adjusted
+ * member 1: y coordinate of the beam left side
+ * member 2: y coordinate of the beam right side
+ * member 3: overlap margin that beam needs to be displaced by
+ * member 4: the Doc
+ **/
+
+class AdjustBeamParams : public FunctorParams {
+public:
+    AdjustBeamParams(Doc *doc)
+    {
+        m_beam = NULL;
+        m_y1 = 0;
+        m_y2 = 0;
+        m_overlapMargin = 0;
+        m_doc = doc;
+    }
+
+    Object *m_beam;
+    int m_y1;
+    int m_y2;
+    int m_overlapMargin;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
 
