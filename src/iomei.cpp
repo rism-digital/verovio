@@ -3798,6 +3798,13 @@ bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
     InstrDef *vrvInstrDef = new InstrDef();
     SetMeiUuid(instrDef, vrvInstrDef);
 
+    if (m_version < MEI_4_0_0) {
+        if (instrDef.attribute("midi.volume")) {
+            const std::string midiVol = instrDef.attribute("midi.volume").as_string();
+            instrDef.attribute("midi.volume").set_value((midiVol + "%").c_str());
+        }
+    }
+
     parent->AddChild(vrvInstrDef);
     vrvInstrDef->ReadChannelized(instrDef);
     vrvInstrDef->ReadLabelled(instrDef);
