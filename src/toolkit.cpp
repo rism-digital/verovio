@@ -1052,7 +1052,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed
-    if (!Resources::SetFont(m_options->m_font.GetValue())) {
+    if (!Resources::SetMusicFont(m_options->m_font.GetValue())) {
         LogWarning("Font '%s' could not be loaded", m_options->m_font.GetValue().c_str());
     }
 
@@ -1252,6 +1252,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
+    svg.SetDefaultFontName(m_options->m_textFont.GetValue());
 
     int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
     svg.SetIndent(indent);

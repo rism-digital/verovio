@@ -1,5 +1,6 @@
 var system = require("system");
 var fs = require("fs");
+//var readline = require('readline');
 
 if (system.args.length !== 4) {
     console.log("Usage: generate-bbox.js svg_input_file bbox_output_file ");
@@ -10,23 +11,43 @@ var address = system.args[1];
 var output = system.args[2];
 var metadata = system.args[3];
 
-var content = JSON.parse(fs.read(metadata));
-var glyphAnchors;
-if (content.hasOwnProperty("glyphsWithAnchors")) {
-    glyphAnchors = content["glyphsWithAnchors"];
+var content;
+var glyphAnchors, glyphMap;
+
+// Retain same behavior for the json file
+if (metadata.search(".json") !== -1) {
+	content = JSON.parse(fs.read(metadata));
+	if (content.hasOwnProperty("glyphsWithAnchors")) {
+		glyphAnchors = content["glyphsWithAnchors"];
+	}
+}
+// Or parse file and create symbol-code mapping if cgf file has been provided
+else if (metadata.search(".g2n") !== -1)
+{
+	glyphMap = new Map();
+	content = fs.read(metadata);
+	lines = content.split("\n");
+	for(i in lines) {
+		var input = lines[i].split(new RegExp("\\s+"));
+		if (input.length !== 6) {
+			continue;
+		}
+		//GLYPHID n	PSNAME str	UNICODE hex
+		glyphMap[input[3]] = parseInt(input[5], 16);
+		
+	}
 }
 
 var page = require("webpage").create();
 
-
-function serialize(glyphAnchors) {
+function serialize(glyphAnchors, glyphMap) {
 
     var items = document.documentElement.getElementsByTagName("path");
     var bb = null;
     var getScreenBBoxImpl = null;
     var svgns = "http://www.w3.org/2000/svg";
     var unitsPerEm = document.documentElement.getElementsByTagName("font-face")[0].getAttribute("units-per-em");
-
+	
     function getScreenBBox(e) {
         if (e.getScreenBBox) {
             return e.getScreenBBox();
@@ -43,7 +64,14 @@ function serialize(glyphAnchors) {
     var i;
     for (i = 0; i < items.length; i++) {
         var item = items[i];
-        impl += "\t<g c=\"" + item.getAttribute("id").toUpperCase() + "\" ";
+		var id = item.getAttribute("id");
+		if (glyphMap) { 
+			if (!glyphMap[id]) {
+				continue;
+			}
+			id = glyphMap[id].toString(16);
+		}
+        impl += "\t<g c=\"" + id.toUpperCase() + "\" ";
         var r = item.getBBox();
 
         // add the bb value to the implementation
@@ -54,8 +82,6 @@ function serialize(glyphAnchors) {
         if (item.getAttribute("horiz-adv-x")) {
             impl += "h-a-x=\"" + item.getAttribute("horiz-adv-x") + "\" ";
         }
-
-
 
         if (glyphAnchors) {
             var anchor = null;
@@ -94,7 +120,7 @@ function extract() {
             console.log("Failed to open the page.");
         }
         else {
-            var code = page.evaluate(serialize, glyphAnchors);
+            var code = page.evaluate(serialize, glyphAnchors, glyphMap);
             //console.log(code);
             try {
                 // We write the impl to the file...
