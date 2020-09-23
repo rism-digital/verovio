@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 19 12:17:14 PDT 2020
+// Last Modified: Sun Sep 20 14:20:16 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -60861,9 +60861,11 @@ void Tool_filter::initialize(HumdrumFile& infile) {
 //
 
 Tool_flipper::Tool_flipper(void) {
-	define("k|keep=b",     "keep *flip/*Xflip instructions");
-	define("a|all=b",     "flip globally, not just inside *flip/*Xflip regions");
-	define("i|interp=s:kern", "flip only in this interpretation");
+	define("k|keep=b",         "keep *flip/*Xflip instructions");
+	define("a|all=b",          "flip globally, not just inside *flip/*Xflip regions");
+	define("s|strophe=b",      "flip inside of strophes as well");
+	define("S|strophe-only|only-strophe=b", "flip only inside of strophes as well");
+	define("i|interp=s:kern",  "flip only in this interpretation");
 }
 
 
@@ -60920,10 +60922,11 @@ bool Tool_flipper::run(HumdrumFile& infile) {
 //
 
 void Tool_flipper::initialize(void) {
-	m_allQ = getBoolean("all");
-	m_keepQ = getBoolean("keep");
-	m_kernQ = true;
-	m_interp = getString("interp");
+	m_allQ         = getBoolean("all");
+	m_keepQ        = getBoolean("keep");
+	m_kernQ        = true;
+	m_stropheQ     = getBoolean("strophe");
+	m_interp       = getString("interp");
 	if (m_interp != "kern") {
 		m_kernQ = false;
 	}
@@ -60937,14 +60940,19 @@ void Tool_flipper::initialize(void) {
 //
 
 void Tool_flipper::processFile(HumdrumFile& infile) {
+
 	m_fliplines.resize(infile.getLineCount());
 	fill(m_fliplines.begin(), m_fliplines.end(), false);
+
 	m_flipState.resize(infile.getMaxTrack()+1);
 	if (m_allQ) {
 		fill(m_flipState.begin(), m_flipState.end(), true);
 	} else {
 		fill(m_flipState.begin(), m_flipState.end(), false);
 	}
+
+	m_strophe.resize(infile.getMaxTrack()+1);
+	fill(m_strophe.begin(), m_strophe.end(), false);
 
 	for (int i=0; i<infile.getLineCount(); i++) {
 		processLine(infile, i);
@@ -60971,11 +60979,26 @@ void Tool_flipper::checkForFlipChanges(HumdrumFile& infile, int index) {
 	if (!infile[index].isInterpretation()) {
 		return;
 	}
+
+	int track;
+
+	for (int i=0; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (*token == "*strophe") {
+			track = token->getTrack();
+			m_strophe[track] = true;
+		} else if (*token == "*Xstrophe") {
+			track = token->getTrack();
+			m_strophe[track] = false;
+		}
+	}
+
+
 	if (m_allQ) {
 		// state always stays on in this case
 		return;
 	}
-	int track;
+
 	for (int i=0; i<infile[index].getFieldCount(); i++) {
 		HTp token = infile.token(index, i);
 		if (*token == "*flip") {
@@ -60988,6 +61011,7 @@ void Tool_flipper::checkForFlipChanges(HumdrumFile& infile, int index) {
 			m_fliplines[i] = true;
 		}
 	}
+
 }
 
 
@@ -61001,7 +61025,7 @@ void Tool_flipper::processLine(HumdrumFile& infile, int index) {
 	if (!infile[index].hasSpines()) {
 		return;
 	}
-	if ((!m_allQ) && infile[index].isInterpretation()) {
+	if (infile[index].isInterpretation()) {
 		checkForFlipChanges(infile, index);
 	}
 
@@ -61076,6 +61100,9 @@ void Tool_flipper::extractFlipees(vector<vector<HTp>>& flipees,
 	for (int i=0; i<line->getFieldCount(); i++) {
 		HTp token = line->token(i);
 		track = token->getTrack();
+		if ((!m_stropheQ) && m_strophe[track]) {
+			continue;
+		}
 		if (!m_flipState[track]) {
 			continue;
 		}

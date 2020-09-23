@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 19 12:17:14 PDT 2020
+// Last Modified: Sun Sep 20 14:20:16 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6039,12 +6039,14 @@ class Tool_flipper : public HumTool {
 		                             HumdrumFile& infile, int index);
 
 	private:
-		bool     m_allQ    = false;
-		bool     m_keepQ   = false;
-		bool     m_kernQ   = false;
+		bool     m_allQ         = false;
+		bool     m_keepQ        = false;
+		bool     m_kernQ        = false;
+		bool     m_stropheQ     = false;
 		std::string m_interp;
 		std::vector<bool> m_flipState;
 		std::vector<bool> m_fliplines;
+		std::vector<bool> m_strophe;
 
 };
 
