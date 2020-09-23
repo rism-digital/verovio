@@ -267,6 +267,12 @@ public:
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
     /**
+     * Moves bounding points vertically by a specified distance downward
+    */
+    void MoveFrontVertical(int distance);
+    void MoveBackVertical(int distance);
+
+    /**
      * Calculate the min or max Y for a set of points
      */
     int CalcMinMaxY(const Point points[4]);
@@ -281,7 +287,7 @@ public:
      * @name Getters for the current parameters
      */
     ///@{
-    void GetPoints(Point points[4]);
+    void GetPoints(Point points[4]) const;
     float GetAngle() { return m_angle; }
     int GetThickness() { return m_thickness; }
     curvature_CURVEDIR GetDir() { return m_dir; }

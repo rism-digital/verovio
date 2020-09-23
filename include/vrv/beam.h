@@ -47,13 +47,18 @@ public:
     /**
      *
      */
-    ArrayOfBeamElementCoords &GetElementCoordRefs();
+    const ArrayOfBeamElementCoords *GetElementCoordRefs();
 
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
     void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoordRefs();
 
 private:
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
@@ -62,14 +67,14 @@ private:
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
 
     void CalcAdjustSlope(
-        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
+        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step, const int &elementCount);
 
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
-    void CalcSetValues();
+    void CalcSetValues(const int &elementCount);
 
 public:
     // values set by CalcBeam
@@ -197,7 +202,7 @@ public:
     data_STEMDIRECTION GetStemDir();
 
     void SetDrawingStemDir(
-        data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface, bool isLast);
+        data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
 
     int m_x;
     int m_yBeam; // y value of stem top position

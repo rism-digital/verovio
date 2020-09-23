@@ -7,6 +7,7 @@
 #import <VerovioFramework/areaposinterface.h>
 #import <VerovioFramework/harm.h>
 #import <VerovioFramework/keyaccid.h>
+#import <VerovioFramework/fing.h>
 #import <VerovioFramework/functorparams.h>
 #import <VerovioFramework/comparison.h>
 #import <VerovioFramework/toolkit.h>
@@ -60,6 +61,7 @@
 #import <VerovioFramework/devicecontextbase.h>
 #import <VerovioFramework/pitchinterface.h>
 #import <VerovioFramework/plistinterface.h>
+#import <VerovioFramework/phrase.h>
 #import <VerovioFramework/mrest.h>
 #import <VerovioFramework/textelement.h>
 #import <VerovioFramework/doc.h>
@@ -124,6 +126,7 @@
 #import <VerovioFramework/iopae.h>
 #import <VerovioFramework/instrdef.h>
 #import <VerovioFramework/barline.h>
+#import <VerovioFramework/transposition.h>
 #import <VerovioFramework/nc.h>
 #import <VerovioFramework/reh.h>
 #import <VerovioFramework/system.h>
