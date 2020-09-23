@@ -265,6 +265,12 @@ void BeamSegment::CalcBeamInit(
     }
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
+    // Only if not only rests. (Will produce non-sense output anyway)
+    const auto elementCount = static_cast<decltype(m_avgY)>(m_beamElementCoordRefs.size());
+    if (elementCount != nbRests) {
+        m_avgY /= elementCount - nbRests;
+    }
+
     if (!m_firstNoteOrChord) return;
     if (!m_lastNoteOrChord) m_lastNoteOrChord = m_firstNoteOrChord;
 
@@ -293,12 +299,6 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_stemXAbove[1] =
             doc->GetGlyphWidth(lastSmuflCode, staff->m_drawingStaffSize, lastGrace) - drawingStemWidth;
         beamInterface->m_stemXBelow[0] = beamInterface->m_stemXBelow[1] = drawingStemWidth;
-    }
-
-    // Only if not only rests. (Will produce non-sense output anyway)
-    const auto elementCount = static_cast<decltype(m_avgY)>(m_beamElementCoordRefs.size());
-    if (elementCount != nbRests) {
-        m_avgY /= elementCount - nbRests;
     }
 }
 
