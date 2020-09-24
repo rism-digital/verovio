@@ -1137,6 +1137,7 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     // ignore elements that are not in the beam or are direct children of the beam
     if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetParent() == params->m_beam) && !IsGraceNote()))
         return FUNCTOR_SIBLINGS;
+    if (Is(GRACEGRP)) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);

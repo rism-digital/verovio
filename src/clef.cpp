@@ -91,6 +91,7 @@ int Clef::AdjustBeams(FunctorParams* functorParams)
 
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
+    if (!params->m_beam) return FUNCTOR_SIBLINGS;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
@@ -104,14 +105,20 @@ int Clef::AdjustBeams(FunctorParams* functorParams)
     const int clefPosition = staff->GetDrawingY()
         - params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - GetLine());
     const int clefGlyphHeight
-        = params->m_doc->GetGlyphHeight(currentShapeIter->second.first, staff->m_drawingStaffSize, false);
-    const int leftMargin = clefPosition + clefGlyphHeight * currentShapeIter->second.second - params->m_y1;
-    const int rightMargin = clefPosition + clefGlyphHeight * currentShapeIter->second.second - params->m_y2;
-
-    const int overlapMargin = std::max(leftMargin, rightMargin);
-    if (overlapMargin >= params->m_overlapMargin) {
+        = params->m_doc->GetGlyphHeight(currentShapeIter->second.first, staff->m_drawingStaffSize, true);
+    const int beamWidth = params->m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false);
+    const int leftMargin = clefPosition + clefGlyphHeight * currentShapeIter->second.second + beamWidth - params->m_y1;
+    const int rightMargin = clefPosition + clefGlyphHeight * currentShapeIter->second.second + beamWidth - params->m_y2;
+    
+    // If both sides of beam overlap with Clef, we need to get smaller margin, i.e. the one that would make one side not
+    // overlap anymore. For sloped beams this would generally mean that slope will avoid collision as well, for non-sloped
+    // ones it doesn't matter since both ends are at the same Y position
+    const bool bothSidesOverlap = ((leftMargin > params->m_overlapMargin) && (rightMargin > params->m_overlapMargin));
+    const int overlapMargin = bothSidesOverlap ? std::min(leftMargin, rightMargin) : std::max(leftMargin, rightMargin);
+    if ((overlapMargin >= params->m_overlapMargin)
+        && ((overlapMargin > beamWidth / 2) || (leftMargin == rightMargin))) {
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params->m_overlapMargin = (overlapMargin/staffOffset + 1) * staffOffset;
+        params->m_overlapMargin = (overlapMargin / staffOffset + (leftMargin == rightMargin? 1 : 2)) * staffOffset;
     }
 
     return FUNCTOR_CONTINUE;
