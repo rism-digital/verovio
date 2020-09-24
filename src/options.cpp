@@ -908,12 +908,12 @@ Options::Options()
 
     m_spacingBraceGroup.SetInfo(
         "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
-    m_spacingBraceGroup.Init(12, 0, 36);
+    m_spacingBraceGroup.Init(12, 0, 48);
     this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
 
     m_spacingBracketGroup.SetInfo(
         "Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
-    m_spacingBracketGroup.Init(12, 0, 36);
+    m_spacingBracketGroup.Init(12, 0, 48);
     this->Register(&m_spacingBracketGroup, "spacingBracketGroup", &m_generalLayout);
 
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
@@ -929,7 +929,7 @@ Options::Options()
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
 
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
-    m_spacingStaff.Init(12, 0, 36);
+    m_spacingStaff.Init(12, 0, 48);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
 
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
