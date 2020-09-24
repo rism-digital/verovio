@@ -291,9 +291,9 @@ void BeamSegment::CalcBeamInit(
         const wchar_t lastSmuflCode = lastNote->GetNoteheadGlyph(lastNote->GetDrawingDur());
         // x-offset values for stem bases, dx[y] where y = element->m_cueSize
         int drawingStemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
-        const bool graceGroop = firstNote->GetFirstAncestor(GRACEGRP);
-        const bool firstGrace = graceGroop || firstNote->HasGrace();
-        const bool lastGrace = graceGroop || lastNote->HasGrace();
+        const bool graceGroup = firstNote->GetFirstAncestor(GRACEGRP);
+        const bool firstGrace = graceGroup || firstNote->HasGrace() || firstNote->HasCue();
+        const bool lastGrace = graceGroup || lastNote->HasGrace() || lastNote->HasCue();
         beamInterface->m_stemXAbove[0] =
             doc->GetGlyphWidth(firstSmuflCode, staff->m_drawingStaffSize, firstGrace) - drawingStemWidth;
         beamInterface->m_stemXAbove[1] =
