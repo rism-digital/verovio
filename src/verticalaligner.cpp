@@ -286,7 +286,7 @@ int StaffAlignment::GetStaffSize() const
 
 const AttSpacing *StaffAlignment::GetAttSpacing() const
 {
-    System* system = GetParentSystem();
+    System *system = GetParentSystem();
     assert(system);
 
     return system->GetDrawingScoreDef();
@@ -377,7 +377,7 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetSelfBottom() + m_staffHeight - this->GetYRel());
 }
 
-int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing* attSpacing) const
+int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const
 {
     const auto &option = doc->GetOptions()->m_spacingStaff;
     int spacing = option.GetValue() * doc->GetDrawingUnit(GetStaffSize());
@@ -421,10 +421,8 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                                              : GetMinimumStaffSpacing(doc, scoreDefSpacing);
                     break;
                 }
-                case SystemAligner::SpacingType::None:
-                    break;
-                default:
-                    assert(false);
+                case SystemAligner::SpacingType::None: break;
+                default: assert(false);
             }
         }
     }
@@ -837,7 +835,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     std::vector<FloatingCurvePositioner *> positioners;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({PHRASE, SLUR})) continue;
+        if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
         Slur *slur = vrv_cast<Slur *>(positioner->GetObject());
         assert(slur);
 
@@ -867,10 +865,13 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
                 positioners[j]->GetPoints(points2);
                 if (firstSlur->GetStart() == secondSlur->GetStart()) {
                     FloatingCurvePositioner *positioner = positioners[points1[2].x > points2[2].x ? i : j];
-                    positioner->MoveFrontVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
-                } else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
+                    positioner->MoveFrontVertical(
+                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                }
+                else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
                     FloatingCurvePositioner *positioner = positioners[points1[0].x < points2[0].x ? i : j];
-                    positioner->MoveBackVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                    positioner->MoveBackVertical(
+                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
                 }
             }
         }

@@ -24,7 +24,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ScoreDefInterface::ScoreDefInterface()
-    : Interface(), AttLyricStyle(), AttMeasureNumbers(), AttMidiTempo(), AttMultinumMeasures(), AttSystems(), AttSpacing()
+    : Interface()
+    , AttLyricStyle()
+    , AttMeasureNumbers()
+    , AttMidiTempo()
+    , AttMultinumMeasures()
+    , AttSystems()
+    , AttSpacing()
 {
     RegisterInterfaceAttClass(ATT_LYRICSTYLE);
     RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
