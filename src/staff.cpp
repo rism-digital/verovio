@@ -121,10 +121,10 @@ bool Staff::IsSupportedChild(Object *child)
     if (child->Is(LAYER)) {
         Layer *layer = vrv_cast<Layer *>(child);
         assert(layer);
-        if (layer && (layer->GetN() < 1)) {
+        if (layer && !layer->HasN()) {
             // This is not 100% safe if we have a <app> and <rdg> with more than
             // one layer as a previous child.
-            layer->SetN(this->GetChildCount());
+            layer->SetN(this->GetChildCount(LAYER) + 1);
         }
     }
     else if (child->IsEditorialElement()) {

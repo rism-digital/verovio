@@ -38,7 +38,7 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
-Layer::Layer(int n)
+Layer::Layer()
     : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
@@ -56,7 +56,6 @@ Layer::Layer(int n)
     m_cautionStaffDefMeterSig = NULL;
 
     Reset();
-    SetN(n);
 }
 
 Layer::~Layer()
