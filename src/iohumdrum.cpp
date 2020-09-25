@@ -18298,8 +18298,17 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         tokindex = 0;
     }
 
-    // check for lower accidental on turn
+    // check for upper and lower accidental on turn
     std::string loweraccid = token->getValue("auto", to_string(tokindex), "turnLowerAccidental");
+    std::string upperaccid = token->getValue("auto", to_string(tokindex), "turnUpperAccidental");
+    // check to see if they need to be flipped
+    std::string text = token->getLayoutParameter("TURN", "facc");
+    if (text == "true") {
+        std::string tval = loweraccid;
+        loweraccid = upperaccid;
+        upperaccid = tval;
+    }
+
     bool hasloweraccid = loweraccid.empty() ? false : true;
     int loweraccidval = 0;
     if (hasloweraccid) {
@@ -18313,8 +18322,6 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         }
     }
 
-    // check for upper accidental on turn
-    std::string upperaccid = token->getValue("auto", to_string(tokindex), "turnUpperAccidental");
     bool hasupperaccid = upperaccid.empty() ? false : true;
     int upperaccidval = 0;
     if (hasupperaccid) {
