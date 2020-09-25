@@ -73,6 +73,8 @@ private:
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
+    int CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
     void CalcSetValues(const int &elementCount);
 
@@ -87,6 +89,7 @@ public:
     int m_avgY;
     int m_ledgerLinesAbove;
     int m_ledgerLinesBelow;
+    int m_uniformStemLength;
 
     BeamElementCoord *m_firstNoteOrChord;
     BeamElementCoord *m_lastNoteOrChord;
@@ -203,6 +206,8 @@ public:
 
     void SetDrawingStemDir(
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
+
+    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
 
     int m_x;
     int m_yBeam; // y value of stem top position
