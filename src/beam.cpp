@@ -93,15 +93,27 @@ void BeamSegment::CalcBeam(
 
     // Set drawing stem positions
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
-        data_STEMDIRECTION stemDir = coord->GetStemDir();
+        data_STEMDIRECTION stemDir;
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             stemDir = STEMDIRECTION_up;
         }
         else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
             stemDir = STEMDIRECTION_down;
         }
-        // TODO - Handle cases where there is no given stem direction (here we can still have NONE)
-        coord->SetDrawingStemDir(stemDir, staff, doc, this, beamInterface, coord == m_beamElementCoordRefs.back());
+        // cross-staff or beam@place=mixed
+        else {
+            if (beamInterface->m_isCrossStaff) {
+                // TODO - look at staff@n and set the stem direction
+                Staff* currentCrossStaff = coord->m_element->m_crossStaff;
+                if (currentCrossStaff) {
+                    // if (currentCrossStaff->GetN() < staff->GetN()
+                }
+            } else {
+                stemDir = coord->GetStemDir();
+                // TODO - Handle cases where there is no given stem direction (here we can still have NONE)
+            }
+        }
+        coord->SetDrawingStemDir(stemDir, staff, doc, this, beamInterface);
     }
 
     // ArrayOfBeamElementCoords stemUps;
@@ -270,36 +282,6 @@ void BeamSegment::CalcBeamInit(
     if (elementCount != nbRests) {
         m_avgY /= elementCount - nbRests;
     }
-
-    if (!m_firstNoteOrChord) return;
-    if (!m_lastNoteOrChord) m_lastNoteOrChord = m_firstNoteOrChord;
-
-    Note *firstNote = NULL, *lastNote = NULL;
-    if (m_firstNoteOrChord->m_element->Is(NOTE)) {
-        firstNote = vrv_cast<Note *>(m_firstNoteOrChord->m_element);
-    } else if (m_firstNoteOrChord->m_element->Is(CHORD)){
-        firstNote = vrv_cast<Chord *>(m_firstNoteOrChord->m_element)->GetBottomNote();
-    }
-    if (m_lastNoteOrChord->m_element->Is(NOTE)) {
-        lastNote = vrv_cast<Note *>(m_lastNoteOrChord->m_element);
-    } else if (m_lastNoteOrChord->m_element->Is(CHORD)){
-        lastNote = vrv_cast<Chord *>(m_lastNoteOrChord->m_element)->GetBottomNote();
-    }
-
-    if (firstNote && lastNote) {
-        const wchar_t firstSmuflCode = firstNote->GetNoteheadGlyph(firstNote->GetDrawingDur());
-        const wchar_t lastSmuflCode = lastNote->GetNoteheadGlyph(lastNote->GetDrawingDur());
-        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-        int drawingStemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
-        const bool graceGroup = firstNote->GetFirstAncestor(GRACEGRP);
-        const bool firstGrace = graceGroup || firstNote->HasGrace() || firstNote->HasCue();
-        const bool lastGrace = graceGroup || lastNote->HasGrace() || lastNote->HasCue();
-        beamInterface->m_stemXAbove[0] =
-            doc->GetGlyphWidth(firstSmuflCode, staff->m_drawingStaffSize, firstGrace) - drawingStemWidth;
-        beamInterface->m_stemXAbove[1] =
-            doc->GetGlyphWidth(lastSmuflCode, staff->m_drawingStaffSize, lastGrace) - drawingStemWidth;
-        beamInterface->m_stemXBelow[0] = beamInterface->m_stemXBelow[1] = drawingStemWidth;
-    }
 }
 
 bool BeamSegment::CalcBeamSlope(
@@ -322,11 +304,12 @@ bool BeamSegment::CalcBeamSlope(
         Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
 
     int noteStep = 0;
-    double noteSlope = 0.0;
     if (m_firstNoteOrChord->m_closestNote && m_lastNoteOrChord->m_closestNote) {
-        noteSlope
-            = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_closestNote->GetDrawingY()),
-                Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_closestNote->GetDrawingY()));
+        if (m_beamSlope==0.0) {
+            m_beamSlope =
+                BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_closestNote->GetDrawingY()),
+                                       Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_closestNote->GetDrawingY()));
+        }
         noteStep
             = abs(m_firstNoteOrChord->m_closestNote->GetDrawingY() - m_lastNoteOrChord->m_closestNote->GetDrawingY());
     }
@@ -336,7 +319,6 @@ bool BeamSegment::CalcBeamSlope(
     // This can happen with two notes with 32sd or 64th notes and a diatonic step
     // Force the noteSlope to be considered instead
     if (m_beamSlope == 0.0) {
-        m_beamSlope = noteSlope;
         return false;
     }
 
@@ -943,7 +925,7 @@ data_STEMDIRECTION BeamElementCoord::GetStemDir()
 }
 
 void BeamElementCoord::SetDrawingStemDir(
-    data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface, bool isLast)
+    data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface)
 {
     assert(staff);
     assert(doc);
@@ -967,12 +949,23 @@ void BeamElementCoord::SetDrawingStemDir(
     int ledgerLinesOpposite = 0;
     int stemLen = 1;
 
+    Note *note;
     if (this->m_element->Is(NOTE)) {
         m_closestNote = dynamic_cast<Note *>(this->m_element);
+        note = vrv_cast<Note *>(m_element);
+    } else {
+        note = vrv_cast<Chord *>(m_element)->GetBottomNote();
+    }
+
+    const int drawingStemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize)/2;
+    int dx = 0;
+    if (note) {
+        const wchar_t firstSmuflCode = note->GetNoteheadGlyph(note->GetDrawingDur());
+        dx = doc->GetGlyphWidth(firstSmuflCode, staff->m_drawingStaffSize, interface->m_cueSize)-drawingStemWidth;
     }
 
     if (stemDir == STEMDIRECTION_up) {
-        this->m_x += interface->m_stemXAbove[isLast ? 1 : 0];
+        this->m_x += dx;
         if (this->m_element->Is(CHORD)) {
             Chord *chord = vrv_cast<Chord *>(this->m_element);
             assert(chord);
@@ -985,7 +978,7 @@ void BeamElementCoord::SetDrawingStemDir(
         }
     }
     else {
-        this->m_x += interface->m_stemXBelow[isLast ? 1 : 0];
+        this->m_x += drawingStemWidth;
         if (this->m_element->Is(CHORD)) {
             Chord *chord = vrv_cast<Chord *>(this->m_element);
             assert(chord);

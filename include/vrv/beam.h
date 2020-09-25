@@ -197,7 +197,7 @@ public:
     data_STEMDIRECTION GetStemDir();
 
     void SetDrawingStemDir(
-        data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface, bool isLast);
+        data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
 
     int m_x;
     int m_yBeam; // y value of stem top position
