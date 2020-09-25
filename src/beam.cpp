@@ -59,6 +59,7 @@ void BeamSegment::Reset()
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
+    m_uniformStemLength = 0;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -101,6 +102,8 @@ void BeamSegment::CalcBeam(
     // Beam@place has precedence - however, in some cases, CalcBeam is called recusively because we need to change the
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
+
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace == BEAMPLACE_below ? STEMDIRECTION_down : STEMDIRECTION_up);
 
     // Set drawing stem positions
     for (i = 0; i < elementCount; ++i) {
@@ -747,10 +750,15 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
-int BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
 {
-    // TODO
-    return 0;
+    const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    for (auto coord : m_beamElementCoordRefs) {
+        const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
+        if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
+            m_uniformStemLength = coordStemDir;
+        }
+    }
 }
 
 void BeamSegment::CalcSetValues(const int &elementCount)
@@ -1029,10 +1037,8 @@ void BeamElementCoord::SetDrawingStemDir(
 
     if (!m_closestNote) return;
 
-    int stemLen = CalculateStemLength(staff, stemDir);
-
-    if (stemLen % 2) this->m_centered = true;
-    this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+    if (segment->m_uniformStemLength % 2) this->m_centered = true;
+    this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
@@ -1068,6 +1074,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
 int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
 {
+    if (!m_closestNote) return 0;
     const bool onStaffLine = m_closestNote->GetDrawingLoc() % 2;
     bool extend = onStaffLine;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;

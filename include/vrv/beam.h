@@ -73,7 +73,8 @@ private:
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
-    int CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+    // Helper to calculate the longest stem length of the beam (which will be used uniformely)
+    void CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir);
 
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
     void CalcSetValues(const int &elementCount);
