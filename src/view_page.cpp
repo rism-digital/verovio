@@ -1105,10 +1105,9 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
 
     dc->StartCustomGraphic("ledgerLines", gClass);
 
-    const int optionLedgerWidth
+    int lineWidth
         = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int lineWidth = optionLedgerWidth * 1.75;
-    if (cueSize) lineWidth = optionLedgerWidth * 1.25;
+    if (cueSize) lineWidth *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
