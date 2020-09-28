@@ -4430,10 +4430,10 @@ bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)
     vrvLayer->ReadVisibility(layer);
 
     if (!vrvLayer->HasN()) {
-        LogWarning("No @n on <layer>, 1 is set");
+        LogWarning("Missing @n on <layer>, filled by order");
     }
     else if (vrvLayer->GetN() == 0) {
-        LogWarning("Value @n='1' on <layer> might yield unpredictable results");
+        LogWarning("Value @n='0' on <layer> might yield unpredictable results");
     }
 
     parent->AddChild(vrvLayer);

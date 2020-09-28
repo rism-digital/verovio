@@ -42,7 +42,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Layer(int n = 1);
+    Layer();
     virtual ~Layer();
     virtual Object *Clone() const { return new Layer(*this); }
     virtual void Reset();
