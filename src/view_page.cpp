@@ -355,11 +355,12 @@ void View::DrawStaffGrp(
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
         DrawBracket(dc, x, yTop, yBottom, staffSize);
-        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
+        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue() + m_doc->GetDrawingUnit(staffSize);
+
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracketsq) {
         DrawBracketsq(dc, x, yTop, yBottom, staffSize);
-        x -= m_doc->GetDrawingBeamWidth(staffSize, false) + 1.5 * m_doc->GetDrawingStaffLineWidth(staffSize);
+        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue() + m_doc->GetDrawingUnit(staffSize);
     }
 
     // recursively draw the children
@@ -491,11 +492,11 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     assert(dc);
 
     const int offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
-    const int beamWidth = m_doc->GetDrawingBeamWidth(staffSize, false);
+    const int basicDist = m_doc->GetDrawingUnit(staffSize);
 
     const int bracketThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
 
-    const int x2 = x - bracketThickness;
+    const int x2 = x - basicDist;
     const int x1 = x2 - bracketThickness;
 
     dc->StartCustomGraphic("grpSym");
@@ -503,7 +504,7 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     DrawSmuflCode(dc, x1, y1 + offset + bracketThickness / 2, SMUFL_E003_bracketTop, staffSize, false);
     DrawSmuflCode(dc, x1, y2 - offset - bracketThickness / 2, SMUFL_E004_bracketBottom, staffSize, false);
 
-    DrawFilledRectangle(dc, x1, y1 + 2 * offset + beamWidth / 2, x2, y2 - 2 * offset - beamWidth / 2);
+    DrawFilledRectangle(dc, x1, y1 + 2 * offset + bracketThickness / 2, x2, y2 - 2 * offset - bracketThickness / 2);
 
     dc->EndCustomGraphic();
 
@@ -514,17 +515,17 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 {
     assert(dc);
 
-    int offset;
+    const int offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
+    const int basicDist = m_doc->GetDrawingUnit(staffSize);
 
     const int bracketWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
-    x -= bracketWidth;
-    offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
+    x -= basicDist;
 
     dc->StartCustomGraphic("grpSym");
 
     DrawFilledRectangle(dc, x, y1 + offset, x - bracketWidth, y2 - offset); // left
-    DrawFilledRectangle(dc, x, y1 + offset, x + bracketWidth, y1 - offset); // top
-    DrawFilledRectangle(dc, x, y2 + offset, x + bracketWidth, y2 - offset); // bottom
+    DrawFilledRectangle(dc, x, y1 + offset, x + basicDist, y1 - offset); // top
+    DrawFilledRectangle(dc, x, y2 + offset, x + basicDist, y2 - offset); // bottom
 
     dc->EndCustomGraphic();
 
