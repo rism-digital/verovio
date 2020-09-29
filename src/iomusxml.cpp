@@ -1025,6 +1025,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     clef->SetDis(OCTAVE_DIS_8);
                 else if (abs(change) == 2)
                     clef->SetDis(OCTAVE_DIS_15);
+                else if (abs(change) == 3)
+                    clef->SetDis(OCTAVE_DIS_22);
                 if (change < 0)
                     clef->SetDisPlace(STAFFREL_basic_below);
                 else if (change > 0)
@@ -1477,6 +1479,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     meiClef->SetDis(OCTAVE_DIS_8);
                 else if (abs(change) == 2)
                     meiClef->SetDis(OCTAVE_DIS_15);
+                else if (abs(change) == 3)
+                    meiClef->SetDis(OCTAVE_DIS_22);
                 if (change < 0)
                     meiClef->SetDisPlace(STAFFREL_basic_below);
                 else
