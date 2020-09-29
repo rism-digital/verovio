@@ -998,7 +998,6 @@ void BeamElementCoord::SetDrawingStemDir(
     bool onStaffLine = false;
     int ledgerLines = 0;
     int ledgerLinesOpposite = 0;
-    this->m_centered = false;
     this->m_shortened = false;
     this->m_closestNote = NULL;
 
@@ -1037,30 +1036,19 @@ void BeamElementCoord::SetDrawingStemDir(
 
     if (!m_closestNote) return;
 
-    if (segment->m_uniformStemLength % 2) this->m_centered = true;
+    this->m_centered = segment->m_uniformStemLength % 2;
     this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (stemDir == STEMDIRECTION_up) {
-        if (this->m_yBeam <= segment->m_verticalCenter) {
-            this->m_yBeam = segment->m_verticalCenter;
-            segment->m_extendedToCenter = true;
-            this->m_centered = false;
-        }
-        else {
-            segment->m_extendedToCenter = false;
-        }
+    if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
+        || (segment->m_verticalCenter <= this->m_yBeam)) {
+        this->m_yBeam = segment->m_verticalCenter;
+        segment->m_extendedToCenter = true;
+        this->m_centered = false;
     }
     else {
-        if (segment->m_verticalCenter <= this->m_yBeam) {
-            this->m_yBeam = segment->m_verticalCenter;
-            segment->m_extendedToCenter = true;
-            this->m_centered = false;
-        }
-        else {
-            segment->m_extendedToCenter = false;
-        }
+        segment->m_extendedToCenter = false;
     }
 
     // Make sure there is a at least one staff space before the ledger lines
