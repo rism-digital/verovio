@@ -144,10 +144,8 @@ public:
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */
     static bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
-    /** Select a particular music font */
-    static bool SetMusicFont(const std::string &fontName);
-    /** Select a particular text font */
-    static bool SetTextFont(const std::string &fontName, const bool usePostfixes = true);
+    /** Select a particular font */
+    static bool SetFont(const std::string &fontName);
     /** Returns the glyph (if exists) for the current SMuFL font */
     static Glyph *GetGlyph(wchar_t smuflCode);
     /** Set current text style*/
