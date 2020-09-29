@@ -87,7 +87,6 @@ public:
         m_userScaleX = scaleX;
         m_userScaleY = scaleY;
     }
-    void SetDefaultFontName(const std::string &defaultFontName) { m_defaultFontName = defaultFontName; }
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
     int GetContentHeight() const { return m_contentHeight; }
@@ -288,9 +287,6 @@ protected:
     bool m_isDeactivatedY;
 
     Zone *m_facsimile = NULL;
-
-    /** stores default font for global styling*/
-    std::string m_defaultFontName;
 
 private:
     /** stores the width and height of the device context */
