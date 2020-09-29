@@ -971,6 +971,11 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(doc);
     assert(interface);
 
+    if (m_element->Is(REST)) {
+        this->m_x += m_element->GetDrawingRadius(doc);
+        return;
+    }
+
     if (!this->m_element->Is({ CHORD, NOTE })) return;
 
     StemmedDrawingInterface *stemInterface = this->m_element->GetStemmedDrawingInterface();
