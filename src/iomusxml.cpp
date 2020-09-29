@@ -2372,7 +2372,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-    bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']")) ? true : false;
+    const bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']")) ? true : false;
+    pugi::xml_node grace = node.select_node("grace").node();
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -2582,6 +2583,15 @@ void MusicXmlInput::ReadMusicXmlNote(
                 AddLayerElement(layer, chord, duration);
                 m_elementStackMap.at(layer).push_back(chord);
                 element = chord;
+                if (grace) {
+                    if (grace.attribute("slash")) {
+                        chord->SetGrace(GRACE_unacc);
+                        chord->SetStemMod(STEMMODIFIER_1slash);
+                    }
+                    else {
+                        chord->SetGrace(GRACE_acc);
+                    }
+                }
             }
         }
         // If the current note is part of a chord.
@@ -2602,21 +2612,17 @@ void MusicXmlInput::ReadMusicXmlNote(
             else if (chord->GetCue() != BOOLEAN_NONE) {
                 chord->SetCue(BOOLEAN_true);
             }
+            grace = pugi::xml_node();
         }
 
-        // grace notes
-        pugi::xpath_node grace = node.select_node("grace");
+        // single grace note
         if (grace) {
-            std::string slashStr = grace.node().attribute("slash").as_string();
-            if (slashStr == "no") {
-                note->SetGrace(GRACE_acc);
-            }
-            else if (slashStr == "yes") {
+            if (grace.attribute("slash")) {
                 note->SetGrace(GRACE_unacc);
                 note->SetStemMod(STEMMODIFIER_1slash);
             }
             else {
-                note->SetGrace(GRACE_unknown);
+                note->SetGrace(GRACE_acc);
             }
         }
         if (cue) note->SetCue(BOOLEAN_true);
