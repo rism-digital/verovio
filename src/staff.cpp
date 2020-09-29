@@ -546,12 +546,10 @@ int Staff::CalcStem(FunctorParams *)
         layers = nonEmptyLayers;
     }
 
-    data_STEMDIRECTION stemDir = STEMDIRECTION_up;
     for (auto &object : layers) {
+        // Alter stem direction between even and odd numbered layers
         Layer *layer = dynamic_cast<Layer *>(object);
-        layer->SetDrawingStemDir(stemDir);
-        // All remaining layers with stem down
-        stemDir = STEMDIRECTION_down;
+        layer->SetDrawingStemDir(layer->GetN() % 2 ? STEMDIRECTION_up : STEMDIRECTION_down);
     }
 
     return FUNCTOR_CONTINUE;
