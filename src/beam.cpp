@@ -1042,7 +1042,7 @@ void BeamElementCoord::SetDrawingStemDir(
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
     if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
-        || (segment->m_verticalCenter <= this->m_yBeam)) {
+        || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= this->m_yBeam))) {
         this->m_yBeam = segment->m_verticalCenter;
         segment->m_extendedToCenter = true;
         this->m_centered = false;
