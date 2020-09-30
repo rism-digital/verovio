@@ -2797,15 +2797,19 @@ void MusicXmlInput::ReadMusicXmlNote(
         for (pugi::xml_node technical : notations.node().children("technical")) {
             // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
             if (technical.child("fingering")) continue;
-
-            Artic *artic = new Artic();
-            for (pugi::xml_node articulation : technical.children()) {
-                artics.push_back(ConvertArticulations(articulation.name()));
+            if (technical.child("fret")) {
+                // set @tab.string and @tab.fret
             }
-            artic->SetArtic(artics);
-            artic->SetType("technical");
-            element->AddChild(artic);
-            artics.clear();
+            else {
+                Artic *artic = new Artic();
+                for (pugi::xml_node articulation : technical.children()) {
+                    artics.push_back(ConvertArticulations(articulation.name()));
+                }
+                artic->SetArtic(artics);
+                artic->SetType("technical");
+                element->AddChild(artic);
+                artics.clear();
+            }
         }
 
         // add the note to the layer or to the current container
