@@ -3055,11 +3055,11 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // arpeggio
-    pugi::xpath_node xmlArpeggiate = notations.node().select_node("arpeggiate");
+    pugi::xpath_node xmlArpeggiate = notations.node().select_node("*[contains(name(), 'arpeggiate')]");
     if (xmlArpeggiate) {
         int arpegN = xmlArpeggiate.node().attribute("number").as_int();
         arpegN = (arpegN < 1) ? 1 : arpegN;
-        std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
+        const std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
         bool added = false;
         if (!m_ArpeggioStack.empty()) { // check existing arpeggios
             std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> >::iterator iter;
@@ -3080,13 +3080,18 @@ void MusicXmlInput::ReadMusicXmlNote(
             // direction (up/down) and in MEI arrow
             if (!direction.empty()) {
                 arpeggio->SetArrow(BOOLEAN_true);
-                if (direction == "up")
+                if (direction == "up") {
                     arpeggio->SetOrder(arpegLog_ORDER_up);
-                else if (direction == "down")
+                }
+                else if (direction == "down") {
                     arpeggio->SetOrder(arpegLog_ORDER_down);
+                }
                 else {
                     arpeggio->SetOrder(arpegLog_ORDER_NONE);
                 }
+            }
+            if (!std::strncmp(xmlArpeggiate.node().name(), "non", 3)) {
+                arpeggio->SetOrder(arpegLog_ORDER_nonarp);
             }
             m_ArpeggioStack.push_back(std::make_pair(arpeggio, musicxml::OpenArpeggio(arpegN, onset)));
             m_controlElements.push_back(std::make_pair(measureNum, arpeggio));
