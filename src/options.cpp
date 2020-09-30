@@ -945,7 +945,7 @@ Options::Options()
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
 
     m_subBracketThickness.SetInfo("Sub bracket thickness", "The thickness of system sub-bracket");
-    m_subBracketThickness.Init(1.0, 0.2, 2.0);
+    m_subBracketThickness.Init(0.20, 0.10, 2.0);
     this->Register(&m_subBracketThickness, "subBracketThickness", &m_generalLayout);
 
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
