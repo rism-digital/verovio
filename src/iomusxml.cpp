@@ -742,9 +742,18 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     labelAbbr->AddChild(text);
                 }
                 else {
-                    Text *text = new Text();
-                    text->SetText(UTF8to16(partAbbr));
-                    labelAbbr->AddChild(text);
+                    std::stringstream sstream(partAbbr);
+                    std::string line;
+                    bool firstLine = true;
+                    while (std::getline(sstream, line)) {
+                        if (!firstLine) {
+                            labelAbbr->AddChild(new Lb());
+                        }
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(line));
+                        labelAbbr->AddChild(text);
+                        firstLine = false;
+                    }
                 }
             }
             if (midiInstrument) {
@@ -1025,6 +1034,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     clef->SetDis(OCTAVE_DIS_8);
                 else if (abs(change) == 2)
                     clef->SetDis(OCTAVE_DIS_15);
+                else if (abs(change) == 3)
+                    clef->SetDis(OCTAVE_DIS_22);
                 if (change < 0)
                     clef->SetDisPlace(STAFFREL_basic_below);
                 else if (change > 0)
@@ -1477,6 +1488,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     meiClef->SetDis(OCTAVE_DIS_8);
                 else if (abs(change) == 2)
                     meiClef->SetDis(OCTAVE_DIS_15);
+                else if (abs(change) == 3)
+                    meiClef->SetDis(OCTAVE_DIS_22);
                 if (change < 0)
                     meiClef->SetDisPlace(STAFFREL_basic_below);
                 else
@@ -2372,7 +2385,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-    bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']")) ? true : false;
+    const bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']")) ? true : false;
+    pugi::xml_node grace = node.select_node("grace").node();
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -2582,6 +2596,15 @@ void MusicXmlInput::ReadMusicXmlNote(
                 AddLayerElement(layer, chord, duration);
                 m_elementStackMap.at(layer).push_back(chord);
                 element = chord;
+                if (grace) {
+                    if (grace.attribute("slash")) {
+                        chord->SetGrace(GRACE_unacc);
+                        chord->SetStemMod(STEMMODIFIER_1slash);
+                    }
+                    else {
+                        chord->SetGrace(GRACE_acc);
+                    }
+                }
             }
         }
         // If the current note is part of a chord.
@@ -2602,21 +2625,17 @@ void MusicXmlInput::ReadMusicXmlNote(
             else if (chord->GetCue() != BOOLEAN_NONE) {
                 chord->SetCue(BOOLEAN_true);
             }
+            grace = pugi::xml_node();
         }
 
-        // grace notes
-        pugi::xpath_node grace = node.select_node("grace");
+        // single grace note
         if (grace) {
-            std::string slashStr = grace.node().attribute("slash").as_string();
-            if (slashStr == "no") {
-                note->SetGrace(GRACE_acc);
-            }
-            else if (slashStr == "yes") {
+            if (grace.attribute("slash")) {
                 note->SetGrace(GRACE_unacc);
                 note->SetStemMod(STEMMODIFIER_1slash);
             }
             else {
-                note->SetGrace(GRACE_unknown);
+                note->SetGrace(GRACE_acc);
             }
         }
         if (cue) note->SetCue(BOOLEAN_true);
@@ -2787,15 +2806,19 @@ void MusicXmlInput::ReadMusicXmlNote(
         for (pugi::xml_node technical : notations.node().children("technical")) {
             // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
             if (technical.child("fingering")) continue;
-
-            Artic *artic = new Artic();
-            for (pugi::xml_node articulation : technical.children()) {
-                artics.push_back(ConvertArticulations(articulation.name()));
+            if (technical.child("fret")) {
+                // set @tab.string and @tab.fret
             }
-            artic->SetArtic(artics);
-            artic->SetType("technical");
-            element->AddChild(artic);
-            artics.clear();
+            else {
+                Artic *artic = new Artic();
+                for (pugi::xml_node articulation : technical.children()) {
+                    artics.push_back(ConvertArticulations(articulation.name()));
+                }
+                artic->SetArtic(artics);
+                artic->SetType("technical");
+                element->AddChild(artic);
+                artics.clear();
+            }
         }
 
         // add the note to the layer or to the current container
