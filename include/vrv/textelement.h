@@ -13,6 +13,8 @@
 
 namespace vrv {
 
+class Rend;
+
 //----------------------------------------------------------------------------
 // TextElement
 //----------------------------------------------------------------------------
@@ -107,6 +109,7 @@ public:
     bool m_verticalShift;
     data_HORIZONTALALIGNMENT m_alignment;
     int m_pointSize;
+    std::vector<TextElement *> m_boxedRend;
 };
 
 } // namespace vrv

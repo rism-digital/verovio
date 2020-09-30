@@ -40,7 +40,7 @@ constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
       "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
       "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15}}";
+      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': 0.2}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -966,6 +966,10 @@ Options::Options()
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
+    m_textEnclosureThickness.SetInfo("Text box line thickness", "The thickness of the line text enclosing box");
+    m_textEnclosureThickness.Init(0.2, 0.10, 0.80);
+    this->Register(&m_textEnclosureThickness, "textEnclosureThickness", &m_generalLayout);
+
     m_thickBarlineThickness.SetInfo("Thick barline thickness", "The thickness of the thick barline");
     m_thickBarlineThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_thickBarlineThickness, "thickBarlineThickness", &m_generalLayout);
@@ -1244,7 +1248,9 @@ void Options::Sync()
               { "hairpinThickness", &m_hairpinThickness }, //
               { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
               { "lyricLineThickness", &m_lyricLineThickness }, //
-              { "tupletBracketThickness", &m_tupletBracketThickness } };
+              { "tupletBracketThickness", &m_tupletBracketThickness }, //
+              { "textEnclosureThickness", &m_textEnclosureThickness }
+    };
 
     for (auto &pair : engravingDefaults) {
         if (pair.second->isSet()) continue;

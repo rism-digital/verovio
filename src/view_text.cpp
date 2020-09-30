@@ -342,11 +342,11 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         assert(dc->GetFont());
         int MHeight = m_doc->GetTextGlyphHeight('M', dc->GetFont(), false);
         if (rend->GetRend() == TEXTRENDITION_sup) {
-            yShift = m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
+            yShift += m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
             yShift += (MHeight * SUPER_SCRIPT_POSITION);
         }
         else {
-            yShift = MHeight * SUB_SCRIPT_POSITION;
+            yShift += MHeight * SUB_SCRIPT_POSITION;
         }
         params.m_y += yShift;
         params.m_verticalShift = true;
@@ -361,6 +361,13 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         params.m_verticalShift = true;
         dc->GetFont()->SetSupSubScript(false);
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
+    }
+
+    if (rend->GetRend() == TEXTRENDITION_box) {
+        params.m_boxedRend.push_back(rend);
+
+        params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
+        params.m_newLine = true;
     }
 
     if (customFont) dc->ResetFont();

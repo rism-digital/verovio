@@ -424,7 +424,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
         Object *textParent = element;
         if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
             || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style")
-            || textNode.attribute("font-weight")) {
+            || textNode.attribute("font-weight") || textNode.attribute("enclosure")) {
             Rend *rend = new Rend();
             rend->SetLang(textNode.attribute("xml:lang").as_string());
             rend->SetColor(textNode.attribute("color").as_string());
@@ -434,6 +434,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
             rend->SetFontfam(textNode.attribute("font-family").as_string());
             rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textNode.attribute("font-style").as_string()));
             rend->SetFontweight(rend->AttTypography::StrToFontweight(textNode.attribute("font-weight").as_string()));
+            rend->SetRend(ConvertEnclosure(textNode.attribute("enclosure").as_string()));
             element->AddChild(rend);
             textParent = rend;
         }
