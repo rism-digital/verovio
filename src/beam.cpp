@@ -278,7 +278,7 @@ void BeamSegment::CalcBeamInit(
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     // Only if not only rests. (Will produce non-sense output anyway)
-    const auto elementCount = static_cast<decltype(m_avgY)>(m_beamElementCoordRefs.size());
+    const int elementCount = static_cast<int>(m_beamElementCoordRefs.size());
     if (elementCount != nbRests) {
         m_avgY /= elementCount - nbRests;
     }
