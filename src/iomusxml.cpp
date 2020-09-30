@@ -742,9 +742,18 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     labelAbbr->AddChild(text);
                 }
                 else {
-                    Text *text = new Text();
-                    text->SetText(UTF8to16(partAbbr));
-                    labelAbbr->AddChild(text);
+                    std::stringstream sstream(partAbbr);
+                    std::string line;
+                    bool firstLine = true;
+                    while (std::getline(sstream, line)) {
+                        if (!firstLine) {
+                            labelAbbr->AddChild(new Lb());
+                        }
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(line));
+                        labelAbbr->AddChild(text);
+                        firstLine = false;
+                    }
                 }
             }
             if (midiInstrument) {
