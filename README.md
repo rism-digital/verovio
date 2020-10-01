@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/rism-ch/verovio.svg?branch=develop)](https://travis-ci.org/rism-ch/verovio)
 [![Build status](https://ci.appveyor.com/api/projects/status/121cxhmtwurxffh0?svg=true)](https://ci.appveyor.com/project/LaurentPugin/verovio-r1t6l)
 
-Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
+Verovio is a fast, portable and lightweight library for engraving and digitalizing [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
 Verovio is written in standard 2017 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](http://www.verovio.org/tutorial.xhtml) for web integration and user interaction.
 
@@ -56,12 +56,12 @@ The following libraries are embedded in Verovio:
 Contributing
 ------------
 
-If you are interested in contributing to Verovio, please read the [contribution](doc/contributing.md) and [coding style](doc/guidelines.md) guidelines.
+If you are interested in contributing to Verovio we will be glad to accept your improovement all the time. please read the [contribution](doc/contributing.md) and [coding style](doc/guidelines.md) guidelines.
 
 Example output
 --------------
 
-The sample page of music shown below was generated with version 2.4.0-dev-2748fed
+The sample page of the music shown below has been generated with version 2.4.0-dev-2748fed
 
 ![Example page](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)
 
@@ -79,10 +79,10 @@ Example resources using verovio
 | [Music Sheet Viewer](http://www.partitionnumerique.com/music-sheet-viewer-wordpress-plugin) | tool | WordPress plugin for displaying graphical music from MEI data | 
 
 
-Digital score repositories on Github
+The Best Digital score repositories on Github
 -------------------------------------
 
-Here is a list of digital score repositories on Github that can be displayed with verovio:
+Here is a list of the best digital score repositories on Github that can be displayed with verovio:
 
 
 | link | encoding | description |
