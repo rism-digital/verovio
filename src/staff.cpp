@@ -121,10 +121,10 @@ bool Staff::IsSupportedChild(Object *child)
     if (child->Is(LAYER)) {
         Layer *layer = vrv_cast<Layer *>(child);
         assert(layer);
-        if (layer && (layer->GetN() < 1)) {
+        if (layer && !layer->HasN()) {
             // This is not 100% safe if we have a <app> and <rdg> with more than
             // one layer as a previous child.
-            layer->SetN(this->GetChildCount());
+            layer->SetN(this->GetChildCount(LAYER) + 1);
         }
     }
     else if (child->IsEditorialElement()) {
@@ -546,12 +546,10 @@ int Staff::CalcStem(FunctorParams *)
         layers = nonEmptyLayers;
     }
 
-    data_STEMDIRECTION stemDir = STEMDIRECTION_up;
     for (auto &object : layers) {
+        // Alter stem direction between even and odd numbered layers
         Layer *layer = dynamic_cast<Layer *>(object);
-        layer->SetDrawingStemDir(stemDir);
-        // All remaining layers with stem down
-        stemDir = STEMDIRECTION_down;
+        layer->SetDrawingStemDir(layer->GetN() % 2 ? STEMDIRECTION_up : STEMDIRECTION_down);
     }
 
     return FUNCTOR_CONTINUE;

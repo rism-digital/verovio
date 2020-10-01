@@ -833,12 +833,12 @@ Options::Options()
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
-    m_ledgerLineThickness.Init(0.15, 0.10, 0.30);
+    m_ledgerLineThickness.Init(0.25, 0.10, 0.50);
     this->Register(&m_ledgerLineThickness, "ledgerLineThickness", &m_generalLayout);
 
     m_ledgerLineExtension.SetInfo(
         "Ledger line extension", "The amount by which a ledger line should extend either side of a notehead");
-    m_ledgerLineExtension.Init(0.20, 0.10, 0.50);
+    m_ledgerLineExtension.Init(0.54, 0.20, 1.00);
     this->Register(&m_ledgerLineExtension, "ledgerLineExtension", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
@@ -945,7 +945,7 @@ Options::Options()
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
 
     m_subBracketThickness.SetInfo("Sub bracket thickness", "The thickness of system sub-bracket");
-    m_subBracketThickness.Init(1.0, 0.5, 2.0);
+    m_subBracketThickness.Init(0.20, 0.10, 2.0);
     this->Register(&m_subBracketThickness, "subBracketThickness", &m_generalLayout);
 
     m_systemDivider.SetInfo("System divider", "The display of system dividers");

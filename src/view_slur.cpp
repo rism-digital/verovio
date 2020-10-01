@@ -371,9 +371,9 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     // Positions not attached to a note
     if (spanningType == SPANNING_START) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
-            y2 = std::max(staff->GetDrawingY(), y1);
+            y2 = staff->GetDrawingY();
         else
-            y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
+            y2 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     }
     if (end->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
@@ -383,9 +383,9 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     }
     if (spanningType == SPANNING_END) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
-            y1 = std::max(staff->GetDrawingY(), y2);
+            y1 = staff->GetDrawingY();
         else
-            y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
+            y1 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     }
     if (start->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
