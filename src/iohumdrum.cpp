@@ -8591,7 +8591,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDynamics(layerdata[i], staffindex);
             assignAutomaticStem(note, layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
-                note->SetStemLen(0);
+                note->SetStemLen(0.0);
             }
             if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
                 note->SetCue(BOOLEAN_true);
@@ -8960,7 +8960,7 @@ template <class ELEMENT> void HumdrumInput::assignAutomaticStem(ELEMENT element,
             switch (value) {
                 case '/': element->SetStemDir(STEMDIRECTION_up); break; // force stem up
                 case '\\': element->SetStemDir(STEMDIRECTION_down); break; // force stem down
-                case 'x': element->SetStemLen(0); break; // force no stem
+                case 'x': element->SetStemLen(0.0); break; // force no stem
             }
         }
     }
@@ -10036,7 +10036,7 @@ void HumdrumInput::removeCharacter(hum::HTp token, char removechar)
 void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staffindex)
 {
     if (m_signifiers.nostem && token->find(m_signifiers.nostem) != string::npos) {
-        chord->SetStemLen(0);
+        chord->SetStemLen(0.0);
     }
 
     if (m_signifiers.cuesize) {
@@ -11979,6 +11979,28 @@ void HumdrumInput::addTextElement(
 //////////////////////////////
 //
 // HumdrumInput::replaceMusicShapes --
+//
+// Verovio font numbers
+// (see https://www.smufl.org/version/latest/range/individualNotes)
+//      square breve    L"\xE1D1"
+//      whole    L"\xE1D2"
+//      half     L"\xE1D3" (stem up)
+//      quarter  L"\xE1D5" (stem up)
+//      eighth   L"\xE1D7" (stem up)
+//      16th     L"\xE1D9" (stem up)
+//      32nd     L"\xE1DB" (stem up)
+//      64th     L"\xE1DD" (stem up)
+//      128th    L"\xE1DF" (stem up)
+//      256th    L"\xE1E1" (stem up)
+//      512th    L"\xE1E3" (stem up)
+//      1024th   L"\xE1E5" (stem up)
+//      augmentation dot   L"\xE1E7"
+//
+// Example usage:
+//     <rend fontname="VerovioText"></rend>
+//
+// Unicode mappings
+//    [breve]        =>  or &#x1d15c;
 //    [thirtysecond] => &#X1d162;
 //    [sixteenth]    => &#X1d161;
 //    [eighth]       => &#x266a; or &#x1d160;
@@ -11997,11 +12019,16 @@ std::string HumdrumInput::replaceMusicShapes(const std::string input)
     std::string output = input;
     hum::HumRegex hre;
     // SMUFL: hre.replaceDestructive(output, "&#xe1d5;", "\\[quarter\\]", "g");
-    // hre.replaceDestructive(output, "&#x1d15d;", "\\[whole\\]", "g");
-    // hre.replaceDestructive(output, "&#x1d15e;", "\\[half\\]", "g");
+    hre.replaceDestructive(output, "&#x1d15c;", "\\[breve\\]", "g");
+
+    hre.replaceDestructive(output, "&#x1d15d;", "\\[whole\\]", "g");
+
+    hre.replaceDestructive(output, "&#x1d15e;", "\\[half\\]", "g");
+
     hre.replaceDestructive(output, "&#x2669;.", "\\[quarter-dot\\]", "g");
-    hre.replaceDestructive(output, "&#x266a;.", "\\[eighth-dot\\]", "g");
     hre.replaceDestructive(output, "&#x2669;", "\\[quarter\\]", "g");
+
+    hre.replaceDestructive(output, "&#x266a;.", "\\[eighth-dot\\]", "g");
     hre.replaceDestructive(output, "&#x266a;", "\\[eighth\\]", "g");
     hre.replaceDestructive(output, "\xF0\x9D\x86\xAE", "\\[[Pp]ed\\.?\\]", "g");
     hre.replaceDestructive(output, "\xF0\x9D\x84\x8B", "\\[[Ss]egno\\]", "g");
@@ -16438,6 +16465,16 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
+    bool removeStemQ = getBooleanParameter(token, "N", "xstem");
+    bool addCueSizeQ = getBooleanParameter(token, "N", "cue");
+
+    if (removeStemQ) {
+        note->SetStemLen(0.0);
+    }
+    if (addCueSizeQ) {
+        note->SetCue(BOOLEAN_true);
+    }
+
     bool mensit = false;
     bool gesturalQ = false;
     bool hasAccidental = false;
@@ -16689,7 +16726,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
         if (dur == 0) {
             note->SetDur(DURATION_4);
-            note->SetStemLen(0);
+            note->SetStemLen(0.0);
             // if you want a stemless grace note, then set the
             // stemlength to zero explicitly.
         }
