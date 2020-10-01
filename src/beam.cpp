@@ -59,6 +59,7 @@ void BeamSegment::Reset()
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
+    m_uniformStemLength = 0;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -101,6 +102,8 @@ void BeamSegment::CalcBeam(
     // Beam@place has precedence - however, in some cases, CalcBeam is called recusively because we need to change the
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
+
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace == BEAMPLACE_below ? STEMDIRECTION_down : STEMDIRECTION_up);
 
     // Set drawing stem positions
     for (i = 0; i < elementCount; ++i) {
@@ -747,6 +750,17 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
+void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+{
+    const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    for (auto coord : m_beamElementCoordRefs) {
+        const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
+        if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
+            m_uniformStemLength = coordStemDir;
+        }
+    }
+}
+
 void BeamSegment::CalcSetValues(const int &elementCount)
 {
     this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
@@ -989,7 +1003,6 @@ void BeamElementCoord::SetDrawingStemDir(
     bool onStaffLine = false;
     int ledgerLines = 0;
     int ledgerLinesOpposite = 0;
-    this->m_centered = false;
     this->m_shortened = false;
     this->m_closestNote = NULL;
 
@@ -998,8 +1011,6 @@ void BeamElementCoord::SetDrawingStemDir(
     if (this->m_element->Is(NOTE)) {
         m_closestNote = dynamic_cast<Note *>(this->m_element);
     }
-
-    int stemLen = 1;
 
     if (stemDir == STEMDIRECTION_up) {
         this->m_x += interface->m_stemXAbove[interface->m_cueSize];
@@ -1026,22 +1037,50 @@ void BeamElementCoord::SetDrawingStemDir(
             onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
         }
-        stemLen = -1;
     }
 
     if (!m_closestNote) return;
 
+    this->m_centered = segment->m_uniformStemLength % 2;
+    this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+
+    // Make sure the stem reaches the center of the staff
+    // Mark the segment as extendedToCenter since we then want a reduced slope
+    if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
+        || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= this->m_yBeam))) {
+        this->m_yBeam = segment->m_verticalCenter;
+        segment->m_extendedToCenter = true;
+        this->m_centered = false;
+    }
+    else {
+        segment->m_extendedToCenter = false;
+    }
+
+    // Make sure there is a at least one staff space before the ledger lines
+    if ((ledgerLines > 2) && (this->m_dur > DUR_32)) {
+        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
+    }
+    else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
+        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
+    }
+}
+
+int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+{
+    if (!m_closestNote) return 0;
+    const bool onStaffLine = m_closestNote->GetDrawingLoc() % 2;
     bool extend = onStaffLine;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
+    const int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
         this->m_shortened = true;
         extend = false;
     }
 
+    int stemLen = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     // For 8th notes, use the shortened stem (if shortened)
     if (this->m_dur == DUR_8) {
         if (stemLenInHalfUnits != standardStemLen) {
@@ -1064,39 +1103,7 @@ void BeamElementCoord::SetDrawingStemDir(
         }
     }
 
-    if (stemLen % 2) this->m_centered = true;
-    this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
-
-    // Make sure the stem reaches the center of the staff
-    // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (stemDir == STEMDIRECTION_up) {
-        if (this->m_yBeam <= segment->m_verticalCenter) {
-            this->m_yBeam = segment->m_verticalCenter;
-            segment->m_extendedToCenter = true;
-            this->m_centered = false;
-        }
-        else {
-            segment->m_extendedToCenter = false;
-        }
-    }
-    else {
-        if (segment->m_verticalCenter <= this->m_yBeam) {
-            this->m_yBeam = segment->m_verticalCenter;
-            segment->m_extendedToCenter = true;
-            this->m_centered = false;
-        }
-        else {
-            segment->m_extendedToCenter = false;
-        }
-    }
-
-    // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (this->m_dur > DUR_32)) {
-        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
-    }
-    else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
-        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
-    }
+    return stemLen;
 }
 
 //----------------------------------------------------------------------------
