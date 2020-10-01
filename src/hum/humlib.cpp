@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Sep 20 14:20:16 PDT 2020
+// Last Modified: Thu Oct  1 05:42:47 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -53485,6 +53485,114 @@ void Tool_cint::usage(const string& command) {
 
 /////////////////////////////////
 //
+// Tool_colorgroups::Tool_colorgroups -- Set the recognized options for the tool.
+//
+
+Tool_colorgroups::Tool_colorgroups(void) {
+	define("A=s:crimson",    "Color for group A");
+	define("B=s:dodgerblue", "Color for group B");
+	define("C=s:limegreen",  "Color for group C");
+	define("command=b",     "print shed command only");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_colorgroups::run -- Do the main work of the tool.
+//
+
+bool Tool_colorgroups::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_colorgroups::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_colorgroups::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_colorgroups::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_colorgroups::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_colorgroups::initialize(void) {
+	// do nothing
+}
+
+
+
+//////////////////////////////
+//
+// Tool_colorgroups::processFile --
+//
+
+void Tool_colorgroups::processFile(HumdrumFile& infile) {
+	Tool_shed shed;
+	vector<string> argv;
+	
+	string command = "s/grp:A/color:";
+	command += getString("A");
+	command += "/I; ";
+	command += "s/grp:B/color:";
+	command += getString("B");
+	command += "/I; ";
+	command += "s/grp:C/color:";
+	command += getString("C");
+	command += "/I";
+
+	if (getBoolean("command")) {
+		m_free_text << command << endl;
+		return;
+	}
+
+	argv.clear();
+	argv.push_back("shed"); // name of program (placeholder)
+	argv.push_back("-e");
+	argv.push_back(command);
+
+	shed.process(argv);
+	shed.run(infile);
+}
+
+
+
+
+
+/////////////////////////////////
+//
 // Tool_colortriads::Tool_colortriads -- Set the recognized options for the tool.
 //
 
@@ -60596,16 +60704,26 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(tabber, infile, commands[i].second, status);
 		} else if (commands[i].first == "tassoize") {
 			RUNTOOL(tassoize, infile, commands[i].second, status);
+		} else if (commands[i].first == "tassoise") {
+			RUNTOOL(tassoize, infile, commands[i].second, status);
 		} else if (commands[i].first == "tasso") {
 			RUNTOOL(tassoize, infile, commands[i].second, status);
 		} else if (commands[i].first == "chantize") {
+			RUNTOOL(chantize, infile, commands[i].second, status);
+		} else if (commands[i].first == "chantise") {
 			RUNTOOL(chantize, infile, commands[i].second, status);
 		} else if (commands[i].first == "tie") {
 			RUNTOOL(tie, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
 			RUNTOOL(transpose, infile, commands[i].second, status);
+		} else if (commands[i].first == "colourtriads") {
+			RUNTOOL(colortriads, infile, commands[i].second, status);
 		} else if (commands[i].first == "colortriads") {
 			RUNTOOL(colortriads, infile, commands[i].second, status);
+		} else if (commands[i].first == "colorgroups") {
+			RUNTOOL(colorgroups, infile, commands[i].second, status);
+		} else if (commands[i].first == "colourgroups") {
+			RUNTOOL(colorgroups, infile, commands[i].second, status);
 		} else if (commands[i].first == "tremolo") {
 			RUNTOOL(tremolo, infile, commands[i].second, status);
 		} else if (commands[i].first == "trillspell") {
