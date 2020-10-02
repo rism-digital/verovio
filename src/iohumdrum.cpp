@@ -18978,26 +18978,39 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
         return;
     }
     hum::HTp starttoken = found->getStartTokenPointer();
+
     bool needToBreak = inDifferentEndings(starttoken, token);
     if (needToBreak) {
         processHangingTieEnd(note, token, tstring, subindex, ss[staffnum].meter_bottom);
         return;
     }
 
-    Tie *tie = found->setEndAndInsert(noteuuid, m_measure, tstring);
-
-    int startindex = found->getStartSubindex();
-    if (starttoken) {
-        addTieLineStyle(tie, starttoken, startindex);
+    bool invisibleTieQ = false;
+    if (starttoken && (subindex < 0) && !needToBreak) {
+        // Only dealing with hiding invisible ties on single notes for now.
+        if ((starttoken->find("[y") != std::string::npos) || (starttoken->find("_y") != std::string::npos)
+            || (starttoken->find("_y") != std::string::npos)) {
+            addType(note, "no-attack");
+            invisibleTieQ = true;
+        }
     }
 
-    setTieLocationId(tie, starttoken, startindex, token, subindex);
-
-    if (found->isInserted()) {
-        // Only deleting the finished tie if it was successful.  Undeleted
-        // ones can be checked later.  They are either encoding errors, or
-        // hanging ties, or arpeggiation ties (the latter should be encoded
-        // with [[, ]] rather than [, ]).
+    if (!invisibleTieQ) {
+        Tie *tie = found->setEndAndInsert(noteuuid, m_measure, tstring);
+        int startindex = found->getStartSubindex();
+        if (starttoken) {
+            addTieLineStyle(tie, starttoken, startindex);
+        }
+        setTieLocationId(tie, starttoken, startindex, token, subindex);
+        if (found->isInserted()) {
+            // Only deleting the finished tie if it was successful.  Undeleted
+            // ones can be checked later.  They are either encoding errors, or
+            // hanging ties, or arpeggiation ties (the latter should be encoded
+            // with [[, ]] rather than [, ]).
+            ss[staffnum].ties.erase(found);
+        }
+    }
+    else {
         ss[staffnum].ties.erase(found);
     }
 }
