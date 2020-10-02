@@ -586,6 +586,94 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     return dotMargin < 0;
 }
 
+std::pair<int, int> Note::CalcNoteHorizontalOverlap(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool ignoreUnison)
+{
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    int overlappingPosition = -1;
+    int shift = 0;
+    
+    for (int i = 0; i < otherElements.size(); ++i) {
+        int verticalMargin = 0;
+        int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
+            Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
+            assert(previousNote);
+            // Unisson, look at the duration for the note heads
+            if (!ignoreUnison && IsUnissonWith(previousNote, false)) {
+                int previousDuration = previousNote->GetDrawingDur();
+                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
+                bool isEdgeElement = false;
+                if (isPreviousCoord) {
+                    Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
+                    data_STEMDIRECTION stemDir = GetDrawingStemDir();
+                    previousDuration = parentChord->GetDur();
+                    isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
+                        || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
+                }
+                if (!isPreviousCoord || isEdgeElement || isChordElement) {
+                    if ((GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
+                        overlappingPosition = i;
+                        continue;
+                    }
+                    else if ((GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
+                        overlappingPosition = i;
+                        continue;
+                    }
+                }
+                // Reduce the margin to 0 for whole notes unisson
+                else if ((GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
+                    horizontalMargin = 0;
+                }
+                else {
+                    horizontalMargin *= -1;
+                }
+            }
+            else if (previousNote->GetDrawingLoc() - GetDrawingLoc() > 1) {
+                continue;
+            }
+            else if (previousNote->GetDrawingLoc() - GetDrawingLoc() == 1) {
+                horizontalMargin = 0;
+            }
+            else if ((previousNote->GetDrawingLoc() - GetDrawingLoc() < 0)
+                && (previousNote->GetDrawingStemDir() != GetDrawingStemDir()) /* && !isChordElement*/) {
+                if (previousNote->GetDrawingLoc() - GetDrawingLoc() == -1) {
+                    horizontalMargin *= -1;
+                }
+                else if ((GetDrawingDur() <= DUR_1) && (previousNote->GetDrawingDur() <= DUR_1)) {
+                    continue;
+                }
+                else {
+                    horizontalMargin *= -1;
+                    verticalMargin = horizontalMargin;
+                }
+            }
+        }
+
+        if ((horizontalMargin >= 0) || isChordElement) {
+            // Nothing to do if we have no vertical overlap
+            if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) return { shift, overlappingPosition };
+
+            // Nothing to do either if we have no horizontal overlap
+            if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift))
+                return { shift, -1 };
+
+            shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+
+            if (overlappingPosition != -1) shift *= -1;
+        }
+        else {
+            // Otherwise move the appropriate parent to the right
+            shift += horizontalMargin - this->HorizontalRightOverlap(
+                otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+        }
+    }
+
+    return { shift, overlappingPosition };
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

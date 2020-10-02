@@ -323,6 +323,7 @@ public:
  * member 5: the current chord (if any)
  * member 6: the doc
  * member 7: a pointer to the functor for passing it to the system aligner
+ * member 8: flag whether element is in unison
  **/
 
 class AdjustLayersParams : public FunctorParams {
@@ -335,6 +336,7 @@ public:
         m_doc = doc;
         m_functor = functor;
         m_staffNs = staffNs;
+        m_unison = false;
     }
     std::vector<int> m_staffNs;
     int m_currentLayerN;
@@ -344,6 +346,7 @@ public:
     Chord *m_currentChord;
     Doc *m_doc;
     Functor *m_functor;
+    bool m_unison;
 };
 
 //----------------------------------------------------------------------------
