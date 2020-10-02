@@ -1122,20 +1122,21 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
         params->m_beam = this;
         params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
         params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
+        params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
         return FUNCTOR_CONTINUE;
     }
 
-    const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+    //const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
 
     const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
     const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
 
-    const int overlapMargin = std::max(leftMargin * directionBias, rightMargin * directionBias);
+    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
     if (overlapMargin >= params->m_overlapMargin) {
         Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
         assert(staff);
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params->m_overlapMargin = (overlapMargin + staffOffset) * directionBias;
+        params->m_overlapMargin = (overlapMargin + staffOffset) * params->m_directionBias;
     }
     return FUNCTOR_SIBLINGS;
 }

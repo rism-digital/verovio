@@ -168,6 +168,7 @@ public:
         m_beam = NULL;
         m_y1 = 0;
         m_y2 = 0;
+        m_directionBias = 0;
         m_overlapMargin = 0;
         m_doc = doc;
     }
@@ -175,6 +176,7 @@ public:
     Object *m_beam;
     int m_y1;
     int m_y2;
+    int m_directionBias;
     int m_overlapMargin;
     Doc *m_doc;
 };

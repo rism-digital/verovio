@@ -99,6 +99,9 @@ int Clef::AdjustBeams(FunctorParams* functorParams)
     auto currentShapeIter = topToMiddleProportions.find(GetShape());
     if (currentShapeIter == topToMiddleProportions.end()) return FUNCTOR_CONTINUE;
 
+    //const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+    const int proportion = (params->m_directionBias > 0) ? 0 : -1;
+
     // Y position differes for clef shapes, so we need to take into account only a part of the glyph height
     // Proportion of the glyph about Y point is defined in the topToMiddleProportions map and used when
     // left and right margins are calculated
@@ -107,8 +110,12 @@ int Clef::AdjustBeams(FunctorParams* functorParams)
     const int clefGlyphHeight
         = params->m_doc->GetGlyphHeight(currentShapeIter->second.first, staff->m_drawingStaffSize, true);
     const int beamWidth = params->m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false);
-    const int leftMargin = clefPosition + clefGlyphHeight * currentShapeIter->second.second + beamWidth - params->m_y1;
-    const int rightMargin = clefPosition + clefGlyphHeight * currentShapeIter->second.second + beamWidth - params->m_y2;
+    const int leftMargin = (clefPosition + clefGlyphHeight * (proportion + currentShapeIter->second.second)
+                               + (params->m_directionBias * beamWidth) - params->m_y1)
+        * params->m_directionBias;
+    const int rightMargin = (clefPosition + clefGlyphHeight * (proportion + currentShapeIter->second.second)
+                                + (params->m_directionBias * beamWidth) - params->m_y2)
+        * params->m_directionBias;
     
     // If both sides of beam overlap with Clef, we need to get smaller margin, i.e. the one that would make one side not
     // overlap anymore. For sloped beams this would generally mean that slope will avoid collision as well, for non-sloped
@@ -116,9 +123,10 @@ int Clef::AdjustBeams(FunctorParams* functorParams)
     const bool bothSidesOverlap = ((leftMargin > params->m_overlapMargin) && (rightMargin > params->m_overlapMargin));
     const int overlapMargin = bothSidesOverlap ? std::min(leftMargin, rightMargin) : std::max(leftMargin, rightMargin);
     if ((overlapMargin >= params->m_overlapMargin)
-        && ((overlapMargin > beamWidth / 2) || (leftMargin == rightMargin))) {
+        && ((overlapMargin >= beamWidth / 2) || (leftMargin == rightMargin))) {
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params->m_overlapMargin = (overlapMargin / staffOffset + (leftMargin == rightMargin? 1 : 2)) * staffOffset;
+        params->m_overlapMargin = (overlapMargin / staffOffset + (leftMargin == rightMargin ? 1 : 2)) * staffOffset
+            * params->m_directionBias;
     }
 
     return FUNCTOR_CONTINUE;
