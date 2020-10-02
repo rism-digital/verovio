@@ -594,6 +594,7 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
 
     int overlappingPosition = -1;
     int shift = 0;
+    bool hasUnison = false;
     
     for (int i = 0; i < otherElements.size(); ++i) {
         int verticalMargin = 0;
@@ -602,6 +603,7 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
             // Unisson, look at the duration for the note heads
+            if (!hasUnison) hasUnison = IsUnissonWith(previousNote, true);
             if (!ignoreUnison && IsUnissonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
                 const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
@@ -654,11 +656,10 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
 
         if ((horizontalMargin >= 0) || isChordElement) {
             // Nothing to do if we have no vertical overlap
-            if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) return { shift, overlappingPosition };
+            if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) break;
 
             // Nothing to do either if we have no horizontal overlap
-            if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift))
-                return { shift, -1 };
+            if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) break;
 
             shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
 
@@ -666,10 +667,14 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
         }
         else {
             // Otherwise move the appropriate parent to the right
-            shift += horizontalMargin - this->HorizontalRightOverlap(
-                otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+            shift -= horizontalMargin
+                - HorizontalRightOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
         }
     }
+
+    // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
+    // That way accidental will be near note that actually has accidental and not near lowest-layer note
+    if (hasUnison && GetDrawingAccid() && (shift > 0)) shift = -shift;
 
     return { shift, overlappingPosition };
 }
