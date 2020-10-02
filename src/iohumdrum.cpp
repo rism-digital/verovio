@@ -524,7 +524,7 @@ bool HumdrumInput::Import(const std::string &content)
 string HumdrumInput::GetHumdrumString()
 {
     stringstream tempout;
-    for (int i = 0; i < m_infiles.getCount(); i++) {
+    for (int i = 0; i < m_infiles.getCount(); ++i) {
         tempout << m_infiles[i];
     }
     return tempout.str();
@@ -553,7 +553,7 @@ bool HumdrumInput::convertHumdrum()
 
     // Apply Humdrum tools if there are any filters in the file.
     hum::Tool_filter filter;
-    for (int i = 0; i < m_infiles.getCount(); i++) {
+    for (int i = 0; i < m_infiles.getCount(); ++i) {
         if (m_infiles[i].hasGlobalFilters()) {
             filter.run(m_infiles[i]);
             if (filter.hasHumdrumText()) {
@@ -609,7 +609,7 @@ bool HumdrumInput::convertHumdrum()
         adjustMeasureTimings(infile);
     }
     m_spine_color.resize(infile.getMaxTrack() + 1);
-    for (int i = 0; i < (int)m_spine_color.size(); i++) {
+    for (int i = 0; i < (int)m_spine_color.size(); ++i) {
         // Hardwire max subtrack count to MAXCOLORSUBTRACK for each spine for now.
         m_spine_color[i].resize(MAXCOLORSUBTRACK);
     }
@@ -765,7 +765,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     int linebreaki = -1;
     int pagebreaki = -1;
 
-    for (int i = line; i < infile.getLineCount(); i++) {
+    for (int i = line; i < infile.getLineCount(); ++i) {
         if (infile[i].isData()) {
             break;
         }
@@ -848,7 +848,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
 void HumdrumInput::processHangingTieStarts()
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
-    for (int i = 0; i < (int)ss.size(); i++) {
+    for (int i = 0; i < (int)ss.size(); ++i) {
         for (auto it : ss[i].ties) {
             processHangingTieStart(it);
         }
@@ -1162,7 +1162,7 @@ void HumdrumInput::adjustMeasureTimings(hum::HumdrumFile &infile)
     hum::HumNum difference;
     barstart = 0;
 
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (infile[i].isBarline()) {
             if (infile[i].allSameBarlineStyle()) {
                 barstart = infile[i].getDurationFromStart();
@@ -1184,7 +1184,7 @@ bool HumdrumInput::checkForScordatura(hum::HumdrumFile &infile)
 {
     hum::HumRegex hre;
     bool status = false;
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (!infile[i].isReference()) {
             continue;
         }
@@ -1232,7 +1232,7 @@ void HumdrumInput::initializeIgnoreVector(hum::HumdrumFile &infile)
 {
     m_ignore.resize(infile.getLineCount());
     int state = false;
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         m_ignore[i] = state;
         if (!infile[i].isGlobalComment()) {
             continue;
@@ -1254,7 +1254,7 @@ void HumdrumInput::initializeIgnoreVector(hum::HumdrumFile &infile)
 void HumdrumInput::extractNullInformation(vector<bool> &nulls, hum::HumdrumFile &infile)
 {
     nulls.resize(infile.getLineCount());
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (!infile[i].isData()) {
             // only keeping track of data null-lines.
             nulls[i] = false;
@@ -1267,11 +1267,11 @@ void HumdrumInput::extractNullInformation(vector<bool> &nulls, hum::HumdrumFile 
     }
 
     m_duradj.resize(infile.getLineCount());
-    for (int i = 0; i < (int)m_duradj.size(); i++) {
+    for (int i = 0; i < (int)m_duradj.size(); ++i) {
         m_duradj[i] = 0;
     }
     hum::HumNum sum = 0;
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (infile[i].isBarline()) {
             // Probably suppress null corrections across barlines...
             sum = 0;
@@ -1340,7 +1340,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc &doc)
     std::string pkey;
     std::string pvalue;
     std::string value;
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (!infile[i].isReference()) {
             continue;
         }
@@ -1409,7 +1409,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc &doc)
 void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
 {
     hum::HumRegex hre;
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (infile[i].isData()) {
             break;
         }
@@ -2178,7 +2178,7 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
 {
     ScoreDef &sdf = m_doc->m_mdivScoreDef;
     int count = sdf.GetChildCount();
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         Object *obj = sdf.GetChild(i);
         std::string name = obj->GetClassName();
         if (name != "StaffGrp") {
@@ -2202,7 +2202,7 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
     string name;
     vector<StaffDef *> sds;
     sds.clear();
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         Object *obj = group->GetChild(i);
         name = obj->GetClassName();
         if (name == "StaffGrp") {
@@ -2223,7 +2223,7 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
         return;
     }
     string nonempty = names[0];
-    for (int i = 1; i < (int)names.size(); i++) {
+    for (int i = 1; i < (int)names.size(); ++i) {
         if (names[i] == "") {
             continue;
         }
@@ -2238,7 +2238,7 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
     }
 
     setInstrumentName(group, nonempty);
-    for (int i = 0; i < (int)sds.size(); i++) {
+    for (int i = 0; i < (int)sds.size(); ++i) {
         removeInstrumentName(sds[i]);
     }
 }
@@ -2253,7 +2253,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
     ScoreDef &sdf = m_doc->m_mdivScoreDef;
     int count = sdf.GetChildCount();
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         Object *obj = sdf.GetChild(i);
         std::string name = obj->GetClassName();
         if (name != "StaffGrp") {
@@ -2277,7 +2277,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
     string name;
     vector<StaffDef *> sds;
     sds.clear();
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         Object *obj = group->GetChild(i);
         name = obj->GetClassName();
         if (name == "StaffGrp") {
@@ -2298,7 +2298,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
         return;
     }
     string nonempty = names[0];
-    for (int i = 1; i < (int)names.size(); i++) {
+    for (int i = 1; i < (int)names.size(); ++i) {
         if (names[i] == "") {
             continue;
         }
@@ -2312,7 +2312,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
     }
 
     setInstrumentAbbreviation(group, nonempty, NULL);
-    for (int i = 0; i < (int)sds.size(); i++) {
+    for (int i = 0; i < (int)sds.size(); ++i) {
         if (names.at(i).empty()) {
             continue;
         }
@@ -2407,7 +2407,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     }
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     vector<int> tracklist;
-    for (int i = 0; i < (int)staffstarts.size(); i++) {
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
         int track = staffstarts[i]->getTrack();
         tracklist.push_back(track);
     }
@@ -2481,7 +2481,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         for (auto it = classToStaffMapping.begin(); it != classToStaffMapping.end(); it++) {
             std::string pattern = it->first;
             std::string replacement = "";
-            for (int i = 0; i < (int)it->second.size(); i++) {
+            for (int i = 0; i < (int)it->second.size(); ++i) {
                 replacement += "s" + to_string(it->second[i]);
             }
             hre.replaceDestructive(d, replacement, pattern, "g");
@@ -2499,7 +2499,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         for (auto const &it : groupToStaffMapping) {
             gstring = "g" + to_string(it.first);
             sstring = "";
-            for (int i = 0; i < (int)it.second.size(); i++) {
+            for (int i = 0; i < (int)it.second.size(); ++i) {
                 sstring += "s" + to_string(it.second.at(i));
                 if (i < (int)it.second.size() - 1) {
                     sstring += ",";
@@ -2519,7 +2519,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         for (auto const &it : partToStaffMapping) {
             pstring = "p" + to_string(it.first);
             sstring = "";
-            for (int i = 0; i < (int)it.second.size(); i++) {
+            for (int i = 0; i < (int)it.second.size(); ++i) {
                 sstring += "s" + to_string(it.second.at(i));
                 if (i < (int)it.second.size() - 1) {
                     sstring += ",";
@@ -2540,7 +2540,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     bool hasstar = false;
     if (hre.search(d, "\\*")) {
         std::string tstring;
-        for (int i = 0; i < (int)tracklist.size(); i++) {
+        for (int i = 0; i < (int)tracklist.size(); ++i) {
             tstring += "t" + to_string(tracklist[i]);
         }
         hre.replaceDestructive(d, tstring, "\\*");
@@ -2558,7 +2558,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
 
     // Remove any staff numbers that are no longer present (or invalid):
     vector<int> deconums = getStaffNumbers(d);
-    for (int i = 0; i < (int)deconums.size(); i++) {
+    for (int i = 0; i < (int)deconums.size(); ++i) {
         auto it = staffToSpineMapping.find(deconums.at(i));
         if (it != staffToSpineMapping.end()) {
             continue;
@@ -2581,7 +2581,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     hre.replaceDestructive(d, "", "<>", "g");
 
     int scount = 0;
-    for (int i = 0; i < (int)d.size(); i++) {
+    for (int i = 0; i < (int)d.size(); ++i) {
         if (d[i] == 's') {
             scount++;
         }
@@ -2601,7 +2601,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     vector<pair<int, char> > stack;
     pair<int, char> item;
     vector<int> pairing(d.size(), -1);
-    for (int i = 0; i < (int)d.size(); i++) {
+    for (int i = 0; i < (int)d.size(); ++i) {
         if (d[i] == '(') {
             item.first = i;
             item.second = d[i];
@@ -2682,7 +2682,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
 
     if ((0)) {
         // print analysis:
-        for (int i = 0; i < (int)d.size(); i++) {
+        for (int i = 0; i < (int)d.size(); ++i) {
             cerr << "D[" << i << "] =\t" << d[i] << " pairing: " << pairing[i] << endl;
         }
     }
@@ -2771,7 +2771,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             if (i < (int)d.size() - 1) {
                 if (d[i + 1] == '(') {
                     groupstyle.back() += "(";
-                    i++;
+                    ++i;
                 }
             }
             grouper = true;
@@ -2792,7 +2792,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             if (i < (int)d.size() - 1) {
                 if (d[i + 1] == '(') {
                     groupstyle.back() += "(";
-                    i++;
+                    ++i;
                 }
             }
             grouper = true;
@@ -2813,7 +2813,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             if (i < (int)d.size() - 1) {
                 if (d[i + 1] == '(') {
                     groupstyle.back() += "(";
-                    i++;
+                    ++i;
                 }
             }
             grouper = true;
@@ -2912,7 +2912,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
 
     if ((0)) {
         cerr << "BAR GROUPS" << endl;
-        for (int i = 0; i < (int)bargroups.size(); i++) {
+        for (int i = 0; i < (int)bargroups.size(); ++i) {
             cerr << "\tgroup_style=" << groupstyle[i] << "\tgroup = " << i << ":\t";
             for (int j = 0; j < (int)bargroups[i].size(); j++) {
                 cerr << " " << bargroups[i][j];
@@ -3155,12 +3155,12 @@ std::string HumdrumInput::getInstrumentClass(hum::HTp start)
 vector<int> HumdrumInput::getStaffNumbers(string &deco)
 {
     vector<int> output;
-    for (int i = 0; i < (int)deco.size(); i++) {
+    for (int i = 0; i < (int)deco.size(); ++i) {
         if (isdigit(deco[i])) {
             int value = 0;
             while ((i < (int)deco.size()) && (isdigit(deco[i]))) {
                 value = value * 10 + (deco[i] - '0');
-                i++;
+                ++i;
             }
             output.push_back(value);
         }
@@ -5252,7 +5252,7 @@ void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::
     }
     std::vector<std::string> pieces;
 
-    for (int i = 0; i < (int)ks.size(); i++) {
+    for (int i = 0; i < (int)ks.size(); ++i) {
         if ((ks[i] >= 'a') && (ks[i] <= 'g')) {
             pieces.resize(pieces.size() + 1);
         }
@@ -5262,7 +5262,7 @@ void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::
         pieces.back() += ks[i];
     }
 
-    for (int i = 0; i < (int)pieces.size(); i++) {
+    for (int i = 0; i < (int)pieces.size(); ++i) {
         if (pieces[i].empty()) {
             // strange error, ignore
             continue;
@@ -5562,7 +5562,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
 std::string HumdrumInput::removeCommas(const std::string &input)
 {
     std::string output = input;
-    for (int i = 0; i < (int)output.size(); i++) {
+    for (int i = 0; i < (int)output.size(); ++i) {
         if (output[i] == ',') {
             output[i] = ' ';
         }
@@ -5946,7 +5946,7 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
     hum::HumRegex hre;
     std::vector<std::string> pieces;
     hre.split(pieces, *resolved, " ");
-    for (int i = 0; i < (int)pieces.size(); i++) {
+    for (int i = 0; i < (int)pieces.size(); ++i) {
         if (pieces[i].find("_") != std::string::npos) {
             F *f = new F();
             Text *text = new Text();
@@ -6537,7 +6537,7 @@ std::string HumdrumInput::getTrackText(hum::HTp token)
     int track = token->getTrack();
     std::string output = to_string(track);
     std::string extension = "";
-    for (int i = 0; i < (int)trackinfo.size(); i++) {
+    for (int i = 0; i < (int)trackinfo.size(); ++i) {
         if (trackinfo[i] == 'a') {
             extension += 'a';
         }
@@ -6574,7 +6574,7 @@ std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &
 {
     std::vector<bool> todelete(pieces.size(), false);
     std::vector<std::wstring> output(pieces.size());
-    for (int i = 0; i < (int)pieces.size(); i++) {
+    for (int i = 0; i < (int)pieces.size(); ++i) {
         output[i] = convertFBNumber(pieces[i], token);
         if ((pieces[i].find("K") != std::string::npos)
             && ((pieces[i].find("x") == std::string::npos) && (pieces[i].find("X") == std::string::npos))) {
@@ -6601,7 +6601,7 @@ std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &
 std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
 {
     std::wstring output;
-    for (int i = 0; i < (int)pieces.size(); i++) {
+    for (int i = 0; i < (int)pieces.size(); ++i) {
         output += convertFBNumber(pieces[i], token);
         if (i < (int)pieces.size() - 1) {
             if (pieces[i + 1] == "") {
@@ -6631,7 +6631,7 @@ std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
 
     bool found = false;
     int digit = 0;
-    for (int i = 0; i < (int)input.size(); i++) {
+    for (int i = 0; i < (int)input.size(); ++i) {
         if (isdigit(input[i])) {
             // digits have to be adjacent
             found = true;
@@ -6831,7 +6831,7 @@ std::wstring HumdrumInput::convertNumberToWstring(int number)
     }
     std::string value = to_string(number);
     std::wstring output;
-    for (int i = 0; i < (int)value.size(); i++) {
+    for (int i = 0; i < (int)value.size(); ++i) {
         switch (value[i]) {
             case '0': output += L"\uEA50"; break;
             case '1': output += L"\uEA51"; break;
@@ -6989,7 +6989,7 @@ std::wstring HumdrumInput::cleanStringString(const std::string &content)
 {
     std::wstring output;
     std::string value;
-    for (int i = 0; i < (int)content.size(); i++) {
+    for (int i = 0; i < (int)content.size(); ++i) {
         switch (content[i]) {
             case '0': output += L"\u24ea"; break; // 0 in circle
             case '1': output += L"\u2460"; break; // 1 in circle
@@ -7261,7 +7261,7 @@ bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline, in
 
 void HumdrumInput::checkClefBufferForSameAs()
 {
-    for (int i = 0; i < (int)m_clef_buffer.size(); i++) {
+    for (int i = 0; i < (int)m_clef_buffer.size(); ++i) {
         if (std::get<0>(m_clef_buffer[i])) {
             suppressBufferedClef(i);
         }
@@ -7280,7 +7280,7 @@ void HumdrumInput::suppressBufferedClef(int index)
 {
     hum::HumNum target = std::get<1>(m_clef_buffer.at(index));
     Clef *goodclef = NULL;
-    for (int i = 0; i < (int)m_clef_buffer.size(); i++) {
+    for (int i = 0; i < (int)m_clef_buffer.size(); ++i) {
         if (std::get<0>(m_clef_buffer[i])) {
             // don't look at bad clefs
             continue;
@@ -7356,7 +7356,7 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 void HumdrumInput::fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
     // triplet-whole + triplet-breve cases
-    for (int i = 1; i < (int)tg.size(); i++) {
+    for (int i = 1; i < (int)tg.size(); ++i) {
         if ((tg.at(i).tupletstart == 2) && (tg.at(i).tupletend == 1) && (tg.at(i - 1).tupletstart == 1)
             && (tg.at(i - 1).tupletend == 1)) {
             tg.at(i).tupletstart = 0;
@@ -7365,7 +7365,7 @@ void HumdrumInput::fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg
     }
 
     // two triplet-halfs + triplet-breve case
-    for (int i = 2; i < (int)tg.size(); i++) {
+    for (int i = 2; i < (int)tg.size(); ++i) {
         if ((tg.at(i).tupletstart == 2) && (tg.at(i).tupletend == 1) && (tg.at(i - 1).tupletstart == 0)
             && (tg.at(i - 1).tupletend == 1) && (tg.at(i - 2).tupletstart == 1) && (tg.at(i - 2).tupletend == 0)) {
             tg.at(i - 1).numscale = 1;
@@ -7377,7 +7377,7 @@ void HumdrumInput::fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg
     }
 
     // two triplet-halfs + triplet-breve case + two triplet-halfs
-    for (int i = 2; i < (int)tg.size(); i++) {
+    for (int i = 2; i < (int)tg.size(); ++i) {
         if ((tg.at(i).tupletstart == 0) && (tg.at(i).tupletend == 2) && (tg.at(i - 1).tupletstart == 2)
             && (tg.at(i - 1).tupletend == 0) && (tg.at(i - 2).tupletstart == 1) && (tg.at(i - 2).tupletend == 1)) {
             tg.at(i).tupletend = 1;
@@ -7480,7 +7480,7 @@ bool HumdrumInput::checkForTremolo(
 {
     int beamnumber = tgs.at(startindex).beamstart;
     std::vector<hum::HTp> notes;
-    for (int i = startindex; i < (int)layerdata.size(); i++) {
+    for (int i = startindex; i < (int)layerdata.size(); ++i) {
         if (layerdata[i]->isNote()) {
             notes.push_back(layerdata[i]);
         }
@@ -7499,7 +7499,7 @@ bool HumdrumInput::checkForTremolo(
 
     bool firstHasTie = false;
     bool lastHasTie = false;
-    for (int i = 0; i < (int)notes.size(); i++) {
+    for (int i = 0; i < (int)notes.size(); ++i) {
         if ((notes[i]->find('_') != std::string::npos) || (notes[i]->find('[') != std::string::npos)
             || (notes[i]->find(']') != std::string::npos)) {
             // Note/chord involved a tie is present,
@@ -7541,7 +7541,7 @@ bool HumdrumInput::checkForTremolo(
         allpequal = false;
     }
     else {
-        for (int i = 1; i < (int)pitches.size(); i++) {
+        for (int i = 1; i < (int)pitches.size(); ++i) {
             if (pitches[i].size() != pitches[i - 1].size()) {
                 allpequal = false;
                 nextsame.at(i - 1) = false;
@@ -7583,7 +7583,7 @@ bool HumdrumInput::checkForTremolo(
         notes[0]->setValue("auto", "tremolo", "1");
         notes[0]->setValue("auto", "recip", recip);
         notes[0]->setValue("auto", "slashes", slashes);
-        for (int i = 1; i < (int)notes.size(); i++) {
+        for (int i = 1; i < (int)notes.size(); ++i) {
             notes[i]->setValue("auto", "suppress", "1");
         }
 
@@ -7595,7 +7595,7 @@ bool HumdrumInput::checkForTremolo(
     // same duration (this requirement can be loosened in the future
     // if necessary).
     bool hasInternalTrem = true;
-    for (int i = 1; i < (int)nextsame.size() - 1; i++) {
+    for (int i = 1; i < (int)nextsame.size() - 1; ++i) {
         if (nextsame.at(i) == 1) {
             continue;
         }
@@ -7620,7 +7620,7 @@ bool HumdrumInput::checkForTremolo(
         groupings.reserve(16);
         groupings.resize(1);
         groupings.back().push_back(notes[0]);
-        for (int i = 0; i < (int)notes.size() - 1; i++) {
+        for (int i = 0; i < (int)notes.size() - 1; ++i) {
             if (nextsame[i]) {
                 groupings.back().push_back(notes[i + 1]);
             }
@@ -7635,7 +7635,7 @@ bool HumdrumInput::checkForTremolo(
     // (deal with dotted internal tremolos as needed in the future).
     bool allpow2 = true;
     if (hasInternalTrem) {
-        for (int i = 0; i < (int)groupings.size(); i++) {
+        for (int i = 0; i < (int)groupings.size(); ++i) {
             hum::HumNum count = (int)groupings[i].size();
             if (!count.isPowerOfTwo()) {
                 allpow2 = false;
@@ -7648,7 +7648,7 @@ bool HumdrumInput::checkForTremolo(
         // Ready to mark internal bTrem configuration.
 
         // First suppress printing of all non-primary tremolo notes:
-        for (int i = 0; i < (int)groupings.size(); i++) {
+        for (int i = 0; i < (int)groupings.size(); ++i) {
             for (int j = 1; j < (int)groupings[i].size(); j++) {
                 groupings[i][j]->setValue("auto", "suppress", "1");
             }
@@ -7656,7 +7656,7 @@ bool HumdrumInput::checkForTremolo(
 
         // Now add tremolo slash(es) on the first notes.
 
-        for (int i = 0; i < (int)groupings.size(); i++) {
+        for (int i = 0; i < (int)groupings.size(); ++i) {
             hum::HumNum tdur = duration * (int)groupings[i].size();
             std::string recip = hum::Convert::durationToRecip(tdur);
             int slashcount = -(int)(log2(duration.getFloat() / tdur.getFloat()));
@@ -7685,7 +7685,7 @@ bool HumdrumInput::checkForTremolo(
     }
 
     // check to see that all even notes/chords are the same
-    for (int i = 2; i < (int)pitches.size(); i++) {
+    for (int i = 2; i < (int)pitches.size(); ++i) {
         if (pitches[i].size() != pitches[i - 2].size()) {
             return false;
         }
@@ -7724,7 +7724,7 @@ bool HumdrumInput::checkForTremolo(
     notes[lasti]->setValue("auto", "tremoloAux", "1");
     notes[lasti]->setValue("auto", "recip", recip);
 
-    for (int i = 1; i < (int)notes.size(); i++) {
+    for (int i = 1; i < (int)notes.size(); ++i) {
         notes[i]->setValue("auto", "suppress", "1");
     }
 
@@ -7915,7 +7915,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             m_layer->AddChild(mrest);
             // Assign a Humdrum ID here.
             hum::HTp trest = NULL;
-            for (int i = 0; i < (int)layerdata.size(); i++) {
+            for (int i = 0; i < (int)layerdata.size(); ++i) {
                 if (layerdata[i]->isRest()) {
                     trest = layerdata[i];
                     break;
@@ -7970,7 +7970,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             MRest *mrest = new MRest;
             appendElement(layer, mrest);
             hum::HTp trest = NULL;
-            for (int i = 0; i < (int)layerdata.size(); i++) {
+            for (int i = 0; i < (int)layerdata.size(); ++i) {
                 if (!layerdata[i]->isData()) {
                     continue;
                 }
@@ -8637,6 +8637,30 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
         }
     }
+
+    // Check for repeat start at beginning of music.  The data for the very
+    // first measure starts at the exclusive interpretation so that clefs
+    // and time signatures and such are included.  If the first element
+    // in the layer is an exclusive interpretation, then search for any
+    // starting barline that should be checked for a repeat start:
+    if (!layerdata.empty() && (layerdata[0]->compare(0, 2, "**") == 0)) {
+        for (int i = 0; i < (int)layerdata.size(); ++i) {
+            if (layerdata[i]->isData()) {
+                break;
+            }
+            if (!layerdata[i]->isBarline()) {
+                continue;
+            }
+            if ((layerdata[i]->find("|:") != std::string::npos) || (layerdata[i]->find("!:") != std::string::npos)) {
+                if (m_measure) {
+                    m_measure->SetLeft(BARRENDITION_rptstart);
+                }
+            }
+            break;
+        }
+    }
+
+    // Check for repeat start at other places besides beginning of music:
     if ((layerindex == 0) && (!layerdata.empty()) && (layerdata[0]->at(0) == '=')) {
         if ((layerdata[0]->find("|:") != std::string::npos) || (layerdata[0]->find("!:") != std::string::npos)) {
             if (m_measure) {
@@ -8661,7 +8685,7 @@ int HumdrumInput::getMultiEndline(int startindex)
 {
     int found = -1;
     int index = startindex;
-    for (int i = index; i < (int)m_multirest.size(); i++) {
+    for (int i = index; i < (int)m_multirest.size(); ++i) {
         if (m_multirest[i] == -1) {
             found = i;
             break;
@@ -8671,7 +8695,7 @@ int HumdrumInput::getMultiEndline(int startindex)
         return startindex;
     }
     int found2 = -1;
-    for (int i = found; i < (int)m_multirest.size(); i++) {
+    for (int i = found; i < (int)m_multirest.size(); ++i) {
         if (m_multirest[i] != -1) {
             found2 = i;
             break;
@@ -8778,7 +8802,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
     int count = ftrem->GetChildCount();
 
     // also deal with chords later
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         Object *obj = ftrem->GetChild(i);
         if (obj->GetClassName() == "Note") {
             if (direction > 0) {
@@ -9131,7 +9155,7 @@ void HumdrumInput::convertMensuralToken(
         processDirections(token, staffindex);
         bool hasstem = false;
         string text = *token;
-        for (int i = 0; i < (int)text.size(); i++) {
+        for (int i = 0; i < (int)text.size(); ++i) {
             switch (text[i]) {
                 case 'M': hasstem = true; break;
                 case 'm': hasstem = true; break;
@@ -9241,13 +9265,13 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             // use 6 slot in array for "^^" (heavy accent)
             ch = 6;
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
-            i++;
+            ++i;
         }
         else if ((ch == '\'') && (posch == '\'')) {
             // staccatissimo alternate (eventually remove)
             ch = '`';
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
-            i++;
+            ++i;
         }
         articloc.at(ch) = i + 1;
 
@@ -11940,7 +11964,7 @@ void HumdrumInput::addTextElement(
     std::vector<std::string> pieces;
     hre.split(pieces, data, "\\\\n");
 
-    for (int i = 0; i < (int)pieces.size(); i++) {
+    for (int i = 0; i < (int)pieces.size(); ++i) {
         data = pieces[i];
         text->SetText(UTF8to16(data));
 
@@ -12080,12 +12104,12 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
     // pair contains the slur start enumeration and the start token.
     std::vector<pair<int, hum::HTp> > slurstartlist;
     slurstartlist.resize(slurendcount + 1);
-    for (int i = 1; i <= slurendcount; i++) {
+    for (int i = 1; i <= slurendcount; ++i) {
         slurstartlist[i].first = slurend->getSlurStartNumber(i);
         slurstartlist[i].second = slurend->getSlurStartToken(i);
     }
 
-    for (int i = 1; i <= slurendcount; i++) {
+    for (int i = 1; i <= slurendcount; ++i) {
         hum::HTp slurstart = slurstartlist[i].second;
         if (!slurstart) {
             continue;
@@ -12233,7 +12257,7 @@ bool HumdrumInput::checkIfSlurIsInvisible(hum::HTp token, int number)
 {
     int tsize = (int)token->size();
     int counter = 0;
-    for (int i = 0; i < tsize - 1; i++) {
+    for (int i = 0; i < tsize - 1; ++i) {
         if (token->at(i) == '(') {
             counter++;
         }
@@ -12266,7 +12290,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
     // here later (such as an excerpt of music where the opening
     // of the phrase is not present in the data).
     std::vector<hum::HTp> phrasestarts;
-    for (int i = 0; i < startcount; i++) {
+    for (int i = 0; i < startcount; ++i) {
         hum::HTp tok;
         tok = phraseend->getPhraseStartToken(i + 1);
         if (tok) {
@@ -12279,7 +12303,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
     // position that the note/chord is found in the phrasestarts list.
     std::vector<std::vector<int> > phraseindex;
     phraseindex.resize(phrasestarts.size());
-    for (int i = 0; i < (int)phrasestarts.size(); i++) {
+    for (int i = 0; i < (int)phrasestarts.size(); ++i) {
         for (int j = 0; j <= i; j++) {
             if (phrasestarts[i] == phrasestarts[j]) {
                 phraseindex[j].push_back(i);
@@ -12295,7 +12319,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
 
     int endsubtokcount = phraseend->getSubtokenCount();
     std::vector<int> endpitches;
-    for (int i = 0; i < endsubtokcount; i++) {
+    for (int i = 0; i < endsubtokcount; ++i) {
         std::string subtok = phraseend->getSubtoken(i);
         if (subtok.find("r") != std::string::npos) {
             endpitches.push_back(0);
@@ -12307,7 +12331,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
     std::vector<pair<int, int> > endchordsorted;
     endchordsorted.reserve(endsubtokcount);
     pair<int, int> v;
-    for (int i = 0; i < endsubtokcount; i++) {
+    for (int i = 0; i < endsubtokcount; ++i) {
         v.first = endpitches[i];
         v.second = i;
         endchordsorted.push_back(v);
@@ -12317,7 +12341,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
     int startsubtokcount;
     std::vector<int> startpitches;
 
-    for (int i = 0; i < (int)phraseindex.size(); i++) {
+    for (int i = 0; i < (int)phraseindex.size(); ++i) {
         std::vector<pair<int, bool> > phrasestartnoteinfo;
         extractPhraseNoteAttachmentInformation(phrasestartnoteinfo, phrasestarts.at(i), '{');
 
@@ -12336,7 +12360,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
         startchordsorted.reserve(startsubtokcount);
 
         pair<int, int> v;
-        for (int i = 0; i < startsubtokcount; i++) {
+        for (int i = 0; i < startsubtokcount; ++i) {
             v.first = startpitches[i];
             v.second = i;
             startchordsorted.push_back(v);
@@ -12436,7 +12460,7 @@ bool HumdrumInput::phraseIsInvisible(hum::HTp token, int pindex)
     }
 
     int counter = -1;
-    for (int i = 0; i < (int)token->size() - 1; i++) {
+    for (int i = 0; i < (int)token->size() - 1; ++i) {
         char ch = token->at(i);
         if (ch != '{') {
             continue;
@@ -12697,7 +12721,7 @@ void HumdrumInput::extractSlurNoteAttachmentInformation(
     int slurnumber = 0;
     int toksize = (int)token->size();
     bool notestate;
-    for (int i = 0; i < toksize; i++) {
+    for (int i = 0; i < toksize; ++i) {
         if (token->at(i) == ' ') {
             subtokindex++;
         }
@@ -12735,7 +12759,7 @@ void HumdrumInput::extractPhraseNoteAttachmentInformation(
     int phrasenumber = 0;
     int toksize = (int)token->size();
     bool notestate;
-    for (int i = 0; i < toksize; i++) {
+    for (int i = 0; i < toksize; ++i) {
         if (token->at(i) == ' ') {
             subtokindex++;
         }
@@ -13065,7 +13089,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             allSameKeySig = false;
         }
         else {
-            for (int i = 1; i < (int)keysigtok.size(); i++) {
+            for (int i = 1; i < (int)keysigtok.size(); ++i) {
                 if (keysigtok[i] == NULL) {
                     allSameKeySig = false;
                     break;
@@ -13087,7 +13111,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             allSameTimeSig = false;
         }
         else {
-            for (int i = 1; i < (int)timesigtok.size(); i++) {
+            for (int i = 1; i < (int)timesigtok.size(); ++i) {
                 if (timesigtok[i] == NULL) {
                     allSameTimeSig = false;
                     break;
@@ -13108,7 +13132,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             allSameMeterSig = false;
         }
         else {
-            for (int i = 1; i < (int)metersigtok.size(); i++) {
+            for (int i = 1; i < (int)metersigtok.size(); ++i) {
                 if (metersigtok[i] == NULL) {
                     allSameMeterSig = false;
                     break;
@@ -13129,7 +13153,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             allSameTranspose = false;
         }
         else {
-            for (int i = 1; i < (int)transposetok.size(); i++) {
+            for (int i = 1; i < (int)transposetok.size(); ++i) {
                 if (transposetok[i] == NULL) {
                     allSameTranspose = false;
                     break;
@@ -13147,7 +13171,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 
     // If there are different active non-zero transpositions
     // then key signatures need to be done individually.
-    for (int i = 0; i < (int)m_transpose.size(); i++) {
+    for (int i = 0; i < (int)m_transpose.size(); ++i) {
         if (m_transpose[i]) {
             allSameKeySig = false;
             break;
@@ -13188,7 +13212,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     bool need = false;
 
     if (!setAllKeySig) {
-        for (int i = 0; i < (int)keysigtok.size(); i++) {
+        for (int i = 0; i < (int)keysigtok.size(); ++i) {
             if (keysigtok[i] != NULL) {
                 need = true;
                 needStaffDef.at(i) = true;
@@ -13196,14 +13220,14 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         }
     }
     if (!setAllTimeSig) {
-        for (int i = 0; i < (int)timesigtok.size(); i++) {
+        for (int i = 0; i < (int)timesigtok.size(); ++i) {
             if (timesigtok[i] != NULL) {
                 need = true;
                 needStaffDef.at(i) = true;
             }
         }
     }
-    for (int i = 0; i < (int)transposetok.size(); i++) {
+    for (int i = 0; i < (int)transposetok.size(); ++i) {
         if (transposetok[i] != NULL) {
             need = true;
             needStaffDef.at(i) = true;
@@ -13216,7 +13240,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     StaffGrp *staffGrp = new StaffGrp;
     scoreDef->AddChild(staffGrp);
     std::vector<StaffDef *> staves(ss.size(), NULL);
-    for (int i = 0; i < (int)needStaffDef.size(); i++) {
+    for (int i = 0; i < (int)needStaffDef.size(); ++i) {
         if (!needStaffDef[i]) {
             continue;
         }
@@ -13228,7 +13252,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 
     if (!setAllTimeSig) {
         // add individual time signatures to each staff as needed
-        for (int i = 0; i < (int)timesigtok.size(); i++) {
+        for (int i = 0; i < (int)timesigtok.size(); ++i) {
             if (timesigtok[i] == NULL) {
                 continue;
             }
@@ -13242,7 +13266,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 
     if (!setAllKeySig) {
         // add individual key signatures to each staff as needed
-        for (int i = 0; i < (int)keysigtok.size(); i++) {
+        for (int i = 0; i < (int)keysigtok.size(); ++i) {
             if (keysigtok[i] == NULL) {
                 continue;
             }
@@ -13255,7 +13279,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     }
 
     // Process any transposition changes:
-    for (int i = 0; i < (int)transposetok.size(); i++) {
+    for (int i = 0; i < (int)transposetok.size(); ++i) {
         if (transposetok[i] == NULL) {
             continue;
         }
@@ -13349,7 +13373,7 @@ int HumdrumInput::insertRepetitionElement(
     }
     hum::HTp repend = NULL;
     int outindex = index;
-    for (int i = index + 1; i < (int)tokens.size(); i++) {
+    for (int i = index + 1; i < (int)tokens.size(); ++i) {
         if (*tokens[i] == "*Xrep") {
             repend = tokens[i];
             outindex = i;
@@ -13412,7 +13436,7 @@ void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, vector<hum::HTp> &tokens, i
     vector<int> repvalues;
     repvalues.reserve(32);
 
-    for (int i = index + 1; i < (int)tokens.size(); i++) {
+    for (int i = index + 1; i < (int)tokens.size(); ++i) {
         item = tokens.at(i);
         if (*item == "*Xrep") {
             break;
@@ -13443,7 +13467,7 @@ void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, vector<hum::HTp> &tokens, i
     }
 
     bool allequal = true;
-    for (int i = 1; i < (int)repvalues.size(); i++) {
+    for (int i = 1; i < (int)repvalues.size(); ++i) {
         if (repvalues[i] != repvalues[0]) {
             allequal = false;
             break;
@@ -13627,7 +13651,7 @@ void HumdrumInput::storeBreaksec(
 
     std::vector<std::vector<int> > beamednotes;
     int bnum = 0;
-    for (int i = 0; i < (int)layerdata.size(); i++) {
+    for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (!beamnum[i]) {
             // not in a beam
             continue;
@@ -13656,7 +13680,7 @@ void HumdrumInput::storeBreaksec(
         beamednotes.back().push_back(i);
     }
 
-    for (int i = 0; i < (int)beamednotes.size(); i++) {
+    for (int i = 0; i < (int)beamednotes.size(); ++i) {
         for (int j = 1; j < (int)beamednotes[i].size() - 1; j++) {
             int index1 = beamednotes[i][j - 1];
             int index2 = beamednotes[i][j];
@@ -13811,7 +13835,7 @@ bool HumdrumInput::shouldHideBeamBracket(
         if (tgs.at(i).beamend) {
             beamedge = true;
         }
-        i++;
+        ++i;
     }
     if (!endtok) {
         return false;
@@ -14263,7 +14287,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
 
     int tcorrection = 0;
-    for (int i = 0; i < (int)tupletgroups.size(); i++) {
+    for (int i = 0; i < (int)tupletgroups.size(); ++i) {
         if (checkForTupletForcedBreak(duritems, i)) {
             tcorrection++;
         }
@@ -14273,7 +14297,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
     if (tcorrection) {
         // invalidate adjustcount
-        for (int i = 0; i < (int)adjustcount.size(); i++) {
+        for (int i = 0; i < (int)adjustcount.size(); ++i) {
             adjustcount[i] = 0;
         }
     }
@@ -14412,7 +14436,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     // adjust tupletgroups based on tuptop and tupbot changes
     int correction = 0;
-    for (int i = 1; i < (int)tuptop.size(); i++) {
+    for (int i = 1; i < (int)tuptop.size(); ++i) {
         if ((tuptop[i] == 1) && (tupbot[i] == 1)) {
             continue;
         }
@@ -14436,7 +14460,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         tupletgroups.at(i) += correction;
     }
 
-    for (int i = 0; i < (int)tuptop.size(); i++) {
+    for (int i = 0; i < (int)tuptop.size(); ++i) {
         if (tuptop[i] < 0) {
             tuptop[i] = -tuptop[i];
         }
@@ -14499,7 +14523,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // Renumber tuplet groups in sequence (otherwise the mergeTupletsCuttingBeam()
     // function will delete the 1st group if it is not the first tuplet.
     int tcounter = 0;
-    for (int i = 0; i < (int)tgs.size(); i++) {
+    for (int i = 0; i < (int)tgs.size(); ++i) {
         if (tgs.at(i).tupletstart) {
             tgs.at(i).tupletstart = ++tcounter;
         }
@@ -14521,7 +14545,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 void HumdrumInput::assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
     int maxgroup = 0;
-    for (int i = 0; i < (int)tg.size(); i++) {
+    for (int i = 0; i < (int)tg.size(); ++i) {
         if (maxgroup < tg[i].group) {
             maxgroup = tg[i].group;
         }
@@ -14533,14 +14557,14 @@ void HumdrumInput::assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet
 
     // tggroups is a list of only durational items, removing things like clefs and barlines.
     vector<vector<humaux::HumdrumBeamAndTuplet *> > tggroups(maxgroup + 1);
-    for (int i = 0; i < (int)tg.size(); i++) {
+    for (int i = 0; i < (int)tg.size(); ++i) {
         int group = tg[i].group;
         if (group <= 0) {
             continue;
         }
         tggroups.at(group).push_back(&tg[i]);
     }
-    for (int i = 1; i < (int)tggroups.size(); i++) {
+    for (int i = 1; i < (int)tggroups.size(); ++i) {
         assignScalingToTupletGroup(tggroups[i]);
     }
 }
@@ -14564,7 +14588,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
             hum::HumNum scale = num;
             scale /= tggroup[0]->num;
             if (scale.isInteger() && (scale >= 1)) {
-                for (int i = 0; i < (int)tggroup.size(); i++) {
+                for (int i = 0; i < (int)tggroup.size(); ++i) {
                     tggroup[i]->numscale = scale.getNumerator();
                 }
                 return;
@@ -14573,12 +14597,12 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
     }
 
     // initialize all scalings to 1
-    for (int i = 0; i < (int)tggroup.size(); i++) {
+    for (int i = 0; i < (int)tggroup.size(); ++i) {
         tggroup[i]->numscale = 1;
     }
 
     std::map<hum::HumNum, int> durcounts;
-    for (int i = 0; i < (int)tggroup.size(); i++) {
+    for (int i = 0; i < (int)tggroup.size(); ++i) {
         durcounts[tggroup[i]->durationnodots]++;
     }
 
@@ -14588,7 +14612,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
         hum::HumNum scale = durcounts.begin()->second;
         scale /= tggroup[0]->num;
         if (scale.isInteger() && (scale > 1)) {
-            for (int i = 0; i < (int)tggroup.size(); i++) {
+            for (int i = 0; i < (int)tggroup.size(); ++i) {
                 tggroup[i]->numscale = scale.getNumerator();
             }
         }
@@ -14604,7 +14628,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
             hum::HumNum scale = count1;
             scale /= tggroup[0]->num;
             if (scale.isInteger() && (scale > 1)) {
-                for (int i = 0; i < (int)tggroup.size(); i++) {
+                for (int i = 0; i < (int)tggroup.size(); ++i) {
                     tggroup[i]->numscale = scale.getNumerator();
                 }
             }
@@ -14634,7 +14658,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
     }
 
     hum::HumNum totaldur = 0;
-    for (int i = 0; i < (int)tggroup.size(); i++) {
+    for (int i = 0; i < (int)tggroup.size(); ++i) {
         totaldur += tggroup[i]->duration;
     }
 
@@ -14645,7 +14669,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
         hum::HumNum scale = units;
         scale /= tggroup[0]->num;
         if (scale.isInteger() && (scale > 1)) {
-            for (int i = 0; i < (int)tggroup.size(); i++) {
+            for (int i = 0; i < (int)tggroup.size(); ++i) {
                 tggroup[i]->numscale = scale.getNumerator();
             }
             return;
@@ -14677,7 +14701,7 @@ void HumdrumInput::checkForTupletMergesAndSplits(std::vector<int> &tupletgroups,
     int lastgroup = 0;
     hum::HumNum sum;
     hum::HumNum targetsum;
-    for (int i = 0; i < (int)tupletgroups.size(); i++) {
+    for (int i = 0; i < (int)tupletgroups.size(); ++i) {
         if (tupletgroups.at(i) == 0) {
             continue;
         }
@@ -14717,7 +14741,7 @@ void HumdrumInput::checkForTupletMergesAndSplits(std::vector<int> &tupletgroups,
 
     counter = 0;
     lastgroup = 0;
-    for (int i = 0; i < (int)tupletgroups.size(); i++) {
+    for (int i = 0; i < (int)tupletgroups.size(); ++i) {
         if (tupletgroups.at(i) == 0) {
             continue;
         }
@@ -14783,14 +14807,14 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
 
     // newtg is a list of only durational items, removing things like clefs and barlines.
     vector<humaux::HumdrumBeamAndTuplet *> newtg;
-    for (int i = 0; i < (int)tg.size(); i++) {
+    for (int i = 0; i < (int)tg.size(); ++i) {
         if (tg.at(i).group >= 0) {
             newtg.push_back(&tg.at(i));
         }
     }
 
     std::vector<int> inbeam(newtg.size(), 0);
-    for (int i = 0; i < (int)inbeam.size(); i++) {
+    for (int i = 0; i < (int)inbeam.size(); ++i) {
         if (newtg.at(i)->force) {
             inbeam.at(i) = 0;
         }
@@ -14810,7 +14834,7 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
 
     std::vector<int> scaleadj(newtg.size(), 1);
 
-    for (int i = 0; i < (int)newtg.size(); i++) {
+    for (int i = 0; i < (int)newtg.size(); ++i) {
         if (!(inbeam.at(i) && newtg.at(i)->tupletend)) {
             continue;
         }
@@ -14872,13 +14896,13 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
 
     if (m_debug) {
         cerr << "INDEX\tBEAM\tTSTART\tTEND\tNUM\tNUMBASE\n";
-        for (int i = 0; i < (int)tg.size(); i++) {
+        for (int i = 0; i < (int)tg.size(); ++i) {
             cerr << "I " << i << ":\t" << inbeam.at(i) << "\t" << tg.at(i).tupletstart << "\t" << tg.at(i).tupletend
                  << "\t" << tg.at(i).num << "\t" << tg.at(i).numbase << "\tSA=" << scaleadj.at(i) << endl;
         }
     }
 
-    for (int i = 0; i < (int)newtg.size(); i++) {
+    for (int i = 0; i < (int)newtg.size(); ++i) {
         if (newtg.at(i)->group < 0) {
             continue;
         }
@@ -15467,7 +15491,7 @@ std::string HumdrumInput::getEndIdForOttava(hum::HTp token)
     }
 
     int bestindex = 0;
-    for (int i = 1; i < (int)notes.size(); i++) {
+    for (int i = 1; i < (int)notes.size(); ++i) {
         if (timestamps[i] > timestamps[bestindex]) {
             bestindex = i;
         }
@@ -15669,7 +15693,7 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     bool allinvis = true;
 
     std::vector<std::string> tstrings = token->getSubtokens();
-    for (int i = 0; i < (int)tstrings.size(); i++) {
+    for (int i = 0; i < (int)tstrings.size(); ++i) {
         if (tstrings[i].find("yy") == std::string::npos) {
             allinvis = false;
             break;
@@ -15815,7 +15839,7 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
 
     vector<int> dataindex;
     dataindex.reserve(layerdata.size());
-    for (int i = 0; i < (int)layerdata.size(); i++) {
+    for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (layerdata.at(i)->isData()) {
             dataindex.push_back(i);
         }
@@ -15877,7 +15901,7 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
 
     // See https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/124
     // This solution may need to be changed for a more general solution.
-    for (int i = 0; i < (int)dataindex.size() - 1; i++) {
+    for (int i = 0; i < (int)dataindex.size() - 1; ++i) {
         int ii = dataindex.at(i);
         int iii = dataindex.at(i + 1);
         if (prespace.at(ii) == 0) {
@@ -16877,7 +16901,7 @@ template <class ELEMENT> void HumdrumInput::addType(ELEMENT element, const std::
 std::string HumdrumInput::checkNoteForScordatura(const std::string &token)
 {
     int index = -1;
-    for (int i = 0; i < (int)m_scordatura_marker.size(); i++) {
+    for (int i = 0; i < (int)m_scordatura_marker.size(); ++i) {
         if (token.find(m_scordatura_marker[i]) != std::string::npos) {
             index = i;
             break;
@@ -17750,7 +17774,7 @@ int HumdrumInput::getStaffAdjustment(hum::HTp token)
     // then move the fermata to the different staff.
     std::vector<string> subtokens;
     int scount = token->getSubtokenCount();
-    for (int i = 0; i < scount; i++) {
+    for (int i = 0; i < scount; ++i) {
         subtokens.emplace_back(token->getSubtoken(i));
     }
     int allabove = true;
@@ -17760,7 +17784,7 @@ int HumdrumInput::getStaffAdjustment(hum::HTp token)
     std::string downquery = "[A-Ga-gr][#n-]*[xXyY]*";
     downquery += m_signifiers.below;
     if (m_signifiers.above) {
-        for (int i = 0; i < scount; i++) {
+        for (int i = 0; i < scount; ++i) {
             if (!hre.search(subtokens[i], upquery)) {
                 allabove = false;
                 break;
@@ -17771,7 +17795,7 @@ int HumdrumInput::getStaffAdjustment(hum::HTp token)
         allabove = false;
     }
     if (m_signifiers.below && !allabove) {
-        for (int i = 0; i < scount; i++) {
+        for (int i = 0; i < scount; ++i) {
             if (!hre.search(subtokens[i], downquery)) {
                 allbelow = false;
                 break;
@@ -18043,7 +18067,7 @@ hum::HTp HumdrumInput::getHighestSystemArpeggio(hum::HTp token)
     int highest = tpitch;
 
     hum::HLp line = token->getLine();
-    for (int i = 0; i < line->getFieldCount(); i++) {
+    for (int i = 0; i < line->getFieldCount(); ++i) {
         hum::HTp tok2 = line->token(i);
         if (!tok2->isKern()) {
             continue;
@@ -18084,7 +18108,7 @@ bool HumdrumInput::isLowestSystemArpeggio(hum::HTp token)
     int lowest = tpitch;
 
     hum::HLp line = token->getLine();
-    for (int i = 0; i < line->getFieldCount(); i++) {
+    for (int i = 0; i < line->getFieldCount(); ++i) {
         hum::HTp tok2 = line->token(i);
         if (!tok2->isKern()) {
             continue;
@@ -18245,7 +18269,7 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     int turnstart = -1;
     int turnend = -1;
 
-    for (int i = 0; i < (int)tok.size(); i++) {
+    for (int i = 0; i < (int)tok.size(); ++i) {
         if ((tok[i] == 's') || (tok[i] == 'S') || (tok[i] == '$')) {
             turnstart = i;
             turnend = i;
@@ -19396,7 +19420,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
 bool HumdrumInput::hasMensuralStaff(hum::HLp line)
 {
-    for (int i = 0; i < line->getFieldCount(); i++) {
+    for (int i = 0; i < line->getFieldCount(); ++i) {
         if (line->token(i)->isMens()) {
             return true;
         }
@@ -19478,7 +19502,7 @@ void HumdrumInput::addFTremSlurs()
     if (!m_measure) {
         return;
     }
-    for (int i = 0; i < (int)m_ftrem_slurs.size(); i++) {
+    for (int i = 0; i < (int)m_ftrem_slurs.size(); ++i) {
         addChildBackMeasureOrSection(m_ftrem_slurs.at(i));
     }
     m_ftrem_slurs.clear();
@@ -19509,7 +19533,7 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
 
     int kerncount = 0;
     int menscount = 0;
-    for (int i = 0; i < (int)m_oclef.size(); i++) {
+    for (int i = 0; i < (int)m_oclef.size(); ++i) {
         if (m_oclef[i].second->isKern()) {
             kerncount++;
         }
@@ -19715,7 +19739,7 @@ int HumdrumInput::getMeasureEndLine(int startline)
             }
         }
         endline = i;
-        i++;
+        ++i;
     }
 
     if (foundDataQ) {
@@ -19777,7 +19801,7 @@ void HumdrumInput::clear()
     m_duradj.clear();
     m_nulls.clear();
     m_fbstates.clear();
-    for (int i = 0; i < (int)m_scordatura_transposition.size(); i++) {
+    for (int i = 0; i < (int)m_scordatura_transposition.size(); ++i) {
         delete m_scordatura_transposition[i];
         m_scordatura_transposition[i] = NULL;
     }
@@ -19810,7 +19834,7 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
         // data line.
         bool found = false;
         int linenum = -1;
-        for (int i = 0; i < infile.getLineCount(); i++) {
+        for (int i = 0; i < infile.getLineCount(); ++i) {
             if (infile[i].isBarline()) {
                 found = true;
                 linenum = i;
@@ -20251,7 +20275,7 @@ void HumdrumInput::checkBeamWith(
     string belowSearch = "[A-Ga-gn#-][XxYy]?";
     aboveSearch += m_signifiers.above;
     belowSearch += m_signifiers.below;
-    for (int i = startindex; i < (int)layerdata.size(); i++) {
+    for (int i = startindex; i < (int)layerdata.size(); ++i) {
         if (!(layerdata[i]->isNote() || layerdata[i]->isRest())) {
             continue;
         }
@@ -20700,7 +20724,7 @@ bool HumdrumInput::analyzeBreaks(hum::HumdrumFile &infile)
     // check for informal breaking markers such as:
     // !!pagebreak:original
     // !!linebreak:original
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (!infile[i].isGlobalComment()) {
             continue;
         }
@@ -20718,7 +20742,7 @@ bool HumdrumInput::analyzeBreaks(hum::HumdrumFile &infile)
     // !!LO:LB:g=original
     // !LO:PB:g=original
     // !LO:LB:g=original
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (!infile[i].isComment()) {
             continue;
         }
@@ -20796,7 +20820,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     // time as the whole-measure rest.  There will still be cases
     // where there is a chord/dynamic which does not start
     // at the same time as the rest that need to be accounted for.
-    for (int i = 0; i < (int)wholerest.size(); i++) {
+    for (int i = 0; i < (int)wholerest.size(); ++i) {
         if (wholerest[i] != 1) {
             continue;
         }
@@ -20827,7 +20851,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     }
 
     // remove cases where there is text attached to the whole-measure rest
-    for (int i = 0; i < (int)wholerest.size(); i++) {
+    for (int i = 0; i < (int)wholerest.size(); ++i) {
         if (wholerest[i] != 1) {
             continue;
         }
@@ -20869,7 +20893,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 
     // Expand backwards to include a whole-measure rest with a
     // measure that has text.
-    for (int i = 0; i < (int)wholerest.size() - 1; i++) {
+    for (int i = 0; i < (int)wholerest.size() - 1; ++i) {
         if (bardur[i] != bardur[i + 1]) {
             continue;
         }
@@ -20935,7 +20959,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
         if (bardur == 0) {
             // Extend first non-zero number in list backwards to start of output.
             // This allows a multibar rest at the start of the music.
-            for (int i = 0; i < firstbar; i++) {
+            for (int i = 0; i < firstbar; ++i) {
                 output[i] = output[firstbar];
             }
         }
@@ -20955,7 +20979,7 @@ void HumdrumInput::prepareSections()
     hum::HumdrumFile &infile = m_infiles[0];
 
     sectionlabels.resize(infile.getLineCount());
-    for (int i = 0; i < (int)sectionlabels.size(); i++) {
+    for (int i = 0; i < (int)sectionlabels.size(); ++i) {
         sectionlabels[i] = NULL;
     }
     hum::HTp secname = NULL;
@@ -21047,7 +21071,7 @@ void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
     string expansion = *etok;
     string variant;
     int startindex = -1;
-    for (int i = 2; i < (int)expansion.size(); i++) {
+    for (int i = 2; i < (int)expansion.size(); ++i) {
         if (expansion[i] == '[') {
             startindex = i + 1;
             break;
@@ -21058,7 +21082,7 @@ void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
         return;
     }
     std::vector<std::string> labels(1);
-    for (int i = startindex; i < (int)expansion.size(); i++) {
+    for (int i = startindex; i < (int)expansion.size(); ++i) {
         if (isspace(expansion[i])) {
             continue;
         }
@@ -21098,7 +21122,7 @@ void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
         exp->SetType(variant);
     }
 
-    for (int i = 0; i < (int)labels.size(); i++) {
+    for (int i = 0; i < (int)labels.size(); ++i) {
         string ref = "#label-" + labels[i];
         exp->AddRefAllowDuplicate(ref);
     }
@@ -21112,7 +21136,7 @@ void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
 
 void HumdrumInput::hideTerminalBarlines(hum::HumdrumFile &infile)
 {
-    for (int i = 0; i < infile.getStrandCount(); i++) {
+    for (int i = 0; i < infile.getStrandCount(); ++i) {
         hum::HTp stok = infile.getStrandStart(i);
         if (!stok->isKern()) {
             continue;
@@ -21185,7 +21209,7 @@ void HumdrumInput::hideBarlinesInTiedGroup(hum::HTp startnote)
 
 void HumdrumInput::analyzeClefNulls(hum::HumdrumFile &infile)
 {
-    for (int i = 0; i < infile.getLineCount(); i++) {
+    for (int i = 0; i < infile.getLineCount(); ++i) {
         if (!infile[i].isInterpretation()) {
             continue;
         }
