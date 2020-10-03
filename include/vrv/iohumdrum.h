@@ -689,11 +689,9 @@ protected:
     void setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex);
     template <class ELEMENT> void addChildBackMeasureOrSection(ELEMENT element);
     template <class ELEMENT> void addChildMeasureOrSection(ELEMENT element);
-
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
     void popElementStack(std::vector<std::string> &elements, std::vector<void *> &pointers);
-
     template <class ELEMENT>
     void addTextElement(
         ELEMENT *element, const std::string &content, const std::string &fontstyle = "", bool addSpacer = true);
@@ -710,6 +708,9 @@ protected:
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
     template <class ELEMENT> void addType(ELEMENT element, const std::string &aType);
+    template <class ELEMENT>
+    void insertTwoRhythmsAndTextBetween(
+        ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

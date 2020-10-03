@@ -5769,6 +5769,12 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             if (track != lasttrack) {
                 layerindex = 0;
             }
+            else if (!token->isPrimaryStrophe()) {
+                // Do not increment layer index for
+                // secondary strophes.
+                // Also ignore non-primary strophes for now.
+                continue;
+            }
             else {
                 layerindex++;
             }
@@ -11935,6 +11941,42 @@ hum::HumNum HumdrumInput::getMeasureEndTstamp(int staffindex)
     return ss[staffindex].meter_top + 1;
 }
 
+//////////////////////////////
+//
+// HumdrumInput::insertTowRhythmsAndTextBetween -- used for display of tempo
+//    changes.  Non-generalized subcase for addTextElement().
+//    Example:
+//       [quarter] = [half]
+//
+
+template <class ELEMENT>
+void HumdrumInput::insertTwoRhythmsAndTextBetween(
+    ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2)
+{
+    std::string newnote1 = convertRhythmToVerovioText(note1);
+    std::string newnote2 = convertRhythmToVerovioText(note2);
+    newnote1 = unescapeHtmlEntities(newnote1);
+    newnote2 = unescapeHtmlEntities(newnote2);
+
+    Rend *rend1 = new Rend;
+    Text *text1 = new Text;
+    text1->SetText(UTF8to16(newnote1));
+    rend1->AddChild(text1);
+    rend1->SetFontname("VerovioText");
+    element->AddChild(rend1);
+
+    Text *middleText = new Text;
+    middleText->SetText(UTF8to16(text));
+    element->AddChild(middleText);
+
+    Rend *rend2 = new Rend;
+    Text *text2 = new Text;
+    text2->SetText(UTF8to16(newnote2));
+    rend2->AddChild(text2);
+    rend2->SetFontname("VerovioText");
+    element->AddChild(rend2);
+}
+
 /////////////////////////////
 //
 // HumdumInput::addTextElement -- Append text to a regular element.
@@ -11946,6 +11988,7 @@ void HumdrumInput::addTextElement(
     ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer)
 {
     Text *text = new Text;
+
     std::string data = content;
     if (element->GetClassName() == "Syl") {
         // Approximate centering of single-letter text on noteheads.
@@ -11955,12 +11998,21 @@ void HumdrumInput::addTextElement(
         }
     }
 
-    if (data.find("[") != std::string::npos) {
-        data = replaceMusicShapes(data);
-    }
+    // Unicode replacement (only works for quarter and eighth:
+    // if (data.find("[") != std::string::npos) {
+    //    data = replaceMusicShapes(data);
+    //}
     data = unescapeHtmlEntities(data);
 
     hum::HumRegex hre;
+    if (hre.search(data, "^\\s*\\[(.*?)\\]([^\\[]*)\\[(.*?)\\]\\s*$")) {
+        std::string note1 = hre.getMatch(1);
+        std::string text1 = hre.getMatch(2);
+        std::string note2 = hre.getMatch(3);
+        insertTwoRhythmsAndTextBetween(element, note1, text1, note2);
+        return;
+    }
+
     std::vector<std::string> pieces;
     hre.split(pieces, data, "\\\\n");
 
@@ -12002,7 +12054,7 @@ void HumdrumInput::addTextElement(
 
 //////////////////////////////
 //
-// HumdrumInput::replaceMusicShapes --
+// HumdrumInput::replaceMusicShapes -- see HumdrumInput::convertRhythmToVerovioText();
 //
 // Verovio font numbers
 // (see https://www.smufl.org/version/latest/range/individualNotes)
