@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Oct  1 05:42:47 PDT 2020
+// Last Modified: Fri Oct  2 00:40:45 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1647,6 +1647,17 @@ class HumdrumToken : public std::string, public HumHash {
 		void     setTrack                  (int aTrack);
 		void     copyStructure             (HTp token);
 
+		// strophe related functions:
+		HTp      getStrophe                (void);
+		std::string getStropheLabel        (void);
+		void     setStrophe                (HTp strophe);
+		bool     hasStrophe                (void);
+		void     clearStrophe              (void);
+		bool     isStrophe                 (const std::string& label);
+		bool     getStropheStartIndex      (void);
+		bool     isFirstStrophe            (void);
+		bool     isPrimaryStrophe          (void);
+
 	protected:
 		void     setLineIndex              (int lineindex);
 		void     setFieldIndex             (int fieldlindex);
@@ -1734,6 +1745,10 @@ class HumdrumToken : public std::string, public HumHash {
 
 		// m_rhythm_analyzed: Set to true when HumdrumFile assigned duration
 		bool m_rhythm_analyzed = false;
+
+		// m_strophe: Starting point of a strophe that the token belongs to.
+		// NULL means that it is not in a strophe.
+		HTp m_strophe = NULL;
 
 	friend class HumdrumLine;
 	friend class HumdrumFileBase;
