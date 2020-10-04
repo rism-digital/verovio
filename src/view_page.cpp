@@ -355,12 +355,13 @@ void View::DrawStaffGrp(
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
         DrawBracket(dc, x, yTop, yBottom, staffSize);
-        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue() + m_doc->GetDrawingUnit(staffSize);
-
+        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue()
+            + m_doc->GetDrawingUnit(staffSize);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracketsq) {
         DrawBracketsq(dc, x, yTop, yBottom, staffSize);
-        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue() + m_doc->GetDrawingUnit(staffSize);
+        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue()
+            + m_doc->GetDrawingUnit(staffSize);
     }
 
     // recursively draw the children
