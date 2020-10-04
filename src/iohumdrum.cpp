@@ -8527,7 +8527,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         else {
             // should be a note
-
             note = new Note;
             setStemLength(note, layerdata[i]);
             setLocationId(note, layerdata[i]);
@@ -8597,7 +8596,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDynamics(layerdata[i], staffindex);
             assignAutomaticStem(note, layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
-                note->SetStemLen(0.0);
+                note->SetStemVisible(BOOLEAN_false);
             }
             if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
                 note->SetCue(BOOLEAN_true);
@@ -8990,7 +8989,7 @@ template <class ELEMENT> void HumdrumInput::assignAutomaticStem(ELEMENT element,
             switch (value) {
                 case '/': element->SetStemDir(STEMDIRECTION_up); break; // force stem up
                 case '\\': element->SetStemDir(STEMDIRECTION_down); break; // force stem down
-                case 'x': element->SetStemLen(0.0); break; // force no stem
+                case 'x': element->SetStemVisible(BOOLEAN_false); break; // force no stem
             }
         }
     }
@@ -10066,7 +10065,7 @@ void HumdrumInput::removeCharacter(hum::HTp token, char removechar)
 void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staffindex)
 {
     if (m_signifiers.nostem && token->find(m_signifiers.nostem) != string::npos) {
-        chord->SetStemLen(0.0);
+        chord->SetStemVisible(BOOLEAN_false);
     }
 
     if (m_signifiers.cuesize) {
@@ -16545,7 +16544,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     bool addCueSizeQ = getBooleanParameter(token, "N", "cue");
 
     if (removeStemQ) {
-        note->SetStemLen(0.0);
+        note->SetStemVisible(BOOLEAN_false);
     }
     if (addCueSizeQ) {
         note->SetCue(BOOLEAN_true);
@@ -16802,7 +16801,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
         if (dur == 0) {
             note->SetDur(DURATION_4);
-            note->SetStemLen(0.0);
+            note->SetStemVisible(BOOLEAN_false);
             // if you want a stemless grace note, then set the
             // stemlength to zero explicitly.
         }
