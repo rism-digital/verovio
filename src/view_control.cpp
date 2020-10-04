@@ -800,7 +800,16 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         }
         if (!isShortTie) {
             x1 += r1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+            if (note1 && note1->GetDots() > 0) {
+                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * note1->GetDots() * 3 / 2;
+            }
+            else if (parentChord1 && (parentChord1->GetDots() > 0)) {
+                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
+            }
         }
+        x2 -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+                  + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize))
+            / 2;
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
