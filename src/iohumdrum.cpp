@@ -5495,7 +5495,11 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
     auto status = convertMeasureStaves(startline, endline);
 
-    checkForRehearsal(startline);
+    int checkline = startline;
+    if (!infile.token(startline, 0)->isBarline()) {
+        checkline = getNextBarlineIndex(infile, startline);
+    }
+    checkForRehearsal(checkline);
 
     addFTremSlurs();
 
@@ -5503,6 +5507,37 @@ bool HumdrumInput::convertSystemMeasure(int &line)
         checkForLayoutBreak(endline);
     }
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getNextBarlineIndex -- Return the next barline row on or after
+//     the current index into the file.  If there is none before the first
+//     encountered data line, then return the input value.
+//
+
+int HumdrumInput::getNextBarlineIndex(hum::HumdrumFile &infile, int startline)
+{
+    hum::HTp token = infile.token(startline, 0);
+    if (token->isBarline()) {
+        return startline;
+    }
+    if (*token == "*-") {
+        return startline;
+    }
+    for (int i = 1; i < infile.getLineCount(); i++) {
+        token = infile.token(startline + i, 0);
+        if (token->isBarline()) {
+            return startline + i;
+        }
+        if (token->isData()) {
+            return startline;
+        }
+        if (*token == "*-") {
+            return startline + i;
+        }
+    }
+    return startline;
 }
 
 //////////////////////////////

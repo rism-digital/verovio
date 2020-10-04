@@ -648,6 +648,7 @@ protected:
     int getLowestDiatonicPitch(hum::HTp token, const string &requirement);
     int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
     bool hasMensuralStaff(hum::HLp line);
+    int getNextBarlineIndex(hum::HumdrumFile &infile, int startline);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
