@@ -200,6 +200,12 @@ public:
     double GetContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
+    /**
+     * Get zone bounds using child elements with facsimile information.
+     * Returns true if bounds can be constructed, false otherwise.
+     */
+    bool GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry);
+
     //----------//
     // Functors //
     //----------//
@@ -290,6 +296,11 @@ public:
     virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
 
     /**
+     * See Object::LayerElementsInTimeSpan
+     */
+    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams);
+
+    /**
      * See Object::CalcOnsetOffset
      */
     ///@{
@@ -319,6 +330,11 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::GetRelativeLayerElement
+     */
+    virtual int GetRelativeLayerElement(FunctorParams *functorParams);
 
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);

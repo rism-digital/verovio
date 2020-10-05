@@ -140,7 +140,7 @@ void TupletBracket::Reset()
 
 int TupletBracket::GetDrawingXLeft()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
     return tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
@@ -148,7 +148,7 @@ int TupletBracket::GetDrawingXLeft()
 
 int TupletBracket::GetDrawingXRight()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
     return tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
@@ -156,7 +156,7 @@ int TupletBracket::GetDrawingXRight()
 
 int TupletBracket::GetDrawingYLeft()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -173,7 +173,7 @@ int TupletBracket::GetDrawingYLeft()
 
 int TupletBracket::GetDrawingYRight()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -231,7 +231,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         return xLeft + ((xRight - xLeft) / 2);
     }
     else {
-        Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+        Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
         assert(tuplet && tuplet->GetDrawingLeft() && tuplet->GetDrawingRight());
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
         int xRight = tuplet->GetDrawingRight()->GetDrawingX();
@@ -368,7 +368,7 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int Stem::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     assert(params->m_staff);
@@ -376,6 +376,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     assert(params->m_interface);
 
     int staffSize = params->m_staff->m_drawingStaffSize;
+    int stemShift = params->m_doc->GetDrawingStemWidth(staffSize) / 2;
     bool drawingCueSize = this->GetDrawingCueSize();
 
     /************ Set the position, the length and adjust to the note head ************/
@@ -398,18 +399,22 @@ int Stem::CalcStem(FunctorParams *functorParams)
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetStemPos() == STEMPOSITION_left) {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+                p.x += stemShift;
             }
             else {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+                p.x -= stemShift;
             }
             this->SetDrawingStemLen(baseStem + params->m_chordStemLength + p.y);
         }
         else {
             if (this->GetStemPos() == STEMPOSITION_right) {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+                p.x -= stemShift;
             }
             else {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+                p.x += stemShift;
             }
             this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - p.y));
         }
@@ -419,14 +424,14 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
-    int slashFactor = this->GetStemMod() - 4;
+    int slashFactor = (this->GetStemMod() < 6) ? this->GetStemMod() - 4 : 0;
 
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
-        flag = dynamic_cast<Flag *>(this->FindDescendantByType(FLAG));
+        flag = vrv_cast<Flag *>(this->FindDescendantByType(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
-        slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        if (!this->HasStemLen() && this->HasStemMod()) slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
     }
 
     // Adjust basic stem length to number of slashes

@@ -131,7 +131,7 @@ namespace musicxml {
 
     class OpenDashes {
     public:
-        OpenDashes(const int &dirN, int &staffNum, const int &measureCount)
+        OpenDashes(const int dirN, int staffNum, const int measureCount)
         {
             m_dirN = dirN;
             m_staffNum = staffNum;
@@ -173,7 +173,8 @@ private:
      */
     ///@{
     bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
-    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset);
+    bool ReadMusicXmlMeasure(
+        pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset, int index);
     ///@}
 
     /*
@@ -186,15 +187,19 @@ private:
      * @name Methods for reading the content of a MusicXml measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, std::string measureNum);
-    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset);
-    void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset, Section *section);
+    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset);
+    void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlNote(
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
+    void ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer* layer, bool isChord);
+    void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
+    void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     ///@}
 
     /*
@@ -207,8 +212,7 @@ private:
     /*
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
-    void AddLayerElement(Layer *layer, LayerElement *element);
-    void AddLayerElement(Layer *layer, LayerElement *element, int duration);
+    void AddLayerElement(Layer *layer, LayerElement *element, int duration = 0);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
@@ -237,9 +241,9 @@ private:
      * @name Helper methods for checking presence of values of attributes or elements
      */
     ///@{
-    bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
-    bool IsElement(pugi::xml_node node, std::string name);
-    bool HasContentWithValue(pugi::xml_node node, std::string value);
+    bool HasAttributeWithValue(const pugi::xml_node node, const std::string &attribute, const std::string &value) const;
+    bool IsElement(const pugi::xml_node node, const std::string &name) const;
+    bool HasContentWithValue(const pugi::xml_node node, const std::string &value) const;
     ///@}
 
     /*
@@ -253,8 +257,8 @@ private:
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
-    std::string GetContent(pugi::xml_node node);
-    std::string GetContentOfChild(pugi::xml_node node, std::string child);
+    std::string GetContent(const pugi::xml_node node) const;
+    std::string GetContentOfChild(const pugi::xml_node node, const std::string &child) const;
     ///@}
 
     /*
@@ -275,7 +279,9 @@ private:
      */
     ///@{
     ///@}
-    void TextRendition(pugi::xpath_node_set words, ControlElement *element);
+    std::string GetWordsOrDynamicsText(const pugi::xml_node node) const;
+    void TextRendition(const pugi::xpath_node_set words, ControlElement *element) const;
+    std::string StyleLabel(pugi::xml_node display);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
     /*
@@ -292,6 +298,21 @@ private:
     ///@}
     void GenerateUuid(pugi::xml_node node);
 
+     /*
+     * @name Helper method for multirests. Returns number of measure hidden by MRest before
+     * measure with certain index
+     */
+    ///@{
+    int GetMrestMeasuresCountBeforeIndex(int index) const;
+    ///@}
+
+    /*
+     * @name Helper method for multirests. Checks whether measure should be hidden as part of MRest
+     */
+    ///@{
+    bool IsMultirestMeasure(int index) const;
+    ///@}
+
     /*
      * @name Helper method for styling fermatas
      */
@@ -300,28 +321,35 @@ private:
     void ShapeFermata(Fermata *fermata, pugi::xml_node node);
 
     /*
+     * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
+     */
+    ///@{
+    ///@}
+    std::string GetOrnamentGlyphNumber(int attributes) const;
+
+    /*
      * @name Methods for converting MusicXML string values to MEI attributes.
      */
     ///@{
-    data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(std::string value);
-    data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(float value);
-    data_ARTICULATION ConvertArticulations(std::string value);
-    data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
-    data_BOOLEAN ConvertWordToBool(std::string value);
-    data_DURATION ConvertTypeToDur(std::string value);
-    data_HEADSHAPE ConvertNotehead(std::string value);
-    data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
-    data_PITCHNAME ConvertStepToPitchName(std::string value);
-    data_TEXTRENDITION ConvertEnclosure(std::string value);
-    curvature_CURVEDIR InferCurvedir(pugi::xml_node slurOrTie);
-    fermataVis_SHAPE ConvertFermataShape(std::string);
-    pedalLog_DIR ConvertPedalTypeToDir(std::string value);
-    tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
-    std::wstring ConvertTypeToVerovioText(std::string value);
-    std::string ConvertAlterToSymbol(std::string value);
-    std::string ConvertKindToSymbol(std::string value);
-    std::string ConvertKindToText(std::string value);
-    std::string ConvertFigureGlyph(std::string value);
+    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
+    static data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(const float value);
+    static data_ARTICULATION ConvertArticulations(const std::string &value);
+    static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
+    static data_BOOLEAN ConvertWordToBool(const std::string &value);
+    static data_DURATION ConvertTypeToDur(const std::string &value);
+    static data_HEADSHAPE ConvertNotehead(const std::string &value);
+    static data_LINESTARTENDSYMBOL ConvertLineEndSymbol(const std::string &value);
+    static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
+    static data_TEXTRENDITION ConvertEnclosure(const std::string &value);
+    static curvature_CURVEDIR InferCurvedir(const pugi::xml_node slurOrTie);
+    static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
+    static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
+    static tupletVis_NUMFORMAT ConvertTupletNumberValue(const std::string &value);
+    static std::wstring ConvertTypeToVerovioText(const std::string &value);
+    static std::string ConvertAlterToSymbol(const std::string &value);
+    static std::string ConvertKindToSymbol(const std::string &value);
+    static std::string ConvertKindToText(const std::string &value);
+    static std::string ConvertFigureGlyph(const std::string &value);
     ///@}
 
 private:
@@ -331,8 +359,6 @@ private:
     bool m_mRpt = false;
     /* measure repeats */
     bool m_slash = false;
-    /* measure rests */
-    int m_multiRest = 0;
     /* MIDI ticks */
     int m_ppq;
     /* measure time */
@@ -388,6 +414,8 @@ private:
     std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> > m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */
     std::map<Measure *, int> m_measureCounts;
+    /* measure rests */
+    std::map<int, int> m_multiRests;
 };
 
 } // namespace vrv

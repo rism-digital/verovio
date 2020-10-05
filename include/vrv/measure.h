@@ -86,6 +86,11 @@ public:
     virtual int GetDrawingX() const;
 
     /**
+     * Reset the cached values of the drawingX values.
+     */
+    virtual void ResetCachedDrawingX() const;
+
+    /**
      * @name Get and set the X drawing relative positions
      */
     ///@{
@@ -197,6 +202,12 @@ public:
     Staff *GetTopVisibleStaff();
 
     /**
+     * Return the botoom (last) visible staff in the measure (if any).
+     * Takes into account system optimization
+     */
+    Staff *GetBottomVisibleStaff();
+
+    /**
      * Check if the measure encloses the given time (in millisecond)
      * Return the playing repeat time (1-based), 0 otherwise
      */
@@ -212,9 +223,9 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertAnalyticalMarkup
+     * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToPageBased

@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -83,8 +84,8 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius);
-    virtual void DrawText(
-        const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET);
+    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
+        int width = VRV_UNSET, int height = VRV_UNSET);
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
     virtual void DrawSpline(int n, Point points[]);
     virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
@@ -254,7 +255,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::vector<std::string> m_smuflGlyphs;
+    std::set<std::string> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;

@@ -10,6 +10,12 @@
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
+		35F6580F24F92B6100C99A2D /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
+		35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; };
+		35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; };
+		35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
+		35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
+		35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		36E0442E2347A9290054F141 /* expansionmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E0442D2347A9290054F141 /* expansionmap.h */; };
 		400FEDD3206FA743000D3233 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
@@ -20,6 +26,12 @@
 		402492BE232E6FCB0017BB75 /* gracegrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 400FEDD1206FA742000D3233 /* gracegrp.h */; };
 		402492BF232E70000017BB75 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
 		4026FBE4203C827E0076535E /* mnum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4026FBE3203C827D0076535E /* mnum.cpp */; };
+		403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0510244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0511244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0512244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0514244F3E4D00EE4F71 /* gliss.h in Headers */ = {isa = PBXBuildFile; fileRef = 403B0513244F3E4C00EE4F71 /* gliss.h */; };
+		403B0515244F3E4D00EE4F71 /* gliss.h in Headers */ = {isa = PBXBuildFile; fileRef = 403B0513244F3E4C00EE4F71 /* gliss.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		403BEFED206C00B500D022D5 /* beatrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFE7206C00B400D022D5 /* beatrpt.cpp */; };
 		403BEFEE206C00B500D022D5 /* mrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEA206C00B400D022D5 /* mrpt.cpp */; };
 		403BEFEF206C00B500D022D5 /* mrpt2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEB206C00B400D022D5 /* mrpt2.cpp */; };
@@ -238,6 +250,8 @@
 		4D22C41918890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41A18890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41C18890E9900D0831F /* mrest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C41B18890E9900D0831F /* mrest.h */; };
+		4D2461DD246BE2E8002BBCCD /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
+		4D2461DE246BE2E9002BBCCD /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		4D2E758822BC2B20004C51F0 /* atts_frettab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740122A46BA900E0765F /* atts_frettab.cpp */; };
 		4D2E758922BC2B25004C51F0 /* atts_frettab.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D20740222A46BA900E0765F /* atts_frettab.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
@@ -681,6 +695,12 @@
 		4DEF8A6421B7AAF90093A76B /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
 		4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
 		4DEF8A6621B7AAF90093A76B /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
+		4DF092A22497706600239195 /* phrase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF092A12497706600239195 /* phrase.h */; };
+		4DF092A32497706600239195 /* phrase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF092A12497706600239195 /* phrase.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DF092A52497711800239195 /* phrase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF092A42497711800239195 /* phrase.cpp */; };
+		4DF092A62497711800239195 /* phrase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF092A42497711800239195 /* phrase.cpp */; };
+		4DF092A72497711800239195 /* phrase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF092A42497711800239195 /* phrase.cpp */; };
+		4DF092A82497711800239195 /* phrase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF092A42497711800239195 /* phrase.cpp */; };
 		4DF21D1322B3D17D009821DE /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
 		4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF289FC1A7545CC00BA9F7D /* timeinterface.h */; };
 		4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
@@ -1208,6 +1228,8 @@
 		1579B3421B15033100B16F5C /* proport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = proport.cpp; path = src/proport.cpp; sourceTree = "<group>"; };
 		2D2A79991A69812C000A441B /* chord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chord.cpp; path = src/chord.cpp; sourceTree = "<group>"; };
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
+		35FDEBCD24B6DBC100AC1696 /* fing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fing.h; path = include/vrv/fing.h; sourceTree = "<group>"; };
+		35FDEBD024B6DC5B00AC1696 /* fing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fing.cpp; path = src/fing.cpp; sourceTree = "<group>"; };
 		36E0442B2347A9150054F141 /* expansionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansionmap.cpp; path = src/expansionmap.cpp; sourceTree = "<group>"; };
 		36E0442D2347A9290054F141 /* expansionmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansionmap.h; path = include/vrv/expansionmap.h; sourceTree = "<group>"; };
 		400FEDD1206FA742000D3233 /* gracegrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gracegrp.h; path = include/vrv/gracegrp.h; sourceTree = "<group>"; };
@@ -1216,6 +1238,8 @@
 		402197931F2E09DA00182DF1 /* ioabc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ioabc.cpp; path = src/ioabc.cpp; sourceTree = "<group>"; };
 		4026FBE2203C827D0076535E /* mnum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mnum.h; path = include/vrv/mnum.h; sourceTree = "<group>"; };
 		4026FBE3203C827D0076535E /* mnum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mnum.cpp; path = src/mnum.cpp; sourceTree = "<group>"; };
+		403B050E244F3E2800EE4F71 /* gliss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gliss.cpp; path = src/gliss.cpp; sourceTree = "<group>"; };
+		403B0513244F3E4C00EE4F71 /* gliss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gliss.h; path = include/vrv/gliss.h; sourceTree = "<group>"; };
 		403BEFE5206C00B300D022D5 /* mrpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mrpt.h; path = include/vrv/mrpt.h; sourceTree = "<group>"; };
 		403BEFE6206C00B300D022D5 /* multirpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multirpt.h; path = include/vrv/multirpt.h; sourceTree = "<group>"; };
 		403BEFE7206C00B400D022D5 /* beatrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beatrpt.cpp; path = src/beatrpt.cpp; sourceTree = "<group>"; };
@@ -1512,6 +1536,8 @@
 		4DEEDE631E617C930087E8BC /* elementpart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = elementpart.cpp; path = src/elementpart.cpp; sourceTree = "<group>"; };
 		4DEF8A6121B7AACC0093A76B /* f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = f.h; path = include/vrv/f.h; sourceTree = "<group>"; };
 		4DEF8A6321B7AAF90093A76B /* f.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = f.cpp; path = src/f.cpp; sourceTree = "<group>"; };
+		4DF092A12497706600239195 /* phrase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = phrase.h; path = include/vrv/phrase.h; sourceTree = "<group>"; };
+		4DF092A42497711800239195 /* phrase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = phrase.cpp; path = src/phrase.cpp; sourceTree = "<group>"; };
 		4DF289FC1A7545CC00BA9F7D /* timeinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timeinterface.h; path = include/vrv/timeinterface.h; sourceTree = "<group>"; };
 		4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timeinterface.cpp; path = src/timeinterface.cpp; sourceTree = "<group>"; };
 		4DF28A021A754DE400BA9F7D /* controlelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = controlelement.h; path = include/vrv/controlelement.h; sourceTree = "<group>"; };
@@ -1954,6 +1980,8 @@
 				4DDBBB561C7AE43E00054AFF /* dynam.h */,
 				4067E4C71DDDAF0000C6E059 /* fermata.cpp */,
 				4067E4C91DDDAF6400C6E059 /* fermata.h */,
+				403B050E244F3E2800EE4F71 /* gliss.cpp */,
+				403B0513244F3E4C00EE4F71 /* gliss.h */,
 				4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */,
 				4DDBBB551C7AE43E00054AFF /* hairpin.h */,
 				4D796B5D1D78641900A15238 /* harm.cpp */,
@@ -1968,9 +1996,11 @@
 				4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */,
 				4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */,
 =======
+				4DF092A42497711800239195 /* phrase.cpp */,
+				4DF092A12497706600239195 /* phrase.h */,
+>>>>>>> develop
 				40ACDEA824079F9000F82B8C /* reh.cpp */,
 				40ACDEA524079F5E00F82B8C /* reh.h */,
->>>>>>> develop
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
 				4DB351121C8040B1002DD057 /* tempo.cpp */,
@@ -1981,6 +2011,8 @@
 				40F910061E2799640081B7BB /* trill.h */,
 				40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */,
 				40D0D5E11E3BD7FE00E6BF5C /* turn.h */,
+				35FDEBCD24B6DBC100AC1696 /* fing.h */,
+				35FDEBD024B6DC5B00AC1696 /* fing.cpp */,
 			);
 			name = controlelements;
 			sourceTree = "<group>";
@@ -2311,6 +2343,7 @@
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
+				4DF092A22497706600239195 /* phrase.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
 				4DEC4DC221C8291300D1D273 /* add.h in Headers */,
@@ -2321,6 +2354,7 @@
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
 				4D4335CF1ED421D2003BE1A9 /* atts_analytical.h in Headers */,
 				4DB3D8AA1F83D02A00B5FC2B /* atts_cmn.h in Headers */,
+				35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */,
 				4DEC4DDB21C8295700D1D273 /* sic.h in Headers */,
 				4DB3D8D41F83D12600B5FC2B /* pedal.h in Headers */,
 				4DB3D8BA1F83D0CA00B5FC2B /* boundary.h in Headers */,
@@ -2331,6 +2365,7 @@
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
+				403B0514244F3E4D00EE4F71 /* gliss.h in Headers */,
 				4DEF8A6221B7AACC0093A76B /* f.h in Headers */,
 				4DB3D8B71F83D0A300B5FC2B /* label.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
@@ -2378,11 +2413,8 @@
 				4DB3D8F21F83D1B100B5FC2B /* svg.h in Headers */,
 				4D2073FE22A3BCEC00E0765F /* tabrhythm.h in Headers */,
 				4DEC4DDC21C8295700D1D273 /* choice.h in Headers */,
-<<<<<<< HEAD
 				4D20740622A46BAA00E0765F /* atts_frettab.h in Headers */,
-=======
 				36E0442E2347A9290054F141 /* expansionmap.h in Headers */,
->>>>>>> develop
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
 				4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */,
 				4DA0EAD722BB77AF00A7EBEB /* editortoolkit_cmn.h in Headers */,
@@ -2503,6 +2535,7 @@
 				BB4C4AA522A9328F001F6AF0 /* vrvdef.h in Headers */,
 				BB4C4BA022A932E5001F6AF0 /* positioninterface.h in Headers */,
 				4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */,
+				4DF092A32497706600239195 /* phrase.h in Headers */,
 				BB4C4A6522A9321F001F6AF0 /* atts_cmnornaments.h in Headers */,
 				BB4C4B9622A932E5001F6AF0 /* drawinginterface.h in Headers */,
 				BB4C4A5E22A9321F001F6AF0 /* attconverter.h in Headers */,
@@ -2560,6 +2593,7 @@
 				BB4C4B2E22A932CF001F6AF0 /* octave.h in Headers */,
 				BB4C4AC022A932B6001F6AF0 /* labelabbr.h in Headers */,
 				BB4C4ABE22A932B6001F6AF0 /* label.h in Headers */,
+				403B0515244F3E4D00EE4F71 /* gliss.h in Headers */,
 				BB4C4B0A22A932C3001F6AF0 /* pghead.h in Headers */,
 				4DFB3E8B23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
 				BB4C4B8A22A932DF001F6AF0 /* mnum.h in Headers */,
@@ -2652,6 +2686,7 @@
 				BB4C4AAA22A932A0001F6AF0 /* devicecontextbase.h in Headers */,
 				BB4C4A9B22A9328F001F6AF0 /* object.h in Headers */,
 				BB4C4A9E22A9328F001F6AF0 /* smufl.h in Headers */,
+				35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */,
 				BB4C4A6722A9321F001F6AF0 /* atts_critapp.h in Headers */,
 				BB4C4B3E22A932D7001F6AF0 /* artic.h in Headers */,
 				4DA0EABE22BB772C00A7EBEB /* atts_neumes.h in Headers */,
@@ -2757,7 +2792,7 @@
 		8F086EA0188534680037FD8E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1200;
 				TargetAttributes = {
 					BB4C4A5122A930A3001F6AF0 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -2844,6 +2879,7 @@
 				4DEC4DB321C826E000D1D273 /* supplied.cpp in Sources */,
 				4DC12A851F741110000440E9 /* pgfoot2.cpp in Sources */,
 				40E1CEE0205060FD0007C8AF /* labelabbr.cpp in Sources */,
+				35F6580F24F92B6100C99A2D /* fing.cpp in Sources */,
 				4D1693FA1E3A44F300569BF4 /* clef.cpp in Sources */,
 				4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */,
 				4D766F0020ACAD6D006875D8 /* syllable.cpp in Sources */,
@@ -2864,6 +2900,7 @@
 				4DB3D8DE1F83D15200B5FC2B /* btrem.cpp in Sources */,
 				4D1694041E3A44F300569BF4 /* space.cpp in Sources */,
 				4DEC4D8321C804E000D1D273 /* app.cpp in Sources */,
+				4DF092A62497711800239195 /* phrase.cpp in Sources */,
 				4DB3D8D91F83D13C00B5FC2B /* turn.cpp in Sources */,
 				4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */,
 				4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */,
@@ -2924,6 +2961,7 @@
 				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
 				4DC12A791F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4D1694231E3A44F300569BF4 /* pitchinterface.cpp in Sources */,
+				403B0510244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				40C2E4222052A6F60003625F /* pb.cpp in Sources */,
 				4DA0EAF322BB77C300A7EBEB /* facsimileinterface.cpp in Sources */,
 				4D1694241E3A44F300569BF4 /* positioninterface.cpp in Sources */,
@@ -2941,11 +2979,8 @@
 				4DB3D8A81F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
 				4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */,
 				4D4335CA1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
-<<<<<<< HEAD
 				4D20741322A708C600E0765F /* view_tab.cpp in Sources */,
-=======
 				406916E12383379B009E6B04 /* mspace.cpp in Sources */,
->>>>>>> develop
 				4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */,
 				4D6413792035F58200BB630E /* pages.cpp in Sources */,
 				4D16942E1E3A44F300569BF4 /* textelement.cpp in Sources */,
@@ -3048,6 +3083,7 @@
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
 				40E1CEDE205060E20007C8AF /* labelabbr.cpp in Sources */,
+				403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				4D766EFD20ACAD63006875D8 /* neume.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
@@ -3063,6 +3099,7 @@
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
+				35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
@@ -3151,6 +3188,7 @@
 				4D94721F20CA702C00C780C8 /* linkinginterface.cpp in Sources */,
 				4D64137E2035F68600BB630E /* mdiv.cpp in Sources */,
 				4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */,
+				4DF092A52497711800239195 /* phrase.cpp in Sources */,
 				403BEFEE206C00B500D022D5 /* mrpt.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
@@ -3248,6 +3286,8 @@
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D4C26EF1EF7E75400681770 /* label.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
+				35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */,
+				403B0511244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				4D6122C01F77E1E000FC90A0 /* rend.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
@@ -3267,7 +3307,11 @@
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
 				4DEC4D8021C804C500D1D273 /* add.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
+<<<<<<< HEAD
 				4D20741422A708C600E0765F /* view_tab.cpp in Sources */,
+=======
+				4DF092A72497711800239195 /* phrase.cpp in Sources */,
+>>>>>>> develop
 				4D1BE7861C6A40A80086DC0E /* pugixml.cpp in Sources */,
 				400FEDD5206FA74D000D3233 /* gracegrp.cpp in Sources */,
 				4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */,
@@ -3374,6 +3418,7 @@
 				4DA0EAEC22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
 				4DB3D8F31F83D1C600B5FC2B /* scoredefinterface.cpp in Sources */,
+				4D2461DD246BE2E8002BBCCD /* expansionmap.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
 				4DC12A7E1F740FB9000440E9 /* view_running.cpp in Sources */,
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
@@ -3449,6 +3494,8 @@
 				BB4C4BB522A932EB001F6AF0 /* view_tuplet.cpp in Sources */,
 				BB4C4B2122A932CF001F6AF0 /* dir.cpp in Sources */,
 				BB4C4BAF22A932EB001F6AF0 /* view_mensural.cpp in Sources */,
+				35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */,
+				403B0512244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				BB4C4B5D22A932D7001F6AF0 /* metersig.cpp in Sources */,
 				BB4C4BB622A932F6001F6AF0 /* jsonxx.cc in Sources */,
 				BB4C4A7622A9321F001F6AF0 /* atts_gestural.cpp in Sources */,
@@ -3469,6 +3516,7 @@
 				BB4C4B4F22A932D7001F6AF0 /* elementpart.cpp in Sources */,
 				BB4C4AC122A932B6001F6AF0 /* layer.cpp in Sources */,
 				BB4C4B0522A932C3001F6AF0 /* pgfoot.cpp in Sources */,
+				4DF092A82497711800239195 /* phrase.cpp in Sources */,
 				BB4C4ABF22A932B6001F6AF0 /* labelabbr.cpp in Sources */,
 				4DA0EAC622BB779400A7EBEB /* surface.cpp in Sources */,
 				BB4C4ADB22A932BC001F6AF0 /* abbr.cpp in Sources */,
@@ -3574,6 +3622,7 @@
 				BB4C4B3722A932CF001F6AF0 /* trill.cpp in Sources */,
 				BB4C4B1F22A932CF001F6AF0 /* breath.cpp in Sources */,
 				BB4C4AC522A932B6001F6AF0 /* measure.cpp in Sources */,
+				4D2461DE246BE2E9002BBCCD /* expansionmap.cpp in Sources */,
 				BB4C4BA722A932EB001F6AF0 /* glyph.cpp in Sources */,
 				BB4C4AB922A932A6001F6AF0 /* iopae.cpp in Sources */,
 				BB4C4ABB22A932B6001F6AF0 /* instrdef.cpp in Sources */,
@@ -3671,6 +3720,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -3727,6 +3777,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -3810,7 +3861,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_COMMA = YES;
@@ -3860,7 +3911,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_COMMA = YES;

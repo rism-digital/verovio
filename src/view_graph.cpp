@@ -224,14 +224,16 @@ void View::DrawSmuflLine(
 {
     assert(dc);
 
-    int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
-    int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
-    int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
-
     if (length <= 0) return;
 
+    const int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
+    const int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
+    int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
+
+    if (fillWidth == 0) fillWidth = m_doc->GetGlyphWidth(fill, staffSize, dimin);
+
     // We add half a fill length for an average shorter / longer line result
-    int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
+    const int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
 
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
@@ -242,8 +244,7 @@ void View::DrawSmuflLine(
         str.push_back(start);
     }
 
-    int i;
-    for (i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i) {
         str.push_back(fill);
     }
 

@@ -59,6 +59,12 @@ signals:
      */
     void toolkitChanged(Toolkit *toolkit);
 
+    /**
+     * @name This signal is used internally to request a new height of the view from the render thread. On some
+     * platforms (e.g. Android), setHeight has to be called on the GUI thread.
+     */
+    void requestNewHeight(int height);
+
 protected:
     /**
      * @name Reimplemented function from QQuickItem.

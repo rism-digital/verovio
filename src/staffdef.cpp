@@ -103,26 +103,14 @@ bool StaffDef::IsSupportedChild(Object *child)
     return true;
 }
 
-bool StaffDef::IsInBraceAndBracket()
-{
-    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp *>(this->GetFirstAncestor(STAFFGRP));
-    if (!staffGrp1 || !staffGrp1->HasSymbol()) {
-        return false;
-    }
-    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp *>(staffGrp1->GetFirstAncestor(STAFFGRP));
-    if (!staffGrp2 || !staffGrp2->HasSymbol()) {
-        return false;
-    }
-    return true;
-}
-
 //----------------------------------------------------------------------------
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
 int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 {
-    ReplaceDrawingValuesInStaffDefParams *params = dynamic_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
+    ReplaceDrawingValuesInStaffDefParams *params
+        = vrv_params_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
     assert(params);
 
     if (params->m_clef) {
@@ -143,7 +131,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 
 int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
 {
-    SetStaffDefRedrawFlagsParams *params = dynamic_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
+    SetStaffDefRedrawFlagsParams *params = vrv_params_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
     assert(params);
 
     if (params->m_clef || params->m_applyToAll) {

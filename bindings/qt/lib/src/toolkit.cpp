@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
-#include <QFileInfo>
 #include <QFontDatabase>
 #include <QUrl>
 
@@ -167,6 +167,33 @@ void Toolkit::setBreaks(QString breaks)
     }
 }
 
+void Toolkit::setHeader(QString header)
+{
+    if (getHeader() != header) {
+        m_verovioToolkit.SetOption("header", header.toStdString());
+        // "header" is used in LoadData
+        requestReloadData();
+    }
+}
+
+void Toolkit::setFooter(QString footer)
+{
+    if (getFooter() != footer) {
+        m_verovioToolkit.SetOption("footer", footer.toStdString());
+        // "footer" is used in LoadData
+        requestReloadData();
+    }
+}
+
+void Toolkit::setTranspose(QString transpose)
+{
+    if (getTranspose() != transpose) {
+        m_verovioToolkit.SetOption("transpose", transpose.toStdString());
+        // "transpose" is used in LoadData
+        requestReloadData();
+    }
+}
+
 void Toolkit::setFileContent(QString fileContent)
 {
     if (m_fileContent != fileContent) {
@@ -175,9 +202,55 @@ void Toolkit::setFileContent(QString fileContent)
     }
 }
 
+bool copyDirRecursive(QString sourcePath, QString destinationPath)
+{
+    QDir sourceDir(sourcePath);
+    if (!sourceDir.exists()) {
+        return false;
+    }
+
+    QDir destinationDir(destinationPath);
+    if (!destinationDir.exists()) destinationDir.mkdir(destinationPath);
+
+    bool success = true;
+
+    // 1. copy all files from given directory
+    for (QString fileName : sourceDir.entryList(QDir::Files)) {
+        QString sourceFilePath = sourcePath + "/" + fileName;
+        QString destinationFilePath = destinationPath + "/" + fileName;
+        if (!QFile::copy(sourceFilePath, destinationFilePath)) {
+            success = false;
+            // continue anyway
+        }
+    }
+
+    // 2. copy all directories recursively
+    for (QString dirName : sourceDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
+        QString sourceDirPath = sourcePath + "/" + dirName;
+        QString destinationDirPath = destinationPath + "/" + dirName;
+        if (!copyDirRecursive(sourceDirPath, destinationDirPath)) {
+            success = false;
+            // continue anyway
+        }
+    }
+
+    return success;
+}
+
 void Toolkit::setResourcesDataPath(QString resourcesDataPath)
 {
     if (m_resourcesDataPath != resourcesDataPath) {
+
+#ifdef Q_OS_ANDROID
+        if (resourcesDataPath.startsWith("assets:/")) {
+            QDir localAssetDir;
+            localAssetDir.mkdir("assetDir");
+            localAssetDir.cd("assetDir");
+            copyDirRecursive(resourcesDataPath, localAssetDir.absolutePath());
+            resourcesDataPath = localAssetDir.absolutePath();
+        }
+#endif
+
         m_resourcesDataPath = resourcesDataPath;
         bool success = m_verovioToolkit.SetResourcePath(resourcesDataPath.toStdString());
 
@@ -230,6 +303,21 @@ int Toolkit::getSpacingStaff() const
 QString Toolkit::getBreaks() const
 {
     return QString::fromStdString(m_verovioToolkit.GetOption("spacingStaff"));
+}
+
+QString Toolkit::getTranspose() const
+{
+    return QString::fromStdString(m_verovioToolkit.GetOption("transpose"));
+}
+
+QString Toolkit::getHeader() const
+{
+    return QString::fromStdString(m_verovioToolkit.GetOption("header"));
+}
+
+QString Toolkit::getFooter() const
+{
+    return QString::fromStdString(m_verovioToolkit.GetOption("footer"));
 }
 
 bool Toolkit::addFont(QString fontFilePath)
@@ -312,15 +400,36 @@ void Toolkit::reloadData()
 
     if (!m_resourcesDataInitialized) return;
 
+    if (!prepareLayout()) {
+        return;
+    }
+
     bool success = m_verovioToolkit.LoadData(m_fileContent.toStdString());
+
     setHasValidData(success);
 
     if (success) {
-        requestDocumentRelayout();
+        setPageCount(m_verovioToolkit.GetPageCount());
+        emit documentLayoutChanged();
     }
     else {
         setPageCount(0);
     }
+}
+
+bool Toolkit::prepareLayout()
+{
+    if (!initFont()) {
+        qWarning() << "Could not layout document because fonts are not correctly initialized";
+        return false;
+    }
+
+    m_verovioToolkit.SetOption(
+        "pageWidth", std::to_string(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale())));
+    m_verovioToolkit.SetOption(
+        "pageHeight", std::to_string(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale())));
+
+    return true;
 }
 
 void Toolkit::documentRelayout()
@@ -331,20 +440,13 @@ void Toolkit::documentRelayout()
         return;
     }
 
-    if (!initFont()) {
-        qWarning() << "Could not layout document because fonts are not correctly initialized";
+    if (!prepareLayout()) {
         return;
     }
-
-    m_verovioToolkit.SetOption(
-        "pageWidth", std::to_string(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale())));
-    m_verovioToolkit.SetOption(
-        "pageHeight", std::to_string(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale())));
 
     m_verovioToolkit.RedoLayout();
 
     setPageCount(m_verovioToolkit.GetPageCount());
-
     emit documentLayoutChanged();
 }
 

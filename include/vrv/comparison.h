@@ -15,6 +15,8 @@
 #include "measure.h"
 #include "note.h"
 #include "object.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -347,7 +349,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        ArticPart *articPart = dynamic_cast<ArticPart *>(object);
+        ArticPart *articPart = vrv_cast<ArticPart *>(object);
         assert(articPart);
         return (articPart->GetType() == m_type);
     }
@@ -373,7 +375,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Alignment *alignment = dynamic_cast<Alignment *>(object);
+        Alignment *alignment = vrv_cast<Alignment *>(object);
         assert(alignment);
         return (alignment->GetType() == m_type);
     }
@@ -399,7 +401,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Measure *measure = dynamic_cast<Measure *>(object);
+        Measure *measure = vrv_cast<Measure *>(object);
         assert(measure);
         return (measure->EnclosesTime(m_time) > 0);
     }
@@ -425,13 +427,44 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Note *note = dynamic_cast<Note *>(object);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
         return ((m_time >= note->GetRealTimeOnsetMilliseconds()) && (m_time <= note->GetRealTimeOffsetMilliseconds()));
     }
 
 private:
     int m_time;
+};
+
+//----------------------------------------------------------------------------
+// VisibleStaffDefOrGrpObject
+//----------------------------------------------------------------------------
+/**
+ * This class evaluates if the object is a visible StaffDef or StaffGrp.
+ * As well it is able to exlude object passed to skip from the result set.
+ */
+class VisibleStaffDefOrGrpObject : public ClassIdsComparison {
+
+public:
+    VisibleStaffDefOrGrpObject() : ClassIdsComparison({ STAFFDEF, STAFFGRP }) {}
+
+    void Skip(const Object *objectToExclude) { m_objectToExclude = objectToExclude; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (object == m_objectToExclude || !ClassIdsComparison::operator()(object)) return false;
+
+        if (object->Is(STAFFDEF)) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(object);
+            return staffDef && staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
+        }
+
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(object);
+        return staffGrp && staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
+    }
+
+protected:
+    const Object *m_objectToExclude;
 };
 
 } // namespace vrv

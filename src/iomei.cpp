@@ -48,6 +48,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
+#include "fing.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "gliss.h"
@@ -90,6 +91,7 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "phrase.h"
 #include "pitchinflection.h"
 #include "proport.h"
 #include "rdg.h"
@@ -411,6 +413,10 @@ bool MEIOutput::WriteObject(Object *object)
             WriteFermata(m_currentNode, dynamic_cast<Fermata *>(object));
         }
     }
+    else if (object->Is(FING)) {
+        m_currentNode = m_currentNode.append_child("fing");
+        WriteFing(m_currentNode, dynamic_cast<Fing *>(object));
+    }
     else if (object->Is(HAIRPIN)) {
         m_currentNode = m_currentNode.append_child("hairpin");
         WriteHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
@@ -435,6 +441,11 @@ bool MEIOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("pedal");
         WritePedal(m_currentNode, dynamic_cast<Pedal *>(object));
     }
+    else if (object->Is(PHRASE)) {
+        m_currentNode = m_currentNode.append_child("phrase");
+        WritePhrase(m_currentNode, dynamic_cast<Phrase *>(object));
+    }
+
     else if (object->Is(PITCHINFLECTION)) {
         m_currentNode = m_currentNode.append_child("pitchInfection");
         WritePitchInflection(m_currentNode, dynamic_cast<PitchInflection *>(object));
@@ -779,6 +790,11 @@ bool MEIOutput::WriteObjectEnd(Object *object)
     else if (m_scoreBasedMEI && (object->Is(PAGE))) {
         return true;
     }
+
+    if (object->HasClosingComment()) {
+        m_currentNode.append_child(pugi::node_comment).set_value(object->GetClosingComment().c_str());
+    }
+
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
 
@@ -1243,8 +1259,19 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     WriteControlElement(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
+    fermata->WriteExtSym(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacement(currentNode);
+}
+
+void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
+{
+    assert(fing);
+
+    WriteControlElement(currentNode, fing);
+    WriteTextDirInterface(currentNode, fing);
+    WriteTimePointInterface(currentNode, fing);
+    fing->WriteNNumberLike(currentNode);
 }
 
 void MEIOutput::WriteGliss(pugi::xml_node currentNode, Gliss *gliss)
@@ -1302,6 +1329,7 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
     WriteControlElement(currentNode, mordent);
     WriteTimePointInterface(currentNode, mordent);
     mordent->WriteColor(currentNode);
+    mordent->WriteExtSym(currentNode);
     mordent->WriteOrnamentAccid(currentNode);
     mordent->WritePlacement(currentNode);
     mordent->WriteMordentLog(currentNode);
@@ -1325,12 +1353,20 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     assert(pedal);
 
     WriteControlElement(currentNode, pedal);
-    WriteTimePointInterface(currentNode, pedal);
+    WriteTimeSpanningInterface(currentNode, pedal);
     pedal->WriteColor(currentNode);
+    pedal->WriteExtSym(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     // pedal->WriteVerticalGroup(currentNode);
+}
+
+void MEIOutput::WritePhrase(pugi::xml_node currentNode, Phrase *phrase)
+{
+    assert(phrase);
+
+    WriteSlur(currentNode, phrase);
 }
 
 void MEIOutput::WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection)
@@ -1411,6 +1447,7 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
     trill->WriteExtender(currentNode);
+    trill->WriteExtSym(currentNode);
     trill->WriteLineRend(currentNode);
     trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
@@ -1424,6 +1461,7 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     WriteControlElement(currentNode, turn);
     WriteTimePointInterface(currentNode, turn);
     turn->WriteColor(currentNode);
+    turn->WriteExtSym(currentNode);
     turn->WriteOrnamentAccid(currentNode);
     turn->WritePlacement(currentNode);
     turn->WriteTurnLog(currentNode);
@@ -1522,6 +1560,7 @@ void MEIOutput::WriteBTrem(pugi::xml_node currentNode, BTrem *bTrem)
     assert(bTrem);
 
     WriteLayerElement(currentNode, bTrem);
+    bTrem->WriteBTremLog(currentNode);
     bTrem->WriteTremMeasured(currentNode);
 }
 
@@ -1691,7 +1730,6 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteCue(currentNode);
     mensur->WriteDurationRatio(currentNode);
     mensur->WriteMensuralShared(currentNode);
-    mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashCount(currentNode);
     mensur->WriteStaffLoc(currentNode);
@@ -1801,6 +1839,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteCue(currentNode);
+    note->WriteExtSym(currentNode);
     note->WriteGraced(currentNode);
     note->WriteMidiVelocity(currentNode);
     note->WriteNoteAnlMensural(currentNode);
@@ -1882,6 +1921,7 @@ void MEIOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     WriteLayerElement(currentNode, syl);
+    WriteFacsimileInterface(currentNode, syl);
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
@@ -2037,6 +2077,7 @@ void MEIOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface
     interface->WriteBeamSecondary(element);
     interface->WriteDurationGestural(element);
     interface->WriteDurationLogical(element);
+    interface->WriteDurationQuality(element);
     interface->WriteDurationRatio(element);
     interface->WriteFermataPresent(element);
     interface->WriteStaffIdent(element);
@@ -2360,7 +2401,7 @@ bool MEIInput::Import(const std::string &mei)
         m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document doc;
-        doc.load_string(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
+        doc.load_string(mei.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
         return ReadDoc(root);
     }
@@ -2372,7 +2413,7 @@ bool MEIInput::Import(const std::string &mei)
 
 bool MEIInput::IsAllowed(std::string element, Object *filterParent)
 {
-    if (!filterParent) {
+    if (!filterParent || (element == "")) {
         return true;
     }
 
@@ -2709,10 +2750,16 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "beam") {
             return true;
         }
+        else if (element == "bTrem") {
+            return true;
+        }
         else if (element == "chord") {
             return true;
         }
         else if (element == "clef") {
+            return true;
+        }
+        else if (element == "fTrem") {
             return true;
         }
         else if (element == "note") {
@@ -2782,7 +2829,9 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         m_doc->m_header.append_copy(current);
         if (root.attribute("meiversion")) {
             std::string version = std::string(root.attribute("meiversion").value());
-            if (version == "4.0.1")
+            if (version == "5.0.0-dev")
+                m_version = MEI_5_0_0_dev;
+            else if (version == "4.0.1")
                 m_version = MEI_4_0_1;
             else if (version == "4.0.0")
                 m_version = MEI_4_0_0;
@@ -2893,18 +2942,12 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
-        m_doc->ConvertAnalyticalMarkupDoc();
+        m_doc->ConvertMarkupDoc();
     }
 
     if (success && !m_hasScoreDef) {
         LogWarning("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
-    }
-
-    if (success && m_doc->GetType() == Facs) {
-        Functor setChildZones(&Object::SetChildZones);
-        SetChildZonesParams setChildZonesParams(m_doc);
-        m_doc->Process(&setChildZones, &setChildZonesParams);
     }
 
     return success;
@@ -2955,6 +2998,10 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
                 LogWarning("Skipping nodes after <score> element");
             }
             break;
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
@@ -3010,6 +3057,10 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
             // Skipping scoreDefs, only the first one is possible
             continue;
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <pages>", current.name());
         }
@@ -3059,6 +3110,10 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
         else if (elementName == "section") {
             success = ReadSection(vrvScore, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
         }
@@ -3077,10 +3132,12 @@ bool MEIInput::ReadSection(Object *parent, pugi::xml_node section)
 
     parent->AddChild(vrvSection);
     ReadUnsupportedAttr(section, vrvSection);
-    if (m_readingScoreBased)
+    if (m_readingScoreBased) {
         return ReadSectionChildren(vrvSection, section);
-    else
+    }
+    else {
         return ReadSystemChildren(vrvSection, section);
+    }
 }
 
 bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
@@ -3142,6 +3199,10 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             //}
             success = ReadMeasure(parent, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <section>", current.name());
         }
@@ -3167,10 +3228,10 @@ bool MEIInput::ReadEnding(Object *parent, pugi::xml_node ending)
 
     parent->AddChild(vrvEnding);
     ReadUnsupportedAttr(ending, vrvEnding);
-    if (m_readingScoreBased)
+    if (m_readingScoreBased) {
         return ReadSectionChildren(vrvEnding, ending);
-    else
-        return true;
+    }
+    return true;
 }
 
 bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
@@ -3181,10 +3242,10 @@ bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);
-    if (m_readingScoreBased)
+    if (m_readingScoreBased) {
         return ReadSectionChildren(vrvExpansion, expansion);
-    else
-        return true;
+    }
+    return true;
 }
 
 bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
@@ -3289,6 +3350,10 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
          ReadApp(vrvPage, current, EDITORIAL_PAGE);
          }
          */
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <page>", current.name());
         }
@@ -3352,7 +3417,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is(SYSTEM)) {
-                    System *system = dynamic_cast<System *>(parent);
+                    System *system = vrv_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
                     m_doc->SetMensuralMusicOnly(true);
@@ -3372,6 +3437,10 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
             // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             success = ReadMeasure(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <system>", current.name());
@@ -3468,6 +3537,11 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         //
         vrvMensur->SetColor(mensuralVis.GetMensurColor());
         vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
+
+        if (m_version < MEI_5_0_0_dev) {
+            UpgradeMensurTo_5_0_0(element, vrvMensur);
+        }
+
         object->AddChild(vrvMensur);
     }
 
@@ -3566,6 +3640,10 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "staffGrp") {
             success = ReadStaffGrp(parent, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <scoreDef>", current.name());
         }
@@ -3622,6 +3700,10 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "staffDef") {
             success = ReadStaffDef(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
@@ -3708,6 +3790,10 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         else if (elementName == "rend") {
             success = ReadRend(parent, xmlElement);
         }
+        // xml comment
+        else if (elementName == "") {
+            success = ReadXMLComment(parent, xmlElement);
+        }
         // unknown
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
@@ -3786,6 +3872,10 @@ bool MEIInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "tuning") {
             success = ReadTuning(parent, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
         }
@@ -3845,6 +3935,13 @@ bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 {
     InstrDef *vrvInstrDef = new InstrDef();
     SetMeiUuid(instrDef, vrvInstrDef);
+
+    if (m_version < MEI_4_0_0) {
+        if (instrDef.attribute("midi.volume")) {
+            const std::string midiVol = instrDef.attribute("midi.volume").as_string();
+            instrDef.attribute("midi.volume").set_value((midiVol + "%").c_str());
+        }
+    }
 
     parent->AddChild(vrvInstrDef);
     vrvInstrDef->ReadChannelized(instrDef);
@@ -3922,6 +4019,11 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "arpeg") {
             success = ReadArpeg(parent, current);
         }
+        else if (std::string(current.name()) == "beamSpan") {
+            if (!ReadBeamSpanAsBeam(dynamic_cast<Measure *>(parent), current)) {
+                LogWarning("<beamSpan> is not readable as <beam> and will be ignored");
+            }
+        }
         else if (std::string(current.name()) == "bracketSpan") {
             success = ReadBracketSpan(parent, current);
         }
@@ -3936,6 +4038,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "fermata") {
             success = ReadFermata(parent, current);
+        }
+        else if (std::string(current.name()) == "fing") {
+            success = ReadFing(parent, current);
         }
         else if (std::string(current.name()) == "gliss") {
             success = ReadGliss(parent, current);
@@ -3957,6 +4062,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "pedal") {
             success = ReadPedal(parent, current);
+        }
+        else if (std::string(current.name()) == "phrase") {
+            success = ReadPhrase(parent, current);
         }
         else if (std::string(current.name()) == "pitchInflection") {
             success = ReadPitchInflection(parent, current);
@@ -3986,6 +4094,10 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
                 LogWarning("<tupletSpan> is not readable as <tuplet> and will be ignored");
             }
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <measure>", current.name());
@@ -4102,12 +4214,27 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
 
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
+    vrvFermata->ReadExtSym(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacement(fermata);
 
     parent->AddChild(vrvFermata);
     ReadUnsupportedAttr(fermata, vrvFermata);
     return true;
+}
+
+bool MEIInput::ReadFing(Object *parent, pugi::xml_node fing)
+{
+    Fing *vrvFing = new Fing();
+    ReadControlElement(fing, vrvFing);
+
+    ReadTextDirInterface(fing, vrvFing);
+    ReadTimePointInterface(fing, vrvFing);
+    vrvFing->ReadNNumberLike(fing);
+
+    parent->AddChild(vrvFing);
+    ReadUnsupportedAttr(fing, vrvFing);
+    return ReadTextChildren(vrvFing, fing, vrvFing);
 }
 
 bool MEIInput::ReadGliss(Object *parent, pugi::xml_node gliss)
@@ -4184,6 +4311,7 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
+    vrvMordent->ReadExtSym(mordent);
     vrvMordent->ReadOrnamentAccid(mordent);
     vrvMordent->ReadPlacement(mordent);
     vrvMordent->ReadMordentLog(mordent);
@@ -4215,8 +4343,9 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     Pedal *vrvPedal = new Pedal();
     ReadControlElement(pedal, vrvPedal);
 
-    ReadTimePointInterface(pedal, vrvPedal);
+    ReadTimeSpanningInterface(pedal, vrvPedal);
     vrvPedal->ReadColor(pedal);
+    vrvPedal->ReadExtSym(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPedalVis(pedal);
     vrvPedal->ReadPlacement(pedal);
@@ -4224,6 +4353,21 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
 
     parent->AddChild(vrvPedal);
     ReadUnsupportedAttr(pedal, vrvPedal);
+    return true;
+}
+
+bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
+{
+    Phrase *vrvPhrase = new Phrase();
+    ReadControlElement(phrase, vrvPhrase);
+
+    ReadTimeSpanningInterface(phrase, vrvPhrase);
+    vrvPhrase->ReadColor(phrase);
+    vrvPhrase->ReadCurvature(phrase);
+    vrvPhrase->ReadCurveRend(phrase);
+
+    parent->AddChild(vrvPhrase);
+    ReadUnsupportedAttr(phrase, vrvPhrase);
     return true;
 }
 
@@ -4309,6 +4453,7 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadExtender(trill);
+    vrvTrill->ReadExtSym(trill);
     vrvTrill->ReadLineRend(trill);
     vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
@@ -4330,6 +4475,7 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
+    vrvTurn->ReadExtSym(turn);
     vrvTurn->ReadOrnamentAccid(turn);
     vrvTurn->ReadPlacement(turn);
     vrvTurn->ReadTurnLog(turn);
@@ -4364,6 +4510,10 @@ bool MEIInput::ReadFbChildren(Object *parent, pugi::xml_node parentNode)
         // content
         else if (std::string(current.name()) == "f") {
             success = ReadF(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <staff>", current.name());
@@ -4412,6 +4562,10 @@ bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "layer") {
             success = ReadLayer(parent, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <staff>", current.name());
         }
@@ -4429,10 +4583,10 @@ bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)
     vrvLayer->ReadVisibility(layer);
 
     if (!vrvLayer->HasN()) {
-        LogWarning("No @n on <layer>, 1 is set");
+        LogWarning("Missing @n on <layer>, filled by order");
     }
     else if (vrvLayer->GetN() == 0) {
-        LogWarning("Value @n='1' on <layer> might yield unpredictable results");
+        LogWarning("Value @n='0' on <layer> might yield unpredictable results");
     }
 
     parent->AddChild(vrvLayer);
@@ -4577,19 +4731,13 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "verse") {
             success = ReadVerse(parent, xmlElement);
         }
+        // xml comment
+        else if (elementName == "") {
+            success = ReadXMLComment(parent, xmlElement);
+        }
         // unknown
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
-        }
-    }
-
-    // if the current parent is a syllable then we need to make sure that a syl got added
-    // if not then add a blank one
-    if (strcmp(parentNode.name(), "syllable") == 0) {
-        auto testSyl = parent->FindDescendantByType(SYL);
-        if (testSyl == NULL) {
-            Syl *syl = new Syl();
-            parent->AddChild(syl);
         }
     }
     return success;
@@ -4600,25 +4748,7 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
-    } /*else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
-        Zone zone = this->m_doc->GetZone(element.attribute("facs").value());
-        AttCoordinated *att = dynamic_cast<AttCoordinated *>(object);
-        assert(att);
-        LogMessage("%d, %d, %d, %d", zone.ulx, zone.uly, zone.lrx, zone.lry);
-        if (zone.ulx > 0) {
-            att->SetUlx(zone.ulx);
-        }
-        if (zone.uly > 0) {
-            att->SetUly(zone.uly);
-        }
-        if (zone.lrx > 0) {
-            att->SetLrx(zone.lrx);
-        }
-        if (zone.lry > 0) {
-            att->SetLry(zone.lry);
-        }
-        LogMessage("Set att_coordinated based on zone %s", zone.xmlId.c_str());
-    }*/
+    }
 
     SetMeiUuid(element, object);
     ReadLinkingInterface(element, object);
@@ -4709,6 +4839,7 @@ bool MEIInput::ReadBTrem(Object *parent, pugi::xml_node bTrem)
     BTrem *vrvBTrem = new BTrem();
     ReadLayerElement(bTrem, vrvBTrem);
 
+    vrvBTrem->ReadBTremLog(bTrem);
     vrvBTrem->ReadTremMeasured(bTrem);
 
     parent->AddChild(vrvBTrem);
@@ -4740,7 +4871,7 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     }
 
     if (vrvChord->HasTie()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_TIE);
     }
 
     parent->AddChild(vrvChord);
@@ -4887,10 +5018,13 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
     vrvMensur->ReadMensuralShared(mensur);
-    vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
     vrvMensur->ReadSlashCount(mensur);
     vrvMensur->ReadStaffLoc(mensur);
+
+    if (m_version < MEI_5_0_0_dev) {
+        UpgradeMensurTo_5_0_0(mensur, vrvMensur);
+    }
 
     parent->AddChild(vrvMensur);
     ReadUnsupportedAttr(mensur, vrvMensur);
@@ -4921,7 +5055,7 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     vrvMRest->ReadVisibility(mRest);
 
     if (vrvMRest->HasFermata()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_FERMATA);
     }
 
     parent->AddChild(vrvMRest);
@@ -5024,6 +5158,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadCue(note);
+    vrvNote->ReadExtSym(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadMidiVelocity(note);
     vrvNote->ReadNoteAnlMensural(note);
@@ -5056,7 +5191,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     }
 
     if (vrvNote->HasTie()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_TIE);
     }
 
     parent->AddChild(vrvNote);
@@ -5113,6 +5248,8 @@ bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
 
+    ReadFacsimileInterface(syl, vrvSyl);
+
     parent->AddChild(vrvSyl);
     ReadUnsupportedAttr(syl, vrvSyl);
     return ReadTextChildren(vrvSyl, syl, vrvSyl);
@@ -5120,7 +5257,6 @@ bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 
 bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 {
-    bool success;
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
 
@@ -5128,20 +5264,7 @@ bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     vrvSyllable->ReadSlashCount(syllable);
 
     parent->AddChild(vrvSyllable);
-
-    // read all of the syllables elements
-    // and add an empty <syl> if it doesn't have one
-    if ((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
-
-        Object *obj = vrvSyllable->FindDescendantByType(SYL);
-        Syl *syl = dynamic_cast<Syl *>(obj);
-
-        if (syl == NULL) {
-            syl = new Syl();
-            vrvSyllable->AddChild(syl);
-        }
-    }
-    return success;
+    return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
 
 bool MEIInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
@@ -5244,6 +5367,10 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         // figured bass
         else if (elementName == "fb") {
             success = ReadFb(parent, xmlElement);
+        }
+        // xml comment
+        else if (elementName == "") {
+            success = ReadXMLComment(parent, xmlElement);
         }
         // unknown
         else {
@@ -5378,12 +5505,13 @@ bool MEIInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     interface->ReadBeamSecondary(element);
     interface->ReadDurationGestural(element);
     interface->ReadDurationLogical(element);
+    interface->ReadDurationQuality(element);
     interface->ReadDurationRatio(element);
     interface->ReadFermataPresent(element);
     interface->ReadStaffIdent(element);
 
     if (interface->HasFermata()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_FERMATA);
     }
 
     return true;
@@ -5610,6 +5738,10 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
         else if (std::string(current.name()) == "rdg") {
             success = ReadRdg(parent, current, level, filter);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <app>", current.name());
         }
@@ -5697,6 +5829,10 @@ bool MEIInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
         }
         else if (std::string(current.name()) == "unclear") {
             success = ReadUnclear(parent, current, level, filter);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <choice>", current.name());
@@ -5909,6 +6045,10 @@ bool MEIInput::ReadSubstChildren(Object *parent, pugi::xml_node parentNode, Edit
         else if (std::string(current.name()) == "subst") {
             success = ReadSubst(parent, current, level, filter);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <subst>", current.name());
         }
@@ -6002,6 +6142,83 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     }
 }
 
+bool MEIInput::ReadBeamSpanAsBeam(Measure *measure, pugi::xml_node beamSpan)
+{
+    if (!measure) {
+        LogWarning("Cannot read <beamSpan> within editorial markup");
+        return false;
+    }
+
+    Beam *beam = new Beam();
+    SetMeiUuid(beamSpan, beam);
+
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+
+    // att.labelled
+    if (beamSpan.attribute("label")) {
+        beam->SetLabel(beamSpan.attribute("label").value());
+    }
+
+    // att.typed
+    if (beamSpan.attribute("type")) {
+        beam->SetType(beamSpan.attribute("type").value());
+    }
+    else {
+        beam->SetType("beamSpan");
+    }
+
+    // att.beam.vis
+    if (beamSpan.attribute("color")) {
+        beam->SetColor(beamSpan.attribute("color").value());
+    }
+
+    // position (pitch)
+    if (beamSpan.attribute("startid")) {
+        std::string refId = ExtractUuidFragment(beamSpan.attribute("startid").value());
+        start = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
+        if (!start) {
+            LogWarning("Element with @startid '%s' not found when trying to read the <beamSpan>", refId.c_str());
+        }
+    }
+    if (beamSpan.attribute("endid")) {
+        std::string refId = ExtractUuidFragment(beamSpan.attribute("endid").value());
+        end = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
+        if (!end) {
+            LogWarning("Element with @endid '%s' not found when trying to read the <beamSpan>", refId.c_str());
+        }
+    }
+    if (!start || !end) {
+        delete beam;
+        return false;
+    }
+
+    LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastAncestorNot(LAYER));
+    LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastAncestorNot(LAYER));
+
+    if (!startChild || !endChild || (startChild->GetParent() != endChild->GetParent())) {
+        LogWarning("Start and end elements for <beamSpan> '%s' not in the same layer", beam->GetUuid().c_str());
+        delete beam;
+        return false;
+    }
+
+    Layer *parentLayer = dynamic_cast<Layer *>(startChild->GetParent());
+    assert(parentLayer);
+
+    int startIdx = startChild->GetIdx();
+    int endIdx = endChild->GetIdx();
+    // LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
+    int i;
+    for (i = endIdx; i >= startIdx; i--) {
+        LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
+        if (element) beam->AddChild(element);
+    }
+    beam->SetParent(parentLayer);
+    parentLayer->InsertChild(beam, startIdx);
+
+    return true;
+}
+
 bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)
 {
     if (!measure) {
@@ -6017,29 +6234,45 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     AttConverter converter;
 
-    // label
+    // att.labelled
     if (tupletSpan.attribute("label")) {
         tuplet->SetLabel(tupletSpan.attribute("label").value());
     }
 
-    // Read in the numerator and denominator properties
+    // att.typed
+    if (tupletSpan.attribute("type")) {
+        tuplet->SetType(tupletSpan.attribute("type").value());
+    }
+    else {
+        tuplet->SetType("tupletSpan");
+    }
+
+    // att.duration.ratio
     if (tupletSpan.attribute("num")) {
         tuplet->SetNum(atoi(tupletSpan.attribute("num").value()));
     }
     if (tupletSpan.attribute("numbase")) {
         tuplet->SetNumbase(atoi(tupletSpan.attribute("numbase").value()));
     }
-    if (tupletSpan.attribute("num.visible")) {
-        tuplet->SetNumVisible(converter.StrToBoolean(tupletSpan.attribute("num.visible").value()));
-    }
-    if (tupletSpan.attribute("num.place")) {
-        tuplet->SetNumPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("num.place").value()));
+
+    // att.tuplet.vis
+    if (tupletSpan.attribute("bracket.place")) {
+        tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
     }
     if (tupletSpan.attribute("bracket.visible")) {
         tuplet->SetBracketVisible(converter.StrToBoolean(tupletSpan.attribute("bracket.visible").value()));
     }
-    if (tupletSpan.attribute("bracket.place")) {
-        tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
+    if (tupletSpan.attribute("num.format")) {
+        tuplet->SetNumFormat(converter.StrToTupletVisNumformat(tupletSpan.attribute("num.format").value()));
+    }
+    if (tupletSpan.attribute("color")) {
+        tuplet->SetColor(tupletSpan.attribute("color").value());
+    }
+    if (tupletSpan.attribute("num.place")) {
+        tuplet->SetNumPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("num.place").value()));
+    }
+    if (tupletSpan.attribute("num.visible")) {
+        tuplet->SetNumVisible(converter.StrToBoolean(tupletSpan.attribute("num.visible").value()));
     }
 
     // position (pitch)
@@ -6090,6 +6323,11 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
 void MEIInput::SetMeiUuid(pugi::xml_node element, Object *object)
 {
+    if (!m_comment.empty()) {
+        object->SetComment(m_comment);
+        m_comment.clear();
+    }
+
     if (!element.attribute("xml:id")) {
         return;
     }
@@ -6122,6 +6360,19 @@ std::wstring MEIInput::RightTrim(std::wstring str)
     while (pos > 0 && iswspace(str[pos - 1])) pos--;
     str.erase(pos);
     return str;
+}
+
+bool MEIInput::ReadXMLComment(Object *object, pugi::xml_node element)
+{
+    assert(object);
+
+    if (element.next_sibling()) {
+        m_comment = element.value();
+    }
+    else {
+        object->SetClosingComment(element.value());
+    }
+    return true;
 }
 
 bool MEIInput::IsEditorialElementName(std::string elementName)
@@ -6168,6 +6419,16 @@ void MEIInput::UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem)
     if (fTrem.attribute("slash")) {
         vrvFTrem->SetBeams(vrvFTrem->AttFTremVis::StrToInt(fTrem.attribute("slash").value()));
         fTrem.remove_attribute("slash");
+    }
+}
+
+void MEIInput::UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur)
+{
+    if (vrvMensur->HasTempus() && !vrvMensur->HasSign()) {
+        vrvMensur->SetSign((vrvMensur->GetTempus() == TEMPUS_3) ? MENSURATIONSIGN_O : MENSURATIONSIGN_C);
+    }
+    if (vrvMensur->HasProlatio() && !vrvMensur->HasDot()) {
+        vrvMensur->SetDot((vrvMensur->GetProlatio() == PROLATIO_3) ? BOOLEAN_true : BOOLEAN_false);
     }
 }
 
@@ -6292,7 +6553,7 @@ void MEIInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
     if (system->m_systemRightMar == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
 
-    Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
+    Page *page = vrv_cast<Page *>(system->GetFirstAncestor(PAGE));
     assert(page);
     measure->m_xAbs = system->m_systemLeftMar;
     measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;

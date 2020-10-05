@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_gestural.h"
+#include "atts_mensural.h"
 #include "atts_shared.h"
 
 namespace vrv {
@@ -30,6 +31,7 @@ class DurationInterface : public Interface,
                           public AttBeamSecondary,
                           public AttDurationGestural,
                           public AttDurationLogical,
+                          public AttDurationQuality,
                           public AttDurationRatio,
                           public AttFermataPresent,
                           public AttStaffIdent {
@@ -51,14 +53,14 @@ public:
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    double GetInterfaceAlignmentDuration(int num, int numbase);
+    double GetInterfaceAlignmentDuration(int num, int numBase);
 
     /**
      * Returns the duration (in double) for the element for mensural notation
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
      * need to be modified for shorter equality in later repertoire.
      */
-    double GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur);
+    double GetInterfaceAlignmentMensuralDuration(int num, int numBase, Mensur *currentMensur);
 
     /**
      * Return true if the note or rest is the first of a beam.

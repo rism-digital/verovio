@@ -106,8 +106,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
     const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();
 
-    assert(beamElementCoords->size() == 2);
-
+    if (beamElementCoords->size() != 2) {
+        LogError("View draw: <fTrem> element has invalid number of descendants.");
+        return;
+    }
     BeamElementCoord *firstElement = beamElementCoords->at(0);
     BeamElementCoord *secondElement = beamElementCoords->at(1);
 
@@ -283,8 +285,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
         }
 
         int fractBeamWidth
-            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beamInterface->m_cueSize) * 7
-            / 10;
+            = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, beamInterface->m_cueSize);
 
         // loop
         while (testDur <= beamInterface->m_shortestDur) {

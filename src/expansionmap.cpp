@@ -61,7 +61,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 else
                     ++it;
             }
-            Expansion *currExpansion = dynamic_cast<Expansion *>(currSect);
+            Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
             assert(currExpansion);
             Expand(currExpansion->GetPlist(), existingList, currSect);
         }

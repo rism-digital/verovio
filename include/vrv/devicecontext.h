@@ -65,6 +65,7 @@ public:
         m_isDeactivatedY = false;
         m_width = 0;
         m_height = 0;
+        m_contentHeight = 0;
         m_userScaleX = 1.0;
         m_userScaleY = 1.0;
     }
@@ -80,13 +81,15 @@ public:
     ///@{
     void SetWidth(int width) { m_width = width; }
     void SetHeight(int height) { m_height = height; }
+    void SetContentHeight(int height) { m_contentHeight = height; }
     void SetUserScale(double scaleX, double scaleY)
     {
         m_userScaleX = scaleX;
         m_userScaleY = scaleY;
     }
-    int GetWidth() { return m_width; }
-    int GetHeight() { return m_height; }
+    int GetWidth() const { return m_width; }
+    int GetHeight() const { return m_height; }
+    int GetContentHeight() const { return m_contentHeight; }
     double GetUserScaleX() { return m_userScaleX; }
     double GetUserScaleY() { return m_userScaleY; }
     ///@}
@@ -148,7 +151,8 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius) = 0;
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET)
+    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
+        int width = VRV_UNSET, int height = VRV_UNSET)
         = 0;
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
@@ -289,6 +293,9 @@ private:
     /** stores the width and height of the device context */
     int m_width;
     int m_height;
+
+    /** stores the height of graphic content */
+    int m_contentHeight;
 
     /** stores the scale as requested by the used */
     double m_userScaleX;

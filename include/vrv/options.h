@@ -20,6 +20,7 @@
 
 #include "attalternates.h"
 #include "atttypes.h"
+#include "jsonxx.h"
 
 //----------------------------------------------------------------------------
 
@@ -41,23 +42,10 @@ class OptionGrp;
 
 // the space between each lyric line in units
 #define TEMP_LYRIC_LINE_SPACE 5.0
-
 // the key signature spacing factor
 #define TEMP_KEYSIG_STEP 0.4
 // the key signature spacing factor for natural (usually slighly larger)
 #define TEMP_KEYSIG_NATURAL_STEP 0.6
-
-/* Options parameters for mensural notation */
-// Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
-#define TEMP_MNOTEHEAD_SIZE_FACTOR 1.0
-#define TEMP_MACCID_SIZE_FACTOR 1.0
-#define TEMP_MAUGDOT_SIZE_FACTOR 1.0
-// Width of the minima diamond relative to its height
-#define TEMP_MINIMA_WIDTH_FACTOR 1.0
-// Relative size of figures in proportions
-#define PROPRT_SIZE_FACTOR 1.0
-// Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
-#define MENSURAL_LINEWIDTH_FACTOR 1.0
 
 //----------------------------------------------------------------------------
 // Option defines
@@ -83,7 +71,7 @@ enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDI
 class Option {
 public:
     // constructors and destructors
-    Option() {}
+    Option() : m_isSet(false) {}
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
 
@@ -101,6 +89,8 @@ public:
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
 
+    bool isSet() const { return m_isSet; }
+
 public:
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
@@ -114,6 +104,7 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
+    bool m_isSet;
 
 private:
     std::string m_key;
@@ -396,6 +387,40 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// OptionJson
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for Json input params
+ */
+
+class OptionJson : public Option {
+    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
+
+public:
+    //
+    OptionJson() = default;
+    virtual ~OptionJson() = default;
+    virtual void Init(const std::string &defaultValue);
+
+    virtual bool SetValue(const std::string &jsonFilePath);
+    //virtual std::string GetStrValue() const;
+
+    int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
+    double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
+    //
+    bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
+    //
+protected:
+    JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
+    //
+private:
+    jsonxx::Object m_values;
+    jsonxx::Object m_defaultValues;
+};
+
+
+//----------------------------------------------------------------------------
 // OptionGrp
 //----------------------------------------------------------------------------
 
@@ -448,6 +473,9 @@ public:
 
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
 
+    // post processing of parameters
+    void Sync();
+
 private:
     void Register(Option *option, const std::string &key, OptionGrp *grp);
 
@@ -469,8 +497,6 @@ public:
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
-    OptionBool m_justifyIncludeLastPage;
-    OptionBool m_justifySystemsOnly;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
@@ -491,6 +517,7 @@ public:
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionString m_expand;
+    OptionBool m_shrinkToFit;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
@@ -498,20 +525,31 @@ public:
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
+    OptionBool m_useBraceGlyph;
 
     /**
      * General layout
      */
     OptionGrp m_generalLayout;
 
+    OptionDbl m_barlineSeparation;
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
+    OptionDbl m_bracketThickness;
+    OptionJson m_engravingDefaults;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
+    OptionDbl m_hairpinThickness;
+    OptionDbl m_justificationBraceGroup;
+    OptionDbl m_justificationBracketGroup;
+    OptionDbl m_justificationStaff;
+    OptionDbl m_justificationSystem;
+    OptionDbl m_ledgerLineThickness;
+    OptionDbl m_ledgerLineExtension;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
@@ -520,6 +558,7 @@ public:
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
+    OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
     OptionInt m_slurCurveFactor;
     OptionInt m_slurHeightFactor;
@@ -527,6 +566,8 @@ public:
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
     OptionDbl m_slurThickness;
+    OptionInt m_spacingBraceGroup;
+    OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
@@ -534,8 +575,12 @@ public:
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
+    OptionDbl m_subBracketThickness;
     OptionIntMap m_systemDivider;
-    OptionDbl m_tieThickness;
+    OptionInt m_systemMaxPerPage;
+    OptionDbl m_thickBarlineThickness;
+    OptionDbl m_tieThickness;    
+    OptionDbl m_tupletBracketThickness;
 
     /**
      * Selectors
@@ -560,6 +605,7 @@ public:
     OptionDbl m_defaultTopMargin;
     //
     OptionDbl m_bottomMarginHarm;
+    OptionDbl m_bottomMarginPgHead;
     //
     OptionDbl m_leftMarginAccid;
     OptionDbl m_leftMarginBarLine;

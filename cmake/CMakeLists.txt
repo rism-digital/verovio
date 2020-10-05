@@ -8,8 +8,9 @@ if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
-option(NO_DARMS_SUPPORT         "Disable Humdrum support"                      ON)
+option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
+option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
 option(BUILD_AS_LIBRARY         "Build verovio as library"                     OFF)
@@ -33,6 +34,7 @@ if(MSVC)
     add_definitions(/W2)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
+    add_definitions(/std:c++17)
     include_directories(../include/win32)
 else()
     # jsonxx raises -Wdollar-in-identifier-extension

@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "fermata.h"
+#include "fing.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "mordent.h"
@@ -156,19 +157,19 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         m_place = STAFFREL_above;
     }
     else if (object->Is(BREATH)) {
-        Breath *breath = dynamic_cast<Breath *>(object);
+        Breath *breath = vrv_cast<Breath *>(object);
         assert(breath);
         // breath above by default
         m_place = (breath->GetPlace() != STAFFREL_NONE) ? breath->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(DIR)) {
-        Dir *dir = dynamic_cast<Dir *>(object);
+        Dir *dir = vrv_cast<Dir *>(object);
         assert(dir);
         // dir below by default
         m_place = (dir->GetPlace() != STAFFREL_NONE) ? dir->GetPlace() : STAFFREL_below;
     }
     else if (object->Is(DYNAM)) {
-        Dynam *dynam = dynamic_cast<Dynam *>(object);
+        Dynam *dynam = vrv_cast<Dynam *>(object);
         assert(dynam);
         // dynam below by default
         m_place = (dynam->GetPlace() != STAFFREL_NONE) ? dynam->GetPlace() : STAFFREL_below;
@@ -178,69 +179,75 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         m_place = STAFFREL_above;
     }
     else if (object->Is(FERMATA)) {
-        Fermata *fermata = dynamic_cast<Fermata *>(object);
+        Fermata *fermata = vrv_cast<Fermata *>(object);
         assert(fermata);
         // fermata above by default
         m_place = (fermata->GetPlace() != STAFFREL_NONE) ? fermata->GetPlace() : STAFFREL_above;
     }
+    else if (object->Is(FING)) {
+        Fing *fing = vrv_cast<Fing *>(object);
+        assert(fing);
+        // fing above by default
+        m_place = (fing->GetPlace() != STAFFREL_NONE) ? fing->GetPlace() : STAFFREL_above;
+    }
     else if (object->Is(HAIRPIN)) {
-        Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
+        Hairpin *hairpin = vrv_cast<Hairpin *>(object);
         assert(hairpin);
         // haripin below by default;
         m_place = (hairpin->GetPlace() != STAFFREL_NONE) ? hairpin->GetPlace() : STAFFREL_below;
     }
     else if (object->Is(HARM)) {
-        Harm *harm = dynamic_cast<Harm *>(object);
+        Harm *harm = vrv_cast<Harm *>(object);
         assert(harm);
         // harm above by default
         m_place = (harm->GetPlace() != STAFFREL_NONE) ? harm->GetPlace() : STAFFREL_above;
         if ((harm->GetPlace() == STAFFREL_NONE) && object->GetFirst()->Is(FB)) m_place = STAFFREL_below;
     }
     else if (object->Is(MORDENT)) {
-        Mordent *mordent = dynamic_cast<Mordent *>(object);
+        Mordent *mordent = vrv_cast<Mordent *>(object);
         assert(mordent);
         // mordent above by default;
         m_place = (mordent->GetPlace() != STAFFREL_NONE) ? mordent->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(OCTAVE)) {
-        Octave *octave = dynamic_cast<Octave *>(object);
+        Octave *octave = vrv_cast<Octave *>(object);
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_above : STAFFREL_below;
     }
     else if (object->Is(PITCHINFLECTION)) {
-        PitchInflection *pitchInflection = dynamic_cast<PitchInflection *>(object);
+        PitchInflection *pitchInflection = vrv_cast<PitchInflection *>(object);
         assert(pitchInflection);
         // pitchInflection above by default;
         // m_place = (pitchInflection->GetPlace() != STAFFREL_NONE) ? pitchInflection->GetPlace() : STAFFREL_above;
         m_place = STAFFREL_above;
     }
     else if (object->Is(PEDAL)) {
-        Pedal *pedal = dynamic_cast<Pedal *>(object);
+        Pedal *pedal = vrv_cast<Pedal *>(object);
         assert(pedal);
         // pedal below by default
         m_place = (pedal->GetPlace() != STAFFREL_NONE) ? pedal->GetPlace() : STAFFREL_below;
     }
     else if (object->Is(REH)) {
-        Reh *reh = dynamic_cast<Reh *>(object);
+        Reh *reh = vrv_cast<Reh *>(object);
         assert(reh);
         // reh above by default
         m_place = (reh->GetPlace() != STAFFREL_NONE) ? reh->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(TEMPO)) {
-        Tempo *tempo = dynamic_cast<Tempo *>(object);
+        Tempo *tempo = vrv_cast<Tempo *>(object);
         assert(tempo);
         // tempo above by default;
         m_place = (tempo->GetPlace() != STAFFREL_NONE) ? tempo->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(TRILL)) {
-        Trill *trill = dynamic_cast<Trill *>(object);
+        Trill *trill = vrv_cast<Trill *>(object);
         assert(trill);
         // trill above by default;
         m_place = (trill->GetPlace() != STAFFREL_NONE) ? trill->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(TURN)) {
-        Turn *turn = dynamic_cast<Turn *>(object);
+        Turn *turn = vrv_cast<Turn *>(object);
         assert(turn);
         // turn above by default;
         m_place = (turn->GetPlace() != STAFFREL_NONE) ? turn->GetPlace() : STAFFREL_above;
@@ -339,7 +346,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
         if (this->m_place == STAFFREL_above) {
-            if (curve && curve->m_object->Is({ SLUR, TIE })) {
+            if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
                 int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -359,7 +366,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             }
         }
         else {
-            if (curve && curve->m_object->Is({ SLUR, TIE })) {
+            if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
                 int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -381,6 +388,26 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
     }
     return true;
+}
+
+int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
+{
+    if (this->m_place != STAFFREL_between) return VRV_UNSET;
+
+    int staffSize = staffAlignment->GetStaffSize();
+
+    FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(horizOverlapingBBox);
+    if (curve) {
+        assert(curve->m_object);
+    }
+    int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+
+    if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
+        // For now ignore curves
+        return 0;
+    }
+
+    return this->GetContentBottom() - horizOverlapingBBox->GetSelfTop() - margin;
 }
 
 //----------------------------------------------------------------------------
@@ -444,10 +471,22 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_cachedMinMaxY = VRV_UNSET;
 }
 
+void FloatingCurvePositioner::MoveFrontVertical(int distance)
+{
+    m_points[0].y += distance;
+    m_points[1].y += distance;
+}
+
+void FloatingCurvePositioner::MoveBackVertical(int distance)
+{
+    m_points[2].y += distance;
+    m_points[3].y += distance;
+}
+
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
-    assert(this->GetObject()->Is({ SLUR, TIE }));
+    assert(this->GetObject()->Is({ PHRASE, SLUR, TIE }));
     assert(m_dir != curvature_CURVEDIR_NONE);
 
     if (m_cachedMinMaxY != VRV_UNSET) return m_cachedMinMaxY;
@@ -567,7 +606,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
     }
 }
 
-void FloatingCurvePositioner::GetPoints(Point points[4])
+void FloatingCurvePositioner::GetPoints(Point points[4]) const
 {
     points[0] = m_points[0];
     points[1] = m_points[1];

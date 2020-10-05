@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "atts_externalsymbols.h"
 #include "atts_frettab.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
@@ -50,6 +51,7 @@ class Note : public LayerElement,
              public AttColor,
              public AttColoration,
              public AttCue,
+             public AttExtSym,
              public AttGraced,
              public AttMidiVelocity,
              public AttNoteAnlMensural,
@@ -119,7 +121,7 @@ public:
     ///@}
 
     /**
-     * Check if the note has leger lines.
+     * Check if the note has ledger lines.
      * If staff is passed, use it for getting the staff line number.
      * Otherwise, it will look for the Staff ancestor.
      * Set the value of ledger lines above or below.
@@ -190,6 +192,11 @@ public:
     wchar_t GetMensuralSmuflNoteHead();
 
     /**
+     * Return a SMuFL code for the notehead
+     */
+    wchar_t GetNoteheadGlyph(const int duration) const;
+
+    /**
      * Check if a note or its parent chord are visible
      */
     bool IsVisible();
@@ -219,9 +226,9 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertAnalyticalMarkup
+     * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem
@@ -292,6 +299,12 @@ private:
     TransPitch GetTransPitch();
 
     void UpdateFromTransPitch(const TransPitch &tp);
+
+    /**
+     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
+     * as position of the note and position of the dots
+     */
+    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted);
 
 public:
     //

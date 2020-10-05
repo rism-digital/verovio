@@ -56,6 +56,11 @@ bindings/qt/build-library
 bindings/qt/build-demo
 *.pro.user
 
+# Android build
+bindings/android/obj
+bindings/android/libs
+bindings/qt/build-android
+
 # MacOS
 .DS_Store
 
@@ -76,3 +81,10 @@ cmake_install.cmake
 libverovio.a
 tools/.cmake
 tools/compile_commands.json
+
+# VS Studio files
+.vs/
+Debug/
+Release/
+*.vcxproj*
+*.sln

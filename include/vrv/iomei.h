@@ -56,6 +56,7 @@ class Expansion;
 class F;
 class Fb;
 class Fig;
+class Fing;
 class Fermata;
 class FloatingElement;
 class FTrem;
@@ -101,6 +102,7 @@ class PgFoot;
 class PgFoot2;
 class PgHead;
 class PgHead2;
+class Phrase;
 class PitchInflection;
 class PitchInterface;
 class PlistInterface;
@@ -306,6 +308,7 @@ private:
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
+    void WriteFing(pugi::xml_node currentNode, Fing *fing);
     void WriteGliss(pugi::xml_node currentNode, Gliss *gliss);
     void WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteHarm(pugi::xml_node currentNode, Harm *harm);
@@ -313,6 +316,7 @@ private:
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
+    void WritePhrase(pugi::xml_node currentNode, Phrase *phrase);
     void WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection);
     void WriteReh(pugi::xml_node currentNode, Reh *reh);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
@@ -565,6 +569,7 @@ private:
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
+    bool ReadFing(Object *parent, pugi::xml_node fing);
     bool ReadGliss(Object *parent, pugi::xml_node gliss);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
@@ -572,6 +577,7 @@ private:
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
+    bool ReadPhrase(Object *parent, pugi::xml_node phrase);
     bool ReadPitchInflection(Object *parent, pugi::xml_node pitchInflection);
     bool ReadReh(Object *parent, pugi::xml_node reh);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
@@ -655,6 +661,7 @@ private:
     ///@{
     bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
     bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
+    bool ReadBeamSpanAsBeam(Measure *measure, pugi::xml_node beamSpan);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     bool ReadZone(Surface *parent, pugi::xml_node zone);
     ///@}
@@ -684,6 +691,7 @@ private:
     DocType StrToDocType(std::string type);
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
+    bool ReadXMLComment(Object *object, pugi::xml_node element);
     ///@}
 
     /**
@@ -693,6 +701,7 @@ private:
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
+    void UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
@@ -747,6 +756,11 @@ private:
      * This is not the case when selecting a mDiv that is not the first one with a score in the tree.
      */
     bool m_useScoreDefForDoc;
+
+    /**
+     * The comment to be attached to the next Object
+     */
+    std::string m_comment;
 };
 
 } // namespace vrv

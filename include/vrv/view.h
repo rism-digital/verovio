@@ -8,9 +8,12 @@
 #ifndef __VRV_RENDERER_H__
 #define __VRV_RENDERER_H__
 
+#include <optional>
+
 #include "devicecontextbase.h"
 #include "scoredef.h"
 #include "smufl.h"
+#include "textelement.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -34,6 +37,7 @@ class Ending;
 class F;
 class Fb;
 class Fig;
+class Fing;
 class FloatingCurvePositioner;
 class Fermata;
 class Gliss;
@@ -190,9 +194,9 @@ protected:
         bool abbreviations = false);
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
-    void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false);
-    void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
-        bool abbreviations, int staffSize, int space);
+    void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
+    void DrawLabels(
+        DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
@@ -206,6 +210,7 @@ protected:
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
+    void DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMeasure);
     ///@}
 
     /**
@@ -393,6 +398,7 @@ protected:
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system);
+    void DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *system);
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
     void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
@@ -517,7 +523,8 @@ protected:
         wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data_HORIZONTALALIGNMENT alignment,
         int staffSize = 100, bool dimin = false, bool setBBGlyph = false);
-    void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100);
+    void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100,
+        std::optional<TextDrawingParams> params = std::nullopt);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);

@@ -882,6 +882,156 @@ data_COURSETUNING AttConverter::StrToCoursetuning(const std::string &value, bool
     return COURSETUNING_NONE;
 }
 
+std::string AttConverter::DivisioToStr(data_DIVISIO data) const
+{
+    std::string value;
+    switch (data) {
+        case DIVISIO_ternaria: value = "ternaria"; break;
+        case DIVISIO_quaternaria: value = "quaternaria"; break;
+        case DIVISIO_senariaimperf: value = "senariaimperf"; break;
+        case DIVISIO_senariaperf: value = "senariaperf"; break;
+        case DIVISIO_octonaria: value = "octonaria"; break;
+        case DIVISIO_novenaria: value = "novenaria"; break;
+        case DIVISIO_duodenaria: value = "duodenaria"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.DIVISIO", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_DIVISIO AttConverter::StrToDivisio(const std::string &value, bool logWarning) const
+{
+    if (value == "ternaria") return DIVISIO_ternaria;
+    if (value == "quaternaria") return DIVISIO_quaternaria;
+    if (value == "senariaimperf") return DIVISIO_senariaimperf;
+    if (value == "senariaperf") return DIVISIO_senariaperf;
+    if (value == "octonaria") return DIVISIO_octonaria;
+    if (value == "novenaria") return DIVISIO_novenaria;
+    if (value == "duodenaria") return DIVISIO_duodenaria;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.DIVISIO", value.c_str());
+    return DIVISIO_NONE;
+}
+
+std::string AttConverter::DurationrestsToStr(data_DURATIONRESTS data) const
+{
+    std::string value;
+    switch (data) {
+        case DURATIONRESTS_long: value = "long"; break;
+        case DURATIONRESTS_breve: value = "breve"; break;
+        case DURATIONRESTS_1: value = "1"; break;
+        case DURATIONRESTS_2: value = "2"; break;
+        case DURATIONRESTS_4: value = "4"; break;
+        case DURATIONRESTS_8: value = "8"; break;
+        case DURATIONRESTS_16: value = "16"; break;
+        case DURATIONRESTS_32: value = "32"; break;
+        case DURATIONRESTS_64: value = "64"; break;
+        case DURATIONRESTS_128: value = "128"; break;
+        case DURATIONRESTS_256: value = "256"; break;
+        case DURATIONRESTS_512: value = "512"; break;
+        case DURATIONRESTS_1024: value = "1024"; break;
+        case DURATIONRESTS_2048: value = "2048"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.DURATIONRESTS", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_DURATIONRESTS AttConverter::StrToDurationrests(const std::string &value, bool logWarning) const
+{
+    if (value == "long") return DURATIONRESTS_long;
+    if (value == "breve") return DURATIONRESTS_breve;
+    if (value == "1") return DURATIONRESTS_1;
+    if (value == "2") return DURATIONRESTS_2;
+    if (value == "4") return DURATIONRESTS_4;
+    if (value == "8") return DURATIONRESTS_8;
+    if (value == "16") return DURATIONRESTS_16;
+    if (value == "32") return DURATIONRESTS_32;
+    if (value == "64") return DURATIONRESTS_64;
+    if (value == "128") return DURATIONRESTS_128;
+    if (value == "256") return DURATIONRESTS_256;
+    if (value == "512") return DURATIONRESTS_512;
+    if (value == "1024") return DURATIONRESTS_1024;
+    if (value == "2048") return DURATIONRESTS_2048;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.DURATIONRESTS", value.c_str());
+    return DURATIONRESTS_NONE;
+}
+
+std::string AttConverter::DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const
+{
+    std::string value;
+    switch (data) {
+        case DURATIONRESTS_mensural_2B: value = "2B"; break;
+        case DURATIONRESTS_mensural_3B: value = "3B"; break;
+        case DURATIONRESTS_mensural_maxima: value = "maxima"; break;
+        case DURATIONRESTS_mensural_longa: value = "longa"; break;
+        case DURATIONRESTS_mensural_brevis: value = "brevis"; break;
+        case DURATIONRESTS_mensural_semibrevis: value = "semibrevis"; break;
+        case DURATIONRESTS_mensural_minima: value = "minima"; break;
+        case DURATIONRESTS_mensural_semiminima: value = "semiminima"; break;
+        case DURATIONRESTS_mensural_fusa: value = "fusa"; break;
+        case DURATIONRESTS_mensural_semifusa: value = "semifusa"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.DURATIONRESTS.mensural", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_DURATIONRESTS_mensural AttConverter::StrToDurationrestsMensural(const std::string &value, bool logWarning) const
+{
+    if (value == "2B") return DURATIONRESTS_mensural_2B;
+    if (value == "3B") return DURATIONRESTS_mensural_3B;
+    if (value == "maxima") return DURATIONRESTS_mensural_maxima;
+    if (value == "longa") return DURATIONRESTS_mensural_longa;
+    if (value == "brevis") return DURATIONRESTS_mensural_brevis;
+    if (value == "semibrevis") return DURATIONRESTS_mensural_semibrevis;
+    if (value == "minima") return DURATIONRESTS_mensural_minima;
+    if (value == "semiminima") return DURATIONRESTS_mensural_semiminima;
+    if (value == "fusa") return DURATIONRESTS_mensural_fusa;
+    if (value == "semifusa") return DURATIONRESTS_mensural_semifusa;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.DURATIONRESTS.mensural", value.c_str());
+    return DURATIONRESTS_mensural_NONE;
+}
+
+std::string AttConverter::DurqualityMensuralToStr(data_DURQUALITY_mensural data) const
+{
+    std::string value;
+    switch (data) {
+        case DURQUALITY_mensural_perfecta: value = "perfecta"; break;
+        case DURQUALITY_mensural_imperfecta: value = "imperfecta"; break;
+        case DURQUALITY_mensural_altera: value = "altera"; break;
+        case DURQUALITY_mensural_minor: value = "minor"; break;
+        case DURQUALITY_mensural_maior: value = "maior"; break;
+        case DURQUALITY_mensural_duplex: value = "duplex"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.DURQUALITY.mensural", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_DURQUALITY_mensural AttConverter::StrToDurqualityMensural(const std::string &value, bool logWarning) const
+{
+    if (value == "perfecta") return DURQUALITY_mensural_perfecta;
+    if (value == "imperfecta") return DURQUALITY_mensural_imperfecta;
+    if (value == "altera") return DURQUALITY_mensural_altera;
+    if (value == "minor") return DURQUALITY_mensural_minor;
+    if (value == "maior") return DURQUALITY_mensural_maior;
+    if (value == "duplex") return DURQUALITY_mensural_duplex;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.DURQUALITY.mensural", value.c_str());
+    return DURQUALITY_mensural_NONE;
+}
+
 std::string AttConverter::EnclosureToStr(data_ENCLOSURE data) const
 {
     std::string value;
@@ -1023,6 +1173,62 @@ data_FILL AttConverter::StrToFill(const std::string &value, bool logWarning) con
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.FILL", value.c_str());
     return FILL_NONE;
+}
+
+std::string AttConverter::FlagformMensuralToStr(data_FLAGFORM_mensural data) const
+{
+    std::string value;
+    switch (data) {
+        case FLAGFORM_mensural_straight: value = "straight"; break;
+        case FLAGFORM_mensural_angled: value = "angled"; break;
+        case FLAGFORM_mensural_curled: value = "curled"; break;
+        case FLAGFORM_mensural_flared: value = "flared"; break;
+        case FLAGFORM_mensural_extended: value = "extended"; break;
+        case FLAGFORM_mensural_hooked: value = "hooked"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.FLAGFORM.mensural", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FLAGFORM_mensural AttConverter::StrToFlagformMensural(const std::string &value, bool logWarning) const
+{
+    if (value == "straight") return FLAGFORM_mensural_straight;
+    if (value == "angled") return FLAGFORM_mensural_angled;
+    if (value == "curled") return FLAGFORM_mensural_curled;
+    if (value == "flared") return FLAGFORM_mensural_flared;
+    if (value == "extended") return FLAGFORM_mensural_extended;
+    if (value == "hooked") return FLAGFORM_mensural_hooked;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.FLAGFORM.mensural", value.c_str());
+    return FLAGFORM_mensural_NONE;
+}
+
+std::string AttConverter::FlagposMensuralToStr(data_FLAGPOS_mensural data) const
+{
+    std::string value;
+    switch (data) {
+        case FLAGPOS_mensural_left: value = "left"; break;
+        case FLAGPOS_mensural_right: value = "right"; break;
+        case FLAGPOS_mensural_center: value = "center"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.FLAGPOS.mensural", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FLAGPOS_mensural AttConverter::StrToFlagposMensural(const std::string &value, bool logWarning) const
+{
+    if (value == "left") return FLAGPOS_mensural_left;
+    if (value == "right") return FLAGPOS_mensural_right;
+    if (value == "center") return FLAGPOS_mensural_center;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.FLAGPOS.mensural", value.c_str());
+    return FLAGPOS_mensural_NONE;
 }
 
 std::string AttConverter::FontsizetermToStr(data_FONTSIZETERM data) const
@@ -1624,6 +1830,19 @@ std::string AttConverter::MensurationsignToStr(data_MENSURATIONSIGN data) const
     switch (data) {
         case MENSURATIONSIGN_C: value = "C"; break;
         case MENSURATIONSIGN_O: value = "O"; break;
+        case MENSURATIONSIGN_t: value = "t"; break;
+        case MENSURATIONSIGN_q: value = "q"; break;
+        case MENSURATIONSIGN_si: value = "si"; break;
+        case MENSURATIONSIGN_i: value = "i"; break;
+        case MENSURATIONSIGN_sg: value = "sg"; break;
+        case MENSURATIONSIGN_g: value = "g"; break;
+        case MENSURATIONSIGN_sp: value = "sp"; break;
+        case MENSURATIONSIGN_p: value = "p"; break;
+        case MENSURATIONSIGN_sy: value = "sy"; break;
+        case MENSURATIONSIGN_y: value = "y"; break;
+        case MENSURATIONSIGN_n: value = "n"; break;
+        case MENSURATIONSIGN_oc: value = "oc"; break;
+        case MENSURATIONSIGN_d: value = "d"; break;
         default:
             LogWarning("Unknown value '%d' for data.MENSURATIONSIGN", data);
             value = "";
@@ -1636,6 +1855,19 @@ data_MENSURATIONSIGN AttConverter::StrToMensurationsign(const std::string &value
 {
     if (value == "C") return MENSURATIONSIGN_C;
     if (value == "O") return MENSURATIONSIGN_O;
+    if (value == "t") return MENSURATIONSIGN_t;
+    if (value == "q") return MENSURATIONSIGN_q;
+    if (value == "si") return MENSURATIONSIGN_si;
+    if (value == "i") return MENSURATIONSIGN_i;
+    if (value == "sg") return MENSURATIONSIGN_sg;
+    if (value == "g") return MENSURATIONSIGN_g;
+    if (value == "sp") return MENSURATIONSIGN_sp;
+    if (value == "p") return MENSURATIONSIGN_p;
+    if (value == "sy") return MENSURATIONSIGN_sy;
+    if (value == "y") return MENSURATIONSIGN_y;
+    if (value == "n") return MENSURATIONSIGN_n;
+    if (value == "oc") return MENSURATIONSIGN_oc;
+    if (value == "d") return MENSURATIONSIGN_d;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.MENSURATIONSIGN", value.c_str());
     return MENSURATIONSIGN_NONE;
@@ -2130,6 +2362,29 @@ data_MODSRELATIONSHIP AttConverter::StrToModsrelationship(const std::string &val
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.MODSRELATIONSHIP", value.c_str());
     return MODSRELATIONSHIP_NONE;
+}
+
+std::string AttConverter::MultibreverestsMensuralToStr(data_MULTIBREVERESTS_mensural data) const
+{
+    std::string value;
+    switch (data) {
+        case MULTIBREVERESTS_mensural_2B: value = "2B"; break;
+        case MULTIBREVERESTS_mensural_3B: value = "3B"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.MULTIBREVERESTS.mensural", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MULTIBREVERESTS_mensural AttConverter::StrToMultibreverestsMensural(const std::string &value, bool logWarning) const
+{
+    if (value == "2B") return MULTIBREVERESTS_mensural_2B;
+    if (value == "3B") return MULTIBREVERESTS_mensural_3B;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MULTIBREVERESTS.mensural", value.c_str());
+    return MULTIBREVERESTS_mensural_NONE;
 }
 
 std::string AttConverter::NonstaffplaceToStr(data_NONSTAFFPLACE data) const
@@ -2844,6 +3099,33 @@ data_STEMDIRECTION_extended AttConverter::StrToStemdirectionExtended(const std::
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.STEMDIRECTION.extended", value.c_str());
     return STEMDIRECTION_extended_NONE;
+}
+
+std::string AttConverter::StemformMensuralToStr(data_STEMFORM_mensural data) const
+{
+    std::string value;
+    switch (data) {
+        case STEMFORM_mensural_circle: value = "circle"; break;
+        case STEMFORM_mensural_oblique: value = "oblique"; break;
+        case STEMFORM_mensural_swallowtail: value = "swallowtail"; break;
+        case STEMFORM_mensural_virgula: value = "virgula"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STEMFORM.mensural", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMFORM_mensural AttConverter::StrToStemformMensural(const std::string &value, bool logWarning) const
+{
+    if (value == "circle") return STEMFORM_mensural_circle;
+    if (value == "oblique") return STEMFORM_mensural_oblique;
+    if (value == "swallowtail") return STEMFORM_mensural_swallowtail;
+    if (value == "virgula") return STEMFORM_mensural_virgula;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STEMFORM.mensural", value.c_str());
+    return STEMFORM_mensural_NONE;
 }
 
 std::string AttConverter::StemmodifierToStr(data_STEMMODIFIER data) const
