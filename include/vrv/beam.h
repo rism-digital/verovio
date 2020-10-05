@@ -91,6 +91,7 @@ public:
     int m_ledgerLinesAbove;
     int m_ledgerLinesBelow;
     int m_uniformStemLength;
+    int m_shortestNoteDuration;
 
     BeamElementCoord *m_firstNoteOrChord;
     BeamElementCoord *m_lastNoteOrChord;

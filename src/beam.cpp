@@ -60,6 +60,7 @@ void BeamSegment::Reset()
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
     m_uniformStemLength = 0;
+    m_shortestNoteDuration = 0;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -758,6 +759,9 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
         if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
             m_uniformStemLength = coordStemDir;
         }
+        if (coord->m_dur > m_shortestNoteDuration) {
+            m_shortestNoteDuration = coord->m_dur;
+        }
     }
 }
 
@@ -1001,7 +1005,6 @@ void BeamElementCoord::SetDrawingStemDir(
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     this->m_stem->SetDrawingStemDir(stemDir);
-    bool onStaffLine = false;
     int ledgerLines = 0;
     int ledgerLinesOpposite = 0;
     this->m_shortened = false;
@@ -1022,7 +1025,6 @@ void BeamElementCoord::SetDrawingStemDir(
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
         }
     }
@@ -1035,7 +1037,6 @@ void BeamElementCoord::SetDrawingStemDir(
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
         }
     }
@@ -1063,10 +1064,10 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (this->m_dur > DUR_32)) {
+    if ((ledgerLines > 2) && (segment->m_shortestNoteDuration > DUR_32)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
     }
-    else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
+    else if ((ledgerLines > 1) && (segment->m_shortestNoteDuration > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
 
@@ -1076,6 +1077,7 @@ void BeamElementCoord::SetDrawingStemDir(
 int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
 {
     if (!m_closestNote) return 0;
+
     const bool onStaffLine = m_closestNote->GetDrawingLoc() % 2;
     bool extend = onStaffLine;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
