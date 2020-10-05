@@ -14949,7 +14949,7 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
                 scaleadj.at(j) = 2;
                 break;
             }
-            cerr << "SOMETHING STANGE HAPPENED HERE" << endl;
+            cerr << "SOMETHING STRANGE HAPPENED HERE" << endl;
         }
         target = newtg.at(i + 1)->tupletstart;
         scaleadj.at(i) = 2;
@@ -14981,11 +14981,24 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
         }
     }
 
+    // recalculate tuplet groups
+    int currgroup = 0;
+    for (int i = 0; i < (int)newtg.size(); i++) {
+        if (newtg[i]->tupletstart) {
+            currgroup = newtg[i]->tupletstart;
+        }
+        newtg[i]->group = currgroup;
+        if (newtg[i]->tupletend) {
+            currgroup = 0;
+        }
+    }
+
     if (m_debug) {
         cerr << "INDEX\tBEAM\tTSTART\tTEND\tNUM\tNUMBASE\n";
-        for (int i = 0; i < (int)tg.size(); ++i) {
-            cerr << "I " << i << ":\t" << inbeam.at(i) << "\t" << tg.at(i).tupletstart << "\t" << tg.at(i).tupletend
-                 << "\t" << tg.at(i).num << "\t" << tg.at(i).numbase << "\tSA=" << scaleadj.at(i) << endl;
+        for (int i = 0; i < (int)newtg.size(); ++i) {
+            cerr << "I " << i << ":\t" << inbeam.at(i) << "\t" << newtg.at(i)->tupletstart << "\t"
+                 << newtg.at(i)->tupletend << "\t" << newtg.at(i)->num << "\t" << newtg.at(i)->numbase
+                 << "\tSA=" << scaleadj.at(i) << endl;
         }
     }
 
