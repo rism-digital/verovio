@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.0.0] - 2020-10-05
 * Support for buzz roll tremolos (@rettinghaus)
 * Support for `Sprechgesang` stems (@rettinghaus)
 * Support for `<phrase>`
@@ -10,9 +10,6 @@
 * Support for pedal lines (@rettinghaus)
 * Options for controlling output tabs (--output-indent and --output-indent-tab)
 * Option to remove ids in the MEI output (--remove-ids) to be passed to GetMEI with the JS toolkit
-
-## [2.7.2] - 2020-07-23
-* Fix bug with memory in beams (@valeriyvan)
 
 ## [2.7.2] - 2020-07-23
 * Fix bug with memory in beams (@valeriyvan)

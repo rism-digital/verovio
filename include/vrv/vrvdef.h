@@ -33,13 +33,25 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 2
-#define VERSION_MINOR 7
-#define VERSION_REVISION 2
+#define VERSION_MAJOR 3
+#define VERSION_MINOR 0
+#define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
 
-enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1 };
+enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, MEI_5_0_0_dev };
+
+//----------------------------------------------------------------------------
+// Cast redefinition
+//----------------------------------------------------------------------------
+
+// Can be changed between static and dynamic for debug purposes
+
+// To be used for all cases where type is cheched through Object::m_type
+#define vrv_cast static_cast
+
+// To be used for all FunctorParams casts withi Functors
+#define vrv_params_cast static_cast
 
 //----------------------------------------------------------------------------
 // Default midi values
@@ -144,6 +156,7 @@ enum ClassId {
     DIR,
     DYNAM,
     FERMATA,
+    FING,
     GLISS,
     HAIRPIN,
     HARM,
@@ -151,6 +164,7 @@ enum ClassId {
     MNUM,
     OCTAVE,
     PEDAL,
+    PHRASE,
     REH,
     SLUR,
     TEMPO,
@@ -277,6 +291,8 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
+typedef std::list<Object *> ListOfObjects;
+
 typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
@@ -289,7 +305,7 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
-typedef std::multimap<std::string, LinkingInterface *> ArrayOfLinkingInterfaceUuidPairs;
+typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 
@@ -525,6 +541,12 @@ enum {
     LIGATURE_OBLIQUE = 16,
     LIGATURE_STACKED = 32
 };
+
+//----------------------------------------------------------------------------
+// Analytical markup bitfields
+//----------------------------------------------------------------------------
+
+enum { MARKUP_DEFAULT = 0, MARKUP_ANALYTICAL_TIE = 1, MARKUP_ANALYTICAL_FERMATA = 2, MARKUP_GRACE_ATTRIBUTE = 4 };
 
 //----------------------------------------------------------------------------
 // Bounding box access
