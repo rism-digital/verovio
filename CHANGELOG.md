@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.0.0] - 2020-10-05
 * Support for buzz roll tremolos (@rettinghaus)
 * Support for `Sprechgesang` stems (@rettinghaus)
 * Support for `<phrase>`
