@@ -1000,7 +1000,6 @@ void BeamElementCoord::SetDrawingStemDir(
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     this->m_stem->SetDrawingStemDir(stemDir);
-    bool onStaffLine = false;
     int ledgerLines = 0;
     int ledgerLinesOpposite = 0;
     this->m_shortened = false;
@@ -1021,7 +1020,6 @@ void BeamElementCoord::SetDrawingStemDir(
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
         }
     }
@@ -1034,7 +1032,6 @@ void BeamElementCoord::SetDrawingStemDir(
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
         }
     }
