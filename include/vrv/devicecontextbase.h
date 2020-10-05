@@ -108,18 +108,20 @@ public:
         m_supSubScript = false;
         m_faceName.clear();
         m_encoding = 0; // was wxFONTENCODING_DEFAULT;
+        m_widthToHeightRatio = 1.0;
     }
     virtual ~FontInfo(){};
 
     // accessors and modifiers for the font elements
     int GetPointSize() { return m_pointSize; }
-    int GetStyle() { return m_style; }
-    int GetWeight() { return m_weight; }
+    data_FONTSTYLE GetStyle() { return m_style; }
+    data_FONTWEIGHT GetWeight() { return m_weight; }
     bool GetUnderlined() { return m_underlined; }
     bool GetSupSubScript() { return m_supSubScript; }
     std::string GetFaceName() { return m_faceName; }
     int GetFamily() { return m_family; }
     int GetEncoding() { return m_encoding; }
+    float GetWidthToHeightRatio() { return m_widthToHeightRatio; }
 
     void SetPointSize(int pointSize) { m_pointSize = pointSize; }
     void SetStyle(data_FONTSTYLE style) { m_style = style; }
@@ -129,6 +131,7 @@ public:
     void SetFaceName(const char *faceName) { m_faceName = faceName; }
     void SetFamily(int family) { m_family = family; }
     void SetEncoding(int encoding) { m_encoding = encoding; }
+    void SetWidthToHeightRatio(float ratio) { m_widthToHeightRatio = ratio; }
 
 private:
     int m_pointSize;
@@ -139,6 +142,7 @@ private:
     bool m_supSubScript;
     std::string m_faceName;
     int m_encoding;
+    float m_widthToHeightRatio;
 };
 
 // ---------------------------------------------------------------------------

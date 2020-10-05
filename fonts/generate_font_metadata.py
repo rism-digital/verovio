@@ -44,8 +44,7 @@ def validateGlyph(glyph):
             report += '- DUPLICATE UNICODE POINT'
 
         if report != '':
-            print >> log, ('%s (%#0.2x) issues: %s' %
-                           (g.glyphname, glyph.unicode, report))
+            print('%s (%#0.2x) issues: %s' % (g.glyphname, glyph.unicode, report), log)
     return report
 
 
@@ -71,8 +70,8 @@ except EnvironmentError:
 fontName = os.path.splitext(os.path.basename(fontFileName))[0]
 
 log = open(outDir + fontName.lower() + '.log', 'w+')
-print >> log, ("\n# # # %s: checking data & generating metadata... # # #" % (
-    fontFileName))
+print ("\n# # # %s: checking data & generating metadata... # # #" % (
+    fontFileName), file=log)
 # generating OpenType font:
 #font.generate( outDir+fontName+'.otf', '', ('glyph-map-file', 'opentype') )
 fontVersion = font.version
@@ -83,33 +82,33 @@ jsonComment = 'Automatically generated Metadata for the' + fontName + \
 metadata["_comment"] = jsonComment
 # customize these values if necessary:
 engravingDefaults = {
-    'arrowShaftThickness': '0.16',
-    'barlineSeparation': '0.4',
-    'beamSpacing': '0.20',
-    'beamThickness': '0.55',
-    'bracketThickness': '0.5',
-    'dashedBarlineDashLength': '0.5',
-    'dashedBarlineGapLength': '0.25',
-    'dashedBarlineThickness': '0.16',
-    'hairpinThickness': '0.16',
-    'legerLineExtension': '0.4',
-    'legerLineThickness': '0.16',
-    'lyricLineThickness': '0.16',
-    'octaveLineThickness': '0.16',
-    'pedalLineThickness': '0.16',
-    'repeatBarlineDotSeparation': '0.16',
-    'repeatEndingLineThickness': '0.16',
-    'slurEndpointThickness': '0.1',
-    'slurMidpointThickness': '0.22',
-    'staffLineThickness': '0.08',
-    'stemThickness': '0.076',
-    'subBracketThickness': '0.16',
-    'textEnclosureThickness': '0.16',
-    'thickBarlineThickness': '0.5',
-    'thinBarlineThickness': '0.16',
-    'tieEndpointThickness': '0.1',
-    'tieMidpointThickness': '0.22',
-    'tupletBracketThickness': '0.16'}
+    'arrowShaftThickness': 0.16,
+    'barlineSeparation': 0.4,
+    'beamSpacing': 0.20,
+    'beamThickness': 0.55,
+    'bracketThickness': 0.5,
+    'dashedBarlineDashLength': 0.5,
+    'dashedBarlineGapLength': 0.25,
+    'dashedBarlineThickness': 0.16,
+    'hairpinThickness': 0.16,
+    'legerLineExtension': 0.27,
+    'legerLineThickness': 0.16,
+    'lyricLineThickness': 0.16,
+    'octaveLineThickness': 0.16,
+    'pedalLineThickness': 0.16,
+    'repeatBarlineDotSeparation': 0.16,
+    'repeatEndingLineThickness': 0.16,
+    'slurEndpointThickness': 0.1,
+    'slurMidpointThickness': 0.22,
+    'staffLineThickness': 0.08,
+    'stemThickness': 0.076,
+    'subBracketThickness': 0.16,
+    'textEnclosureThickness': 0.16,
+    'thickBarlineThickness': 0.5,
+    'thinBarlineThickness': 0.16,
+    'tieEndpointThickness': 0.1,
+    'tieMidpointThickness': 0.22,
+    'tupletBracketThickness': 0.16}
 
 metadata["engravingDefaults"] = engravingDefaults
 
@@ -118,8 +117,8 @@ lilypondData += '  TODO: LilyPond data header\n%}\n\n'
 lilypondData += '#(define ' + fontName.lower() + ' \'(\n'
 lilypondGlyphs = list()
 
-print >> log, ("  Generating unicode metadata...")
-print >> log, ("  Generating LilyPond metadata...")
+print ("  Generating unicode metadata...", file=log)
+print ("  Generating LilyPond metadata...", file=log)
 
 with open(fontFileName) as f:
     lines = f.readlines()
@@ -129,8 +128,8 @@ for anyLine in line_iter:
     line1 = anyLine.split()
     if len(line1) > 0 and line1[0] == 'StartChar:':
         glyphName = line1[1]
-        line2 = line_iter.next().split()
-        line3 = line_iter.next().split()
+        line2 = line_iter.__next__().split()
+        line3 = line_iter.__next__().split()
         value = int(line2[2])
         if value != '-1' and value > 31:
             mainCodepoint = "%#06X" % value
@@ -162,9 +161,9 @@ metadata["glyphs"] = glyphs
 lilypondGlyphs.sort()
 lilypondData += '\n'.join(lilypondGlyphs) + '\n))\n'
 
-print >> log, ("  Generating bounding box metadata...")
-print >> log, ("  Checking font...")
-print >> log
+print ("  Generating bounding box metadata...", file=log)
+print ("  Checking font...", file=log)
+print("", file=log)
 glyphBBoxes = dict()
 glyphsWithAnchors = dict()
 count = 0
@@ -190,11 +189,11 @@ for glyph in font:
 metadata["glyphBBoxes"] = glyphBBoxes
 metadata["glyphsWithAnchors"] = glyphsWithAnchors
 font.close()
-print >> log, ("\n%d defined glyphs processed (there are %d undefined glyphs)" % (
-    count, undefCount - 31))
+print("\n%d defined glyphs processed (there are %d undefined glyphs)" % (
+    count, undefCount - 31), file=log)
 log.close()
 log = open(outDir + fontName.lower() + '.log', 'r')
-print log.read()
+print(log.read())
 
 output = json.dumps(metadata, sort_keys=True, indent=4, separators=(',', ': '))
 jsonFileName = outDir + fontName.lower() + "_metadata.json"

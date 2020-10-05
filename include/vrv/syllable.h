@@ -42,10 +42,16 @@ public:
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+
+    /**
+     * Add a default syl to this syllable if one does not exist.
+     * Returns true if a syl was added, false otherwise.
+     */
+    bool MarkupAddSyl();
 
 private:
     //

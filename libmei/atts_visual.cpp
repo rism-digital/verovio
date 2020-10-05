@@ -1216,6 +1216,8 @@ void AttMensurVis::ResetMensurVis()
 {
     m_form = mensurVis_FORM_NONE;
     m_orient = ORIENTATION_NONE;
+    m_dot = BOOLEAN_NONE;
+    m_sign = MENSURATIONSIGN_NONE;
 }
 
 bool AttMensurVis::ReadMensurVis(pugi::xml_node element)
@@ -1229,6 +1231,16 @@ bool AttMensurVis::ReadMensurVis(pugi::xml_node element)
     if (element.attribute("orient")) {
         this->SetOrient(StrToOrientation(element.attribute("orient").value()));
         element.remove_attribute("orient");
+        hasAttribute = true;
+    }
+    if (element.attribute("dot")) {
+        this->SetDot(StrToBoolean(element.attribute("dot").value()));
+        element.remove_attribute("dot");
+        hasAttribute = true;
+    }
+    if (element.attribute("sign")) {
+        this->SetSign(StrToMensurationsign(element.attribute("sign").value()));
+        element.remove_attribute("sign");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1245,6 +1257,14 @@ bool AttMensurVis::WriteMensurVis(pugi::xml_node element)
         element.append_attribute("orient") = OrientationToStr(this->GetOrient()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasDot()) {
+        element.append_attribute("dot") = BooleanToStr(this->GetDot()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSign()) {
+        element.append_attribute("sign") = MensurationsignToStr(this->GetSign()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
@@ -1258,7 +1278,17 @@ bool AttMensurVis::HasOrient() const
     return (m_orient != ORIENTATION_NONE);
 }
 
-/* include <attorient> */
+bool AttMensurVis::HasDot() const
+{
+    return (m_dot != BOOLEAN_NONE);
+}
+
+bool AttMensurVis::HasSign() const
+{
+    return (m_sign != MENSURATIONSIGN_NONE);
+}
+
+/* include <attsign> */
 
 //----------------------------------------------------------------------------
 // AttMensuralVis
@@ -2379,6 +2409,14 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             att->SetOrient(att->StrToOrientation(attrValue));
             return true;
         }
+        if (attrType == "dot") {
+            att->SetDot(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "sign") {
+            att->SetSign(att->StrToMensurationsign(attrValue));
+            return true;
+        }
     }
     if (element->HasAttClass(ATT_MENSURALVIS)) {
         AttMensuralVis *att = dynamic_cast<AttMensuralVis *>(element);
@@ -2757,6 +2795,12 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasOrient()) {
             attributes->push_back(std::make_pair("orient", att->OrientationToStr(att->GetOrient())));
+        }
+        if (att->HasDot()) {
+            attributes->push_back(std::make_pair("dot", att->BooleanToStr(att->GetDot())));
+        }
+        if (att->HasSign()) {
+            attributes->push_back(std::make_pair("sign", att->MensurationsignToStr(att->GetSign())));
         }
     }
     if (element->HasAttClass(ATT_MENSURALVIS)) {

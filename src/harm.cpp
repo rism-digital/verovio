@@ -58,7 +58,7 @@ void Harm::Reset()
     ResetNNumberLike();
 }
 
-void Harm::AddChild(Object *child)
+bool Harm::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -70,13 +70,9 @@ void Harm::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)
@@ -159,7 +155,7 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 
 int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     std::string n = this->GetN();
@@ -180,7 +176,7 @@ int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 
 int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 {
-    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
     assert(params);
 
     // If the harm is empty, do not adjust spacing
@@ -286,7 +282,7 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 
 int Harm::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
     LogDebug("Transposing harm");

@@ -49,7 +49,7 @@ void Ligature::Reset()
 
 void Ligature::ClearClusters() {}
 
-void Ligature::AddChild(Object *child)
+bool Ligature::IsSupportedChild(Object *child)
 {
     if (child->Is(NOTE)) {
         assert(dynamic_cast<LayerElement *>(child));
@@ -57,15 +57,10 @@ void Ligature::AddChild(Object *child)
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
-
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Ligature::FilterList(ArrayOfObjects *childList)
@@ -79,7 +74,7 @@ void Ligature::FilterList(ArrayOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        LayerElement *currentElement = dynamic_cast<LayerElement *>(*iter);
+        LayerElement *currentElement = vrv_cast<LayerElement *>(*iter);
         assert(currentElement);
         if (!currentElement->HasInterface(INTERFACE_DURATION)) {
             iter = childList->erase(iter);
@@ -118,13 +113,13 @@ int Ligature::GetDrawingNoteShape(Note *note)
 
 int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     m_drawingShapes.clear();
 
     Note *lastNote = dynamic_cast<Note *>(this->GetList(this)->back());
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     const ArrayOfObjects *notes = this->GetList(this);
@@ -145,7 +140,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     for (auto &iter : *notes) {
 
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
 
         m_drawingShapes.push_back(LIGATURE_DEFAULT);
@@ -289,7 +284,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     for (auto &iter : *notes) {
 
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
 
         // previousRight is 0 for the first note

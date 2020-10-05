@@ -37,7 +37,7 @@ public:
     /**
      * Add an element (an articPart) to a artic.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Split the articulation content into an array with the values to be displayed inside the staff / slur

@@ -17,6 +17,8 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
@@ -48,24 +50,28 @@ void Verse::Reset()
     ResetLang();
     ResetNInteger();
     ResetTypography();
+
+    m_drawingLabelAbbr = NULL;
 }
 
-void Verse::AddChild(Object *child)
+bool Verse::IsSupportedChild(Object *child)
 {
-    if (child->Is(SYL)) {
+    if (child->Is(LABEL)) {
+        assert(dynamic_cast<Label *>(child));
+    }
+    else if (child->Is(LABELABBR)) {
+        assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
@@ -100,7 +106,7 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
 
 int Verse::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     // this gets (or creates) the measureAligner for the measure
@@ -116,10 +122,28 @@ int Verse::AlignVertically(FunctorParams *functorParams)
 
 int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 {
-    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
-    ArrayOfObjects syls;
+    /****** find label / labelAbbr */
+
+    // If we have a <label>, reset the previous abbreviation
+    if (this->FindDescendantByType(LABEL)) {
+        params->m_currentLabelAbbr = NULL;
+    }
+
+    bool newLabelAbbr = false;
+    this->m_drawingLabelAbbr = NULL;
+    // Find the labelAbbr (if none previously given)
+    if (params->m_currentLabelAbbr == NULL) {
+        params->m_currentLabelAbbr = dynamic_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR));
+        // Keep indication that this is a new abbreviation and that is should not be displayed on this verse
+        newLabelAbbr = true;
+    }
+
+    /*******/
+
+    ListOfObjects syls;
     ClassIdComparison matchTypeSyl(SYL);
     this->FindAllDescendantByComparison(&syls, &matchTypeSyl);
 
@@ -132,10 +156,10 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     this->SetDrawingXRel(-1 * shift);
 
-    ArrayOfObjects::iterator iter = syls.begin();
+    ListOfObjects::iterator iter = syls.begin();
     while (iter != syls.end()) {
         if ((*iter)->HasContentHorizontalBB()) {
-            Syl *syl = dynamic_cast<Syl *>(*iter);
+            Syl *syl = vrv_cast<Syl *>(*iter);
             assert(syl);
             syl->SetDrawingXRel(previousSylShift);
             previousSylShift += syl->GetContentX2() + syl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
@@ -148,17 +172,22 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     if (syls.empty()) return FUNCTOR_CONTINUE;
 
-    Syl *firstSyl = dynamic_cast<Syl *>(syls.front());
+    Syl *firstSyl = vrv_cast<Syl *>(syls.front());
     assert(firstSyl);
     // We keep a pointer to the last syl because we move it (when more than one) and the verse content bounding box is
     // not updated
-    Syl *lastSyl = dynamic_cast<Syl *>(syls.back());
+    Syl *lastSyl = vrv_cast<Syl *>(syls.back());
     assert(lastSyl);
 
     // Not much to do when we hit the first syllable of the system
     if (params->m_previousVerse == NULL) {
         params->m_previousVerse = this;
         params->m_lastSyl = lastSyl;
+
+        if (!newLabelAbbr && params->m_currentLabelAbbr) {
+            this->m_drawingLabelAbbr = params->m_currentLabelAbbr;
+        }
+
         // No free space because we never move the first one back
         params->m_freeSpace = 0;
         params->m_previousMeasure = NULL;
@@ -175,7 +204,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     // Use the syl because the content bounding box of the verse might be invalid at this stage
     int overlap = params->m_lastSyl->GetContentRight() - (firstSyl->GetContentLeft() + xShift);
-    overlap += lastSyl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
+    overlap += params->m_lastSyl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
 
     int nextFreeSpace = params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
@@ -205,12 +234,12 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
 int Verse::PrepareProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = dynamic_cast<PrepareProcessingListsParams *>(functorParams);
+    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
     assert(params);
-    // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
+    // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(staff && layer);
 
     params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];
@@ -218,6 +247,16 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
     //(*tree)[ staff->GetN() ][ layer->GetN() ][ this->GetN() ] = true;
 
     return FUNCTOR_SIBLINGS;
+}
+
+int Verse::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    m_drawingLabelAbbr = NULL;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

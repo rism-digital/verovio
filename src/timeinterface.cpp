@@ -103,13 +103,30 @@ bool TimePointInterface::IsOnStaff(int n)
     return false;
 }
 
-std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
+std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Object *object)
 {
+    assert(measure);
+    assert(object);
+
     std::vector<Staff *> staves;
     std::vector<int>::iterator iter;
     std::vector<int> staffList;
     if (this->HasStaff()) {
-        staffList = this->GetStaff();
+        bool isInBetween = false;
+        // limit between support to some elements?
+        if (object->Is({ DYNAM, DIR, HAIRPIN, TEMPO })) {
+            AttPlacement *att = dynamic_cast<AttPlacement *>(object);
+            assert(att);
+            isInBetween = (att->GetPlace() == STAFFREL_between);
+        }
+        if (isInBetween) {
+            assert(this->GetStaff().size() > 0);
+            // With @place="between" we use only the first staff value
+            staffList.push_back(this->GetStaff().front());
+        }
+        else {
+            staffList = this->GetStaff();
+        }
     }
     else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
         Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
@@ -208,7 +225,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
     // If the starting point is a chord we need to select the appropriate extreme staff
     Staff *startStaff = NULL;
     if (this->GetStart()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetStart());
+        Chord *chord = vrv_cast<Chord *>(this->GetStart());
         assert(chord);
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
@@ -221,7 +238,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
     // Same for the end point
     Staff *endStaff = NULL;
     if (this->GetEnd()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetEnd());
+        Chord *chord = vrv_cast<Chord *>(this->GetEnd());
         assert(chord);
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
@@ -262,7 +279,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 
 int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
     // First we check if the object has already a mapped @startid (it should not)
@@ -291,7 +308,7 @@ int TimePointInterface::InterfaceResetDrawing(FunctorParams *functorParams, Obje
 
 int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
+    PrepareTimePointingParams *params = vrv_params_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
 
     if (!this->HasStartid()) return FUNCTOR_CONTINUE;
@@ -304,7 +321,7 @@ int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParam
 
 int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
+    PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
     if (!this->HasStartid() && !this->HasEndid()) {
@@ -323,7 +340,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
 
 int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
-    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
     // First we check if the object has already a mapped @endid (it should not)
@@ -351,7 +368,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
 
 int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     if (this->IsSpanningMeasures()) {

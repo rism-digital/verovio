@@ -16,6 +16,13 @@
 #include "vrvqt/toolkit.h"
 #include "vrvqt/view.h"
 
+#ifdef Q_OS_ANDROID
+// With Android GL_MAX_SAMPLES is not defined by QOpenGL, fix this by manually defining this constant
+#ifndef GL_MAX_SAMPLES
+#define GL_MAX_SAMPLES 0x8D57
+#endif
+#endif
+
 /**
  * Retrieves GL_MAX_SAMPLES by creating an offscreen surface.
  */

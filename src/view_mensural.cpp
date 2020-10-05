@@ -44,7 +44,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(staff);
     assert(measure);
 
-    Note *note = dynamic_cast<Note *>(element);
+    Note *note = vrv_cast<Note *>(element);
     assert(note);
 
     int yNote = element->GetDrawingY();
@@ -110,7 +110,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
 
     wchar_t charCode;
 
-    Rest *rest = dynamic_cast<Rest *>(element);
+    Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
 
     bool drawingCueSize = rest->GetDrawingCueSize();
@@ -140,10 +140,13 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Mensur *mensur = dynamic_cast<Mensur *>(element);
+    Mensur *mensur = vrv_cast<Mensur *>(element);
     assert(mensur);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    if (!mensur->HasSign()) {
+        // only react to visual attributes
+        return;
+    }
 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
@@ -155,36 +158,23 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
             - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
     }
 
-    if (mensur->HasSign()) {
-        if (mensur->GetSign() == MENSURATIONSIGN_O) {
-            code = SMUFL_E911_mensuralProlation2;
+    if (mensur->GetSign() == MENSURATIONSIGN_O) {
+        code = SMUFL_E911_mensuralProlation2;
+    }
+    else if (mensur->GetSign() == MENSURATIONSIGN_C) {
+        if (mensur->GetOrient() == ORIENTATION_reversed) {
+            code = SMUFL_E916_mensuralProlation7;
+            // additional offset
+            // perfectRadius -= 2 * perfectRadius - m_doc->GetGlyphWidth(SMUFL_E916_mensuralProlation7,
+            // staff->m_drawingStaffSize, false);
         }
-        else if (mensur->GetSign() == MENSURATIONSIGN_C) {
-            if (mensur->GetOrient() == ORIENTATION_reversed) {
-                code = SMUFL_E916_mensuralProlation7;
-                // additional offset
-                // perfectRadius -= 2 * perfectRadius - m_doc->GetGlyphWidth(SMUFL_E916_mensuralProlation7,
-                // staff->m_drawingStaffSize, false);
-            }
-            else {
-                code = SMUFL_E915_mensuralProlation6;
-            }
+        else {
+            code = SMUFL_E915_mensuralProlation6;
         }
     }
-    else if (mensur->HasTempus()) {
-        if (mensur->GetTempus() == TEMPUS_3) {
-            if (mensur->GetProlatio() == PROLATIO_3)
-                code = SMUFL_E910_mensuralProlation1;
-            else
-                code = SMUFL_E911_mensuralProlation2;
-        }
-        else if (mensur->GetTempus() == TEMPUS_2) {
-            if (mensur->GetProlatio() == PROLATIO_3)
-                code = SMUFL_E914_mensuralProlation5;
-            else
-                code = SMUFL_E915_mensuralProlation6;
-        }
-    }
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
 
     x += perfectRadius;
@@ -320,7 +310,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     assert(layer);
     assert(staff);
 
-    Note *note = dynamic_cast<Note *>(element);
+    Note *note = vrv_cast<Note *>(element);
     assert(note);
 
     bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
@@ -385,7 +375,7 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(layer);
     assert(staff);
 
-    Ligature *ligature = dynamic_cast<Ligature *>(element);
+    Ligature *ligature = vrv_cast<Ligature *>(element);
     assert(ligature);
 
     dc->StartGraphic(ligature, "", ligature->GetUuid());
@@ -403,10 +393,10 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(layer);
     assert(staff);
 
-    Note *note = dynamic_cast<Note *>(element);
+    Note *note = vrv_cast<Note *>(element);
     assert(note);
 
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
+    Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
     Note *prevNote = dynamic_cast<Note *>(ligature->GetListPrevious(note));
@@ -500,7 +490,7 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     assert(staff);
 
     int ynum = 0, yden = 0;
-    int textSize = PROPRT_SIZE_FACTOR * staff->m_drawingStaffSize;
+    int textSize = staff->m_drawingStaffSize;
     std::wstring wtext;
 
     if (numBase) {

@@ -64,15 +64,23 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
     ///@}
 
     /**
-     * @name Get the X and Y drawing position
+     * @name Get the X, Y, and angle of drawing position
      */
     ///@{
     virtual int GetDrawingY() const;
     virtual int GetDrawingX() const;
+    virtual double GetDrawingRotate() const;
+    ///@}
+
+    /**
+     * Adjust drawingStaffSize based on rotate angle
+     */
+    void AdjustDrawingStaffSize();
+
     /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
@@ -109,8 +117,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLegerLineAbove(int count, int left, int right, bool cueSize);
-    void AddLegerLineBelow(int count, int left, int right, bool cueSize);
+    void AddLedgerLineAbove(int count, int left, int right, bool cueSize);
+    void AddLedgerLineBelow(int count, int left, int right, bool cueSize);
     ///@}
 
     //----------//
@@ -195,7 +203,7 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
+    void AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
 
 public:
     /**

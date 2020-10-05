@@ -95,7 +95,7 @@ void Chord::ClearClusters() const
     m_clusters.clear();
 }
 
-void Chord::AddChild(Object *child)
+bool Chord::IsSupportedChild(Object *child)
 {
     if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
@@ -116,17 +116,27 @@ void Chord::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
+        return false;
+    }
+    return true;
+}
+
+void Chord::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return;
     }
 
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ DOTS, STEM }))
+    if (child->Is({ DOTS, STEM })) {
         m_children.insert(m_children.begin(), child);
-    else
+    }
+    else {
         m_children.push_back(child);
+    }
     Modify();
 }
 
@@ -155,7 +165,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
 
     this->ClearClusters();
 
-    Note *curNote, *lastNote = dynamic_cast<Note *>(*iter);
+    Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
     assert(lastNote);
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
@@ -166,7 +176,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
     Layer *layer2 = NULL;
 
     while (iter != childList->end()) {
-        curNote = dynamic_cast<Note *>(*iter);
+        curNote = vrv_cast<Note *>(*iter);
         assert(curNote);
         curPitch = curNote->GetDiatonicPitch();
 
@@ -234,7 +244,7 @@ Note *Chord::GetTopNote()
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
-    Note *topNote = dynamic_cast<Note *>(childList->back());
+    Note *topNote = vrv_cast<Note *>(childList->back());
     assert(topNote);
     return topNote;
 }
@@ -245,7 +255,7 @@ Note *Chord::GetBottomNote()
     assert(childList->size() > 0);
 
     // The first note is the bottom
-    Note *bottomNote = dynamic_cast<Note *>(childList->front());
+    Note *bottomNote = vrv_cast<Note *>(childList->front());
     assert(bottomNote);
     return bottomNote;
 }
@@ -379,7 +389,7 @@ bool Chord::IsVisible()
     assert(notes);
 
     for (auto &iter : *notes) {
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
         if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
             return true;
@@ -395,7 +405,7 @@ bool Chord::HasNoteWithDots()
     assert(notes);
 
     for (auto &iter : *notes) {
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
         if (note->GetDots() > 0) {
             return true;
@@ -411,7 +421,7 @@ bool Chord::HasNoteWithDots()
 
 int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
@@ -428,9 +438,9 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     assert(!params->m_currentChord);
@@ -446,9 +456,9 @@ int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (params->m_permanent) {
@@ -463,7 +473,7 @@ int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
 
 int Chord::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     // Set them to NULL in any case
@@ -482,9 +492,9 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -533,7 +543,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
 int Chord::CalcDots(FunctorParams *functorParams)
 {
-    CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
+    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
     // if the chord isn't visible, stop here
@@ -550,7 +560,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
         }
     }
 
-    Dots *dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
     params->m_chordDots = dots;
@@ -565,7 +575,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetBottomNote());
 
     for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
-        Note *note = dynamic_cast<Note *>(*rit);
+        Note *note = vrv_cast<Note *>(*rit);
         assert(note);
 
         if (note->GetDots() == 0) {
@@ -665,7 +675,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         assert((*it)->Is(NOTE));
-        Note *note = dynamic_cast<Note *>(*it);
+        Note *note = vrv_cast<Note *>(*it);
         assert(note);
         note->SetDrawingStem(currentStem);
     }
@@ -698,7 +708,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();

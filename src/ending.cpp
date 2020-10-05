@@ -45,7 +45,7 @@ void Ending::Reset()
     ResetNNumberLike();
 }
 
-void Ending::AddChild(Object *child)
+bool Ending::IsSupportedChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
@@ -55,23 +55,18 @@ void Ending::AddChild(Object *child)
     }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
-        // here we are actually allowing ending withing ending, which is wrong
+        // here we are actually allowing ending within ending, which is wrong
         if (child->Is(ENDING)) {
-            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-            assert(false);
+            return false;
         }
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -80,7 +75,7 @@ void Ending::AddChild(Object *child)
 
 int Ending::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
@@ -90,7 +85,7 @@ int Ending::ConvertToPageBased(FunctorParams *functorParams)
 
 int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
@@ -100,7 +95,7 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
 int Ending::PrepareBoundaries(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
     // Endings should always have an BoundaryEnd
@@ -124,7 +119,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
 
 int Ending::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -143,7 +138,7 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
 
 int Ending::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);
@@ -153,7 +148,7 @@ int Ending::CastOffEncoding(FunctorParams *functorParams)
 
 int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (params->m_previousEnding) {

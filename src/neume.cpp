@@ -56,19 +56,15 @@ void Neume::Reset()
     ResetColor();
 }
 
-void Neume::AddChild(Object *child)
+bool Neume::IsSupportedChild(Object *child)
 {
     if (child->Is(NC)) {
         assert(dynamic_cast<Nc *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Neume::GetPosition(LayerElement *element)
@@ -92,19 +88,19 @@ bool Neume::IsLastInNeume(LayerElement *element)
 
 NeumeGroup Neume::GetNeumeGroup()
 {
-    ArrayOfObjects children;
+    ListOfObjects children;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&children, &ac);
 
     auto iter = children.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
     if (previous == NULL) return NEUME_ERROR;
-    iter++;
+    ++iter;
 
     std::string key = "";
 
-    for (; iter != children.end(); iter++) {
-        Nc *current = dynamic_cast<Nc *>(*iter);
+    for (; iter != children.end(); ++iter) {
+        Nc *current = vrv_cast<Nc *>(*iter);
         assert(current);
 
         int pitchDifference = current->PitchDifferenceTo(previous);
@@ -125,7 +121,7 @@ NeumeGroup Neume::GetNeumeGroup()
 std::vector<int> Neume::GetPitchDifferences()
 {
     std::vector<int> pitchDifferences;
-    ArrayOfObjects ncChildren;
+    ListOfObjects ncChildren;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&ncChildren, &ac);
 
@@ -135,10 +131,10 @@ std::vector<int> Neume::GetPitchDifferences()
     auto iter = ncChildren.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
     if (previous == NULL) return pitchDifferences;
-    iter++;
+    ++iter;
 
-    for (; iter != ncChildren.end(); iter++) {
-        Nc *current = dynamic_cast<Nc *>(*iter);
+    for (; iter != ncChildren.end(); ++iter) {
+        Nc *current = vrv_cast<Nc *>(*iter);
         assert(current);
         pitchDifferences.push_back(current->PitchDifferenceTo(previous));
         previous = current;
@@ -148,7 +144,7 @@ std::vector<int> Neume::GetPitchDifferences()
 
 bool Neume::GenerateChildMelodic()
 {
-    ArrayOfObjects children;
+    ListOfObjects children;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&children, &ac);
 
@@ -156,11 +152,11 @@ bool Neume::GenerateChildMelodic()
     auto iter = children.begin();
     Nc *head = dynamic_cast<Nc *>(*iter);
     if (head == NULL) return false;
-    iter++;
+    ++iter;
 
     // Iterate on second to last neume component and add intm value
-    for (; iter != children.end(); iter++) {
-        Nc *current = dynamic_cast<Nc *>(*iter);
+    for (; iter != children.end(); ++iter) {
+        Nc *current = vrv_cast<Nc *>(*iter);
         assert(current);
         std::string intmValue;
 
@@ -184,7 +180,7 @@ bool Neume::GenerateChildMelodic()
 
 PitchInterface *Neume::GetHighestPitch()
 {
-    ArrayOfObjects pitchChildren;
+    ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
     this->FindAllDescendantByComparison(&pitchChildren, &ic);
 
@@ -192,7 +188,7 @@ PitchInterface *Neume::GetHighestPitch()
     PitchInterface *max = (*it)->GetPitchInterface();
     if (!max) return NULL;
     for (it++; it != pitchChildren.end(); it++) {
-        PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
+        PitchInterface *pi = vrv_cast<PitchInterface *>((*it)->GetPitchInterface());
         assert(pi);
         if (pi->PitchDifferenceTo(max) > 0) {
             max = pi;
@@ -203,7 +199,7 @@ PitchInterface *Neume::GetHighestPitch()
 
 PitchInterface *Neume::GetLowestPitch()
 {
-    ArrayOfObjects pitchChildren;
+    ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
     this->FindAllDescendantByComparison(&pitchChildren, &ic);
 
@@ -211,7 +207,7 @@ PitchInterface *Neume::GetLowestPitch()
     PitchInterface *min = (*it)->GetPitchInterface();
     if (!min) return NULL;
     for (it++; it != pitchChildren.end(); it++) {
-        PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
+        PitchInterface *pi = vrv_cast<PitchInterface *>((*it)->GetPitchInterface());
         assert(pi);
         if (pi->PitchDifferenceTo(min) < 0) {
             min = pi;

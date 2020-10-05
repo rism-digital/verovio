@@ -42,7 +42,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Layer(int n = 1);
+    Layer();
     virtual ~Layer();
     virtual Object *Clone() const { return new Layer(*this); }
     virtual void Reset();
@@ -59,7 +59,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
     ///@}
 
     /**
@@ -114,6 +114,18 @@ public:
      * Takes into account cross-staff situations.
      */
     int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
+
+    /**
+     * Get the list of the layer elements for the duration of an element
+     * Takes into account cross-staff situations.
+     */
+    ListOfObjects GetLayerElementsForTimeSpanOf(LayerElement *element);
+
+    /**
+     * Get the list of the layer elements used within a time span.
+     * Takes into account cross-staff situations.
+     */
+    ListOfObjects GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff);
 
     Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig() const;

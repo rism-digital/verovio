@@ -24,10 +24,6 @@ Verovio uses a [Clang-Format](http://clang.llvm.org/docs/ClangFormat.html) (**5.
 The simplest way to fullfil the Verovio coding style is to use a clang-format tool and to apply the style defined in the 
 [.clang-format](../.clang-format) file available in the project root directory.
 
-### Exception for one-line control clauses
-
-WebKit coding style recommends that one-line control clauses should not use braces unless comments are included or a single statement spans multiple lines. We recommend **always** to use braces, even for one-line control clauses.
-
 ### Downloading clang-format for OS X
 
 An easy way to install clang-format on OS X computers is to use [Hombrew](http://brew.sh).  Type this command in the terminal to install:

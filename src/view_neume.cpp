@@ -27,6 +27,7 @@
 #include "staff.h"
 #include "syllable.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -145,12 +146,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     int noteY, noteX;
     int yValue;
-    if (nc->HasFacs() && m_doc->GetType() == Facs) {
+    if (nc->HasFacs() && (m_doc->GetType() == Facs)) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = nc->GetDrawingX();
         params.at(0).xOffset = 0;
     }
-    else if (neume->HasFacs() && m_doc->GetType() == Facs) {
+    else if (neume->HasFacs() && (m_doc->GetType() == Facs)) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = neume->GetDrawingX() + position * noteWidth;
     }
@@ -158,10 +159,19 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         noteX = element->GetDrawingX();
         noteY = element->GetDrawingY();
     }
-    // Calculating proper y offset based on pname, clef, and staff
+    // Calculating proper y offset based on pname, clef, staff, and staff rotate
     int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset = 0;
     int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
+    int rotateOffset;
+    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+        double deg = staff->GetDrawingRotate();
+        int xDiff = noteX - staff->GetDrawingX();
+        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+    }
+    else {
+        rotateOffset = 0;
+    }
 
     if (clef->GetShape() == CLEFSHAPE_C) {
         pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
@@ -170,11 +180,20 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
     }
 
-    yValue = clefYPosition + pitchOffset + octaveOffset;
+    yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
         DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
             staff->m_drawingStaffSize, false, true);
+    }
+
+    // adjust facsimile values of element based on where it is rendered if necessary
+    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        fi->GetZone()->SetUlx(noteX);
+        fi->GetZone()->SetUly(ToDeviceContextY(yValue));
+        fi->GetZone()->SetLrx(noteX + noteWidth);
+        fi->GetZone()->SetLry(ToDeviceContextY(yValue - noteHeight));
     }
 
     // Draw the children

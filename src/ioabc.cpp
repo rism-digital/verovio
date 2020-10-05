@@ -69,8 +69,8 @@ std::string abcLine;
 char dataKey[MAX_DATA_LEN];
 char dataValue[MAX_DATA_LEN]; // ditto as above
 
-std::string pitch = "FCGDAEB";
-std::string shorthandDecoration = ".~HLMOPSTuv";
+const std::string pitch = "FCGDAEB";
+const std::string shorthandDecoration = ".~HLMOPSTuv";
 std::string keyPitchAlter = "";
 int keyPitchAlterAmount = 0;
 
@@ -146,7 +146,7 @@ void ABCInput::parseABC(std::istream &infile)
         // create score
         assert(m_mdiv != NULL);
         Score *score = new Score();
-        if (!m_doc->m_scoreDef.GetFirst(STAFFGRP)) {
+        if (!m_doc->m_mdivScoreDef.GetFirst(STAFFGRP)) {
             m_mdiv->AddChild(score);
 
             // create page head
@@ -162,13 +162,13 @@ void ABCInput::parseABC(std::istream &infile)
                 m_clef = NULL;
             }
             staffGrp->AddChild(staffDef);
-            m_doc->m_scoreDef.AddChild(staffGrp);
+            m_doc->m_mdivScoreDef.AddChild(staffGrp);
             if (m_key) {
-                m_doc->m_scoreDef.AddChild(m_key);
+                m_doc->m_mdivScoreDef.AddChild(m_key);
                 m_key = NULL;
             }
             if (m_meter) {
-                m_doc->m_scoreDef.AddChild(m_meter);
+                m_doc->m_mdivScoreDef.AddChild(m_meter);
                 m_meter = NULL;
             }
         }
@@ -225,7 +225,7 @@ void ABCInput::parseABC(std::istream &infile)
                 delete iter->second;
                 continue;
             }
-            measure = dynamic_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
+            measure = vrv_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
             assert(measure);
             measure->AddChild(iter->second);
         }
@@ -291,7 +291,7 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
 
 void ABCInput::CalcUnitNoteLength()
 {
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindDescendantByType(METERSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_mdivScoreDef.FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
@@ -344,7 +344,7 @@ void ABCInput::AddTuplet()
     m_noteStack.clear();
 }
 
-void ABCInput::AddAnnot(std::string remark)
+void ABCInput::AddAnnot(const std::string &remark)
 {
     // remarks
     Annot *annot = new Annot();
@@ -474,7 +474,7 @@ void ABCInput::EndSlur()
     LogWarning("ABC input: Closing slur for element '%s' could not be matched", m_ID.c_str());
 }
 
-void ABCInput::parseDecoration(std::string decorationString)
+void ABCInput::parseDecoration(const std::string &decorationString)
 {
     // shorthand decorations hard-coded !
     if (isdigit(decorationString[0])) {
@@ -535,7 +535,7 @@ void ABCInput::parseDecoration(std::string decorationString)
 // parse information fields
 //
 
-void ABCInput::parseInstruction(std::string instruction)
+void ABCInput::parseInstruction(const std::string &instruction)
 {
     if (!strncmp(instruction.c_str(), "abc-include", 11)) {
         LogWarning("ABC input: Include field is ignored");
@@ -556,7 +556,7 @@ void ABCInput::parseInstruction(std::string instruction)
     }
 }
 
-void ABCInput::parseKey(std::string keyString)
+void ABCInput::parseKey(std::string &keyString)
 {
     int i = 0;
     m_ID = "";
@@ -713,7 +713,7 @@ void ABCInput::parseKey(std::string keyString)
     }
 }
 
-void ABCInput::parseUnitNoteLength(std::string unitNoteLength)
+void ABCInput::parseUnitNoteLength(const std::string &unitNoteLength)
 {
     if (unitNoteLength.find('/'))
         m_unitDur = atoi(&unitNoteLength[unitNoteLength.find('/') + 1]);
@@ -734,7 +734,7 @@ void ABCInput::parseUnitNoteLength(std::string unitNoteLength)
     // m_doc->m_scoreDef.SetDurDefault(m_durDefault);
 }
 
-void ABCInput::parseMeter(std::string meterString)
+void ABCInput::parseMeter(const std::string &meterString)
 {
     m_meter = new MeterSig();
     if (meterString.find('C') != std::string::npos) {
@@ -756,14 +756,15 @@ void ABCInput::parseMeter(std::string meterString)
         // this is a little "hack", until libMEI is fixed
         m_meter->SetCount(atoi(meterCount.c_str()));
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
+        m_meter->IsAttribute(true);
     }
 }
 
-void ABCInput::parseTempo(std::string tempoString)
+void ABCInput::parseTempo(const std::string &tempoString)
 {
     Tempo *tempo = new Tempo();
     if (tempoString.find('=') != std::string::npos) {
-        int numStart = int(tempoString.find('=') + 1);
+        const int numStart = int(tempoString.find('=') + 1);
         tempo->SetMm(std::atoi(tempoString.substr(numStart).c_str()));
     }
     if (tempoString.find('\"') != std::string::npos) {
@@ -781,13 +782,13 @@ void ABCInput::parseTempo(std::string tempoString)
     LogWarning("ABC input: Tempo definitions are not fully supported yet");
 }
 
-void ABCInput::parseReferenceNumber(std::string referenceNumberString)
+void ABCInput::parseReferenceNumber(const std::string &referenceNumberString)
 {
     // The X: field is also used to indicate the start of the tune
     m_mdiv = new Mdiv();
     m_mdiv->m_visibility = Visible;
     if (!referenceNumberString.empty()) {
-        int mdivNum = atoi(referenceNumberString.c_str());
+        const int mdivNum = atoi(referenceNumberString.c_str());
         if (mdivNum < 1) {
             LogError("ABC input: reference number should be a positive integer");
         }
@@ -846,7 +847,7 @@ void ABCInput::PrintInformationFields()
         originRend->AddChild(origin);
         pgHead->AddChild(originRend);
     }
-    m_doc->m_scoreDef.AddChild(pgHead);
+    m_doc->m_mdivScoreDef.AddChild(pgHead);
 }
 
 void ABCInput::CreateHeader()
@@ -891,7 +892,7 @@ void ABCInput::CreateHeader()
     appText.append_child(pugi::node_pcdata).set_value("Transcoded from abc music");
 
     // isodate and version //
-    time_t t = time(0); // get time now
+    const time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
     std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
@@ -956,7 +957,7 @@ void ABCInput::CreateWorkEntry()
 // followed by a single colon
 //
 
-void ABCInput::readInformationField(char dataKey, std::string value)
+void ABCInput::readInformationField(const char &dataKey, std::string value)
 {
     // remove comments and trim
     if (dataKey == '%' || dataKey == '\0')

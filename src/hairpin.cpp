@@ -31,12 +31,14 @@ Hairpin::Hairpin()
     , TimeSpanningInterface()
     , AttColor()
     , AttHairpinLog()
+    , AttHairpinVis()
     , AttPlacement()
     , AttVerticalGroup()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_HAIRPINLOG);
+    RegisterAttClass(ATT_HAIRPINVIS);
     RegisterAttClass(ATT_PLACEMENT);
     RegisterAttClass(ATT_VERTICALGROUP);
 
@@ -51,6 +53,7 @@ void Hairpin::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetHairpinLog();
+    ResetHairpinVis();
     ResetPlacement();
     ResetVerticalGroup();
 
@@ -66,6 +69,10 @@ int Hairpin::CalcHeight(
 
     int endY = doc->GetDrawingHairpinSize(staffSize, false);
 
+    if (this->HasOpening()) {
+        endY = this->GetOpening() * doc->GetDrawingUnit(staffSize);
+    }
+
     // Something is probably wrong before...
     if (!this->GetDrawingLength()) return endY;
 
@@ -78,11 +85,10 @@ int Hairpin::CalcHeight(
     if ((this->GetForm() == hairpinLog_FORM_dim) && m_leftLink && m_leftLink->Is(HAIRPIN)) {
         // Do no ajust height when previous hairpin is not a full hairpin
         if (!leftPositioner || (leftPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
-        Hairpin *left = dynamic_cast<Hairpin *>(m_leftLink);
+        Hairpin *left = vrv_cast<Hairpin *>(m_leftLink);
         assert(left);
         // Take into account its length only if the left one is actually a <
         if (left->GetForm() == hairpinLog_FORM_cres) {
-            ;
             length = std::max(length, left->GetDrawingLength());
         }
     }
@@ -91,7 +97,7 @@ int Hairpin::CalcHeight(
     if ((this->GetForm() == hairpinLog_FORM_cres) && m_rightLink && m_rightLink->Is(HAIRPIN)) {
         // Do no ajust height when next hairpin is not a full hairpin
         if (!rightPositioner || (rightPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
-        Hairpin *right = dynamic_cast<Hairpin *>(m_rightLink);
+        Hairpin *right = vrv_cast<Hairpin *>(m_rightLink);
         assert(right);
         // Take into account its length only if the right one is actually a >
         if (right->GetForm() == hairpinLog_FORM_dim) {
@@ -153,7 +159,7 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
 
 int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (this->HasVgrp()) {

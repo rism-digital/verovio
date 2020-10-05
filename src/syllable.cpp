@@ -10,6 +10,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <iostream>
 
@@ -17,6 +18,7 @@
 
 #include "neume.h"
 #include "syl.h"
+#include "text.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -38,7 +40,7 @@ void Syllable::Init()
     Reset();
 }
 
-void Syllable::AddChild(Object *child)
+bool Syllable::IsSupportedChild(Object *child)
 {
     if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
@@ -47,13 +49,9 @@ void Syllable::AddChild(Object *child)
         assert(dynamic_cast<Neume *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 Syllable::~Syllable() {}
@@ -63,6 +61,24 @@ void Syllable::Reset()
     LayerElement::Reset();
     ResetColor();
     ResetSlashCount();
+}
+
+bool Syllable::MarkupAddSyl()
+{
+    Object *obj = this->FindDescendantByType(SYL);
+    ArrayOfStrAttr attributes;
+    this->GetAttributes(&attributes);
+    bool noFollows = std::find_if(attributes.begin(), attributes.end(), [](auto att) -> bool {
+        return (std::string{ "follows" }.compare(att.first) == 0);
+    }) == attributes.end();
+    if (noFollows && (obj == NULL)) {
+        Syl *syl = new Syl();
+        Text *text = new Text();
+        syl->AddChild(text);
+        this->AddChild(syl);
+        return true;
+    }
+    return false;
 }
 
 } // namespace vrv

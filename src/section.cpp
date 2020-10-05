@@ -46,7 +46,7 @@ void Section::Reset()
     ResetNNumberLike();
 }
 
-void Section::AddChild(Object *child)
+bool Section::IsSupportedChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
@@ -61,13 +61,9 @@ void Section::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -76,7 +72,7 @@ void Section::AddChild(Object *child)
 
 int Section::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
@@ -86,7 +82,7 @@ int Section::ConvertToPageBased(FunctorParams *functorParams)
 
 int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
@@ -96,7 +92,7 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
 int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
 
     params->m_contentMeasure = NULL;

@@ -50,7 +50,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
     ///@}
 
     /**
@@ -226,6 +226,11 @@ public:
      * See Object::AdjustFloatingPositioners
      */
     virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustFloatingPositionersBetween
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustSlurs

@@ -221,15 +221,21 @@ public:
      */
     virtual void CloneReset();
 
-    std::string GetUuid() const { return m_uuid; }
+    const std::string &GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
+    /**
+     * Methods for setting / getting comments
+     */
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
     bool HasComment() { return !m_comment.empty(); }
+    std::string GetClosingComment() const { return m_closingComment; }
+    void SetClosingComment(std::string endComment) { m_closingComment = endComment; }
+    bool HasClosingComment() { return !m_closingComment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.
@@ -281,8 +287,8 @@ public:
      * Returns NULL is not found
      */
     ///@{
-    Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
-    Object *GetPrevious(Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetNext(const Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetPrevious(const Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
@@ -308,8 +314,14 @@ public:
     void ResetParent() { m_parent = NULL; }
 
     /**
-     * Base method for adding children.
+     * Base method for checking if a child can be added.
      * The method has to be overridden.
+     */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Base method for adding children.
+     * The method can be overridden.
      */
     virtual void AddChild(Object *object);
 
@@ -392,7 +404,7 @@ public:
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllDescendantByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
@@ -400,7 +412,7 @@ public:
      * The start and end objects are included in the result set.
      */
     void FindAllDescendantBetween(
-        ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
+        ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -445,6 +457,11 @@ public:
     Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1);
 
     /**
+     * Return the first child that is NOT of the specified type.
+     */
+    Object *GetFirstChildNot(const ClassId classId);
+
+    /**
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
@@ -487,7 +504,19 @@ public:
      */
     virtual int Save(Output *output);
 
+    /**
+     * Sort the child elements using std::stable_sort
+     */
+    template <class Compare> void StableSort(Compare comp)
+    {
+        std::stable_sort(m_children.begin(), m_children.end(), comp);
+    }
+
     virtual void ReorderByXPos();
+
+    Object *FindNextChild(Comparison *comp, Object *start);
+
+    Object *FindPreviousChild(Comparison *comp, Object *start);
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -540,9 +569,19 @@ public:
     virtual int FindAllBetween(FunctorParams *functorParams);
 
     /**
+     * Find a all Object to which another object points to in the data.
+     */
+    virtual int FindAllReferencedObjects(FunctorParams *functorParams);
+
+    /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
      */
     virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Look for all the layer elements that overlap with the time / duration within certain layer passed as parameter
+     */
+    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the layer elements spanned by two points
@@ -581,11 +620,11 @@ public:
 
     /**
      * Convert analytical markup (@fermata, @tie) to elements.
-     * See Doc::ConvertAnalyticalMarkupDoc
+     * See Doc::ConvertMarkupAnalyticalDoc
      */
     ///@{
-    virtual int ConvertAnalyticalMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupAnalytical(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -785,9 +824,14 @@ public:
     ///@}
 
     /**
-     * Adjust the position of all floating positionner, staff by staff.
+     * Adjust the position of all floating positionners, staff by staff.
      */
     virtual int AdjustFloatingPositioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position of floating positionners placed between staves
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner that are grouped, staff by staff.
@@ -914,6 +958,11 @@ public:
     ///@}
 
     /**
+     * Associate LayerElement with @facs to the appropriate zone
+     */
+    virtual int PrepareFacsimile(FunctorParams *functorParams);
+
+    /**
      * Match linking element (e.g, @next).
      */
     ///@{
@@ -1017,6 +1066,13 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Go through all layer elements of the layer and return next/previous element relative to the specified
+     * layer element. It will search recursively through children elements until note, chord or ftrem is found.
+     * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
+     */
+    virtual int GetRelativeLayerElement(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     ///@}
 
     /**
@@ -1114,10 +1170,9 @@ public:
      */
     virtual int ReorderByXPos(FunctorParams *);
 
-    /**
-     * Associate child objects with zones.
-     */
-    virtual int SetChildZones(FunctorParams *);
+    virtual int FindNextChildByComparison(FunctorParams *);
+
+    virtual int FindPreviousChildByComparison(FunctorParams *);
 
     /**
      * Transpose the content.
@@ -1202,10 +1257,13 @@ private:
     std::vector<InterfaceId> m_interfaces;
 
     /**
-     * A string for storing a comment to be printed immediately before
-     * the object when printing an MEI element.
+     * String for storing a comments attached to the object when printing an MEI element.
+     * m_comment is to be printed immediately before the element
+     * m_closingComment is to be printed before the closing tag of the element
      */
     std::string m_comment;
+    std::string m_closingComment;
+    ///@}
 
     /**
      * A flag indicating if the Object represents an attribute in the original MEI.

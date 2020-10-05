@@ -26,8 +26,9 @@ namespace vrv {
 // BTrem
 //----------------------------------------------------------------------------
 
-BTrem::BTrem() : LayerElement("btrem-"), AttTremMeasured()
+BTrem::BTrem() : LayerElement("btrem-"), AttBTremLog(), AttTremMeasured()
 {
+    RegisterAttClass(ATT_BTREMLOG);
     RegisterAttClass(ATT_TREMMEASURED);
 
     Reset();
@@ -38,10 +39,11 @@ BTrem::~BTrem() {}
 void BTrem::Reset()
 {
     LayerElement::Reset();
+    ResetBTremLog();
     ResetTremMeasured();
 }
 
-void BTrem::AddChild(Object *child)
+bool BTrem::IsSupportedChild(Object *child)
 {
     if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
@@ -56,13 +58,9 @@ void BTrem::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 } // namespace vrv

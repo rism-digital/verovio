@@ -75,7 +75,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->m_scoreDef.Save(this);
+    m_doc->m_mdivScoreDef.Save(this);
 
     m_docScoreDef = false;
 
@@ -499,7 +499,7 @@ void PAEOutput::WriteTuplet(Tuplet *tuplet)
 {
     assert(tuplet);
 
-    Staff *staff = dynamic_cast<Staff *>(tuplet->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(tuplet->GetFirstAncestor(STAFF));
     assert(staff);
 
     double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
@@ -1000,20 +1000,20 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->m_scoreDef.AddChild(scoreDefKeySig);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         // Make it an attribute for now
         scoreDefMeterSig->IsAttribute(true);
-        m_doc->m_scoreDef.AddChild(scoreDefMeterSig);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now
         scoreDefMensur->IsAttribute(true);
-        m_doc->m_scoreDef.AddChild(scoreDefMensur);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefMensur);
     }
 
-    m_doc->m_scoreDef.AddChild(staffGrp);
+    m_doc->m_mdivScoreDef.AddChild(staffGrp);
 
     if (m_tie != NULL) {
         delete m_tie;
@@ -1967,7 +1967,7 @@ void PAEInput::parseNote(pae::Note *note)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
     if (note->acciaccatura && (element->Is(NOTE))) {
-        Note *mnote = dynamic_cast<Note *>(element);
+        Note *mnote = vrv_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
         mnote->SetGrace(GRACE_unacc);
@@ -1975,7 +1975,7 @@ void PAEInput::parseNote(pae::Note *note)
     }
 
     if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
-        Note *mnote = dynamic_cast<Note *>(element);
+        Note *mnote = vrv_cast<Note *>(element);
         assert(mnote);
         mnote->SetGrace(GRACE_acc);
         mnote->SetStemDir(STEMDIRECTION_up);

@@ -53,19 +53,15 @@ void Artic::Reset()
     ResetPlacement();
 }
 
-void Artic::AddChild(Object *child)
+bool Artic::IsSupportedChild(Object *child)
 {
     if (child->Is(ARTIC_PART)) {
         assert(dynamic_cast<ArticPart *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)
@@ -252,7 +248,7 @@ void ArticPart::AddSlurPositioner(FloatingCurvePositioner *positioner, bool star
 
 int Artic::CalcArtic(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     /************** Get the parent and the stem direction **************/
@@ -276,9 +272,9 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
@@ -462,7 +458,7 @@ int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;

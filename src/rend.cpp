@@ -58,7 +58,7 @@ void Rend::Reset()
     ResetWhitespace();
 }
 
-void Rend::AddChild(Object *child)
+bool Rend::IsSupportedChild(Object *child)
 {
     if (child->Is(LB)) {
         assert(dynamic_cast<Lb *>(child));
@@ -76,13 +76,9 @@ void Rend::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -91,7 +87,7 @@ void Rend::AddChild(Object *child)
 
 int Rend::AlignVertically(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     if (this->GetHalign()) {

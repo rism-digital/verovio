@@ -835,6 +835,10 @@ public:
     void SetLry(int lry_) { m_lry = lry_; }
     int GetLry() const { return m_lry; }
     bool HasLry() const;
+    //
+    void SetRotate(double rotate) { m_rotate = rotate; }
+    double GetRotate() const { return m_rotate; }
+    bool HasRotate() const;
     ///@}
 
 private:
@@ -846,6 +850,8 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
+    /** Indicates the rotate of the bounding box. **/
+    double m_rotate;
 
     /* include <attlry> */
 };
@@ -914,8 +920,8 @@ public:
     std::string GetBezier() const { return m_bezier; }
     bool HasBezier() const;
     //
-    void SetBulge(double bulge_) { m_bulge = bulge_; }
-    double GetBulge() const { return m_bulge; }
+    void SetBulge(std::string bulge_) { m_bulge = bulge_; }
+    std::string GetBulge() const { return m_bulge; }
     bool HasBulge() const;
     //
     void SetCurvedir(curvature_CURVEDIR curvedir_) { m_curvedir = curvedir_; }
@@ -938,7 +944,7 @@ private:
      * line's length. N.B. An MEI virtual unit (VU) is half the distance between
      * adjacent staff lines.
      **/
-    double m_bulge;
+    std::string m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
     curvature_CURVEDIR m_curvedir;
 
@@ -2635,48 +2641,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMensurLog
-//----------------------------------------------------------------------------
-
-class AttMensurLog : public Att {
-public:
-    AttMensurLog();
-    virtual ~AttMensurLog();
-
-    /** Reset the default values for the attribute class **/
-    void ResetMensurLog();
-
-    /** Read the values for the attribute class **/
-    bool ReadMensurLog(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteMensurLog(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetDot(data_BOOLEAN dot_) { m_dot = dot_; }
-    data_BOOLEAN GetDot() const { return m_dot; }
-    bool HasDot() const;
-    //
-    void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; }
-    data_MENSURATIONSIGN GetSign() const { return m_sign; }
-    bool HasSign() const;
-    ///@}
-
-private:
-    /** Specifies whether a dot is to be added to the base symbol. **/
-    data_BOOLEAN m_dot;
-    /** The base symbol in the mensuration sign/time signature of mensural notation. **/
-    data_MENSURATIONSIGN m_sign;
-
-    /* include <attsign> */
-};
-
-//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 
@@ -4102,6 +4066,45 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttRestdurationLogical
+//----------------------------------------------------------------------------
+
+class AttRestdurationLogical : public Att {
+public:
+    AttRestdurationLogical();
+    virtual ~AttRestdurationLogical();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRestdurationLogical();
+
+    /** Read the values for the attribute class **/
+    bool ReadRestdurationLogical(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRestdurationLogical(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetDur(data_DURATIONRESTS dur_) { m_dur = dur_; }
+    data_DURATIONRESTS GetDur() const { return m_dur; }
+    bool HasDur() const;
+    ///@}
+
+private:
+    /**
+     * When a duration cannot be represented as a single power-of-two value, multiple
+     * space-separated values that add up to the total duration may be used.
+     **/
+    data_DURATIONRESTS m_dur;
+
+    /* include <attdur> */
+};
+
+//----------------------------------------------------------------------------
 // AttScalable
 //----------------------------------------------------------------------------
 
@@ -4911,9 +4914,9 @@ public:
 
 private:
     /**
-     * Indicates whether the staves are joined at the left by a continuous line.
-     * The default value is "true". Do not confuse this with the heavy vertical line
-     * used as a grouping symbol.
+     * Indicates whether the system starts with a continuous line connecting all
+     * staves, including single-staff systems.
+     * Do not confuse this with the heavy vertical line used as a grouping symbol.
      **/
     data_BOOLEAN m_systemLeftline;
     /**

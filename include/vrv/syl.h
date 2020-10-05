@@ -64,12 +64,15 @@ public:
      * Add an element (text, rend. etc.) to a syl.
      * Only supported elements will be actually added to the child list.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Calculate the spacing needed depending on the @worpos and @con
      */
     int CalcConnectorSpacing(Doc *doc, int staffSize);
+
+    int GetDrawingWidth() const;
+    int GetDrawingHeight() const;
 
     //----------//
     // Functors //
@@ -89,6 +92,9 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /** Create a default zone for a syl based on syllable. */
+    bool CreateDefaultZone(Doc *doc);
 
 private:
     //

@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <bTrem> element.
  */
-class BTrem : public LayerElement, public AttTremMeasured {
+class BTrem : public LayerElement, public AttBTremLog, public AttTremMeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -39,7 +39,7 @@ public:
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
 private:
     //

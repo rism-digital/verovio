@@ -28,17 +28,16 @@ Facsimile::Facsimile() : Object("facsimile-") {}
 Facsimile::~Facsimile() {}
 void Facsimile::Reset() {}
 
-void Facsimile::AddChild(Object *object)
+bool Facsimile::IsSupportedChild(Object *object)
 {
     if (object->Is(SURFACE)) {
-        object->SetParent(this);
-        this->m_children.push_back(object);
-        Modify();
+        assert(dynamic_cast<Surface *>(object));
     }
     else {
         LogError("Unsupported child '%s' of facsimile", object->GetClassName().c_str());
-        assert(false);
+        return false;
     }
+    return true;
 }
 
 Zone *Facsimile::FindZoneByUuid(std::string zoneId)
@@ -49,12 +48,12 @@ Zone *Facsimile::FindZoneByUuid(std::string zoneId)
 int Facsimile::GetMaxX()
 {
     ClassIdComparison ac(SURFACE);
-    ArrayOfObjects surfaces;
+    ListOfObjects surfaces;
     this->FindAllDescendantByComparison(&surfaces, &ac);
 
     int max = 0;
-    for (auto iter = surfaces.begin(); iter != surfaces.end(); iter++) {
-        Surface *surface = dynamic_cast<Surface *>(*iter);
+    for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {
+        Surface *surface = vrv_cast<Surface *>(*iter);
         assert(surface);
         max = (surface->GetMaxX() > max) ? surface->GetMaxX() : max;
     }
@@ -64,12 +63,12 @@ int Facsimile::GetMaxX()
 int Facsimile::GetMaxY()
 {
     ClassIdComparison ac(SURFACE);
-    ArrayOfObjects surfaces;
+    ListOfObjects surfaces;
     this->FindAllDescendantByComparison(&surfaces, &ac);
 
     int max = 0;
-    for (auto iter = surfaces.begin(); iter != surfaces.end(); iter++) {
-        Surface *surface = dynamic_cast<Surface *>(*iter);
+    for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {
+        Surface *surface = vrv_cast<Surface *>(*iter);
         assert(surface);
         max = (surface->GetMaxY() > max) ? surface->GetMaxY() : max;
     }

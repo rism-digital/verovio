@@ -39,6 +39,17 @@ Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), Att
     Reset();
 }
 
+Slur::Slur(const std::string &classid)
+    : ControlElement(classid), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+{
+    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
+
+    Reset();
+}
+
 Slur::~Slur() {}
 
 void Slur::Reset()
@@ -267,7 +278,6 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
 
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
-    int shift, leftShift, rightShift;
 
     int dist = abs(p2.x - p1.x);
     float posXRatio = 1.0;
@@ -306,18 +316,11 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
         }
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
 
-        shift = 0;
-        // Keep the maximum shift on the left and right
-        if (curveDir == curvature_CURVEDIR_above) {
-            shift = intersection;
-        }
-        else {
-            shift = intersection;
-        }
-        // shift += doc->GetDrawingUnit(100);
-        if (shift > 0) {
-            leftShift = (forceBothSides || leftPoint) ? shift : shift * posXRatio;
-            rightShift = (forceBothSides || !leftPoint) ? shift : shift * posXRatio;
+        // intersection += doc->GetDrawingUnit(100);
+        if (intersection > 0) {
+            int leftShift = (forceBothSides || leftPoint) ? intersection : intersection * posXRatio;
+            int rightShift = (forceBothSides || !leftPoint) ? intersection : intersection * posXRatio;
+            // Keep the maximum shift on the left and right
             maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
             maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
         }

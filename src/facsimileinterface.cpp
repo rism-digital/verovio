@@ -13,8 +13,11 @@
 
 //---------------------------------------------------------------------------
 
+#include "doc.h"
 #include "facsimile.h"
+#include "functorparams.h"
 #include "surface.h"
+#include "syllable.h"
 #include "view.h"
 #include "vrv.h"
 #include "zone.h"
@@ -44,7 +47,13 @@ int FacsimileInterface::GetDrawingX() const
 int FacsimileInterface::GetDrawingY() const
 {
     assert(m_zone);
-    int y = (m_zone->GetLogicalUly());
+    int y;
+    if (m_zone->GetRotate() >= 0) {
+        y = m_zone->GetLogicalUly();
+    }
+    else {
+        y = m_zone->GetLogicalUly() - (m_zone->GetLrx() - m_zone->GetUlx()) * tan(m_zone->GetRotate() * M_PI / 180.0);
+    }
     return y;
 }
 
@@ -54,10 +63,22 @@ int FacsimileInterface::GetWidth() const
     return m_zone->GetLrx() - m_zone->GetUlx();
 }
 
+int FacsimileInterface::GetHeight() const
+{
+    assert(m_zone);
+    return m_zone->GetLogicalLry() - m_zone->GetLogicalUly();
+}
+
+double FacsimileInterface::GetDrawingRotate() const
+{
+    assert(m_zone);
+    return m_zone->GetRotate();
+}
+
 int FacsimileInterface::GetSurfaceY() const
 {
     assert(m_zone);
-    Surface *surface = dynamic_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
+    Surface *surface = vrv_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
     assert(surface);
     if (surface->HasLry()) {
         return surface->GetLry();
@@ -76,5 +97,12 @@ void FacsimileInterface::SetZone(Zone *zone)
         }
     }
     m_zone = zone;
+    if (m_zone == NULL) {
+        this->SetFacs("");
+    }
+    else {
+        this->SetFacs("#" + m_zone->GetUuid());
+    }
 }
+
 } // namespace vrv

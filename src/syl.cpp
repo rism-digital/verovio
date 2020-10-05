@@ -22,6 +22,7 @@
 #include "textelement.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -53,7 +54,7 @@ void Syl::Reset()
     m_nextWordSyl = NULL;
 }
 
-void Syl::AddChild(Object *child)
+bool Syl::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -65,13 +66,9 @@ void Syl::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
@@ -109,13 +106,29 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     return spacing;
 }
 
+int Syl::GetDrawingWidth() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetWidth();
+    }
+    return 0;
+}
+
+int Syl::GetDrawingHeight() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetHeight();
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
 
 int Syl::PrepareLyrics(FunctorParams *functorParams)
 {
-    PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
+    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
 
     Verse *verse = dynamic_cast<Verse *>(this->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
@@ -178,6 +191,53 @@ int Syl::ResetDrawing(FunctorParams *functorParams)
 
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
+}
+
+bool Syl::CreateDefaultZone(Doc *doc)
+{
+    const int offsetUly = 100;
+    const int offsetLrx = 100;
+    const int offsetLry = 200;
+
+    LayerElement *syllable = dynamic_cast<LayerElement *>(this->GetFirstAncestor(SYLLABLE));
+    if (syllable == NULL) { // Only do this for neume notation
+        return false;
+    }
+
+    Zone *zone = new Zone();
+
+    if (syllable->HasFacs()) {
+        Zone *tempZone = syllable->GetZone();
+        assert(tempZone);
+        zone->SetUlx(tempZone->GetUlx());
+        zone->SetUly(tempZone->GetUly() + offsetUly);
+        zone->SetLrx(tempZone->GetLrx() + offsetLrx);
+        zone->SetLry(tempZone->GetLry() + offsetLry);
+    }
+    else {
+        int ulx, uly, lrx, lry;
+        if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
+            if (ulx == 0 || uly == 0 || lrx == 0 || lry == 0) {
+                LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)", syllable->GetUuid().c_str(),
+                    ulx, uly, lrx, lry);
+            }
+            zone->SetUlx(ulx);
+            zone->SetUly(uly + offsetUly);
+            zone->SetLrx(lrx + offsetLrx);
+            zone->SetLry(lry + offsetLry);
+        }
+        else {
+            LogWarning(
+                "Failed to create zone for %s of type %s", this->GetUuid().c_str(), this->GetClassName().c_str());
+            delete zone;
+            return false;
+        }
+    }
+    Object *surface = doc->GetFacsimile()->FindDescendantByType(SURFACE);
+    assert(surface);
+    surface->AddChild(zone);
+    this->SetZone(zone);
+    return true;
 }
 
 } // namespace vrv

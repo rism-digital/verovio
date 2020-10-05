@@ -14,11 +14,13 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "btrem.h"
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "note.h"
 #include "rest.h"
@@ -65,7 +67,7 @@ void Tuplet::Reset()
     m_numAlignedBeam = NULL;
 }
 
-void Tuplet::AddChild(Object *child)
+bool Tuplet::IsSupportedChild(Object *child)
 {
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
@@ -73,11 +75,17 @@ void Tuplet::AddChild(Object *child)
     else if (child->Is(TUPLET_BRACKET)) {
         assert(dynamic_cast<TupletBracket *>(child));
     }
+    else if (child->Is(BTREM)) {
+        assert(dynamic_cast<BTrem *>(child));
+    }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(FTREM)) {
+        assert(dynamic_cast<FTrem *>(child));
     }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
@@ -98,18 +106,28 @@ void Tuplet::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
+        return false;
+    }
+    return true;
+}
+
+void Tuplet::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return;
     }
 
     child->SetParent(this);
 
     // Num and bracket are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ TUPLET_BRACKET, TUPLET_NUM }))
+    if (child->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
         m_children.insert(m_children.begin(), child);
-    else
+    }
+    else {
         m_children.push_back(child);
+    }
 
     Modify();
 }
@@ -161,7 +179,7 @@ void Tuplet::CalcDrawingBracketAndNumPos()
     ArrayOfObjects::const_iterator iter = tupletChildren->begin();
     while (iter != tupletChildren->end()) {
         if ((*iter)->Is(CHORD)) {
-            Chord *currentChord = dynamic_cast<Chord *>(*iter);
+            Chord *currentChord = vrv_cast<Chord *>(*iter);
             assert(currentChord);
             if (currentChord->GetDrawingStemDir() == STEMDIRECTION_up) {
                 ups++;
@@ -171,7 +189,7 @@ void Tuplet::CalcDrawingBracketAndNumPos()
             }
         }
         else if ((*iter)->Is(NOTE)) {
-            Note *currentNote = dynamic_cast<Note *>(*iter);
+            Note *currentNote = vrv_cast<Note *>(*iter);
             assert(currentNote);
             if (!currentNote->IsChordTone() && (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)) {
                 ups++;
@@ -207,7 +225,7 @@ void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc)
         //
     }
     else if (m_drawingLeft->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(m_drawingLeft);
+        Chord *chord = vrv_cast<Chord *>(m_drawingLeft);
         assert(chord);
         XRelLeft = chord->GetXMin() - m_drawingLeft->GetDrawingX();
     }
@@ -221,7 +239,7 @@ void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc)
         XRelRight += m_drawingRight->GetSelfX2();
     }
     else if (m_drawingRight->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(m_drawingRight);
+        Chord *chord = vrv_cast<Chord *>(m_drawingRight);
         assert(chord);
         XRelRight = chord->GetXMax() - chord->GetDrawingX() + (2 * chord->GetDrawingRadius(doc));
     }
@@ -294,7 +312,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     // Nothing to do if there is no number
@@ -377,7 +395,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 
 int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     // Nothing to do if there is no number
@@ -394,7 +412,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     int staffSize = staff->m_drawingStaffSize;
 
@@ -413,7 +431,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         Beam *beam = this->GetBracketAlignedBeam();
         if (beam) {
             // Check for possible articulations
-            ArrayOfObjects artics;
+            ListOfObjects artics;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART });
             this->FindAllDescendantByComparison(&artics, &comparison);
 
@@ -449,7 +467,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
             // Check for overlap with content
             // Possible issue with beam above the tuplet - not sure this will be noticable
-            ArrayOfObjects descendants;
+            ListOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 
@@ -509,7 +527,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             int yRel = tupletNum->GetDrawingY();
 
             // Check for overlap with content - beam is not taken into account
-            ArrayOfObjects descendants;
+            ListOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 

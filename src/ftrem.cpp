@@ -50,7 +50,7 @@ void FTrem::Reset()
     ResetTremMeasured();
 }
 
-void FTrem::AddChild(Object *child)
+bool FTrem::IsSupportedChild(Object *child)
 {
     if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
@@ -65,13 +65,9 @@ void FTrem::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
@@ -93,7 +89,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         }
         // also remove notes within chords
         if ((*iter)->Is(NOTE)) {
-            Note *note = dynamic_cast<Note *>(*iter);
+            Note *note = vrv_cast<Note *>(*iter);
             assert(note);
             if (note->IsChordTone()) {
                 iter = childList->erase(iter);
@@ -103,7 +99,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     InitCoords(childList, staff, BEAMPLACE_NONE);
@@ -167,7 +163,7 @@ void FTrem::InitCoords(ArrayOfObjects *childList)
 
 int FTrem::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     const ArrayOfObjects *fTremChildren = this->GetList(this);
@@ -177,13 +173,16 @@ int FTrem::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    assert(this->GetElementCoords()->size() == 2);
+    if (GetElementCoords()->size() != 2) {
+        LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
+        return FUNCTOR_STOP;
+    }
 
     this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, this);
@@ -205,16 +204,18 @@ int FTrem::ResetDrawing(FunctorParams *functorParams)
 
 int FTrem::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
+    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    // assert(params);
 
-    FTrem *fTrem = dynamic_cast<FTrem *>(this);
+    FTrem *fTrem = vrv_cast<FTrem *>(this);
     assert(fTrem);
 
-    if (!fTrem->HasUnitdur())
+    if (!fTrem->HasUnitdur()) {
         return FUNCTOR_CONTINUE;
-    else
+    }
+    else {
         LogWarning("FTrem produces incorrect MIDI output");
+    }
 
     return FUNCTOR_CONTINUE;
 }

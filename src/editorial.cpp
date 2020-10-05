@@ -61,7 +61,7 @@ void EditorialElement::Reset()
 
 EditorialElement::~EditorialElement() {}
 
-void EditorialElement::AddChild(Object *child)
+bool EditorialElement::IsSupportedChild(Object *child)
 {
     if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -97,13 +97,9 @@ void EditorialElement::AddChild(Object *child)
         assert(dynamic_cast<Staff *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -112,7 +108,7 @@ void EditorialElement::AddChild(Object *child)
 
 int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
@@ -122,7 +118,7 @@ int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
 
 int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     if (this->m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
@@ -150,7 +146,7 @@ int EditorialElement::ResetDrawing(FunctorParams *functorParams)
 
 int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -161,7 +157,7 @@ int EditorialElement::CastOffSystems(FunctorParams *functorParams)
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     EditorialElement *editorialElement
-        = dynamic_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+        = vrv_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(editorialElement);
     // move as pending since we want it at the beginning of the system in case of system break coming
     params->m_pendingObjects.push_back(editorialElement);
@@ -171,7 +167,7 @@ int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 
 int EditorialElement::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);

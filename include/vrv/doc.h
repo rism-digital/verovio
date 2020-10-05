@@ -52,9 +52,9 @@ public:
     /**
      * Add a page to the document
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
-    /*
+    /**
      * Clear the content of the document.
      */
     virtual void Reset();
@@ -163,6 +163,7 @@ public:
     int GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextLineHeight(FontInfo *font, bool graceSize) const;
+    int GetTextXHeight(FontInfo *font, bool graceSize) const;
     ///@}
 
     /**
@@ -248,10 +249,10 @@ public:
 
     /**
      * Casts off the entire document, with options for obeying breaks.
-     * @param useSectionBreaks - true to use the section breaks from the document.
-     * @param usePageBreaks - true to use the page breaks from the document.
+     * @param useSb - true to use the sb from the document.
+     * @param usePg - true to use the pb from the document.
      */
-    void CastOffDocBase(bool useSectionBreaks, bool usePageBreaks);
+    void CastOffDocBase(bool useSb, bool usePb);
 
     /**
      * Casts off the running elements (headers and footer)
@@ -304,7 +305,7 @@ public:
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
-    void ConvertAnalyticalMarkupDoc(bool permanent = false);
+    void ConvertMarkupDoc(bool permanent = false);
 
     /**
      * Transpose the content of the doc.
@@ -356,9 +357,11 @@ public:
     int GetAdjustedDrawingPageHeight() const;
 
     /**
-     * Setter for analytical markup flag
+     * Setter for markup flag. See corresponding enum in vrvdef.h
+     * Set when reading the file to indicate what markup conversion needs to be applied.
+     * See Doc::ConvertMarkupDoc
      */
-    void SetAnalyticalMarkup(bool hasAnalyticalMarkup) { m_hasAnalyticalMarkup = hasAnalyticalMarkup; }
+    void SetMarkup(int markup) { m_markup |= markup; }
 
     /**
      * @name Setter for and getter for mensural only flag
@@ -417,14 +420,18 @@ public:
      * Holds the top scoreDef.
      * In a standard MEI file, this is the <scoreDef> encoded before the first <section>.
      */
-    ScoreDef m_scoreDef;
+    ScoreDef m_mdivScoreDef;
 
     /** The current page height */
     int m_drawingPageHeight;
     /** The current page width */
     int m_drawingPageWidth;
+    /** The current page content height (without margings) */
+    int m_drawingPageContentHeight;
+    /** The current page content width (without margins) */
+    int m_drawingPageContentWidth;
     /** The current page bottom margin */
-    int m_drawingPageMarginBot;
+    int m_drawingPageMarginBottom;
     /** The current page left margin */
     int m_drawingPageMarginLeft;
     /** The current page right margin */
@@ -513,7 +520,7 @@ private:
      * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
      * is converted during the import in MEIInput.
      */
-    bool m_hasAnalyticalMarkup;
+    int m_markup;
 
     /**
      * A flag to indicate whereas to document contains only mensural music.

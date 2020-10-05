@@ -9,13 +9,14 @@
 #define __VRV_FERMATA_H__
 
 #include "atts_cmn.h"
+#include "atts_externalsymbols.h"
 #include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
 
-class ConvertAnalyticalMarkupParams;
+class ConvertMarkupAnalyticalParams;
 
 //----------------------------------------------------------------------------
 // Fermata
@@ -27,6 +28,7 @@ class ConvertAnalyticalMarkupParams;
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
+                public AttExtSym,
                 public AttFermataVis,
                 public AttPlacement {
 public:
@@ -54,7 +56,12 @@ public:
      * Helpler for converting markup (from Note, Chord, Rest, MRest)
      */
     void ConvertFromAnalyticalMarkup(
-        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertAnalyticalMarkupParams *params);
+        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertMarkupAnalyticalParams *params);
+
+    /**
+     * Get the SMuFL glyph for the fermata based on type, shape or glyph.num
+     */
+    wchar_t GetFermataGlyph() const;
 
     //----------//
     // Functors //
