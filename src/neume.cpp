@@ -95,11 +95,11 @@ NeumeGroup Neume::GetNeumeGroup()
     auto iter = children.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
     if (previous == NULL) return NEUME_ERROR;
-    iter++;
+    ++iter;
 
     std::string key = "";
 
-    for (; iter != children.end(); iter++) {
+    for (; iter != children.end(); ++iter) {
         Nc *current = vrv_cast<Nc *>(*iter);
         assert(current);
 
@@ -131,9 +131,9 @@ std::vector<int> Neume::GetPitchDifferences()
     auto iter = ncChildren.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
     if (previous == NULL) return pitchDifferences;
-    iter++;
+    ++iter;
 
-    for (; iter != ncChildren.end(); iter++) {
+    for (; iter != ncChildren.end(); ++iter) {
         Nc *current = vrv_cast<Nc *>(*iter);
         assert(current);
         pitchDifferences.push_back(current->PitchDifferenceTo(previous));
@@ -152,10 +152,10 @@ bool Neume::GenerateChildMelodic()
     auto iter = children.begin();
     Nc *head = dynamic_cast<Nc *>(*iter);
     if (head == NULL) return false;
-    iter++;
+    ++iter;
 
     // Iterate on second to last neume component and add intm value
-    for (; iter != children.end(); iter++) {
+    for (; iter != children.end(); ++iter) {
         Nc *current = vrv_cast<Nc *>(*iter);
         assert(current);
         std::string intmValue;
