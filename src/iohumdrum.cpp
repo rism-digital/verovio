@@ -13795,38 +13795,37 @@ void HumdrumInput::analyzeLayerBeams(
     std::vector<int> gbeamstate(layerdata.size(), 0); // for grace notes
     int negativeQ = 0;
     int gnegativeQ = 0;
+    int lastbeamstate = 0;
+    int lastgbeamstate = 0;
 
     int i;
     for (i = 0; i < (int)beamstate.size(); ++i) {
         if (!layerdata[i]->isData()) {
-            if (i > 0) {
-                beamstate[i] = beamstate[i - 1];
-                gbeamstate[i] = gbeamstate[i - 1];
-            }
-            else {
-                beamstate[i] = 0;
-                gbeamstate[i] = 0;
-            }
+            beamstate[i] = lastbeamstate;
+            gbeamstate[i] = lastgbeamstate;
             continue;
         }
         if (layerdata[i]->isNull()) {
             // shouldn't get to this state
-            beamstate[i] = 0;
-            gbeamstate[i] = 0;
+            beamstate[i] = lastbeamstate;
+            gbeamstate[i] = lastgbeamstate;
             continue;
         }
         if (layerdata[i]->isGrace()) {
             gbeamstate[i] = characterCount(*layerdata[i], 'L');
             gbeamstate[i] -= characterCount(*layerdata[i], 'J');
-            // beamstate[i] = 0;
+            lastgbeamstate = gbeamstate[i];
         }
         else {
             beamstate[i] = characterCount(*layerdata[i], 'L');
             beamstate[i] -= characterCount(*layerdata[i], 'J');
+            lastbeamstate = beamstate[i];
         }
         if (i > 0) {
             beamstate[i] += beamstate[i - 1];
             gbeamstate[i] += gbeamstate[i - 1];
+            lastbeamstate = beamstate[i];
+            lastgbeamstate = gbeamstate[i];
         }
         if (beamstate[i] < 0) {
             negativeQ = 1;
@@ -14251,9 +14250,11 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
+    // tgs may not be completly filled in if there are no tuplets. Check on this later.
     if (!hastupletQ) {
         tgs.resize(layerdata.size());
         for (int i = 0; i < (int)layerdata.size(); ++i) {
+            tgs.at(i).token = layerdata[i];
             tgs.at(i).gbeamstart = gbeamstart.at(i);
             tgs.at(i).gbeamend = gbeamend.at(i);
             if (indexmapping2[i] < 0) {
