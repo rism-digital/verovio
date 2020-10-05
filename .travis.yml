@@ -2,9 +2,8 @@ branches:
   only:
     - develop
 
-sudo: false
 os: linux
-dist: bionic
+dist: focal
 language: cpp
 
 git:
