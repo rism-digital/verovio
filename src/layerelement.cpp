@@ -1158,7 +1158,7 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
     if (overlapMargin >= params->m_directionBias * params->m_overlapMargin) {
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params->m_overlapMargin = (overlapMargin + staffOffset) * params->m_directionBias;
+        params->m_overlapMargin = (((overlapMargin + staffOffset - 1) / staffOffset + 1) * staffOffset) * params->m_directionBias;
     }
 
     return FUNCTOR_CONTINUE;
