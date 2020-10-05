@@ -769,6 +769,10 @@ Options::Options()
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
 
+    m_barlineSeparation.SetInfo("Bar line separation", "The default distance between multiple barlines when locked together");
+    m_barlineSeparation.Init(1.0, 0.5, 2.0);
+    this->Register(&m_barlineSeparation, "barlineSeparation", &m_generalLayout);
+
     m_barLineWidth.SetInfo("Bar line width", "The barLine width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
@@ -1227,6 +1231,7 @@ void Options::Sync()
               { "tieMidpointThickness", &m_tieThickness }, //
               { "thinBarlineThickness", &m_barLineWidth }, //
               { "thickBarlineThickness", &m_thickBarlineThickness }, //
+              { "barlineSeparation", &m_barlineSeparation }, //
               { "bracketThickness", &m_bracketThickness }, //
               { "subBracketThickness", &m_subBracketThickness }, //
               { "hairpinThickness", &m_hairpinThickness }, //
