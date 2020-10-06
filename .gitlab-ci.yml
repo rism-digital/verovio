@@ -28,7 +28,7 @@ variables:
   script:
     - cd tools
     - cmake ../cmake
-    - make -j 8
+    - make -j 10
 
 build-osx:
   extends: .build-template
