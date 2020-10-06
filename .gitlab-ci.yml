@@ -1,15 +1,17 @@
 ---
 stages:
   - build
+  - build-toolkit
   # - precache
   # - build-toolkit
   # - deploy
 
-# variables:
+variables:
+  EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
+  EMSCRIPTEN_DIRECTORY: "emsdk"
 #   COMMIT_AUTHOR_EMAIL: "$(git log -1 --pretty=format:'%aE')"  # TODO: switch author email back to: "lxpugin@gmail.com" if necessary
 #   SHA: $CI_COMMIT_SHA
 #   # repos
-#   EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
 #   VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
 #   VEROVIO_ORG_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio.org"
 #   # branches
@@ -18,10 +20,8 @@ stages:
 #   TEMPORARY_OUTPUT_BRANCH: gh-pages-update-toolkit-${SHA}
 #   # directories
 #   CURRENT_PATH: "$(pwd)"
-#   EMSCRIPTEN_DIRECTORY: "emsdk"
 #   GH_PAGES_DIRECTORY: "gh-pages"
 #   OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
-
 
 .build-template:
   stage: build
@@ -40,6 +40,23 @@ build-linux:
   image:
     name: rikorose/gcc-cmake
     entrypoint: [""]
+
+build-toolkit:
+  stage: build-toolkit
+  image:
+    name: rikorose/gcc-cmake
+    entrypoint: [""]
+  script:
+    - git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
+    - cd $EMSCRIPTEN_DIRECTORY
+    - ./emsdk install latest
+    - ./emsdk activate latest
+    - source /emsdk_env.sh
+    - cd ../emscripten
+    - ./buildToolkit -c -H -M
+  artifacts:
+    paths:
+      - build/verovio-toolkit.js*
 
 # precache:
 #   stage: precache
