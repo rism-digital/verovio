@@ -759,6 +759,16 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
             m_uniformStemLength = coordStemDir;
         }
     }
+    // make adjustments for the grace notes length
+    for (auto coord : m_beamElementCoordRefs) {
+        if (coord->m_element) {
+            const bool isInGraceGroup = coord->m_element->GetFirstAncestor(GRACEGRP);
+            if (coord->m_element->IsGraceNote() || isInGraceGroup) {
+                m_uniformStemLength *= 0.75;
+                break;
+            }
+        }
+    }
 }
 
 void BeamSegment::CalcSetValues(const int &elementCount)
@@ -1039,12 +1049,10 @@ void BeamElementCoord::SetDrawingStemDir(
 
     if (!m_closestNote) return;
 
-    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
-    
-    if (m_element->IsGraceNote() || isInGraceGroup) segment->m_uniformStemLength *= 0.75;
     this->m_centered = segment->m_uniformStemLength % 2;
     this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
+    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
     if (m_element->IsGraceNote() || isInGraceGroup) return;
 
     // Make sure the stem reaches the center of the staff
