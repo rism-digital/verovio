@@ -1,6 +1,6 @@
 ---
 stages:
-  - build-c++
+  - build
   # - precache
   # - build-toolkit
   # - deploy
@@ -23,22 +23,20 @@ stages:
 #   OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
 
-.build-c++-template:
-  stage: build-c++
+.build-template:
+  stage: build
   script:
     - cd tools
     - cmake ../cmake
     - make -j 8
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "develop"'
 
-build-c++-osx:
-  extends: .build-c++-template
+build-osx:
+  extends: .build-template
   tags:
     - macos
 
-build-c++-linux:
-  extends: .build-c++-template
+build-linux:
+  extends: .build-template
   image:
     name: rikorose/gcc-cmake
     entrypoint: [""]
