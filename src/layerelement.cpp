@@ -974,15 +974,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             if (hasMultipleLayer) {
                 Layer *firstLayer = vrv_cast<Layer *>(staffY->FindDescendantByType(LAYER));
                 assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN())
+                if (firstLayer->GetN() == layerY->GetN()) {
                     loc += 2;
-                else
+                }
+                else {
                     loc -= 2;
+                }
             }
-
             // add offset
-            else if (staff->m_drawingLines > 3)
+            else if (staff->m_drawingLines > 3) {
                 loc += 2;
+            }
         }
 
         mRest->SetDrawingLoc(loc);
