@@ -1,0 +1,104 @@
+---
+stages:
+  - build-c++
+  # - precache
+  # - build-toolkit
+  # - deploy
+
+# variables:
+#   COMMIT_AUTHOR_EMAIL: "$(git log -1 --pretty=format:'%aE')"  # TODO: switch author email back to: "lxpugin@gmail.com" if necessary
+#   SHA: $CI_COMMIT_SHA
+#   # repos
+#   EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
+#   VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
+#   VEROVIO_ORG_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio.org"
+#   # branches
+#   BUILD_BRANCH: develop
+#   GH_PAGES_BRANCH: gh-pages
+#   TEMPORARY_OUTPUT_BRANCH: gh-pages-update-toolkit-${SHA}
+#   # directories
+#   CURRENT_PATH: "$(pwd)"
+#   EMSCRIPTEN_DIRECTORY: "emsdk"
+#   GH_PAGES_DIRECTORY: "gh-pages"
+#   OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
+
+
+.build-c++-template:
+  stage: build-c++
+  script:
+    - cd tools
+    - cmake ../cmake
+    - make -j 8
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+
+build-c++-osx:
+  extends: .build-c++-template
+  tags:
+    - macos
+
+build-c++-linux:
+  extends: .build-c++-template
+  image:
+    name: rikorose/gcc-cmake
+    entrypoint: [""]
+
+# precache:
+#   stage: precache
+#   image:
+#     name: rikorose/gcc-cmake
+#     entrypoint: [""]
+#   script:
+#     - ./travis/ci_precache.sh
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "develop"'
+#
+# .build-toolkit-template:
+#   stage: build-toolkit
+#   image:
+#     name: rikorose/gcc-cmake
+#     entrypoint: [""]
+#   script:
+#     - ./travis/ci_build-toolkit.sh $COMMAND
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "develop"'
+#
+# build-toolkit-nohumdrum:
+#   extends: .build-toolkit-template
+#   variables:
+#     COMMAND: nohumdrum
+#
+# build-toolkit-light:
+#   extends: .build-toolkit-template
+#   variables:
+#     COMMAND: light
+#
+# build-toolkit-wasm:
+#   extends: .build-toolkit-template
+#   variables:
+#     COMMAND: wasm
+#
+# build-toolkit-default:
+#   extends: .build-toolkit-template
+#   variables:
+#     COMMAND: default
+#
+# .deploy-template:
+#   stage: deploy
+#   image:
+#     name: rikorose/gcc-cmake
+#     entrypoint: [""]
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "develop"'
+#
+# deploy-toolkit:
+#   extends: .deploy-template
+#   script:
+#     - ./travis/ci_deploy-toolkit.sh
+#
+# deploy-doxygen:
+#   extends: .deploy-template
+#   script:
+#     - apt update
+#     - apt install -y doxygen
+#     - ./travis/ci_deploy-doxygen.sh
