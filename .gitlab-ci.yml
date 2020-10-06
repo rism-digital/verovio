@@ -56,7 +56,7 @@ build-toolkit:
     - ./buildToolkit -c -H -M
   artifacts:
     paths:
-      - build/verovio-toolkit.js*
+      - emscripten/build/verovio-toolkit.js*
 
 # precache:
 #   stage: precache
