@@ -135,23 +135,6 @@ void BeamSegment::CalcBeam(
     // ArrayOfBeamElementCoords stemUps;
     // ArrayOfBeamElementCoords stemDowns;
 
-    // For 32th and shorter notes, we want to treat beams that have really small diatonic difference (i.e. just one step)
-    // as horizontal, so that we don't end up with really gentle slopes
-    if (beamInterface->m_shortestDur >= DUR_32) {
-        int top = -128;
-        int bottom = 128;
-        for (auto coord : m_beamElementCoordRefs) {
-            if (coord->m_element) {
-                Note *note = vrv_cast<Note *>(coord->m_element);
-                assert(note);
-                int loc = note->GetDrawingLoc();
-                if (loc > top) top = loc;
-                if (loc < bottom) bottom = loc;
-            }
-        }
-        if (abs(top - bottom) <= 1) horizontal = true;
-    }
-    
     /******************************************************************/
     // Calculate the slope is necessary
 
@@ -770,8 +753,6 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
 {
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
-    int bottommostLocation = 128;
-    int topmostLocation = -128;
     for (auto coord : m_beamElementCoordRefs) {
         const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
         if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
