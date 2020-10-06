@@ -60,7 +60,6 @@ void BeamSegment::Reset()
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
     m_uniformStemLength = 0;
-    m_shortestNoteDuration = 0;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -136,6 +135,23 @@ void BeamSegment::CalcBeam(
     // ArrayOfBeamElementCoords stemUps;
     // ArrayOfBeamElementCoords stemDowns;
 
+    // For 32th and shorter notes, we want to treat beams that have really small diatonic difference (i.e. just one step)
+    // as horizontal, so that we don't end up with really gentle slopes
+    if (beamInterface->m_shortestDur >= DUR_32) {
+        int top = -128;
+        int bottom = 128;
+        for (auto coord : m_beamElementCoordRefs) {
+            if (coord->m_element) {
+                Note *note = vrv_cast<Note *>(coord->m_element);
+                assert(note);
+                int loc = note->GetDrawingLoc();
+                if (loc > top) top = loc;
+                if (loc < bottom) bottom = loc;
+            }
+        }
+        if (abs(top - bottom) <= 1) horizontal = true;
+    }
+    
     /******************************************************************/
     // Calculate the slope is necessary
 
@@ -754,13 +770,12 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
 {
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    int bottommostLocation = 128;
+    int topmostLocation = -128;
     for (auto coord : m_beamElementCoordRefs) {
         const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
         if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
             m_uniformStemLength = coordStemDir;
-        }
-        if (coord->m_dur > m_shortestNoteDuration) {
-            m_shortestNoteDuration = coord->m_dur;
         }
     }
 }
@@ -1064,10 +1079,10 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (segment->m_shortestNoteDuration > DUR_32)) {
+    if ((ledgerLines > 2) && (interface->m_shortestDur > DUR_32)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
     }
-    else if ((ledgerLines > 1) && (segment->m_shortestNoteDuration > DUR_16)) {
+    else if ((ledgerLines > 1) && (interface->m_shortestDur > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
 
