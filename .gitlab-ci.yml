@@ -51,7 +51,7 @@ build-toolkit:
     - cd $EMSCRIPTEN_DIRECTORY
     - ./emsdk install latest
     - ./emsdk activate latest
-    - source /emsdk_env.sh
+    - source emsdk_env.sh
     - cd ../emscripten
     - ./buildToolkit -c -H -M
   artifacts:
