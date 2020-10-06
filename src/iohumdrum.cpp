@@ -710,8 +710,8 @@ bool HumdrumInput::convertHumdrum()
     prepareVerses();
     prepareSections();
 
-    prepareStaffGroups();
     prepareHeaderFooter();
+    prepareStaffGroups();
 
     // m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
