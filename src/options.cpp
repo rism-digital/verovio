@@ -769,11 +769,11 @@ Options::Options()
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
 
-    m_barlineSeparation.SetInfo("Bar line separation", "The default distance between multiple barlines when locked together");
-    m_barlineSeparation.Init(1.0, 0.5, 2.0);
+    m_barlineSeparation.SetInfo("Barline separation", "The default distance between multiple barlines when locked together");
+    m_barlineSeparation.Init(0.8, 0.5, 2.0);
     this->Register(&m_barlineSeparation, "barlineSeparation", &m_generalLayout);
 
-    m_barLineWidth.SetInfo("Bar line width", "The barLine width");
+    m_barLineWidth.SetInfo("Barline width", "The barLine width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
@@ -876,6 +876,10 @@ Options::Options()
     m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
+    
+    m_repeatBarlineDotSeparation.SetInfo("Repeat barline dot separation", "The default horizontal distance between the dots and the inner barline of a repeat barline");
+    m_repeatBarlineDotSeparation.Init(0.30, 0.10, 1.00);
+    this->Register(&m_repeatBarlineDotSeparation, "repeatBarlineDotSeparation", &m_generalLayout);
 
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
     m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
@@ -1232,6 +1236,7 @@ void Options::Sync()
               { "thinBarlineThickness", &m_barLineWidth }, //
               { "thickBarlineThickness", &m_thickBarlineThickness }, //
               { "barlineSeparation", &m_barlineSeparation }, //
+              { "repeatBarlineDotSeparation", &m_repeatBarlineDotSeparation }, //
               { "bracketThickness", &m_bracketThickness }, //
               { "subBracketThickness", &m_subBracketThickness }, //
               { "hairpinThickness", &m_hairpinThickness }, //

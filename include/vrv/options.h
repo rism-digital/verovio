@@ -558,6 +558,7 @@ public:
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
+    OptionDbl m_repeatBarlineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
     OptionInt m_slurCurveFactor;
