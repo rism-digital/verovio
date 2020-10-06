@@ -1778,12 +1778,15 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
     if (valeur == DUR_1) vertic = -vertic;
 
     // look if on line or between line
+    // I think this came from OMR output use. Commented because does not work with `@scale` -
+    /*
     if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) {
         if (valeur == DUR_2)
             y1 -= vertic;
         else
             y1 += vertic;
     }
+    */
 
     // legder line
     if (y > (int)staff->GetDrawingY()
