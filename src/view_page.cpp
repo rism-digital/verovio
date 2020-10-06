@@ -775,9 +775,9 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     assert(barLine);
 
     Staff *staff = dynamic_cast<Staff *>(barLine->GetFirstAncestor(STAFF));
-    int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
+    const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
 
-    int x = barLine->GetDrawingX();
+    const int x = barLine->GetDrawingX();
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
     const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
     const int barlineSeparation = m_doc->GetDrawingUnit(staffSize) * m_options->m_barlineSeparation.GetValue();
@@ -844,7 +844,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         barLine->SetEmptyBB();
     }
     else if (barLine->GetForm() == BARRENDITION_end) {
-        DrawVerticalSegmentedLine(dc, x1, line, barLineWidth);
+        DrawVerticalSegmentedLine(dc, x1 - (barLineThickWidth - barLineWidth) / 2, line, barLineWidth);
         DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_dbl) {
@@ -870,14 +870,16 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     assert(staff);
     assert(barLine);
 
-    int x = barLine->GetDrawingX();
-    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
-        - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
-        + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    const int x = barLine->GetDrawingX();
+    // HARDCODED - should be half the width of the proper glyph
+    const int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 5), 2);
+    const int dotSeparation = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_repeatBarlineDotSeparation.GetValue();
+    const int xShift = m_doc->GetDrawingUnit(100) * m_options->m_thickBarlineThickness.GetValue() / 2 + m_doc->GetDrawingUnit(100) * m_options->m_barlineSeparation.GetValue() + m_doc->GetDrawingUnit(100) * m_options->m_barLineWidth.GetValue() + dotSeparation + r;
+    const int x1 = x - xShift;
+    const int x2 = x + xShift;
 
-    int yBottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int yBottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if ((barLine->GetForm() == BARRENDITION_rptstart) || (barLine->GetForm() == BARRENDITION_rptboth)) {
         DrawDot(dc, x2, yBottom, staff->m_drawingStaffSize);
