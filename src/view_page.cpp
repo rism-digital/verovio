@@ -685,7 +685,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 }
                 DrawBarLine(dc, yTop, yBottom, barLine);
                 if (barLine->HasRepetitionDots()) {
-                    DrawBarLineDots(dc, childStaffDef, staff, barLine);
+                    DrawBarLineDots(dc, staff, barLine);
                 }
             }
         }
@@ -762,7 +762,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                             "Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
                         continue;
                     }
-                    DrawBarLineDots(dc, childStaffDef, staff, barLine);
+                    DrawBarLineDots(dc, staff, barLine);
                 }
             }
         }
@@ -863,10 +863,9 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     }
 }
 
-void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, BarLine *barLine)
+void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
 {
     assert(dc);
-    assert(staffDef);
     assert(staff);
     assert(barLine);
 
@@ -878,7 +877,7 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     const int x1 = x - xShift;
     const int x2 = x + xShift;
 
-    const int yBottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int yBottom = staff->GetDrawingY() - staff->m_drawingLines * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if ((barLine->GetForm() == BARRENDITION_rptstart) || (barLine->GetForm() == BARRENDITION_rptboth)) {
