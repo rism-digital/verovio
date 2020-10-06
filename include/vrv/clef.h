@@ -57,6 +57,15 @@ public:
      */
     static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place);
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::AdjustBeams
+     */
+    virtual int AdjustBeams(FunctorParams *functorParams);
+
 private:
 public:
     //

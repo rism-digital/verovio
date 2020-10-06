@@ -805,6 +805,16 @@ public:
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Calculate the vertical position adjustment for the beam if it overlaps with layer elements
+     */
+    virtual int AdjustBeams(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Apply position adjustment that has been calculated previously
+     */
+    virtual int AdjustBeamsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the postion position of slurs.
      */
     virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
