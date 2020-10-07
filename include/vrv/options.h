@@ -566,7 +566,7 @@ public:
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
-    OptionDbl m_slurThickness;
+    OptionDbl m_slurMidpointThickness;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;
@@ -580,7 +580,7 @@ public:
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
     OptionDbl m_thickBarlineThickness;
-    OptionDbl m_tieThickness;    
+    OptionDbl m_tieMidpointThickness;    
     OptionDbl m_tupletBracketThickness;
 
     /**
@@ -643,6 +643,14 @@ public:
     OptionDbl m_rightMarginRightBarLine;
     //
     OptionDbl m_topMarginHarm;
+
+    /**
+     * Deprecated options
+     */
+    OptionGrp m_deprecated;
+    
+    OptionDbl m_slurThickness;
+    OptionDbl m_tieThickness;
 
 private:
     /** The array of style parameters */
