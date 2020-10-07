@@ -12036,6 +12036,7 @@ void HumdrumInput::addTextElement(
     // if (data.find("[") != std::string::npos) {
     //    data = replaceMusicShapes(data);
     //}
+    data = escapeFreeAmpersand(data);
     data = unescapeHtmlEntities(data);
 
     hum::HumRegex hre;
@@ -12084,6 +12085,50 @@ void HumdrumInput::addTextElement(
             text = new Text;
         }
     }
+}
+
+//////////////////////////////
+//
+// escapeFreeAmpersand -- Convert & into &amp;, but do not mess
+//    with other HTML/XML entity encodings such as &auml; or &#5432;.
+//
+
+std::string HumdrumInput::escapeFreeAmpersand(const std::string &value)
+{
+    std::string output;
+    for (int i = 0; i < (int)value.size(); i++) {
+        if (value[i] != '&') {
+            output += value[i];
+            continue;
+        }
+        int solo = false;
+        int lastj = i;
+        for (int j = i + 1; j < (int)value.size(); j++) {
+            if (value[j] == ' ') {
+                solo = true;
+                break;
+            }
+            if (value[j] == '&') {
+                solo = true;
+                break;
+            }
+            if (value[j] == ';') {
+                solo = false;
+                break;
+            }
+            lastj = j;
+        }
+        if (lastj == (int)value.size() - 1) {
+            solo = true;
+        }
+        if (solo == true) {
+            output += "&amp;";
+        }
+        else {
+            output += '&';
+        }
+    }
+    return output;
 }
 
 //////////////////////////////

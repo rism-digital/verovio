@@ -649,6 +649,7 @@ protected:
     int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
     bool hasMensuralStaff(hum::HLp line);
     int getNextBarlineIndex(hum::HumdrumFile &infile, int startline);
+    std::string escapeFreeAmpersand(const std::string &value);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
