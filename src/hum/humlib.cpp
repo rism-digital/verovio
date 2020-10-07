@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Oct  2 00:40:45 PDT 2020
+// Last Modified: Tue Oct  6 11:29:00 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -75910,6 +75910,18 @@ int Tool_musicxml2hum::getFiguredBassDuration(xml_node fnode) {
 //       <offset>-8</offset>
 //   </harmony>
 //
+// For harmony labels from Musescore:
+//
+//    <harmony print-frame="no">
+//      <root>
+//        <root-step text="">C</root-step>
+//        </root>
+//      <kind text="V43">none</kind>
+//      </harmony>
+//
+// Converts to: "V43" ignoring the root-step and kind contents
+// if they are both "C" and "none".
+//
 
 string Tool_musicxml2hum::getHarmonyString(xml_node hnode) {
 	if (!hnode) {
@@ -75921,6 +75933,7 @@ string Tool_musicxml2hum::getHarmonyString(xml_node hnode) {
 	}
 	string root;
 	string kind;
+	string kindtext;
 	string bass;
 	int rootalter = 0;
 	int bassalter = 0;
@@ -75937,6 +75950,7 @@ string Tool_musicxml2hum::getHarmonyString(xml_node hnode) {
 				grandchild = grandchild.next_sibling();
 			}
 		} else if (nodeType(child, "kind")) {
+			kindtext = getAttributeValue(child, "text");
 			kind = child.child_value();
 			if (kind == "") {
 				kind = child.attribute("text").value();
@@ -75956,6 +75970,13 @@ string Tool_musicxml2hum::getHarmonyString(xml_node hnode) {
 		child = child.next_sibling();
 	}
 	stringstream ss;
+
+	if ((kind == "none") && (root == "C") && !kindtext.empty()) {
+		ss << kindtext;
+		string output = cleanSpaces(ss.str());
+		return output;
+	}
+
 	ss << root;
 
 	if (rootalter > 0) {
