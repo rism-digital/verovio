@@ -1,0 +1,43 @@
+---
+stages:
+  - build
+  - build-toolkit
+
+variables:
+  EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
+  EMSCRIPTEN_DIRECTORY: "emsdk"
+
+.build-template:
+  stage: build
+  script:
+    - cd tools
+    - cmake ../cmake
+    - make -j 10
+
+build-osx:
+  extends: .build-template
+  tags:
+    - macos
+
+build-linux:
+  extends: .build-template
+  image:
+    name: rikorose/gcc-cmake
+    entrypoint: [""]
+
+build-toolkit:
+  stage: build-toolkit
+  image:
+    name: rikorose/gcc-cmake
+    entrypoint: [""]
+  script:
+    - git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
+    - cd $EMSCRIPTEN_DIRECTORY
+    - ./emsdk install latest
+    - ./emsdk activate latest
+    - source emsdk_env.sh
+    - cd ../emscripten
+    - ./buildToolkit -c -H -M
+  artifacts:
+    paths:
+      - emscripten/build/verovio-toolkit.js*
