@@ -1306,7 +1306,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(node);
     assert(measure);
 
-    std::string measureNum = node.attribute("number").as_string();
+    const std::string measureNum = node.attribute("number").as_string();
+    if (node.attribute("id")) measure->SetUuid(node.attribute("id").as_string());
     if (measure != NULL) measure->SetN(measureNum);
 
     bool implicit = node.attribute("implicit").as_bool();
@@ -1544,6 +1545,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             if (!keySig) keySig = new KeySig();
             keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
         }
+        if (key.node().attribute("id")) keySig->SetUuid(key.node().attribute("id").as_string());
         // Add it if necessary
         if (keySig) {
             // Make it an attribute for now
@@ -1699,6 +1701,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
         else {
             fermata->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
         }
+        if (xmlFermata.attribute("id")) fermata->SetUuid(xmlFermata.attribute("id").as_string());
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         ShapeFermata(fermata, xmlFermata);
     }
@@ -1712,6 +1715,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const pugi::xpath_node staffNode = node.select_node("staff");
 
+    const std::string directionId = node.attribute("id").as_string();
     const std::string placeStr = node.attribute("placement").as_string();
     const int offset = node.select_node("offset").node().text().as_int();
     const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
@@ -1761,6 +1765,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("coda");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        if (coda.node().attribute("id")) dir->SetUuid(coda.node().attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -1981,6 +1986,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             hairpin->SetColor(wedge.node().attribute("color").as_string());
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             hairpin->SetTstamp(timeStamp);
+            if (wedge.node().attribute("id")) hairpin->SetUuid(wedge.node().attribute("id").as_string());
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -2017,17 +2023,23 @@ void MusicXmlInput::ReadMusicXmlDirection(
     pugi::xpath_node xmlShift = type.select_node("octave-shift");
     if (xmlShift) {
         pugi::xpath_node staffNode = node.select_node("staff");
-        int staffN = (!staffNode) ? 1 : staffNode.node().text().as_int() + staffOffset;
+        const int staffN = (!staffNode) ? 1 : staffNode.node().text().as_int() + staffOffset;
         if (HasAttributeWithValue(xmlShift.node(), "type", "stop")) {
             m_octDis[staffN] = 0;
             std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
             for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
                 if (iter->second->Is(OCTAVE)) {
                     Octave *octave = dynamic_cast<Octave *>(iter->second);
+                    if (octave->HasEndid()) continue;
                     std::vector<int> staffAttr = octave->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffN) != staffAttr.end()
-                        && !octave->HasEndid()) {
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffN) != staffAttr.end()) {
                         octave->SetEndid(m_ID);
+                    }
+                    else if (xmlShift.node().attribute("number").as_string() == octave->GetN()) {
+                        octave->SetEndid(m_ID);
+                    }
+                    else {
+                        LogWarning("MusicXML import: octave for '%s' could not be closed", octave->GetUuid().c_str());
                     }
                 }
             }
@@ -2036,13 +2048,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
             Octave *octave = new Octave();
             octave->SetColor(xmlShift.node().attribute("color").as_string());
             octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
-            octave->SetStaff(octave->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffN)));
-            int octDisNum = xmlShift.node().attribute("size") ? xmlShift.node().attribute("size").as_int() : 8;
+            octave->SetN(xmlShift.node().attribute("number").as_string());
+            const int octDisNum = xmlShift.node().attribute("size") ? xmlShift.node().attribute("size").as_int() : 8;
             octave->SetDis(octave->AttOctaveDisplacement::StrToOctaveDis(std::to_string(octDisNum)));
             m_octDis[staffN] = (octDisNum + 2) / 8;
             if (HasAttributeWithValue(xmlShift.node(), "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
-                m_octDis[staffN] = -1 * m_octDis[staffN];
+                m_octDis[staffN] *= -1;
             }
             else
                 octave->SetDisPlace(STAFFREL_basic_above);
@@ -2155,6 +2167,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("segno");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        if (segno.node().attribute("id")) dir->SetUuid(segno.node().attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -2539,9 +2552,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         // pitch and octave
         pugi::xpath_node pitch = node.select_node("pitch");
         if (pitch) {
-            std::string stepStr = GetContentOfChild(pitch.node(), "step");
+            const std::string stepStr = GetContentOfChild(pitch.node(), "step");
+            const std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!octaveStr.empty()) {
                 if (m_octDis[staff->GetN()] != 0) {
                     note->SetOct(atoi(octaveStr.c_str()) - m_octDis[staff->GetN()]);
@@ -2551,7 +2564,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     note->SetOct(atoi(octaveStr.c_str()));
                 }
             }
-            std::string alterStr = GetContentOfChild(pitch.node(), "alter");
+            const std::string alterStr = GetContentOfChild(pitch.node(), "alter");
             if (!alterStr.empty()) {
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
@@ -3334,6 +3347,7 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
     if (!beamStart || (node.select_node("notations/ornaments/tremolo[@type='start']"))) return;
 
     Beam *beam = new Beam();
+    if (beamStart.attribute("id")) beam->SetUuid(beamStart.attribute("id").as_string());
     AddLayerElement(layer, beam);
     m_elementStackMap.at(layer).push_back(beam);
 }

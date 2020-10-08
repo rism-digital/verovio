@@ -28,6 +28,7 @@ Octave::Octave()
     , AttExtender()
     , AttLineRend()
     , AttLineRendBase()
+    , AttNNumberLike()
     , AttOctaveDisplacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -35,6 +36,7 @@ Octave::Octave()
     RegisterAttClass(ATT_EXTENDER);
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_LINERENDBASE);
+    RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
 
     Reset();
@@ -50,6 +52,7 @@ void Octave::Reset()
     ResetExtender();
     ResetLineRend();
     ResetLineRendBase();
+    ResetNNumberLike();
     ResetOctaveDisplacement();
 }
 
