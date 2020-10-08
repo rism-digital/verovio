@@ -755,8 +755,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     for (auto coord : m_beamElementCoordRefs) {
         const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
-        if ((stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength)
-                && (stemDirBias * m_uniformStemLength + 1 != stemDirBias * coordStemDir)) {
+        if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
             m_uniformStemLength = coordStemDir;
         }
     }
