@@ -17437,16 +17437,16 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
                     appendTypeTag(syls.back(), "i");
                 }
             }
-            else if (extender) {
+            else {
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
+                    appendTypeTag(syls[0], "t");
+                }
+            }
+            if (extender) {
                 syls.back()->SetWordpos(sylLog_WORDPOS_t);
                 syls.back()->SetCon(sylLog_CON_u);
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
                     appendTypeTag(syls.back(), "t");
-                }
-            }
-            else {
-                if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    appendTypeTag(syls[0], "t");
                 }
             }
             // remove the last dash in a line (double dash which indicates
