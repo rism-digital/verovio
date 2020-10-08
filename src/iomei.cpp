@@ -1304,6 +1304,7 @@ void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
     octave->WriteExtender(currentNode);
     octave->WriteLineRend(currentNode);
     octave->WriteLineRendBase(currentNode);
+    octave->WriteNNumberLike(currentNode);
     octave->WriteOctaveDisplacement(currentNode);
 }
 
@@ -4190,6 +4191,7 @@ bool MEIInput::ReadOctave(Object *parent, pugi::xml_node octave)
     vrvOctave->ReadExtender(octave);
     vrvOctave->ReadLineRend(octave);
     vrvOctave->ReadLineRendBase(octave);
+    vrvOctave->ReadNNumberLike(octave);
     vrvOctave->ReadOctaveDisplacement(octave);
 
     parent->AddChild(vrvOctave);

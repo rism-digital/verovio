@@ -2023,17 +2023,23 @@ void MusicXmlInput::ReadMusicXmlDirection(
     pugi::xpath_node xmlShift = type.select_node("octave-shift");
     if (xmlShift) {
         pugi::xpath_node staffNode = node.select_node("staff");
-        int staffN = (!staffNode) ? 1 : staffNode.node().text().as_int() + staffOffset;
+        const int staffN = (!staffNode) ? 1 : staffNode.node().text().as_int() + staffOffset;
         if (HasAttributeWithValue(xmlShift.node(), "type", "stop")) {
             m_octDis[staffN] = 0;
             std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
             for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
                 if (iter->second->Is(OCTAVE)) {
                     Octave *octave = dynamic_cast<Octave *>(iter->second);
+                    if (octave->HasEndid()) continue;
                     std::vector<int> staffAttr = octave->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffN) != staffAttr.end()
-                        && !octave->HasEndid()) {
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffN) != staffAttr.end()) {
                         octave->SetEndid(m_ID);
+                    }
+                    else if (xmlShift.node().attribute("number").as_string() == octave->GetN()) {
+                        octave->SetEndid(m_ID);
+                    }
+                    else {
+                        LogWarning("MusicXML import: octave for '%s' could not be closed", octave->GetUuid().c_str());
                     }
                 }
             }
@@ -2042,13 +2048,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
             Octave *octave = new Octave();
             octave->SetColor(xmlShift.node().attribute("color").as_string());
             octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
-            octave->SetStaff(octave->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffN)));
-            int octDisNum = xmlShift.node().attribute("size") ? xmlShift.node().attribute("size").as_int() : 8;
+            octave->SetN(xmlShift.node().attribute("number").as_string());
+            const int octDisNum = xmlShift.node().attribute("size") ? xmlShift.node().attribute("size").as_int() : 8;
             octave->SetDis(octave->AttOctaveDisplacement::StrToOctaveDis(std::to_string(octDisNum)));
             m_octDis[staffN] = (octDisNum + 2) / 8;
             if (HasAttributeWithValue(xmlShift.node(), "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
-                m_octDis[staffN] = -1 * m_octDis[staffN];
+                m_octDis[staffN] *= -1;
             }
             else
                 octave->SetDisPlace(STAFFREL_basic_above);
@@ -2546,9 +2552,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         // pitch and octave
         pugi::xpath_node pitch = node.select_node("pitch");
         if (pitch) {
-            std::string stepStr = GetContentOfChild(pitch.node(), "step");
+            const std::string stepStr = GetContentOfChild(pitch.node(), "step");
+            const std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!octaveStr.empty()) {
                 if (m_octDis[staff->GetN()] != 0) {
                     note->SetOct(atoi(octaveStr.c_str()) - m_octDis[staff->GetN()]);
@@ -2558,7 +2564,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     note->SetOct(atoi(octaveStr.c_str()));
                 }
             }
-            std::string alterStr = GetContentOfChild(pitch.node(), "alter");
+            const std::string alterStr = GetContentOfChild(pitch.node(), "alter");
             if (!alterStr.empty()) {
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
