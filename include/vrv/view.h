@@ -598,6 +598,8 @@ protected:
      */
     int m_currentColour;
 
+    double m_bezierCurveThicknessCoeficient;
+
     /**
      * The current drawing score def.
      * The is set when starting to draw a page in DrawCurrentPage and then

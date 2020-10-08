@@ -292,7 +292,11 @@ void View::DrawThickBezierCurve(
 
     Point bez1[4], bez2[4]; // filled array with control points and end point
 
-    BoundingBox::CalcThickBezier(bezier, thickness, angle, bez1, bez2);
+    if (m_bezierCurveThicknessCoeficient <= 0) {
+        m_bezierCurveThicknessCoeficient = BoundingBox::GetBezierThicknessCoeficient(bezier, thickness, angle);
+    }
+
+    BoundingBox::CalcThickBezier(bezier, thickness * m_bezierCurveThicknessCoeficient, angle, bez1, bez2);
 
     bez1[0] = ToDeviceContext(bez1[0]);
     bez1[1] = ToDeviceContext(bez1[1]);

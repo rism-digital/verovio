@@ -29,6 +29,7 @@ View::View()
     m_doc = NULL;
     m_options = NULL;
     m_pageIdx = 0;
+    m_bezierCurveThicknessCoeficient = 0.0;
 
     m_currentColour = AxNONE;
     m_currentElement = NULL;
