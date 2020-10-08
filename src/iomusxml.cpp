@@ -1306,7 +1306,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(node);
     assert(measure);
 
-    std::string measureNum = node.attribute("number").as_string();
+    const std::string measureNum = node.attribute("number").as_string();
+    if (node.attribute("id")) measure->SetUuid(node.attribute("id").as_string());
     if (measure != NULL) measure->SetN(measureNum);
 
     bool implicit = node.attribute("implicit").as_bool();
@@ -1544,6 +1545,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             if (!keySig) keySig = new KeySig();
             keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
         }
+        if (key.node().attribute("id")) keySig->SetUuid(key.node().attribute("id").as_string());
         // Add it if necessary
         if (keySig) {
             // Make it an attribute for now
@@ -1699,6 +1701,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
         else {
             fermata->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
         }
+        if (xmlFermata.attribute("id")) fermata->SetUuid(xmlFermata.attribute("id").as_string());
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         ShapeFermata(fermata, xmlFermata);
     }
@@ -1712,6 +1715,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const pugi::xpath_node staffNode = node.select_node("staff");
 
+    const std::string directionId = node.attribute("id").as_string();
     const std::string placeStr = node.attribute("placement").as_string();
     const int offset = node.select_node("offset").node().text().as_int();
     const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
@@ -1761,6 +1765,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("coda");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        if (coda.node().attribute("id")) dir->SetUuid(coda.node().attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -1981,6 +1986,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             hairpin->SetColor(wedge.node().attribute("color").as_string());
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             hairpin->SetTstamp(timeStamp);
+            if (wedge.node().attribute("id")) hairpin->SetUuid(wedge.node().attribute("id").as_string());
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -2155,6 +2161,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("segno");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        if (segno.node().attribute("id")) dir->SetUuid(segno.node().attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -3334,6 +3341,7 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
     if (!beamStart || (node.select_node("notations/ornaments/tremolo[@type='start']"))) return;
 
     Beam *beam = new Beam();
+    if (beamStart.attribute("id")) beam->SetUuid(beamStart.attribute("id").as_string());
     AddLayerElement(layer, beam);
     m_elementStackMap.at(layer).push_back(beam);
 }
