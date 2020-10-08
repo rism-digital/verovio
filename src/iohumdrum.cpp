@@ -8633,6 +8633,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemVisible(BOOLEAN_false);
             }
+            if (m_signifiers.hairpinAccent && layerdata[i]->find(m_signifiers.hairpinAccent) != string::npos) {
+                addHairpinAccent(layerdata[i]);
+            }
             if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
                 note->SetCue(BOOLEAN_true);
             }
@@ -8714,6 +8717,51 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addHairpinAccent -- Simulate a hairpin accent with <> text dir.
+//
+
+void HumdrumInput::addHairpinAccent(hum::HTp token)
+{
+    auto pos = token->find(m_signifiers.hairpinAccent);
+    if (pos == std::string::npos) {
+        return;
+    }
+    int position = -1; // place below by default (may change based on layer position later).
+    if ((int)pos < (int)token->size() - 1) {
+        if (m_signifiers.above == token->at(pos + 1)) {
+            position = +1;
+        }
+    }
+
+    int track = token->getTrack();
+    std::vector<int> &rkern = m_rkern;
+    int staffindex = rkern[track];
+
+    Dir *dir = new Dir;
+    setStaff(dir, m_currentstaff);
+    setLocationId(dir, token); // adjust with new element class
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    dir->SetTstamp(tstamp.getFloat());
+
+    if (position > 0) {
+        setPlace(dir, "above");
+        addChildBackMeasureOrSection(dir);
+    }
+    else if (position < 0) {
+        setPlace(dir, "below");
+        addChildBackMeasureOrSection(dir);
+    }
+    else {
+        addChildBackMeasureOrSection(dir);
+    }
+
+    Rend *rend = new Rend;
+    dir->AddChild(rend);
+    addTextElement(rend, "<>");
 }
 
 //////////////////////////////
@@ -20771,6 +20819,12 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // !!!RDF**kern: i = cue size
         if (value.find("cue size", equals) != string::npos) {
             m_signifiers.cuesize = signifier;
+        }
+
+        // hairpin accents:
+        // !!!RDF**kern: i = hairpin accent
+        if (value.find("hairpin accent", equals) != string::npos) {
+            m_signifiers.hairpinAccent = signifier;
         }
 
         // terminal longs

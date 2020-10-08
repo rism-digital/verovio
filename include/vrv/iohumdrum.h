@@ -337,6 +337,8 @@ public:
 
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
+
+    char hairpinAccent = '\0'; // For <> accent on a note.
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -650,6 +652,7 @@ protected:
     bool hasMensuralStaff(hum::HLp line);
     int getNextBarlineIndex(hum::HumdrumFile &infile, int startline);
     std::string escapeFreeAmpersand(const std::string &value);
+    void addHairpinAccent(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
