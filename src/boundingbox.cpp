@@ -752,8 +752,8 @@ void BoundingBox::CalcThickBezier(
 
     Point c1Rotated = bezier[1];
     Point c2Rotated = bezier[2];
-    c1Rotated.y += thickness / 2;
-    c2Rotated.y += thickness / 2;
+    c1Rotated.y += thickness * 0.575;
+    c2Rotated.y += thickness * 0.575;
     if (angle != 0.0) {
         c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
         c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
@@ -769,8 +769,8 @@ void BoundingBox::CalcThickBezier(
 
     c1Rotated = bezier[1];
     c2Rotated = bezier[2];
-    c1Rotated.y -= thickness / 2;
-    c2Rotated.y -= thickness / 2;
+    c1Rotated.y -= thickness * 0.575;
+    c2Rotated.y -= thickness * 0.575;
     if (angle != 0.0) {
         c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
         c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
