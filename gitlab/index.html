@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Verovio Web Viewer</title>
+        <script src="verovio-toolkit.js"></script>
+        <style>
+            #sidebar {
+                height: 100%;
+                background-color: #eee;
+                position: fixed;
+                right: 0;
+                top: 0;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                z-index: 100;
+                padding-left: .5em;
+            }
+            #sidebar.autohide {
+                width: 1em;
+            }
+            #sidebar:hover {
+                width: auto;
+            }
+            #sidebar.focus form > :not(.focus) {
+                display: none;
+            }
+            #output.redrawing {
+                opacity: 50%;
+            }
+            #output {
+                width: 130vw;
+            }
+            body {
+                background-color: #000;
+            }
+            #output > svg {
+                background-color: #fff;
+            }
+            select[name="font-family"] {
+                /* Separate groups of font settings; font-family is always the first setting */
+                margin-top: .75em;
+            }
+            g.mNum rect, g.mNum ellipse {
+                fill: none;
+                stroke: #000;
+                stroke-width: 17;
+            }
+            @media print {
+                #sidebar {
+                    display: none;
+                }
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="sidebar" class="autohide">
+            <h2>Editor options</h2>
+            <div>
+                <label>auto-hide this pane</label>
+                <input type="checkbox" id="autohide" checked="checked"/>
+            </div>
+            <div>
+                <input name="foo" type="checkbox" id="focusOnSelected" value="false"/>
+                <label>Focus on selected options (left checkbox)</label>
+            </div>
+            <div>
+                <input type="number" id="zoomInput" step="1" value="50"/>
+                <label>% zoom</label>
+            </div>
+            <div>
+                <label>Load style</label>
+                <input type="file" id="load"/>
+            </div>
+            <div>
+                <a download="style.json" id="save">Save style</a>
+            </div>
+            <div>
+                <label>Import font list from Inkscape SVG file</label>
+                <input type="file" id="importFonts"/>
+            </div>
+            <div>
+                <label>Example file</label>
+                <select id="meiFiles">
+                  <option value="mei/chopin-mazurka-op-33-no-2.mei">chopin-mazurka-op-33-no-2.mei</option>
+                  <option value="mei/chopin-prelude-op-28-no-4.mei">chopin-prelude-op-28-no-4.mei</option>
+                  <option value="mei/ganz-hexentanz-git1-p004.mei">ganz-hexentanz-git1-p004.mei</option>
+                  <option value="mei/haendel-deutsche-arien-p001.mei">haendel-deutsche-arien-p001.mei</option>
+                  <option value="mei/haendel-deutsche-arien-p004.mei">haendel-deutsche-arien-p004.mei</option>
+                  <option value="mei/jarnach-quartett-p32.mei">jarnach-quartett-p32.mei</option>
+                  <option value="mei/kropfreiter-partita-p010.mei">kropfreiter-partita-p010.mei</option>
+                  <option value="mei/loose-change.mei">loose-change.mei</option>
+                  <option value="mei/mozart-grave-und-presto-p22.mei">mozart-grave-und-presto-p22.mei</option>
+                  <option value="mei/schubert-5-I-III.mei">schubert-5-I-III.mei</option>
+                  <option value="mei/wollny-valse-p1.mei">wollny-valse-p1.mei</option>
+                </select>
+            </div>
+            <h2>Verovio options</h2>
+            <form id="verovioOptions"></form>
+            <h2>Text options</h2>
+            <form id="fontOptions"></form>
+        </div>
+        <div id="output"/>
+        <script type="text/javascript">//<![CDATA[
+            const vrvToolkit = new verovio.toolkit();
+            const svgNS = "http://www.w3.org/2000/svg";
+            const sidebar = document.querySelector("#sidebar");
+            const focusCheckbox = document.querySelector("#focusOnSelected");
+            const zoomInput = document.querySelector("#zoomInput");
+            const autohideCheckbox = document.querySelector("#autohide");
+            const loadButton = document.querySelector("#load");
+            const saveButton = document.querySelector("#save");
+            const importFontsButton = document.querySelector("#importFonts");
+            const meiFilesDropdown = document.querySelector("#meiFiles");
+            const fontOptionsDiv = document.querySelector("form#fontOptions");
+            const focusCheckboxes = [];
+            const output = document.querySelector("#output");
+            let meiString;
+            const NOTHING_TO_SAVE = 0;
+            const UNSAVED_CHANGES = 1;
+            const UNKNOWN_SAVE_STATUS = 2;
+            let saveStatus = NOTHING_TO_SAVE;
+            let unscaledSvgDimensions;
+            let svg;
+
+            const selectTypes = {
+                "font-family": ["Times", "Arial"],
+                "font-style": ["normal", "italic"],
+                "font": ["MTF-VintageGHMA", "MTF-VintageECP1", "MTF-Scorlatti", "MTF-Beethoven", "Leipzig", "Bravura", "Gootville", "Petaluma"],
+                "enclosure": ["none", "rectangle", "ellipse"],
+            };
+            const meiCache = {};
+            const savedFontFamilies = localStorage.getItem("fontFamilies");
+            if (savedFontFamilies) {
+                Object.entries(JSON.parse(savedFontFamilies)).forEach(entry => {
+                    const [key, value] = entry;
+                    selectTypes["font-family"][key] = value;
+                });
+            }
+            const verovioOptions = [];
+            const verovioDefaults = vrvToolkit.getOptions();
+            for (const group of Object.values(vrvToolkit.getAvailableOptions().groups)) {
+                for (const [optionName, option] of Object.entries(group.options)) {
+                    option.name = optionName;
+                    option.value = verovioDefaults[optionName];
+                    verovioOptions.push(option);
+                }
+            }
+            const fontOptions = [
+                {"selector": "g.tempo", name: "font-family", description: "Tempo font name", type: "dropdown", value: "Times"},
+                {"selector": "g.tempo", name: "font-size", description: "Tempo font size in %", type: "number", value: 100},
+                {"selector": "g.tempo", name: "font-weight", description: "Tempo font weight", type: "number", value: 700, step: 100},
+                {"selector": "g.tempo", name: "font-style", description: "Tempo font style", type: "dropdown", value: "normal"},
+
+                {"selector": "g.dir", name: "font-family", description: "Directive font name", type: "dropdown", value: "Times"},
+                {"selector": "g.dir", name: "font-size", description: "Directive font size in %", type: "number", value: 100},
+                {"selector": "g.dir", name: "font-weight", description: "Directive font weight", type: "number", value: 400, step: 100},
+                {"selector": "g.dir", name: "font-style", description: "Directive font style", type: "dropdown", value: "italic"},
+
+                {"selector": "g.dynam", name: "font-family", description: "Dynamic font name", title: "For textual dynamics like 'decresc.'", type: "dropdown", value: "Times"},
+                {"selector": "g.dynam", name: "font-size", description: "Dynamic font size in %", title: "For textual dynamics like 'decresc.'", type: "number", value: 100},
+                {"selector": "g.dynam", name: "font-weight", description: "Dynamic font weight", title: "For textual dynamics like 'decresc.'", type: "number", value: 400, step: 100},
+                {"selector": "g.dynam", name: "font-style", description: "Dynamic font style", title: "For textual dynamics like 'decresc.'", type: "dropdown", value: "italic"},
+
+                {"selector": "g.mNum", name: "font-family", description: "Measure number font name", type: "dropdown", value: "Times"},
+                {"selector": "g.mNum", name: "font-size", description: "Measure number font size in %", type: "number", value: 100},
+                {"selector": "g.mNum", name: "font-weight", description: "Measure number font weight", type: "number", value: 400, step: 100},
+                {"selector": "g.mNum", name: "font-style", description: "Measure number font style", type: "dropdown", value: "italic"},
+                {"selector": "g.mNum", name: "enclosure", description: "Measure number enclosure", type: "dropdown", value: "none"},
+
+                {"selector": "g.syl", name: "font-family", description: "Lyrics font name", type: "dropdown", value: "Times"},
+                {"selector": "g.syl", name: "font-size", description: "Lyrics font size in %", type: "number", value: 100},
+                {"selector": "g.syl", name: "font-weight", description: "Lyrics font weight", type: "number", value: 400, step: 100},
+                {"selector": "g.syl", name: "font-style", description: "Lyrics font style", type: "dropdown", value: "normal"},
+
+                {"selector": ".system > g.label", name: "font-family", description: "Instrument label font name", type: "dropdown", value: "Times"},
+                {"selector": ".system > g.label", name: "font-size", description: "Instrument label font size in %", type: "number", value: 100},
+                {"selector": ".system > g.label", name: "font-weight", description: "Instrument label font weight", type: "number", value: 400, step: 100},
+                {"selector": ".system > g.label", name: "font-style", description: "Instrument label font style", type: "dropdown", value: "normal"},
+
+                {"selector": ".pgHead .ngb-title", name: "font-family", description: "Title font name", type: "dropdown", value: "Times"},
+                {"selector": ".pgHead .ngb-title", name: "font-size", description: "Title font size in %", type: "number", value: 100},
+                {"selector": ".pgHead .ngb-title", name: "font-weight", description: "Title font weight", type: "number", value: 400, step: 100},
+                {"selector": ".pgHead .ngb-title", name: "font-style", description: "Title font style", type: "dropdown", value: "normal"},
+
+                {"selector": ".pgHead .ngb-composer", name: "font-family", description: "Composer font name", type: "dropdown", value: "Times"},
+                {"selector": ".pgHead .ngb-composer", name: "font-size", description: "Composer font size in %", type: "number", value: 100},
+                {"selector": ".pgHead .ngb-composer", name: "font-weight", description: "Composer font weight", type: "number", value: 400, step: 100},
+                {"selector": ".pgHead .ngb-composer", name: "font-style", description: "Composer font style", type: "dropdown", value: "normal"},
+            ];
+            const optionMods = {
+                humType: false,
+                svgBoundingBoxes: false,
+                svgViewBox: false,
+                appXPathQuery: false,
+                substXPathQuery: false,
+                mdivXPathQuery: false,
+                choiceXPathQuery: false,
+                mensuralToMeasure: false,
+                pageWidth: {value: 1536},
+                pageHeight: {value: 1671},
+                font: {
+                    "type": "std::string-list",
+                }
+            };
+
+            const inputTypeByOptionType = {
+                bool: "checkbox",
+                double: "number",
+                int: "number",
+            };
+
+            function updateFocus() {
+                focusCheckboxes.forEach(checkbox => {
+                    console.log(focusCheckbox.parentElement);
+                    if (checkbox.checked === true) {
+                        checkbox.parentElement.classList.add("focus");
+                    } else {
+                        checkbox.parentElement.classList.remove("focus");
+                    }
+                });
+                if (focusCheckbox.checked) {
+                    sidebar.classList.add("focus");
+                } else {
+                    sidebar.classList.remove("focus");
+                }
+            }
+
+            function zoom() {
+                svg.width.baseVal.value = unscaledSvgDimensions[0] * zoomInput.value / 100;
+                svg.height.baseVal.value = unscaledSvgDimensions[1] * zoomInput.value / 100;
+            }
+
+            focusCheckbox.addEventListener("change", updateFocus);
+            zoomInput.addEventListener("change", zoom);
+
+
+            function buildOptionsForm(optionsForm, options) {
+                optionsForm.innerHTML = "";
+                options.forEach(option => {
+                    const optionMod = optionMods[option.name];
+                    if (optionMod === false) {
+                        return;
+                    }
+                    Object.keys(optionMod || {}).forEach(key => option[key] = optionMod[key]);
+                    const optionWrapper = document.createElement("div");
+                    optionsForm.appendChild(optionWrapper);
+                    const focusCheckbox = document.createElement("input");
+                    optionWrapper.appendChild(focusCheckbox);
+                    focusCheckbox.type = "checkbox";
+                    focusCheckbox.name = "focus";
+                    focusCheckbox.addEventListener("change", updateFocus);
+                    focusCheckboxes.push(focusCheckbox);
+                    const label = document.createElement("label");
+                    optionWrapper.appendChild(label);
+                    label.textContent = option.description;
+                    const input = document.createElement(option.type === "std::string-list" ? "select" : "input");
+                    if (input.tagName === "select") {
+                        (selectTypes[option.name] || option.values).forEach(value => {
+                            const optionElement = document.createElement("option");
+                            input.appendChild(optionElement);
+                            optionElement.textContent = value;
+                            optionElement.value = value;
+                        });
+                    } else {
+                        input.type = inputTypeByOptionType[option.type] || option.type;
+                        input.step = option.type === "int" ? 1 : "any";
+                    }
+                    optionWrapper.appendChild(input);
+                    option.input = input;
+                    ["name", "min", "max", "value"].forEach(propertyName => {
+                        input[propertyName] = option[propertyName];
+                    });
+                    optionWrapper.title = (optionMod && optionMod.title) || option.title || "";
+                    optionWrapper.title += "\ndefault: " + verovioDefaults[option.name];
+                    if ((option.min || option.max) !== undefined) {
+                        optionWrapper.title += `\nmin: ${option.min}\nmax: ${option.max}`;
+                    }
+                });
+                optionsForm.addEventListener("change", function(e){
+                    saveStatus = UNSAVED_CHANGES;
+                    if (e.target.name !== "focus") {
+                        redraw(meiString);
+                    }
+                });
+            }
+
+            function readOptionsForm(optionsArray) {
+                const options = {};
+                optionsArray.forEach(option => {
+                    const value = option.input ? option.input.value : option.value;
+                    option.value = value;
+                    options[option.name] = value;
+                });
+                return options;
+            }
+
+
+            function readFontOptions(fontOptions) {
+                readOptionsForm(fontOptions);
+                const stylesBySelector = {};
+                fontOptions.forEach(option => {stylesBySelector[option.selector] = {}});
+                fontOptions.forEach(option => {
+                    stylesBySelector[option.selector][option.name] = option.value;
+                });
+                return stylesBySelector;
+            }
+
+
+            function redraw(meiString) {
+                const options = readOptionsForm(verovioOptions);
+                output.classList.add("redrawing");
+                output.innerHTML = vrvToolkit.renderData(meiString, options);
+                svg = output.querySelector("svg");
+                unscaledSvgDimensions = [svg.width.baseVal.value, svg.height.baseVal.value];
+                postprocessSvg();
+                zoom();
+                output.classList.remove("redrawing");
+                saveButton.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify({
+                  verovio: readOptionsForm(verovioOptions), text: readFontOptions(fontOptions)
+                }));
+                svg.querySelectorAll("title.labelAttr").forEach(element => {
+                    element.parentElement.classList.add("ngb-" + element.textContent);
+                });
+                svg.querySelectorAll("text, tspan").forEach(text => {
+                    const classes = [];
+                    let element = text;
+                    while (element && element.namespaceURI === svgNS) {
+                        if (element.classList.contains("staff") || element.classList.contains("measure") || element.classList.contains("system")) {
+                            break;
+                        }
+                        if (element.classList.value !== "text") {
+                            classes.push(element.classList.value);
+                        }
+                        element = element.parentNode;
+                    }
+                    if (classes.length > 0) {
+                      const title = document.createElementNS(svgNS, "title");
+                      title.textContent = classes.join(" ");
+                      text.appendChild(title);
+                    }
+                });
+            }
+
+
+            function postprocessSvg() {
+                const svg = document.querySelector("#output > svg");
+                const style = svg.querySelector("style");
+
+                Object.entries(readFontOptions(fontOptions)).forEach(entry => {
+                    const [selector, options] = entry;
+                    style.textContent += `${selector} {${
+                        Object.keys(options).reduce((cssString, key) => {
+                            return cssString += key === "font-size" ? "" : `${key}: ${options[key]};`
+                        }, "")
+                    }}`;
+                    svg.querySelectorAll(selector + " [font-size]").forEach(el => {
+                        const oldAttribute = el.getAttribute("font-size");
+                        const [, oldValue, unit] = oldAttribute.match(/^([\d.]*)(.*)$/);
+                        const newValue = parseFloat(oldValue) * options["font-size"] / 100;
+                        if (newValue === NaN) {
+                            alert(`Could not set font size for selector ${option.selector} on element ${el.parentElement.id}`);
+                        } else {
+                            el.setAttribute("font-size", newValue + unit);
+                        }
+                    });
+                });
+
+                document.querySelectorAll("g.mNum").forEach(function(mnum) {
+                    const bbox = mnum.getBBox();
+                    switch (document.querySelector("select[name=enclosure]").value) {
+                        case "rectangle":
+                            const padding = 100;
+                            bbox.width += 2 * padding;
+                            bbox.x -= padding;
+                            const rect = document.createElementNS(svgNS, "rect");
+                            mnum.appendChild(rect);
+                            rect.x.baseVal.value = bbox.x;
+                            rect.y.baseVal.value = bbox.y;
+                            rect.width.baseVal.value = bbox.width;
+                            rect.height.baseVal.value = bbox.height;
+                            break;
+                        case "ellipse":
+                            const ellipse = document.createElementNS(svgNS, "ellipse");
+                            mnum.appendChild(ellipse);
+                            ellipse.cx.baseVal.value = bbox.x + .5 * bbox.width;
+                            ellipse.cy.baseVal.value = bbox.y + .5 * bbox.height;
+                            ellipse.rx.baseVal.value = Math.max(.55 * bbox.width, .65 * bbox.height);
+                            ellipse.ry.baseVal.value = .5 * bbox.height;
+                            break;
+                    }
+                });
+            }
+
+            buildOptionsForm(document.querySelector("form#verovioOptions"), verovioOptions);
+            buildOptionsForm(fontOptionsDiv, fontOptions);
+
+            loadButton.addEventListener("click", (e) => {
+                const message = {
+                    [UNSAVED_CHANGES]: "There are unsaved changes that will be lost when loading a style from disk. Continue anyway?",
+                    [UNKNOWN_SAVE_STATUS]: "Are you sure your changes were saved properly? Do you want to replace the current settings with a saved style?"
+                }[saveStatus];
+                if (message && !confirm(message)) {
+                    e.preventDefault();
+                }
+            }, false);
+
+            saveButton.addEventListener("click", (e) => {
+                saveStatus = UNKNOWN_SAVE_STATUS;
+            });
+
+            loadButton.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                  return;
+                }
+                file.text().then(content => {
+                    let loadedOptions;
+                    try {
+                        loadedOptions = JSON.parse(content);
+                    } catch (e) {
+                        alert("The selected file is not a valid JSON file");
+                        return;
+                    }
+                    const loadedFonts = [];
+                    fontOptions.forEach(option => {
+                        const loadedOptionsForSelector = loadedOptions.text[option.selector];
+                        if (loadedOptionsForSelector && loadedOptionsForSelector[option.name] !== undefined) {
+                            option.value = loadedOptionsForSelector[option.name];
+                            if (option.name === "font-family"){
+                                loadedFonts.push(option.value);
+                            }
+                        }
+                    });
+                    updateFontList(loadedFonts);
+                    verovioOptions.forEach(option => {
+                        const loadedOption = loadedOptions.verovio[option.name];
+                        if (loadedOption !== undefined && option.input) {
+                            option.value = option.input.value = loadedOption;
+                        }
+                    });
+                    saveStatus = NOTHING_TO_SAVE;
+                    redraw(meiString);
+                    saveButton.setAttribute("download", file.name);
+                });
+            });
+
+            document.querySelector("#importFonts").addEventListener("change", function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    return;
+                }
+                file.text().then(content => {
+                    const fonts = {};
+                    const svg = (new DOMParser().parseFromString(content, "image/svg+xml"));
+                    svg.querySelectorAll('[style*="font-family"]').forEach(element => {
+                        const style = element.getAttribute("style");
+                        const font = style.match(/font-family\s*:\s*([^;]+)/)[1];
+                        fonts[font] = true;
+                    });
+                    updateFontList(Object.keys(fonts));
+                });
+            });
+
+            meiFilesDropdown.addEventListener("change", function(e) {
+                loadMei(meiFilesDropdown.value);
+            });
+
+            function updateFontList(fontList) {
+                fontList.forEach(fontName => {
+                    if (selectTypes["font-family"].indexOf(fontName) < 0) {
+                        selectTypes["font-family"].push(fontName);
+                    }
+                })
+                selectTypes["font-family"].sort();
+                localStorage.setItem("fontFamilies", JSON.stringify(selectTypes["font-family"]));
+                buildOptionsForm(fontOptionsDiv, fontOptions);
+            }
+
+            function loadMei(path) {
+                if (meiCache[path]) {
+                    redraw(meiCache[path]);
+                    return;
+                }
+                const xhr = new XMLHttpRequest();
+                xhr.onload = function() {
+                    meiString = xhr.responseText;
+                    meiCache[path] = meiString;
+                    redraw(meiString);
+                }
+                // xhr.open("GET", "Aguado_Walzer_G-major.mei");
+                xhr.open("GET", path);
+                xhr.send(null);
+            }
+
+            function setAutohide() {
+                sidebar.classList[autohideCheckbox.checked ? "add" : "remove"]("autohide");
+            }
+            autohideCheckbox.addEventListener("change", setAutohide);
+            setAutohide();
+
+            window.addEventListener("beforeunload", function(e) {
+                const message = {
+                    [UNSAVED_CHANGES]: "There are unsaved changes that will be lost when leaving the page.",
+                    [UNKNOWN_SAVE_STATUS]: "Are you sure your changes were saved properly?"
+                }[saveStatus];
+                if (message) {
+                    e.returnValue = message;
+                    e.preventDefault();
+                }
+            });
+
+            loadMei(meiFilesDropdown.value);
+            // ]]>
+        </script>
+    </body>
+</html>
