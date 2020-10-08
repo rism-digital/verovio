@@ -872,8 +872,11 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     const int x = barLine->GetDrawingX();
     // HARDCODED - should be half the width of the proper glyph
     const int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 5), 2);
-    const int dotSeparation = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_repeatBarLineDotSeparation.GetValue();
-    const int xShift = m_doc->GetDrawingUnit(100) * m_options->m_thickBarlineThickness.GetValue() / 2 + m_doc->GetDrawingUnit(100) * m_options->m_barLineSeparation.GetValue() + m_doc->GetDrawingUnit(100) * m_options->m_barLineWidth.GetValue() + dotSeparation + r;
+    const int dotSeparation
+        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_repeatBarLineDotSeparation.GetValue();
+    const int xShift = m_doc->GetDrawingUnit(100) * m_options->m_thickBarlineThickness.GetValue() / 2
+        + m_doc->GetDrawingUnit(100) * m_options->m_barLineSeparation.GetValue()
+        + m_doc->GetDrawingUnit(100) * m_options->m_barLineWidth.GetValue() + dotSeparation + r;
     const int x1 = x - xShift;
     const int x2 = x + xShift;
 

@@ -769,7 +769,8 @@ Options::Options()
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
 
-    m_barLineSeparation.SetInfo("Barline separation", "The default distance between multiple barlines when locked together");
+    m_barLineSeparation.SetInfo(
+        "Barline separation", "The default distance between multiple barlines when locked together");
     m_barLineSeparation.Init(0.8, 0.5, 2.0);
     this->Register(&m_barLineSeparation, "barLineSeparation", &m_generalLayout);
 
@@ -876,8 +877,9 @@ Options::Options()
     m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
-    
-    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation", "The default horizontal distance between the dots and the inner barline of a repeat barline");
+
+    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
+        "The default horizontal distance between the dots and the inner barline of a repeat barline");
     m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
