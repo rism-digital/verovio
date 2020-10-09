@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Improved barline rendition (@rettinghaus)
 
 ## [3.0.0] - 2020-10-05
 * Support for buzz roll tremolos (@rettinghaus)
@@ -12,6 +13,7 @@
 * Support for pedal lines (@rettinghaus)
 * Options for controlling output tabs (--output-indent and --output-indent-tab)
 * Option to remove ids in the MEI output (--remove-ids) to be passed to GetMEI with the JS toolkit
+* Fix tremolo tuplets (@rettinghaus)
 
 ## [2.7.2] - 2020-07-23
 * Fix bug with memory in beams (@valeriyvan)
