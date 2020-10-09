@@ -3799,6 +3799,25 @@ bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
     return true;
 }
 
+void MusicXmlInput::SetFermataExternalSymbols(Fermata *fermata, const std::string &shape)
+{
+    // When MEI adds support for all of these shapes, this can be merged with ConvertFermataShape()
+    static const std::map<std::string, std::string> fermataExtSymbolsAbove = { { "double-angled", "U+E4C2" },
+        { "double-square", "U+E4C8" }, { "double-dot", "U+E4CA" }, { "half-curve", "U+E4CC" }, { "curlew", "U+E4D6" } };
+    static const std::map<std::string, std::string> fermataExtSymbolsBelow = { { "double-angled", "U+E4C3" },
+        { "double-square", "U+E4C9" }, { "double-dot", "U+E4CB" }, { "half-curve", "U+E4CD" }, { "curlew", "U+E4D6" } };
+
+    if (const auto result = fermataExtSymbolsBelow.find(shape);
+             (fermata->GetForm() == fermataVis_FORM_inv) && (result != fermataExtSymbolsBelow.end())) {
+        fermata->SetExternalsymbols(fermata, "glyph.num", result->second);
+        fermata->SetExternalsymbols(fermata, "glyph.auth", "smufl");
+    }
+    else if (const auto result = fermataExtSymbolsAbove.find(shape); result != fermataExtSymbolsAbove.end()) {
+        fermata->SetExternalsymbols(fermata, "glyph.num", result->second);
+        fermata->SetExternalsymbols(fermata, "glyph.auth", "smufl");
+    }
+}
+
 void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
 {
     assert(fermata);
@@ -3816,6 +3835,7 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
         fermata->SetForm(fermataVis_FORM_norm);
         fermata->SetPlace(STAFFREL_above);
     }
+    SetFermataExternalSymbols(fermata, node.text().as_string());
 }
 
 bool MusicXmlInput::IsMultirestMeasure(int index) const
