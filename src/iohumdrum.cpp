@@ -16731,6 +16731,12 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         else if (head == "quarter") {
             note->SetHeadShape(HEADSHAPE_quarter);
         }
+        else if (head == "solid") {
+            note->SetHeadShape(HEADSHAPE_quarter);
+        }
+        else if (head == "open") {
+            note->SetHeadShape(HEADSHAPE_half);
+        }
         else if (head == "half") {
             note->SetHeadShape(HEADSHAPE_half);
         }
@@ -16740,7 +16746,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         else if (head == "rhombus") {
             note->SetHeadShape(HEADSHAPE_diamond);
         }
-        else if (head == "diamond") {
+        else if (head.compare(0, 3, "dia") == 0) {
             note->SetHeadShape(HEADSHAPE_diamond);
         }
         else if (head == "slash") {
@@ -16748,6 +16754,12 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
         else if (head == "plus") {
             note->SetHeadShape(HEADSHAPE_plus);
+        }
+        else if (head == "regular") {
+            // do nothing, using default nohead-shape
+        }
+        else {
+            // other unknown notehead shapes will also do nothing
         }
     }
 
