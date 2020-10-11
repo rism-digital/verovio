@@ -292,6 +292,10 @@ namespace humaux {
         // m_dynampos == dynamic position relativ to the staff:
         // +1 = above, -1=below, 0=undefined (deal center between staves later)
         int m_dynampos = 0;
+
+        // m_notehead == notehead shape for notes on the staff.  This could be
+        // expanded later into separate control by subspine and/or by pitch (staff/line).
+        std::string m_notehead;
     };
 } // namespace humaux
 

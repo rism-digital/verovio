@@ -15299,6 +15299,7 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //       *stem:x   = no stem
 //       *stem:/   = no stem up
 //       *stem:\   = no stem down
+//    *head:       = notehead shape
 //
 
 void HumdrumInput::handleStaffStateVariables(hum::HTp token)
@@ -15363,6 +15364,18 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
     else if (value == "*kcancel") {
         m_show_cautionary_keysig = true;
+    }
+
+    if (value.compare(0, 6, "*head:") == 0) {
+        ss[staffindex].m_notehead.clear();
+        for (int i = 6; i < (int)value.size(); ++i) {
+            if (value[i] == ':') {
+                // There may be a pitch parameter after the shape,
+                // but this is ignored for now.
+                break;
+            }
+            ss[staffindex].m_notehead += value[i];
+        }
     }
 }
 
@@ -16693,6 +16706,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     std::string head = token->getLayoutParameter("N", "head", subtoken);
+    if (head.empty()) {
+        if (!ss[staffindex].m_notehead.empty()) {
+            head = ss[staffindex].m_notehead;
+        }
+    }
     if (!head.empty()) {
         // See https://music-encoding.org/guidelines/v4/data-types/data.headshape.list.html
         // not all available in veorvio yet.
