@@ -16692,6 +16692,36 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         note->SetCue(BOOLEAN_true);
     }
 
+    std::string head = token->getLayoutParameter("N", "head", subtoken);
+    if (!head.empty()) {
+        // See https://music-encoding.org/guidelines/v4/data-types/data.headshape.list.html
+        // not all available in veorvio yet.
+        if (head == "x") {
+            note->SetHeadShape(HEADSHAPE_x);
+        }
+        else if (head == "quarter") {
+            note->SetHeadShape(HEADSHAPE_quarter);
+        }
+        else if (head == "half") {
+            note->SetHeadShape(HEADSHAPE_half);
+        }
+        else if (head == "whole") {
+            note->SetHeadShape(HEADSHAPE_whole);
+        }
+        else if (head == "rhombus") {
+            note->SetHeadShape(HEADSHAPE_diamond);
+        }
+        else if (head == "diamond") {
+            note->SetHeadShape(HEADSHAPE_diamond);
+        }
+        else if (head == "slash") {
+            note->SetHeadShape(HEADSHAPE_slash);
+        }
+        else if (head == "plus") {
+            note->SetHeadShape(HEADSHAPE_plus);
+        }
+    }
+
     bool mensit = false;
     bool gesturalQ = false;
     bool hasAccidental = false;
