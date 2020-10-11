@@ -16467,6 +16467,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
     bool chordQ = token->isChord();
     bool unpitchedQ = token->isUnpitched();
+    bool badpitchedQ = false;
+    if (!unpitchedQ && (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0)) {
+        badpitchedQ = true;
+        unpitchedQ = true;
+    }
 
     if (!chordQ) {
         setStemLength(note, token);
@@ -16650,14 +16655,16 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
-    switch (diatonic % 7) {
-        case 0: note->SetPname(PITCHNAME_c); break;
-        case 1: note->SetPname(PITCHNAME_d); break;
-        case 2: note->SetPname(PITCHNAME_e); break;
-        case 3: note->SetPname(PITCHNAME_f); break;
-        case 4: note->SetPname(PITCHNAME_g); break;
-        case 5: note->SetPname(PITCHNAME_a); break;
-        case 6: note->SetPname(PITCHNAME_b); break;
+    if (!unpitchedQ) {
+        switch (diatonic % 7) {
+            case 0: note->SetPname(PITCHNAME_c); break;
+            case 1: note->SetPname(PITCHNAME_d); break;
+            case 2: note->SetPname(PITCHNAME_e); break;
+            case 3: note->SetPname(PITCHNAME_f); break;
+            case 4: note->SetPname(PITCHNAME_g); break;
+            case 5: note->SetPname(PITCHNAME_a); break;
+            case 6: note->SetPname(PITCHNAME_b); break;
+        }
     }
 
     if (unpitchedQ) {
@@ -16665,6 +16672,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         note->SetLoc(loc);
         // suppress note@pname (see issue https://github.com/rism-ch/verovio/issues/1385)
         // suppress note@oct as well
+    }
+
+    if (badpitchedQ) {
+        note->SetColor("#c41414");
     }
 
     bool cautionaryQ = false;

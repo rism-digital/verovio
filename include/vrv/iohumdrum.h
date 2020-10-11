@@ -208,6 +208,7 @@ namespace humaux {
         bool ligature_obliqua = false;
 
         // last_clef == keep track of last clef on staff to avoid duplications.
+        // Probably better to convert to hum::HTp so its location can be utilized.
         std::string last_clef;
 
         // acclev == In **mens data, controls the accidental level conversion
