@@ -3541,7 +3541,7 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
         return result->second;
     }
 
-    return TEXTRENDITION_box;
+    return TEXTRENDITION_none;
 }
 
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
