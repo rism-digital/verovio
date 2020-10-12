@@ -566,6 +566,7 @@ public:
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
+    OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMidpointThickness;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
@@ -580,6 +581,7 @@ public:
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
     OptionDbl m_thickBarlineThickness;
+    OptionDbl m_tieEndpointThickness;    
     OptionDbl m_tieMidpointThickness;    
     OptionDbl m_tupletBracketThickness;
 

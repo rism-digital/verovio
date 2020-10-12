@@ -910,6 +910,10 @@ Options::Options()
     m_slurMaxSlope.Init(20, 0, 60);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
+    m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
+    m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
+
     m_slurMidpointThickness.SetInfo("Slur midpoint thickness", "The midpoint slur thickness in MEI units");
     m_slurMidpointThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurMidpointThickness, "slurMidpointThickness", &m_generalLayout);
@@ -967,6 +971,10 @@ Options::Options()
     m_thickBarlineThickness.SetInfo("Thick barline thickness", "The thickness of the thick barline");
     m_thickBarlineThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_thickBarlineThickness, "thickBarlineThickness", &m_generalLayout);
+
+    m_tieEndpointThickness.SetInfo("Tie Endpoint thickness", "The Endpoint tie thickness in MEI units");
+    m_tieEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_tieEndpointThickness, "tieEndpointThickness", &m_generalLayout);
 
     m_tieMidpointThickness.SetInfo("Tie midpoint thickness", "The midpoint tie thickness in MEI units");
     m_tieMidpointThickness.Init(0.5, 0.2, 1.0);
@@ -1244,7 +1252,9 @@ void Options::Sync()
               { "stemThickness", &m_stemWidth }, //
               { "legerLineThickness", &m_ledgerLineThickness }, //
               { "legerLineExtension", &m_ledgerLineExtension }, //
+              { "slurEndpointThickness", &m_slurEndpointThickness }, //
               { "slurMidpointThickness", &m_slurMidpointThickness }, //
+              { "tieEndpointThickness", &m_tieEndpointThickness }, //
               { "tieMidpointThickness", &m_tieMidpointThickness }, //
               { "thinBarlineThickness", &m_barLineWidth }, //
               { "thickBarlineThickness", &m_thickBarlineThickness }, //

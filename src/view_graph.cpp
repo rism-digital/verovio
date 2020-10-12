@@ -286,17 +286,13 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data
 }
 
 void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle, int penStyle)
+    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, float angle, int penStyle)
 {
     assert(dc);
 
     Point bez1[4], bez2[4]; // filled array with control points and end point
 
-    if (m_bezierCurveThicknessCoeficient <= 0) {
-        m_bezierCurveThicknessCoeficient = BoundingBox::GetBezierThicknessCoeficient(bezier, thickness, angle);
-    }
-
-    BoundingBox::CalcThickBezier(bezier, thickness * m_bezierCurveThicknessCoeficient, angle, bez1, bez2);
+    BoundingBox::CalcThickBezier(bezier, thickness, angle, bez1, bez2);
 
     bez1[0] = ToDeviceContext(bez1[0]);
     bez1[1] = ToDeviceContext(bez1[1]);
@@ -311,12 +307,12 @@ void View::DrawThickBezierCurve(
     // Actually draw it
     if (penStyle == AxSOLID) {
         // Solid Thick Bezier Curves are made of two beziers, filled in.
-        dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
+        dc->SetPen(m_currentColour, std::max(1, penWidth), penStyle);
         dc->DrawComplexBezierPath(bez1, bez2);
     }
     else {
         // Dashed or Dotted Thick Bezier Curves have a uniform line width.
-        dc->SetPen(m_currentColour, thickness, penStyle);
+        dc->SetPen(m_currentColour, penWidth, penStyle);
         dc->DrawSimpleBezierPath(bez1);
     }
     dc->ResetPen();

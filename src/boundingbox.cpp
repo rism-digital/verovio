@@ -752,7 +752,7 @@ Point BoundingBox::CalcPointAtBezier(const Point bezier[4], double t)
     return midPoint;
 }
 
-double BoundingBox::GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle)
+double BoundingBox::GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle, int penWidth)
 {
     Point top[4], bottom[4];
     CalcThickBezier(bezier, currentThickness, angle, top, bottom);
@@ -762,7 +762,7 @@ double BoundingBox::GetBezierThicknessCoeficient(const Point bezier[4], int curr
 
     int actualThickness = sqrt((topMidpoint.x - bottomMidpoint.x) * (topMidpoint.x - bottomMidpoint.x)
         + (topMidpoint.y - bottomMidpoint.y) * (topMidpoint.y - bottomMidpoint.y));
-    return (double)currentThickness / (double)actualThickness;
+    return (double)currentThickness / (double)(actualThickness + penWidth);
 }
 
 Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
