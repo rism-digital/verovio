@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct  6 11:29:00 PDT 2020
+// Last Modified: Mon Oct 12 12:17:36 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -88333,8 +88333,7 @@ void Tool_transpose::convertToWrittenPitches(HumdrumFile& infile, int line,
 			}
 			continue;
 		}
-		if (hre.search(infile.token(line, j),
-		"^\\*ITrd[+-]?\\d+c[+-]?\\d+$", "")) {
+		if (hre.search(infile.token(line, j), "^\\*ITrd[+-]?\\d+c[+-]?\\d+$", "")) {
 			base = Convert::transToBase40(*infile.token(line, j));
 
 			string output = "*Tr";
@@ -88948,7 +88947,11 @@ void Tool_transpose::printHumdrumMxhmToken(HumdrumLine& record, int index,
 
 void Tool_transpose::printNewKernString(const string& input, int transval) {
 	HumRegex hre;
-	if (input.rfind('r') != string::npos) {
+	if (input.rfind('R') != string::npos) {
+		// don't transpose unpitched notes...
+		m_humdrum_text << input;
+		return;
+	} else if(input.rfind('r') != string::npos) {
 		string output = input;
 		if (hre.search(input, "([A-Ga-g]+[#n-]*)")) {
 			// transpose pitch portion of rest (indicating vertical position)
