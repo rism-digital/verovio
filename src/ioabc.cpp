@@ -1156,20 +1156,24 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
 
             // accidentals
             if (i >= 1) {
-                Accid *accid = new Accid();
+                data_ACCIDENTAL_WRITTEN abcAccid = ACCIDENTAL_WRITTEN_NONE;
                 switch (musicCode.at(i - 1)) {
                     case '^':
-                        i > 1 && musicCode.at(i - 2) == '^' ? accid->SetAccid(ACCIDENTAL_WRITTEN_x)
-                                                            : accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+                        i > 1 && musicCode.at(i - 2) == '^' ? abcAccid = ACCIDENTAL_WRITTEN_x
+                                                            : abcAccid = ACCIDENTAL_WRITTEN_s;
                         break;
-                    case '=': accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+                    case '=': abcAccid = ACCIDENTAL_WRITTEN_n; break;
                     case '_':
-                        i > 1 && musicCode.at(i - 2) == '_' ? accid->SetAccid(ACCIDENTAL_WRITTEN_ff)
-                                                            : accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+                        i > 1 && musicCode.at(i - 2) == '_' ? abcAccid = ACCIDENTAL_WRITTEN_ff
+                                                            : abcAccid = ACCIDENTAL_WRITTEN_f;
                         break;
                     default: break;
                 }
-                note->AddChild(accid);
+                if (abcAccid != ACCIDENTAL_WRITTEN_NONE) {
+                    Accid *accid = new Accid();
+                    accid->SetAccid(abcAccid);
+                    note->AddChild(accid);
+                }
             }
 
             if (keyPitchAlter.find(static_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
