@@ -684,7 +684,7 @@ void View::DrawOctave(
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         TextExtend extend;
         dc->GetSmuflTextExtent(str, &extend);
-        int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
+        const int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
         DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
         dc->ResetFont();
 
@@ -704,9 +704,10 @@ void View::DrawOctave(
 
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
         // draw the ending vertical line if not the end of the system
-        if (spanningType != SPANNING_START)
+        if (spanningType == SPANNING_END) {
             dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
                 ToDeviceContextY(y2 + lineWidth / 2));
+        }
 
         dc->ResetPen();
         dc->ResetBrush();
