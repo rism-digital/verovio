@@ -5385,27 +5385,12 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
         int line = -100;
         if (hre.search(clef, "clefX(\\d)")) {
             line = hre.getMatchInt(1);
+            if (line > 0) {
+                vrvclef->SetLine(line);
+            }
         }
         else {
-            // Automatically center percussion clef in middle of staff.
-            int lines = 5;
-            if (striatok) {
-                if (hre.search(striatok, "stria(\\d+)")) {
-                    lines = hre.getMatchInt(1);
-                }
-            }
-
-            if (lines % 2) {
-                // Odd number of lines, so center on line in middle of staff:
-                line = (lines + 1) / 2;
-            }
-            else {
-                // Even number of lines. Can't position on a space, so put on next lower line:
-                line = lines / 2;
-            }
-        }
-        if (line > 0) {
-            vrvclef->SetLine(line);
+            // Do nothing: it will be centered by verovio
         }
     }
 
