@@ -1326,6 +1326,10 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             int numbase = 1;
+            if ((m_broken < 0) && (grace == GRACE_NONE)) {
+                dots = -m_broken;
+                m_broken = 0;
+            }
             while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
                 numStr.push_back(musicCode.at(i));
@@ -1338,9 +1342,14 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 ++i;
                 numbaseStr.push_back(musicCode.at(i));
             }
-            if (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
                 ++i;
-                LogWarning("ABC import: Broken rhythms not supported");
+                ++m_broken;
+                ++dots;
+            }
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '<') {
+                ++i;
+                --m_broken;
             }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
@@ -1350,8 +1359,19 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 num = num - num / 3;
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC import: note length divider must be power of 2");
+            int dur = m_unitDur * numbase / num;
+
+            if (m_broken < 0) {
+                for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
+            }
+            else if ((dots == 0) && (m_broken > 0)) {
+                for (; m_broken != 0; --m_broken) dur = dur * 2;
+            }
+            data_DURATION meiDur
+                = (dur == 0) ? DURATION_breve : space->AttDurationLogical::StrToDuration(std::to_string(dur));
+
             if (dots > 0) space->SetDots(dots);
-            space->SetDur(space->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
+            space->SetDur(meiDur);
 
             // spaces cannot be beamed
             AddBeam();
