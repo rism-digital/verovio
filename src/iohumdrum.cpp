@@ -8354,7 +8354,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     Rest *rest = new Rest;
                     setLocationId(rest, layerdata[i]);
                     appendElement(elements, pointers, rest);
-                    convertRest(rest, layerdata[i]);
+                    convertRest(rest, layerdata[i], -1, staffindex);
                     int line = layerdata[i]->getLineIndex();
                     int field = layerdata[i]->getFieldIndex();
                     colorRest(rest, *layerdata[i], line, field);
@@ -8517,7 +8517,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     Rest *rest = new Rest;
                     setLocationId(rest, layerdata[i]);
                     appendElement(elements, pointers, rest);
-                    convertRest(rest, layerdata[i]);
+                    convertRest(rest, layerdata[i], -1, staffindex);
                     colorRest(rest, *layerdata[i], line, field);
                     verticalRest(rest, *layerdata[i]);
                 }
@@ -8537,7 +8537,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 Rest *rest = new Rest;
                 setLocationId(rest, layerdata[i]);
                 appendElement(elements, pointers, rest);
-                convertRest(rest, layerdata[i]);
+                convertRest(rest, layerdata[i], -1, staffindex);
                 processSlurs(layerdata[i]);
                 processPhrases(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
@@ -9228,7 +9228,7 @@ void HumdrumInput::convertMensuralToken(
         Rest *rest = new Rest;
         setLocationId(rest, token);
         appendElement(elements, pointers, rest);
-        convertRest(rest, token, -1);
+        convertRest(rest, token, -1, staffindex);
     }
     else if (token->isNote()) {
         Note *note = new Note;
@@ -9966,7 +9966,7 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
         if (visible) {
             Rest *rest = new Rest;
             // setLocationId(rest, layerdata[i]);
-            // convertRest(rest, layerdata[i]);
+            // convertRest(rest, layerdata[i], -1, staffindex);
             // processSlurs(layerdata[i]);
             // processPhrases(layerdata[i]);
             // processDynamics(layerdata[i], staffindex);
@@ -16295,8 +16295,10 @@ void HumdrumInput::convertMRest(MRest *rest, hum::HTp token, int subtoken, int s
 // HumdrumInput::convertRest --
 //
 
-void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
+void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int staffindex)
 {
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     // Shouldn't be in a chord, so add rest duration here.
     // Also full-measure rests are handled elsewhere.
@@ -16306,30 +16308,70 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
     string ploc = token->getValue("auto", "ploc");
     int ottava = token->getValueInt("auto", "ottava");
 
-    if ((!oloc.empty()) && (!ploc.empty())) {
-        int olocint = stoi(oloc);
-        olocint -= ottava;
-        rest->SetOloc(olocint);
-        if (ploc == "C") {
-            rest->SetPloc(PITCHNAME_c);
+    bool percussionQ = false;
+    if (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0) {
+        percussionQ = true;
+    }
+
+    if (percussionQ) {
+        if ((!oloc.empty()) && (!ploc.empty())) {
+            // treat as treble clef, but convert to @loc
+            int olocint = stoi(oloc);
+            olocint -= ottava;
+            int plocint = 0;
+            if (ploc == "C") {
+                plocint = 0;
+            }
+            else if (ploc == "D") {
+                plocint = 1;
+            }
+            else if (ploc == "E") {
+                plocint = 2;
+            }
+            else if (ploc == "F") {
+                plocint = 3;
+            }
+            else if (ploc == "G") {
+                plocint = 4;
+            }
+            else if (ploc == "A") {
+                plocint = 5;
+            }
+            else if (ploc == "B") {
+                plocint = 6;
+            }
+            int loc = plocint + 7 * olocint;
+            loc -= 30;
+            rest->SetLoc(loc);
         }
-        else if (ploc == "D") {
-            rest->SetPloc(PITCHNAME_d);
-        }
-        else if (ploc == "E") {
-            rest->SetPloc(PITCHNAME_e);
-        }
-        else if (ploc == "F") {
-            rest->SetPloc(PITCHNAME_f);
-        }
-        else if (ploc == "G") {
-            rest->SetPloc(PITCHNAME_g);
-        }
-        else if (ploc == "A") {
-            rest->SetPloc(PITCHNAME_a);
-        }
-        else if (ploc == "B") {
-            rest->SetPloc(PITCHNAME_b);
+    }
+    else {
+
+        if ((!oloc.empty()) && (!ploc.empty())) {
+            int olocint = stoi(oloc);
+            olocint -= ottava;
+            rest->SetOloc(olocint);
+            if (ploc == "C") {
+                rest->SetPloc(PITCHNAME_c);
+            }
+            else if (ploc == "D") {
+                rest->SetPloc(PITCHNAME_d);
+            }
+            else if (ploc == "E") {
+                rest->SetPloc(PITCHNAME_e);
+            }
+            else if (ploc == "F") {
+                rest->SetPloc(PITCHNAME_f);
+            }
+            else if (ploc == "G") {
+                rest->SetPloc(PITCHNAME_g);
+            }
+            else if (ploc == "A") {
+                rest->SetPloc(PITCHNAME_a);
+            }
+            else if (ploc == "B") {
+                rest->SetPloc(PITCHNAME_b);
+            }
         }
     }
 
