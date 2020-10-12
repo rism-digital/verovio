@@ -615,6 +615,10 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
                     isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
                         || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
                 }
+                // Reduce the margin to 0 for whole notes unisson
+                else if ((GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
+                    horizontalMargin = 0;
+                }
                 if (!isPreviousCoord || isEdgeElement || isChordElement) {
                     if ((GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
                         overlappingPosition = i;
@@ -624,10 +628,6 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
                         overlappingPosition = i;
                         continue;
                     }
-                }
-                // Reduce the margin to 0 for whole notes unisson
-                else if ((GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
-                    horizontalMargin = 0;
                 }
                 else {
                     horizontalMargin *= -1;
