@@ -199,7 +199,7 @@ public:
     /**
      * Calculate thickness coeficient to be applient for bezier curve to fit MEI units thickness
      */
-    static double BoundingBox::GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle);
+    static double GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle);
 
     /**
      * Calculate the point bezier point position for a t between 0.0 and 1.0
