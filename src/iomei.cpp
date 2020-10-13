@@ -1004,6 +1004,7 @@ void MEIOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
 
     WriteXmlId(currentNode, scoreDefElement);
     scoreDefElement->WriteMeasureNumbers(currentNode);
+    scoreDefElement->WriteSpacing(currentNode);
     scoreDefElement->WriteSystems(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
@@ -1304,6 +1305,7 @@ void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
     octave->WriteExtender(currentNode);
     octave->WriteLineRend(currentNode);
     octave->WriteLineRendBase(currentNode);
+    octave->WriteNNumberLike(currentNode);
     octave->WriteOctaveDisplacement(currentNode);
 }
 
@@ -3388,6 +3390,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 {
     SetMeiUuid(element, object);
     object->ReadMeasureNumbers(element);
+    object->ReadSpacing(element);
     object->ReadSystems(element);
     object->ReadTyped(element);
 
@@ -4190,6 +4193,7 @@ bool MEIInput::ReadOctave(Object *parent, pugi::xml_node octave)
     vrvOctave->ReadExtender(octave);
     vrvOctave->ReadLineRend(octave);
     vrvOctave->ReadLineRendBase(octave);
+    vrvOctave->ReadNNumberLike(octave);
     vrvOctave->ReadOctaveDisplacement(octave);
 
     parent->AddChild(vrvOctave);

@@ -34,7 +34,7 @@ namespace vrv {
 // SystemAligner
 //----------------------------------------------------------------------------
 
-SystemAligner::SystemAligner() : Object()
+SystemAligner::SystemAligner() : Object(), m_bottomAlignment(NULL), m_system(NULL)
 {
     Reset();
 }
@@ -44,6 +44,8 @@ SystemAligner::~SystemAligner() {}
 void SystemAligner::Reset()
 {
     Object::Reset();
+    m_spacingTypes.clear();
+    m_system = NULL;
     m_bottomAlignment = NULL;
     m_bottomAlignment = GetStaffAlignment(0, NULL, NULL);
 }
@@ -69,6 +71,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc
     StaffAlignment *alignment = new StaffAlignment();
     alignment->SetStaff(staff, doc, GetAboveSpacingType(staff));
     alignment->SetParent(this);
+    alignment->SetParentSystem(GetSystem());
     m_children.push_back(alignment);
 
     if (m_bottomAlignment) {
@@ -89,6 +92,14 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
     }
     LogDebug("Staff alignment for staff %d not found", staffN);
     return NULL;
+}
+
+System *SystemAligner::GetSystem()
+{
+    if (m_system == NULL) {
+        m_system = dynamic_cast<System *>(GetFirstAncestor(SYSTEM));
+    }
+    return m_system;
 }
 
 void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object)
@@ -263,9 +274,22 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc, SystemAligner::SpacingType
     }
 }
 
+void StaffAlignment::SetParentSystem(System *system)
+{
+    m_system = system;
+}
+
 int StaffAlignment::GetStaffSize() const
 {
     return m_staff ? m_staff->m_drawingStaffSize : 100;
+}
+
+const AttSpacing *StaffAlignment::GetAttSpacing() const
+{
+    System *system = GetParentSystem();
+    assert(system);
+
+    return system->GetDrawingScoreDef();
 }
 
 void StaffAlignment::SetYRel(int yRel)
@@ -353,6 +377,17 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetSelfBottom() + m_staffHeight - this->GetYRel());
 }
 
+int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const
+{
+    const auto &option = doc->GetOptions()->m_spacingStaff;
+    int spacing = option.GetValue() * doc->GetDrawingUnit(GetStaffSize());
+
+    if (!option.isSet() && attSpacing->HasSpacingStaff()) {
+        spacing = attSpacing->GetSpacingStaff() * doc->GetDrawingUnit(100);
+    }
+    return spacing;
+}
+
 int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
 {
     assert(doc);
@@ -361,30 +396,37 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
     if (m_staff && m_staff->m_drawingStaffDef) {
         // Default or staffDef spacing
         if (m_staff->m_drawingStaffDef->HasSpacing()) {
-            spacing = m_staff->m_drawingStaffDef->GetSpacing();
+            spacing = m_staff->m_drawingStaffDef->GetSpacing() * doc->GetDrawingUnit(100);
         }
         else {
+            const AttSpacing *scoreDefSpacing = GetAttSpacing();
             switch (m_spacingType) {
-                case SystemAligner::SpacingType::System: spacing = doc->GetOptions()->m_spacingSystem.GetValue(); break;
-                case SystemAligner::SpacingType::Staff: spacing = doc->GetOptions()->m_spacingStaff.GetValue(); break;
-                case SystemAligner::SpacingType::Brace:
-                    spacing = doc->GetOptions()->m_spacingBraceGroup.GetValue();
+                case SystemAligner::SpacingType::System: {
+                    spacing = GetParentSystem()->GetMinimumSystemSpacing(doc);
                     break;
-                case SystemAligner::SpacingType::Bracket:
-                    spacing = doc->GetOptions()->m_spacingBracketGroup.GetValue();
+                }
+                case SystemAligner::SpacingType::Staff: {
+                    spacing = GetMinimumStaffSpacing(doc, scoreDefSpacing);
                     break;
+                }
+                case SystemAligner::SpacingType::Brace: {
+                    const auto &option = doc->GetOptions()->m_spacingBraceGroup;
+                    spacing = option.isSet() ? option.GetValue() * doc->GetDrawingUnit(GetStaffSize())
+                                             : GetMinimumStaffSpacing(doc, scoreDefSpacing);
+                    break;
+                }
+                case SystemAligner::SpacingType::Bracket: {
+                    const auto &option = doc->GetOptions()->m_spacingBracketGroup;
+                    spacing = option.isSet() ? option.GetValue() * doc->GetDrawingUnit(GetStaffSize())
+                                             : GetMinimumStaffSpacing(doc, scoreDefSpacing);
+                    break;
+                }
                 case SystemAligner::SpacingType::None: break;
                 default: assert(false);
             }
         }
-
-        if (m_staff->m_drawingStaffDef->HasSpacing() || m_spacingType == SystemAligner::SpacingType::System) {
-            spacing *= doc->GetDrawingUnit(100);
-        }
-        else {
-            spacing *= doc->GetDrawingUnit(GetStaffSize());
-        }
     }
+
     return spacing;
 }
 
@@ -793,7 +835,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     std::vector<FloatingCurvePositioner *> positioners;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({PHRASE, SLUR})) continue;
+        if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
         Slur *slur = vrv_cast<Slur *>(positioner->GetObject());
         assert(slur);
 
@@ -823,10 +865,13 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
                 positioners[j]->GetPoints(points2);
                 if (firstSlur->GetStart() == secondSlur->GetStart()) {
                     FloatingCurvePositioner *positioner = positioners[points1[2].x > points2[2].x ? i : j];
-                    positioner->MoveFrontVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
-                } else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
+                    positioner->MoveFrontVertical(
+                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                }
+                else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
                     FloatingCurvePositioner *positioner = positioners[points1[0].x < points2[0].x ? i : j];
-                    positioner->MoveBackVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                    positioner->MoveBackVertical(
+                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
                 }
             }
         }

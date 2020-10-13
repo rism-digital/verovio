@@ -404,6 +404,12 @@ void Page::LayOutVertically()
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
+    // Adjust the position of the beams in regards of layer elements
+    AdjustBeamParams adjustBeamParams(doc);
+    Functor adjustBeams(&Object::AdjustBeams);
+    Functor adjustBeamsEnd(&Object::AdjustBeamsEnd);
+    this->Process(&adjustBeams, &adjustBeamParams, &adjustBeamsEnd);
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsYParams(doc);
     Functor adjustTupletsY(&Object::AdjustTupletsY);

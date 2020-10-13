@@ -395,9 +395,15 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int y = staff->GetDrawingY();
-    DrawBarLine(
-        dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), barLine);
+    int yTop = staff->GetDrawingY();
+    int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+    int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
+
+    DrawBarLine(dc, yTop + offset, yBottom - offset, barLine);
+    if (barLine->HasRepetitionDots()) {
+        DrawBarLineDots(dc, staff, barLine);
+    }
 
     dc->EndGraphic(element, this);
 }
@@ -1778,12 +1784,15 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
     if (valeur == DUR_1) vertic = -vertic;
 
     // look if on line or between line
+    // I think this came from OMR output use. Commented because does not work with `@scale` -
+    /*
     if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) {
         if (valeur == DUR_2)
             y1 -= vertic;
         else
             y1 += vertic;
     }
+    */
 
     // legder line
     if (y > (int)staff->GetDrawingY()

@@ -859,13 +859,14 @@ void Beam::FilterList(ArrayOfObjects *childList)
             // if we are at the beginning of the beam
             // and the note is cueSize
             // assume all the beam is of grace notes
+            const bool isInGraceGroup = element->GetFirstAncestor(GRACEGRP);
             if (childList->begin() == iter) {
-                if (element->IsGraceNote()) firstNoteGrace = true;
+                if (element->IsGraceNote() || isInGraceGroup) firstNoteGrace = true;
             }
             // if the first note in beam was NOT a grace
             // we have grace notes embedded in a beam
             // drop them
-            if (!firstNoteGrace && element->IsGraceNote()) {
+            if (!firstNoteGrace && (element->IsGraceNote() || isInGraceGroup)) {
                 iter = childList->erase(iter);
                 continue;
             }
@@ -1041,8 +1042,13 @@ void BeamElementCoord::SetDrawingStemDir(
 
     if (!m_closestNote) return;
 
+    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
+    
+    if (m_element->IsGraceNote() || isInGraceGroup) segment->m_uniformStemLength *= 0.75;
     this->m_centered = segment->m_uniformStemLength % 2;
     this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+
+    if (m_element->IsGraceNote() || isInGraceGroup) return;
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
@@ -1063,6 +1069,8 @@ void BeamElementCoord::SetDrawingStemDir(
     else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
+
+    this->m_yBeam += m_overlapMargin;
 }
 
 int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
@@ -1109,6 +1117,55 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Beam::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    // process highest-level beam
+    if (!params->m_beam) {
+        params->m_beam = this;
+        params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
+        params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
+        params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+        return FUNCTOR_CONTINUE;
+    }
+
+    //const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+
+    const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
+    const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
+
+    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
+    if (overlapMargin >= params->m_overlapMargin) {
+        Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+        assert(staff);
+        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params->m_overlapMargin = (overlapMargin + staffOffset) * params->m_directionBias;
+    }
+    return FUNCTOR_SIBLINGS;
+}
+
+
+int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (params->m_beam != this) return FUNCTOR_CONTINUE;
+
+    // set overlap margin for each coord in the beam
+    if (params->m_overlapMargin) {
+        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+            [overlap = params->m_overlapMargin](BeamElementCoord *coord) { coord->m_overlapMargin = overlap; });
+    }
+    params->m_beam = NULL;
+    params->m_overlapMargin = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
 
 int Beam::CalcStem(FunctorParams *functorParams)
 {

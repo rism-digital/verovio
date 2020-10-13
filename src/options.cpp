@@ -769,7 +769,12 @@ Options::Options()
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
 
-    m_barLineWidth.SetInfo("Bar line width", "The barLine width");
+    m_barLineSeparation.SetInfo(
+        "Barline separation", "The default distance between multiple barlines when locked together");
+    m_barLineSeparation.Init(0.8, 0.5, 2.0);
+    this->Register(&m_barLineSeparation, "barLineSeparation", &m_generalLayout);
+
+    m_barLineWidth.SetInfo("Barline width", "The barLine width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
@@ -873,6 +878,11 @@ Options::Options()
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
 
+    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
+        "The default horizontal distance between the dots and the inner barline of a repeat barline");
+    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
+
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
     m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
@@ -908,12 +918,12 @@ Options::Options()
 
     m_spacingBraceGroup.SetInfo(
         "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
-    m_spacingBraceGroup.Init(12, 0, 36);
+    m_spacingBraceGroup.Init(12, 0, 48);
     this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
 
     m_spacingBracketGroup.SetInfo(
         "Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
-    m_spacingBracketGroup.Init(12, 0, 36);
+    m_spacingBracketGroup.Init(12, 0, 48);
     this->Register(&m_spacingBracketGroup, "spacingBracketGroup", &m_generalLayout);
 
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
@@ -929,7 +939,7 @@ Options::Options()
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
 
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
-    m_spacingStaff.Init(12, 0, 36);
+    m_spacingStaff.Init(12, 0, 48);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
 
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
@@ -1227,6 +1237,8 @@ void Options::Sync()
               { "tieMidpointThickness", &m_tieThickness }, //
               { "thinBarlineThickness", &m_barLineWidth }, //
               { "thickBarlineThickness", &m_thickBarlineThickness }, //
+              { "barlineSeparation", &m_barLineSeparation }, //
+              { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
               { "bracketThickness", &m_bracketThickness }, //
               { "subBracketThickness", &m_subBracketThickness }, //
               { "hairpinThickness", &m_hairpinThickness }, //
