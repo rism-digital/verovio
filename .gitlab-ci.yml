@@ -2,6 +2,8 @@
 stages:
   - build
   - build-toolkit
+  - build-viewer
+  - deploy-viewer
 
 variables:
   EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
@@ -41,3 +43,38 @@ build-toolkit:
   artifacts:
     paths:
       - emscripten/build/verovio-toolkit.js*
+
+build-viewer:
+  stage: build-viewer
+  dependencies:
+  - build-toolkit
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+deploy-viewer:
+  stage: deploy-viewer
+  image:
+    name: bitnami/git
+    entrypoint: ["bash"]
+  except:
+    - external_pull_requests
+  variables:
+    TAG: $CI_COMMIT_SHA
+  script:
+    - apt-get update
+    - apt-get install gettext-base
+    - git clone https://$GITHUB_PERSONAL_TOKEN@github.com/eNote-GmbH/helm-charts.git /tmp/helm-charts
+    - cd /tmp/helm-charts
+    - rm dev/verovio-web-viewer/values.yaml
+    - envsubst '${TAG}' < "dev/verovio-web-viewer/values-template.yaml" > "dev/verovio-web-viewer/values.yaml"
+    - git config credential.helper 'cache --timeout=120'
+    - git config user.email "ci-cd@enote.com"
+    - git config user.name "enotecicd"
+    - git add .
+    - git commit -m "Update via GitLab"
+    - git push -q https://$GITHUB_PERSONAL_TOKEN@github.com/eNote-GmbH/helm-charts.git master
