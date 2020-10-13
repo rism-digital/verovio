@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct 12 12:17:36 PDT 2020
+// Last Modified: Mon Oct 12 18:45:19 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -77472,6 +77472,8 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 	// Check for percussion clefs, etc., here.
 	if (sign == "percussion") {
 		sign = "X";
+		// ignore line of percussion clef (assume it is centered on staff).
+		line = -1000;
 	}
 	stringstream ss;
 	ss << "*clef" << sign;
