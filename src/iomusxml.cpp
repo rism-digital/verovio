@@ -3026,11 +3026,11 @@ void MusicXmlInput::ReadMusicXmlNote(
             m_trillStack.push_back(std::make_pair(trill, openTrill));
         }
         for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
-            if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
-                trill->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
-            }
-            else if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
+            if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
                 trill->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+            else {
+                trill->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
         }
     }
