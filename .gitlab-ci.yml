@@ -61,6 +61,8 @@ deploy-viewer:
   image:
     name: bitnami/git
     entrypoint: ["bash"]
+  except:
+    - external_pull_requests
   variables:
     TAG: $CI_COMMIT_SHA
   script:
