@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `accidental-mark` in MusicXML import (@rettinghaus)
 * Improved barline rendition (@rettinghaus)
 
 ## [3.0.0] - 2020-10-05
