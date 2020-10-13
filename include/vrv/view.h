@@ -363,7 +363,7 @@ protected:
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
-    void DrawTextBoxes(DeviceContext *dc, const std::vector<TextElement *> &boxedRend);
+    void DrawTextBoxes(DeviceContext *dc, const std::vector<TextElement *> &boxedRend, int staffSize);
 
     /**
      * @name Method for drawing Beam and FTrem.

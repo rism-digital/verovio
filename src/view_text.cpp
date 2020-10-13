@@ -246,7 +246,7 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
     FontInfo *currentFont = dc->GetFont();
 
     params.m_y -= m_doc->GetTextLineHeight(currentFont, false);
-    params.m_newLine = true;
+    params.m_explicitPosition = true;
 
     dc->EndTextGraphic(lb, this);
 }
@@ -353,6 +353,11 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetSupSubScript(true);
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() * SUPER_SCRIPT_FACTOR);
     }
+    
+    if ((rend->GetRend() == TEXTRENDITION_box) && (params.m_actualWidth != 0)) {
+        params.m_x = params.m_actualWidth + m_doc->GetDrawingUnit(100);
+        params.m_explicitPosition = true;
+    }
 
     DrawTextChildren(dc, rend, params);
 
@@ -365,9 +370,8 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     if (rend->GetRend() == TEXTRENDITION_box) {
         params.m_boxedRend.push_back(rend);
-
         params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
-        params.m_newLine = true;
+        params.m_explicitPosition = true;
     }
 
     if (customFont) dc->ResetFont();
@@ -384,9 +388,9 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     Resources::SelectTextFont(dc->GetFont()->GetWeight(), dc->GetFont()->GetStyle());
 
-    if (params.m_newLine) {
+    if (params.m_explicitPosition) {
         dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
-        params.m_newLine = false;
+        params.m_explicitPosition = false;
     }
     else if (params.m_verticalShift) {
         dc->MoveTextVerticallyTo(ToDeviceContextY(params.m_y));
@@ -413,6 +417,8 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     else {
         DrawTextString(dc, text->GetText(), params);
     }
+
+    params.m_actualWidth = text->GetContentRight();
 
     dc->EndTextGraphic(text, this);
 }

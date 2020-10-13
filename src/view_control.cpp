@@ -1488,7 +1488,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBoxes(dc, params.m_boxedRend);
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(dir, this);
@@ -1570,7 +1570,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             dc->ResetFont();
             dc->ResetBrush();
         }
-        DrawTextBoxes(dc, params.m_boxedRend);
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(dynam, this);
@@ -1699,7 +1699,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBoxes(dc, params.m_boxedRend);
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(fing, this);
@@ -1865,7 +1865,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             dc->ResetFont();
             dc->ResetBrush();
 
-            DrawTextBoxes(dc, params.m_boxedRend);
+            DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
         }
     }
 
@@ -2087,7 +2087,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBoxes(dc, params.m_boxedRend);
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(reh, this);
@@ -2161,7 +2161,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBoxes(dc, params.m_boxedRend);
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(tempo, this);
@@ -2511,11 +2511,11 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->EndGraphic(ending, this);
 }
 
-void View::DrawTextBoxes(DeviceContext *dc, const std::vector<TextElement *> &boxedRend)
+void View::DrawTextBoxes(DeviceContext *dc, const std::vector<TextElement *> &boxedRend, int staffSize)
 {
     assert(dc);
-    const int lineThickness = m_options->m_textEnclosureThickness.GetValue() * m_doc->GetDrawingUnit(100);
-    const int boxMargin = m_doc->GetDrawingUnit(100) / 2;
+    const int lineThickness = m_options->m_textEnclosureThickness.GetValue() * staffSize;
+    const int boxMargin = staffSize / 2;
 
     for (const auto rend : boxedRend) {
         const int x1 = rend->GetContentLeft() - boxMargin;
