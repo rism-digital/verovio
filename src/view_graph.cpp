@@ -114,7 +114,8 @@ void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int
     dc->SetPen(m_currentColour, penWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 
-    dc->DrawRoundedRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
+    dc->DrawRoundedRectangle(
+        ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
 
     dc->ResetPen();
     dc->ResetBrush();

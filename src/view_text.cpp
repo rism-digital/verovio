@@ -353,7 +353,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetSupSubScript(true);
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() * SUPER_SCRIPT_FACTOR);
     }
-    
+
     if ((rend->GetRend() == TEXTRENDITION_box) && (params.m_actualWidth != 0)) {
         params.m_x = params.m_actualWidth + m_doc->GetDrawingUnit(100);
         params.m_explicitPosition = true;

@@ -1249,7 +1249,7 @@ void Options::Sync()
               { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
               { "lyricLineThickness", &m_lyricLineThickness }, //
               { "tupletBracketThickness", &m_tupletBracketThickness }, //
-              { "textEnclosureThickness", &m_textEnclosureThickness }
+              { "textEnclosureThickness", &m_textEnclosureThickness } //
     };
 
     for (auto &pair : engravingDefaults) {

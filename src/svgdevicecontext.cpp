@@ -671,8 +671,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 
     if (m_penStack.size()) {
         Pen currentPen = m_penStack.top();
-        if (currentPen.GetWidth() > 0)
-            rectChild.append_attribute("stroke") = GetColour(currentPen.GetColour()).c_str();
+        if (currentPen.GetWidth() > 0) rectChild.append_attribute("stroke") = GetColour(currentPen.GetColour()).c_str();
         if (currentPen.GetWidth() > 1)
             rectChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
         if (currentPen.GetOpacity() != 1.0)
