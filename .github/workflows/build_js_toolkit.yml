@@ -87,13 +87,13 @@ jobs:
             actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
 
         - name: Cache emsdk artifacts
-            id: cache-emsdk
-            uses: actions/cache@v2
-            with:
-              # path for cache
-              path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
-              # key for cache
-              key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.sha }}
+          id: cache-emsdk
+          uses: actions/cache@v2
+          with:
+            # path for cache
+            path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+            # key for cache
+            key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.sha }}
 
         - name: Verify emscripten build
           run: emcc -v
