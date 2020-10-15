@@ -7,7 +7,10 @@ on:
     types:
       - completed
     # build C++ workflow runs on push to develop, ci-test or travis-test branch
-    branches: [develop, ci-test, travis-test]
+    branches:
+      - develop
+      - ci-test
+      - travis-test
 
 # globals
 env:
