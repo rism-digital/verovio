@@ -21,8 +21,10 @@ jobs:
 
       - name: Download clang-format
         # make sure to use version 5.0
-        # run: |
+        run: |
         #   brew install clang-format
 
       - name: Running clang-format
+        run: |
         # clang-format -style=file -i   some-directory/some-file.cpp
+
