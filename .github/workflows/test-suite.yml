@@ -56,15 +56,14 @@ jobs:
           make -j 8
 
       - name: Run tests
+        env:
+          TEST_DIR: $GITHUB_WORKSPACE/$GH_PAGES_FOLDER/_tests
         run: |
-          dir = $GITHUB_WORKSPACE/$GH_PAGES_FOLDER/_tests
-          tests = `LS $dir`
-
           cd $GITHUB_WORKSPACE/tools
-          for t in $tests; do
-              for i in `LS $dir/$t/*.mei`; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
-              for i in `LS $dir/$t/*.mei`; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
-              mv $dir/$t/*.svg $GITHUB_WORKSPACE/$TEMP_FOLDER;
+          for t in `LS $TEST_DIR`; do
+              for i in `LS $TEST_DIR/$t/*.mei`; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
+              for i in `LS $TEST_DIR/$t/*.mei`; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
+              mv $TEST_DIR/$t/*.svg $GITHUB_WORKSPACE/$TEMP_FOLDER;
           done
 
       - name: Verify
