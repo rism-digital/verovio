@@ -62,9 +62,9 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/$TEMP_FOLDER
 
           cd $GITHUB_WORKSPACE/tools
-          for t in `ls $TEST_DIR`; do
-              for i in `ls $TEST_DIR/$t/*.mei`; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
-              for i in `ls $TEST_DIR/$t/*.mei`; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
+          for t in $TEST_DIR/*; do
+              for i in $TEST_DIR/$t/*.mei; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
+              for i in $TEST_DIR/$t/*.mei; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
               mv $TEST_DIR/$t/*.svg $GITHUB_WORKSPACE/$TEMP_FOLDER;
           done
 
