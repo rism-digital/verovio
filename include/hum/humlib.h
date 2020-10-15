@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct 12 18:45:19 PDT 2020
+// Last Modified: Tue Oct 13 14:01:31 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6830,10 +6830,10 @@ class SonorityNoteData {
 				m_tok = *token;
 				m_index = 0;
 			}
-			if (m_tok.find('_') != string::npos) {
+			if (m_tok.find('_') != std::string::npos) {
 				m_attackQ = false;
 			}
-			if (m_tok.find(']') != string::npos) {
+			if (m_tok.find(']') != std::string::npos) {
 				m_attackQ = false;
 			}
 			m_base7 = Convert::kernToBase7(m_tok);
@@ -6848,21 +6848,21 @@ class SonorityNoteData {
 			m_token = NULL;
 			m_index = 0;
 			m_tok = tok;
-			if (m_tok.find('_') != string::npos) {
+			if (m_tok.find('_') != std::string::npos) {
 				m_attackQ = false;
 			}
-			if (m_tok.find(']') != string::npos) {
+			if (m_tok.find(']') != std::string::npos) {
 				m_attackQ = false;
 			}
 			m_base7 = Convert::kernToBase7(m_tok);
 			m_base12 = Convert::kernToBase12(m_tok);
 			m_base40 = Convert::kernToBase40(m_tok);
 
-			if (m_tok.find('n') != string::npos) {
+			if (m_tok.find('n') != std::string::npos) {
 				m_accidentalQ = true;
-			} if (m_tok.find('-') != string::npos) {
+			} if (m_tok.find('-') != std::string::npos) {
 				m_accidentalQ = true;
-			} if (m_tok.find('#') != string::npos) {
+			} if (m_tok.find('#') != std::string::npos) {
 				m_accidentalQ = true;
 			}
 			for (int i=0; i<(int)m_tok.size(); i++) {
@@ -6898,7 +6898,7 @@ class SonorityNoteData {
 
 	private:
 		HTp m_token;
-		string m_tok;       // note string from token
+		std::string m_tok;  // note string from token
 		bool m_accidentalQ; // note contains an accidental
 		bool m_upperQ;      // Diatonic note name contains an upper case letter
 		bool m_attackQ;     // true if note is an attack
@@ -7129,12 +7129,13 @@ class Tool_msearch : public HumTool {
 		void    markNote           (HTp token, int index);
 		int     checkHarmonicPitchMatch (SonorityNoteData& query,
 		                           SonorityDatabase& sonorities, bool suppressQ);
-		bool    checkVerticalOnly  (const string& input);
+		bool    checkVerticalOnly  (const std::string& input);
+		void    makeLowerCase      (std::string& inout);
 
 	private:
 	 	vector<HTp> m_kernspines;
-		string      m_text;
-		string      m_marker;
+		std::string m_text;
+		std::string m_marker;
 		bool        m_verticalOnlyQ = false;
 		bool        m_markQ      = false;
 		bool        m_quietQ     = false;
