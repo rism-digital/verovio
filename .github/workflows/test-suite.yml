@@ -42,28 +42,34 @@ jobs:
         run: |
           pwd
           ls -al
-
           ls -R
 
       - name: Find tests
         run: |
-          cd ${{ env.GH_PAGES_FOLDER }}/_tests
+          cd $GITHUB_WORKSPACE/$GH_PAGES_FOLDER/_tests
           ls -al
-          echo "dir=${{ env.GH_PAGES_FOLDER }}/_tests" >> $GITHUB_ENV
 
-      - name: Verify
-        run: |
-          echo $dir
-          $dir
-
-          
       - name: Run make
         run: |
           cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
           make -j 8
 
-      - name: Running clang-format
+      - name: Run tests
         run: |
-        # clang-format -style=file -i   some-directory/some-file.cpp
+          dir = $GITHUB_WORKSPACE/$GH_PAGES_FOLDER/_tests
+          tests = `LS $dir`
+
+          cd $GITHUB_WORKSPACE/tools
+          for t in $tests; do
+              for i in `LS $dir/$t/*.mei`; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
+              for i in `LS $dir/$t/*.mei`; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
+              mv $dir/$t/*.svg $GITHUB_WORKSPACE/$TEMP_FOLDER;
+          done
+
+      - name: Verify
+        run: |
+          $GITHUB_WORKSPACE/$TEMP_FOLDER
+          pwd
+          ls -al
 
