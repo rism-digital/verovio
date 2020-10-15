@@ -428,6 +428,6 @@ private:
     /* include <attppq> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_MIDI_H__

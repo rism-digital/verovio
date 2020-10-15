@@ -27,7 +27,7 @@ void *vrvToolkit_constructor()
     return new Toolkit();
 }
 
-void *vrvToolkit_constructorResourcePath(const char *resourcePath)
+void *vrvToolkit_constructorResourcePath(const char* resourcePath)
 {
     // set the resource path
     Resources::SetPath(resourcePath);

@@ -64,6 +64,6 @@ private:
     /* include <attfacs> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_FACSIMILE_H__

@@ -111,13 +111,12 @@ void display_usage()
     std::cout << " -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)" << std::endl;
     std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
     std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
-    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")"
-              << std::endl;
+    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
     std::cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << std::endl;
     std::cout << " -t, --to <s>          Select output format: mei, pb-mei, svg, or midi (default is svg)" << std::endl;
     std::cout << " -v, --version         Display the version number" << std::endl;
     std::cout << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << std::endl;
-
+    
     std::cout << std::endl << "Additional long options" << std::endl;
     std::cout << "--remove-ids           Remove in the MEI output XML IDs that are not referenced " << std::endl;
 
@@ -215,13 +214,21 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    static struct option base_options[] = { { "all-pages", no_argument, 0, 'a' }, { "from", required_argument, 0, 'f' },
-        { "help", no_argument, 0, 'h' }, { "outfile", required_argument, 0, 'o' },
-        { "page", required_argument, 0, 'p' }, { "resources", required_argument, 0, 'r' },
-        { "scale", required_argument, 0, 's' }, { "to", required_argument, 0, 't' }, { "version", no_argument, 0, 'v' },
-        { "xml-id-seed", required_argument, 0, 'x' },
-        // mei output - long options only
-        { "remove-ids", no_argument, 0, 'm' }, { 0, 0, 0, 0 } };
+    static struct option base_options[]
+        = { { "all-pages", no_argument, 0, 'a' },
+            { "from", required_argument, 0, 'f' },
+            { "help", no_argument, 0, 'h' },
+            { "outfile", required_argument, 0, 'o' },
+            { "page", required_argument, 0, 'p' },
+            { "resources", required_argument, 0, 'r' },
+            { "scale", required_argument, 0, 's' },
+            { "to", required_argument, 0, 't' },
+            { "version", no_argument, 0, 'v' },
+            { "xml-id-seed", required_argument, 0, 'x' },
+            // mei output - long options only
+            { "remove-ids", no_argument, 0, 'm' },
+            { 0, 0, 0, 0 }
+        };
 
     int baseSize = sizeof(base_options) / sizeof(option);
 
@@ -303,7 +310,7 @@ int main(int argc, char **argv)
                     exit(1);
                 };
                 break;
-
+                
             case 'm':
                 if (!strcmp(long_options[option_index].name, "remove-ids")) {
                     remove_ids = true;
@@ -331,15 +338,9 @@ int main(int argc, char **argv)
 
             case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
 
-            case 'h':
-                display_usage();
-                exit(0);
-                break;
+            case 'h': display_usage(); exit(0); break;
 
-            case '?':
-                display_usage();
-                exit(1);
-                break;
+            case '?': display_usage(); exit(1); break;
 
             default: break;
         }
@@ -388,8 +389,7 @@ int main(int argc, char **argv)
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
         && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae") && (outformat != "pb-mei")) {
-        std::cerr << "Output format (" << outformat
-                  << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
+        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
         exit(1);
     }
 
@@ -545,8 +545,7 @@ int main(int argc, char **argv)
             }
         }
         else {
-            std::string params
-                = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, page, removeIds);
+            std::string params = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, page, removeIds);
             if (std_output) {
                 std::cout << toolkit.GetMEI(params);
             }

@@ -61,6 +61,6 @@ private:
     /* include <attchordref> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_HARMONY_H__

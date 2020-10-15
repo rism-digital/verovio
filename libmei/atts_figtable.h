@@ -67,6 +67,6 @@ private:
     /* include <attrowspan> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_FIGTABLE_H__

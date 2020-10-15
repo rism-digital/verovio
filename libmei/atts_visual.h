@@ -1529,6 +1529,6 @@ private:
     /* include <attnum.format> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_VISUAL_H__

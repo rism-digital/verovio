@@ -127,9 +127,9 @@ private:
      */
     std::map<int, SpacingType> m_spacingTypes;
     /**
-     * A pointer to the parent system
-     */
-    System *m_system;
+    * A pointer to the parent system
+    */
+    System* m_system;
 };
 
 //----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ public:
      */
     ///@{
     System *GetParentSystem() const { return m_system; }
-    void SetParentSystem(System *system);
+    void SetParentSystem(System* system);
 
     /**
      * Returns the staff size (100 if no staff object is refered to)
@@ -314,6 +314,7 @@ public:
     virtual int JustifyY(FunctorParams *functorParams);
 
 private:
+
     /**
      * Returns minimus preset spacing
      */

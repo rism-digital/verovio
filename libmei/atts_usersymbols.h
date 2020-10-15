@@ -172,6 +172,6 @@ private:
     /* include <attfunc> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_USERSYMBOLS_H__

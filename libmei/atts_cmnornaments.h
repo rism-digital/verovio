@@ -194,6 +194,6 @@ private:
     /* include <attform> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_CMNORNAMENTS_H__

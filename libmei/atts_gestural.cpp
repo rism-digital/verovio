@@ -35,7 +35,9 @@ AttAccidentalGestural::AttAccidentalGestural() : Att()
     ResetAccidentalGestural();
 }
 
-AttAccidentalGestural::~AttAccidentalGestural() {}
+AttAccidentalGestural::~AttAccidentalGestural()
+{
+}
 
 void AttAccidentalGestural::ResetAccidentalGestural()
 {
@@ -79,7 +81,9 @@ AttArticulationGestural::AttArticulationGestural() : Att()
     ResetArticulationGestural();
 }
 
-AttArticulationGestural::~AttArticulationGestural() {}
+AttArticulationGestural::~AttArticulationGestural()
+{
+}
 
 void AttArticulationGestural::ResetArticulationGestural()
 {
@@ -123,7 +127,9 @@ AttBendGes::AttBendGes() : Att()
     ResetBendGes();
 }
 
-AttBendGes::~AttBendGes() {}
+AttBendGes::~AttBendGes()
+{
+}
 
 void AttBendGes::ResetBendGes()
 {
@@ -167,7 +173,9 @@ AttDurationGestural::AttDurationGestural() : Att()
     ResetDurationGestural();
 }
 
-AttDurationGestural::~AttDurationGestural() {}
+AttDurationGestural::~AttDurationGestural()
+{
+}
 
 void AttDurationGestural::ResetDurationGestural()
 {
@@ -286,7 +294,9 @@ AttNcGes::AttNcGes() : Att()
     ResetNcGes();
 }
 
-AttNcGes::~AttNcGes() {}
+AttNcGes::~AttNcGes()
+{
+}
 
 void AttNcGes::ResetNcGes()
 {
@@ -360,7 +370,9 @@ AttNoteGes::AttNoteGes() : Att()
     ResetNoteGes();
 }
 
-AttNoteGes::~AttNoteGes() {}
+AttNoteGes::~AttNoteGes()
+{
+}
 
 void AttNoteGes::ResetNoteGes()
 {
@@ -449,7 +461,9 @@ AttScoreDefGes::AttScoreDefGes() : Att()
     ResetScoreDefGes();
 }
 
-AttScoreDefGes::~AttScoreDefGes() {}
+AttScoreDefGes::~AttScoreDefGes()
+{
+}
 
 void AttScoreDefGes::ResetScoreDefGes()
 {
@@ -523,7 +537,9 @@ AttSectionGes::AttSectionGes() : Att()
     ResetSectionGes();
 }
 
-AttSectionGes::~AttSectionGes() {}
+AttSectionGes::~AttSectionGes()
+{
+}
 
 void AttSectionGes::ResetSectionGes()
 {
@@ -567,7 +583,9 @@ AttSoundLocation::AttSoundLocation() : Att()
     ResetSoundLocation();
 }
 
-AttSoundLocation::~AttSoundLocation() {}
+AttSoundLocation::~AttSoundLocation()
+{
+}
 
 void AttSoundLocation::ResetSoundLocation()
 {
@@ -626,7 +644,9 @@ AttTimestampGestural::AttTimestampGestural() : Att()
     ResetTimestampGestural();
 }
 
-AttTimestampGestural::~AttTimestampGestural() {}
+AttTimestampGestural::~AttTimestampGestural()
+{
+}
 
 void AttTimestampGestural::ResetTimestampGestural()
 {
@@ -685,7 +705,9 @@ AttTimestamp2Gestural::AttTimestamp2Gestural() : Att()
     ResetTimestamp2Gestural();
 }
 
-AttTimestamp2Gestural::~AttTimestamp2Gestural() {}
+AttTimestamp2Gestural::~AttTimestamp2Gestural()
+{
+}
 
 void AttTimestamp2Gestural::ResetTimestamp2Gestural()
 {
@@ -1015,4 +1037,4 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace

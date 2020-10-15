@@ -28,7 +28,9 @@ Element::Element() : LayerElement("element-"), AttNNumberLike()
     Reset();
 }
 
-Element::~Element() {}
+Element::~Element()
+{
+}
 
 void Element::Reset()
 {

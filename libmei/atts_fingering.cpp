@@ -35,7 +35,9 @@ AttFingGrpLog::AttFingGrpLog() : Att()
     ResetFingGrpLog();
 }
 
-AttFingGrpLog::~AttFingGrpLog() {}
+AttFingGrpLog::~AttFingGrpLog()
+{
+}
 
 void AttFingGrpLog::ResetFingGrpLog()
 {
@@ -95,4 +97,4 @@ void Att::GetFingering(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace

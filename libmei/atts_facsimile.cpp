@@ -35,7 +35,9 @@ AttFacsimile::AttFacsimile() : Att()
     ResetFacsimile();
 }
 
-AttFacsimile::~AttFacsimile() {}
+AttFacsimile::~AttFacsimile()
+{
+}
 
 void AttFacsimile::ResetFacsimile()
 {
@@ -95,4 +97,4 @@ void Att::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace

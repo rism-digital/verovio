@@ -81,11 +81,13 @@ int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, dat
 // Clef functors methods
 //----------------------------------------------------------------------------
 
-int Clef::AdjustBeams(FunctorParams *functorParams)
+int Clef::AdjustBeams(FunctorParams* functorParams)
 {
     const std::map<data_CLEFSHAPE, std::pair<wchar_t, double> > topToMiddleProportions
-        = { { CLEFSHAPE_G, { SMUFL_E050_gClef, 0.6 } }, { CLEFSHAPE_C, { SMUFL_E05C_cClef, 0.5 } },
-              { CLEFSHAPE_F, { SMUFL_E062_fClef, 0.35 } } };
+        = { { CLEFSHAPE_G, { SMUFL_E050_gClef, 0.6 } }, 
+            { CLEFSHAPE_C, { SMUFL_E05C_cClef, 0.5 } },
+            { CLEFSHAPE_F, { SMUFL_E062_fClef, 0.35 } }
+    };
 
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
@@ -97,7 +99,7 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     auto currentShapeIter = topToMiddleProportions.find(GetShape());
     if (currentShapeIter == topToMiddleProportions.end()) return FUNCTOR_CONTINUE;
 
-    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+    //const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
     const int proportion = (params->m_directionBias > 0) ? 0 : -1;
 
     // Y position differes for clef shapes, so we need to take into account only a part of the glyph height
@@ -114,10 +116,10 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     const int rightMargin = (clefPosition + clefGlyphHeight * (proportion + currentShapeIter->second.second)
                                 + (params->m_directionBias * beamWidth) - params->m_y2)
         * params->m_directionBias;
-
+    
     // If both sides of beam overlap with Clef, we need to get smaller margin, i.e. the one that would make one side not
-    // overlap anymore. For sloped beams this would generally mean that slope will avoid collision as well, for
-    // non-sloped ones it doesn't matter since both ends are at the same Y position
+    // overlap anymore. For sloped beams this would generally mean that slope will avoid collision as well, for non-sloped
+    // ones it doesn't matter since both ends are at the same Y position
     const bool bothSidesOverlap = ((leftMargin > params->m_overlapMargin) && (rightMargin > params->m_overlapMargin));
     const int overlapMargin = bothSidesOverlap ? std::min(leftMargin, rightMargin) : std::max(leftMargin, rightMargin);
     if ((overlapMargin >= params->m_overlapMargin)

@@ -35,7 +35,9 @@ AttHarmLog::AttHarmLog() : Att()
     ResetHarmLog();
 }
 
-AttHarmLog::~AttHarmLog() {}
+AttHarmLog::~AttHarmLog()
+{
+}
 
 void AttHarmLog::ResetHarmLog()
 {
@@ -95,4 +97,4 @@ void Att::GetHarmony(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace

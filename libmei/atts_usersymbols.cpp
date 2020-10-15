@@ -35,7 +35,9 @@ AttAltSym::AttAltSym() : Att()
     ResetAltSym();
 }
 
-AttAltSym::~AttAltSym() {}
+AttAltSym::~AttAltSym()
+{
+}
 
 void AttAltSym::ResetAltSym()
 {
@@ -79,7 +81,9 @@ AttAnchoredTextLog::AttAnchoredTextLog() : Att()
     ResetAnchoredTextLog();
 }
 
-AttAnchoredTextLog::~AttAnchoredTextLog() {}
+AttAnchoredTextLog::~AttAnchoredTextLog()
+{
+}
 
 void AttAnchoredTextLog::ResetAnchoredTextLog()
 {
@@ -123,7 +127,9 @@ AttCurveLog::AttCurveLog() : Att()
     ResetCurveLog();
 }
 
-AttCurveLog::~AttCurveLog() {}
+AttCurveLog::~AttCurveLog()
+{
+}
 
 void AttCurveLog::ResetCurveLog()
 {
@@ -167,7 +173,9 @@ AttLineLog::AttLineLog() : Att()
     ResetLineLog();
 }
 
-AttLineLog::~AttLineLog() {}
+AttLineLog::~AttLineLog()
+{
+}
 
 void AttLineLog::ResetLineLog()
 {
@@ -272,4 +280,4 @@ void Att::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace

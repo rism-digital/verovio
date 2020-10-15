@@ -35,7 +35,9 @@ AttSurface::AttSurface() : Att()
     ResetSurface();
 }
 
-AttSurface::~AttSurface() {}
+AttSurface::~AttSurface()
+{
+}
 
 void AttSurface::ResetSurface()
 {
@@ -95,4 +97,4 @@ void Att::GetPagebased(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace

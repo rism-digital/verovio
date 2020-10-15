@@ -35,7 +35,9 @@ AttArpegLog::AttArpegLog() : Att()
     ResetArpegLog();
 }
 
-AttArpegLog::~AttArpegLog() {}
+AttArpegLog::~AttArpegLog()
+{
+}
 
 void AttArpegLog::ResetArpegLog()
 {
@@ -79,7 +81,9 @@ AttBTremLog::AttBTremLog() : Att()
     ResetBTremLog();
 }
 
-AttBTremLog::~AttBTremLog() {}
+AttBTremLog::~AttBTremLog()
+{
+}
 
 void AttBTremLog::ResetBTremLog()
 {
@@ -123,7 +127,9 @@ AttBeamPresent::AttBeamPresent() : Att()
     ResetBeamPresent();
 }
 
-AttBeamPresent::~AttBeamPresent() {}
+AttBeamPresent::~AttBeamPresent()
+{
+}
 
 void AttBeamPresent::ResetBeamPresent()
 {
@@ -167,7 +173,9 @@ AttBeamRend::AttBeamRend() : Att()
     ResetBeamRend();
 }
 
-AttBeamRend::~AttBeamRend() {}
+AttBeamRend::~AttBeamRend()
+{
+}
 
 void AttBeamRend::ResetBeamRend()
 {
@@ -256,7 +264,9 @@ AttBeamSecondary::AttBeamSecondary() : Att()
     ResetBeamSecondary();
 }
 
-AttBeamSecondary::~AttBeamSecondary() {}
+AttBeamSecondary::~AttBeamSecondary()
+{
+}
 
 void AttBeamSecondary::ResetBeamSecondary()
 {
@@ -300,7 +310,9 @@ AttBeamedWith::AttBeamedWith() : Att()
     ResetBeamedWith();
 }
 
-AttBeamedWith::~AttBeamedWith() {}
+AttBeamedWith::~AttBeamedWith()
+{
+}
 
 void AttBeamedWith::ResetBeamedWith()
 {
@@ -344,7 +356,9 @@ AttBeamingLog::AttBeamingLog() : Att()
     ResetBeamingLog();
 }
 
-AttBeamingLog::~AttBeamingLog() {}
+AttBeamingLog::~AttBeamingLog()
+{
+}
 
 void AttBeamingLog::ResetBeamingLog()
 {
@@ -403,7 +417,9 @@ AttBeatRptLog::AttBeatRptLog() : Att()
     ResetBeatRptLog();
 }
 
-AttBeatRptLog::~AttBeatRptLog() {}
+AttBeatRptLog::~AttBeatRptLog()
+{
+}
 
 void AttBeatRptLog::ResetBeatRptLog()
 {
@@ -447,7 +463,9 @@ AttBracketSpanLog::AttBracketSpanLog() : Att()
     ResetBracketSpanLog();
 }
 
-AttBracketSpanLog::~AttBracketSpanLog() {}
+AttBracketSpanLog::~AttBracketSpanLog()
+{
+}
 
 void AttBracketSpanLog::ResetBracketSpanLog()
 {
@@ -491,7 +509,9 @@ AttCutout::AttCutout() : Att()
     ResetCutout();
 }
 
-AttCutout::~AttCutout() {}
+AttCutout::~AttCutout()
+{
+}
 
 void AttCutout::ResetCutout()
 {
@@ -535,7 +555,9 @@ AttExpandable::AttExpandable() : Att()
     ResetExpandable();
 }
 
-AttExpandable::~AttExpandable() {}
+AttExpandable::~AttExpandable()
+{
+}
 
 void AttExpandable::ResetExpandable()
 {
@@ -579,7 +601,9 @@ AttFTremLog::AttFTremLog() : Att()
     ResetFTremLog();
 }
 
-AttFTremLog::~AttFTremLog() {}
+AttFTremLog::~AttFTremLog()
+{
+}
 
 void AttFTremLog::ResetFTremLog()
 {
@@ -623,7 +647,9 @@ AttGlissPresent::AttGlissPresent() : Att()
     ResetGlissPresent();
 }
 
-AttGlissPresent::~AttGlissPresent() {}
+AttGlissPresent::~AttGlissPresent()
+{
+}
 
 void AttGlissPresent::ResetGlissPresent()
 {
@@ -667,7 +693,9 @@ AttGraceGrpLog::AttGraceGrpLog() : Att()
     ResetGraceGrpLog();
 }
 
-AttGraceGrpLog::~AttGraceGrpLog() {}
+AttGraceGrpLog::~AttGraceGrpLog()
+{
+}
 
 void AttGraceGrpLog::ResetGraceGrpLog()
 {
@@ -711,7 +739,9 @@ AttGraced::AttGraced() : Att()
     ResetGraced();
 }
 
-AttGraced::~AttGraced() {}
+AttGraced::~AttGraced()
+{
+}
 
 void AttGraced::ResetGraced()
 {
@@ -770,7 +800,9 @@ AttHairpinLog::AttHairpinLog() : Att()
     ResetHairpinLog();
 }
 
-AttHairpinLog::~AttHairpinLog() {}
+AttHairpinLog::~AttHairpinLog()
+{
+}
 
 void AttHairpinLog::ResetHairpinLog()
 {
@@ -829,7 +861,9 @@ AttHarpPedalLog::AttHarpPedalLog() : Att()
     ResetHarpPedalLog();
 }
 
-AttHarpPedalLog::~AttHarpPedalLog() {}
+AttHarpPedalLog::~AttHarpPedalLog()
+{
+}
 
 void AttHarpPedalLog::ResetHarpPedalLog()
 {
@@ -963,7 +997,9 @@ AttLvPresent::AttLvPresent() : Att()
     ResetLvPresent();
 }
 
-AttLvPresent::~AttLvPresent() {}
+AttLvPresent::~AttLvPresent()
+{
+}
 
 void AttLvPresent::ResetLvPresent()
 {
@@ -1007,7 +1043,9 @@ AttMeasureLog::AttMeasureLog() : Att()
     ResetMeasureLog();
 }
 
-AttMeasureLog::~AttMeasureLog() {}
+AttMeasureLog::~AttMeasureLog()
+{
+}
 
 void AttMeasureLog::ResetMeasureLog()
 {
@@ -1066,7 +1104,9 @@ AttMeterSigGrpLog::AttMeterSigGrpLog() : Att()
     ResetMeterSigGrpLog();
 }
 
-AttMeterSigGrpLog::~AttMeterSigGrpLog() {}
+AttMeterSigGrpLog::~AttMeterSigGrpLog()
+{
+}
 
 void AttMeterSigGrpLog::ResetMeterSigGrpLog()
 {
@@ -1110,7 +1150,9 @@ AttNumberPlacement::AttNumberPlacement() : Att()
     ResetNumberPlacement();
 }
 
-AttNumberPlacement::~AttNumberPlacement() {}
+AttNumberPlacement::~AttNumberPlacement()
+{
+}
 
 void AttNumberPlacement::ResetNumberPlacement()
 {
@@ -1169,7 +1211,9 @@ AttNumbered::AttNumbered() : Att()
     ResetNumbered();
 }
 
-AttNumbered::~AttNumbered() {}
+AttNumbered::~AttNumbered()
+{
+}
 
 void AttNumbered::ResetNumbered()
 {
@@ -1213,7 +1257,9 @@ AttOctaveLog::AttOctaveLog() : Att()
     ResetOctaveLog();
 }
 
-AttOctaveLog::~AttOctaveLog() {}
+AttOctaveLog::~AttOctaveLog()
+{
+}
 
 void AttOctaveLog::ResetOctaveLog()
 {
@@ -1257,7 +1303,9 @@ AttPedalLog::AttPedalLog() : Att()
     ResetPedalLog();
 }
 
-AttPedalLog::~AttPedalLog() {}
+AttPedalLog::~AttPedalLog()
+{
+}
 
 void AttPedalLog::ResetPedalLog()
 {
@@ -1316,7 +1364,9 @@ AttPianoPedals::AttPianoPedals() : Att()
     ResetPianoPedals();
 }
 
-AttPianoPedals::~AttPianoPedals() {}
+AttPianoPedals::~AttPianoPedals()
+{
+}
 
 void AttPianoPedals::ResetPianoPedals()
 {
@@ -1360,7 +1410,9 @@ AttRehearsal::AttRehearsal() : Att()
     ResetRehearsal();
 }
 
-AttRehearsal::~AttRehearsal() {}
+AttRehearsal::~AttRehearsal()
+{
+}
 
 void AttRehearsal::ResetRehearsal()
 {
@@ -1404,7 +1456,9 @@ AttScoreDefVisCmn::AttScoreDefVisCmn() : Att()
     ResetScoreDefVisCmn();
 }
 
-AttScoreDefVisCmn::~AttScoreDefVisCmn() {}
+AttScoreDefVisCmn::~AttScoreDefVisCmn()
+{
+}
 
 void AttScoreDefVisCmn::ResetScoreDefVisCmn()
 {
@@ -1448,7 +1502,9 @@ AttSlurRend::AttSlurRend() : Att()
     ResetSlurRend();
 }
 
-AttSlurRend::~AttSlurRend() {}
+AttSlurRend::~AttSlurRend()
+{
+}
 
 void AttSlurRend::ResetSlurRend()
 {
@@ -1507,7 +1563,9 @@ AttStemsCmn::AttStemsCmn() : Att()
     ResetStemsCmn();
 }
 
-AttStemsCmn::~AttStemsCmn() {}
+AttStemsCmn::~AttStemsCmn()
+{
+}
 
 void AttStemsCmn::ResetStemsCmn()
 {
@@ -1551,7 +1609,9 @@ AttTieRend::AttTieRend() : Att()
     ResetTieRend();
 }
 
-AttTieRend::~AttTieRend() {}
+AttTieRend::~AttTieRend()
+{
+}
 
 void AttTieRend::ResetTieRend()
 {
@@ -1610,7 +1670,9 @@ AttTremMeasured::AttTremMeasured() : Att()
     ResetTremMeasured();
 }
 
-AttTremMeasured::~AttTremMeasured() {}
+AttTremMeasured::~AttTremMeasured()
+{
+}
 
 void AttTremMeasured::ResetTremMeasured()
 {
@@ -2239,4 +2301,4 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace

@@ -61,6 +61,6 @@ private:
     /* include <attsurface> */
 };
 
-} // namespace vrv
+} // vrv namespace
 
 #endif // __VRV_ATTS_PAGEBASED_H__

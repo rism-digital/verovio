@@ -35,7 +35,9 @@ AttCrit::AttCrit() : Att()
     ResetCrit();
 }
 
-AttCrit::~AttCrit() {}
+AttCrit::~AttCrit()
+{
+}
 
 void AttCrit::ResetCrit()
 {
@@ -95,4 +97,4 @@ void Att::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // vrv namespace
