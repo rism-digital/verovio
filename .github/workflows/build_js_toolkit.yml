@@ -39,7 +39,11 @@ jobs:
   # Build the CLI artifacts
   build_cli:
     name: Build cli
-    runs-on: ${{ env.OS_RUNNER }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: ${{ env.OS_RUNNER }}
 
     steps:
       - name: Checkout main repo
@@ -77,7 +81,11 @@ jobs:
 
   setup_emscripten:
     name: Setup emscripten
-    runs-on: ${{ env.OS_RUNNER }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: ${{ env.OS_RUNNER }}
 
     steps:
         - name: Setup emsdk (use cache if found, create otherwise)
@@ -101,11 +109,12 @@ jobs:
   # Build the JS toolkit artifacts
   build_js:
     name: Build JS toolkit
-    runs-on: ${{ env.OS_RUNNER }}
+    runs-on: ${{ matrix.os }}
 
     # set matrix with toolkit options (runs the following steps for every target in parallel)
     strategy:
       matrix:
+        os: ${{ env.OS_RUNNER }}
         toolkit:
           - target: nohumdrum
             message: "Building toolkit without humdrum"
@@ -174,9 +183,13 @@ jobs:
   # Deploy the build artifacts to gh-pages
   deploy:
     name: Deploy
-    runs-on: ${{ env.OS_RUNNER }}
+    runs-on: ${{ matrix.os }}
     # run deployment only after finishing the build jobs
     needs: [build_cli, build_js]
+
+    strategy:
+      matrix:
+        os: ${{ env.OS_RUNNER }}
 
     steps:
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_FOLDER
