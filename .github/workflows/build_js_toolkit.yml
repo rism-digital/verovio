@@ -14,12 +14,9 @@ on:
 
 # globals
 env:
-  # os
-  OS_RUNNER: ubuntu-20.04
-
   # emscripten
   EMSCRIPTEN_VERSION: latest
-  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+  EMSCRIPTEN_CACHE_FOLDER: emscripten-cache
 
   # gh-pages
   GH_PAGES_BRANCH: gh-pages
@@ -75,28 +72,32 @@ jobs:
           ls -al
 
 
+
+  # Setup and cache emscripten build
   setup_emscripten:
-    name: Setup emscripten
+    name: Setup and cache emscripten
     runs-on: ubuntu-20.04
 
     steps:
-        - name: Setup emsdk (use cache if found, create otherwise)
-          uses: mymindstorm/setup-emsdk@v7
-          with:
-            version: ${{ env.EMSCRIPTEN_VERSION }}
-            actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+      - name: Setup cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run.id }}
 
-        - name: Cache emsdk artifacts
-          id: cache-emsdk
-          uses: actions/cache@v2
-          with:
-            # path for cache
-            path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
-            # key for cache
-            key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.sha }}
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
 
-        - name: Verify emscripten build
-          run: emcc -v
+      - name: Verify emscripten build
+        run: emcc -v
+
+
+
 
   # Build the JS toolkit artifacts
   build_js:
