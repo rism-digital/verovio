@@ -70,27 +70,27 @@ jobs:
           ls -al
 
 
-  # Setup and cache emscripten build
+  # Set up and cache emscripten build
   setup_emscripten:
-    name: Setup and cache emscripten
+    name: Set up and cache emscripten
     runs-on: ubuntu-20.04
 
     steps:
       # Cache system libraries generated during build time
-      - name: Setup cache
+      - name: Set up cache
         uses: actions/cache@v2
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run.id }}
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run.id }}
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
 
       # Cache emsdk
-      - name: Setup emsdk
+      - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run.id }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
 
       - name: Verify emscripten build
         run: emcc -v
@@ -131,7 +131,7 @@ jobs:
         uses: mymindstorm/setup-emsdk@v7
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
 
       - name: Verify emscripten build
         run: emcc -v
