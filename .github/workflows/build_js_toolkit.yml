@@ -69,10 +69,38 @@ jobs:
           pwd
           ls -al
 
+
+  # Set up and cache emscripten build
+  setup_emscripten:
+    name: Set up and cache emscripten
+    runs-on: ubuntu-20.04
+
+    steps:
+      # Cache system libraries generated during build time
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
+      # Cache emsdk
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+
   # Build the JS toolkit artifacts
   build_js:
     name: Build JS toolkit
     runs-on: ubuntu-20.04
+    needs: [setup_emscripten]
 
     # set matrix with toolkit options (runs the following steps for every target in parallel)
     strategy:
@@ -99,20 +127,20 @@ jobs:
       - name: Checkout main repo
         uses: actions/checkout@v2
 
-      - name: Cache emsdk artifacts
-        id: cache-emsdk
+      # Restore system libraries generated during build time from cache
+      - name: Restore system libraries from cache
         uses: actions/cache@v2
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.sha }}
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
 
-      - name: Setup emsdk (use cache if found, create otherwise)
+      - name: Get emscripten build from cache and activate
         uses: mymindstorm/setup-emsdk@v7
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
 
       - name: Verify emscripten build
         run: emcc -v
