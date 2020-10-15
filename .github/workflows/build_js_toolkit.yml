@@ -14,6 +14,9 @@ on:
 
 # globals
 env:
+  # os
+  OS_RUNNER: ubuntu-20.04
+
   # emscripten
   EMSCRIPTEN_VERSION: latest
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
@@ -30,11 +33,13 @@ env:
   TEMP_FOLDER: temp
 
 
+
+
 jobs:
   # Build the CLI artifacts
   build_cli:
     name: Build cli
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.OS_RUNNER }}
 
     steps:
       - name: Checkout main repo
@@ -69,10 +74,34 @@ jobs:
           pwd
           ls -al
 
+
+  setup_emscripten:
+    name: Setup emscripten
+    runs-on: ${{ env.OS_RUNNER }}
+
+    steps:
+        - name: Setup emsdk (use cache if found, create otherwise)
+          uses: mymindstorm/setup-emsdk@v7
+          with:
+            version: ${{ env.EMSCRIPTEN_VERSION }}
+            actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+
+        - name: Cache emsdk artifacts
+            id: cache-emsdk
+            uses: actions/cache@v2
+            with:
+              # path for cache
+              path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+              # key for cache
+              key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.sha }}
+
+        - name: Verify emscripten build
+          run: emcc -v
+
   # Build the JS toolkit artifacts
   build_js:
     name: Build JS toolkit
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.OS_RUNNER }}
 
     # set matrix with toolkit options (runs the following steps for every target in parallel)
     strategy:
@@ -99,14 +128,14 @@ jobs:
       - name: Checkout main repo
         uses: actions/checkout@v2
 
-      - name: Cache emsdk artifacts
-        id: cache-emsdk
-        uses: actions/cache@v2
-        with:
-          # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
-          # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.sha }}
+#      - name: Cache emsdk artifacts
+#        id: cache-emsdk
+#        uses: actions/cache@v2
+#        with:
+#          # path for cache
+#          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}
+#          # key for cache
+#          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.sha }}
 
       - name: Setup emsdk (use cache if found, create otherwise)
         uses: mymindstorm/setup-emsdk@v7
@@ -145,7 +174,7 @@ jobs:
   # Deploy the build artifacts to gh-pages
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.OS_RUNNER }}
     # run deployment only after finishing the build jobs
     needs: [build_cli, build_js]
 
