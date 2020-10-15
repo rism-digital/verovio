@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clang Code Formatter
-        uses: cvra/clang-format-action@clang9
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Clang Code Formatter
+#        uses: cvra/clang-format-action@clang9
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download clang-format
         # make sure to use version 5.0
