@@ -1,12 +1,16 @@
 name: Verovio CI (build JS toolkit)
 
 on:
-  workflow_run:
-  # Trigger the workflow when specified workflow is completed
-    workflows: ["Verovio CI (build C++)"]
-    types:
-      - completed
-    # build C++ workflow runs on push to develop, ci-test or travis-test branch
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - develop
+      # Push events on ci-test branch (only needed for testing purposes)
+      - ci-test
+      # Push events on travis-test branch (only needed for testing purposes)
+      - travis-test
 
 # globals
 env:
