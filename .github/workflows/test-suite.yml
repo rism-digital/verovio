@@ -1,0 +1,55 @@
+name: Verovio CI Test Suite
+
+on:
+  # pull_request:
+  #  branches: develop
+  # TODO: run this task only on PR in production; use push event for testing
+  push:
+    branches:
+      - '**'
+
+# globals
+env:
+  # gh-pages
+  GH_PAGES_BRANCH: gh-pages
+  GH_PAGES_FOLDER: gh-pages
+
+  # build artifacts
+  TEST_BUILD: test-build
+
+  # temp
+  TEMP_FOLDER: temp
+
+
+jobs:
+  test:
+    name: Run Verovio test suite
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout GH_PAGES_BRANCH into GH_PAGES_FOLDER
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.GH_PAGES_BRANCH }}
+          path: ${{ env.GH_PAGES_FOLDER }}
+
+#      - name: Copy tests to temp folder
+#        run: |
+#          cp $GH_PAGES_FOLDER/_includes/ $GITHUB_WORKSPACE/$TEMP_FOLDER/
+
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: List all files
+        run: ls -R
+
+#      - name: Run make
+#        run: |
+#          cd $GITHUB_WORKSPACE/tools
+#          cmake ../cmake
+#          make -j 8
+
+      - name: Running clang-format
+        run: |
+        # clang-format -style=file -i   some-directory/some-file.cpp
+
