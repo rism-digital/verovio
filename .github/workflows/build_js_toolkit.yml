@@ -1,4 +1,4 @@
-name: Verovio CI (build JS toolkit)
+name: CI Build
 
 on:
   push:
