@@ -44,7 +44,7 @@ git status
 
 # Push all changes in one commit to the gh-pages branch
 echo "Pushing final commit"
-git push origin ${GH_PAGES_BRANCH}
+# git push origin ${GH_PAGES_BRANCH}
 
 # After all, it is safe to delete the temporary output branch locally and on remote
 echo "Delete ${TEMPORARY_OUTPUT_BRANCH}"

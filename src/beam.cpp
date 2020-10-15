@@ -759,6 +759,16 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
             m_uniformStemLength = coordStemDir;
         }
     }
+    // make adjustments for the grace notes length
+    for (auto coord : m_beamElementCoordRefs) {
+        if (coord->m_element) {
+            const bool isInGraceGroup = coord->m_element->GetFirstAncestor(GRACEGRP);
+            if (coord->m_element->IsGraceNote() || isInGraceGroup) {
+                m_uniformStemLength *= 0.75;
+                break;
+            }
+        }
+    }
 }
 
 void BeamSegment::CalcSetValues(const int &elementCount)
@@ -1001,7 +1011,6 @@ void BeamElementCoord::SetDrawingStemDir(
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     this->m_stem->SetDrawingStemDir(stemDir);
-    bool onStaffLine = false;
     int ledgerLines = 0;
     int ledgerLinesOpposite = 0;
     this->m_shortened = false;
@@ -1022,7 +1031,6 @@ void BeamElementCoord::SetDrawingStemDir(
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
         }
     }
@@ -1035,19 +1043,16 @@ void BeamElementCoord::SetDrawingStemDir(
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
         }
     }
 
     if (!m_closestNote) return;
 
-    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
-    
-    if (m_element->IsGraceNote() || isInGraceGroup) segment->m_uniformStemLength *= 0.75;
     this->m_centered = segment->m_uniformStemLength % 2;
     this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
+    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
     if (m_element->IsGraceNote() || isInGraceGroup) return;
 
     // Make sure the stem reaches the center of the staff
@@ -1063,10 +1068,10 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (this->m_dur > DUR_32)) {
+    if ((ledgerLines > 2) && (interface->m_shortestDur > DUR_32)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
     }
-    else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
+    else if ((ledgerLines > 1) && (interface->m_shortestDur > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
 
@@ -1076,6 +1081,7 @@ void BeamElementCoord::SetDrawingStemDir(
 int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
 {
     if (!m_closestNote) return 0;
+
     const bool onStaffLine = m_closestNote->GetDrawingLoc() % 2;
     bool extend = onStaffLine;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
