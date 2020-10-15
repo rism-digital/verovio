@@ -29,8 +29,8 @@ ScoreDefInterface::ScoreDefInterface()
     , AttMeasureNumbers()
     , AttMidiTempo()
     , AttMultinumMeasures()
-    , AttSystems()
     , AttSpacing()
+    , AttSystems()
 {
     RegisterInterfaceAttClass(ATT_LYRICSTYLE);
     RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
@@ -38,8 +38,8 @@ ScoreDefInterface::ScoreDefInterface()
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_MIDITEMPO);
     RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
-    RegisterInterfaceAttClass(ATT_SYSTEMS);
     RegisterInterfaceAttClass(ATT_SPACING);
+    RegisterInterfaceAttClass(ATT_SYSTEMS);
 
     Reset();
 }
@@ -52,8 +52,8 @@ void ScoreDefInterface::Reset()
     ResetMeasureNumbers();
     ResetMidiTempo();
     ResetMultinumMeasures();
-    ResetSystems();
     ResetSpacing();
+    ResetSystems();
 }
 
 } // namespace vrv
