@@ -1,4 +1,4 @@
-name: Verovio CI (build JS toolkit)
+name: Verovio CI Build
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
   # Build the CLI artifacts
   build_cli:
     name: Build cli
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout main repo
@@ -72,7 +72,7 @@ jobs:
   # Build the JS toolkit artifacts
   build_js:
     name: Build JS toolkit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     # set matrix with toolkit options (runs the following steps for every target in parallel)
     strategy:
@@ -142,10 +142,11 @@ jobs:
           pwd
           ls -al
 
+
   # Deploy the build artifacts to gh-pages
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
     needs: [build_cli, build_js]
 
