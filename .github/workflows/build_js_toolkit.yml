@@ -1,8 +1,8 @@
 name: Verovio CI (build JS toolkit)
 
 on:
-  # Trigger the workflow when specified workflow is completed
   workflow_run:
+  # Trigger the workflow when specified workflow is completed
     workflows: ['Verovio CI (build C++)']
     types:
       - completed
