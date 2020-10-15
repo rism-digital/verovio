@@ -32,7 +32,9 @@ namespace vrv {
 
 AttHarmAnl::AttHarmAnl() : Att()
 {
+
     ResetHarmAnl();
+
 }
 
 AttHarmAnl::~AttHarmAnl()
@@ -41,6 +43,9 @@ AttHarmAnl::~AttHarmAnl()
 
 void AttHarmAnl::ResetHarmAnl()
 {
+
+
+
     m_form = harmAnl_FORM_NONE;
 }
 
