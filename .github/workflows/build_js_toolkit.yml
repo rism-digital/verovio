@@ -127,6 +127,15 @@ jobs:
       - name: Checkout main repo
         uses: actions/checkout@v2
 
+      # Restore system libraries generated during build time from cache
+      - name: Restore system libraries from cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
       - name: Get emscripten build from cache and activate
         uses: mymindstorm/setup-emsdk@v7
         with:
