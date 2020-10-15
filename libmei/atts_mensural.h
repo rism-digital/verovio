@@ -412,6 +412,6 @@ private:
     /* include <attstem.form> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_MENSURAL_H__

@@ -15,7 +15,6 @@
 
 #include <stdlib.h>
 
-
 namespace smf {
 
 //////////////////////////////
@@ -23,140 +22,136 @@ namespace smf {
 // MidiEvent::MidiEvent -- Constructor classes
 //
 
-MidiEvent::MidiEvent(void) : MidiMessage() {
-	clearVariables();
+MidiEvent::MidiEvent(void) : MidiMessage()
+{
+    clearVariables();
 }
 
-
-MidiEvent::MidiEvent(int command) : MidiMessage(command)  {
-	clearVariables();
+MidiEvent::MidiEvent(int command) : MidiMessage(command)
+{
+    clearVariables();
 }
 
-
-MidiEvent::MidiEvent(int command, int p1) : MidiMessage(command, p1) {
-	clearVariables();
+MidiEvent::MidiEvent(int command, int p1) : MidiMessage(command, p1)
+{
+    clearVariables();
 }
 
-
-MidiEvent::MidiEvent(int command, int p1, int p2)
-		: MidiMessage(command, p1, p2) {
-	clearVariables();
+MidiEvent::MidiEvent(int command, int p1, int p2) : MidiMessage(command, p1, p2)
+{
+    clearVariables();
 }
 
-
-MidiEvent::MidiEvent(int aTime, int aTrack, vector<uchar>& message)
-		: MidiMessage(message) {
-	track       = aTrack;
-	tick        = aTime;
-	seconds     = 0.0;
-	seq         = 0;
-	m_eventlink = NULL;
+MidiEvent::MidiEvent(int aTime, int aTrack, vector<uchar> &message) : MidiMessage(message)
+{
+    track = aTrack;
+    tick = aTime;
+    seconds = 0.0;
+    seq = 0;
+    m_eventlink = NULL;
 }
 
+MidiEvent::MidiEvent(const MidiEvent &mfevent) : MidiMessage()
+{
+    track = mfevent.track;
+    tick = mfevent.tick;
+    seconds = mfevent.seconds;
+    seq = mfevent.seq;
+    m_eventlink = NULL;
 
-MidiEvent::MidiEvent(const MidiEvent& mfevent) : MidiMessage() {
-	track   = mfevent.track;
-	tick    = mfevent.tick;
-	seconds = mfevent.seconds;
-	seq     = mfevent.seq;
-	m_eventlink = NULL;
-
-	this->resize(mfevent.size());
-	for (int i=0; i<(int)this->size(); i++) {
-		(*this)[i] = mfevent[i];
-	}
+    this->resize(mfevent.size());
+    for (int i = 0; i < (int)this->size(); i++) {
+        (*this)[i] = mfevent[i];
+    }
 }
-
-
 
 //////////////////////////////
 //
 // MidiEvent::~MidiEvent -- MidiFile Event destructor
 //
 
-MidiEvent::~MidiEvent() {
-	track   = -1;
-	tick    = -1;
-	seconds = -1.0;
-	seq     = -1;
-	this->resize(0);
-	m_eventlink = NULL;
+MidiEvent::~MidiEvent()
+{
+    track = -1;
+    tick = -1;
+    seconds = -1.0;
+    seq = -1;
+    this->resize(0);
+    m_eventlink = NULL;
 }
-
 
 //////////////////////////////
 //
 // MidiEvent::clearVariables --  Clear everything except MidiMessage data.
 //
 
-void MidiEvent::clearVariables(void) {
-	track     = 0;
-	tick      = 0;
-	seconds   = 0.0;
-	seq       = 0;
-	m_eventlink = NULL;
+void MidiEvent::clearVariables(void)
+{
+    track = 0;
+    tick = 0;
+    seconds = 0.0;
+    seq = 0;
+    m_eventlink = NULL;
 }
-
 
 //////////////////////////////
 //
 // MidiEvent::operator= -- Copy the contents of another MidiEvent.
 //
 
-MidiEvent& MidiEvent::operator=(const MidiEvent& mfevent) {
-	if (this == &mfevent) {
-		return *this;
-	}
-	tick    = mfevent.tick;
-	track   = mfevent.track;
-	seconds = mfevent.seconds;
-	seq     = mfevent.seq;
-	m_eventlink = NULL;
-	this->resize(mfevent.size());
-	for (int i=0; i<(int)this->size(); i++) {
-		(*this)[i] = mfevent[i];
-	}
-	return *this;
+MidiEvent &MidiEvent::operator=(const MidiEvent &mfevent)
+{
+    if (this == &mfevent) {
+        return *this;
+    }
+    tick = mfevent.tick;
+    track = mfevent.track;
+    seconds = mfevent.seconds;
+    seq = mfevent.seq;
+    m_eventlink = NULL;
+    this->resize(mfevent.size());
+    for (int i = 0; i < (int)this->size(); i++) {
+        (*this)[i] = mfevent[i];
+    }
+    return *this;
 }
 
-
-MidiEvent& MidiEvent::operator=(const MidiMessage& message) {
-	if (this == &message) {
-		return *this;
-	}
-	clearVariables();
-	this->resize(message.size());
-	for (int i=0; i<(int)this->size(); i++) {
-		(*this)[i] = message[i];
-	}
-	return *this;
+MidiEvent &MidiEvent::operator=(const MidiMessage &message)
+{
+    if (this == &message) {
+        return *this;
+    }
+    clearVariables();
+    this->resize(message.size());
+    for (int i = 0; i < (int)this->size(); i++) {
+        (*this)[i] = message[i];
+    }
+    return *this;
 }
 
-
-MidiEvent& MidiEvent::operator=(const vector<uchar>& bytes) {
-	clearVariables();
-	this->resize(bytes.size());
-	for (int i=0; i<(int)this->size(); i++) {
-		(*this)[i] = bytes[i];
-	}
-	return *this;
+MidiEvent &MidiEvent::operator=(const vector<uchar> &bytes)
+{
+    clearVariables();
+    this->resize(bytes.size());
+    for (int i = 0; i < (int)this->size(); i++) {
+        (*this)[i] = bytes[i];
+    }
+    return *this;
 }
 
-
-MidiEvent& MidiEvent::operator=(const vector<char>& bytes) {
-	clearVariables();
-	setMessage(bytes);
-	return *this;
+MidiEvent &MidiEvent::operator=(const vector<char> &bytes)
+{
+    clearVariables();
+    setMessage(bytes);
+    return *this;
 }
 
-
-MidiEvent& MidiEvent::operator=(const vector<int>& bytes) {
-	clearVariables();
-	setMessage(bytes);
-	return *this;
+MidiEvent &MidiEvent::operator=(const vector<int> &bytes)
+{
+    clearVariables();
+    setMessage(bytes);
+    return *this;
 }
-
-
 
 //////////////////////////////
 //
@@ -164,16 +159,15 @@ MidiEvent& MidiEvent::operator=(const vector<int>& bytes) {
 //   Also tell the other event to disassociate from this event.
 //
 
-void MidiEvent::unlinkEvent(void) {
-	if (m_eventlink == NULL) {
-		return;
-	}
-	MidiEvent* mev = m_eventlink;
-	m_eventlink = NULL;
-	mev->unlinkEvent();
+void MidiEvent::unlinkEvent(void)
+{
+    if (m_eventlink == NULL) {
+        return;
+    }
+    MidiEvent *mev = m_eventlink;
+    m_eventlink = NULL;
+    mev->unlinkEvent();
 }
-
-
 
 //////////////////////////////
 //
@@ -181,27 +175,26 @@ void MidiEvent::unlinkEvent(void) {
 //   Unlinking
 //
 
-void MidiEvent::linkEvent(MidiEvent* mev) {
-	if (mev->m_eventlink != NULL) {
-		// unlink other event if it is linked to something else;
-		mev->unlinkEvent();
-	}
-	// if this is already linked to something else, then unlink:
-	if (m_eventlink != NULL) {
-		m_eventlink->unlinkEvent();
-	}
-	unlinkEvent();
+void MidiEvent::linkEvent(MidiEvent *mev)
+{
+    if (mev->m_eventlink != NULL) {
+        // unlink other event if it is linked to something else;
+        mev->unlinkEvent();
+    }
+    // if this is already linked to something else, then unlink:
+    if (m_eventlink != NULL) {
+        m_eventlink->unlinkEvent();
+    }
+    unlinkEvent();
 
-	mev->m_eventlink = this;
-	m_eventlink = mev;
+    mev->m_eventlink = this;
+    m_eventlink = mev;
 }
 
-
-void MidiEvent::linkEvent(MidiEvent& mev) {
-	linkEvent(&mev);
+void MidiEvent::linkEvent(MidiEvent &mev)
+{
+    linkEvent(&mev);
 }
-
-
 
 //////////////////////////////
 //
@@ -210,16 +203,15 @@ void MidiEvent::linkEvent(MidiEvent& mev) {
 //   Returns null if there are no links.
 //
 
-MidiEvent* MidiEvent::getLinkedEvent(void) {
-	return m_eventlink;
+MidiEvent *MidiEvent::getLinkedEvent(void)
+{
+    return m_eventlink;
 }
 
-
-const MidiEvent* MidiEvent::getLinkedEvent(void) const {
-	return m_eventlink;
+const MidiEvent *MidiEvent::getLinkedEvent(void) const
+{
+    return m_eventlink;
 }
-
-
 
 //////////////////////////////
 //
@@ -227,11 +219,10 @@ const MidiEvent* MidiEvent::getLinkedEvent(void) const {
 //   NULL.  This function is similar to getLinkedEvent().
 //
 
-int MidiEvent::isLinked(void) const {
-	return m_eventlink == NULL ? 0 : 1;
+int MidiEvent::isLinked(void) const
+{
+    return m_eventlink == NULL ? 0 : 1;
 }
-
-
 
 //////////////////////////////
 //
@@ -241,20 +232,20 @@ int MidiEvent::isLinked(void) const {
 //    delta tick mode.  Returns 0 if not linked.
 //
 
-int MidiEvent::getTickDuration(void) const {
-	const MidiEvent* mev = getLinkedEvent();
-	if (mev == NULL) {
-		return 0;
-	}
-	int tick2 = mev->tick;
-	if (tick2 > tick) {
-		return tick2 - tick;
-	} else {
-		return tick - tick2;
-	}
+int MidiEvent::getTickDuration(void) const
+{
+    const MidiEvent *mev = getLinkedEvent();
+    if (mev == NULL) {
+        return 0;
+    }
+    int tick2 = mev->tick;
+    if (tick2 > tick) {
+        return tick2 - tick;
+    }
+    else {
+        return tick - tick2;
+    }
 }
-
-
 
 //////////////////////////////
 //
@@ -264,21 +255,19 @@ int MidiEvent::getTickDuration(void) const {
 //     reported as zero.
 //
 
-double MidiEvent::getDurationInSeconds(void) const {
-	const MidiEvent* mev = getLinkedEvent();
-	if (mev == NULL) {
-		return 0;
-	}
-	double seconds2 = mev->seconds;
-	if (seconds2 > seconds) {
-		return seconds2 - seconds;
-	} else {
-		return seconds - seconds2;
-	}
+double MidiEvent::getDurationInSeconds(void) const
+{
+    const MidiEvent *mev = getLinkedEvent();
+    if (mev == NULL) {
+        return 0;
+    }
+    double seconds2 = mev->seconds;
+    if (seconds2 > seconds) {
+        return seconds2 - seconds;
+    }
+    else {
+        return seconds - seconds2;
+    }
 }
 
-
 } // end namespace smf
-
-
-

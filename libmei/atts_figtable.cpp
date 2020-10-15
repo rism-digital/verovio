@@ -35,9 +35,7 @@ AttTabular::AttTabular() : Att()
     ResetTabular();
 }
 
-AttTabular::~AttTabular()
-{
-}
+AttTabular::~AttTabular() {}
 
 void AttTabular::ResetTabular()
 {
@@ -119,4 +117,4 @@ void Att::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

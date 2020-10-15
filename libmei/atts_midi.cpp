@@ -35,9 +35,7 @@ AttChannelized::AttChannelized() : Att()
     ResetChannelized();
 }
 
-AttChannelized::~AttChannelized()
-{
-}
+AttChannelized::~AttChannelized() {}
 
 void AttChannelized::ResetChannelized()
 {
@@ -126,9 +124,7 @@ AttInstrumentIdent::AttInstrumentIdent() : Att()
     ResetInstrumentIdent();
 }
 
-AttInstrumentIdent::~AttInstrumentIdent()
-{
-}
+AttInstrumentIdent::~AttInstrumentIdent() {}
 
 void AttInstrumentIdent::ResetInstrumentIdent()
 {
@@ -172,9 +168,7 @@ AttMidiInstrument::AttMidiInstrument() : Att()
     ResetMidiInstrument();
 }
 
-AttMidiInstrument::~AttMidiInstrument()
-{
-}
+AttMidiInstrument::~AttMidiInstrument() {}
 
 void AttMidiInstrument::ResetMidiInstrument()
 {
@@ -293,9 +287,7 @@ AttMidiNumber::AttMidiNumber() : Att()
     ResetMidiNumber();
 }
 
-AttMidiNumber::~AttMidiNumber()
-{
-}
+AttMidiNumber::~AttMidiNumber() {}
 
 void AttMidiNumber::ResetMidiNumber()
 {
@@ -339,9 +331,7 @@ AttMidiTempo::AttMidiTempo() : Att()
     ResetMidiTempo();
 }
 
-AttMidiTempo::~AttMidiTempo()
-{
-}
+AttMidiTempo::~AttMidiTempo() {}
 
 void AttMidiTempo::ResetMidiTempo()
 {
@@ -400,9 +390,7 @@ AttMidiValue::AttMidiValue() : Att()
     ResetMidiValue();
 }
 
-AttMidiValue::~AttMidiValue()
-{
-}
+AttMidiValue::~AttMidiValue() {}
 
 void AttMidiValue::ResetMidiValue()
 {
@@ -446,9 +434,7 @@ AttMidiValue2::AttMidiValue2() : Att()
     ResetMidiValue2();
 }
 
-AttMidiValue2::~AttMidiValue2()
-{
-}
+AttMidiValue2::~AttMidiValue2() {}
 
 void AttMidiValue2::ResetMidiValue2()
 {
@@ -492,9 +478,7 @@ AttMidiVelocity::AttMidiVelocity() : Att()
     ResetMidiVelocity();
 }
 
-AttMidiVelocity::~AttMidiVelocity()
-{
-}
+AttMidiVelocity::~AttMidiVelocity() {}
 
 void AttMidiVelocity::ResetMidiVelocity()
 {
@@ -538,9 +522,7 @@ AttTimeBase::AttTimeBase() : Att()
     ResetTimeBase();
 }
 
-AttTimeBase::~AttTimeBase()
-{
-}
+AttTimeBase::~AttTimeBase() {}
 
 void AttTimeBase::ResetTimeBase()
 {
@@ -783,4 +765,4 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

@@ -6015,6 +6015,6 @@ private:
     /* include <atty2> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_SHARED_H__

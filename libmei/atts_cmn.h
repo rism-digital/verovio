@@ -1301,6 +1301,6 @@ private:
     /* include <attunitdur> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_CMN_H__

@@ -104,6 +104,6 @@ private:
     /* include <attreason> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_EDITTRANS_H__

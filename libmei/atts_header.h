@@ -193,6 +193,6 @@ private:
     /* include <attmethod> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_HEADER_H__

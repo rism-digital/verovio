@@ -73,6 +73,6 @@ private:
     /* include <attnotationsubtype> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_MEI_H__

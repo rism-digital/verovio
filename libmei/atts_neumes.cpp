@@ -35,9 +35,7 @@ AttNcLog::AttNcLog() : Att()
     ResetNcLog();
 }
 
-AttNcLog::~AttNcLog()
-{
-}
+AttNcLog::~AttNcLog() {}
 
 void AttNcLog::ResetNcLog()
 {
@@ -96,9 +94,7 @@ AttNcForm::AttNcForm() : Att()
     ResetNcForm();
 }
 
-AttNcForm::~AttNcForm()
-{
-}
+AttNcForm::~AttNcForm() {}
 
 void AttNcForm::ResetNcForm()
 {
@@ -334,4 +330,4 @@ void Att::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

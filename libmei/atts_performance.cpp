@@ -35,9 +35,7 @@ AttAlignment::AttAlignment() : Att()
     ResetAlignment();
 }
 
-AttAlignment::~AttAlignment()
-{
-}
+AttAlignment::~AttAlignment() {}
 
 void AttAlignment::ResetAlignment()
 {
@@ -97,4 +95,4 @@ void Att::GetPerformance(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

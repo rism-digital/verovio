@@ -85,6 +85,6 @@ private:
     /* include <attglyph.uri> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_EXTERNALSYMBOLS_H__

@@ -35,9 +35,7 @@ AttAgentIdent::AttAgentIdent() : Att()
     ResetAgentIdent();
 }
 
-AttAgentIdent::~AttAgentIdent()
-{
-}
+AttAgentIdent::~AttAgentIdent() {}
 
 void AttAgentIdent::ResetAgentIdent()
 {
@@ -81,9 +79,7 @@ AttReasonIdent::AttReasonIdent() : Att()
     ResetReasonIdent();
 }
 
-AttReasonIdent::~AttReasonIdent()
-{
-}
+AttReasonIdent::~AttReasonIdent() {}
 
 void AttReasonIdent::ResetReasonIdent()
 {
@@ -158,4 +154,4 @@ void Att::GetEdittrans(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

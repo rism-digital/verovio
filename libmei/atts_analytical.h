@@ -382,6 +382,6 @@ private:
     /* include <attpsolfa> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_ANALYTICAL_H__

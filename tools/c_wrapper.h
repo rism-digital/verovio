@@ -10,7 +10,7 @@
  ****************************************************************/
 
 void *vrvToolkit_constructor();
-void *vrvToolkit_constructorResourcePath(const char * resourcePath);
+void *vrvToolkit_constructorResourcePath(const char *resourcePath);
 void vrvToolkit_destructor(Toolkit *tk);
 bool vrvToolkit_edit(Toolkit *tk, const char *editorAction);
 const char *vrvToolkit_getAvailableOptions(Toolkit *tk);

@@ -33,21 +33,13 @@ namespace vrv {
 AttHarmAnl::AttHarmAnl() : Att()
 {
 
-
-
-
     ResetHarmAnl();
-
 }
 
-AttHarmAnl::~AttHarmAnl()
-{
-}
+AttHarmAnl::~AttHarmAnl() {}
 
 void AttHarmAnl::ResetHarmAnl()
 {
-
-
 
     m_form = harmAnl_FORM_NONE;
 }
@@ -89,9 +81,7 @@ AttHarmonicFunction::AttHarmonicFunction() : Att()
     ResetHarmonicFunction();
 }
 
-AttHarmonicFunction::~AttHarmonicFunction()
-{
-}
+AttHarmonicFunction::~AttHarmonicFunction() {}
 
 void AttHarmonicFunction::ResetHarmonicFunction()
 {
@@ -135,9 +125,7 @@ AttIntervalHarmonic::AttIntervalHarmonic() : Att()
     ResetIntervalHarmonic();
 }
 
-AttIntervalHarmonic::~AttIntervalHarmonic()
-{
-}
+AttIntervalHarmonic::~AttIntervalHarmonic() {}
 
 void AttIntervalHarmonic::ResetIntervalHarmonic()
 {
@@ -181,9 +169,7 @@ AttIntervalMelodic::AttIntervalMelodic() : Att()
     ResetIntervalMelodic();
 }
 
-AttIntervalMelodic::~AttIntervalMelodic()
-{
-}
+AttIntervalMelodic::~AttIntervalMelodic() {}
 
 void AttIntervalMelodic::ResetIntervalMelodic()
 {
@@ -227,9 +213,7 @@ AttKeySigAnl::AttKeySigAnl() : Att()
     ResetKeySigAnl();
 }
 
-AttKeySigAnl::~AttKeySigAnl()
-{
-}
+AttKeySigAnl::~AttKeySigAnl() {}
 
 void AttKeySigAnl::ResetKeySigAnl()
 {
@@ -273,9 +257,7 @@ AttKeySigDefaultAnl::AttKeySigDefaultAnl() : Att()
     ResetKeySigDefaultAnl();
 }
 
-AttKeySigDefaultAnl::~AttKeySigDefaultAnl()
-{
-}
+AttKeySigDefaultAnl::~AttKeySigDefaultAnl() {}
 
 void AttKeySigDefaultAnl::ResetKeySigDefaultAnl()
 {
@@ -349,9 +331,7 @@ AttMelodicFunction::AttMelodicFunction() : Att()
     ResetMelodicFunction();
 }
 
-AttMelodicFunction::~AttMelodicFunction()
-{
-}
+AttMelodicFunction::~AttMelodicFunction() {}
 
 void AttMelodicFunction::ResetMelodicFunction()
 {
@@ -395,9 +375,7 @@ AttPitchClass::AttPitchClass() : Att()
     ResetPitchClass();
 }
 
-AttPitchClass::~AttPitchClass()
-{
-}
+AttPitchClass::~AttPitchClass() {}
 
 void AttPitchClass::ResetPitchClass()
 {
@@ -441,9 +419,7 @@ AttSolfa::AttSolfa() : Att()
     ResetSolfa();
 }
 
-AttSolfa::~AttSolfa()
-{
-}
+AttSolfa::~AttSolfa() {}
 
 void AttSolfa::ResetSolfa()
 {
@@ -637,4 +613,4 @@ void Att::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

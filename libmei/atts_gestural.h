@@ -533,6 +533,6 @@ private:
     /* include <atttstamp2.real> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_GESTURAL_H__

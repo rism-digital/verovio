@@ -64,6 +64,6 @@ private:
     /* include <attwhen> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_PERFORMANCE_H__

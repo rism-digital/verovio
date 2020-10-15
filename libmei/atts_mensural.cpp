@@ -35,9 +35,7 @@ AttSTEMPROPERTIESMensural::AttSTEMPROPERTIESMensural() : Att()
     ResetSTEMPROPERTIESMensural();
 }
 
-AttSTEMPROPERTIESMensural::~AttSTEMPROPERTIESMensural()
-{
-}
+AttSTEMPROPERTIESMensural::~AttSTEMPROPERTIESMensural() {}
 
 void AttSTEMPROPERTIESMensural::ResetSTEMPROPERTIESMensural()
 {
@@ -156,9 +154,7 @@ AttDurationQuality::AttDurationQuality() : Att()
     ResetDurationQuality();
 }
 
-AttDurationQuality::~AttDurationQuality()
-{
-}
+AttDurationQuality::~AttDurationQuality() {}
 
 void AttDurationQuality::ResetDurationQuality()
 {
@@ -202,9 +198,7 @@ AttLigatureLog::AttLigatureLog() : Att()
     ResetLigatureLog();
 }
 
-AttLigatureLog::~AttLigatureLog()
-{
-}
+AttLigatureLog::~AttLigatureLog() {}
 
 void AttLigatureLog::ResetLigatureLog()
 {
@@ -248,9 +242,7 @@ AttMensuralLog::AttMensuralLog() : Att()
     ResetMensuralLog();
 }
 
-AttMensuralLog::~AttMensuralLog()
-{
-}
+AttMensuralLog::~AttMensuralLog() {}
 
 void AttMensuralLog::ResetMensuralLog()
 {
@@ -354,9 +346,7 @@ AttMensuralShared::AttMensuralShared() : Att()
     ResetMensuralShared();
 }
 
-AttMensuralShared::~AttMensuralShared()
-{
-}
+AttMensuralShared::~AttMensuralShared() {}
 
 void AttMensuralShared::ResetMensuralShared()
 {
@@ -460,9 +450,7 @@ AttNoteAnlMensural::AttNoteAnlMensural() : Att()
     ResetNoteAnlMensural();
 }
 
-AttNoteAnlMensural::~AttNoteAnlMensural()
-{
-}
+AttNoteAnlMensural::~AttNoteAnlMensural() {}
 
 void AttNoteAnlMensural::ResetNoteAnlMensural()
 {
@@ -506,9 +494,7 @@ AttRestVisMensural::AttRestVisMensural() : Att()
     ResetRestVisMensural();
 }
 
-AttRestVisMensural::~AttRestVisMensural()
-{
-}
+AttRestVisMensural::~AttRestVisMensural() {}
 
 void AttRestVisMensural::ResetRestVisMensural()
 {
@@ -552,9 +538,7 @@ AttStemsMensural::AttStemsMensural() : Att()
     ResetStemsMensural();
 }
 
-AttStemsMensural::~AttStemsMensural()
-{
-}
+AttStemsMensural::~AttStemsMensural() {}
 
 void AttStemsMensural::ResetStemsMensural()
 {
@@ -810,4 +794,4 @@ void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv
