@@ -160,7 +160,6 @@ jobs:
   build_cli:
     name: Build cli
     runs-on: ubuntu-20.04
-    needs: [build_cpp]
 
     steps:
       - name: Checkout main repo
@@ -201,7 +200,6 @@ jobs:
   setup_emscripten:
     name: Set up and cache emscripten
     runs-on: ubuntu-20.04
-    needs: [build_cpp]
 
     steps:
       # Cache system libraries generated during build time
@@ -307,7 +305,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
-    needs: [build_cli, build_js]
+    needs: [build_cpp, build_cli, build_js]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
