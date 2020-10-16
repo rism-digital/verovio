@@ -95,7 +95,7 @@ jobs:
 
       # Installation step for Ubuntu
       - name: Install Ubuntu (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: matrix.config.os == 'ubuntu'
+        if: runner.os == 'Linux'
         run: |
           # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | sudo apt-key add -
@@ -115,7 +115,7 @@ jobs:
 
       # Installation step for MacOS
       - name: Install macOS (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: matrix.config.os == 'macos'
+        if: runner.os == 'macOS'
         run: |
           brew install ninja llvm
           sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
@@ -129,7 +129,7 @@ jobs:
 
       # Installation step for Windows
       - name: Install Windows (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: matrix.config.os == 'windows'
+        if: runner.os == 'windows'
         run: |
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           scoop install ninja llvm --global
@@ -150,7 +150,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
-          make -j 8
+          make -j8
 
 
   ###########################
@@ -174,7 +174,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
-          make -j 8
+          make -j8
 
       - name: Update cli.txt
         run: |
