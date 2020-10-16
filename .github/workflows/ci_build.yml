@@ -314,6 +314,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: ${{ env.GH_PAGES_REPO }}
+          token: ${{ secrets.GH_TOKEN }}
           ref: ${{ env.GH_PAGES_BRANCH }}
           path: ${{ env.GH_PAGES_FOLDER }}
 
