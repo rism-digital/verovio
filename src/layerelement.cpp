@@ -24,6 +24,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
+#include "elementpart.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
@@ -747,6 +748,15 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
                 LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
                 assert(parent);
                 int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                Flag *currentFlag = NULL;
+                currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
+                if (currentFlag) {
+                    wchar_t flagGlyph = currentFlag->GetSmuflCode(STEMDIRECTION_down);
+                    const int flagWidth
+                        = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
+                    horizontalMargin += flagWidth;
+                }
+
                 if (right < left) {
                     parent->SetDrawingXRel(parent->GetDrawingXRel() + right + horizontalMargin);
                 }

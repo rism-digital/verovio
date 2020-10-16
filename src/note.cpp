@@ -639,6 +639,8 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
             else if (previousNote->GetDrawingLoc() - GetDrawingLoc() == 1) {
                 horizontalMargin = 0;
             }
+            else if (previousNote->m_crossStaff || m_crossStaff)
+                continue;
             else if ((previousNote->GetDrawingLoc() - GetDrawingLoc() < 0)
                 && (previousNote->GetDrawingStemDir() != GetDrawingStemDir()) /* && !isChordElement*/) {
                 if (previousNote->GetDrawingLoc() - GetDrawingLoc() == -1) {
