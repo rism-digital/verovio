@@ -19,16 +19,17 @@ env:
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
 
   # gh-pages
-  GH_PAGES_REPO: rism-ch/verovio.org
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # --> resolves to rism-ch/verovio.org
   GH_PAGES_BRANCH: gh-pages
-  GH_PAGES_FOLDER: gh-pages
 
   # build artifacts
   CLI_BUILD: cli-build
   TOOLKIT_BUILD: toolkit-build
 
-  # temp
-  TEMP_FOLDER: temp
+  # temporary directories
+  GH_PAGES_DIR: gh-pages-dir
+  TEMP_DIR: temp-dir
+
 
 jobs:
   ###############################################################################################
@@ -168,7 +169,7 @@ jobs:
       - name: Create temp dir
         run: |
           cd $GITHUB_WORKSPACE
-          mkdir -p $TEMP_FOLDER/
+          mkdir -p $TEMP_DIR/
 
       - name: Run make
         run: |
@@ -179,18 +180,18 @@ jobs:
       - name: Update cli.txt
         run: |
           cd $GITHUB_WORKSPACE/tools
-          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_FOLDER/cli.txt
+          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.CLI_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_FOLDER }}/cli.txt
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
       - name: Check files
         if: always()
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
 
@@ -277,25 +278,25 @@ jobs:
       - name: Create temp dir
         run: |
           cd $GITHUB_WORKSPACE
-          mkdir -p $TEMP_FOLDER//
+          mkdir -p $TEMP_DIR/
 
       - name: Build Toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
         run: |
           cd $GITHUB_WORKSPACE/emscripten
           echo "${{ matrix.toolkit.message }}"
           ./buildToolkit ${{ matrix.toolkit.options }}
-          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TOOLKIT_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_FOLDER }}/${{ matrix.toolkit.filepath }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
       - name: Check files
         if: always()
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
 
@@ -309,13 +310,13 @@ jobs:
     needs: [build_cli, build_js]
 
     steps:
-      - name: Checkout GH_PAGES_REPO into GH_PAGES_FOLDER
+      - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
         uses: actions/checkout@v2
         with:
           repository: ${{ env.GH_PAGES_REPO }}
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ env.GH_PAGES_BRANCH }}
-          path: ${{ env.GH_PAGES_FOLDER }}
+          path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v2
@@ -325,18 +326,18 @@ jobs:
 
       - name: Copy artifacts to gh-pages
         run: |
-          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_FOLDER/_includes/
-          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_FOLDER/javascript/develop/
+          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
+          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
-      - name: Check git status
+      - name: Check git status before commit
         run: |
+          cd $GH_PAGES_DIR
           echo ${{ github.repository }}
-          cd $GH_PAGES_FOLDER
           git status
 
       - name: Push to gh-pages
         run: |
-          cd $GH_PAGES_FOLDER
+          cd $GH_PAGES_DIR
 
           echo "Configuring git push"
           git config user.name "GH actions toolkit builder"
