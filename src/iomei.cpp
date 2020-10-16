@@ -1602,6 +1602,7 @@ void MEIOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
     assert(halfmRpt);
 
     WriteLayerElement(currentNode, halfmRpt);
+    halfmRpt->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
@@ -1725,6 +1726,7 @@ void MEIOutput::WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt)
     assert(mRpt);
 
     WriteLayerElement(currentNode, mRpt);
+    mRpt->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2)
@@ -1732,6 +1734,7 @@ void MEIOutput::WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2)
     assert(mRpt2);
 
     WriteLayerElement(currentNode, mRpt2);
+    mRpt2->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteMSpace(pugi::xml_node currentNode, MSpace *mSpace)
@@ -4805,6 +4808,8 @@ bool MEIInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
     HalfmRpt *vrvHalfmRpt = new HalfmRpt();
     ReadLayerElement(halfmRpt, vrvHalfmRpt);
 
+    vrvHalfmRpt->ReadColor(halfmRpt);
+
     parent->AddChild(vrvHalfmRpt);
     ReadUnsupportedAttr(halfmRpt, vrvHalfmRpt);
     return true;
@@ -4913,6 +4918,8 @@ bool MEIInput::ReadMRpt(Object *parent, pugi::xml_node mRpt)
     MRpt *vrvMRpt = new MRpt();
     ReadLayerElement(mRpt, vrvMRpt);
 
+    vrvMRpt->ReadColor(mRpt);
+
     parent->AddChild(vrvMRpt);
     ReadUnsupportedAttr(mRpt, vrvMRpt);
     return true;
@@ -4922,6 +4929,8 @@ bool MEIInput::ReadMRpt2(Object *parent, pugi::xml_node mRpt2)
 {
     MRpt2 *vrvMRpt2 = new MRpt2();
     ReadLayerElement(mRpt2, vrvMRpt2);
+
+    vrvMRpt2->ReadColor(mRpt2);
 
     parent->AddChild(vrvMRpt2);
     ReadUnsupportedAttr(mRpt2, vrvMRpt2);
