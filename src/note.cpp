@@ -639,8 +639,6 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
             else if (previousNote->GetDrawingLoc() - GetDrawingLoc() == 1) {
                 horizontalMargin = 0;
             }
-            else if (previousNote->m_crossStaff || m_crossStaff)
-                continue;
             else if ((previousNote->GetDrawingLoc() - GetDrawingLoc() < 0)
                 && (previousNote->GetDrawingStemDir() != GetDrawingStemDir()) /* && !isChordElement*/) {
                 if (previousNote->GetDrawingLoc() - GetDrawingLoc() == -1) {
@@ -649,6 +647,8 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
                 else if ((GetDrawingDur() <= DUR_1) && (previousNote->GetDrawingDur() <= DUR_1)) {
                     continue;
                 }
+                else if (previousNote->m_crossStaff || m_crossStaff)
+                    continue;
                 else {
                     horizontalMargin *= -1;
                     verticalMargin = horizontalMargin;
@@ -665,6 +665,8 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
 
             shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
 
+            // Make additional adjustments for cross-staff and unison notes
+            if (m_crossStaff) shift -= horizontalMargin;
             if (overlappingPosition != -1) shift *= -1;
         }
         else {
