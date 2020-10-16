@@ -45,15 +45,21 @@ jobs:
           ls -R
 
       - name: Find tests
+        env:
+          TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
         run: |
-          cd $GITHUB_WORKSPACE/$GH_PAGES_DIR/_tests
+          cd $TEST_DIR
           ls -al
+
+          for testcase in $TEST_DIR/*; do
+            echo $ textcase
+          done
 
       - name: Run make
         run: |
           cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
-          make -j 8
+          make -j8
 
       - name: Run tests
         env:
@@ -62,10 +68,12 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/$TEMP_DIR
 
           cd $GITHUB_WORKSPACE/tools
-          for t in $TEST_DIR/*; do
-              for i in $TEST_DIR/$t/*.mei; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
-              for i in $TEST_DIR/$t/*.mei; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
-              mv $TEST_DIR/$t/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
+
+          for testcase in $TEST_DIR/*; do
+              echo $ textcase
+              for i in $testcase/*.mei; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
+              for i in $testcase/*.mei; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
+              mv $TEST_DIR/$testcase/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
           done
 
       - name: Verify
