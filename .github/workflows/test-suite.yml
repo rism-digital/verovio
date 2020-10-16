@@ -74,7 +74,7 @@ jobs:
               echo $testcase
               for i in $testcase/*.mei; do ./verovio -r ../data/ $i --breaks none --adjust-page-height --scale 50; done
               for i in $testcase/*.mei; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $i; done
-              mv $TEST_DIR/$testcase/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
+              mv $testcase/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
           done
 
       - name: Verify
