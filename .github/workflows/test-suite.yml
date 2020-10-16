@@ -53,7 +53,7 @@ jobs:
 
           for testcase in $TEST_DIR/*; do
             echo $testcase
-            for testfile in $testcase/*.mei; do ; echo $testfile done
+            for testfile in $testcase/*.mei; do echo $testfile; done
           done
 
       - name: Run make
