@@ -30,7 +30,6 @@ env:
   # temp
   TEMP_FOLDER: temp
 
-
 jobs:
   ###############################################################################################
   # Build c++ code on different os in parallel.                                                 #
