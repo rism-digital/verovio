@@ -333,13 +333,13 @@ jobs:
           echo ${{ github.repository }}
           git status
 
-      - name: Push to gh-pages
+      - name: Commit files
         run: |
           cd $GH_PAGES_DIR
 
-          echo "Configuring git push"
-          git config user.name "GH actions toolkit builder"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          echo "Configuring git"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
 
           echo "Running git commit"
           git add .
@@ -348,8 +348,22 @@ jobs:
           echo "Running git status"
           git status
 
+      - name: Check git status after commit
+        run: |
+          cd $GH_PAGES_DIR
+          echo ${{ github.repository }}
+          git status
+
+      - name: Push changes to gh-pages
+        run: |
+          cd $GH_PAGES_DIR
+
           # Push all changes in one commit to the gh-pages branch
           echo "Build branch ready to go. Pushing to Github..."
-          git push origin ${GH_PAGES_BRANCH}
 
+          git push origin HEAD:$GH_PAGES_BRANCH
+
+      - name: Congratulations
+        if: ${{ success() }}
+        run: |
           echo "🎉 New version deployed 🎊"
