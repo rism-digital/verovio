@@ -1,0 +1,354 @@
+name: Verovio CI Build
+
+on:
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - develop
+      # Push events on ci-test branch (only needed for testing purposes)
+      - ci-test
+      # Push events on travis-test branch (only needed for testing purposes)
+      - travis-test
+
+# globals
+env:
+  # emscripten
+  EMSCRIPTEN_VERSION: latest
+  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+
+  # gh-pages
+  GH_PAGES_BRANCH: gh-pages
+  GH_PAGES_FOLDER: gh-pages
+
+  # build artifacts
+  CLI_BUILD: cli-build
+  TOOLKIT_BUILD: toolkit-build
+
+  # temp
+  TEMP_FOLDER: temp
+
+
+jobs:
+  ###############################################################################################
+  # Build c++ code on different os in parallel.                                                 #
+  # Adapted from https://github.com/DaanDeMeyer/reproc/blob/master/.github/workflows/main.yml . #
+  ###############################################################################################
+  build_cpp:
+    name: Build ${{ matrix.config.os }}-${{ matrix.config.compiler }}-${{ matrix.config.version }}
+    # This job runs on all the os specified in strategy.matrix.os
+    runs-on: ${{ matrix.config.os }}
+
+    # set matrix with config options
+    # (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-20.04
+            compiler: gcc
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: gcc
+            version: "10"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "6.0"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "10"
+
+          #          - os: windows-latest
+          #            compiler: cl
+          #            version: "default"
+          #
+          #          - os: windows-latest
+          #            compiler: clang-cl
+          #            version: "latest"
+          #
+          #          - os: windows-latest
+          #            compiler: clang
+          #            version: "latest"
+          #
+          #          - os: windows-latest
+          #            compiler: gcc
+          #            version: "latest"
+
+          - os: macos-latest
+            compiler: xcode
+            version: "default"
+
+          - os: macos-latest
+            compiler: gcc
+            version: "latest"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      # Installation step for Ubuntu
+      - name: Install Ubuntu (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: matrix.config.os == 'ubuntu'
+        run: |
+          # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | sudo apt-key add -
+          sudo add-apt-repository 'deb http://apt.llvm.org/focal llvm-toolchain-focal-10 main' -y
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
+          sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
+          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
+            sudo apt-get install -y --no-install-recommends g++-${{ matrix.config.version }}
+            echo CC=gcc-${{ matrix.config.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.config.version }} >> $GITHUB_ENV
+          else
+            sudo apt-get install -y --no-install-recommends clang-${{ matrix.config.version }}
+            echo CC=clang-${{ matrix.config.version }} >> $GITHUB_ENV
+            echo CXX=clang++-${{ matrix.config.version }} >> $GITHUB_ENV
+          fi
+
+      # Installation step for MacOS
+      - name: Install macOS (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: matrix.config.os == 'macos'
+        run: |
+          brew install ninja llvm
+          sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
+          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
+            echo CC=gcc >> $GITHUB_ENV
+            echo CXX=g++ >> $GITHUB_ENV
+          else
+            echo CC=clang >> $GITHUB_ENV
+            echo CXX=clang++ >> $GITHUB_ENV
+          fi
+
+      # Installation step for Windows
+      - name: Install Windows (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: matrix.config.os == 'windows'
+        run: |
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+          scoop install ninja llvm --global
+          if ("${{ matrix.config.compiler }}" -eq "gcc") {
+            echo "::set-env name=CC::gcc"
+            echo "::set-env name=CXX::g++"
+          } elseif ("${{ matrix.config.compiler }}" -eq "clang") {
+            echo "::set-env name=CC::clang"
+            echo "::set-env name=CXX::clang++"
+          } else {
+            echo "::set-env name=CC::${{ matrix.config.compiler }}"
+            echo "::set-env name=CXX::${{ matrix.config.compiler }}"
+          }
+          # Make all PATH additions made by scoop and ourselves global.
+          echo "::set-env name=PATH::$env:PATH"
+
+      - name: Run make
+        run: |
+          cd $GITHUB_WORKSPACE/tools
+          cmake ../cmake
+          make -j 8
+
+
+  ###########################
+  # Build the CLI artifacts #
+  ###########################
+  build_cli:
+    name: Build cli
+    runs-on: ubuntu-20.04
+    needs: [build_cpp]
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Create temp dir
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir -p $TEMP_FOLDER/
+
+      - name: Run make
+        run: |
+          cd $GITHUB_WORKSPACE/tools
+          cmake ../cmake
+          make -j 8
+
+      - name: Update cli.txt
+        run: |
+          cd $GITHUB_WORKSPACE/tools
+          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_FOLDER/cli.txt
+
+      - name: Upload cli artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CLI_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_FOLDER }}/cli.txt
+
+      - name: Check files
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          pwd
+          ls -al
+
+  #####################################
+  # Set up and cache emscripten build #
+  #####################################
+  setup_emscripten:
+    name: Set up and cache emscripten
+    runs-on: ubuntu-20.04
+    needs: [build_cpp]
+
+    steps:
+      # Cache system libraries generated during build time
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
+      # Cache emsdk
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+
+  ##################################
+  # Build the JS toolkit artifacts #
+  ##################################
+  build_js:
+    name: Build JS toolkit
+    runs-on: ubuntu-20.04
+    needs: [setup_emscripten]
+
+    # set matrix with toolkit options (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        toolkit:
+          - target: nohumdrum
+            message: "Building toolkit without humdrum"
+            options: "-c -H -M"
+            filepath: "verovio-toolkit.js*"
+          - target: light
+            message: "Building toolkit without humdrum as light version"
+            options: "-c -H -l -M"
+            filepath: "verovio-toolkit-light.js*"
+          - target: wasm
+            message: "Building toolkit without humdrum as wasm"
+            options: "-c -H -w -M"
+            filepath: "verovio*wasm*"
+          - target: default
+            message: "Building default toolkit (with humdrum)"
+            options: "-c -M"
+            filepath: "*-hum.js*"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      # Restore system libraries generated during build time from cache
+      - name: Restore system libraries from cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
+      - name: Get emscripten build from cache and activate
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+      - name: Create temp dir
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir -p $TEMP_FOLDER//
+
+      - name: Build Toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+        run: |
+          cd $GITHUB_WORKSPACE/emscripten
+          echo "${{ matrix.toolkit.message }}"
+          ./buildToolkit ${{ matrix.toolkit.options }}
+          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_FOLDER/
+
+      - name: Upload js build artifact (${{ matrix.toolkit.target }})
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_FOLDER }}/${{ matrix.toolkit.filepath }}
+
+      - name: Check files
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          pwd
+          ls -al
+
+  ##########################################
+  # Deploy the build artifacts to gh-pages #
+  ##########################################
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build jobs
+    needs: [build_cli, build_js]
+
+    steps:
+      - name: Checkout GH_PAGES_BRANCH into GH_PAGES_FOLDER
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.GH_PAGES_BRANCH }}
+          path: ${{ env.GH_PAGES_FOLDER }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          #if no name specified, all artifacts are downloaded (here: [cli-build, toolkit-build])
+          path: artifacts
+
+      - name: Copy artifacts to gh-pages
+        run: |
+          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_FOLDER/_includes/
+          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_FOLDER/javascript/develop/
+
+      - name: Check git status
+        run: |
+          echo ${{ github.repository }}
+          cd $GH_PAGES_FOLDER
+          git status
+
+      - name: Push to gh-pages
+        run: |
+          cd $GH_PAGES_FOLDER
+
+          echo "Configuring git push"
+          git config user.name "GH actions toolkit builder"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+          echo "Running git commit"
+          git add .
+          git commit -m "Auto-commit of toolkit build for ${{ github.repository }}@${{ github.sha }}"
+
+          echo "Running git status"
+          git status
+
+          # Push all changes in one commit to the gh-pages branch
+          echo "Build branch ready to go. Pushing to Github..."
+          git push origin ${GH_PAGES_BRANCH}
+
+          echo "🎉 New version deployed 🎊"
