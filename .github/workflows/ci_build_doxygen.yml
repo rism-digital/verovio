@@ -72,11 +72,11 @@ jobs:
           (cat verovio.conf ; echo "OUTPUT_DIRECTORY = ${DOXYGEN_DIR}") | doxygen -
 
       - name: Check files in DOXYGEN
-          if: always()
-          run: |
-            cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
-            pwd
-            ls -al
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
+          pwd
+          ls -al
 
       - name: Copy artifacts to gh-pages
         run: |
