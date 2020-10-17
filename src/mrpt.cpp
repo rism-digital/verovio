@@ -28,8 +28,10 @@ namespace vrv {
 // MRpt
 //----------------------------------------------------------------------------
 
-MRpt::MRpt() : LayerElement("mrpt-")
+MRpt::MRpt() : LayerElement("mrpt-"), AttColor()
 {
+    RegisterAttClass(ATT_COLOR);
+
     Reset();
 }
 
@@ -38,6 +40,7 @@ MRpt::~MRpt() {}
 void MRpt::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
 
     m_drawingMeasureCount = 0;
 }
