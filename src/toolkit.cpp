@@ -681,7 +681,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogWarning("Can not parse JSON std::string. Using default options.");
+        LogWarning("Cannot parse JSON std::string. Using default options.");
     }
     else {
         if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
@@ -875,7 +875,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         return false;
     }
 
