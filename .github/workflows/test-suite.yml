@@ -52,6 +52,7 @@ jobs:
           ls -al
 
           for testcase in $TEST_DIR/*; do
+            echo "********"
             echo $testcase
             for testfile in $testcase/*.mei; do echo $testfile; done
           done
