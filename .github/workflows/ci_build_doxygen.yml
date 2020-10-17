@@ -69,14 +69,13 @@ jobs:
           doxygen --help
 
       - name: Build documentation
-        run: |
-          cd $GITHUB_WORKSPACE/doc
-          (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/${DOXYGEN_DIR}") | doxygen -
+        working-directory: ${{ github.WORKSPACE }}/doc
+        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/${DOXYGEN_DIR}") | doxygen -
 
       - name: Check files in WORKSPACE
         if: always()
+        working-directory: ${{ github.WORKSPACE }}
         run: |
-          cd $GITHUB_WORKSPACE
           pwd
           ls -al
 
@@ -116,7 +115,7 @@ jobs:
       - name: Push changes to doxygen
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          # Push all changes in one commit to the gh-pages branch
+          # Push all changes in one commit to the doxygen repo
           echo "Build branch ready to go. Pushing to Github..."
 
           git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
