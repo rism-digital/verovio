@@ -66,10 +66,19 @@ jobs:
           pwd
           ls -al
 
+      - name: Install doxygen
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends doxygen
+
+      - name: Check installation
+        run: |
+          doxygen --help
+
       - name: Build documentation
         run: |
           cd $GITHUB_WORKSPACE/doc
-          (cat verovio.conf ; echo "OUTPUT_DIRECTORY = ${DOXYGEN_DIR}") | doxygen -
+          (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/${DOXYGEN_DIR}") | doxygen -
 
       - name: Check files in DOXYGEN
         if: always()
