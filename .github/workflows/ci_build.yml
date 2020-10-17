@@ -19,16 +19,17 @@ env:
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
 
   # gh-pages
-  GH_PAGES_REPO: rism-ch/verovio.org
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # --> resolves to rism-ch/verovio.org
   GH_PAGES_BRANCH: gh-pages
-  GH_PAGES_FOLDER: gh-pages
 
   # build artifacts
   CLI_BUILD: cli-build
   TOOLKIT_BUILD: toolkit-build
 
-  # temp
-  TEMP_FOLDER: temp
+  # temporary directories
+  GH_PAGES_DIR: gh-pages-dir
+  TEMP_DIR: temp-dir
+
 
 jobs:
   ###############################################################################################
@@ -95,7 +96,7 @@ jobs:
 
       # Installation step for Ubuntu
       - name: Install Ubuntu (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: matrix.config.os == 'ubuntu'
+        if: runner.os == 'Linux'
         run: |
           # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | sudo apt-key add -
@@ -115,7 +116,7 @@ jobs:
 
       # Installation step for MacOS
       - name: Install macOS (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: matrix.config.os == 'macos'
+        if: runner.os == 'macOS'
         run: |
           brew install ninja llvm
           sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
@@ -129,7 +130,7 @@ jobs:
 
       # Installation step for Windows
       - name: Install Windows (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: matrix.config.os == 'windows'
+        if: runner.os == 'windows'
         run: |
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           scoop install ninja llvm --global
@@ -150,7 +151,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
-          make -j 8
+          make -j8
 
 
   ###########################
@@ -159,7 +160,6 @@ jobs:
   build_cli:
     name: Build cli
     runs-on: ubuntu-20.04
-    needs: [build_cpp]
 
     steps:
       - name: Checkout main repo
@@ -168,29 +168,29 @@ jobs:
       - name: Create temp dir
         run: |
           cd $GITHUB_WORKSPACE
-          mkdir -p $TEMP_FOLDER/
+          mkdir -p $TEMP_DIR/
 
       - name: Run make
         run: |
           cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
-          make -j 8
+          make -j8
 
       - name: Update cli.txt
         run: |
           cd $GITHUB_WORKSPACE/tools
-          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_FOLDER/cli.txt
+          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.CLI_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_FOLDER }}/cli.txt
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
       - name: Check files
         if: always()
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
 
@@ -200,7 +200,6 @@ jobs:
   setup_emscripten:
     name: Set up and cache emscripten
     runs-on: ubuntu-20.04
-    needs: [build_cpp]
 
     steps:
       # Cache system libraries generated during build time
@@ -277,25 +276,25 @@ jobs:
       - name: Create temp dir
         run: |
           cd $GITHUB_WORKSPACE
-          mkdir -p $TEMP_FOLDER//
+          mkdir -p $TEMP_DIR/
 
       - name: Build Toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
         run: |
           cd $GITHUB_WORKSPACE/emscripten
           echo "${{ matrix.toolkit.message }}"
           ./buildToolkit ${{ matrix.toolkit.options }}
-          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TOOLKIT_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_FOLDER }}/${{ matrix.toolkit.filepath }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
       - name: Check files
         if: always()
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_FOLDER/
+          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
 
@@ -306,16 +305,16 @@ jobs:
     name: Deploy
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
-    needs: [build_cli, build_js]
+    needs: [build_cpp, build_cli, build_js]
 
     steps:
-      - name: Checkout GH_PAGES_REPO into GH_PAGES_FOLDER
+      - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
         uses: actions/checkout@v2
         with:
           repository: ${{ env.GH_PAGES_REPO }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY }}
           ref: ${{ env.GH_PAGES_BRANCH }}
-          path: ${{ env.GH_PAGES_FOLDER }}
+          path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v2
@@ -325,22 +324,22 @@ jobs:
 
       - name: Copy artifacts to gh-pages
         run: |
-          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_FOLDER/_includes/
-          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_FOLDER/javascript/develop/
+          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
+          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
-      - name: Check git status
+      - name: Check git status before commit
         run: |
+          cd $GH_PAGES_DIR
           echo ${{ github.repository }}
-          cd $GH_PAGES_FOLDER
           git status
 
-      - name: Push to gh-pages
+      - name: Commit files
         run: |
-          cd $GH_PAGES_FOLDER
+          cd $GH_PAGES_DIR
 
-          echo "Configuring git push"
-          git config user.name "GH actions toolkit builder"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          echo "Configuring git"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
 
           echo "Running git commit"
           git add .
@@ -349,8 +348,22 @@ jobs:
           echo "Running git status"
           git status
 
+      - name: Check git status after commit
+        run: |
+          cd $GH_PAGES_DIR
+          echo ${{ github.repository }}
+          git status
+
+      - name: Push changes to gh-pages
+        run: |
+          cd $GH_PAGES_DIR
+
           # Push all changes in one commit to the gh-pages branch
           echo "Build branch ready to go. Pushing to Github..."
-          git push origin ${GH_PAGES_BRANCH}
 
+          git push origin HEAD:$GH_PAGES_BRANCH
+
+      - name: Congratulations
+        if: ${{ success() }}
+        run: |
           echo "🎉 New version deployed 🎊"
