@@ -75,13 +75,13 @@ jobs:
               echo "********"
               echo $testcase
 
-              echo "Creating SVG files..."
+              echo "* Creating SVG files..."
               for testfile in $testcase/*.mei; do ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50; done
 
-              echo "Creating MEI files..."
+              echo "* Creating MEI files..."
               for testfile in $testcase/*.mei; do ./verovio -r ../data/ -t mei --remove-ids --all-pages $testfile; done
 
-              echo "Copying SVG files..."
+              echo "* Copying SVG files..."
               mv $testcase/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
           done
 
