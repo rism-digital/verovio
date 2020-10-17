@@ -23,7 +23,7 @@ env:
   GH_PAGES_BRANCH: gh-pages
 
   #doxygen
-  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen"
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen
   DOXYGEN_BRANCH: master
 
   # build artifacts
