@@ -1,0 +1,125 @@
+name: Verovio CI Build
+
+on:
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - develop
+      # Push events on ci-test branch (only needed for testing purposes)
+      - ci-test
+      # Push events on travis-test branch (only needed for testing purposes)
+      - travis-test
+
+# globals
+env:
+  # emscripten
+  EMSCRIPTEN_VERSION: latest
+  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+
+  # gh-pages
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # --> resolves to rism-ch/verovio.org
+  GH_PAGES_BRANCH: gh-pages
+
+  #doxygen
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen"
+  DOXYGEN_BRANCH: master
+
+  # build artifacts
+  CLI_BUILD: cli-build
+  TOOLKIT_BUILD: toolkit-build
+
+  # temporary directories
+  DOXYGEN_DIR: doxygen
+  GH_PAGES_DIR: gh-pages-dir
+  TEMP_DIR: temp-dir
+
+
+jobs:
+
+  ###############################################
+  # Deploy the documentation to verovio-doxygen #
+  ###############################################
+  deploy:
+    name: Deploy doxygen
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build jobs
+    # needs: [build_cpp, build_cli, build_js]
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.DOXYGEN_REPO }}
+#          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
+          ref: ${{ env.DOXYGEN_BRANCH }}
+          path: ${{ env.DOXYGEN_DIR }}
+
+      - name: Check files in WORKSPACE
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE
+          pwd
+          ls -al
+
+      - name: Build documentation
+        run: |
+          cd $GITHUB_WORKSPACE/doc
+          (cat verovio.conf ; echo "OUTPUT_DIRECTORY = ${DOXYGEN_DIR}") | doxygen -
+
+      - name: Check files in DOXYGEN
+          if: always()
+          run: |
+            cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
+            pwd
+            ls -al
+
+      - name: Copy artifacts to gh-pages
+        run: |
+          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
+          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+
+      - name: Check git status before commit
+        run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
+          echo ${{ github.repository }}
+          git status
+
+      - name: Commit files
+        run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
+
+          echo "Configuring git"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+
+          echo "Running git commit"
+          git add .
+          git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
+
+          echo "Running git status"
+          git status
+
+      - name: Check git status after commit
+        run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
+          echo ${{ github.repository }}
+          git status
+
+      - name: Push changes to doxygen
+        run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
+
+          # Push all changes in one commit to the gh-pages branch
+          echo "Build branch ready to go. Pushing to Github..."
+
+          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+
+      - name: Congratulations
+        if: ${{ success() }}
+        run: |
+          echo "🎉 Documentation deployed 🎊"
