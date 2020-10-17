@@ -10808,7 +10808,7 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
     std::string first = hre.getMatch(1);
     std::string second = hre.getMatch(2);
     std::string third = hre.getMatch(3);
-    second = convertRhythmToVerovioText(second);
+    second = convertMusicSymbolNameToSmuflEntity(second);
 
     if (!first.empty()) {
         addTextElement(tempo, first);
@@ -10828,14 +10828,88 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 
 //////////////////////////////
 //
-// HumdrumInput::convertRhythmToVerovioText --
+// HumdrumInput::convertMusicSymbolNameToSmuflEntity --  Convert from
+//    text names for music symbols into SMuFL codepoints for VerovioText font.
+//
+//      NAME       HEX ENCODING
+// ===============================================================
+//
+// https://www.smufl.org/version/latest/range/repeats
+//      segno             E047
+//      coda              E048
+//
+// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
+//      sc                EA00   (signum congruentiae up)
+//      sc-down           EA01   (signum congruentiae down)
+//
+// https://www.smufl.org/version/latest/range/individualNotes
+//      breve             E1D1
+//      whole             E1D2
+//      half              E1D3   (half-up)
+//      quarter           E1D5   (quarter-up)
+//      eighth            E1D7   (eighth-up)
+//      sixteenth         E1D9   (sixteenth-up) (or 16th)
+//      32nd              E1DB   (32nd-up)
+//      64th              E1DD   (64th-up)
+//      128th             E1DF   (128th-up)
+//      256th             E1E1   (256th-up)
+//      512th             E1E3   (512th-up)
+//      1024th            E1E5   (1024th-up)
+//      -dot              E1E7   (1024th-up)
+//
+// https://www.smufl.org/version/latest/range/metronomeMarks
+//      breve             ECA1
+//      whole             ECA2
+//      half              ECA3   (half-up)
+//      quarter           ECA5   (quarter-up)
+//      eighth            ECA7   (eighth-up)
+//      sixteenth         ECA9   (sixteenth-up) (or 16th)
+//      32nd              ECAB   (32nd-up)
+//      64th              ECAD   (64th-up)
+//      128th             ECAF   (128th-up)
+//      256th             ECB1   (256th-up)
+//      512th             ECB3   (512th-up)
+//      1024th            ECB5   (1024th-up)
+//      -dot              ECB7   (1024th-up)
 //
 
-std::string HumdrumInput::convertRhythmToVerovioText(const std::string &text)
+std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string &text)
 {
+
+    if (text.empty()) {
+        return "";
+    }
+    std::string second;
+    if ((text[0] == '[') && (text.back() == ']')) {
+        second = text.substr(1, text.size() - 2);
+    }
+    else {
+        second = text;
+    }
+
+    // remove syling qualifiers
+    size_t pos = second.find('|');
+    if (pos != std::string::npos) {
+        second = second.substr(0, pos);
+    }
+
+    if (second == "segno") {
+        return "&#xE047;";
+    }
+    if (second == "coda") {
+        return "&#xE048;";
+    }
+    if (second == "sc") {
+        return "&#xEA00;";
+    }
+    if (second == "sc-down") {
+        return "&#xEA01;";
+    }
+
+    // generating rhythmic note with optional "-dot" after it.
+
     hum::HumRegex hre;
     bool dot = false;
-    std::string second = text;
     if (hre.search(second, "-dot$")) {
         dot = true;
         second.resize((int)second.size() - 4);
@@ -10846,6 +10920,7 @@ std::string HumdrumInput::convertRhythmToVerovioText(const std::string &text)
     }
 
     std::string output;
+
     if ((second == "quarter") || (second == "4")) {
         output += "&#xE1D5;";
     }
@@ -10858,30 +10933,31 @@ std::string HumdrumInput::convertRhythmToVerovioText(const std::string &text)
     else if ((second == "breve") || (second == "double-whole") || (second == "0")) {
         output += "&#xE1D1;";
     }
-    else if ((second == "eighth") || (second == "8")) {
+    else if ((second == "eighth") || (second == "8") || (second == "8th")) {
         output += "&#xE1D7;";
     }
-    else if ((second == "sixteenth") || (second == "16")) {
+    else if ((second == "sixteenth") || (second == "16") || (second == "16th")) {
         output += "&#xE1D9;";
     }
-    else if (second == "32") {
+    else if ((second == "32") || (second == "32nd")) {
         output += "&#xE1DB;";
     }
-    else if (second == "64") {
+    else if ((second == "64") || (second == "64th")) {
         output += "&#xE1DD;";
     }
-    else if (second == "128") {
+    else if ((second == "128") || (second == "128th")) {
         output += "&#xE1DF;";
     }
-    else if (second == "256") {
+    else if ((second == "256") || (second == "256th")) {
         output += "&#xE1E1;";
     }
-    else if (second == "512") {
+    else if ((second == "512") || (second == "512th")) {
         output += "&#xE1E3;";
     }
-    else if (second == "1024") {
+    else if ((second == "1024") || (second == "1024th")) {
         output += "&#xE1E5;";
     }
+
     if (dot) {
         output += "&#xE1E7;";
     }
@@ -12020,8 +12096,8 @@ template <class ELEMENT>
 void HumdrumInput::insertTwoRhythmsAndTextBetween(
     ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2)
 {
-    std::string newnote1 = convertRhythmToVerovioText(note1);
-    std::string newnote2 = convertRhythmToVerovioText(note2);
+    std::string newnote1 = convertMusicSymbolNameToSmuflEntity(note1);
+    std::string newnote2 = convertMusicSymbolNameToSmuflEntity(note2);
     newnote1 = unescapeHtmlEntities(newnote1);
     newnote2 = unescapeHtmlEntities(newnote2);
 
@@ -12046,6 +12122,51 @@ void HumdrumInput::insertTwoRhythmsAndTextBetween(
 
 /////////////////////////////
 //
+// HumdrumInput::addVerovioTextElement -- Add a VerovioText symbol to some
+//      text-based element.  SMuFL code points encoded as entities are assumed
+//      as input, such as "&#xE047;" for a segno sign.
+//      See convertMusicSymbolNameToSmuflEntity() for converting from [ASCII] into
+//      SMuFL entities.
+
+template <class ELEMENT> void HumdrumInput::addVerovioTextElement(ELEMENT *element, const std::string &musictext)
+{
+    std::string smuflentities = convertMusicSymbolNameToSmuflEntity(musictext);
+    Rend *rend = new Rend;
+    Text *text = new Text;
+    std::string newtext = unescapeHtmlEntities(smuflentities);
+    text->SetText(UTF8to16(newtext));
+    rend->AddChild(text);
+    rend->SetFontname("VerovioText");
+    if (musictext.find("smaller") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_x_small);
+        rend->SetFontsize(fs);
+    } else if (musictext.find("smallest") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_xx_small);
+        rend->SetFontsize(fs);
+    } else if (musictext.find("small") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_small);
+        rend->SetFontsize(fs);
+    } else if (musictext.find("larger") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_x_large);
+        rend->SetFontsize(fs);
+    } else if (musictext.find("largest") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_xx_large);
+        rend->SetFontsize(fs);
+    } else if (musictext.find("large") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_large);
+        rend->SetFontsize(fs);
+    }
+    element->AddChild(rend);
+}
+
+/////////////////////////////
+//
 // HumdumInput::addTextElement -- Append text to a regular element.
 //   default value: fontstyle == ""
 //
@@ -12065,14 +12186,61 @@ void HumdrumInput::addTextElement(
         }
     }
 
-    // Unicode replacement (only works for quarter and eighth:
-    // if (data.find("[") != std::string::npos) {
-    //    data = replaceMusicShapes(data);
-    //}
+    // Parse [ASCII] music codes to route to VerovioText font rends:
+    hum::HumRegex hre;
+    if (hre.search(data, "^(.*?)(\\[.*?\\])(.*)$")) {
+        std::string pretext = hre.getMatch(1);
+        std::string rawmusictext = hre.getMatch(2);
+        std::string musictext = convertMusicSymbolNameToSmuflEntity(rawmusictext);
+        std::string posttext = hre.getMatch(3);
+        if (pretext.empty() && musictext.empty()) {
+            // adjust last [] pair:
+            if (!posttext.empty()) {
+                if (posttext[0] == '[') {
+                    musictext = posttext;
+                    posttext = "";
+                }
+            }
+        }
+
+        if (!musictext.empty()) {
+            if (musictext[0] == '[') {
+                // Avoid recursion:
+                for (int k = 0; k < (int)musictext.size(); k++) {
+                    if (musictext[k] == '[') {
+                        pretext += "&#91;";
+                    }
+                    else if (musictext[k] == ']') {
+                        pretext += "&#93;";
+                    }
+                    else {
+                        pretext += musictext[k];
+                    }
+                }
+                musictext = "";
+            }
+            else {
+            }
+        }
+
+        if (!pretext.empty()) {
+            addTextElement(element, pretext, fontstyle, addSpacer);
+        }
+        if (!musictext.empty()) {
+            addVerovioTextElement(element, rawmusictext);
+        }
+        if (!posttext.empty()) {
+            addTextElement(element, posttext, fontstyle, addSpacer);
+            return;
+        }
+        else {
+            return;
+        }
+    }
+
     data = escapeFreeAmpersand(data);
     data = unescapeHtmlEntities(data);
 
-    hum::HumRegex hre;
     if (hre.search(data, "^\\s*\\[(.*?)\\]([^\\[]*)\\[(.*?)\\]\\s*$")) {
         std::string note1 = hre.getMatch(1);
         std::string text1 = hre.getMatch(2);
@@ -12161,67 +12329,6 @@ std::string HumdrumInput::escapeFreeAmpersand(const std::string &value)
             output += '&';
         }
     }
-    return output;
-}
-
-//////////////////////////////
-//
-// HumdrumInput::replaceMusicShapes -- see HumdrumInput::convertRhythmToVerovioText();
-//
-// Verovio font numbers
-// (see https://www.smufl.org/version/latest/range/individualNotes)
-//      square breve    L"\xE1D1"
-//      whole    L"\xE1D2"
-//      half     L"\xE1D3" (stem up)
-//      quarter  L"\xE1D5" (stem up)
-//      eighth   L"\xE1D7" (stem up)
-//      16th     L"\xE1D9" (stem up)
-//      32nd     L"\xE1DB" (stem up)
-//      64th     L"\xE1DD" (stem up)
-//      128th    L"\xE1DF" (stem up)
-//      256th    L"\xE1E1" (stem up)
-//      512th    L"\xE1E3" (stem up)
-//      1024th   L"\xE1E5" (stem up)
-//      augmentation dot   L"\xE1E7"
-//
-// Example usage:
-//     <rend fontname="VerovioText"></rend>
-//
-// Unicode mappings
-//    [breve]        =>  or &#x1d15c;
-//    [thirtysecond] => &#X1d162;
-//    [sixteenth]    => &#X1d161;
-//    [eighth]       => &#x266a; or &#x1d160;
-//    [quarter]      => &#x2669; or &#x1d15f; (\xF0\x9D\x85\xBD)
-//    [half]         =>  or &#x1d15e;
-//    [whole]        =>  or &#x1d15d;
-//    [breve]        =>  or &#x1d15c;
-//    [ped]          => &#x1d1ae; (\xF0\x9D\x86\xAE)
-//    [segno]        => &#x1d10b; (\xF0\x9D\x84\x8B)
-//    [coda]         => &#x1d10c; (\xF0\x9D\x84\x8C)
-// long values do not work, so only quarter and eight at the moment.
-//
-
-std::string HumdrumInput::replaceMusicShapes(const std::string input)
-{
-    std::string output = input;
-    hum::HumRegex hre;
-    // SMUFL: hre.replaceDestructive(output, "&#xe1d5;", "\\[quarter\\]", "g");
-    hre.replaceDestructive(output, "&#x1d15c;", "\\[breve\\]", "g");
-
-    hre.replaceDestructive(output, "&#x1d15d;", "\\[whole\\]", "g");
-
-    hre.replaceDestructive(output, "&#x1d15e;", "\\[half\\]", "g");
-
-    hre.replaceDestructive(output, "&#x2669;.", "\\[quarter-dot\\]", "g");
-    hre.replaceDestructive(output, "&#x2669;", "\\[quarter\\]", "g");
-
-    hre.replaceDestructive(output, "&#x266a;.", "\\[eighth-dot\\]", "g");
-    hre.replaceDestructive(output, "&#x266a;", "\\[eighth\\]", "g");
-    hre.replaceDestructive(output, "\xF0\x9D\x86\xAE", "\\[[Pp]ed\\.?\\]", "g");
-    hre.replaceDestructive(output, "\xF0\x9D\x84\x8B", "\\[[Ss]egno\\]", "g");
-    hre.replaceDestructive(output, "\xF0\x9D\x84\x8C", "\\[[Cc]oda\\]", "g");
-    // hre.replaceDestructive(output, "&#x1d161;", "\\[sixteenth\\]", "g");
     return output;
 }
 
