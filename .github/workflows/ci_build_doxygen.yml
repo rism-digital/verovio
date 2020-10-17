@@ -14,21 +14,22 @@ on:
 
 # globals
 env:
+  # build artifacts
+  CLI_BUILD: cli-build
+  DOC_BUILD: doc-build
+  TOOLKIT_BUILD: toolkit-build
+
+  # doxygen
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works also for forks of verovio
+  DOXYGEN_BRANCH: master
+
   # emscripten
   EMSCRIPTEN_VERSION: latest
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # --> resolves to rism-ch/verovio.org
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works also for forks of verovio
   GH_PAGES_BRANCH: gh-pages
-
-  #doxygen
-  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen
-  DOXYGEN_BRANCH: master
-
-  # build artifacts
-  CLI_BUILD: cli-build
-  TOOLKIT_BUILD: toolkit-build
 
   # temporary directories
   DOXYGEN_DIR: doxygen
@@ -38,11 +39,11 @@ env:
 
 jobs:
 
-  ###############################################
-  # Deploy the documentation to verovio-doxygen #
-  ###############################################
-  deploy:
-    name: Deploy doxygen
+  ###################################
+  # Build the doxygen documentation #
+  ###################################
+  build_docs:
+    name: Build documentation
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
     # needs: [build_cpp, build_cli, build_js]
@@ -50,14 +51,6 @@ jobs:
     steps:
       - name: Checkout main repo
         uses: actions/checkout@v2
-
-      - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ env.DOXYGEN_REPO }}
-          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
-          ref: ${{ env.DOXYGEN_BRANCH }}
-          path: ${{ env.DOXYGEN_DIR }}
 
       - name: Install doxygen
         run: |
@@ -68,23 +61,61 @@ jobs:
         run: |
           doxygen --help
 
-      - name: Build documentation
+      - name: Build documentation with doxygen
         working-directory: ${{ github.WORKSPACE }}/doc
-        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/${DOXYGEN_DIR}") | doxygen -
+        if: ${{ success() }}
+        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
-      - name: Check files in WORKSPACE
+      - name: Upload doxygen build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DOC_BUILD }}
+          path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
+
+      - name: Check files
+        working-directory: ${{ github.WORKSPACE }}//${{ env.DOXYGEN_DIR }}
         if: always()
-        working-directory: ${{ github.WORKSPACE }}
         run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
           pwd
           ls -al
 
-      - name: Check files in DOXYGEN
-        if: always()
+
+
+
+  ###############################################
+  # Deploy the documentation to verovio-doxygen #
+  ###############################################
+  deploy_docs:
+    name: Deploy documentation
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build jobs
+    needs: [build_docs]
+
+    steps:
+      - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.DOXYGEN_REPO }}
+          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
+          ref: ${{ env.DOXYGEN_BRANCH }}
+          path: ${{ env.DOXYGEN_DIR }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.DOC_BUILD }}
+          path: artifacts
+
+      - name: Copy build artifacts to DOXYGEN_DIR
+        run: |
+          cp artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+
+      - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          pwd
-          ls -al
+          git config --get remote.origin.url
+          git status
 
       - name: Configure git
         working-directory: ${{ env.DOXYGEN_DIR }}
@@ -93,12 +124,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
 
-      - name: Check git status before commit
-        working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          git config --get remote.origin.url
-          git status
-
       - name: Commit files
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
@@ -106,11 +131,11 @@ jobs:
           git add .
           git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
 
-      - name: Check git status after commit
-        working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          git config --get remote.origin.url
-          git status
+#      - name: Check git status after commit
+#        working-directory: ${{ env.DOXYGEN_DIR }}
+#        run: |
+#          git config --get remote.origin.url
+#          git status
 
       - name: Push changes to doxygen
         working-directory: ${{ env.DOXYGEN_DIR }}
