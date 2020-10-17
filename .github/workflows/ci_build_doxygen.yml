@@ -59,13 +59,6 @@ jobs:
           ref: ${{ env.DOXYGEN_BRANCH }}
           path: ${{ env.DOXYGEN_DIR }}
 
-      - name: Check files in WORKSPACE
-        if: always()
-        run: |
-          cd $GITHUB_WORKSPACE
-          pwd
-          ls -al
-
       - name: Install doxygen
         run: |
           sudo apt-get update -q
@@ -80,17 +73,19 @@ jobs:
           cd $GITHUB_WORKSPACE/doc
           (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/${DOXYGEN_DIR}") | doxygen -
 
+      - name: Check files in WORKSPACE
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE
+          pwd
+          ls -al
+
       - name: Check files in DOXYGEN
         if: always()
         run: |
           cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
           pwd
           ls -al
-
-      - name: Copy artifacts to gh-pages
-        run: |
-          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
-          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
         run: |
