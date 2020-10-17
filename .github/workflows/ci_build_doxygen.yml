@@ -73,14 +73,13 @@ jobs:
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
 
       - name: Check files
-        working-directory: ${{ github.WORKSPACE }}//${{ env.DOXYGEN_DIR }}
+        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
         if: always()
         run: |
           cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
           pwd
           ls -al
-
-
+          ls -R
 
 
   ###############################################
@@ -106,6 +105,15 @@ jobs:
         with:
           name: ${{ env.DOC_BUILD }}
           path: artifacts
+
+      - name: Check files
+        working-directory: ${{ github.WORKSPACE }}
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
+          pwd
+          ls -al
+          ls- R
 
       - name: Copy build artifacts to DOXYGEN_DIR
         run: |
