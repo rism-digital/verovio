@@ -46,8 +46,6 @@ jobs:
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
     # needs: [build_cpp, build_cli, build_js]
-    env:
-      WORKING_DIR: ${{ env.DOXYGEN_DIR }}
 
     steps:
       - name: Checkout main repo
@@ -84,39 +82,39 @@ jobs:
 
       - name: Check files in DOXYGEN
         if: always()
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           pwd
           ls -al
 
       - name: Configure git
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           echo "Configuring git"
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Check git status before commit
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           git config --get remote.origin.url
           git status
 
       - name: Commit files
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           echo "Running git commit"
           git add .
           git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
 
       - name: Check git status after commit
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           git config --get remote.origin.url
           git status
 
       - name: Push changes to doxygen
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages branch
           echo "Build branch ready to go. Pushing to Github..."
