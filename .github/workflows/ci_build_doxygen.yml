@@ -110,10 +110,15 @@ jobs:
         working-directory: ${{ github.WORKSPACE }}
         if: always()
         run: |
-          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
+          cd $DOXYGEN_DIR/
           pwd
           ls -al
-          ls- R
+
+          cd ../artifacts/
+          pwd
+          ls -al
+          ls -R
+
 
       - name: Copy build artifacts to DOXYGEN_DIR
         run: |
