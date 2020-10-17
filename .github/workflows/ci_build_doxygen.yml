@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: ${{ env.DOXYGEN_REPO }}
-#          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
+          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
           ref: ${{ env.DOXYGEN_BRANCH }}
           path: ${{ env.DOXYGEN_DIR }}
 
@@ -90,10 +90,10 @@ jobs:
       - name: Check git status before commit
         run: |
           cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
-          echo ${{ github.repository }}
+          git config --get remote.origin.url
           git status
 
-      - name: Commit files
+      - name: Configure git
         run: |
           cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
 
@@ -101,17 +101,18 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
 
+      - name: Commit files
+        run: |
+          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
+
           echo "Running git commit"
           git add .
           git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
 
-          echo "Running git status"
-          git status
-
       - name: Check git status after commit
         run: |
           cd $GITHUB_WORKSPACE/$DOXYGEN_DIR
-          echo ${{ github.repository }}
+          git config --get remote.origin.url
           git status
 
       - name: Push changes to doxygen
