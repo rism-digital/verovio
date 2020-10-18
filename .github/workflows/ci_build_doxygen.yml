@@ -99,8 +99,8 @@ jobs:
 
           echo "-----------------"
           echo "Configure dry-run"
-          echo "::set-env name=DRY_RUN_OPTIONS::$(echo '-v --dry-run')"
-          $IS_DRY_RUN = true
+          echo "{DRY_RUN_OPTION}={$(echo '-v --dry-run')}" >> $GITHUB_ENV
+          echo "{IS_DRY_RUN}={true}" >> $GITHUB_ENV
 
 
       - name: Push changes to doxygen
@@ -118,7 +118,7 @@ jobs:
           # Push all changes in one commit to the doxygen repo
           echo "Build branch ready to go. Pushing to Github..."
 
-          if [ "$GITHUB_REPOSITORY_OWNER" != "$RISM_OWNER" ]
+          if [ "$IS_DRY_RUN" = true ]
           then
             echo "Push dry-run style"
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
