@@ -90,9 +90,9 @@ jobs:
 #          git config --get remote.origin.url
 #          git status
 
-      - name: Disable dry-run mode on rism-ch repo
+      - name: Disable dry-run mode on rism-ch
         # if we are on rism-ch repos
-        if: github.repository_owner != env.RISM_OWNER
+        if: github.repository_owner == env.RISM_OWNER
         run: |
           echo "Disabling dry-run mode..."
           echo "IS_DRY_RUN=false" >> $GITHUB_ENV
@@ -109,7 +109,7 @@ jobs:
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
             echo "Pushing to Github..."
-            # git push origin HEAD:$DOXYGEN_BRANCH
+            git push origin HEAD:$DOXYGEN_BRANCH
           fi
 
       - name: Congratulations
