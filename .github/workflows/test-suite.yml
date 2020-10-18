@@ -61,6 +61,7 @@ jobs:
               if [ "$testcategory" == "$TEST_DIR/ligature" ]
               then
                 echo "Found ligature"
+                continue
               fi
 
               for testfile in $testcategory/*.mei; do echo $testfile; done
