@@ -61,6 +61,9 @@ jobs:
         run: |
           doxygen --help
 
+      - name: Upgrade doxygen
+        run: doxygen -u -
+
       - name: Build documentation with doxygen
         working-directory: ${{ github.WORKSPACE }}/doc
         if: ${{ success() }}
