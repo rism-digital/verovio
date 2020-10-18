@@ -92,7 +92,7 @@ jobs:
 
       - name: Disable dry-run mode on ${{ env.RISM_OWNER }} repo
         # if we are on rism-ch repos
-        if: github.repository_owner = env.RISM_OWNER
+        if: github.repository_owner == env.RISM_OWNER
         run: |
           echo "Disabling dry-run mode..."
           echo "IS_DRY_RUN=false" >> $GITHUB_ENV
