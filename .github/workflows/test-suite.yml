@@ -51,67 +51,72 @@ jobs:
           cd $TEST_DIR
           ls -al
 
-          for testcase in $TEST_DIR/*; do
-            if [ -d "$testcase" ]; then
+          for testcategory in $TEST_DIR/*; do
+            if [ -d "$testcategory" ]; then
               echo "********"
-              echo $testcase
+              echo $testcategory
 
-              for testfile in $testcase/*.mei; do echo $testfile; done
+              if [ "$testcategory" == */ligature ] ; then echo "Found ligature" ; fi
+
+              for testfile in $testcategory/*.mei; do echo $testfile; done
             else
               echo "### No test file here..."
             fi
 
           done
 
-      - name: Run make
-        run: |
-          cd $GITHUB_WORKSPACE/tools
-          cmake ../cmake
-          make -j8
-
-      - name: Run tests
-        env:
-          TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/$TEMP_DIR
-
-          cd $GITHUB_WORKSPACE/tools
-
-          for testcase in $TEST_DIR/*; do
-              echo "********"
-              echo $testcase
-
-              if [ "$testcase" == *ligature ] ; then echo "Found ligature" ; fi
-
-              echo "* Creating SVG files..."
-              for testfile in $testcase/*.mei; do
-                if [ -f "$testfile" ]; then
-                  ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
-                else
-                  echo "### No test file here..."
-                fi
-              done
-
-              echo "* Creating MEI files..."
-              for testfile in $testcase/*.mei; do
-                if [ -f "$testfile" ]; then
-                  ./verovio -r ../data/ -t mei --remove-ids --all-pages $testfile
-                else
-                  echo "### No test file here..."
-                fi
-              done
-
-              echo "* Copying SVG files..."
-              if [ -f "$testcase/*.svg" ]; then
-                mv $testcase/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
-              else
-                echo "### No svg output to copy here..."
-              fi
-          done
+#      - name: Run make
+#        working-directory: ${{ github.workspace }}/tools
+#        run: |
+#          cmake ../cmake
+#          make -j8
+#
+#      - name: Run tests
+#        env:
+#          TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
+#        working-directory: ${{ github.workspace }}/tools
+#        run: |
+#          mkdir -p $GITHUB_WORKSPACE/$TEMP_DIR
+#
+#          for testcategory in $TEST_DIR/*; do
+#            if [ -d "$testcategory" ]; then
+#              echo "********"
+#              echo $testcategory
+#
+#              if [ "$testcategory" == */ligature ] ; then echo "Found ligature" ; fi
+#
+#              echo "* Creating SVG files..."
+#              for testfile in $testcategory/*.mei; do
+#                if [ -f "$testfile" ]; then
+#                  ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
+#                else
+#                  echo "### No test file here..."
+#                fi
+#              done
+#
+#              echo "* Creating MEI files..."
+#              for testfile in $testcategory/*.mei; do
+#                if [ -f "$testfile" ]; then
+#                  ./verovio -r ../data/ -t mei --remove-ids --all-pages $testfile
+#                else
+#                  echo "### No test file here..."
+#                fi
+#              done
+#
+#              echo "* Copying SVG files..."
+#              if [ -f "$testcategory/*.svg" ]; then
+#                mv $testcategory/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
+#              else
+#                echo "### No svg output to copy here..."
+#              fi
+#            else
+#              echo "### No test category here..."
+#            fi
+#          done
 
       - name: Verify
+        working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_DIR
           pwd
           ls -al
 
