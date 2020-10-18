@@ -47,8 +47,9 @@ jobs:
       - name: Find tests
         env:
           TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
+        working-directory: ${{ env.TEST_DIR }}
         run: |
-          cd $TEST_DIR
+          pwd
           ls -al
 
           for testcategory in $TEST_DIR/*; do
@@ -57,7 +58,10 @@ jobs:
               echo "********"
               echo $testcategory
 
-              if [ "$testcategory" == "$TESTDIR/ligature" ] ; then echo "Found ligature" ; fi
+              if [ "$testcategory" == "$TEST_DIR/ligature" ]
+              then
+                echo "Found ligature"
+              fi
 
               for testfile in $testcategory/*.mei; do echo $testfile; done
             else
