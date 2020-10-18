@@ -14,6 +14,8 @@ on:
 
 # globals
 env:
+  RISM_OWNER: rism-ch
+
   # build artifacts
   CLI_BUILD: cli-build
   DOC_BUILD: doc-build
@@ -36,62 +38,10 @@ env:
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
 
+  isDryRUN: ${{ github.repository_owner }} != rism-ch
+
 
 jobs:
-
-  ###################################
-  # Build the doxygen documentation #
-  ###################################
-  build_docs:
-    name: Build documentation
-    runs-on: ubuntu-20.04
-    # run deployment only after finishing the build jobs
-    # needs: [build_cpp, build_cli, build_js]
-
-    steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v2
-
-      - name: Install doxygen
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends doxygen
-
-      - name: Check installation
-        run: |
-          doxygen --help
-
-      - name: Upgrade doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
-        run: doxygen -u verovio.conf
-
-      - name: Check files
-        working-directory: ${{ github.WORKSPACE }}/doc
-        if: always()
-        run: |
-          pwd
-          ls -al
-          ls -R
-
-      - name: Build documentation with (updated) doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
-        if: ${{ success() }}
-        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
-
-      - name: Upload doxygen build artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.DOC_BUILD }}
-          path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
-
-      - name: Check files
-        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
-        if: always()
-        run: |
-          pwd
-          ls -al
-          ls -R
-
 
   ###############################################
   # Deploy the documentation to verovio-doxygen #
@@ -111,29 +61,10 @@ jobs:
           ref: ${{ env.DOXYGEN_BRANCH }}
           path: ${{ env.DOXYGEN_DIR }}
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ env.DOC_BUILD }}
-          path: artifacts/${{ env.DOC_BUILD }}
-
-      - name: Check files
-        working-directory: ${{ github.WORKSPACE }}
-        if: always()
+      - name: Create file for DOXYGEN_DIR
         run: |
-          cd $DOXYGEN_DIR/
-          pwd
-          ls -al
-
-          cd ../artifacts/
-          pwd
-          ls -al
-          ls -R
-
-
-      - name: Copy build artifacts to DOXYGEN_DIR
-        run: |
-         cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+          touch testfile.txt
+          cp testfile.txt $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
@@ -161,13 +92,24 @@ jobs:
 #          git config --get remote.origin.url
 #          git status
 
+      - name: Configure dry-run
+        run: |
+          echo "Configure dry-run"
+          echo "is dry run: $isDryRun"
+
+
       - name: Push changes to doxygen
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
           echo "Build branch ready to go. Pushing to Github..."
 
-          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+          if ${{ github.repository_owner }} != ${{ env.RISM_OWNER }}
+          then
+            git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+          else
+            git push origin HEAD:$DOXYGEN_BRANCH
+          fi
 
       - name: Congratulations
         if: ${{ success() }}
