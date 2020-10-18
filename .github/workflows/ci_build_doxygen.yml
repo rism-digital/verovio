@@ -90,9 +90,9 @@ jobs:
 #          git config --get remote.origin.url
 #          git status
 
-      - name: Disable dry-run mode on ${{ env.RISM_OWNER }} repo
+      - name: Disable dry-run mode on rism-ch repo
         # if we are on rism-ch repos
-        if: github.repository_owner == env.RISM_OWNER
+        if: github.repository_owner != env.RISM_OWNER
         run: |
           echo "Disabling dry-run mode..."
           echo "IS_DRY_RUN=false" >> $GITHUB_ENV
@@ -101,14 +101,14 @@ jobs:
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go. Pushing to Github..."
+          echo "Build branch ready to go."
 
           if [ "$IS_DRY_RUN" = true ]
           then
-            echo "Running <git push> in dry-run mode..."
+            echo "Pushing to Github in dry-run mode..."
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
-            echo "Pushing to repo..."
+            echo "Pushing to Github..."
             # git push origin HEAD:$DOXYGEN_BRANCH
           fi
 
