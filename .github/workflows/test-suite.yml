@@ -81,6 +81,8 @@ jobs:
               echo "********"
               echo $testcase
 
+              if [ "$testcase" == *ligature ] ; then echo "Found ligature" ; fi
+
               echo "* Creating SVG files..."
               for testfile in $testcase/*.mei; do
                 if [ -f "$testfile" ]; then

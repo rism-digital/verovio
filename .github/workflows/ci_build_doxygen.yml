@@ -16,9 +16,9 @@ on:
 env:
   # general settings
   RISM_OWNER: rism-ch
-  IS_DRY_RUN: false      # flag used for 'git push' command
-                        # set to false here if you need to deploy from fork
-                        # will be programmatically set to false for rism-ch repo
+  IS_DRY_RUN: true      # Flag used for dry-run mode in 'git push' command (default: true).
+                        # Set it manually to 'false' if you need to deploy from fork.
+                        # Will be programmatically set to 'false' for rism-ch repo.
 
   # build artifacts
   CLI_BUILD: cli-build
@@ -26,7 +26,7 @@ env:
   TOOLKIT_BUILD: toolkit-build
 
   # doxygen
-  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works also for forks
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-ch and from forks
   DOXYGEN_BRANCH: master
 
   # emscripten
@@ -34,7 +34,7 @@ env:
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works also for forks
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-ch and from forks
   GH_PAGES_BRANCH: gh-pages
 
   # temporary directories
@@ -111,7 +111,7 @@ jobs:
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
             echo "Pushing to Github..."
-            # git push origin HEAD:$DOXYGEN_BRANCH
+            git push origin HEAD:$DOXYGEN_BRANCH
           fi
 
       - name: Congratulations
