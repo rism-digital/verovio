@@ -95,6 +95,9 @@ jobs:
               if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
                 echo "Skip ligature"
                 continue
+              elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
+                echo "Skip mensural"
+                continue
               fi
 
               echo "* Creating SVG files..."
