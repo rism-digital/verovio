@@ -14,7 +14,9 @@ on:
 
 # globals
 env:
+  # general settings
   RISM_OWNER: rism-ch
+  IS_DRY_RUN: false
 
   # build artifacts
   CLI_BUILD: cli-build
@@ -22,7 +24,7 @@ env:
   TOOLKIT_BUILD: toolkit-build
 
   # doxygen
-  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works also for forks of verovio
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works also for forks
   DOXYGEN_BRANCH: master
 
   # emscripten
@@ -30,7 +32,7 @@ env:
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works also for forks of verovio
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works also for forks
   GH_PAGES_BRANCH: gh-pages
 
   # temporary directories
@@ -38,11 +40,8 @@ env:
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
 
-  IS_DRY_RUN: false
-
 
 jobs:
-
   ###############################################
   # Deploy the documentation to verovio-doxygen #
   ###############################################
@@ -91,43 +90,26 @@ jobs:
 #          git config --get remote.origin.url
 #          git status
 
-      - name: Configure dry-run
+      - name: Set dry-run mode on forks
         if: github.repository_owner != env.RISM_OWNER
         run: |
-          echo "**********"
-          echo $GITHUB_ENV
-
-          echo "-----------------"
-          echo "Configure dry-run"
-          echo "DRY_RUN_OPTION=$(echo '-v --dry-run')" >> $GITHUB_ENV
+          echo "Setting git to dry-run mode"
           echo "IS_DRY_RUN=true" >> $GITHUB_ENV
-
 
       - name: Push changes to doxygen
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-
-          echo "**********"
-          echo $GITHUB_ENV
-
-          echo "-----------------"
-          echo $DRY_RUN_OPTIONS
-
-
-
           # Push all changes in one commit to the doxygen repo
           echo "Build branch ready to go. Pushing to Github..."
 
           if [ "$IS_DRY_RUN" = true ]
           then
-            echo "Push dry-run style"
+            echo "Running `git push` in dry-run mode."
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
-            echo "Real push to repo"
+            echo "Pushing to repo"
             # git push origin HEAD:$DOXYGEN_BRANCH
           fi
-
-          # git push $IS_DRY_RUN origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
         if: ${{ success() }}
