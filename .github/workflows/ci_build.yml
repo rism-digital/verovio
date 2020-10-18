@@ -305,56 +305,11 @@ jobs:
           ls -al
 
 
-  ###################################
-  # Build the doxygen documentation #
-  ###################################
-  build_docs:
-    name: Build documentation
-    runs-on: ubuntu-20.04
-    # run only after finishing other build jobs
-    needs: [build_cpp, build_cli, build_js]
-
-    steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v2
-
-      - name: Install doxygen
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends doxygen
-
-      - name: Check installation
-        run: |
-          doxygen --help
-
-      - name: Upgrade doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
-        run: doxygen -u verovio.conf
-
-      - name: Build documentation with (updated) doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
-        if: ${{ success() }}
-        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
-
-      - name: Upload doxygen build artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.DOC_BUILD }}
-          path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
-
-      - name: Check files
-        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
-        if: always()
-        run: |
-          pwd
-          ls -al
-          ls -R
-
   #########################################
   # Deploy the toolkit builds to gh-pages #
   #########################################
   deploy_toolkit:
-    name: Deploy JS Toolkit
+    name: Deploy JS toolkit
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_cli, build_js]
@@ -425,6 +380,52 @@ jobs:
           echo "🎉 New JS toolkit builds deployed 🎊"
 
 
+  ###################################
+  # Build the doxygen documentation #
+  ###################################
+  build_docs:
+    name: Build documentation
+    runs-on: ubuntu-20.04
+    # run only after finishing other build jobs
+    needs: [build_cpp, build_cli, build_js]
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Install doxygen
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends doxygen
+
+      - name: Check installation
+        run: |
+          doxygen --help
+
+      - name: Upgrade doxygen conf
+        working-directory: ${{ github.WORKSPACE }}/doc
+        run: doxygen -u verovio.conf
+
+      - name: Build documentation with (updated) doxygen conf
+        working-directory: ${{ github.WORKSPACE }}/doc
+        if: ${{ success() }}
+        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
+
+      - name: Upload doxygen build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DOC_BUILD }}
+          path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
+
+      - name: Check files
+        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
+        if: always()
+        run: |
+          pwd
+          ls -al
+          ls -R
+
+
   ###############################################
   # Deploy the documentation to verovio-doxygen #
   ###############################################
@@ -490,4 +491,4 @@ jobs:
       - name: Congratulations
         if: ${{ success() }}
         run: |
-          echo "🎉 Documentation deployed 🎊"
+          echo "🎉 New documentation deployed 🎊"
