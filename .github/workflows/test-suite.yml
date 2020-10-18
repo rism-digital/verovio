@@ -104,6 +104,9 @@ jobs:
               elif [ "$testcategory" == "$TEST_DIR/sameas" ]; then
                 echo "Skip sameas"
                 continue
+              elif [ "$testcategory" == "$TEST_DIR/stem" ]; then
+                echo "Skip stem"
+                continue
               fi
 
               echo "* Creating SVG files..."
