@@ -12141,23 +12141,28 @@ template <class ELEMENT> void HumdrumInput::addVerovioTextElement(ELEMENT *eleme
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_x_small);
         rend->SetFontsize(fs);
-    } else if (musictext.find("smallest") != std::string::npos) {
+    }
+    else if (musictext.find("smallest") != std::string::npos) {
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_xx_small);
         rend->SetFontsize(fs);
-    } else if (musictext.find("small") != std::string::npos) {
+    }
+    else if (musictext.find("small") != std::string::npos) {
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_small);
         rend->SetFontsize(fs);
-    } else if (musictext.find("larger") != std::string::npos) {
+    }
+    else if (musictext.find("larger") != std::string::npos) {
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_x_large);
         rend->SetFontsize(fs);
-    } else if (musictext.find("largest") != std::string::npos) {
+    }
+    else if (musictext.find("largest") != std::string::npos) {
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_xx_large);
         rend->SetFontsize(fs);
-    } else if (musictext.find("large") != std::string::npos) {
+    }
+    else if (musictext.find("large") != std::string::npos) {
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_large);
         rend->SetFontsize(fs);
@@ -21366,6 +21371,26 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
             for (int i = 0; i < firstbar; ++i) {
                 output[i] = output[firstbar];
             }
+        }
+    }
+
+    // Mark empty and null lines inside of multi-measure rest regions:
+    for (int i = 0; i < (int)output.size(); i++) {
+        if (!output[i]) {
+            continue;
+        }
+        if (!infile[i].isBarline()) {
+            continue;
+        }
+        for (int j = i + 1; j < infile.getLineCount(); j++) {
+            if (infile[j].isBarline()) {
+                i = j - 1;
+                break;
+            }
+            if (*infile.token(j, 0) == "*-") {
+                break;
+            }
+            output[j] = -1;
         }
     }
 
