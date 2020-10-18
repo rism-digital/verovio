@@ -1,0 +1,493 @@
+name: Verovio CI Build
+
+on:
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - develop
+      # Push events on ci-test branch (only needed for testing purposes)
+      - ci-test
+      # Push events on travis-test branch (only needed for testing purposes)
+      - travis-test
+
+# globals
+env:
+  # build artifacts
+  CLI_BUILD: cli-build
+  DOC_BUILD: doc-build
+  TOOLKIT_BUILD: toolkit-build
+
+  # doxygen
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works also for forks of verovio
+  DOXYGEN_BRANCH: master
+
+  # emscripten
+  EMSCRIPTEN_VERSION: latest
+  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+
+  # gh-pages
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works also for forks of verovio
+  GH_PAGES_BRANCH: gh-pages
+
+  # temporary directories
+  DOXYGEN_DIR: doxygen-dir
+  GH_PAGES_DIR: gh-pages-dir
+  TEMP_DIR: temp-dir
+
+
+jobs:
+  ###############################################################################################
+  # Build c++ code on different os in parallel.                                                 #
+  # Adapted from https://github.com/DaanDeMeyer/reproc/blob/master/.github/workflows/main.yml . #
+  ###############################################################################################
+  build_cpp:
+    name: Build ${{ matrix.config.os }}-${{ matrix.config.compiler }}-${{ matrix.config.version }}
+    # This job runs on all the os specified in strategy.matrix.os
+    runs-on: ${{ matrix.config.os }}
+
+    # set matrix with config options
+    # (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-20.04
+            compiler: gcc
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: gcc
+            version: "10"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "6.0"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "10"
+
+          #          - os: windows-latest
+          #            compiler: cl
+          #            version: "default"
+          #
+          #          - os: windows-latest
+          #            compiler: clang-cl
+          #            version: "latest"
+          #
+          #          - os: windows-latest
+          #            compiler: clang
+          #            version: "latest"
+          #
+          #          - os: windows-latest
+          #            compiler: gcc
+          #            version: "latest"
+
+          - os: macos-latest
+            compiler: xcode
+            version: "default"
+
+          - os: macos-latest
+            compiler: gcc
+            version: "latest"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      # Installation step for Ubuntu
+      - name: Install Ubuntu (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: runner.os == 'Linux'
+        run: |
+          # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | sudo apt-key add -
+          sudo add-apt-repository 'deb http://apt.llvm.org/focal llvm-toolchain-focal-10 main' -y
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
+          sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
+          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
+            sudo apt-get install -y --no-install-recommends g++-${{ matrix.config.version }}
+            echo CC=gcc-${{ matrix.config.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.config.version }} >> $GITHUB_ENV
+          else
+            sudo apt-get install -y --no-install-recommends clang-${{ matrix.config.version }}
+            echo CC=clang-${{ matrix.config.version }} >> $GITHUB_ENV
+            echo CXX=clang++-${{ matrix.config.version }} >> $GITHUB_ENV
+          fi
+
+      # Installation step for MacOS
+      - name: Install macOS (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja llvm
+          sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
+          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
+            echo CC=gcc >> $GITHUB_ENV
+            echo CXX=g++ >> $GITHUB_ENV
+          else
+            echo CC=clang >> $GITHUB_ENV
+            echo CXX=clang++ >> $GITHUB_ENV
+          fi
+
+      # Installation step for Windows
+      - name: Install Windows (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: runner.os == 'windows'
+        run: |
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+          scoop install ninja llvm --global
+          if ("${{ matrix.config.compiler }}" -eq "gcc") {
+            echo "::set-env name=CC::gcc"
+            echo "::set-env name=CXX::g++"
+          } elseif ("${{ matrix.config.compiler }}" -eq "clang") {
+            echo "::set-env name=CC::clang"
+            echo "::set-env name=CXX::clang++"
+          } else {
+            echo "::set-env name=CC::${{ matrix.config.compiler }}"
+            echo "::set-env name=CXX::${{ matrix.config.compiler }}"
+          }
+          # Make all PATH additions made by scoop and ourselves global.
+          echo "::set-env name=PATH::$env:PATH"
+
+      - name: Run make
+        run: |
+          cd $GITHUB_WORKSPACE/tools
+          cmake ../cmake
+          make -j8
+
+
+  ###########################
+  # Build the CLI artifacts #
+  ###########################
+  build_cli:
+    name: Build cli
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Create temp dir
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir -p $TEMP_DIR/
+
+      - name: Run make
+        run: |
+          cd $GITHUB_WORKSPACE/tools
+          cmake ../cmake
+          make -j8
+
+      - name: Update cli.txt
+        run: |
+          cd $GITHUB_WORKSPACE/tools
+          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
+
+      - name: Upload cli artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CLI_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
+
+      - name: Check files
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE/$TEMP_DIR/
+          pwd
+          ls -al
+
+  #####################################
+  # Set up and cache emscripten build #
+  #####################################
+  setup_emscripten:
+    name: Set up and cache emscripten
+    runs-on: ubuntu-20.04
+
+    steps:
+      # Cache system libraries generated during build time
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
+      # Cache emsdk
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+
+  ##################################
+  # Build the JS toolkit artifacts #
+  ##################################
+  build_js:
+    name: Build JS toolkit
+    runs-on: ubuntu-20.04
+    needs: [setup_emscripten]
+
+    # set matrix with toolkit options (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        toolkit:
+          - target: nohumdrum
+            message: "Building toolkit without humdrum"
+            options: "-c -H -M"
+            filepath: "verovio-toolkit.js*"
+          - target: light
+            message: "Building toolkit without humdrum as light version"
+            options: "-c -H -l -M"
+            filepath: "verovio-toolkit-light.js*"
+          - target: wasm
+            message: "Building toolkit without humdrum as wasm"
+            options: "-c -H -w -M"
+            filepath: "verovio*wasm*"
+          - target: default
+            message: "Building default toolkit (with humdrum)"
+            options: "-c -M"
+            filepath: "*-hum.js*"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      # Restore system libraries generated during build time from cache
+      - name: Restore system libraries from cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
+      - name: Get emscripten build from cache and activate
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+      - name: Create temp dir
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir -p $TEMP_DIR/
+
+      - name: Build Toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+        run: |
+          cd $GITHUB_WORKSPACE/emscripten
+          echo "${{ matrix.toolkit.message }}"
+          ./buildToolkit ${{ matrix.toolkit.options }}
+          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload js build artifact (${{ matrix.toolkit.target }})
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
+
+      - name: Check files
+        if: always()
+        run: |
+          cd $GITHUB_WORKSPACE/$TEMP_DIR/
+          pwd
+          ls -al
+
+
+  ###################################
+  # Build the doxygen documentation #
+  ###################################
+  build_docs:
+    name: Build documentation
+    runs-on: ubuntu-20.04
+    # run only after finishing other build jobs
+    needs: [build_cpp, build_cli, build_js]
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Install doxygen
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends doxygen
+
+      - name: Check installation
+        run: |
+          doxygen --help
+
+      - name: Upgrade doxygen conf
+        working-directory: ${{ github.WORKSPACE }}/doc
+        run: doxygen -u verovio.conf
+
+      - name: Build documentation with (updated) doxygen conf
+        working-directory: ${{ github.WORKSPACE }}/doc
+        if: ${{ success() }}
+        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
+
+      - name: Upload doxygen build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DOC_BUILD }}
+          path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
+
+      - name: Check files
+        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
+        if: always()
+        run: |
+          pwd
+          ls -al
+          ls -R
+
+  #########################################
+  # Deploy the toolkit builds to gh-pages #
+  #########################################
+  deploy_toolkit:
+    name: Deploy JS Toolkit
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build jobs
+    needs: [build_cpp, build_cli, build_js]
+
+    steps:
+      - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.GH_PAGES_REPO }}
+          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY }}
+          ref: ${{ env.GH_PAGES_BRANCH }}
+          path: ${{ env.GH_PAGES_DIR }}
+
+      - name: Download CLI_BUILD artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.CLI_BUILD }}
+          path: artifacts/${{ env.CLI_BUILD }}
+
+      - name: Download TOOLKIT_BUILD artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: artifacts/${{ env.TOOLKIT_BUILD }}
+
+      - name: Copy artifacts to gh-pages
+        run: |
+          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
+          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+
+      - name: Check git status before commit
+        working-directory: ${{ env.$GH_PAGES_DIR }}
+        run: |
+          git config --get remote.origin.url
+          git status
+
+      - name: Configure git
+        working-directory: ${{ env.$GH_PAGES_DIR }}
+        run: |
+          echo "Configuring git"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+
+      - name: Commit files
+        working-directory: ${{ env.$GH_PAGES_DIR }}
+        run: |
+          echo "Running git commit"
+          git add .
+          git commit -m "Auto-commit of toolkit build for ${{ github.repository }}@${{ github.sha }}"
+
+      #      - name: Check git status after commit
+      #        working-directory: ${{ env.DOXYGEN_DIR }}
+      #        run: |
+      #          git config --get remote.origin.url
+      #          git status
+
+      - name: Push changes to gh-pages
+        working-directory: ${{ env.$GH_PAGES_DIR }}
+        run: |
+          # Push all changes in one commit to the gh-pages repo
+          echo "Build branch ready to go. Pushing to Github..."
+
+          git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+
+      - name: Congratulations
+        if: ${{ success() }}
+        run: |
+          echo "🎉 New JS toolkit builds deployed 🎊"
+
+
+  ###############################################
+  # Deploy the documentation to verovio-doxygen #
+  ###############################################
+  deploy_docs:
+    name: Deploy documentation
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build job
+    needs: [build_docs]
+
+    steps:
+      - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.DOXYGEN_REPO }}
+          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
+          ref: ${{ env.DOXYGEN_BRANCH }}
+          path: ${{ env.DOXYGEN_DIR }}
+
+      - name: Download DOC_BUILD artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.DOC_BUILD }}
+          path: artifacts/${{ env.DOC_BUILD }}
+
+      - name: Copy build artifacts to DOXYGEN_DIR
+        run: |
+          cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+
+      - name: Check git status before commit
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          git config --get remote.origin.url
+          git status
+
+      - name: Configure git
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          echo "Configuring git"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+
+      - name: Commit files
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          echo "Running git commit"
+          git add .
+          git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
+
+      #      - name: Check git status after commit
+      #        working-directory: ${{ env.DOXYGEN_DIR }}
+      #        run: |
+      #          git config --get remote.origin.url
+      #          git status
+
+      - name: Push changes to doxygen
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          # Push all changes in one commit to the doxygen repo
+          echo "Build branch ready to go. Pushing to Github..."
+
+          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+
+      - name: Congratulations
+        if: ${{ success() }}
+        run: |
+          echo "🎉 Documentation deployed 🎊"
