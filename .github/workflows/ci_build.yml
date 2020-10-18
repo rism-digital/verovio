@@ -386,20 +386,20 @@ jobs:
           cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
-        working-directory: ${{ env.$GH_PAGES_DIR }}
+        working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           git config --get remote.origin.url
           git status
 
       - name: Configure git
-        working-directory: ${{ env.$GH_PAGES_DIR }}
+        working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           echo "Configuring git"
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Commit files
-        working-directory: ${{ env.$GH_PAGES_DIR }}
+        working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           echo "Running git commit"
           git add .
@@ -412,7 +412,7 @@ jobs:
       #          git status
 
       - name: Push changes to gh-pages
-        working-directory: ${{ env.$GH_PAGES_DIR }}
+        working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
           echo "Build branch ready to go. Pushing to Github..."
