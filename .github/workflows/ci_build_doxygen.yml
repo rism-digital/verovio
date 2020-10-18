@@ -61,6 +61,18 @@ jobs:
         run: |
           doxygen --help
 
+      - name: Upgrade doxygen conf
+        working-directory: ${{ github.WORKSPACE }}/doc
+        run: (cat verovio.conf) | doxygen -u -
+
+      - name: Check files
+        working-directory: ${{ github.WORKSPACE }}/doc
+        if: always()
+        run: |
+          pwd
+          ls -al
+          ls -R
+
       - name: Build documentation with (updated) doxygen conf
         working-directory: ${{ github.WORKSPACE }}/doc
         if: ${{ success() }}
@@ -76,7 +88,6 @@ jobs:
         working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
         if: always()
         run: |
-          cd $GITHUB_WORKSPACE/$DOXYGEN_DIR/
           pwd
           ls -al
           ls -R
