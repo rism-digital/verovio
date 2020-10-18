@@ -50,7 +50,6 @@ jobs:
     name: Deploy documentation
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
-    needs: [build_docs]
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
