@@ -63,7 +63,7 @@ jobs:
 
       - name: Upgrade doxygen conf
         working-directory: ${{ github.WORKSPACE }}/doc
-        run: (cat verovio.conf) | doxygen -u -
+        run: doxygen -u verovio.conf
 
       - name: Check files
         working-directory: ${{ github.WORKSPACE }}/doc
@@ -76,7 +76,7 @@ jobs:
       - name: Build documentation with (updated) doxygen conf
         working-directory: ${{ github.WORKSPACE }}/doc
         if: ${{ success() }}
-        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -u -
+        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
       - name: Upload doxygen build artifact
         uses: actions/upload-artifact@v2
