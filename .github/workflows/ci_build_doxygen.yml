@@ -62,6 +62,7 @@ jobs:
           doxygen --help
 
       - name: Upgrade doxygen conf
+        working-directory: ${{ github.WORKSPACE }}/doc
         run: (cat verovio.conf) | doxygen -u -
 
       - name: Build documentation with doxygen
