@@ -104,7 +104,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.DOC_BUILD }}
-          path: artifacts
+          path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Check files
         working-directory: ${{ github.WORKSPACE }}
@@ -122,7 +122,8 @@ jobs:
 
       - name: Copy build artifacts to DOXYGEN_DIR
         run: |
-          cp artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+          # check if doc build dir exists
+          [ -d artifacts/$DOC_BUILD ] && cp artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
