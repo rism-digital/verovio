@@ -122,7 +122,7 @@ jobs:
 
       - name: Copy build artifacts to DOXYGEN_DIR
         run: |
-         cp artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+         cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
