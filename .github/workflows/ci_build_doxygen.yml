@@ -38,7 +38,7 @@ env:
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
 
-  isDryRUN: ${{ github.repository_owner }} != rism-ch
+  IS_DRY_RUN: ${{ github.repository_owner }} != rism-ch
 
 
 jobs:
@@ -94,7 +94,7 @@ jobs:
       - name: Configure dry-run
         run: |
           echo "Configure dry-run"
-          echo "is dry run: $isDryRun"
+          echo "is dry run: ${{ env.IS_DRY_RUN }}"
 
 
       - name: Push changes to doxygen
@@ -103,7 +103,7 @@ jobs:
           # Push all changes in one commit to the doxygen repo
           echo "Build branch ready to go. Pushing to Github..."
 
-          if ${{ github.repository_owner }} != ${{ env.RISM_OWNER }}
+          if "${{ github.repository_owner }}" != "${{ env.RISM_OWNER }}"
           then
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
