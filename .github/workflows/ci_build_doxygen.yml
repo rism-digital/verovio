@@ -16,7 +16,9 @@ on:
 env:
   # general settings
   RISM_OWNER: rism-ch
-  IS_DRY_RUN: true      # flag used for 'git push' command; set to false if you need to deploy from fork
+  IS_DRY_RUN: false      # flag used for 'git push' command
+                        # set to false here if you need to deploy from fork
+                        # will be programmatically set to false for rism-ch repo
 
   # build artifacts
   CLI_BUILD: cli-build
@@ -91,8 +93,8 @@ jobs:
 #          git status
 
       - name: Disable dry-run mode on rism-ch
-        # if we are on rism-ch repos
         if: github.repository_owner == env.RISM_OWNER
+        # if we are on rism-ch repos
         run: |
           echo "Disabling dry-run mode..."
           echo "IS_DRY_RUN=false" >> $GITHUB_ENV
@@ -105,11 +107,11 @@ jobs:
 
           if [ "$IS_DRY_RUN" = true ]
           then
-            echo "Pushing to Github in dry-run mode..."
+            echo "Running git in dry-run mode..."
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
             echo "Pushing to Github..."
-            git push origin HEAD:$DOXYGEN_BRANCH
+            # git push origin HEAD:$DOXYGEN_BRANCH
           fi
 
       - name: Congratulations
