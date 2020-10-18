@@ -8226,6 +8226,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 // be good for time signatures which change in the
                 // middle of measures.
                 // insertMeterSigElement(elements, pointers, layerdata, i);
+                processDirections(layerdata[i], staffindex);
             }
         }
         if (layerdata[i]->isBarline() && (!layerdata[i]->allSameBarlineStyle())) {
@@ -10412,7 +10413,6 @@ bool HumdrumInput::isFirstTokenOnStaff(hum::HTp token)
 
 void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffindex)
 {
-
     bool globalQ = token->linkedParameterIsGlobal(index);
     bool firstQ = true;
     if (globalQ) {
@@ -10616,6 +10616,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             return;
         }
     }
+    if (token->isTimeSignature()) {
+        addTempoDirection(text, placement, bold, italic, token, staffindex, justification, color);
+        return;
+    }
 
     Dir *dir = new Dir;
     setStaff(dir, m_currentstaff);
@@ -10661,7 +10665,17 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
     bool plain = !(italic || bold);
     bool needrend = plain || bold || justification || color.size();
+
+    bool oldneedrend = false;
+    bool onlyverovio = false;
+    if (hre.search(text, "^(\\[.*?\\])+$")) {
+        oldneedrend = needrend;
+        needrend = false;
+        onlyverovio = true;
+    }
+
     if (needrend) {
+
         Rend *rend = new Rend;
         if (!color.empty()) {
             rend->SetColor(color);
@@ -10686,7 +10700,37 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
     else {
         addTextElement(dir, text);
+
+        if (onlyverovio && oldneedrend) {
+            int count = dir->GetChildCount();
+            for (int j = 0; j < count; j++) {
+                Object *obj = dir->GetChild(j);
+                if (obj->GetClassName() != "Rend") {
+                    continue;
+                }
+                Rend *item = (Rend *)obj;
+                if (!color.empty()) {
+                    item->SetColor(color);
+                }
+                else if (problemQ) {
+                    item->SetColor("red");
+                }
+                else if (sicQ) {
+                    item->SetColor("limegreen");
+                }
+                if (!italic) {
+                    item->SetFontstyle(FONTSTYLE_normal);
+                }
+                if (bold) {
+                    item->SetFontweight(FONTWEIGHT_bold);
+                }
+                if (justification == 1) {
+                    item->SetHalign(HORIZONTALALIGNMENT_right);
+                }
+            }
+        }
     }
+    // ggg
 }
 
 //////////////////////////////
@@ -10723,7 +10767,9 @@ bool HumdrumInput::addTempoDirection(const string &text, const string &placement
         return true;
     }
     else {
-        return false;
+        addTextElement(tempo, text);
+        addChildMeasureOrSection(tempo);
+        return true;
     }
 }
 
@@ -10802,7 +10848,9 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 {
     hum::HumRegex hre;
     if (!hre.search(text, "(.*)\\[([^=\\]]*)\\]\\s*=\\s*(\\d+.*)")) {
-        addTextElement(tempo, text);
+        // This function is only used to force spaces around
+        // equalis sign in metronome markings, so handle
+        // other tempo directives elsewhere.
         return false;
     }
     std::string first = hre.getMatch(1);
@@ -10831,46 +10879,62 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 // HumdrumInput::convertMusicSymbolNameToSmuflEntity --  Convert from
 //    text names for music symbols into SMuFL codepoints for VerovioText font.
 //
-//      NAME       HEX ENCODING
+//      NAME (alternates)      HEX ENCODING    NOTES
 // ===============================================================
 //
 // https://www.smufl.org/version/latest/range/repeats
-//      segno             E047
-//      coda              E048
+//      segno                      E047
+//      coda                       E048
 //
 // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
-//      sc                EA00   (signum congruentiae up)
-//      sc-down           EA01   (signum congruentiae down)
+//      sc                         EA00   (signum congruentiae up)
+//      sc-below                   EA01   (signum congruentiae below the staff)
 //
 // https://www.smufl.org/version/latest/range/individualNotes
-//      breve             E1D1
-//      whole             E1D2
-//      half              E1D3   (half-up)
-//      quarter           E1D5   (quarter-up)
-//      eighth            E1D7   (eighth-up)
-//      sixteenth         E1D9   (sixteenth-up) (or 16th)
-//      32nd              E1DB   (32nd-up)
-//      64th              E1DD   (64th-up)
-//      128th             E1DF   (128th-up)
-//      256th             E1E1   (256th-up)
-//      512th             E1E3   (512th-up)
-//      1024th            E1E5   (1024th-up)
-//      -dot              E1E7   (1024th-up)
+//      breve                      E1D1
+//      whole                      E1D2
+//      half                       E1D3   (half-up)
+//      quarter                    E1D5   (quarter-up)
+//      eighth                     E1D7   (eighth-up)
+//      sixteenth                  E1D9   (sixteenth-up) (or 16th)
+//      32nd                       E1DB   (32nd-up)
+//      64th                       E1DD   (64th-up)
+//      128th                      E1DF   (128th-up)
+//      256th                      E1E1   (256th-up)
+//      512th                      E1E3   (512th-up)
+//      1024th                     E1E5   (1024th-up)
+//      -dot                       E1E7   (1024th-up)
+//
+// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
+//      circle-dot (O., o.)        E910   (also O-dot, and o-dot)
+//      circle (O, o)              E911
+//      cut-circle (O!, o!)        E912   (also cut-o, and cut-O)
+//      cut-circle-dot (O.!, o.!)) E913   (also cut-o-dot, and cut-O-dot)
+//      c-dot (C., c.)             E914
+//      c (C)                      E915
+//      reverse-c (Cr, cr)         E916
+//      cut-c-dot (C.!, c.!)       E917
+//      cut-c (C!, c!)             E918
+//      reverse-cut-c (C!r, c!r)   E919
+//      reverse-c-dot (C.r, c.r)   E91A
+//      o-slash (O/, o/)           E91B
+
 //
 // https://www.smufl.org/version/latest/range/metronomeMarks
-//      breve             ECA1
-//      whole             ECA2
-//      half              ECA3   (half-up)
-//      quarter           ECA5   (quarter-up)
-//      eighth            ECA7   (eighth-up)
-//      sixteenth         ECA9   (sixteenth-up) (or 16th)
-//      32nd              ECAB   (32nd-up)
-//      64th              ECAD   (64th-up)
-//      128th             ECAF   (128th-up)
-//      256th             ECB1   (256th-up)
-//      512th             ECB3   (512th-up)
-//      1024th            ECB5   (1024th-up)
-//      -dot              ECB7   (1024th-up)
+//      [not used (actually copied to E1D0 range)]
+//      breve                      ECA1
+//      whole                      ECA2
+//      half                       ECA3   (half-up)
+//      quarter                    ECA5   (quarter-up)
+//      eighth                     ECA7   (eighth-up)
+//      sixteenth                  ECA9   (sixteenth-up) (or 16th)
+//      32nd                       ECAB   (32nd-up)
+//      64th                       ECAD   (64th-up)
+//      128th                      ECAF   (128th-up)
+//      256th                      ECB1   (256th-up)
+//      512th                      ECB3   (512th-up)
+//      1024th                     ECB5   (1024th-up)
+//      -dot                       ECB7   (1024th-up)
 //
 
 std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string &text)
@@ -10893,22 +10957,70 @@ std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string 
         second = second.substr(0, pos);
     }
 
+    hum::HumRegex hre;
+    if (hre.search(second, "^(&#x[a-f0-9]{4};)+$", "i")) {
+        // Passing a raw SMuFL entity
+        return second;
+    }
+
+    // https://www.smufl.org/version/latest/range/repeats
     if (second == "segno") {
         return "&#xE047;";
     }
     if (second == "coda") {
         return "&#xE048;";
     }
+
+    // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
     if (second == "sc") {
         return "&#xEA00;";
     }
-    if (second == "sc-down") {
+    if (second == "sc-below") {
         return "&#xEA01;";
     }
 
-    // generating rhythmic note with optional "-dot" after it.
+    // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
+    if ((second == "circle-dot") || (second == "o-dot") || (second == "O-dot") || (second == "O.")
+        || (second == "o.")) {
+        return "&#xE910;";
+    }
+    if ((second == "circle") || (second == "O") || (second == "o")) {
+        return "&#xE911;";
+    }
+    if ((second == "cut-circle") || (second == "cut-o") || (second == "cut-O") || (second == "O!")
+        || (second == "o!")) {
+        return "&#xE912;";
+    }
+    if ((second == "cut-circle-dot") || (second == "cut-o-dot") || (second == "cut-O-dot") || (second == "O.!")
+        || (second == "o.!")) {
+        return "&#xE913;";
+    }
+    if ((second == "c-dot") || (second == "C.") || (second == "c.")) {
+        return "&#xE914;";
+    }
+    if ((second == "c") || (second == "C")) {
+        return "&#xE915;";
+    }
+    if ((second == "reverse-c") || (second == "Cr") || (second == "cr")) {
+        return "&#xE916;";
+    }
+    if ((second == "cut-c-dot") || (second == "C.!") || (second == "c.!")) {
+        return "&#xE917;";
+    }
+    if ((second == "cut-c") || (second == "C!") || (second == "c!")) {
+        return "&#xE918;";
+    }
+    if ((second == "reverse-cut-c") || (second == "C!r") || (second == "c!r")) {
+        return "&#xE919;";
+    }
+    if ((second == "reverse-c-dot") || (second == "C.r") || (second == "c.r")) {
+        return "&#xE91A;";
+    }
+    if ((second == "circle-slash") || (second == "o-slash") || (second == "O/") || (second == "o/")) {
+        return "&#xE91B;";
+    }
 
-    hum::HumRegex hre;
+    // generating rhythmic note with optional "-dot" after it.
     bool dot = false;
     if (hre.search(second, "-dot$")) {
         dot = true;
@@ -10921,6 +11033,7 @@ std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string 
 
     std::string output;
 
+    // https://www.smufl.org/version/latest/range/individualNotes
     if ((second == "quarter") || (second == "4")) {
         output += "&#xE1D5;";
     }
@@ -10985,6 +11098,10 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         if (status) {
             return;
         }
+    }
+    if (token->isTimeSignature()) {
+        addTempoDirection(text, placement, bold, italic, token, staffindex, justification, color);
+        return;
     }
 
     Dir *dir = new Dir;
@@ -12136,6 +12253,7 @@ template <class ELEMENT> void HumdrumInput::addVerovioTextElement(ELEMENT *eleme
     std::string newtext = unescapeHtmlEntities(smuflentities);
     text->SetText(UTF8to16(newtext));
     rend->AddChild(text);
+    rend->SetFontstyle(FONTSTYLE_normal);
     rend->SetFontname("VerovioText");
     if (musictext.find("smaller") != std::string::npos) {
         data_FONTSIZE fs;
@@ -12273,14 +12391,14 @@ void HumdrumInput::addTextElement(
                 rend->AddChild(text);
             }
             if (fontstyle == "normal") {
-                rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+                rend->SetFontstyle(FONTSTYLE_normal);
             }
             else if (fontstyle == "bold") {
-                rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
-                rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+                rend->SetFontweight(FONTWEIGHT_bold);
+                rend->SetFontstyle(FONTSTYLE_normal);
             }
             else if (fontstyle == "bold-italic") {
-                rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+                rend->SetFontweight(FONTWEIGHT_bold);
             }
         }
 
