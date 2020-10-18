@@ -52,11 +52,12 @@ jobs:
           ls -al
 
           for testcategory in $TEST_DIR/*; do
+            if [ "$textcategory" = "*" ]; then continue; fi   # skip empty directory
             if [ -d "$testcategory" ]; then
               echo "********"
               echo $testcategory
 
-              if [ "$testcategory" == "*/ligature" ] ; then echo "Found ligature" ; fi
+              if [ "$testcategory" == "$TESTDIR/ligature" ] ; then echo "Found ligature" ; fi
 
               for testfile in $testcategory/*.mei; do echo $testfile; done
             else
