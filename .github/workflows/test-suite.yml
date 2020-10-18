@@ -53,7 +53,7 @@ jobs:
           ls -al
 
           for testcategory in $TEST_DIR/*; do
-            if [ "$textcategory" = "*" ]; then continue; fi   # skip empty directory
+            if [ "$testcategory" = "*" ]; then continue; fi   # skip empty directory
             if [ -d "$testcategory" ]; then
               echo "********"
               echo $testcategory
@@ -71,58 +71,65 @@ jobs:
 
           done
 
-#      - name: Run make
-#        working-directory: ${{ github.workspace }}/tools
-#        run: |
-#          cmake ../cmake
-#          make -j8
-#
-#      - name: Run tests
-#        env:
-#          TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
-#        working-directory: ${{ github.workspace }}/tools
-#        run: |
-#          mkdir -p $GITHUB_WORKSPACE/$TEMP_DIR
-#
-#          for testcategory in $TEST_DIR/*; do
-#            if [ -d "$testcategory" ]; then
-#              echo "********"
-#              echo $testcategory
-#
-#              if [ "$testcategory" == */ligature ] ; then echo "Found ligature" ; fi
-#
-#              echo "* Creating SVG files..."
-#              for testfile in $testcategory/*.mei; do
-#                if [ -f "$testfile" ]; then
-#                  ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
-#                else
-#                  echo "### No test file here..."
-#                fi
-#              done
-#
-#              echo "* Creating MEI files..."
-#              for testfile in $testcategory/*.mei; do
-#                if [ -f "$testfile" ]; then
-#                  ./verovio -r ../data/ -t mei --remove-ids --all-pages $testfile
-#                else
-#                  echo "### No test file here..."
-#                fi
-#              done
-#
-#              echo "* Copying SVG files..."
-#              if [ -f "$testcategory/*.svg" ]; then
-#                mv $testcategory/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
-#              else
-#                echo "### No svg output to copy here..."
-#              fi
-#            else
-#              echo "### No test category here..."
-#            fi
-#          done
-#
-#      - name: Verify
-#        working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
-#        run: |
-#          pwd
-#          ls -al
+      - name: Run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          cmake ../cmake
+          make -j8
+
+      - name: Run tests
+        env:
+          TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/$TEMP_DIR
+
+          for testcategory in $TEST_DIR/*; do
+            # skip empty directory
+            if [ "$testcategory" = "*" ]; then continue; fi
+
+            if [ -d "$testcategory" ]; then
+               echo "********"
+               echo $testcategory
+
+              if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
+                echo "Skip ligature"
+                continue
+              fi
+
+              echo "* Creating SVG files..."
+              for testfile in $testcategory/*.mei; do
+                if [ -f "$testfile" ]; then
+                  ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
+                else
+                  echo "### No test file here..."
+                fi
+              done
+
+              echo "* Creating MEI files..."
+              for testfile in $testcategory/*.mei; do
+                if [ -f "$testfile" ]; then
+                  ./verovio -r ../data/ -t mei --remove-ids --all-pages $testfile
+                else
+                  echo "### No test file here..."
+                fi
+              done
+
+              echo "* Copying SVG files..."
+              count=`ls -1 $testcategory/*.svg 2>/dev/null | wc -l`
+              if [ "$count" != 0 ]; then
+                mv $testcategory/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
+              else
+                echo "### No svg output to copy here..."
+              fi
+            else
+              echo "### No test category here..."
+            fi
+          done
+
+      - name: Verify
+        working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
+        run: |
+          pwd
+          ls -al
 
