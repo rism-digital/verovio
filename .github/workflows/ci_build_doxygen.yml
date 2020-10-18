@@ -16,7 +16,7 @@ on:
 env:
   # general settings
   RISM_OWNER: rism-ch
-  IS_DRY_RUN: false
+  IS_DRY_RUN: true      # flag used for 'git push' command; set to false if you need to deploy from fork
 
   # build artifacts
   CLI_BUILD: cli-build
@@ -73,14 +73,14 @@ jobs:
       - name: Configure git
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          echo "Configuring git"
+          echo "Configuring git..."
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Commit files
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          echo "Running git commit"
+          echo "Running git commit..."
           git add .
           git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
 
@@ -90,11 +90,12 @@ jobs:
 #          git config --get remote.origin.url
 #          git status
 
-      - name: Set dry-run mode on forks
-        if: github.repository_owner != env.RISM_OWNER
+      - name: Disable dry-run mode on ${{ env.RISM_OWNER }} repo
+        # if we are on rism-ch repos
+        if: github.repository_owner = env.RISM_OWNER
         run: |
-          echo "Setting git to dry-run mode"
-          echo "IS_DRY_RUN=true" >> $GITHUB_ENV
+          echo "Disabling dry-run mode..."
+          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
 
       - name: Push changes to doxygen
         working-directory: ${{ env.DOXYGEN_DIR }}
@@ -104,10 +105,10 @@ jobs:
 
           if [ "$IS_DRY_RUN" = true ]
           then
-            echo "Running `git push` in dry-run mode."
+            echo "Running <git push> in dry-run mode..."
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
-            echo "Pushing to repo"
+            echo "Pushing to repo..."
             # git push origin HEAD:$DOXYGEN_BRANCH
           fi
 
