@@ -99,8 +99,8 @@ jobs:
 
           echo "-----------------"
           echo "Configure dry-run"
-          echo "{DRY_RUN_OPTION}={$(echo '-v --dry-run')}" >> $GITHUB_ENV
-          echo "{IS_DRY_RUN}={true}" >> $GITHUB_ENV
+          echo "DRY_RUN_OPTION=$(echo '-v --dry-run')" >> $GITHUB_ENV
+          echo "IS_DRY_RUN=true" >> $GITHUB_ENV
 
 
       - name: Push changes to doxygen
