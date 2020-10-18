@@ -92,9 +92,13 @@ jobs:
 #          git status
 
       - name: Configure dry-run
+        if: github.repository_owner != env.RISM_OWNER
         run: |
+          echo $GITHUB_ENV
+
+          echo "-----------------"
           echo "Configure dry-run"
-          echo "is dry run: ${{ env.IS_DRY_RUN }}"
+          echo "::set-env name=IS_DRY_RUN::$(echo '-v --dry-run')"
 
 
       - name: Push changes to doxygen
@@ -103,11 +107,13 @@ jobs:
           # Push all changes in one commit to the doxygen repo
           echo "Build branch ready to go. Pushing to Github..."
 
-          if "${{ github.repository_owner }}" != "${{ env.RISM_OWNER }}"
+          if [ "${{ github.repository_owner }}" != "${{ env.RISM_OWNER }}" ]
           then
+            echo "Push dry-run style"
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
-            git push origin HEAD:$DOXYGEN_BRANCH
+            echo "Real push to repo"
+            # git push origin HEAD:$DOXYGEN_BRANCH
           fi
 
       - name: Congratulations
