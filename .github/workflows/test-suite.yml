@@ -98,6 +98,9 @@ jobs:
               elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
                 echo "Skip mensural"
                 continue
+              elif [ "$testcategory" == "$TEST_DIR/note" ]; then
+                echo "Skip note"
+                continue
               fi
 
               echo "* Creating SVG files..."
