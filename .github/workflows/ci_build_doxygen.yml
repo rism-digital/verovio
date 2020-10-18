@@ -32,7 +32,7 @@ env:
   GH_PAGES_BRANCH: gh-pages
 
   # temporary directories
-  DOXYGEN_DIR: doxygen
+  DOXYGEN_DIR: doxygen-dir
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
 
@@ -122,8 +122,7 @@ jobs:
 
       - name: Copy build artifacts to DOXYGEN_DIR
         run: |
-          # check if doc build dir exists
-          [ -d /artifacts/$DOC_BUILD ] && cp /artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+         cp artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
