@@ -38,7 +38,7 @@ env:
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
 
-  IS_DRY_RUN: ${{ github.repository_owner }} != rism-ch
+  IS_DRY_RUN: "${{ github.repository_owner }}" != "rism-ch"
 
 
 jobs:
@@ -99,7 +99,7 @@ jobs:
 
           echo "-----------------"
           echo "Configure dry-run"
-          echo "::set-env name=IS_DRY_RUN::$(echo '-v --dry-run')"
+          echo "::set-env name=DRY_RUN_OPTIONS::$(echo '-v --dry-run')"
 
 
       - name: Push changes to doxygen
@@ -110,7 +110,7 @@ jobs:
           echo $GITHUB_ENV
 
           echo "-----------------"
-          echo $IS_DRY_RUN
+          echo $DRY_RUN_OPTIONS
 
 
 
@@ -125,6 +125,8 @@ jobs:
             echo "Real push to repo"
             # git push origin HEAD:$DOXYGEN_BRANCH
           fi
+
+          # git push $IS_DRY_RUN origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
         if: ${{ success() }}
