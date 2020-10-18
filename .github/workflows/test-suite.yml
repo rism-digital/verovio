@@ -56,7 +56,7 @@ jobs:
               echo "********"
               echo $testcategory
 
-              if [ "$testcategory" == */ligature ] ; then echo "Found ligature" ; fi
+              if [ "$testcategory" == "*/ligature" ] ; then echo "Found ligature" ; fi
 
               for testfile in $testcategory/*.mei; do echo $testfile; done
             else
@@ -113,10 +113,10 @@ jobs:
 #              echo "### No test category here..."
 #            fi
 #          done
-
-      - name: Verify
-        working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
-        run: |
-          pwd
-          ls -al
+#
+#      - name: Verify
+#        working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
+#        run: |
+#          pwd
+#          ls -al
 
