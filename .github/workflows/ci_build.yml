@@ -13,17 +13,17 @@ on:
 # globals
 env:
   # general settings
-  MAIN_REPO_OWNER: musicEnfanthen    # Main repo owner (default: rism-ch)
-                                     # Needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
-                                     # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
+  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
+                                # Needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
+                                # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
 
-  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
+  DISABLE_DEPLOY_STEPS: false   # Flag used to disable deploy steps at all (default: true).
                                 # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
                                 # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
                                 # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
                                 # Will be programmatically set to 'false' for rism-ch repo.
 
-  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
+  IS_DRY_RUN: false             # Flag used for dry-run mode in 'git push' command (default: true).
                                 # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
                                 # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
                                 # Will be programmatically set to 'false' for rism-ch repo.
@@ -352,7 +352,7 @@ jobs:
       - name: Enable deployment for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         run: |
-          echo "Enable deploy steps for main repo owner..."
+          echo "Enabling deploy steps for main repo owner..."
           echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
 
           echo "Disabling dry-run mode for main repo owner..."
@@ -606,5 +606,17 @@ jobs:
         run: |
           echo "Deploy job skipped due to deployment settings..."
 
-          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
-          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+          echo "DISABLE_DEPLOY_STEPS = ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
+
+    skip_deploy:
+      name: Skip deployment
+      runs-on: ubuntu-20.04
+      if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
+      # run deployment only after finishing the build job
+      needs: [ check_deploy_settings ]
+      run: |
+        echo "Deploy jobs skipped due to deployment settings..."
+
+        echo "DISABLE_DEPLOY_STEPS = ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS}"
+        echo "IS_DRY_RUN = ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
