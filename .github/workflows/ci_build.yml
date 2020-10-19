@@ -7,13 +7,17 @@ on:
     branches:
       # Push events on develop branch
       - develop
-      # Push events on ci-test branch (only needed for testing purposes)
-      - ci-test
-      # Push events on travis-test branch (only needed for testing purposes)
-      - travis-test
+      # Push events on ci-test branch (uncomment if needed for testing purposes)
+      - '**'
 
 # globals
 env:
+  # general settings
+  RISM_OWNER: rism-ch
+  IS_DRY_RUN: true      # Flag used for dry-run mode in 'git push' command (default: true).
+                        # Set it manually to 'false' if you need to deploy from fork.
+                        # Will be programmatically set to 'false' for rism-ch repo.
+
   # build artifacts
   CLI_BUILD: cli-build
   DOC_BUILD: doc-build
@@ -378,13 +382,27 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
+      - name: Disable dry-run mode on rism-ch
+        if: github.repository_owner == env.RISM_OWNER
+        # if we are on rism-ch repos
+        run: |
+          echo "Disabling dry-run mode..."
+          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+
       - name: Push changes to gh-pages
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go. Pushing to Github..."
+          echo "Build branch ready to go."
 
-          git push origin HEAD:$GH_PAGES_BRANCH
+          if [ "$IS_DRY_RUN" = true ]
+          then
+            echo "Running git in dry-run mode..."
+            git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+          else
+            echo "Pushing to Github..."
+            git push origin HEAD:$GH_PAGES_BRANCH
+          fi
 
       - name: Congratulations
         if: ${{ success() }}
@@ -475,14 +493,14 @@ jobs:
       - name: Configure git
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          echo "Configuring git"
+          echo "Configuring git..."
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Commit files
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          echo "Running git commit"
+          echo "Running git commit..."
           git add .
           git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
 
@@ -492,13 +510,27 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
+      - name: Disable dry-run mode on rism-ch
+        if: github.repository_owner == env.RISM_OWNER
+        # if we are on rism-ch repos
+        run: |
+          echo "Disabling dry-run mode..."
+          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+
       - name: Push changes to doxygen
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go. Pushing to Github..."
+          echo "Build branch ready to go."
 
-          git push origin HEAD:$DOXYGEN_BRANCH
+          if [ "$IS_DRY_RUN" = true ]
+          then
+            echo "Running git in dry-run mode..."
+            git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+          else
+            echo "Pushing to Github..."
+            git push origin HEAD:$DOXYGEN_BRANCH
+          fi
 
       - name: Congratulations
         if: ${{ success() }}
