@@ -118,13 +118,13 @@ jobs:
   deploy_toolkit:
     name: Deploy JS toolkit
     runs-on: ubuntu-20.04
-    if: ${{ DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
     # needs: [build_cpp, build_cli, build_js, prepare_deploy]
     needs: [build_cli, prepare_deploy]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         uses: actions/checkout@v2
         with:
           repository: ${{ env.GH_PAGES_REPO }}
@@ -133,6 +133,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download CLI_BUILD artifacts
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.CLI_BUILD }}
@@ -145,17 +146,20 @@ jobs:
 #          path: artifacts/${{ env.TOOLKIT_BUILD }}
 
       - name: Copy artifacts to gh-pages
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         run: |
           cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
           # cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           git config --get remote.origin.url
           git status
 
       - name: Configure git
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           echo "Configuring git"
@@ -163,6 +167,7 @@ jobs:
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Commit files
+        if: ${{ DISABLE_DEPLOY_STEPS == 'false' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           echo "Running git commit"
@@ -170,13 +175,14 @@ jobs:
           git commit -m "Auto-commit of toolkit build for ${{ github.repository }}@${{ github.sha }}"
 
       #      - name: Check git status after commit
-      #        working-directory: ${{ env.DOXYGEN_DIR }}
+      #        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
+      #        working-directory: ${{ env.GH_PAGES_DIR }}
       #        run: |
       #          git config --get remote.origin.url
       #          git status
 
       - name: Push changes to gh-pages (dry-run)
-        if: ${{ env.IS_DRY_RUN == 'true' }}
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' && env.IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
@@ -186,7 +192,7 @@ jobs:
           git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
 
       - name: Push changes to gh-pages
-        if: ${{ env.IS_DRY_RUN == 'false' }}
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' && env.IS_DRY_RUN == 'false' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
@@ -196,9 +202,14 @@ jobs:
           git push origin HEAD:$GH_PAGES_BRANCH
 
       - name: Congratulations
-        if: ${{ success() }}
+        if: ${{ success() && env.DISABLE_DEPLOY_STEPS == 'false' }}
         run: |
           echo "🎉 New JS toolkit builds deployed 🎊"
+
+      - name: Skipped
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' }}
+        run: |
+          echo "Deploy job skipped"
 
 
   ###################################
@@ -253,12 +264,12 @@ jobs:
   deploy_docs:
     name: Deploy documentation
     runs-on: ubuntu-20.04
-    if: ${{ DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build job
     needs: [build_docs, prepare_deploy]
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         uses: actions/checkout@v2
         with:
           repository: ${{ env.DOXYGEN_REPO }}
@@ -267,22 +278,26 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.DOC_BUILD }}
           path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Copy build artifacts to DOXYGEN_DIR
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         run: |
           cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           git config --get remote.origin.url
           git status
 
       - name: Configure git
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           echo "Configuring git..."
@@ -290,6 +305,7 @@ jobs:
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Commit files
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           echo "Running git commit..."
@@ -303,7 +319,7 @@ jobs:
       #          git status
 
       - name: Push changes to doxygen (dry-run)
-        if: ${{ env.IS_DRY_RUN == 'true' }}
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' && env.IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
@@ -314,7 +330,7 @@ jobs:
 
 
       - name: Push changes to doxygen
-        if: ${{ env.IS_DRY_RUN == 'false' }}
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' && env.IS_DRY_RUN == 'false' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
@@ -324,6 +340,11 @@ jobs:
           git push origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
-        if: ${{ success() }}
+        if: ${{ success() && env.DISABLE_DEPLOY_STEPS == 'false' }}
         run: |
           echo "🎉 New documentation deployed 🎊"
+
+      - name: Skipped
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' }}
+        run: |
+          echo "Deploy job skipped"
