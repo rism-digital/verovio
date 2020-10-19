@@ -580,6 +580,7 @@ public:
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
     OptionString m_textFont;
+    OptionDbl m_textEnclosureThickness;
     OptionDbl m_thickBarlineThickness;
     OptionDbl m_tieThickness;    
     OptionDbl m_tupletBracketThickness;

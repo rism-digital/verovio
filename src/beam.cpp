@@ -1139,7 +1139,7 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    //const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
 
     const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
     const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
@@ -1153,7 +1153,6 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
     }
     return FUNCTOR_SIBLINGS;
 }
-
 
 int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
 {
@@ -1172,7 +1171,6 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-
 
 int Beam::CalcStem(FunctorParams *functorParams)
 {

@@ -424,7 +424,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
         Object *textParent = element;
         if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
             || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style")
-            || textNode.attribute("font-weight")) {
+            || textNode.attribute("font-weight") || textNode.attribute("enclosure")) {
             Rend *rend = new Rend();
             rend->SetLang(textNode.attribute("xml:lang").as_string());
             rend->SetColor(textNode.attribute("color").as_string());
@@ -434,6 +434,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
             rend->SetFontfam(textNode.attribute("font-family").as_string());
             rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textNode.attribute("font-style").as_string()));
             rend->SetFontweight(rend->AttTypography::StrToFontweight(textNode.attribute("font-weight").as_string()));
+            rend->SetRend(ConvertEnclosure(textNode.attribute("enclosure").as_string()));
             element->AddChild(rend);
             textParent = rend;
         }
@@ -2952,6 +2953,14 @@ void MusicXmlInput::ReadMusicXmlNote(
         mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlMordent.node().attribute("placement").as_string()));
         // form
         mordent->SetForm(mordentLog_FORM_lower);
+        for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
+            if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
+                mordent->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+            else if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
+                mordent->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+        }
         if (!std::strncmp(xmlMordent.node().name(), "inverted", 7)) {
             mordent->SetForm(mordentLog_FORM_upper);
         }
@@ -3017,6 +3026,14 @@ void MusicXmlInput::ReadMusicXmlNote(
             musicxml::OpenSpanner openTrill(1, m_measureCounts.at(measure));
             m_trillStack.push_back(std::make_pair(trill, openTrill));
         }
+        for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
+            if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
+                trill->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+            else {
+                trill->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+        }
     }
     if (!m_trillStack.empty() && notations.node().select_node("ornaments/wavy-line[@type='stop']")) {
         int extNumber
@@ -3043,12 +3060,17 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_controlElements.push_back(std::make_pair(measureNum, turn));
         turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         turn->SetStartid(m_ID);
-        // color
         turn->SetColor(xmlTurn.node().attribute("color").as_string());
-        // form
-        // place
         turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
         turn->SetForm(turnLog_FORM_upper);
+        for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
+            if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
+                turn->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+            else if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
+                turn->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+        }
         if (!std::strncmp(xmlTurn.node().name(), "inverted", 8)) {
             turn->SetForm(turnLog_FORM_lower);
             if (std::string(xmlTurn.node().name()).find("vertical") != std::string::npos) {
@@ -3519,7 +3541,7 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
         return result->second;
     }
 
-    return TEXTRENDITION_box;
+    return TEXTRENDITION_none;
 }
 
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
