@@ -23,7 +23,7 @@ env:
                                 # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
                                 # Will be programmatically set to 'false' for rism-ch repo.
 
-  IS_DRY_RUN: false              # Flag used for dry-run mode in 'git push' command (default: true).
+  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
                                 # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
                                 # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
                                 # Will be programmatically set to 'false' for rism-ch repo.
