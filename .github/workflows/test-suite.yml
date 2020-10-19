@@ -132,8 +132,10 @@ jobs:
                   echo $testfile
 
                   if [ "$testfile" == "$TEST_DIR/sameas/sameas-002.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
 
                   ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
+
                 else
                   echo "### No test file here..."
                 fi
@@ -142,10 +144,14 @@ jobs:
               echo "* Creating MEI files..."
               for testfile in $testcategory/*.mei; do
                 if [ -f "$testfile" ]; then
+                  echo "--"
+                  echo $testfile
 
+                  if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/sameas/sameas-002.mei" ]; then continue; fi
 
                   ./verovio -r ../data/ -t mei --remove-ids --all-pages $testfile
+
                 else
                   echo "### No test file here..."
                 fi
