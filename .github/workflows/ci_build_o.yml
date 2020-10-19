@@ -387,10 +387,8 @@ jobs:
 
     steps:
       - name: Skipped
-        env:
-          DISABLE_DEPLOY_STEPS_OUTPUT: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS }}
         run: |
           echo "Deploy jobs skipped due to deployment settings..."
 
-          echo "DISABLE_DEPLOY_STEPS: ${ env.DISABLE_DEPLOY_STEPS_OUTPUT }"
+          echo "DISABLE_DEPLOY_STEPS: true"
           echo "IS_DRY_RUN: ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
