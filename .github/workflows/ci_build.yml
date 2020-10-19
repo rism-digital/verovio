@@ -8,15 +8,23 @@ on:
       # Push events on develop branch
       - develop
       # Push events on ci-test branch (uncomment if needed for testing purposes)
-      # - ci-test
+      - '**'
 
 # globals
 env:
   # general settings
   RISM_OWNER: rism-ch
-  IS_DRY_RUN: true      # Flag used for dry-run mode in 'git push' command (default: true).
-                        # Set it manually to 'false' if you need to deploy from fork.
-                        # Will be programmatically set to 'false' for rism-ch repo.
+
+  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
+                                # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
+                                # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
+
+  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
+                                # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
 
   # build artifacts
   CLI_BUILD: cli-build
@@ -321,14 +329,39 @@ jobs:
           ls -al
 
 
+  ####################################
+  # Prepare deploy steps for RISM_CH #
+  ####################################
+  prepare_deploy:
+    name: Prepare deployment steps for rism-ch
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build jobs
+    needs: [ build_cpp, build_cli, build_js ]
+
+    steps:
+      - name: Prepare deployment for rism-ch
+        if: github.repository_owner == env.RISM_OWNER
+        run: |
+          echo "Enable deploy steps on rism-ch..."
+          echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
+
+          echo "Disabling dry-run mode on rism-ch..."
+          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+
+      - name: Check deployment settings
+          run: |
+            echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+            echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
   #########################################
   # Deploy the toolkit builds to gh-pages #
   #########################################
   deploy_toolkit:
     name: Deploy JS toolkit
     runs-on: ubuntu-20.04
+    if: env.DISABLE_DEPLOY_STEPS == 'false'
     # run deployment only after finishing the build jobs
-    needs: [build_cpp, build_cli, build_js]
+    needs: [build_cpp, build_cli, build_js, prepare_deploy]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
@@ -382,27 +415,25 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Disable dry-run mode on rism-ch
-        if: github.repository_owner == env.RISM_OWNER
-        # if we are on rism-ch repos
-        run: |
-          echo "Disabling dry-run mode..."
-          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
-
-      - name: Push changes to gh-pages
+      - name: Push changes to gh-pages (dry-run)
+        if: env.IS_DRY_RUN == 'true'
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
           echo "Build branch ready to go."
 
-          if [ "$IS_DRY_RUN" = true ]
-          then
-            echo "Running git in dry-run mode..."
-            git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
-          else
-            echo "Pushing to Github..."
-            git push origin HEAD:$GH_PAGES_BRANCH
-          fi
+          echo "Running git in dry-run mode..."
+          git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+
+      - name: Push changes to gh-pages
+        if: env.IS_DRY_RUN == 'false'
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: |
+          # Push all changes in one commit to the gh-pages repo
+          echo "Build branch ready to go."
+
+          echo "Pushing to Github..."
+          git push origin HEAD:$GH_PAGES_BRANCH
 
       - name: Congratulations
         if: ${{ success() }}
@@ -462,8 +493,9 @@ jobs:
   deploy_docs:
     name: Deploy documentation
     runs-on: ubuntu-20.04
+    if: env.DISABLE_DEPLOY_STEPS == 'false'
     # run deployment only after finishing the build job
-    needs: [build_docs]
+    needs: [build_docs, prepare_deploy]
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
@@ -510,27 +542,26 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Disable dry-run mode on rism-ch
-        if: github.repository_owner == env.RISM_OWNER
-        # if we are on rism-ch repos
-        run: |
-          echo "Disabling dry-run mode..."
-          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
-
-      - name: Push changes to doxygen
+      - name: Push changes to doxygen (dry-run)
+        if: env.IS_DRY_RUN == 'true'
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
           echo "Build branch ready to go."
 
-          if [ "$IS_DRY_RUN" = true ]
-          then
-            echo "Running git in dry-run mode..."
-            git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
-          else
+          echo "Running git in dry-run mode..."
+          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+
+
+      - name: Push changes to doxygen
+          if: env.IS_DRY_RUN == 'false'
+          working-directory: ${{ env.DOXYGEN_DIR }}
+          run: |
+            # Push all changes in one commit to the doxygen repo
+            echo "Build branch ready to go."
+
             echo "Pushing to Github..."
             git push origin HEAD:$DOXYGEN_BRANCH
-          fi
 
       - name: Congratulations
         if: ${{ success() }}
