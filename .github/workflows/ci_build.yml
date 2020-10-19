@@ -90,18 +90,18 @@ jobs:
           ls -al
 
 
-  ####################################
-  # Prepare deploy steps for RISM_CH #
-  ####################################
-  prepare_deploy:
-    name: Prepare deployment steps for rism-ch
+  ##################################
+  # Check settings for deployment  #
+  ##################################
+  check_deploy_settings:
+    name: Check settings for deployment
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
     # needs: [ build_cpp, build_cli, build_js ]
     needs: [ build_cli ]
 
     steps:
-      - name: Prepare deployment for rism-ch
+      - name: Enable deployment for rism-ch
         if: ${{ github.repository_owner == env.RISM_OWNER }}
         run: |
           echo "Enable deploy steps on rism-ch..."
@@ -122,8 +122,8 @@ jobs:
     name: Deploy JS toolkit
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
-    # needs: [build_cpp, build_cli, build_js, prepare_deploy]
-    needs: [build_cli, prepare_deploy]
+    # needs: [build_cpp, build_cli, build_js, check_deploy_settings]
+    needs: [build_cli, check_deploy_settings]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
@@ -212,7 +212,10 @@ jobs:
       - name: Skipped
         if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' }}
         run: |
-          echo "Deploy job skipped"
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
 
   ###################################
@@ -269,7 +272,7 @@ jobs:
     name: Deploy documentation
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build job
-    needs: [build_docs, prepare_deploy]
+    needs: [build_docs, check_deploy_settings]
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
@@ -351,4 +354,7 @@ jobs:
       - name: Skipped
         if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' }}
         run: |
-          echo "Deploy job skipped"
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
