@@ -167,7 +167,7 @@ jobs:
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Commit files
-        if: ${{ DISABLE_DEPLOY_STEPS == 'false' }}
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           echo "Running git commit"
