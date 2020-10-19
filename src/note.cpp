@@ -596,7 +596,7 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
     int shift = 0;
     bool hasUnison = false;
     
-    for (int i = 0; i < otherElements.size(); ++i) {
+    for (int i = 0; i < int(otherElements.size()); ++i) {
         int verticalMargin = 0;
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
