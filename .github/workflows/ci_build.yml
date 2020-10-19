@@ -70,7 +70,7 @@ jobs:
       - name: Update cli.txt
         working-directory: ${{ github.workspace }}/$TEMP_DIR
         run: |
-          echo "Test" > cli.txt
+          echo "Test" > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
         uses: actions/upload-artifact@v2
