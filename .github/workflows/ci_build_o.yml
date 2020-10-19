@@ -400,7 +400,7 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
     # run deployment only after finishing the build job
-    needs: [ check_deploy_settings ]
+    needs: [ build_cli, check_deploy_settings ]
 
     steps:
       - name: Skipped
