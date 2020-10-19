@@ -107,7 +107,7 @@ jobs:
     # Cf. https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idoutputs
     # So global envs are reset here as outputs.
     outputs:
-      DISABLE_DEPLOY_STEPS_OUTPUT: ${{ steps.settings.outputs.DISABLE_DEPLOY_STEPS }}
+      DISABLE_DEPLOY_STEPS: ${{ steps.settings.outputs.DISABLE_DEPLOY_STEPS }}
       IS_DRY_RUN: ${{ steps.settings.outputs.IS_DRY_RUN }}
 
     steps:
@@ -135,7 +135,7 @@ jobs:
   deploy_toolkit:
     name: Deploy JS toolkit
     runs-on: ubuntu-20.04
-    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS_OUTPUT == 'false' }}
+    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
     # needs: [build_cpp, build_cli, build_js, check_deploy_settings]
     needs: [build_cli, check_deploy_settings]
@@ -229,7 +229,7 @@ jobs:
         run: |
           echo "Deploy job skipped due to deployment settings..."
 
-          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS_OUTPUT}"
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
 
@@ -286,7 +286,7 @@ jobs:
   deploy_docs:
     name: Deploy documentation
     runs-on: ubuntu-20.04
-    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS_OUTPUT == 'false' }}
+    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build job
     needs: [build_docs, check_deploy_settings]
 
@@ -372,7 +372,7 @@ jobs:
         run: |
           echo "Deploy job skipped due to deployment settings..."
 
-          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS_OUTPUT}"
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
   ###############################################
@@ -381,14 +381,16 @@ jobs:
   skip_deploy:
     name: Skip deployment if set
     runs-on: ubuntu-20.04
-    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS_OUTPUT == 'true' }}
+    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
     # run deployment only after finishing the build job
     needs: [ check_deploy_settings ]
 
     steps:
       - name: Skipped
+        env:
+          DISABLE_DEPLOY_STEPS_OUTPUT: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS }}
         run: |
           echo "Deploy jobs skipped due to deployment settings..."
 
-          echo "DISABLE_DEPLOY_STEPS: ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS_OUTPUT}"
+          echo "DISABLE_DEPLOY_STEPS: ${ env.DISABLE_DEPLOY_STEPS_OUTPUT }"
           echo "IS_DRY_RUN: ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
