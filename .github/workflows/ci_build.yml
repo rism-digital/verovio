@@ -102,24 +102,24 @@ jobs:
     # needs: [ build_cpp, build_cli, build_js ]
     needs: [ build_cli ]
 
+    # Github Environment Variables persist only on job level.
+    # To transfer values to later jobs, outputs mechanism has to be used.
+    # Cf. https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idoutputs
+    # So global envs are reset here as outputs.
     outputs:
       DISABLE_DEPLOY_STEPS: ${{ steps.settings.outputs.DISABLE_DEPLOY_STEPS }}
       IS_DRY_RUN: ${{ steps.settings.outputs.IS_DRY_RUN }}
 
     steps:
-      - name: Enable deployment for rism-ch
+      - name: Enable deployment for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         run: |
-          echo "Enable deploy steps on rism-ch..."
+          echo "Enable deploy steps for main repo owner..."
           echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
 
-          echo "Disabling dry-run mode on rism-ch..."
+          echo "Disabling dry-run mode for main repo owner..."
           echo "IS_DRY_RUN=false" >> $GITHUB_ENV
 
-      # Github Environment Variables persist only on job level.
-      # To transfer values to later jobs, outputs mechanism has to be used.
-      # Cf. https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idoutputs
-      # So global envs are reset here as outputs.
       - name: Check deployment settings and set them as outputs
         id: settings
         run: |
