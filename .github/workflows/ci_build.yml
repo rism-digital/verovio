@@ -102,6 +102,10 @@ jobs:
     # needs: [ build_cpp, build_cli, build_js ]
     needs: [ build_cli ]
 
+    outputs:
+      DISABLE_DEPLOY_STEPS: ${{ steps.settings.outputs.DISABLE_DEPLOY_STEPS }}
+      IS_DRY_RUN: ${{ steps.settings.outputs.IS_DRY_RUN }}
+
     steps:
       - name: Enable deployment for rism-ch
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
@@ -112,10 +116,14 @@ jobs:
           echo "Disabling dry-run mode on rism-ch..."
           echo "IS_DRY_RUN=false" >> $GITHUB_ENV
 
-      - name: Check deployment settings
+      - name: Check deployment settings and set them as outputs
+        id: settings
         run: |
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
+          echo "::set-output name=DISABLE_DEPLOY_STEPS::${DISABLE_DEPLOY_STEPS}"
+          echo "::set-output name=IS_DRY_RUN::${IS_DRY_RUN}"
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
@@ -128,8 +136,13 @@ jobs:
     needs: [build_cli, check_deploy_settings]
 
     steps:
+      - name: check step outputs
+        run: |
+          echo ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS }}
+          echo ${{ needs.check_deploy_settings.outputs.IS_DRY_RUN }}
+
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
+        if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'false' }}
         uses: actions/checkout@v2
         with:
           repository: ${{ env.GH_PAGES_REPO }}
