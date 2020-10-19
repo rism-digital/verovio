@@ -111,8 +111,8 @@ jobs:
               if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
                 echo "Skip ligature"
                 continue
-              elif [ "$testcategory" != "$TEST_DIR/mensural" ]; then
-                echo "Skip others than mensural"
+              elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
+                echo "Skip mensural"
                 continue
               elif [ "$testcategory" == "$TEST_DIR/note" ]; then
                 echo "Skip note"
@@ -120,8 +120,8 @@ jobs:
               elif [ "$testcategory" == "$TEST_DIR/sameas" ]; then
                 echo "Skip sameas"
                 continue
-              elif [ "$testcategory" == "$TEST_DIR/stem" ]; then
-                echo "Skip stem"
+              elif [ "$testcategory" != "$TEST_DIR/stem" ]; then
+                echo "Skip others than stem"
                 continue
               fi
 
