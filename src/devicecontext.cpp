@@ -161,8 +161,9 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
             if (c == L' ') {
                 glyph = Resources::GetTextGlyph(L'.');
             }
-            else
+            else {
                 glyph = unkown;
+            }
         }
         AddGlyphToTextExtend(glyph, extend);
     }
