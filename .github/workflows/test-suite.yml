@@ -108,8 +108,8 @@ jobs:
                echo "********"
                echo $testcategory
 
-              if [ "$testcategory" != "$TEST_DIR/ligature" ]; then
-                echo "Skip others than ligature"
+              if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
+                echo "Skip ligature"
                 continue
               elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
                 echo "Skip mensural"
@@ -117,21 +117,27 @@ jobs:
               elif [ "$testcategory" == "$TEST_DIR/note" ]; then
                 echo "Skip note"
                 continue
-              elif [ "$testcategory" == "$TEST_DIR/sameas" ]; then
-                echo "Skip sameas"
+              elif [ "$testcategory" != "$TEST_DIR/sameas" ]; then
+                echo "Skip others than sameas"
                 continue
               elif [ "$testcategory" == "$TEST_DIR/stem" ]; then
                 echo "Skip stem"
                 continue
               fi
 
+              echo "-------- CHECK --------"
+              pwd
+              ls -al
+              ls -R
+              echo "-------- END CHECK --------"
+
               echo "* Creating SVG files..."
               for testfile in $testcategory/*.mei; do
                 if [ -f "$testfile" ]; then
                   echo "--"
                   echo $testfile
-                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-001.mei" ]; then continue; fi
-                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-002.mei" ]; then continue; fi
+                  # if [ "$testfile" == "$TEST_DIR/ligature/ligature-001.mei" ]; then continue; fi
+                  # if [ "$testfile" == "$TEST_DIR/ligature/ligature-002.mei" ]; then continue; fi
 
                   ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
                 else
