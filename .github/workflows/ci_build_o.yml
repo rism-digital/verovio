@@ -379,6 +379,23 @@ jobs:
   # Skip deployment steps according to settings #
   ###############################################
   skip_deploy:
+    name: Deploy documentation
+    runs-on: ubuntu-20.04
+    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
+    # run deployment only after finishing the build job
+    needs: [ build_docs, check_deploy_settings ]
+
+    steps:
+      - name: Skipped
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        if: ${{ needs.check_deploy_settings.outputs.IS_DRY_RUN == 'true' }}
+        run: |
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
+  skip_deploy_2:
     name: Skip deployment if set
     runs-on: ubuntu-20.04
     if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}

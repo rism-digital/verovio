@@ -108,22 +108,22 @@ jobs:
                echo "********"
                echo $testcategory
 
-              if [ "$testcategory" != "$TEST_DIR/ligature" ]; then
-                echo "Skip others than ligature"
-                continue
-              elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
-                echo "Skip mensural"
-                continue
-              elif [ "$testcategory" == "$TEST_DIR/note" ]; then
-                echo "Skip note"
-                continue
-              elif [ "$testcategory" == "$TEST_DIR/sameas" ]; then
-                echo "Skip sameas"
-                continue
-              elif [ "$testcategory" == "$TEST_DIR/stem" ]; then
-                echo "Skip stem"
-                continue
-              fi
+#              if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
+#                echo "Skip ligature"
+#                continue
+#              elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
+#                echo "Skip mensural"
+#                continue
+#              elif [ "$testcategory" == "$TEST_DIR/note" ]; then
+#                echo "Skip note"
+#                continue
+#              elif [ "$testcategory" == "$TEST_DIR/sameas" ]; then
+#                echo "Skip sameas"
+#                continue
+#              elif [ "$testcategory" == "$TEST_DIR/stem" ]; then
+#                echo "Skip stem"
+#                continue
+#              fi
 
               echo "* Creating SVG files..."
               for testfile in $testcategory/*.mei; do
@@ -175,7 +175,7 @@ jobs:
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-042.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-043.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-044.mei" ]; then continue; fi
-                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-045.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-046.mei" ]; then continue; fi
 
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
@@ -241,6 +241,7 @@ jobs:
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-043.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-044.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-045.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-046.mei" ]; then continue; fi
 
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
