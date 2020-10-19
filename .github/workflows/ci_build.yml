@@ -131,6 +131,7 @@ jobs:
   deploy_toolkit:
     name: Deploy JS toolkit
     runs-on: ubuntu-20.04
+    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
     # needs: [build_cpp, build_cli, build_js, check_deploy_settings]
     needs: [build_cli, check_deploy_settings]
@@ -142,7 +143,7 @@ jobs:
           echo ${{ needs.check_deploy_settings.outputs.IS_DRY_RUN }}
 
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'false' }}
+        #if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'false' }}
         uses: actions/checkout@v2
         with:
           repository: ${{ env.GH_PAGES_REPO }}
@@ -225,7 +226,8 @@ jobs:
           echo "🎉 New JS toolkit builds deployed 🎊"
 
       - name: Skipped
-        if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' }}
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' || (env.DISABLE_DEPLOY_STEPS == 'false' && env.IS_DRY_RUN == 'true') }}
         run: |
           echo "Deploy job skipped due to deployment settings..."
 
@@ -362,12 +364,13 @@ jobs:
           git push origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
-        if: ${{ success() && env.DISABLE_DEPLOY_STEPS == 'false' }}
+        if: ${{ success() && env.DISABLE_DEPLOY_STEPS == 'false' && env.IS_DRY_RUN == 'false' }}
         run: |
           echo "🎉 New documentation deployed 🎊"
 
       - name: Skipped
-        if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' }}
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        if: ${{ env.DISABLE_DEPLOY_STEPS == 'true' || (env.DISABLE_DEPLOY_STEPS == 'false' && env.IS_DRY_RUN == 'true') }}
         run: |
           echo "Deploy job skipped due to deployment settings..."
 
