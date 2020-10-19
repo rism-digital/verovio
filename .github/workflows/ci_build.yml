@@ -52,9 +52,137 @@ env:
 
 
 jobs:
+  ###############################################################################################
+  # Build c++ code on different os in parallel.                                                 #
+  # Adapted from https://github.com/DaanDeMeyer/reproc/blob/master/.github/workflows/main.yml . #
+  ###############################################################################################
+  build_cpp:
+    name: Build ${{ matrix.config.os }}-${{ matrix.config.compiler }}-${{ matrix.config.version }}
+    # This job runs on all the os specified in strategy.matrix.os
+    runs-on: ${{ matrix.config.os }}
+
+    # set matrix with config options
+    # (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-20.04
+            compiler: gcc
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: gcc
+            version: "10"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "6.0"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "10"
+
+          #          - os: windows-latest
+          #            compiler: cl
+          #            version: "default"
+          #
+          #          - os: windows-latest
+          #            compiler: clang-cl
+          #            version: "latest"
+          #
+          #          - os: windows-latest
+          #            compiler: clang
+          #            version: "latest"
+          #
+          #          - os: windows-latest
+          #            compiler: gcc
+          #            version: "latest"
+
+          - os: macos-latest
+            compiler: xcode
+            version: "default"
+
+          - os: macos-latest
+            compiler: gcc
+            version: "latest"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      # Installation step for Ubuntu
+      - name: Install Ubuntu (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: runner.os == 'Linux'
+        run: |
+          # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | sudo apt-key add -
+          sudo add-apt-repository 'deb http://apt.llvm.org/focal llvm-toolchain-focal-10 main' -y
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
+          sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
+          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
+            sudo apt-get install -y --no-install-recommends g++-${{ matrix.config.version }}
+            echo CC=gcc-${{ matrix.config.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.config.version }} >> $GITHUB_ENV
+          else
+            sudo apt-get install -y --no-install-recommends clang-${{ matrix.config.version }}
+            echo CC=clang-${{ matrix.config.version }} >> $GITHUB_ENV
+            echo CXX=clang++-${{ matrix.config.version }} >> $GITHUB_ENV
+          fi
+
+      # Installation step for MacOS
+      - name: Install macOS (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja llvm
+          sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
+          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
+            echo CC=gcc >> $GITHUB_ENV
+            echo CXX=g++ >> $GITHUB_ENV
+          else
+            echo CC=clang >> $GITHUB_ENV
+            echo CXX=clang++ >> $GITHUB_ENV
+          fi
+
+      # Installation step for Windows
+      - name: Install Windows (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+        if: runner.os == 'windows'
+        run: |
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+          scoop install ninja llvm --global
+          if ("${{ matrix.config.compiler }}" -eq "gcc") {
+            echo "::set-env name=CC::gcc"
+            echo "::set-env name=CXX::g++"
+          } elseif ("${{ matrix.config.compiler }}" -eq "clang") {
+            echo "::set-env name=CC::clang"
+            echo "::set-env name=CXX::clang++"
+          } else {
+            echo "::set-env name=CC::${{ matrix.config.compiler }}"
+            echo "::set-env name=CXX::${{ matrix.config.compiler }}"
+          }
+          # Make all PATH additions made by scoop and ourselves global.
+          echo "::set-env name=PATH::$env:PATH"
+
+      - name: Run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          cmake ../cmake
+          make -j8
+
+      - name: Check files
+        if: always()
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          pwd
+          ls -al
+
 
   ###########################
-  # Build test artifact #
+  # Build the CLI artifacts #
   ###########################
   build_cli:
     name: Build cli
@@ -68,21 +196,132 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           mkdir -p $TEMP_DIR/
-          pwd
-          ls -al
+
+      - name: Run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          cmake ../cmake
+          make -j8
 
       - name: Update cli.txt
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          pwd
-          ls -al
-          echo "Test" > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
+          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.CLI_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
+
+      - name: Check files
+        if: always()
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+        run: |
+          pwd
+          ls -al
+
+  #####################################
+  # Set up and cache emscripten build #
+  #####################################
+  setup_emscripten:
+    name: Set up and cache emscripten
+    runs-on: ubuntu-20.04
+
+    steps:
+      # Cache system libraries generated during build time
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
+      # Cache emsdk
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+
+  ##################################
+  # Build the JS toolkit artifacts #
+  ##################################
+  build_js:
+    name: Build JS toolkit
+    runs-on: ubuntu-20.04
+    needs: [setup_emscripten]
+
+    # set matrix with toolkit options (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        toolkit:
+          - target: nohumdrum
+            message: "Building toolkit without humdrum"
+            options: "-c -H -M"
+            filepath: "verovio-toolkit.js*"
+          - target: light
+            message: "Building toolkit without humdrum as light version"
+            options: "-c -H -l -M"
+            filepath: "verovio-toolkit-light.js*"
+          - target: wasm
+            message: "Building toolkit without humdrum as wasm"
+            options: "-c -H -w -M"
+            filepath: "verovio*wasm*"
+          - target: default
+            message: "Building default toolkit (with humdrum)"
+            options: "-c -M"
+            filepath: "*-hum.js*"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      # Restore system libraries generated during build time from cache
+      - name: Restore system libraries from cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+
+      - name: Get emscripten build from cache and activate
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p $TEMP_DIR/
+
+      - name: Build toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+        working-directory: ${{ github.workspace }}/emscripten
+        run: |
+          echo "${{ matrix.toolkit.message }}"
+          ./buildToolkit ${{ matrix.toolkit.options }}
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/emscripten
+        run: |
+          echo "Copy toolkit build into $TEMP_DIR..."
+          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload js build artifact (${{ matrix.toolkit.target }})
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
       - name: Check files
         if: always()
@@ -99,8 +338,7 @@ jobs:
     name: Check settings for deployment
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
-    # needs: [ build_cpp, build_cli, build_js ]
-    needs: [ build_cli ]
+    needs: [ build_cpp, build_cli, build_js ]
 
     # Github Environment Variables persist only on job level.
     # To transfer values to later jobs, outputs mechanism has to be used.
@@ -137,8 +375,7 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
-    # needs: [build_cpp, build_cli, build_js, check_deploy_settings]
-    needs: [build_cli, check_deploy_settings]
+    needs: [build_cpp, build_cli, build_js, check_deploy_settings]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
@@ -160,16 +397,16 @@ jobs:
           name: ${{ env.CLI_BUILD }}
           path: artifacts/${{ env.CLI_BUILD }}
 
-#      - name: Download TOOLKIT_BUILD artifacts
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: ${{ env.TOOLKIT_BUILD }}
-#          path: artifacts/${{ env.TOOLKIT_BUILD }}
+      - name: Download TOOLKIT_BUILD artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: artifacts/${{ env.TOOLKIT_BUILD }}
 
       - name: Copy artifacts to gh-pages
         run: |
           cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
-          # cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
         working-directory: ${{ env.GH_PAGES_DIR }}
@@ -192,8 +429,7 @@ jobs:
           git commit -m "Auto-commit of toolkit build for ${{ github.repository }}@${{ github.sha }}"
 
       #      - name: Check git status after commit
-      #        if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
-      #        working-directory: ${{ env.GH_PAGES_DIR }}
+      #        working-directory: ${{ env.DOXYGEN_DIR }}
       #        run: |
       #          git config --get remote.origin.url
       #          git status
@@ -224,7 +460,7 @@ jobs:
           echo "🎉 New JS toolkit builds deployed 🎊"
 
       - name: Skipped
-        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        # skip deployment when deploy steps are disabled or when running in dry-run mode
         if: ${{ needs.check_deploy_settings.outputs.IS_DRY_RUN == 'true' }}
         run: |
           echo "Deploy job skipped due to deployment settings..."
@@ -240,8 +476,7 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-20.04
     # run only after finishing other build jobs
-    # needs: [build_cpp, build_cli, build_js]
-    needs: [build_cli]
+    needs: [build_cpp, build_cli, build_js]
 
     steps:
       - name: Checkout main repo
@@ -304,7 +539,6 @@ jobs:
           # relative path under $GITHUB_WORKSPACE to place the repository
           path: ${{ env.DOXYGEN_DIR }}
 
-
       - name: Download DOC_BUILD artifacts
         uses: actions/download-artifact@v2
         with:
@@ -350,7 +584,6 @@ jobs:
 
           echo "Running git in dry-run mode..."
           git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
-
 
       - name: Push changes to doxygen
         if: ${{ needs.check_deploy_settings.outputs.IS_DRY_RUN == 'false' }}
