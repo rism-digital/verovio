@@ -13,7 +13,7 @@ on:
 # globals
 env:
   # general settings
-  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
+  MAIN_REPO_OWNER: musicEnfanthen      # Main repo owner (default: rism-ch; should not be changed)
                                 # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
                                 # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
 
