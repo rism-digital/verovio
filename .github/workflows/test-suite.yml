@@ -92,8 +92,8 @@ jobs:
                echo "********"
                echo $testcategory
 
-              if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
-                echo "Skip ligature"
+              if [ "$testcategory" != "$TEST_DIR/ligature" ]; then
+                echo "Skip others than ligature"
                 continue
               elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
                 echo "Skip mensural"
