@@ -390,11 +390,11 @@ jobs:
         run: |
           echo "Deploy job skipped due to deployment settings..."
 
-          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
-          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+          echo "DISABLE_DEPLOY_STEPS (env) = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN (env) = ${IS_DRY_RUN}"
 
-          echo "DISABLE_DEPLOY_STEPS: ${needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS}"
-          echo "IS_DRY_RUN: ${needs.check_deploy_settings.outputs._IS_DRY_RUN}"
+          echo "DISABLE_DEPLOY_STEPS (output): true"
+          echo "IS_DRY_RUN (output): ${needs.check_deploy_settings.outputs._IS_DRY_RUN}"
 
   skip_deploy_2:
     name: Skip deployment if set (needs check_deploy_settings)
