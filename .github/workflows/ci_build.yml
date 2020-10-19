@@ -13,11 +13,11 @@ on:
 # globals
 env:
   # general settings
-  MAIN_REPO_OWNER: musicEnfanthen      # Main repo owner (default: rism-ch; should not be changed)
+  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
                                 # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
                                 # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
 
-  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
+  DISABLE_DEPLOY_STEPS: false    # Flag used to disable deploy steps at all (default: true).
                                 # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
                                 # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
                                 # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
