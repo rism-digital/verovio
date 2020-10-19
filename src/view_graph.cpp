@@ -104,6 +104,25 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
     return;
 }
 
+void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius = 0)
+{
+    assert(dc); // DC cannot be NULL
+
+    BoundingBox::Swap(y1, y2);
+
+    const int penWidth = lineThinkness;
+    dc->SetPen(m_currentColour, penWidth, AxSOLID);
+    dc->SetBrush(m_currentColour, AxTRANSPARENT);
+
+    dc->DrawRoundedRectangle(
+        ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
+
+    dc->ResetPen();
+    dc->ResetBrush();
+
+    return;
+}
+
 /* Draw a filled rectangle with horizontal and vertical sides. */
 void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2)
 {

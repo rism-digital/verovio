@@ -25,7 +25,6 @@ class Beam;
 class BeamSegment;
 class BracketSpan;
 class Breath;
-class ControlElement;
 class Chord;
 class ControlElement;
 class DeviceContext;
@@ -364,6 +363,7 @@ protected:
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
+    void DrawTextBoxes(DeviceContext *dc, const std::vector<TextElement *> &boxedRend, int staffSize);
 
     /**
      * @name Method for drawing Beam and FTrem.
@@ -509,6 +509,7 @@ protected:
     void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100,
         std::optional<TextDrawingParams> params = std::nullopt);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
+    void DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius);
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
