@@ -609,14 +609,14 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
 
-    skip_deploy:
-      name: Skip deployment
-      runs-on: ubuntu-20.04
-      if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
-      # run deployment only after finishing the build job
-      needs: [ check_deploy_settings ]
-      run: |
-        echo "Deploy jobs skipped due to deployment settings..."
+  skip_deploy:
+    name: Skip deployment
+    runs-on: ubuntu-20.04
+    if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
+    # run deployment only after finishing the build job
+    needs: [ check_deploy_settings ]
+    run: |
+      echo "Deploy jobs skipped due to deployment settings..."
 
-        echo "DISABLE_DEPLOY_STEPS = ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS}"
-        echo "IS_DRY_RUN = ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
+      echo "DISABLE_DEPLOY_STEPS = ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS}"
+      echo "IS_DRY_RUN = ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
