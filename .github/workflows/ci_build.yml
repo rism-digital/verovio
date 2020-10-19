@@ -625,5 +625,5 @@ jobs:
         run: |
           echo "Deploy jobs skipped due to deployment settings..."
 
-          echo "DISABLE_DEPLOY_STEPS = ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS}"
-          echo "IS_DRY_RUN = ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
+          echo "DISABLE_DEPLOY_STEPS: ${needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN: ${needs.check_deploy_settings.outputs.IS_DRY_RUN}"
