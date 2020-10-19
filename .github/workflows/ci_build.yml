@@ -13,8 +13,8 @@ on:
 # globals
 env:
   # general settings
-  RISM_OWNER: musicEnfanthen
-  IS_DRY_RUN: true      # Flag used for dry-run mode in 'git push' command (default: true).
+  RISM_OWNER: rism-ch
+  IS_DRY_RUN: false      # Flag used for dry-run mode in 'git push' command (default: true).
                         # Set it manually to 'false' if you need to deploy from fork.
                         # Will be programmatically set to 'false' for rism-ch repo.
 
