@@ -70,7 +70,7 @@ jobs:
           ls -al
 
       - name: Update cli.txt
-        working-directory: ${{ github.workspace }}/$TEMP_DIR
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
         run: |
           pwd
           ls -al
