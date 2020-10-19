@@ -17,7 +17,7 @@ env:
                                      # Needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
                                      # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
 
-  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
+  DISABLE_DEPLOY_STEPS: false    # Flag used to disable deploy steps at all (default: true).
                                 # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
                                 # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
                                 # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
@@ -393,10 +393,13 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
+          echo "DISABLE_DEPLOY_STEPS: ${needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN: ${needs.check_deploy_settings.outputs._IS_DRY_RUN}"
+
   skip_deploy_2:
     name: Skip deployment if set (needs check_deploy_settings)
     runs-on: ubuntu-20.04
-    if: ${{ cancelled() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
+    if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
     # run deployment only after finishing the build job
     needs: [ check_deploy_settings, deploy_toolkit, deploy_docs ]
 
