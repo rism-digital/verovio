@@ -340,7 +340,7 @@ jobs:
 
     steps:
       - name: Prepare deployment for rism-ch
-        if: github.repository_owner == env.RISM_OWNER
+        if: ${{ github.repository_owner == env.RISM_OWNER }}
         run: |
           echo "Enable deploy steps on rism-ch..."
           echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
@@ -349,9 +349,9 @@ jobs:
           echo "IS_DRY_RUN=false" >> $GITHUB_ENV
 
       - name: Check deployment settings
-          run: |
-            echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
-            echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+        run: |
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
@@ -359,7 +359,7 @@ jobs:
   deploy_toolkit:
     name: Deploy JS toolkit
     runs-on: ubuntu-20.04
-    if: env.DISABLE_DEPLOY_STEPS == 'false'
+    if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_cli, build_js, prepare_deploy]
 
@@ -416,7 +416,7 @@ jobs:
       #          git status
 
       - name: Push changes to gh-pages (dry-run)
-        if: env.IS_DRY_RUN == 'true'
+        if: ${{ env.IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
@@ -426,7 +426,7 @@ jobs:
           git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
 
       - name: Push changes to gh-pages
-        if: env.IS_DRY_RUN == 'false'
+        if: {{ env.IS_DRY_RUN == 'false' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
@@ -493,7 +493,7 @@ jobs:
   deploy_docs:
     name: Deploy documentation
     runs-on: ubuntu-20.04
-    if: env.DISABLE_DEPLOY_STEPS == 'false'
+    if: ${{ env.DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build job
     needs: [build_docs, prepare_deploy]
 
@@ -543,7 +543,7 @@ jobs:
       #          git status
 
       - name: Push changes to doxygen (dry-run)
-        if: env.IS_DRY_RUN == 'true'
+        if: ${{ env.IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
@@ -554,14 +554,14 @@ jobs:
 
 
       - name: Push changes to doxygen
-          if: env.IS_DRY_RUN == 'false'
-          working-directory: ${{ env.DOXYGEN_DIR }}
-          run: |
-            # Push all changes in one commit to the doxygen repo
-            echo "Build branch ready to go."
+        if: ${{ env.IS_DRY_RUN == 'false' }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          # Push all changes in one commit to the doxygen repo
+          echo "Build branch ready to go."
 
-            echo "Pushing to Github..."
-            git push origin HEAD:$DOXYGEN_BRANCH
+          echo "Pushing to Github..."
+          git push origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
         if: ${{ success() }}
