@@ -379,11 +379,11 @@ jobs:
   # Skip deployment steps according to settings #
   ###############################################
   skip_deploy:
-    name: Deploy documentation
+    name: Skip deployment if set (needs build_docs, check_deploy_settings)
     runs-on: ubuntu-20.04
     if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
     # run deployment only after finishing the build job
-    needs: [ build_docs, check_deploy_settings ]
+    needs: [ build_cli, check_deploy_settings ]
 
     steps:
       - name: Skipped
@@ -396,7 +396,7 @@ jobs:
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
   skip_deploy_2:
-    name: Skip deployment if set
+    name: Skip deployment if set (needs check_deploy_settings)
     runs-on: ubuntu-20.04
     if: ${{ needs.check_deploy_settings.outputs.DISABLE_DEPLOY_STEPS == 'true' }}
     # run deployment only after finishing the build job

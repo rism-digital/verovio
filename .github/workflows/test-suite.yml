@@ -105,25 +105,8 @@ jobs:
             if [ "$testcategory" = "*" ]; then continue; fi
 
             if [ -d "$testcategory" ]; then
-               echo "********"
-               echo $testcategory
-
-#              if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
-#                echo "Skip ligature"
-#                continue
-#              elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
-#                echo "Skip mensural"
-#                continue
-#              elif [ "$testcategory" == "$TEST_DIR/note" ]; then
-#                echo "Skip note"
-#                continue
-#              elif [ "$testcategory" == "$TEST_DIR/sameas" ]; then
-#                echo "Skip sameas"
-#                continue
-#              elif [ "$testcategory" == "$TEST_DIR/stem" ]; then
-#                echo "Skip stem"
-#                continue
-#              fi
+              echo "********"
+              echo $testcategory
 
               echo "* Creating SVG files..."
               for testfile in $testcategory/*.mei; do
