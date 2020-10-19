@@ -13,7 +13,7 @@ on:
 # globals
 env:
   # general settings
-  RISM_OWNER: rism-ch
+  RISM_OWNER: musicEnfanthen
   IS_DRY_RUN: true      # Flag used for dry-run mode in 'git push' command (default: true).
                         # Set it manually to 'false' if you need to deploy from fork.
                         # Will be programmatically set to 'false' for rism-ch repo.
@@ -401,7 +401,7 @@ jobs:
             git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
           else
             echo "Pushing to Github..."
-            git push origin HEAD:$GH_PAGES_BRANCH
+            # git push origin HEAD:$GH_PAGES_BRANCH
           fi
 
       - name: Congratulations
@@ -529,7 +529,7 @@ jobs:
             git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
           else
             echo "Pushing to Github..."
-            git push origin HEAD:$DOXYGEN_BRANCH
+            # git push origin HEAD:$DOXYGEN_BRANCH
           fi
 
       - name: Congratulations
