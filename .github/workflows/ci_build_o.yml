@@ -380,7 +380,7 @@ jobs:
   skip_deploy:
     name: Skip deployment if set (needs build_cli, check_deploy_settings)
     runs-on: ubuntu-20.04
-    if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
+    if: ${{ skipped() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
     # run deployment only after finishing the build job
     needs: [ check_deploy_settings, deploy_toolkit, deploy_docs ]
 
@@ -397,7 +397,7 @@ jobs:
   skip_deploy_2:
     name: Skip deployment if set (needs check_deploy_settings)
     runs-on: ubuntu-20.04
-    if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
+    if: ${{ cancelled() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
     # run deployment only after finishing the build job
     needs: [ check_deploy_settings, deploy_toolkit, deploy_docs ]
 
