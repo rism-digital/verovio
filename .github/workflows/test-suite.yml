@@ -151,6 +151,16 @@ jobs:
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-018.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-019.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-020.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-021.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-022.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-023.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-024.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-025.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-026.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-027.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-028.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-029.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-030.mei" ]; then continue; fi
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
@@ -190,6 +200,16 @@ jobs:
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-018.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-019.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-020.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-021.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-022.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-023.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-024.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-025.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-026.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-027.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-028.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-029.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-030.mei" ]; then continue; fi
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
