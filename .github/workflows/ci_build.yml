@@ -20,7 +20,7 @@ env:
   TOOLKIT_BUILD: toolkit-build
 
   # doxygen
-  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works also for forks of verovio
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-ch and from forks
   DOXYGEN_BRANCH: master
 
   # emscripten
@@ -28,7 +28,7 @@ env:
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works also for forks of verovio
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
   GH_PAGES_BRANCH: gh-pages
 
   # temporary directories
@@ -154,10 +154,17 @@ jobs:
           echo "::set-env name=PATH::$env:PATH"
 
       - name: Run make
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
           make -j8
+
+      - name: Check files
+        if: always()
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          pwd
+          ls -al
 
 
   ###########################
@@ -172,19 +179,19 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create temp dir
+        working-directory: ${{ github.workspace }}
         run: |
-          cd $GITHUB_WORKSPACE
           mkdir -p $TEMP_DIR/
 
       - name: Run make
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
           make -j8
 
       - name: Update cli.txt
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          cd $GITHUB_WORKSPACE/tools
           ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
@@ -195,8 +202,8 @@ jobs:
 
       - name: Check files
         if: always()
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
 
@@ -279,16 +286,21 @@ jobs:
       - name: Verify emscripten build
         run: emcc -v
 
-      - name: Create temp dir
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
         run: |
-          cd $GITHUB_WORKSPACE
           mkdir -p $TEMP_DIR/
 
-      - name: Build Toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+      - name: Build toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+        working-directory: ${{ github.workspace }}/emscripten
         run: |
-          cd $GITHUB_WORKSPACE/emscripten
           echo "${{ matrix.toolkit.message }}"
           ./buildToolkit ${{ matrix.toolkit.options }}
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/emscripten
+        run: |
+          echo "Copy toolkit build into $TEMP_DIR..."
           cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
@@ -299,8 +311,8 @@ jobs:
 
       - name: Check files
         if: always()
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
 
@@ -403,11 +415,11 @@ jobs:
           doxygen --help
 
       - name: Upgrade doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
+        working-directory: ${{ github.workspace }}/doc
         run: doxygen -u verovio.conf
 
       - name: Build documentation with (updated) doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
+        working-directory: ${{ github.workspace }}/doc
         if: ${{ success() }}
         run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
