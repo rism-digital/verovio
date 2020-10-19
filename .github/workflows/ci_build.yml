@@ -66,10 +66,14 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           mkdir -p $TEMP_DIR/
+          pwd
+          ls -al
 
       - name: Update cli.txt
         working-directory: ${{ github.workspace }}/$TEMP_DIR
         run: |
+          pwd
+          ls -al
           echo "Test" > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
