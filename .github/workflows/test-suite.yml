@@ -108,14 +108,14 @@ jobs:
                echo "********"
                echo $testcategory
 
-              if [ "$testcategory" == "$TEST_DIR/ligature" ]; then
-                echo "Skip ligature"
+              if [ "$testcategory" != "$TEST_DIR/ligature" ]; then
+                echo "Skip others than ligature"
                 continue
               elif [ "$testcategory" == "$TEST_DIR/mensural" ]; then
                 echo "Skip mensural"
                 continue
-              elif [ "$testcategory" != "$TEST_DIR/note" ]; then
-                echo "Skip others than note"
+              elif [ "$testcategory" == "$TEST_DIR/note" ]; then
+                echo "Skip note"
                 continue
               elif [ "$testcategory" == "$TEST_DIR/sameas" ]; then
                 echo "Skip sameas"
@@ -130,6 +130,8 @@ jobs:
                 if [ -f "$testfile" ]; then
                   echo "--"
                   echo $testfile
+
+          #       if [ "$testfile" == "$TEST_DIR/ligature/ligature-001.mei" ]; then continue; fi
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
@@ -148,6 +150,8 @@ jobs:
                 if [ -f "$testfile" ]; then
                   echo "--"
                   echo $testfile
+
+          #       if [ "$testfile" == "$TEST_DIR/ligature/ligature-001.mei" ]; then continue; fi
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
