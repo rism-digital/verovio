@@ -219,7 +219,8 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-20.04
     # run only after finishing other build jobs
-    needs: [build_cpp, build_cli, build_js]
+    # needs: [build_cpp, build_cli, build_js]
+    needs: [build_cli]
 
     steps:
       - name: Checkout main repo
