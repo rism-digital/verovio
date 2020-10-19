@@ -130,8 +130,8 @@ jobs:
                 if [ -f "$testfile" ]; then
                   echo "--"
                   echo $testfile
-                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-001.mei ]; then continue; fi
-          
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-001.mei" ]; then continue; fi
+
                   ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
                 else
                   echo "### No test file here..."
