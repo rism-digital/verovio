@@ -158,6 +158,7 @@ jobs:
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-042.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-043.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-044.mei" ]; then continue; fi
+                  if [ "$testfile" == "$TEST_DIR/ligature/ligature-045.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/ligature/ligature-046.mei" ]; then continue; fi
 
 
