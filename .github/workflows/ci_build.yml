@@ -352,7 +352,7 @@ jobs:
       - name: Enable deployment for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         run: |
-          echo "Enable deploy steps for main repo owner..."
+          echo "Enabling deploy steps for main repo owner..."
           echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
 
           echo "Disabling dry-run mode for main repo owner..."
@@ -617,6 +617,8 @@ jobs:
   skip_deploy:
     name: Skip deployment if set
     runs-on: ubuntu-20.04
+    # always() is needed here to meet if-condition even if earlier steps failed
+    # cf. https://github.com/actions/runner/issues/491
     if: ${{ always() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
     needs: [ check_deploy_settings, deploy_toolkit, deploy_docs ]
 
