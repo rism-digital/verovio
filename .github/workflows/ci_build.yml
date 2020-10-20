@@ -284,9 +284,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create TEMP_DIR
-          working-directory: ${{ github.workspace }}
-          run: |
-            mkdir -p $TEMP_DIR/
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p $TEMP_DIR/
 
       # Restore system libraries generated during build time from cache
       - name: Restore cache
