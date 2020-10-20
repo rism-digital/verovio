@@ -3631,7 +3631,9 @@ fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(const std::string &value)
     static const std::map<std::string, fermataVis_SHAPE> FermataShape2Id{
         { "normal", fermataVis_SHAPE_curved }, //
         { "angled", fermataVis_SHAPE_angular }, //
-        { "square", fermataVis_SHAPE_square } //
+        { "square", fermataVis_SHAPE_square }, //
+        { "double-angled", fermataVis_SHAPE_angular }, //
+        { "double-square", fermataVis_SHAPE_square } //
     };
 
     const auto result = FermataShape2Id.find(value);
