@@ -39,7 +39,7 @@ env:
 
   # emscripten
   EMSCRIPTEN_VERSION: latest
-  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+  EMSCRIPTEN_CACHE_FOLDER: emsdk-caching-cache
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
