@@ -576,8 +576,9 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    const wchar_t flagGlyph
-        = (this->GetDur() >= DURATION_16) ? SMUFL_E242_flag16thUp : flag->GetSmuflCode(GetDrawingStemDir());
+    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    data_DURATION dur = this->GetDur();
+    if (dur < DURATION_16) flagGlyph = flag->GetSmuflCode(GetDrawingStemDir());
     const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
 
     const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
