@@ -312,13 +312,11 @@ jobs:
 
       - name: Setup emsdk (cache found)
         if: steps.cache.outputs.cache-hit == 'true'
-        # uses: mymindstorm/setup-emsdk@v7
-        # with:
-        #   version: ${{ env.EMSCRIPTEN_VERSION }}
-        #   actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
-        #  no-cache: true
-        run: |
-          $GITHUB_WORKSPACE/$EMSCRIPTEN_CACHE_FOLDER/emsdk-master/emsdk activate latest
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          no-cache: true
 
       - name: Verify emscripten build
         run: emcc -v
