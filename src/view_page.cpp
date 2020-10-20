@@ -975,9 +975,33 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = staff->GetDrawingX();
         params.m_y = staff->GetDrawingY() + 1.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize() * 4 / 5;
-
-        mnumTxt.SetPointSize(params.m_pointSize);
+        if (mnum->HasFontsize()) {
+            data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
+            if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
+                mnumTxt.SetPointSize(fs->GetFontSizeNumeric());
+            }
+            else if (fs->GetType() == FONTSIZE_term) {
+                int percent = 100;
+                switch (fs->GetTerm()) {
+                    case (FONTSIZETERM_xx_large): percent = 200; break;
+                    case (FONTSIZETERM_x_large): percent = 150; break;
+                    case (FONTSIZETERM_large): percent = 110; break;
+                    case (FONTSIZETERM_larger): percent = 110; break;
+                    case (FONTSIZETERM_small): percent = 80; break;
+                    case (FONTSIZETERM_smaller): percent = 80; break;
+                    case (FONTSIZETERM_x_small): percent = 60; break;
+                    case (FONTSIZETERM_xx_small): percent = 50; break;
+                    default: break;
+                }
+                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(percent)->GetPointSize());
+            }
+            else if (fs->GetType() == FONTSIZE_percent) {
+                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(fs->GetPercent())->GetPointSize());
+            }
+        }
+        else {
+            mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
+        }
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&mnumTxt);
