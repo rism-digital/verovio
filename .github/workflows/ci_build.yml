@@ -230,21 +230,21 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      # Cache system libraries generated during build time
       - name: Set up cache
         uses: actions/cache@v2
+        id: cache
         with:
           # path for cache
           path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
           # key for cache
           key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
 
-      # Cache emsdk
       - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
           actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          no-cache: true
 
       - name: Verify emscripten build
         run: emcc -v
@@ -283,8 +283,14 @@ jobs:
       - name: Checkout main repo
         uses: actions/checkout@v2
 
+      - name: Create TEMP_DIR
+          working-directory: ${{ github.workspace }}
+          run: |
+            mkdir -p $TEMP_DIR/
+
       # Restore system libraries generated during build time from cache
-      - name: Restore system libraries from cache
+      - name: Restore cache
+        id: restore_cache
         uses: actions/cache@v2
         with:
           # path for cache
@@ -292,19 +298,23 @@ jobs:
           # key for cache
           key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
 
-      - name: Get emscripten build from cache and activate
+      # Install and/or activate emsdk
+      - name: Set up emsdk (cache not found)
+        uses: mymindstorm/setup-emsdk@v7
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          no-cache: true
+      - name: Set up emsdk (cache found)
+        if: steps.restore_cache.outputs.cache-hit == 'true'
         uses: mymindstorm/setup-emsdk@v7
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
           actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          no-cache: true
 
       - name: Verify emscripten build
         run: emcc -v
-
-      - name: Create TEMP_DIR
-        working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p $TEMP_DIR/
 
       - name: Build toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
         working-directory: ${{ github.workspace }}/emscripten
