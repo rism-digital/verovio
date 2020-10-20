@@ -308,6 +308,7 @@ jobs:
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
           actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          no-cache: true
 
       - name: Verify emscripten build
         run: emcc -v
