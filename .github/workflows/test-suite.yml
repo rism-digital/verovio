@@ -79,7 +79,7 @@ jobs:
           # path for cache
           path: ${{ github.workspace }}/tools/verovio
           # key for cache
-          key: ${{ runner.os }}-verovio-build
+          key: ${{ runner.os }}-verovio-build-${{ github.sha }}
 
       # if no cache is found, build verovio
       - name: Run make
