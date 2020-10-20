@@ -163,8 +163,8 @@ jobs:
 
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
-                  if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
-                  if [ "$testfile" == "$TEST_DIR/sameas/sameas-002.mei" ]; then continue; fi
+                  # if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
+                  # if [ "$testfile" == "$TEST_DIR/sameas/sameas-002.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/stem/stem-002.mei" ]; then continue; fi
 
                   ./verovio -r ../data/ $testfile --breaks none --adjust-page-height --scale 50
@@ -229,8 +229,8 @@ jobs:
 
 
                   if [ "$testfile" == "$TEST_DIR/mensural/mensural-001.mei" ]; then continue; fi
-                  if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
-                  if [ "$testfile" == "$TEST_DIR/sameas/sameas-002.mei" ]; then continue; fi
+                  # if [ "$testfile" == "$TEST_DIR/note/note-003.mei" ]; then continue; fi
+                  # if [ "$testfile" == "$TEST_DIR/sameas/sameas-002.mei" ]; then continue; fi
                   if [ "$testfile" == "$TEST_DIR/stem/stem-002.mei" ]; then continue; fi
 
                   ./verovio -r ../data/ -t mei --remove-ids --all-pages $testfile
