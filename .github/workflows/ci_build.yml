@@ -245,7 +245,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
-          store-actions-cache: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
           no-cache: true
 
       # Cache emsdk
