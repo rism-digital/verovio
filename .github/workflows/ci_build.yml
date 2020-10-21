@@ -165,13 +165,14 @@ jobs:
         if: runner.os == 'windows'
         uses: msys2/setup-msys2@v2
       - shell: msys2 {0}
+        if: runner.os == 'windows'
         run: |
           if ("${{ matrix.compiler }}" -eq "gcc") {
             pacman --noconfirm -S make gcc
 
             echo CC=gcc
             echo CXX=g++
-          
+
           } elseif ("${{ matrix.compiler }}" -eq "clang") {
             pacman --noconfirm -S make mingw-w64-x86_64-clang
 
