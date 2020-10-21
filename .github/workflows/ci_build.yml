@@ -109,7 +109,7 @@ jobs:
             version: "12.1"
 
           - os: macos-latest
-            compiler: gcc
+            compiler: g++
             version: "9"
 
     steps:
@@ -120,33 +120,20 @@ jobs:
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'Linux'
         run: |
-          # dpkg --list | grep compiler
+          # check if compiler is available from runner by default
+          if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
+            echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
+          else
+            # if not, install compiler
+            sudo apt-get update -q
+            sudo apt-get install -y -q --no-install-recommends ${{ matrix.compiler }}-${{ matrix.version }}
+          fi
 
-          sudo apt-get update -q
-
+          # set environment variables
           if [ "${{ matrix.compiler }}" = "g++" ]; then
-            # check if compiler is available from runner by default
-            if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
-              echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
-            else
-              # install g++
-              sudo apt-get install -y --no-install-recommends -q -y ${{ matrix.compiler }}-${{ matrix.version }}
-            fi
-
-            # set environment variables
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
-
           else
-            # check if compiler is available from runner by default
-            if dpkg -l | grep "${{ matrix.compiler }}-${{ matrix.version }}"; then
-              echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
-            else
-              # install clang
-              sudo apt-get install -y --no-install-recommends -q -y ${{ matrix.compiler }}-${{ matrix.version }}
-            fi
-
-            # set environment variables
             echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
           fi
@@ -155,7 +142,7 @@ jobs:
       - name: Configure macOS with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'macOS'
         run: |
-          if [ "${{ matrix.compiler }}" = "gcc" ]; then
+          if [ "${{ matrix.compiler }}" = "g++" ]; then
             # set environment variables (use alias gcc-9)
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
