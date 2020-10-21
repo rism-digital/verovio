@@ -69,7 +69,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-20.04
-            compiler: gcc
+            compiler: g++
             version: "9"
 
           - os: ubuntu-20.04
@@ -124,13 +124,13 @@ jobs:
 
           sudo apt-get update -q
 
-          if [ "${{ matrix.compiler }}" = "gcc" ]; then
+          if [ "${{ matrix.compiler }}" = "g++" ]; then
             # check if compiler is available from runner by default
             if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
               echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
             else
               # install g++
-              sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
+              sudo apt-get install -y --no-install-recommends -q -y {{ matrix.compiler }}-${{ matrix.version }}
             fi
 
             # set environment variables
@@ -143,7 +143,7 @@ jobs:
               echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
             else
               # install clang
-              sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
+              sudo apt-get install -y --no-install-recommends -q -y {{ matrix.compiler }}-${{ matrix.version }}
             fi
 
             # set environment variables
