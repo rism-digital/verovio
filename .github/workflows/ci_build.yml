@@ -152,7 +152,7 @@ jobs:
 
           else
             # switch XCode version
-            sudo xcode-select -switch /Applications/Xcode_{{ matrix.version }}.app
+            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
             # set environment variables
             echo CC=$(xcrun -f clang) >> $GITHUB_ENV
