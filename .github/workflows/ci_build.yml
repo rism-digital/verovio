@@ -65,7 +65,7 @@ jobs:
     # set matrix with config options
     # (runs the following steps for every target in parallel)
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-20.04
@@ -110,7 +110,7 @@ jobs:
 
           - os: macos-latest
             compiler: gcc
-            version: "latest"
+            version: "9"
 
     steps:
       - name: Checkout main repo
@@ -141,8 +141,8 @@ jobs:
         run: |
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            echo CC=gcc-9 >> $GITHUB_ENV
-            echo CXX=g++-9 >> $GITHUB_ENV
+            echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
           else
             brew update
             brew upgrade llvm
