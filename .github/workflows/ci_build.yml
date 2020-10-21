@@ -176,14 +176,17 @@ jobs:
           if ("${{ matrix.compiler }}".endswith("cl")) {
             & .github\workflows\vsenv.ps1 -arch x64 -hostArch x64
           }
-      - name: Check version
+      - name: Check version and dry-run make
         working-directory: ${{ github.workspace }}/tools
         run: |
           echo $CC
           echo $CXX
           cmake --version
 
-          cmake -S ../cmake -Bbuild -DCMAKE_BUILD_TYPE=Debug
+          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+
+          pwd
+          ls -R ./debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
