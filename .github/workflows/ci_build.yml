@@ -141,28 +141,6 @@ jobs:
             echo CXX=$(xcrun --find clang++) >> $GITHUB_ENV
           fi
 
-      # Installation step for Windows
-      # cf. https://ariya.io/2020/07/on-github-actions-with-msys2
-      - name: Configure Windows with ${{ matrix.compiler }}-${{ matrix.version }}
-        if: runner.os == 'windows'
-        uses: msys2/setup-msys2@v2
-      - shell: msys2 {0}
-        if: runner.os == 'windows'
-        run: |
-          if ("${{ matrix.compiler }}" -eq "gcc") {
-            pacman --noconfirm -S make gcc
-
-            echo CC=gcc
-            echo CXX=g++
-
-          } elseif ("${{ matrix.compiler }}" -eq "clang") {
-            pacman --noconfirm -S make mingw-w64-x86_64-clang
-
-            echo CC=clang
-            echo CXX=clang++
-          }
-
-
       - name: Check settings and dry-run make
         working-directory: ${{ github.workspace }}/tools
         run: |
@@ -170,7 +148,6 @@ jobs:
           echo "CXX: ${CXX}"
 
           cmake --version
-
           cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
@@ -195,7 +172,7 @@ jobs:
     # This job runs on all the os specified in strategy.matrix.os
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-    
+
     strategy:
       matrix:
         os: [windows-latest]
@@ -205,41 +182,41 @@ jobs:
         run:
           shell: msys2 {0}
 
-      steps:
-        - name: Checkout main repo
-          uses: actions/checkout@v2
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
 
-        - name: Set up msys2
-          uses: msys2/setup-msys2@v2
-          with:
-            msystem: ${{ matrix.msystem }}
-            install: make
+      - name: Set up msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          install: make
 
-        - name: Configure gcc
-          if: ${{ matrix.compiler == 'gcc' }}
-          run: pacman --noconfirm -S gcc
+      - name: Configure gcc
+        if: ${{ matrix.compiler == 'gcc' }}
+        run: pacman --noconfirm -S gcc
 
-        - name: Configure clang (MINGW 64)
-          if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'clang') }}
-          run: pacman --noconfirm -S mingw-w64-x86_64-clang
+      - name: Configure clang (MINGW 64)
+        if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'clang') }}
+        run: pacman --noconfirm -S mingw-w64-x86_64-clang
 
-        - name: Configure clang (MINGW 64)
-          if: ${{ (matrix.msystem == 'MINGW32') && (matrix.compiler == 'clang') }}
-          run: pacman --noconfirm -S mingw-w64-i686-clang
+      - name: Configure clang (MINGW 64)
+        if: ${{ (matrix.msystem == 'MINGW32') && (matrix.compiler == 'clang') }}
+        run: pacman --noconfirm -S mingw-w64-i686-clang
 
-        - name: Check settings and dry-run make
-          working-directory: ${{ github.workspace }}/tools
-          run: |
-            ${{ matrix.compiler }} --version
-            make --version
+      - name: Check settings and dry-run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          ${{ matrix.compiler }} --version
+          make --version
 
-            # make CC=${{matrix.compiler}} -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+          # make CC=${{matrix.compiler}} -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
 
-        - name: Run make
-          working-directory: ${{ github.workspace }}/tools
-          run: |
-            make ../cmake
-            make -j8 CC=${{matrix.compiler}}
+      - name: Run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          make ../cmake
+          make -j8 CC=${{matrix.compiler}}
 
   ###########################
   # Build the CLI artifacts #
