@@ -120,11 +120,12 @@ jobs:
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'Linux'
         run: |
-          dpkg --list | grep compiler
+          # dpkg --list | grep compiler
 
           sudo apt-get update -q
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}
             # install g++ (needed for versions not in the runner by default)
             sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
 
@@ -133,6 +134,8 @@ jobs:
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 
           else
+            dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}
+
             # install clang (needed for versions not in the runner by default)
             sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
 
