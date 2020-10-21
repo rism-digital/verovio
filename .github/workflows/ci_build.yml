@@ -132,7 +132,7 @@ jobs:
           fi
 
           # set environment variables
-          if [ "${{ matrix.compiler }}" = "g++" ]; then
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
           else
@@ -144,7 +144,7 @@ jobs:
       - name: Configure macOS with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'macOS'
         run: |
-          if [ "${{ matrix.compiler }}" = "g++" ]; then
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
             # set environment variables (use alias gcc-9)
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
@@ -160,25 +160,24 @@ jobs:
           fi
 
       # Installation step for Windows
+      # cf. https://ariya.io/2020/07/on-github-actions-with-msys2
       - name: Configure Windows with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'windows'
+        uses: msys2/setup-msys2@v2
+      - shell: msys2 {0}
         run: |
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-          scoop install llvm --global
-
           if ("${{ matrix.compiler }}" -eq "gcc") {
-            echo CC=gcc | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
-            echo CXX=g++ | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
-          } elseif ("${{ matrix.compiler }}" -eq "clang") {
-            echo CC=clang | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
-            echo CXX=clang++ | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
-          } else {
-            echo CC=${{ matrix.compiler }} | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
-            echo CXX=${{ matrix.compiler }} | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
-          }
+            pacman --noconfirm -S make gcc
 
-          # Make all PATH additions made by scoop and ourselves global.
-          echo "PATH=$env:PATH" | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
+            echo CC=gcc
+            echo CXX=g++
+          
+          } elseif ("${{ matrix.compiler }}" -eq "clang") {
+            pacman --noconfirm -S make mingw-w64-x86_64-clang
+
+            echo CC=clang
+            echo CXX=clang++
+          }
 
 
       - name: Check settings and dry-run make
