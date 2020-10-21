@@ -117,7 +117,7 @@ jobs:
         uses: actions/checkout@v2
 
       # Installation step for Ubuntu
-      - name: Install Ubuntu (${{ matrix.compiler }}-${{ matrix.version }})
+      - name: Configure ${{ matrix.os }} with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -q
@@ -141,7 +141,7 @@ jobs:
 
       # Installation step for MacOS
       # cf. https://github.com/sergeyklay/ytc/commit/84c46f4dd3f8d958e9c9c478c45499e24d977fe1
-      - name: Install macOS (${{ matrix.compiler }}-${{ matrix.version }})
+      - name: Configure ${{ matrix.os }} with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'macOS'
         run: |
 
@@ -157,16 +157,10 @@ jobs:
             # set environment variables
             echo CC=$(xcrun -f clang) >> $GITHUB_ENV
             echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
-            # echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
-            # echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
-            # echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
-            # echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
-
-            clang -v
           fi
 
       # Installation step for Windows
-      - name: Install Windows (${{ matrix.compiler }}-${{ matrix.version }})
+      - name: Configure ${{ matrix.os }} with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'windows'
         run: |
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
@@ -189,17 +183,15 @@ jobs:
           if ("${{ matrix.compiler }}".endswith("cl")) {
             & .github\workflows\vsenv.ps1 -arch x64 -hostArch x64
           }
-      - name: Check version and dry-run make
+      - name: Check settings and dry-run make
         working-directory: ${{ github.workspace }}/tools
         run: |
-          echo $CC
-          echo $CXX
-          echo $CMAKE_C_COMPILER
-          echo $CMAKE_CXX_COMPILER
+          echo "CC: ${CC}"
+          echo "CXX: ${CXX}"
 
           cmake --version
 
-          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX
+          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug # -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools

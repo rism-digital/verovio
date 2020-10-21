@@ -4,9 +4,6 @@ project(Verovio)
 
 set(CMAKE_BUILD_TYPE Release)
 
-# See: https://github.com/conan-io/cmake-conan/issues/159
-cmake_policy(SET CMP0025 NEW)
-
 if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
