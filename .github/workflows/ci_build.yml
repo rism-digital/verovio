@@ -120,6 +120,8 @@ jobs:
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'Linux'
         run: |
+          dpkg --list | grep compiler
+
           sudo apt-get update -q
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
@@ -133,7 +135,7 @@ jobs:
           else
             # install clang (needed for versions not in the runner by default)
             sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
-            
+
             # set environment variables
             echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
