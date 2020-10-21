@@ -192,6 +192,9 @@ jobs:
           msystem: ${{ matrix.msystem }}
           install: make
 
+      - name: Get CMake, v3.18.3
+        uses: lukka/get-cmake@v3.18.4
+
       - name: Configure gcc
         if: ${{ matrix.compiler == 'gcc' }}
         run: pacman --noconfirm -S gcc
