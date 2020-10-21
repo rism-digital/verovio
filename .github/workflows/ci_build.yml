@@ -181,7 +181,7 @@ jobs:
         os: [windows-latest]
         compiler: [ gcc, clang ]
         msystem: [ MINGW32, MINGW64 ]
-   
+
     steps:
       - name: Checkout main repo
         uses: actions/checkout@v2
@@ -208,14 +208,14 @@ jobs:
         working-directory: ${{ github.workspace }}/tools
         run: |
           ${{ matrix.compiler }} --version
-          make --version
+          cmake --version
 
-          # make CC=${{matrix.compiler}} -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+          cmake CC=${{matrix.compiler}} -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
         run: |
-          make ../cmake
+          cmake ../cmake
           make -j8 CC=${{matrix.compiler}}
 
   ###########################
