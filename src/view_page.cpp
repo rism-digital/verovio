@@ -975,9 +975,22 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = staff->GetDrawingX();
         params.m_y = staff->GetDrawingY() + 1.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize() * 4 / 5;
-
-        mnumTxt.SetPointSize(params.m_pointSize);
+        if (mnum->HasFontsize()) {
+            data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
+            if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
+                mnumTxt.SetPointSize(fs->GetFontSizeNumeric());
+            }
+            else if (fs->GetType() == FONTSIZE_term) {
+                const int percent = fs->GetPercentForTerm();
+                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(percent)->GetPointSize());
+            }
+            else if (fs->GetType() == FONTSIZE_percent) {
+                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(fs->GetPercent())->GetPointSize());
+            }
+        }
+        else {
+            mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
+        }
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&mnumTxt);

@@ -7,20 +7,34 @@ on:
     branches:
       # Push events on develop branch
       - develop
-      # Push events on ci-test branch (only needed for testing purposes)
-      - ci-test
-      # Push events on travis-test branch (only needed for testing purposes)
-      - travis-test
+      # Push events on ci-test branch (uncomment if needed for testing purposes)
+      # - ci-test
 
 # globals
 env:
+  # general settings
+  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
+                                # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
+                                # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
+
+  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
+                                # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
+                                # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
+
+  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
+                                # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
+
   # build artifacts
   CLI_BUILD: cli-build
   DOC_BUILD: doc-build
   TOOLKIT_BUILD: toolkit-build
 
   # doxygen
-  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works also for forks of verovio
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-ch and from forks
   DOXYGEN_BRANCH: master
 
   # emscripten
@@ -28,13 +42,14 @@ env:
   EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works also for forks of verovio
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
   GH_PAGES_BRANCH: gh-pages
 
   # temporary directories
   DOXYGEN_DIR: doxygen-dir
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
+
 
 
 jobs:
@@ -154,10 +169,17 @@ jobs:
           echo "::set-env name=PATH::$env:PATH"
 
       - name: Run make
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
           make -j8
+
+      - name: Check files
+        if: always()
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          pwd
+          ls -al
 
 
   ###########################
@@ -172,19 +194,19 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create temp dir
+        working-directory: ${{ github.workspace }}
         run: |
-          cd $GITHUB_WORKSPACE
           mkdir -p $TEMP_DIR/
 
       - name: Run make
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          cd $GITHUB_WORKSPACE/tools
           cmake ../cmake
           make -j8
 
       - name: Update cli.txt
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          cd $GITHUB_WORKSPACE/tools
           ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
@@ -195,8 +217,8 @@ jobs:
 
       - name: Check files
         if: always()
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
 
@@ -208,21 +230,21 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      # Cache system libraries generated during build time
       - name: Set up cache
         uses: actions/cache@v2
+        id: cache
         with:
           # path for cache
           path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
           # key for cache
           key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
 
-      # Cache emsdk
       - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
           actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          no-cache: true
 
       - name: Verify emscripten build
         run: emcc -v
@@ -261,8 +283,14 @@ jobs:
       - name: Checkout main repo
         uses: actions/checkout@v2
 
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p $TEMP_DIR/
+
       # Restore system libraries generated during build time from cache
-      - name: Restore system libraries from cache
+      - name: Restore cache
+        id: restore_cache
         uses: actions/cache@v2
         with:
           # path for cache
@@ -270,25 +298,34 @@ jobs:
           # key for cache
           key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
 
-      - name: Get emscripten build from cache and activate
+      # Install and/or activate emsdk
+      - name: Set up emsdk (cache not found)
+        uses: mymindstorm/setup-emsdk@v7
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          no-cache: true
+      - name: Set up emsdk (cache found)
+        if: steps.restore_cache.outputs.cache-hit == 'true'
         uses: mymindstorm/setup-emsdk@v7
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
           actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          no-cache: true
 
       - name: Verify emscripten build
         run: emcc -v
 
-      - name: Create temp dir
+      - name: Build toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+        working-directory: ${{ github.workspace }}/emscripten
         run: |
-          cd $GITHUB_WORKSPACE
-          mkdir -p $TEMP_DIR/
-
-      - name: Build Toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
-        run: |
-          cd $GITHUB_WORKSPACE/emscripten
           echo "${{ matrix.toolkit.message }}"
           ./buildToolkit ${{ matrix.toolkit.options }}
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/emscripten
+        run: |
+          echo "Copy toolkit build into $TEMP_DIR..."
           cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
@@ -299,10 +336,47 @@ jobs:
 
       - name: Check files
         if: always()
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
         run: |
-          cd $GITHUB_WORKSPACE/$TEMP_DIR/
           pwd
           ls -al
+
+
+  ##################################
+  # Check settings for deployment  #
+  ##################################
+  check_deploy_settings:
+    name: Check settings for deployment
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build jobs
+    needs: [ build_cpp, build_cli, build_js ]
+
+    # Github Environment Variables persist only on job level.
+    # To transfer values to later jobs, outputs mechanism has to be used.
+    # Cf. https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idoutputs
+    # So global envs are reset here as outputs.
+    outputs:
+      _DISABLE_DEPLOY_STEPS: ${{ steps.settings.outputs.disable }}
+      _IS_DRY_RUN: ${{ steps.settings.outputs.dry-run }}
+
+    steps:
+      - name: Enable deployment for main repo owner
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        run: |
+          echo "Enabling deploy steps for main repo owner..."
+          echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
+
+          echo "Disabling dry-run mode for main repo owner..."
+          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+
+      - name: Check deployment settings and set them as outputs
+        id: settings
+        run: |
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
+          echo "::set-output name=disable::${DISABLE_DEPLOY_STEPS}"
+          echo "::set-output name=dry-run::${IS_DRY_RUN}"
 
 
   #########################################
@@ -311,16 +385,22 @@ jobs:
   deploy_toolkit:
     name: Deploy JS toolkit
     runs-on: ubuntu-20.04
+    if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
-    needs: [build_cpp, build_cli, build_js]
+    needs: [build_cpp, build_cli, build_js, check_deploy_settings]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
         uses: actions/checkout@v2
         with:
+          # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
+          # Deploy key as secret for accessing <owner>/<GH_PAGES_REPO>;
+          # cf. explanation in https://github.com/rism-ch/verovio/pull/1751
           ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY }}
+          # ref (branch, tag or SHA) to check out
           ref: ${{ env.GH_PAGES_BRANCH }}
+          # relative path under $GITHUB_WORKSPACE to place the repository
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download CLI_BUILD artifacts
@@ -366,18 +446,39 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to gh-pages
+      - name: Push changes to gh-pages (dry-run)
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
         run: |
           # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go. Pushing to Github..."
+          echo "Build branch ready to go."
 
+          echo "Running git in dry-run mode..."
+          git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+
+      - name: Push changes to gh-pages
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: |
+          # Push all changes in one commit to the gh-pages repo
+          echo "Build branch ready to go."
+
+          echo "Pushing to Github..."
           git push origin HEAD:$GH_PAGES_BRANCH
 
       - name: Congratulations
-        if: ${{ success() }}
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
         run: |
           echo "🎉 New JS toolkit builds deployed 🎊"
+
+      - name: Skipped
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
+        run: |
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
 
   ###################################
@@ -403,11 +504,11 @@ jobs:
           doxygen --help
 
       - name: Upgrade doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
+        working-directory: ${{ github.workspace }}/doc
         run: doxygen -u verovio.conf
 
       - name: Build documentation with (updated) doxygen conf
-        working-directory: ${{ github.WORKSPACE }}/doc
+        working-directory: ${{ github.workspace }}/doc
         if: ${{ success() }}
         run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
@@ -432,16 +533,22 @@ jobs:
   deploy_docs:
     name: Deploy documentation
     runs-on: ubuntu-20.04
+    if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build job
-    needs: [build_docs]
+    needs: [build_docs, check_deploy_settings]
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
         uses: actions/checkout@v2
         with:
+          # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
+          # Deploy key as secret for accessing <owner>/<DOXYGEN_REPO>;
+          # cf. explanation in https://github.com/rism-ch/verovio/pull/1751
           ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
+          # ref (branch, tag or SHA) to check out
           ref: ${{ env.DOXYGEN_BRANCH }}
+          # relative path under $GITHUB_WORKSPACE to place the repository
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
@@ -463,14 +570,14 @@ jobs:
       - name: Configure git
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          echo "Configuring git"
+          echo "Configuring git..."
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
 
       - name: Commit files
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
-          echo "Running git commit"
+          echo "Running git commit..."
           git add .
           git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
 
@@ -480,15 +587,57 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to doxygen
+      - name: Push changes to doxygen (dry-run)
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
         run: |
           # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go. Pushing to Github..."
+          echo "Build branch ready to go."
 
+          echo "Running git in dry-run mode..."
+          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+
+      - name: Push changes to doxygen
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          # Push all changes in one commit to the doxygen repo
+          echo "Build branch ready to go."
+
+          echo "Pushing to Github..."
           git push origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
-        if: ${{ success() }}
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
         run: |
           echo "🎉 New documentation deployed 🎊"
+
+      - name: Skipped
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
+        run: |
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
+
+  ###############################################
+  # Skip deployment steps according to settings #
+  ###############################################
+  skip_deploy:
+    name: Skip deployment if set
+    runs-on: ubuntu-20.04
+    # always() is needed here to meet if-condition even if earlier steps failed
+    # cf. https://github.com/actions/runner/issues/491
+    if: ${{ always() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
+    needs: [ check_deploy_settings, deploy_toolkit, deploy_docs ]
+
+    steps:
+      - name: Skipped
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        run: |
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS (env) = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN (env) = ${IS_DRY_RUN}"

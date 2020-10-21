@@ -1130,6 +1130,10 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
 
+    if (this->HasSameas() && !this->GetChild(1)) {
+        return FUNCTOR_CONTINUE;
+    }
+    
     // process highest-level beam
     if (!params->m_beam) {
         params->m_beam = this;
