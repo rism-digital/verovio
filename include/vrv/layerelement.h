@@ -9,6 +9,9 @@
 #define __VRV_LAYER_ELEMENT_H__
 
 #include <set>
+
+//----------------------------------------------------------------------------
+
 #include "atts_shared.h"
 #include "facsimileinterface.h"
 #include "linkinginterface.h"
