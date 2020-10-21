@@ -144,14 +144,19 @@ jobs:
             echo CC=gcc-9 >> $GITHUB_ENV
             echo CXX=g++-9 >> $GITHUB_ENV
           else
-            sudo xcode-select -switch /Applications/Xcode.app
+            brew update
+            brew upgrade llvm
+            export CC="/usr/local/opt/llvm/bin/clang"
+            export CXX="/usr/local/opt/llvm/bin/clang++"
 
-            echo CC=$(xcrun -f clang) >> $GITHUB_ENV
-            echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
-            echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
-            echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
-            echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
-            echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
+            # sudo xcode-select -switch /Applications/Xcode.app
+
+            # echo CC=$(xcrun -f clang) >> $GITHUB_ENV
+            # echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
+            # echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
+            # echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
+            # echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
+            # echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
           fi
 
       # Installation step for Windows
@@ -159,7 +164,7 @@ jobs:
         if: runner.os == 'windows'
         run: |
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-          scoop install ninja llvm --global
+          scoop install llvm --global
 
           if ("${{ matrix.compiler }}" -eq "gcc") {
             echo CC=gcc | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
