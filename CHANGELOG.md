@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `mNum@fontsize` (@rettinghaus)
 * Support for `accidental-mark` in MusicXML import (@rettinghaus)
 * Improved barline rendition (@rettinghaus)
 
