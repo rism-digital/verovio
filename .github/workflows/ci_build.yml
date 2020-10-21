@@ -141,8 +141,8 @@ jobs:
         run: |
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            echo CC=gcc >> $GITHUB_ENV
-            echo CXX=g++ >> $GITHUB_ENV
+            echo CC=gcc-9 >> $GITHUB_ENV
+            echo CXX=g++-9 >> $GITHUB_ENV
           else
             sudo xcode-select -switch /Applications/Xcode.app
 
