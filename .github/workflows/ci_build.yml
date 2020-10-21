@@ -124,15 +124,15 @@ jobs:
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
             # install g++
-            sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
+            # sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
 
             # set environment variables
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 
           else
-            # install g++ clang
-            sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
+            # install clang
+            # sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
 
             # set environment variables
             echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
@@ -140,7 +140,6 @@ jobs:
           fi
 
       # Installation step for MacOS
-      # cf. https://github.com/sergeyklay/ytc/commit/84c46f4dd3f8d958e9c9c478c45499e24d977fe1
       - name: Configure macOS with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'macOS'
         run: |
@@ -150,7 +149,8 @@ jobs:
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 
           else
-            # switch XCode version (see https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956)
+            # switch XCode version
+            # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
             sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
             # set environment variables from XCode
