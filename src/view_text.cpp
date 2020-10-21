@@ -313,18 +313,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
                 rendFont.SetPointSize(fs->GetFontSizeNumeric());
             }
             else if (fs->GetType() == FONTSIZE_term) {
-                int percent = 100;
-                switch (fs->GetTerm()) {
-                    case (FONTSIZETERM_xx_large): percent = 200; break;
-                    case (FONTSIZETERM_x_large): percent = 150; break;
-                    case (FONTSIZETERM_large): percent = 110; break;
-                    case (FONTSIZETERM_larger): percent = 110; break;
-                    case (FONTSIZETERM_small): percent = 80; break;
-                    case (FONTSIZETERM_smaller): percent = 80; break;
-                    case (FONTSIZETERM_x_small): percent = 60; break;
-                    case (FONTSIZETERM_xx_small): percent = 50; break;
-                    default: break;
-                }
+                const int percent = fs->GetPercentForTerm();
                 rendFont.SetPointSize(params.m_pointSize * percent / 100);
             }
             else if (fs->GetType() == FONTSIZE_percent) {
