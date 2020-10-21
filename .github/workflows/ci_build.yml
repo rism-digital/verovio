@@ -181,7 +181,7 @@ jobs:
             echo $CXX
             cmake --version
 
-            cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=Debug
+            cmake -S ../cmake -Bbuild -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
