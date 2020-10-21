@@ -106,7 +106,7 @@ jobs:
 
           - os: macos-latest
             compiler: xcode
-            version: "default"
+            version: "12.1"
 
           - os: macos-latest
             compiler: gcc
@@ -120,16 +120,21 @@ jobs:
       - name: Install Ubuntu (${{ matrix.compiler }}-${{ matrix.version }})
         if: runner.os == 'Linux'
         run: |
-          #  sudo apt-get update -q
-          #  sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
-          #  sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
-  
+          sudo apt-get update -q
+
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            # install g++
             sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
+
+            # set environment variables
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
+
           else
+            # install g++ clang
             sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
+
+            # set environment variables
             echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
           fi
@@ -141,15 +146,19 @@ jobs:
         run: |
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            # set environment variables (use alias gcc-9)
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
-          else
-            sudo xcode-select -switch /Applications/Xcode_12.app
 
+          else
+            # switch XCode version
+            sudo xcode-select -switch /Applications/Xcode_{{ matrix.version }}.app
+
+            # set environment variables
             echo CC=$(xcrun -f clang) >> $GITHUB_ENV
             echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
-            echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
-            echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
+            # echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
+            # echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
             echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
             echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
 
