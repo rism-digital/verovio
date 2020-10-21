@@ -123,17 +123,17 @@ jobs:
           sudo apt-get update -q
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            # install g++
-            # sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
+            # install g++ (needed for versions not in the runner by default)
+            sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
 
             # set environment variables
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 
           else
-            # install clang
-            # sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
-
+            # install clang (needed for versions not in the runner by default)
+            sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
+            
             # set environment variables
             echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
