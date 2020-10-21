@@ -179,8 +179,8 @@ jobs:
           }
       - name: Check version
         run: |
-            $CC --version
-            $CXX --version
+            $CC -v
+            $CXX -v
             cmake --version
 
             cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=Debug
