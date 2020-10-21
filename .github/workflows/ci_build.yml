@@ -126,7 +126,7 @@ jobs:
 
           if [ "${{ matrix.compiler }}" = "g++" ]; then
             # check if compiler is available from runner by default
-            if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
+            if [ dpkg -l | grep "${{ matrix.compiler }}-${{ matrix.version }}" ]; then
               echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
             else
               # install g++
@@ -139,7 +139,7 @@ jobs:
 
           else
             # check if compiler is available from runner by default
-            if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
+            if [dpkg -l | grep "${{ matrix.compiler }}-${{ matrix.version }}" ]; then
               echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
             else
               # install clang
