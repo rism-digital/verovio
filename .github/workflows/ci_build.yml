@@ -124,11 +124,11 @@ jobs:
           sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            sudo apt-get install -y --no-install-recommends g++-${{ matrix.version }}
+            sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
           else
-            sudo apt-get install -y --no-install-recommends clang-${{ matrix.version }}
+            sudo apt-get install -y --no-install-recommends -q -y clang-${{ matrix.version }}
             echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
           fi
@@ -146,9 +146,12 @@ jobs:
             echo CC=gcc >> $GITHUB_ENV
             echo CXX=g++ >> $GITHUB_ENV
           else
+            sudo xcode-select -switch /Applications/Xcode.app
+
+            echo "name=CC::$(xcrun -f clang)" >> $GITHUB_ENV
+            echo "name=CXX::$(xcrun -f clang++)" >> $GITHUB_ENV
             echo "name=SDKROOT::$(xcodebuild -version -sdk macosx Path)" >> $GITHUB_ENV
-            echo CC=clang >> $GITHUB_ENV
-            echo CXX=clang++ >> $GITHUB_ENV
+            echo "name=PATH::$(dirname $(xcrun -f clang)):$PATH" >> $GITHUB_ENV
           fi
 
       # Installation step for Windows
