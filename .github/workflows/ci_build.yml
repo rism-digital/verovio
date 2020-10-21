@@ -110,7 +110,7 @@ jobs:
 
           - os: macos-latest
             compiler: gcc
-            version: "9"
+            version: "10"
 
     steps:
       - name: Checkout main repo
@@ -144,8 +144,10 @@ jobs:
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
           else
-            
-            brew update --debug --verbose
+            # see https://github.com/actions/virtual-environments/issues/1568
+            sudo git -C $(brew --prefix)/Homebrew checkout HEAD .
+            sudo git -C $(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-core checkout HEAD .
+            brew update
             brew upgrade llvm
             export CC="/usr/local/opt/llvm/bin/clang"
             export CXX="/usr/local/opt/llvm/bin/clang++"
