@@ -134,11 +134,10 @@ jobs:
           fi
 
       # Installation step for MacOS
+      # cf. https://github.com/sergeyklay/ytc/commit/84c46f4dd3f8d958e9c9c478c45499e24d977fe1
       - name: Install macOS (${{ matrix.compiler }}-${{ matrix.version }})
         if: runner.os == 'macOS'
         run: |
-          brew install ninja
-          sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
 
 
 
@@ -178,6 +177,13 @@ jobs:
           if ("${{ matrix.compiler }}".endswith("cl")) {
             & .github\workflows\vsenv.ps1 -arch x64 -hostArch x64
           }
+      - name: Check version
+        run: |
+            $CC --version
+            $CXX --version
+            cmake --version
+
+            cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
