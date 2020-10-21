@@ -61,11 +61,11 @@ jobs:
     name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.version }}
     # This job runs on all the os specified in strategy.matrix.os
     runs-on: ${{ matrix.os }}
-    fail-fast: true
 
     # set matrix with config options
     # (runs the following steps for every target in parallel)
     strategy:
+      fail-fast: true
       matrix:
         include:
           - os: ubuntu-20.04
