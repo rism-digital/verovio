@@ -669,10 +669,12 @@ bool LayerElement::AreElementsInUnison(
     // With DOWN stem direction, highest note of the chord HAS to be in unison. If topmost location of the chord
     // is higher than topmost location of the opposing chord it means that these elements cannot be in unison.
     // Same applies to the UP stem direction, just with reversed condition
-    if (STEMDIRECTION_down == stemDirection)
+    if (stemDirection == STEMDIRECTION_down) {
         return ((*firstChord.rbegin() <= *secondChord.rbegin()) && (*firstChord.begin() <= *secondChord.begin()));
-    else
+    }
+    else {
         return ((*firstChord.rbegin() >= *secondChord.rbegin()) && (*firstChord.begin() >= *secondChord.begin()));
+    }
 }
 
 void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
@@ -731,7 +733,7 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
                 isUnison = true;
             break;
         }
-        // process stems 
+        // process stems
         case STEM: {
             if (isUnison) {
                 isUnison = false;
@@ -752,8 +754,7 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
                 currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
                 if (currentFlag) {
                     wchar_t flagGlyph = currentFlag->GetSmuflCode(STEMDIRECTION_down);
-                    const int flagWidth
-                        = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
+                    const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
                     horizontalMargin += flagWidth;
                 }
 
@@ -1298,7 +1299,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     }
 
     AdjustOverlappingLayers(params->m_doc, params->m_previous, params->m_unison);
-    
+
     return FUNCTOR_SIBLINGS;
 }
 
