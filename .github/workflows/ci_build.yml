@@ -186,10 +186,6 @@ jobs:
       - name: Checkout main repo
         uses: actions/checkout@v2
 
-
-      - name: Get CMake, v3.18.3
-        uses: lukka/get-cmake@v3.18.3
-
       - name: Set up msys2
         uses: msys2/setup-msys2@v2
         with:
@@ -198,7 +194,7 @@ jobs:
 
       - name: Configure gcc
         if: ${{ matrix.compiler == 'gcc' }}
-        run: pacman --noconfirm -S gcc
+        run: pacman --noconfirm -S gcc cmake
 
       - name: Configure clang (MINGW 64)
         if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'clang') }}
@@ -210,9 +206,11 @@ jobs:
 
       - name: Check settings and dry-run make
         working-directory: ${{ github.workspace }}/tools
-
+        # shell: bash
         run: |
           ${{ matrix.compiler }} --version
+
+          which cmake
           cmake --version
 
           cmake CC=${{matrix.compiler}} -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
