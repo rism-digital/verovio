@@ -642,16 +642,16 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 else if (groupGymbol == "square") {
                     staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
                 }
-                std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
+                const std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
                 staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
-                std::string groupName = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
-                std::string groupAbbr
+                const std::string groupName = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
+                const std::string groupAbbr
                     = GetContentOfChild(xpathNode.node(), "group-abbreviation[not(@print-object='no')]");
                 if (!groupName.empty()) {
                     Label *label = new Label();
                     if (xpathNode.node().select_node("group-name-display[not(@print-object='no')]")) {
-                        std::string name = StyleLabel(xpathNode.node().select_node("group-name-display").node());
+                        const std::string name = StyleLabel(xpathNode.node().select_node("group-name-display").node());
                         Text *text = new Text();
                         text->SetText(UTF8to16(name));
                         label->AddChild(text);
@@ -666,7 +666,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (!groupAbbr.empty()) {
                     LabelAbbr *labelAbbr = new LabelAbbr();
                     if (xpathNode.node().select_node("group-abbreviation-display[not(@print-object='no')]")) {
-                        std::string name
+                        const std::string name
                             = StyleLabel(xpathNode.node().select_node("group-abbreviation-display").node());
                         Text *text = new Text();
                         text->SetText(UTF8to16(name));
@@ -689,7 +689,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
-            std::string partId = xpathNode.node().attribute("id").as_string();
+            const std::string partId = xpathNode.node().attribute("id").as_string();
             std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
             pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
             if (!partFirstMeasure.node().select_node("attributes")) {
@@ -769,11 +769,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             if (staves > 1) {
+                partStaffGrp->SetUuid(partId.c_str());
                 if (label) partStaffGrp->AddChild(label);
                 if (labelAbbr) partStaffGrp->AddChild(labelAbbr);
                 if (instrdef) partStaffGrp->AddChild(instrdef);
             }
-            int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
+            const int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 if (m_staffGrpStack.back()->GetSymbol() != staffGroupingSym_SYMBOL_brace) {
@@ -785,6 +786,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             else {
                 StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindDescendantByType(STAFFDEF));
                 if (staffDef) {
+                    staffDef->SetUuid(partId.c_str());
                     if (label) staffDef->AddChild(label);
                     if (labelAbbr) staffDef->AddChild(labelAbbr);
                     if (instrdef) staffDef->AddChild(instrdef);
@@ -3653,7 +3655,9 @@ fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(const std::string &value)
     static const std::map<std::string, fermataVis_SHAPE> FermataShape2Id{
         { "normal", fermataVis_SHAPE_curved }, //
         { "angled", fermataVis_SHAPE_angular }, //
-        { "square", fermataVis_SHAPE_square } //
+        { "square", fermataVis_SHAPE_square }, //
+        { "double-angled", fermataVis_SHAPE_angular }, //
+        { "double-square", fermataVis_SHAPE_square } //
     };
 
     const auto result = FermataShape2Id.find(value);
@@ -3821,6 +3825,25 @@ bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
     return true;
 }
 
+void MusicXmlInput::SetFermataExternalSymbols(Fermata *fermata, const std::string &shape)
+{
+    // When MEI adds support for all of these shapes, this can be merged with ConvertFermataShape()
+    static const std::map<std::string, std::string> fermataExtSymbolsAbove = { { "double-angled", "U+E4C2" },
+        { "double-square", "U+E4C8" }, { "double-dot", "U+E4CA" }, { "half-curve", "U+E4CC" }, { "curlew", "U+E4D6" } };
+    static const std::map<std::string, std::string> fermataExtSymbolsBelow = { { "double-angled", "U+E4C3" },
+        { "double-square", "U+E4C9" }, { "double-dot", "U+E4CB" }, { "half-curve", "U+E4CD" }, { "curlew", "U+E4D6" } };
+
+    if (const auto result = fermataExtSymbolsBelow.find(shape);
+             (fermata->GetForm() == fermataVis_FORM_inv) && (result != fermataExtSymbolsBelow.end())) {
+        fermata->SetExternalsymbols(fermata, "glyph.num", result->second);
+        fermata->SetExternalsymbols(fermata, "glyph.auth", "smufl");
+    }
+    else if (const auto result = fermataExtSymbolsAbove.find(shape); result != fermataExtSymbolsAbove.end()) {
+        fermata->SetExternalsymbols(fermata, "glyph.num", result->second);
+        fermata->SetExternalsymbols(fermata, "glyph.auth", "smufl");
+    }
+}
+
 void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
 {
     assert(fermata);
@@ -3838,6 +3861,7 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
         fermata->SetForm(fermataVis_FORM_norm);
         fermata->SetPlace(STAFFREL_above);
     }
+    SetFermataExternalSymbols(fermata, node.text().as_string());
 }
 
 bool MusicXmlInput::IsMultirestMeasure(int index) const

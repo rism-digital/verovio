@@ -576,14 +576,112 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    const wchar_t flagGlyph
-        = (this->GetDur() >= DURATION_16) ? SMUFL_E242_flag16thUp : flag->GetSmuflCode(GetDrawingStemDir());
+    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    data_DURATION dur = this->GetDur();
+    if (dur < DURATION_16) flagGlyph = flag->GetSmuflCode(GetDrawingStemDir());
     const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
 
     const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
         - (isDotShifted ? doc->GetDrawingUnit(staffSize) : 0);
 
     return dotMargin < 0;
+}
+
+std::pair<int, int> Note::CalcNoteHorizontalOverlap(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool ignoreUnison)
+{
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    int overlappingPosition = -1;
+    int shift = 0;
+    bool hasUnison = false;
+    
+    for (int i = 0; i < int(otherElements.size()); ++i) {
+        int verticalMargin = 0;
+        int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
+            Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
+            assert(previousNote);
+            // Unisson, look at the duration for the note heads
+            if (!hasUnison) hasUnison = IsUnissonWith(previousNote, true);
+            if (!ignoreUnison && IsUnissonWith(previousNote, false)) {
+                int previousDuration = previousNote->GetDrawingDur();
+                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
+                bool isEdgeElement = false;
+                if (isPreviousCoord) {
+                    Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
+                    data_STEMDIRECTION stemDir = GetDrawingStemDir();
+                    previousDuration = parentChord->GetDur();
+                    isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
+                        || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
+                }
+                // Reduce the margin to 0 for whole notes unisson
+                else if ((GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
+                    horizontalMargin = 0;
+                }
+                if (!isPreviousCoord || isEdgeElement || isChordElement) {
+                    if ((GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
+                        overlappingPosition = i;
+                        continue;
+                    }
+                    else if ((GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
+                        overlappingPosition = i;
+                        continue;
+                    }
+                }
+                else {
+                    horizontalMargin *= -1;
+                }
+            }
+            else if (previousNote->GetDrawingLoc() - GetDrawingLoc() > 1) {
+                continue;
+            }
+            else if (previousNote->GetDrawingLoc() - GetDrawingLoc() == 1) {
+                horizontalMargin = 0;
+            }
+            else if ((previousNote->GetDrawingLoc() - GetDrawingLoc() < 0)
+                && (previousNote->GetDrawingStemDir() != GetDrawingStemDir()) /* && !isChordElement*/) {
+                if (previousNote->GetDrawingLoc() - GetDrawingLoc() == -1) {
+                    horizontalMargin *= -1;
+                }
+                else if ((GetDrawingDur() <= DUR_1) && (previousNote->GetDrawingDur() <= DUR_1)) {
+                    continue;
+                }
+                else if (previousNote->m_crossStaff || m_crossStaff)
+                    continue;
+                else {
+                    horizontalMargin *= -1;
+                    verticalMargin = horizontalMargin;
+                }
+            }
+        }
+
+        if ((horizontalMargin >= 0) || isChordElement) {
+            // Nothing to do if we have no vertical overlap
+            if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) break;
+
+            // Nothing to do either if we have no horizontal overlap
+            if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) break;
+
+            shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+
+            // Make additional adjustments for cross-staff and unison notes
+            if (m_crossStaff) shift -= horizontalMargin;
+            if (overlappingPosition != -1) shift *= -1;
+        }
+        else {
+            // Otherwise move the appropriate parent to the right
+            shift -= horizontalMargin
+                - HorizontalRightOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+        }
+    }
+
+    // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
+    // That way accidental will be near note that actually has accidental and not near lowest-layer note
+    if (hasUnison && GetDrawingAccid() && (shift > 0)) shift = -shift;
+
+    return { shift, overlappingPosition };
 }
 
 //----------------------------------------------------------------------------

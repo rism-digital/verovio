@@ -317,8 +317,9 @@ private:
      * @name Helper method for styling fermatas
      */
     ///@{
-    ///@}
+    void SetFermataExternalSymbols(Fermata *fermata, const std::string &shape);
     void ShapeFermata(Fermata *fermata, pugi::xml_node node);
+    ///@}
 
     /*
      * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
