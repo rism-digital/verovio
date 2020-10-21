@@ -61,6 +61,7 @@ jobs:
     name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.version }}
     # This job runs on all the os specified in strategy.matrix.os
     runs-on: ${{ matrix.os }}
+    fail-fast: true
 
     # set matrix with config options
     # (runs the following steps for every target in parallel)
@@ -176,12 +177,13 @@ jobs:
             & .github\workflows\vsenv.ps1 -arch x64 -hostArch x64
           }
       - name: Check version
+        working-directory: ${{ github.workspace }}/tools
         run: |
-            echo $CC
-            echo $CXX
-            cmake --version
+          echo $CC
+          echo $CXX
+          cmake --version
 
-            cmake -S ../cmake -Bbuild -DCMAKE_BUILD_TYPE=Debug
+          cmake -S ../cmake -Bbuild -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
