@@ -146,10 +146,10 @@ jobs:
           else
             sudo xcode-select -switch /Applications/Xcode.app
 
-            echo "name=CC::$(xcrun -f clang)" >> $GITHUB_ENV
-            echo "name=CXX::$(xcrun -f clang++)" >> $GITHUB_ENV
-            echo "name=SDKROOT::$(xcodebuild -version -sdk macosx Path)" >> $GITHUB_ENV
-            echo "name=PATH::$(dirname $(xcrun -f clang)):$PATH" >> $GITHUB_ENV
+            echo CC=$(xcrun -f clang) >> $GITHUB_ENV
+            echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
+            echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
+            echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
           fi
 
       # Installation step for Windows
