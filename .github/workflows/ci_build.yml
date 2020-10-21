@@ -110,7 +110,7 @@ jobs:
 
           - os: macos-latest
             compiler: gcc
-            version: "10"
+            version: "9"
 
     steps:
       - name: Checkout main repo
@@ -144,22 +144,14 @@ jobs:
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
           else
-            # see https://github.com/actions/virtual-environments/issues/1568
-            sudo git -C $(brew --prefix)/Homebrew checkout HEAD .
-            sudo git -C $(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-core checkout HEAD .
-            brew update
-            brew upgrade llvm
-            export CC="/usr/local/opt/llvm/bin/clang"
-            export CXX="/usr/local/opt/llvm/bin/clang++"
+            sudo xcode-select -switch /Applications/Xcode_11.3.app
 
-            # sudo xcode-select -switch /Applications/Xcode.app
-
-            # echo CC=$(xcrun -f clang) >> $GITHUB_ENV
-            # echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
-            # echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
-            # echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
-            # echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
-            # echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
+            echo CC=$(xcrun -f clang) >> $GITHUB_ENV
+            echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
+            echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
+            echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
+            echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
+            echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
           fi
 
       # Installation step for Windows
