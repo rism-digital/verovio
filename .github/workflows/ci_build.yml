@@ -148,6 +148,8 @@ jobs:
 
             echo CC=$(xcrun -f clang) >> $GITHUB_ENV
             echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
+            echo CMAKE_C_COMPILER=$(xcrun -f clang) >> $GITHUB_ENV
+            echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
             echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
             echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
           fi
@@ -181,6 +183,9 @@ jobs:
         run: |
           echo $CC
           echo $CXX
+          echo $CMAKE_C_COMPILER
+          echo $CMAKE_CXX_COMPILER
+
           cmake --version
 
           cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
