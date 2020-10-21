@@ -1201,7 +1201,7 @@ Options::Options()
 
     m_deprecated.SetLabel("Deprecated options", "Deprecated");
     m_grps.push_back(&m_deprecated);
-    
+
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
     m_slurThickness.Init(0.6, 0.2, 2);
     this->Register(&m_slurThickness, "slurThickness", &m_deprecated);
@@ -1253,26 +1253,26 @@ void Options::Sync()
 {
     if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults
-        = { { "staffLineThickness", &m_staffLineWidth }, //
-              { "stemThickness", &m_stemWidth }, //
-              { "legerLineThickness", &m_ledgerLineThickness }, //
-              { "legerLineExtension", &m_ledgerLineExtension }, //
-              { "slurEndpointThickness", &m_slurEndpointThickness }, //
-              { "slurMidpointThickness", &m_slurMidpointThickness }, //
-              { "tieEndpointThickness", &m_tieEndpointThickness }, //
-              { "tieMidpointThickness", &m_tieMidpointThickness }, //
-              { "thinBarlineThickness", &m_barLineWidth }, //
-              { "thickBarlineThickness", &m_thickBarlineThickness }, //
-              { "barlineSeparation", &m_barLineSeparation }, //
-              { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
-              { "bracketThickness", &m_bracketThickness }, //
-              { "subBracketThickness", &m_subBracketThickness }, //
-              { "hairpinThickness", &m_hairpinThickness }, //
-              { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
-              { "lyricLineThickness", &m_lyricLineThickness }, //
-              { "tupletBracketThickness", &m_tupletBracketThickness }, //
-              { "textEnclosureThickness", &m_textEnclosureThickness } //
+    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = {
+        { "staffLineThickness", &m_staffLineWidth }, //
+        { "stemThickness", &m_stemWidth }, //
+        { "legerLineThickness", &m_ledgerLineThickness }, //
+        { "legerLineExtension", &m_ledgerLineExtension }, //
+        { "slurEndpointThickness", &m_slurEndpointThickness }, //
+        { "slurMidpointThickness", &m_slurMidpointThickness }, //
+        { "tieEndpointThickness", &m_tieEndpointThickness }, //
+        { "tieMidpointThickness", &m_tieMidpointThickness }, //
+        { "thinBarlineThickness", &m_barLineWidth }, //
+        { "thickBarlineThickness", &m_thickBarlineThickness }, //
+        { "barlineSeparation", &m_barLineSeparation }, //
+        { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
+        { "bracketThickness", &m_bracketThickness }, //
+        { "subBracketThickness", &m_subBracketThickness }, //
+        { "hairpinThickness", &m_hairpinThickness }, //
+        { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
+        { "lyricLineThickness", &m_lyricLineThickness }, //
+        { "tupletBracketThickness", &m_tupletBracketThickness }, //
+        { "textEnclosureThickness", &m_textEnclosureThickness } //
     };
 
     for (auto &pair : engravingDefaults) {

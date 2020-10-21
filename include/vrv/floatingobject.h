@@ -268,7 +268,7 @@ public:
 
     /**
      * Moves bounding points vertically by a specified distance downward
-    */
+     */
     void MoveFrontVertical(int distance);
     void MoveBackVertical(int distance);
 

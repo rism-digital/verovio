@@ -1461,7 +1461,6 @@ public:
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;
-
 };
 
 //----------------------------------------------------------------------------

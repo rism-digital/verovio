@@ -748,11 +748,12 @@ Point BoundingBox::CalcPointAtBezier(const Point bezier[4], double t)
     CalcLinearInterpolation(p4, p1, p2, t);
     CalcLinearInterpolation(p5, p2, p3, t);
     Point midPoint;
-    CalcLinearInterpolation(midPoint, p4, p5, t); // middle point on the bezier-curve 
+    CalcLinearInterpolation(midPoint, p4, p5, t); // middle point on the bezier-curve
     return midPoint;
 }
 
-double BoundingBox::GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle, int penWidth)
+double BoundingBox::GetBezierThicknessCoeficient(
+    const Point bezier[4], int currentThickness, double angle, int penWidth)
 {
     Point top[4], bottom[4];
     CalcThickBezier(bezier, currentThickness, angle, top, bottom);

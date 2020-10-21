@@ -1132,7 +1132,7 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
     if (this->HasSameas() && !this->GetChild(1)) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // process highest-level beam
     if (!params->m_beam) {
         params->m_beam = this;

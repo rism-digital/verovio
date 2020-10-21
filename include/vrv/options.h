@@ -404,7 +404,7 @@ public:
     virtual void Init(const std::string &defaultValue);
 
     virtual bool SetValue(const std::string &jsonFilePath);
-    //virtual std::string GetStrValue() const;
+    // virtual std::string GetStrValue() const;
 
     int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
@@ -418,7 +418,6 @@ private:
     jsonxx::Object m_values;
     jsonxx::Object m_defaultValues;
 };
-
 
 //----------------------------------------------------------------------------
 // OptionGrp
@@ -582,8 +581,8 @@ public:
     OptionInt m_systemMaxPerPage;
     OptionDbl m_textEnclosureThickness;
     OptionDbl m_thickBarlineThickness;
-    OptionDbl m_tieEndpointThickness;    
-    OptionDbl m_tieMidpointThickness;    
+    OptionDbl m_tieEndpointThickness;
+    OptionDbl m_tieMidpointThickness;
     OptionDbl m_tupletBracketThickness;
 
     /**
@@ -651,7 +650,7 @@ public:
      * Deprecated options
      */
     OptionGrp m_deprecated;
-    
+
     OptionDbl m_slurThickness;
     OptionDbl m_tieThickness;
 

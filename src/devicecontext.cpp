@@ -155,7 +155,7 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
             glyph = Resources::GetGlyph(c);
         }
         if (!glyph) {
-            // There is no glyph for space, and we would use 'o' to increase extend width. However 'o' is wider than 
+            // There is no glyph for space, and we would use 'o' to increase extend width. However 'o' is wider than
             // space, which led to incorrect rendering. For the time being, set width to that of '.' instead.
             // This will probably need to be improved to change with font size/style
             if (c == L' ') {

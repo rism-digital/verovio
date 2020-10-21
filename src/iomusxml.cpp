@@ -645,7 +645,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 const std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
                 staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
-                const std::string groupName = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
+                const std::string groupName
+                    = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
                 const std::string groupAbbr
                     = GetContentOfChild(xpathNode.node(), "group-abbreviation[not(@print-object='no')]");
                 if (!groupName.empty()) {
@@ -774,7 +775,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (labelAbbr) partStaffGrp->AddChild(labelAbbr);
                 if (instrdef) partStaffGrp->AddChild(instrdef);
             }
-            const int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
+            const int nbStaves
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 if (m_staffGrpStack.back()->GetSymbol() != staffGroupingSym_SYMBOL_brace) {
@@ -3834,7 +3836,7 @@ void MusicXmlInput::SetFermataExternalSymbols(Fermata *fermata, const std::strin
         { "double-square", "U+E4C9" }, { "double-dot", "U+E4CB" }, { "half-curve", "U+E4CD" }, { "curlew", "U+E4D6" } };
 
     if (const auto result = fermataExtSymbolsBelow.find(shape);
-             (fermata->GetForm() == fermataVis_FORM_inv) && (result != fermataExtSymbolsBelow.end())) {
+        (fermata->GetForm() == fermataVis_FORM_inv) && (result != fermataExtSymbolsBelow.end())) {
         fermata->SetExternalsymbols(fermata, "glyph.num", result->second);
         fermata->SetExternalsymbols(fermata, "glyph.auth", "smufl");
     }
