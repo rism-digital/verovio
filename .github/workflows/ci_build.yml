@@ -144,6 +144,8 @@ jobs:
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
           else
+            rm -rf "$(brew --repo homebrew/core)"
+            brew tap homebrew/core
             brew update
             brew upgrade llvm
             export CC="/usr/local/opt/llvm/bin/clang"
