@@ -120,9 +120,9 @@ jobs:
       - name: Install Ubuntu (${{ matrix.compiler }}-${{ matrix.version }})
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
-          sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
+        #  sudo apt-get update -q
+        #  sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
+        #  sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
             sudo apt-get install -y --no-install-recommends -q -y g++-${{ matrix.version }}
@@ -144,7 +144,7 @@ jobs:
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
           else
-            sudo xcode-select -switch /Applications/Xcode_11.3.app
+            sudo xcode-select -switch /Applications/Xcode_12.app
 
             echo CC=$(xcrun -f clang) >> $GITHUB_ENV
             echo CXX=$(xcrun -f clang++) >> $GITHUB_ENV
@@ -152,6 +152,8 @@ jobs:
             echo CMAKE_CXX_COMPILER=$(xcrun -f clang++) >> $GITHUB_ENV
             echo SDKROOT=$(xcodebuild -version -sdk macosx Path) >> $GITHUB_ENV
             echo PATH=$(dirname $(xcrun -f clang)):$PATH >> $GITHUB_ENV
+
+            clang -v
           fi
 
       # Installation step for Windows
