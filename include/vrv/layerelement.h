@@ -8,6 +8,10 @@
 #ifndef __VRV_LAYER_ELEMENT_H__
 #define __VRV_LAYER_ELEMENT_H__
 
+#include <set>
+
+//----------------------------------------------------------------------------
+
 #include "atts_shared.h"
 #include "facsimileinterface.h"
 #include "linkinginterface.h"
@@ -206,6 +210,12 @@ public:
      */
     bool GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry);
 
+    /**
+     * Helper to adjust overlaping layers for notes, chords, stems, etc. 
+     * 
+     */
+    void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+
     //----------//
     // Functors //
     //----------//
@@ -343,6 +353,15 @@ public:
 
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+
+    /**
+     * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
+     * This function assumes that two chords are already in unison and checks whether chords can overlap with
+     * their unison notes or if they should be placed separately.
+     * Returns true if all elements can safely overlap.
+     */
+    virtual bool AreElementsInUnison(
+        const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
