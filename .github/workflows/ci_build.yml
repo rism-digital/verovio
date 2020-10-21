@@ -69,23 +69,23 @@ jobs:
       matrix:
         include:
           - os: ubuntu-20.04
-            compiler: g++
+            compiler: "g++"
             version: "9"
 
           - os: ubuntu-20.04
-            compiler: gcc
+            compiler: "gcc"
             version: "10"
 
           - os: ubuntu-20.04
-            compiler: clang
+            compiler: "clang"
             version: "6.0"
 
           - os: ubuntu-20.04
-            compiler: clang
+            compiler: "clang"
             version: "9"
 
           - os: ubuntu-20.04
-            compiler: clang
+            compiler: "clang"
             version: "10"
 
           #          - os: windows-latest
