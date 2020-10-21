@@ -762,7 +762,9 @@ double BoundingBox::GetBezierThicknessCoeficient(const Point bezier[4], int curr
 
     int actualThickness = sqrt((topMidpoint.x - bottomMidpoint.x) * (topMidpoint.x - bottomMidpoint.x)
         + (topMidpoint.y - bottomMidpoint.y) * (topMidpoint.y - bottomMidpoint.y));
-    return (double)currentThickness / (double)(actualThickness + penWidth);
+    double adjustedThickness = currentThickness - penWidth;
+    if (adjustedThickness < 0) adjustedThickness = 0;
+    return adjustedThickness / actualThickness;
 }
 
 Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
