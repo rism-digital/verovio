@@ -88,6 +88,14 @@ jobs:
             compiler: clang
             version: "10"
 
+          - os: macos-latest
+            compiler: xcode
+            version: "12.1"
+
+          - os: macos-latest
+            compiler: g++
+            version: "9"
+
           #          - os: windows-latest
           #            compiler: cl
           #            version: "default"
@@ -96,21 +104,15 @@ jobs:
           #            compiler: clang-cl
           #            version: "latest"
           #
-          #          - os: windows-latest
-          #            compiler: clang
-          #            version: "latest"
-          #
-          #          - os: windows-latest
-          #            compiler: gcc
-          #            version: "latest"
+          - os: windows-latest
+            compiler: clang
+            version: "latest"
 
-          - os: macos-latest
-            compiler: xcode
-            version: "12.1"
+          - os: windows-latest
+            compiler: gcc
+            version: "latest"
 
-          - os: macos-latest
-            compiler: g++
-            version: "9"
+
 
     steps:
       - name: Checkout main repo
@@ -178,9 +180,7 @@ jobs:
           # Make all PATH additions made by scoop and ourselves global.
           echo "PATH=$env:PATH" | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
 
-          if ("${{ matrix.compiler }}".endswith("cl")) {
-            & .github\workflows\vsenv.ps1 -arch x64 -hostArch x64
-          }
+
       - name: Check settings and dry-run make
         working-directory: ${{ github.workspace }}/tools
         run: |
