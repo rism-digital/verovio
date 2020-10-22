@@ -88,11 +88,11 @@ jobs:
             compiler: clang
             version: "10"
 
-          - os: macos-latest
+          - os: macos-10.15
             compiler: xcode
             version: "12.1"
 
-          - os: macos-latest
+          - os: macos-10.15
             compiler: g++
             version: "9"
 
@@ -134,7 +134,7 @@ jobs:
           else
             # switch XCode version
             # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
-            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app//Contents/Developer
+            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
 
             # set environment variables from XCode
             echo CC=$(xcrun --find clang) >> $GITHUB_ENV
