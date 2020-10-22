@@ -99,7 +99,7 @@ jobs:
       - name: Run tests
         env:
           TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
-          OUTPUT_DIR: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+          OUTPUT_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/${{ env.TEMP_DIR }}
         working-directory: ${{ github.workspace }}/tools
         run: |
           for testcategory in $TEST_DIR/*; do
