@@ -58,15 +58,15 @@ jobs:
   # Adapted from https://github.com/DaanDeMeyer/reproc/blob/master/.github/workflows/main.yml . #
   ###############################################################################################
   build_cpp:
-    name: Build ${{ matrix.config.os }}-${{ matrix.config.compiler }}-${{ matrix.config.version }}
+    name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.version }}
     # This job runs on all the os specified in strategy.matrix.os
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ${{ matrix.os }}
 
     # set matrix with config options
     # (runs the following steps for every target in parallel)
     strategy:
       matrix:
-        config:
+        include:
           - os: ubuntu-20.04
             compiler: gcc
             version: "9"
@@ -101,7 +101,7 @@ jobs:
         uses: actions/checkout@v2
 
       # Installation step for Ubuntu
-      - name: Install Ubuntu (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+      - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'Linux'
         run: |
           # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
@@ -121,7 +121,7 @@ jobs:
           fi
 
       # Installation step for MacOS
-      - name: Install macOS (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+      - name: Configure macOS with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'macOS'
         run: |
           brew install ninja llvm
