@@ -465,11 +465,11 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         assert(note);
         dur = note->GetDrawingDur();
         if (note->IsMensuralDur() && !isInLigature) {
-            return doc->GetGlyphWidth(
-                       note->GetMensuralSmuflNoteHead(), staff->m_drawingStaffSize, this->GetDrawingCueSize())
-                / 2;
+            code = note->GetMensuralSmuflNoteHead();
         }
-        code = note->GetNoteheadGlyph(dur);
+        else {
+            code = note->GetNoteheadGlyph(dur);
+        }
     }
     else if (this->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(this);
