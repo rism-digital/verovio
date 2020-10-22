@@ -68,11 +68,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-20.04
-            compiler: gcc
+            compiler: g++
             version: "9"
 
           - os: ubuntu-20.04
-            compiler: gcc
+            compiler: g++
             version: "10"
 
           - os: ubuntu-20.04
@@ -104,20 +104,22 @@ jobs:
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'Linux'
         run: |
-          # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | sudo apt-key add -
-          sudo add-apt-repository 'deb http://apt.llvm.org/focal llvm-toolchain-focal-10 main' -y
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
-          sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
-          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
-            sudo apt-get install -y --no-install-recommends g++-${{ matrix.config.version }}
-            echo CC=gcc-${{ matrix.config.version }} >> $GITHUB_ENV
-            echo CXX=g++-${{ matrix.config.version }} >> $GITHUB_ENV
+          # check if compiler is available from runner by default
+          if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
+            echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
           else
-            sudo apt-get install -y --no-install-recommends clang-${{ matrix.config.version }}
-            echo CC=clang-${{ matrix.config.version }} >> $GITHUB_ENV
-            echo CXX=clang++-${{ matrix.config.version }} >> $GITHUB_ENV
+            # if not, install compiler
+            sudo apt-get update -q
+            sudo apt-get install -y -q --no-install-recommends ${{ matrix.compiler }}-${{ matrix.version }}
+          fi
+
+          # set environment variables
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
+            echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
+          else
+            echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
           fi
 
       # Installation step for MacOS
