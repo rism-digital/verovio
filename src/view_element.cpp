@@ -1262,6 +1262,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
         y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
+        // bounding box is not relevant for the multi-rest rectangle
+        dc->DeactivateGraphicX();
+
         // Draw the base rect
         DrawFilledRectangle(dc, x1, y1, x2, y2);
 
@@ -1271,6 +1274,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
         DrawFilledRectangle(
             dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
+
+        dc->ReactivateGraphic();
     }
     else {
         // Draw the base rect

@@ -681,7 +681,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogWarning("Can not parse JSON std::string. Using default options.");
+        LogWarning("Cannot parse JSON std::string. Using default options.");
     }
     else {
         if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
@@ -875,7 +875,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         return false;
     }
 
@@ -1010,6 +1010,26 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     else {
                         opt->SetValue("auto");
                     }
+                }
+            }
+            else if (iter->first == "slurThickness") {
+                LogWarning("Option slurThickness is deprecated; use slurMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("slurThickness")) {
+                    double thickness = json.get<jsonxx::Number>("slurThickness");
+                    opt = m_options->GetItems()->at("slurMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
+                }
+            }
+            else if (iter->first == "tieThickness") {
+                vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("tieThickness")) {
+                    double thickness = json.get<jsonxx::Number>("tieThickness");
+                    opt = m_options->GetItems()->at("tieMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
                 }
             }
             else {

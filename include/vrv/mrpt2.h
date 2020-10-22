@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "beam.h"
 #include "layerelement.h"
 
@@ -22,7 +23,7 @@ namespace vrv {
 /**
  * This class models the MEI <mRpt2> element.
  */
-class MRpt2 : public LayerElement {
+class MRpt2 : public LayerElement, public AttColor {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

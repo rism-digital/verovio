@@ -188,6 +188,13 @@ public:
     bool IsVisible();
 
     /**
+     * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
+     * element if it's in unison with it
+     */
+    std::pair<int, int> CalcNoteHorizontalOverlap(
+        Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool ignoreUnison = false);
+
+    /**
      * MIDI timing information
      */
     ///@{

@@ -24,6 +24,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
+#include "elementpart.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
@@ -464,11 +465,11 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         assert(note);
         dur = note->GetDrawingDur();
         if (note->IsMensuralDur() && !isInLigature) {
-            return doc->GetGlyphWidth(
-                       note->GetMensuralSmuflNoteHead(), staff->m_drawingStaffSize, this->GetDrawingCueSize())
-                / 2;
+            code = note->GetMensuralSmuflNoteHead();
         }
-        code = note->GetNoteheadGlyph(dur);
+        else {
+            code = note->GetNoteheadGlyph(dur);
+        }
     }
     else if (this->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(this);
@@ -637,6 +638,139 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
         }
     }
     return result;
+}
+
+bool LayerElement::AreElementsInUnison(
+    const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
+{
+    // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
+    // of how they are encoded in the MEI file
+    std::set<int> difference;
+    if (firstChord.size() > secondChord.size()) {
+        std::set_difference(firstChord.begin(), firstChord.end(), secondChord.begin(), secondChord.end(),
+            std::inserter(difference, difference.begin()));
+    }
+    else {
+        std::set_difference(secondChord.begin(), secondChord.end(), firstChord.begin(), firstChord.end(),
+            std::inserter(difference, difference.begin()));
+    }
+    // If there is a difference, there are two situations:
+    // 1. Location is between start and end of either chords/set of notes - this means these elements cannot be
+    //    in unison (since there is interfering note there)
+    // 2. Location is lesser/greater than start/end of either - it's ok, overlapping notes can still be in unison
+    if (!difference.empty()) {
+        for (const auto &element : difference) {
+            if (((element > *firstChord.begin()) && (element < *firstChord.rbegin()))
+                || ((element > *secondChord.begin()) && (element < *secondChord.rbegin())))
+                return false;
+        }
+    }
+    // If there are no `middle` notes, check whether chords can be in unison with regards of stem direction
+    // With DOWN stem direction, highest note of the chord HAS to be in unison. If topmost location of the chord
+    // is higher than topmost location of the opposing chord it means that these elements cannot be in unison.
+    // Same applies to the UP stem direction, just with reversed condition
+    if (stemDirection == STEMDIRECTION_down) {
+        return ((*firstChord.rbegin() <= *secondChord.rbegin()) && (*firstChord.begin() <= *secondChord.begin()));
+    }
+    else {
+        return ((*firstChord.rbegin() >= *secondChord.rbegin()) && (*firstChord.begin() >= *secondChord.begin()));
+    }
+}
+
+void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    switch (GetClassId()) {
+        case NOTE: {
+            Note *note = vrv_cast<Note *>(this);
+            assert(note);
+            if (note->GetParent()->Is(CHORD)) break;
+            auto [margin, inUnisonWith] = note->CalcNoteHorizontalOverlap(doc, otherElements, false);
+            if (inUnisonWith == -1)
+                note->SetDrawingXRel(note->GetDrawingXRel() + margin);
+            else
+                isUnison = true;
+            break;
+        }
+        case CHORD: {
+            Chord *chord = vrv_cast<Chord *>(this);
+            assert(chord);
+            int lastElementInUnison = -1;
+            int margin = 0;
+            std::set<int> chordElementLocations, otherElementLocations;
+            // process each note of the chord separately, storing locations in the set
+            for (int i = 0; i < chord->GetChildCount(NOTE); ++i) {
+                Note *note = vrv_cast<Note *>(chord->GetChild(i, NOTE));
+                assert(note);
+                auto [overlap, inUnisonWith] = note->CalcNoteHorizontalOverlap(doc, otherElements, true);
+                if (overlap != 0) {
+                    margin = overlap;
+                    break;
+                }
+
+                chordElementLocations.insert(note->GetDrawingLoc());
+                if (inUnisonWith != -1) lastElementInUnison = i;
+            }
+            if (!margin && (lastElementInUnison != -1)) {
+                for (auto element : otherElements) {
+                    if (element->Is(NOTE)) {
+                        Note *note = vrv_cast<Note *>(element);
+                        assert(note);
+                        otherElementLocations.insert(note->GetDrawingLoc());
+                    }
+                }
+                // if elements are not in unison (or not all of them are) calculate overlap ignoring unison for the
+                // last element in the unison (which will be overlap for other unison notes as well)
+                if (!AreElementsInUnison(chordElementLocations, otherElementLocations, chord->GetDrawingStemDir())) {
+                    Note *unisonNote = vrv_cast<Note *>(chord->GetChild(lastElementInUnison, NOTE));
+                    assert(unisonNote);
+                    auto [unisonOverlap, var] = unisonNote->CalcNoteHorizontalOverlap(doc, otherElements, true, true);
+                    margin = unisonOverlap;
+                }
+            }
+            if (margin)
+                chord->SetDrawingXRel(chord->GetDrawingXRel() + margin);
+            else if (lastElementInUnison != -1)
+                isUnison = true;
+            break;
+        }
+        // process stems
+        case STEM: {
+            if (isUnison) {
+                isUnison = false;
+                break;
+            }
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            assert(staff);
+            // check if there is an overlap on the left or on the right and displace stem's parent correspondigly
+            for (auto element : otherElements) {
+                int right = HorizontalLeftOverlap(element, doc, 0, 0);
+                int left = HorizontalRightOverlap(element, doc, 0, 0);
+                if (!right || !left) continue;
+
+                LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+                assert(parent);
+                int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                Flag *currentFlag = NULL;
+                currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
+                if (currentFlag) {
+                    wchar_t flagGlyph = currentFlag->GetSmuflCode(STEMDIRECTION_down);
+                    const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
+                    horizontalMargin += flagWidth;
+                }
+
+                if (right < left) {
+                    parent->SetDrawingXRel(parent->GetDrawingXRel() + right + horizontalMargin);
+                }
+                else {
+                    parent->SetDrawingXRel(parent->GetDrawingXRel() - horizontalMargin - left);
+                }
+                break;
+            }
+            break;
+        }
+
+        default: break;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1145,7 +1279,7 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     assert(staff);
 
     // check if top/bottom of the element overlaps with beam coordinates
-    //const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
     int leftMargin = 0, rightMargin = 0;
 
     if (params->m_directionBias > 0) {
@@ -1160,7 +1294,8 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
     if (overlapMargin >= params->m_directionBias * params->m_overlapMargin) {
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params->m_overlapMargin = (((overlapMargin + staffOffset - 1) / staffOffset + 1) * staffOffset) * params->m_directionBias;
+        params->m_overlapMargin
+            = (((overlapMargin + staffOffset - 1) / staffOffset + 1) * staffOffset) * params->m_directionBias;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1201,87 +1336,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
         assert(params->m_currentChord);
     }
 
-    // Eventually we also want to have stem for overlapping voices
-    if (this->Is({ NOTE, DOTS })) {
-
-        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
-
-        std::vector<LayerElement *>::iterator iter;
-        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); ++iter) {
-
-            int verticalMargin = 0; // 1 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            int horizontalMargin = 2 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-
-            if (this->Is(NOTE) && (*iter)->Is(NOTE)) {
-                assert(params->m_currentNote);
-                Note *previousNote = vrv_cast<Note *>(*iter);
-                assert(previousNote);
-                // Unisson, look at the duration for the note heads
-                if (params->m_currentNote->IsUnissonWith(previousNote, false)) {
-                    if ((params->m_currentNote->GetDrawingDur() == DUR_2) && (previousNote->GetDrawingDur() == DUR_2))
-                        continue;
-                    else if ((params->m_currentNote->GetDrawingDur() > DUR_2)
-                        && (previousNote->GetDrawingDur() > DUR_2))
-                        continue;
-                    // Reduce the margin to 0 for whole notes unisson
-                    else if ((params->m_currentNote->GetDrawingDur() == DUR_1)
-                        && (previousNote->GetDrawingDur() == DUR_1))
-                        horizontalMargin = 0;
-                }
-                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() > 1) {
-                    continue;
-                }
-                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
-                    horizontalMargin = 0;
-                }
-                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() < 0)
-                    && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())
-                    && !params->m_currentChord) {
-                    if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
-                        horizontalMargin *= -1;
-                    }
-                    else if ((params->m_currentNote->GetDrawingDur() <= DUR_1)
-                        && (previousNote->GetDrawingDur() <= DUR_1)) {
-                        continue;
-                    }
-                    else {
-                        horizontalMargin *= -1;
-                        verticalMargin = horizontalMargin;
-                    }
-                }
-            }
-
-            if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
-                continue;
-            }
-
-            if (!(horizontalMargin < 0) || params->m_currentChord) {
-
-                // Nothing to do if we have no vertical overlap
-                if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
-
-                // Nothing to do either if we have no horizontal overlap
-                if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
-
-                int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
-
-                // Move the appropriate parent to the left
-                if (xRelShift > 0) {
-                    if (params->m_currentChord)
-                        params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
-                    else if (params->m_currentNote)
-                        params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
-                }
-            }
-            else {
-                // Move the appropriate parent to the right
-                int xRelShift = this->HorizontalRightOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
-                params->m_currentNote->SetDrawingXRel(
-                    params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
-            }
-        }
-    }
+    AdjustOverlappingLayers(params->m_doc, params->m_previous, params->m_unison);
 
     return FUNCTOR_SIBLINGS;
 }

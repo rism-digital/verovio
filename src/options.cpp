@@ -40,7 +40,7 @@ constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
       "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
       "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15}}";
+      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': 0.2}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -912,9 +912,13 @@ Options::Options()
     m_slurMaxSlope.Init(20, 0, 60);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
-    m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
-    m_slurThickness.Init(0.6, 0.2, 1.2);
-    this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
+    m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
+    m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
+
+    m_slurMidpointThickness.SetInfo("Slur midpoint thickness", "The midpoint slur thickness in MEI units");
+    m_slurMidpointThickness.Init(0.6, 0.2, 1.2);
+    this->Register(&m_slurMidpointThickness, "slurMidpointThickness", &m_generalLayout);
 
     m_spacingBraceGroup.SetInfo(
         "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
@@ -966,13 +970,21 @@ Options::Options()
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
+    m_textEnclosureThickness.SetInfo("Text box line thickness", "The thickness of the line text enclosing box");
+    m_textEnclosureThickness.Init(0.2, 0.10, 0.80);
+    this->Register(&m_textEnclosureThickness, "textEnclosureThickness", &m_generalLayout);
+
     m_thickBarlineThickness.SetInfo("Thick barline thickness", "The thickness of the thick barline");
     m_thickBarlineThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_thickBarlineThickness, "thickBarlineThickness", &m_generalLayout);
 
-    m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
-    m_tieThickness.Init(0.5, 0.2, 1.0);
-    this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
+    m_tieEndpointThickness.SetInfo("Tie Endpoint thickness", "The Endpoint tie thickness in MEI units");
+    m_tieEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_tieEndpointThickness, "tieEndpointThickness", &m_generalLayout);
+
+    m_tieMidpointThickness.SetInfo("Tie midpoint thickness", "The midpoint tie thickness in MEI units");
+    m_tieMidpointThickness.Init(0.5, 0.2, 1.0);
+    this->Register(&m_tieMidpointThickness, "tieMidpointThickness", &m_generalLayout);
 
     m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
     m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
@@ -1185,6 +1197,19 @@ Options::Options()
     m_topMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
 
+    /********* Deprecated options *********/
+
+    m_deprecated.SetLabel("Deprecated options", "Deprecated");
+    m_grps.push_back(&m_deprecated);
+
+    m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
+    m_slurThickness.Init(0.6, 0.2, 2);
+    this->Register(&m_slurThickness, "slurThickness", &m_deprecated);
+
+    m_tieThickness.SetInfo("Tie  thickness", "The tie thickness in MEI units");
+    m_tieThickness.Init(0.5, 0.2, 1.0);
+    this->Register(&m_tieThickness, "tieThickness", &m_deprecated);
+
     /*
     // Example of a staffRel param
     OptionStaffrel rel;
@@ -1228,23 +1253,27 @@ void Options::Sync()
 {
     if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults
-        = { { "staffLineThickness", &m_staffLineWidth }, //
-              { "stemThickness", &m_stemWidth }, //
-              { "legerLineThickness", &m_ledgerLineThickness }, //
-              { "legerLineExtension", &m_ledgerLineExtension }, //
-              { "slurMidpointThickness", &m_slurThickness }, //
-              { "tieMidpointThickness", &m_tieThickness }, //
-              { "thinBarlineThickness", &m_barLineWidth }, //
-              { "thickBarlineThickness", &m_thickBarlineThickness }, //
-              { "barlineSeparation", &m_barLineSeparation }, //
-              { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
-              { "bracketThickness", &m_bracketThickness }, //
-              { "subBracketThickness", &m_subBracketThickness }, //
-              { "hairpinThickness", &m_hairpinThickness }, //
-              { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
-              { "lyricLineThickness", &m_lyricLineThickness }, //
-              { "tupletBracketThickness", &m_tupletBracketThickness } };
+    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = {
+        { "staffLineThickness", &m_staffLineWidth }, //
+        { "stemThickness", &m_stemWidth }, //
+        { "legerLineThickness", &m_ledgerLineThickness }, //
+        { "legerLineExtension", &m_ledgerLineExtension }, //
+        { "slurEndpointThickness", &m_slurEndpointThickness }, //
+        { "slurMidpointThickness", &m_slurMidpointThickness }, //
+        { "tieEndpointThickness", &m_tieEndpointThickness }, //
+        { "tieMidpointThickness", &m_tieMidpointThickness }, //
+        { "thinBarlineThickness", &m_barLineWidth }, //
+        { "thickBarlineThickness", &m_thickBarlineThickness }, //
+        { "barlineSeparation", &m_barLineSeparation }, //
+        { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
+        { "bracketThickness", &m_bracketThickness }, //
+        { "subBracketThickness", &m_subBracketThickness }, //
+        { "hairpinThickness", &m_hairpinThickness }, //
+        { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
+        { "lyricLineThickness", &m_lyricLineThickness }, //
+        { "tupletBracketThickness", &m_tupletBracketThickness }, //
+        { "textEnclosureThickness", &m_textEnclosureThickness } //
+    };
 
     for (auto &pair : engravingDefaults) {
         if (pair.second->isSet()) continue;
