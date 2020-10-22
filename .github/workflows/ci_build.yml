@@ -137,10 +137,10 @@ jobs:
             echo "$(xcode-select --print-path)"
 
             echo "grep"
-            xcode-select --print-path | grep /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
+            xcode-select --print-path | grep Xcode
 
             echo "if"
-            if xcode-select --print-path | grep /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer; then
+            if xcode-select --print-path | grep Xcode; then
               echo "HOORAY"
               xcode-select --print-path
               echo /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
