@@ -68,7 +68,14 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         // TODO: Implement wavy slur.
         default: break;
     }
-    DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle(), penStyle);
+    const int penWidth
+        = m_doc->GetOptions()->m_slurEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (m_slurThicknessCoeficient <= 0) {
+        m_slurThicknessCoeficient
+            = BoundingBox::GetBezierThicknessCoeficient(points, curve->GetThickness(), curve->GetAngle(), penWidth);
+    }
+    DrawThickBezierCurve(dc, points, m_slurThicknessCoeficient * curve->GetThickness(), staff->m_drawingStaffSize,
+        penWidth, curve->GetAngle(), penStyle);
 
     /*
     int i;
@@ -419,7 +426,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     points[3] = Point(x2, y2);
 
     float angle = CalcInitialSlur(curve, slur, staff, layer->GetN(), drawingCurveDir, points);
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurMidpointThickness.GetValue();
 
     curve->UpdateCurveParams(points, angle, thickness, drawingCurveDir);
 

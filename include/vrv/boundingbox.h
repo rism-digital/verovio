@@ -187,6 +187,21 @@ public:
     static int CalcBezierAtPosition(const Point bezier[4], int x);
 
     /**
+     * Calculate linear interpolation between two points at time t
+     */
+    static void CalcLinearInterpolation(Point &dest, const Point &a, const Point &b, double t);
+
+    /**
+     * Calculate point (X,Y) coordinaties on the bezier curve
+     */
+    static Point CalcPointAtBezier(const Point bezier[4], double t);
+
+    /**
+     * Calculate thickness coeficient to be applient for bezier curve to fit MEI units thickness
+     */
+    static double GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle, int penWidth);
+
+    /**
      * Calculate the point bezier point position for a t between 0.0 and 1.0
      */
     static Point CalcDeCasteljau(const Point bezier[4], double t);

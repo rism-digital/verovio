@@ -893,7 +893,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
         height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieThickness.GetValue();
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieMidpointThickness.GetValue();
 
     // control points
     Point c1, c2;
@@ -937,7 +937,14 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "", tie->GetUuid(), false);
-    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize, 0, penStyle);
+    // set pen width and calculate tie thickness coeficient to adjust tie width in according to it
+    const int penWidth
+        = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (m_tieThicknessCoeficient <= 0) {
+        m_tieThicknessCoeficient = BoundingBox::GetBezierThicknessCoeficient(bezier, thickness, 0, penWidth);
+    }
+    DrawThickBezierCurve(
+        dc, bezier, m_tieThicknessCoeficient * thickness, staff->m_drawingStaffSize, penWidth, 0, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else

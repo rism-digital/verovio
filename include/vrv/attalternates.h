@@ -64,6 +64,21 @@ public:
         m_percent = value;
     }
 
+    int GetPercentForTerm() const
+    {
+        switch (m_term) {
+            case (FONTSIZETERM_xx_large): return 200; break;
+            case (FONTSIZETERM_x_large): return 150; break;
+            case (FONTSIZETERM_large): return 110; break;
+            case (FONTSIZETERM_larger): return 110; break;
+            case (FONTSIZETERM_small): return 80; break;
+            case (FONTSIZETERM_smaller): return 80; break;
+            case (FONTSIZETERM_x_small): return 60; break;
+            case (FONTSIZETERM_xx_small): return 50; break;
+            default: return 100; break;
+        }
+    }
+
     bool HasValue() const
     {
         if (m_fontSizeNumeric != VRV_UNSET) return true;
