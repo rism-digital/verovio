@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct 13 14:01:31 PDT 2020
+// Last Modified: Wed Oct 21 21:42:12 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1827,6 +1827,7 @@ class HumFileAnalysis {
 			m_slurs_analyzed     = false;
 			m_phrases_analyzed   = false;
 			m_nulls_analyzed     = false;
+			m_strophes_analyzed  = false;
 
 			m_barlines_analyzed  = false;
 			m_barlines_different = false;
@@ -1843,6 +1844,10 @@ class HumFileAnalysis {
 		// m_strands_analyzed: Used to keep track of whether or not
 		// file strands have been analyzed.
 		bool m_strands_analyzed = false;
+
+		// m_strophes_analyzed: Used to keep track of whether or not
+		// file strands have been analyzed.
+		bool m_strophes_analyzed = false;
 
 		// m_slurs_analyzed: Used to keep track of whether or not
 		// slur endpoints have been linked or not.
@@ -1902,6 +1907,7 @@ class HumdrumFileBase : public HumHash {
 		bool          isStructureAnalyzed      (void);
 		bool          isRhythmAnalyzed         (void);
 		bool          areStrandsAnalyzed       (void);
+		bool          areStrophesAnalyzed      (void);
 
     	template <class TYPE>
 		   void       initializeArray          (std::vector<std::vector<TYPE>>& array, TYPE value);
@@ -2133,6 +2139,12 @@ class HumdrumFileBase : public HumHash {
 		// m_strands2d: two-dimensional list of spine strands.
 		std::vector<std::vector<TokenPair> > m_strand2d;
 
+		// m_strophes1d: one-dimensional list of all *strophe/*Xstrophe pairs.
+		std::vector<TokenPair> m_strophes1d;
+
+		// m_strophes2d: two-dimensional list of all *strophe/*Xstrophe pairs.
+		std::vector<std::vector<TokenPair> > m_strophes2d;
+
 		// m_quietParse: Set to true if error messages should not be
 		// printed to the console when reading.
 		bool m_quietParse;
@@ -2239,7 +2251,10 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		std::ostream& printDurationInfo            (std::ostream& out = std::cout);
 		int           tpq                          (void);
 
+		void          resolveNullTokens (void);
+
 		// strand functionality:
+		int           getStrandCount    (void);
 		HTp           getStrandStart    (int index);
 		HTp           getStrandBegin    (int index) { return getStrandStart(index); }
 		HTp           getStrandEnd      (int index);
@@ -2248,14 +2263,26 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		HTp           getStrandBegin    (int sindex, int index) { return getStrandStart(sindex, index); }
 		HTp           getStrandEnd      (int sindex, int index);
 		HTp           getStrandStop     (int sindex, int index) { return getStrandEnd(sindex, index); }
-		int           getStrandCount    (void);
 		int           getStrandCount    (int spineindex);
-		void          resolveNullTokens (void);
 
 		HTp           getStrand                    (int index)
 		                                        { return getStrandStart(index); }
 		HTp           getStrand                    (int sindex, int index)
 		                                { return getStrandStart(sindex, index); }
+
+		// strophe functionality (located in src/HumdrumFileStructure-strophe.cpp)
+		bool         analyzeStrophes    (void);
+		void         analyzeStropheMarkers(void);
+		int          getStropheCount    (void);
+		int          getStropheCount    (int spineindex);
+		HTp          getStropheStart    (int index);
+		HTp          getStropheBegin    (int index) { return getStropheStart(index); }
+		HTp          getStropheEnd      (int index);
+		HTp          getStropheStop     (int index) { return getStropheStart(index); }
+		HTp          getStropheStart    (int spine, int index);
+		HTp          getStropheBegin    (int spine, int index) { return getStropheStart(index); }
+		HTp          getStropheEnd      (int spine, int index);
+		HTp          getStropheStop     (int spine, int index) { return getStropheStart(index); }
 
 		// barline/measure functionality:
 		int           getBarlineCount              (void) const;
@@ -2274,6 +2301,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		std::string   getKernAboveSignifier        (void);
 		std::string   getKernBelowSignifier        (void);
 
+
 	protected:
 		bool          analyzeRhythm                (void);
 		bool          assignRhythmFromRecip        (HTp spinestart);
@@ -2282,7 +2310,6 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		bool          analyzeGlobalParameters      (void);
 		bool          analyzeLocalParameters       (void);
 		// bool          analyzeParameters            (void);
-		bool          analyzeStrophes              (void);
 		bool          analyzeDurationsOfNonRhythmicSpines(void);
 		HumNum        getMinDur                    (std::vector<HumNum>& durs,
 		                                            std::vector<HumNum>& durstate);
@@ -8208,6 +8235,33 @@ class Tool_spinetrace : public HumTool {
 
 };
 
+
+
+class Tool_strophe : public HumTool {
+	public:
+		         Tool_strophe       (void);
+		        ~Tool_strophe       () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		void     displayStropheVariants(HumdrumFile& infile);
+		void     markWithColor     (HumdrumFile& infile);
+		int      markStrophe       (HTp strophestart, HTp stropheend);
+
+	private:
+		bool         m_listQ;      // boolean for showing a list of variants
+		bool         m_markQ;      // boolean for marking strophes 
+		std::string  m_marker;     // character for marking strophes 
+		std::string  m_color;      // color for strphe notes/rests
+      std::set<std::string> m_variants;  // used for --list option
+
+};
 
 
 class Tool_tabber : public HumTool {

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct 13 14:01:31 PDT 2020
+// Last Modified: Wed Oct 21 21:42:12 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -18707,6 +18707,8 @@ HumdrumFileBase::HumdrumFileBase(HumdrumFileBase& infile) {
 	m_idprefix = infile.m_idprefix;
 	m_strand1d.clear();
 	m_strand2d.clear();
+	m_strophes1d.clear();
+	m_strophes2d.clear();
 	m_quietParse = infile.m_quietParse;
 	m_parseError = infile.m_parseError;
 	m_displayError = infile.m_displayError;
@@ -18743,6 +18745,8 @@ HumdrumFileBase& HumdrumFileBase::operator=(HumdrumFileBase& infile) {
 	m_idprefix = infile.m_idprefix;
 	m_strand1d.clear();
 	m_strand2d.clear();
+	m_strophes1d.clear();
+	m_strophes2d.clear();
 	m_quietParse = infile.m_quietParse;
 	m_parseError = infile.m_parseError;
 	m_displayError = infile.m_displayError;
@@ -18793,6 +18797,8 @@ void HumdrumFileBase::clear(void) {
 	m_idprefix.clear();
 	m_strand1d.clear();
 	m_strand2d.clear();
+	m_strophes1d.clear();
+	m_strophes2d.clear();
 	m_filename.clear();
 	m_segmentlevel = 0;
 	m_analyses.clear();
@@ -18829,6 +18835,17 @@ bool HumdrumFileBase::isRhythmAnalyzed(void) {
 
 bool HumdrumFileBase::areStrandsAnalyzed(void) {
 	return m_analyses.m_strands_analyzed;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::areStrandsAnalyzed --
+//
+
+bool HumdrumFileBase::areStrophesAnalyzed(void) {
+	return m_analyses.m_strophes_analyzed;
 }
 
 
@@ -19702,6 +19719,7 @@ void HumdrumFileBase::getSpineStopList(vector<HTp>& spinestops) {
 		}
 	}
 }
+
 
 
 //////////////////////////////
@@ -25377,6 +25395,246 @@ void HumdrumFileStream::fillUrlBuffer(stringstream& uribuffer,
 
 
 
+
+//////////////////////////////
+//
+// HumdrumFileStructure::analyzeStropheMarkers -- Merge this
+//    with analyzeStrophes (below) at some point.
+//
+
+void HumdrumFileStructure::analyzeStropheMarkers(void) {
+	m_analyses.m_strophes_analyzed = true;
+
+	m_strophes1d.clear();
+	m_strophes2d.clear();
+	int spines = getSpineCount();
+	m_strophes2d.resize(spines);
+
+	map<string, HTp> laststrophe;
+
+	HumdrumFileStructure& infile = *this;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (*token == "*strophe") {
+				string spineinfo = token->getSpineInfo();
+	 			HTp lastone = laststrophe[spineinfo];
+				if (lastone) {
+					// Improperly terminated strophe,
+					// ending here and starting a new one.
+					TokenPair tp;
+					tp.first = lastone;
+					tp.last = token;
+					m_strophes1d.push_back(tp);
+					int spine = token->getTrack() - 1;
+					m_strophes2d.at(spine).push_back(tp);
+					laststrophe[spineinfo] = token;
+				} else {
+					// Store the new strophe.
+					laststrophe[spineinfo] = token;
+				}
+			} else if (*token == "*Xstrophe") {
+				string spineinfo = token->getSpineInfo();
+	 			HTp lastone = laststrophe[spineinfo];
+				if (lastone) {
+					TokenPair tp;
+					tp.first = lastone;
+					tp.last = token;
+					m_strophes1d.push_back(tp);
+					int spine = token->getTrack() - 1;
+					m_strophes2d.at(spine).push_back(tp);
+					laststrophe[spineinfo] = NULL;
+				} else {
+					// Improperly placed *Xstrophe, so ignore
+					cerr << "WARNING: unmatched strophe end: " << token << " ON LINE " << token->getLineNumber() << endl;
+				}
+			}
+		}
+	}
+
+	// Warn about any improperly terminated *strophe:
+	for (auto it = laststrophe.begin(); it != laststrophe.end(); ++it) {
+		HTp token = it->second;
+		if (token != NULL) {
+			cerr << "WARNING: unmatched strophe begin: " << token << " ON LINE " << token->getLineNumber() << endl;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileStructure::analyzeStrophes --
+//
+
+bool HumdrumFileStructure::analyzeStrophes(void) {
+	if (!m_analyses.m_strands_analyzed) {
+		analyzeStrands();
+	}
+	analyzeStropheMarkers();
+
+	int scount = (int)m_strand1d.size();
+	// bool dataQ;
+	vector<HTp> strophestarts;
+	strophestarts.reserve(100);
+	for (int i=0; i<scount; i++) {
+		// dataQ = false;
+		HTp current = m_strand1d.at(i).first;
+		HTp send = m_strand1d.at(i).last;
+		if (!send) {
+			continue;
+		}
+		while (current && (current != send)) {
+			if (!current->isInterpretation()) {
+				// not a strophe (data not allowed in subspine before strophe marker).
+				break;
+			}
+
+			if (current->compare(0, 3, "*S/") == 0) {
+				int track = current->getTrack();
+				HTp first = current->getPreviousFieldToken();
+				if (first) {
+					int trackp = first->getTrack();
+					if (track == trackp) {
+						if (first->compare(0, 3, "*S/") == 0) {
+							bool found = false;
+							for (int j=0; j<(int)strophestarts.size(); j++) {
+								if (strophestarts[j] == first) {
+									found = true;
+									break;
+								}
+							}
+							if (!found) {
+								strophestarts.push_back(first);
+							}
+						}
+					}
+				}
+				bool found = false;
+				for (int j=0; j<(int)strophestarts.size(); j++) {
+					if (strophestarts[j] == current) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					strophestarts.push_back(current);
+				}
+				break;
+			}
+			current = current->getNextToken();
+		}
+	}
+
+	// Now store strophe information in tokens.  Currently
+	// spine splits are not allowed in strophes.  Spine merges
+	// are OK: the first strophe will dominate in a merge.
+	for (int i=0; i<(int)strophestarts.size(); i++) {
+		HTp current = strophestarts[i];
+		if (current->hasStrophe()) {
+			continue;
+		}
+		current->setStrophe(strophestarts[i]);
+		current = current->getNextToken();
+		while (current) {
+			if (current->hasStrophe()) {
+				break;
+			}
+			if (*current == "*Xstrophe") {
+				break;
+			}
+			current->setStrophe(strophestarts[i]);
+			current = current->getNextToken();
+		}
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileStructure::getStropheCount --  Return the number of
+//    strophes in the file (for void input), or return the number
+//    of strophes for a particular spine (for int input).
+//
+
+int HumdrumFileStructure::getStropheCount(void) {
+	return (int)m_strophes1d.size();
+}
+
+
+int HumdrumFileStructure::getStropheCount(int spineindex) {
+	if ((spineindex < 0) || (spineindex >= (int)m_strophes2d.size())) {
+		return 0;
+	}
+	return (int)m_strophes2d.at(spineindex).size();
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileStructure::getStropheStart --
+//
+
+HTp HumdrumFileStructure::getStropheStart(int index) {
+	if ((index < 0) || (index >= (int)m_strophes1d.size())) {
+		return NULL;
+	}
+	return m_strophes1d.at(index).first;
+}
+
+HTp HumdrumFileStructure::getStropheStart(int spine, int index) { 
+		if ((spine < 0) || (index < 0)) {
+			return NULL;
+		}
+		if (spine >= (int)m_strophes2d.size()) {
+			return NULL;
+		}
+		if (index >= (int)m_strophes2d.at(spine).size()) {
+			return NULL;
+		}
+		return m_strophes2d.at(spine).at(index).first;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileStructure::getStropheEnd --
+//
+
+HTp HumdrumFileStructure::getStropheEnd(int index) {
+	if ((index < 0) || (index >= (int)m_strophes1d.size())) {
+		return NULL;
+	}
+	return m_strophes1d.at(index).last;
+}
+
+
+HTp HumdrumFileStructure::getStropheEnd(int spine, int index) {
+		if ((spine < 0) || (index < 0)) {
+			return NULL;
+		}
+		if (spine >= (int)m_strophes2d.size()) {
+			return NULL;
+		}
+		if (index >= (int)m_strophes2d.at(spine).size()) {
+			return NULL;
+		}
+		return m_strophes2d.at(spine).at(index).last;
+}
+
+
+
+
 //////////////////////////////
 //
 // HumdrumFileStructure::HumdrumFileStructure -- HumdrumFileStructure
@@ -25560,92 +25818,6 @@ bool HumdrumFileStructure::analyzeStructure(void) {
 	analyzeSignifiers();
 	return isValid();
 }
-
-
-
-//////////////////////////////
-//
-// HumdrumFileStructure::analyzeStrophes --
-//
-
-bool HumdrumFileStructure::analyzeStrophes(void) {
-	int scount = (int)m_strand1d.size();
-	// bool dataQ;
-	vector<HTp> strophestarts;
-	strophestarts.reserve(100);
-	for (int i=0; i<scount; i++) {
-		// dataQ = false;
-		HTp current = m_strand1d.at(i).first;
-		HTp send = m_strand1d.at(i).last;
-		if (!send) {
-			continue;
-		}
-		while (current && (current != send)) {
-			if (current->isData()) {
-				// not a strophe (data not allowed in subspine before strophe marker).
-				break;
-			}
-			if (current->compare(0, 3, "*S/") == 0) {
-				int track = current->getTrack();
-				HTp first = current->getPreviousFieldToken();
-				if (first) {
-					int trackp = first->getTrack();
-					if (track == trackp) {
-						if (first->compare(0, 3, "*S/") == 0) {
-							bool found = false;
-							for (int j=0; j<(int)strophestarts.size(); j++) {
-								if (strophestarts[j] == first) {
-									found = true;
-									break;
-								}
-							}
-							if (!found) {
-								strophestarts.push_back(first);
-							}
-						}
-					}
-				}
-				bool found = false;
-				for (int j=0; j<(int)strophestarts.size(); j++) {
-					if (strophestarts[j] == current) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					strophestarts.push_back(current);
-				}
-				break;
-			}
-			current = current->getNextToken();
-		}
-	}
-
-	// Now store strophe information in tokens.  Currently
-	// spine splits are not allowed in strophes.  Spine merges
-	// are OK: the first strophe will dominate in a merge.
-	for (int i=0; i<(int)strophestarts.size(); i++) {
-		HTp current = strophestarts[i];
-		if (current->hasStrophe()) {
-			continue;
-		}
-		current->setStrophe(strophestarts[i]);
-		current = current->getNextToken();
-		while (current) {
-			if (current->hasStrophe()) {
-				break;
-			}
-			if (*current == "*Xstrophe") {
-				break;
-			}
-			current->setStrophe(strophestarts[i]);
-			current = current->getNextToken();
-		}
-	}
-
-	return true;
-}
-
 
 
 
@@ -60870,6 +61042,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
 		} else if (commands[i].first == "spinetrace") {
 			RUNTOOL(spinetrace, infile, commands[i].second, status);
+		} else if (commands[i].first == "strophe") {
+			RUNTOOL(strophe, infile, commands[i].second, status);
 		} else if (commands[i].first == "tabber") {
 			RUNTOOL(tabber, infile, commands[i].second, status);
 		} else if (commands[i].first == "tassoize") {
@@ -78504,7 +78678,7 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 						m_humdrum_text << "!!LO:TX:Z=20:X=-90:t=" << barline << endl;
 					}
 				}
-			} else if (doubleQ && (lastbarnum > -1) && (fabs(barnum - lastbarnum) > 1)) {
+			} else if (doubleQ && (lastbarnum > -1) && (abs(barnum - lastbarnum) > 1)) {
 				printDoubleBarline(infile, i);
 				measurestart = 0;
 			} else if (measurestart && infile[i].isBarline()) {
@@ -86624,6 +86798,179 @@ void Tool_spinetrace::processFile(HumdrumFile& infile) {
 		m_humdrum_text << "\n";
 	}
 }
+
+
+
+
+/////////////////////////////////
+//
+// Tool_strophe::Tool_strophe -- Set the recognized options for the tool.
+//
+
+Tool_strophe::Tool_strophe(void) {
+	define("l|list=b",         "list all possible variants");
+	define("m=b",              "mark strophe music");
+	define("mark|marker=s:@",  "character to mark with");
+	define("c|color=s:red",    "character to mark with");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_strophe::run -- Do the main work of the tool.
+//
+
+bool Tool_strophe::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	for (auto it = m_variants.begin(); it != m_variants.end(); ++it) {
+		m_free_text << *it << endl;
+	}
+	return status;
+}
+
+
+bool Tool_strophe::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else if (!m_listQ) {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_strophe::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else if (!m_listQ) {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_strophe::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_strophe::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_strophe::initialize(void) {
+	m_listQ     = getBoolean("list");
+	m_markQ     = getBoolean("m");
+	m_marker    = getString("marker");
+	m_color     = getString("color");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_strophe::processFile --
+//
+
+void Tool_strophe::processFile(HumdrumFile& infile) {
+	infile.analyzeStrophes();
+	if (m_listQ) {
+		displayStropheVariants(infile);
+	} else {
+		markWithColor(infile);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_strophe::markWithColor --  Maybe give different colors
+//     to different variants.  Currently only marking the primary
+//     strophe.
+//
+
+void Tool_strophe::markWithColor(HumdrumFile& infile) {
+	int counter = 0;
+	for (int i=0; i<infile.getStropheCount(); i++) {
+		HTp strophestart = infile.getStropheStart(i);
+		HTp stropheend = infile.getStropheEnd(i);
+		counter += markStrophe(strophestart, stropheend);
+	}
+	if (counter) {
+		string rdf = "!!!RDF**kern: ";
+		rdf += m_marker;
+		rdf += " = marked note, strophe";
+		if (m_color != "red") {
+			rdf += ", color=\"";
+			rdf += m_color;
+			rdf += "\"";
+		}
+		infile.appendLine(rdf);
+		infile.createLinesFromTokens();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_strophe::markStrophe -- Returns the number of marked notes/rests.
+//
+
+int Tool_strophe::markStrophe(HTp strophestart, HTp stropheend) {
+	HTp current = strophestart;
+	int output = 0;
+	while (current && current != stropheend) {
+		if (current->isData() && !current->isNull()) {
+			// Think about multiple marking for individual notes in chords.
+			string value = current->getText();
+			value += m_marker;
+			current->setText(value);
+			output++;
+		}
+		current = current->getNextToken();
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// displayStropheVariants --
+//
+
+void Tool_strophe::displayStropheVariants(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->compare(0, 3, "*S/") != 0) {
+				continue;
+			}
+			string variant = token->substr(3);
+			m_variants.insert(variant);
+		}
+	}
+}
+
+
+
 
 
 
