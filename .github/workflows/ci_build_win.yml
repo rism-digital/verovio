@@ -1,0 +1,106 @@
+name: Verovio CI Build
+
+on:
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - develop
+      # Push events on ci-test branch (uncomment if needed for testing purposes)
+      - ci-test
+
+# globals
+env:
+  # build artifacts
+  WIN_BUILD: win-build
+
+  # temporary directories
+  TEMP_DIR: temp-dir
+
+
+
+jobs:
+  ###############################################################################################
+  # Build c++ code on windwos.                                                                  #
+  # Adapted from https://ariya.io/2020/07/on-github-actions-with-msys2 . #
+  ###############################################################################################
+  build_win:
+    name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.msystem }}
+    # This job runs on all the os specified in strategy.matrix.os
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+        compiler: [ gcc, clang ]
+        msystem: [ MINGW32, MINGW64 ]
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Set up msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          install: make git
+
+      - name: Configure gcc (MINGW64)
+        if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'gcc') }}
+        run: |
+          pacman --noconfirm -S gcc mingw-w64-x86_64-cmake
+
+          # set environment variables
+          echo CC=gcc >> $GITHUB_ENV
+          echo CXX=g++ >> $GITHUB_ENV
+
+      - name: Configure gcc (MINGW32)
+        if: ${{ (matrix.msystem == 'MINGW32') && (matrix.compiler == 'gcc') }}
+        run: |
+          pacman --noconfirm -S gcc mingw-w64-i686-cmake
+
+          # set environment variables
+          echo CC=gcc >> $GITHUB_ENV
+          echo CXX=g++ >> $GITHUB_ENV
+
+      - name: Configure clang (MINGW 64)
+        if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'clang') }}
+        run: |
+          pacman --noconfirm -S mingw-w64-x86_64-clang mingw-w64-x86_64-cmake
+
+          # set environment variables
+          echo CC=clang >> $GITHUB_ENV
+          echo CXX=clang++ >> $GITHUB_ENV
+
+      - name: Configure clang (MINGW 32)
+        if: ${{ (matrix.msystem == 'MINGW32') && (matrix.compiler == 'clang') }}
+        run: |
+          pacman --noconfirm -S mingw-w64-i686-clang mingw-w64-i686-cmake
+
+          # set environment variables
+          echo CC=clang >> $GITHUB_ENV
+          echo CXX=clang++ >> $GITHUB_ENV
+
+      - name: Check settings and dry-run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          echo "CC: ${CC}"
+          echo "CXX: ${CXX}"
+          ${{ matrix.compiler }} --version
+
+          which cmake
+          cmake --version
+
+          cmake -S ../cmake -B debug -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Run make
+        working-directory: ${{ github.workspace }}/tools
+        shell: bash
+        run: |
+          cmake ../cmake
+          make -j8
