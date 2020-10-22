@@ -132,18 +132,19 @@ jobs:
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 
           else
-            # check XCode version
             TARGET_XCODE="/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
             echo $TARGET_XCODE
 
-            echo "----- grep xcodebuild"
-            xcodebuild -version | grep Xcode
-
-            echo "----- if"
-            if xcode-select --print-path | grep Xcode; then
-              echo "HOORAY"
+            # check XCode version
+            if [ (xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
+              echo "XCode ${{ matrix.version }} already in use via..."
               xcode-select --print-path
-              echo /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
+            else
+              # switch XCode version
+              # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
+              # sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+              echo "Switching to XCode ${{ matrix.version }} via..."
+              xcode-select --print-path
             fi
 
             # switch XCode version
