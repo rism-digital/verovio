@@ -169,13 +169,6 @@ jobs:
           cmake ../cmake
           make -j8
 
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/tools
-        run: |
-          pwd
-          ls -al
-
 
   ###########################
   # Build the CLI artifacts #
@@ -208,12 +201,6 @@ jobs:
           name: ${{ env.CLI_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
-        run: |
-          pwd
-          ls -al
 
   #####################################
   # Set up and cache emscripten build #
@@ -299,7 +286,7 @@ jobs:
       - name: Verify emscripten build
         run: emcc -v
 
-      - name: ${{ matrix.toolkit.message }}
+      - name: ${{ matrix.toolkit.message }} ({{ matrix.toolkit.options }})
         working-directory: ${{ github.workspace }}/emscripten
         run: ./buildToolkit ${{ matrix.toolkit.options }}
 
