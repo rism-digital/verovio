@@ -91,7 +91,7 @@ jobs:
           make -j8
 
       - name: Create temp dir
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ github.workspace }}/${{ env.GH_PAGES_DIR }}
         run: |
           mkdir -p $TEMP_DIR/
 
@@ -140,6 +140,12 @@ jobs:
             fi
           done
 
+      - name: Upload test artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TEST_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+
       - name: Verify
         working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
         run: |
@@ -150,8 +156,8 @@ jobs:
 
           ls -al
 
-      - name: Upload test artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.TEST_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+      - name: Check git status
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: |
+          git config --get remote.origin.url
+          git status
