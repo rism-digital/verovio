@@ -137,19 +137,19 @@ jobs:
 
             # check XCode version
             if [ $(xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
-              echo "XCode ${{ matrix.version }} already in use via..."
+              echo "XCode ${{ matrix.version }} already in use..."
               xcode-select --print-path
             else
               # switch XCode version
               # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
-              # sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
-              echo "Switching to XCode ${{ matrix.version }} via..."
+              echo "Found active $(xcodebuild -version). Switching to XCode ${{ matrix.version }}..."
+              sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
               xcode-select --print-path
             fi
 
             # switch XCode version
             # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
-            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+            # sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
             # set environment variables from XCode
             echo CC=$(xcrun --find clang) >> $GITHUB_ENV
