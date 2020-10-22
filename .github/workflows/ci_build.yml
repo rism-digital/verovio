@@ -87,14 +87,17 @@ jobs:
             compiler: clang
             version: "10"
 
-
-          - os: macos-latest
+          - os: macos-10.15
             compiler: xcode
-            version: "default"
+            version: "11.7"
 
-          - os: macos-latest
-            compiler: gcc
-            version: "latest"
+          - os: macos-10.15
+            compiler: xcode
+            version: "12.1"
+
+          - os: macos-10.15
+            compiler: g++
+            version: "9"
 
     steps:
       - name: Checkout main repo
@@ -126,14 +129,27 @@ jobs:
       - name: Configure macOS with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'macOS'
         run: |
-          brew install ninja llvm
-          sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
-          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
-            echo CC=gcc >> $GITHUB_ENV
-            echo CXX=g++ >> $GITHUB_ENV
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
+            # set environment variables (use alias gcc-9)
+            echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
+
           else
-            echo CC=clang >> $GITHUB_ENV
-            echo CXX=clang++ >> $GITHUB_ENV
+            TARGET_XCODE="/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
+
+            # check XCode version
+            if [ $(xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
+              echo "XCode ${{ matrix.version }} already set..."
+            else
+              # switch XCode version
+              # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
+              echo "Found active $(xcodebuild -version | grep Xcode). Switching to XCode ${{ matrix.version }}..."
+              sudo xcode-select -s $TARGET_XCODE
+            fi
+
+            # set environment variables from XCode
+            echo CC=$(xcrun --find clang) >> $GITHUB_ENV
+            echo CXX=$(xcrun --find clang++) >> $GITHUB_ENV
           fi
 
 
