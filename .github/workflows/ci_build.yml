@@ -134,7 +134,7 @@ jobs:
           else
             # switch XCode version
             # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
-            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app//Contents/Developer
 
             # set environment variables from XCode
             echo CC=$(xcrun --find clang) >> $GITHUB_ENV
