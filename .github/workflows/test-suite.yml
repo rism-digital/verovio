@@ -144,10 +144,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TEST_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+          path: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/${{ env.TEMP_DIR }}
 
       - name: Verify
-        working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
+        working-directory: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/${{ env.TEMP_DIR }}
         run: |
           pwd
 
@@ -157,7 +157,7 @@ jobs:
           ls -al
 
       - name: Check git status
-        working-directory: ${{ env.GH_PAGES_DIR }}
+        working-directory: ${{ github.workspace }}/${{ env.GH_PAGES_DIR }}
         run: |
           git config --get remote.origin.url
           git status
