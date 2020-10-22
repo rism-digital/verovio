@@ -497,6 +497,10 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         }
     }
 
+    // The code should not be null at this stage. It can above but only with mensural notation.
+    // Maybe this can be refactored with a distinct method for radius in mensural notation.
+    assert(code);
+
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
