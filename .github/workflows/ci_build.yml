@@ -87,21 +87,6 @@ jobs:
             compiler: clang
             version: "10"
 
-          #          - os: windows-latest
-          #            compiler: cl
-          #            version: "default"
-          #
-          #          - os: windows-latest
-          #            compiler: clang-cl
-          #            version: "latest"
-          #
-          #          - os: windows-latest
-          #            compiler: clang
-          #            version: "latest"
-          #
-          #          - os: windows-latest
-          #            compiler: gcc
-          #            version: "latest"
 
           - os: macos-latest
             compiler: xcode
@@ -149,24 +134,6 @@ jobs:
             echo CXX=clang++ >> $GITHUB_ENV
           fi
 
-      # Installation step for Windows
-      - name: Install Windows (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: runner.os == 'windows'
-        run: |
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-          scoop install ninja llvm --global
-          if ("${{ matrix.config.compiler }}" -eq "gcc") {
-            echo "::set-env name=CC::gcc"
-            echo "::set-env name=CXX::g++"
-          } elseif ("${{ matrix.config.compiler }}" -eq "clang") {
-            echo "::set-env name=CC::clang"
-            echo "::set-env name=CXX::clang++"
-          } else {
-            echo "::set-env name=CC::${{ matrix.config.compiler }}"
-            echo "::set-env name=CXX::${{ matrix.config.compiler }}"
-          }
-          # Make all PATH additions made by scoop and ourselves global.
-          echo "::set-env name=PATH::$env:PATH"
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
