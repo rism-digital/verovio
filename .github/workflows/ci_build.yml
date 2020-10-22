@@ -90,7 +90,7 @@ jobs:
 
           - os: macos-10.15
             compiler: xcode
-            version: "12.1"
+            version: "11.7"
 
           - os: macos-10.15
             compiler: g++
@@ -133,7 +133,6 @@ jobs:
 
           else
             TARGET_XCODE="/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
-            echo $TARGET_XCODE
 
             # check XCode version
             if [ $(xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
