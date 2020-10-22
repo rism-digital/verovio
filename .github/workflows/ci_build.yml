@@ -133,11 +133,8 @@ jobs:
 
           else
             # check XCode version
-            echo "----- xcode select --print-path"
-            echo "$(xcode-select --print-path)"
-
-            echo "----- grep print path"
-            xcode-select --print-path | grep Xcode
+            TARGET_XCODE = /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
+            echo $TARGET_XCODE
 
             echo "----- grep xcodebuild"
             xcodebuild -version | grep Xcode
