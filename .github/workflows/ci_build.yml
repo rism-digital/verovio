@@ -174,7 +174,7 @@ jobs:
     continue-on-error: true
     defaults:
       run:
-        shell: msys2 {0}
+        shell: bash
 
     strategy:
       matrix:
