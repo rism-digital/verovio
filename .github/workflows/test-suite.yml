@@ -163,7 +163,7 @@ jobs:
           git status
 
           echo "-------"
-          git diff ${{ github.sha }}~ ${{ github.sha }} 
+          git diff --cached
 
       - uses: lots0logs/gh-action-get-changed-files@2.1.4
         id: get_changed_files
