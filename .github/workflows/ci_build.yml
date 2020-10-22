@@ -133,9 +133,14 @@ jobs:
 
           else
             # check XCode version
+            echo "xcode select --print-path"
             echo "$(xcode-select --print-path)"
+
+            echo "grep"
             xcode-select --print-path | grep /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
-            if [ echo "$(xcode-select --print-path)" != "/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer" ]; then
+
+            echo "if"
+            if xcode-select --print-path | grep /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer; then
               echo "HOORAY"
               xcode-select --print-path
               echo /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
