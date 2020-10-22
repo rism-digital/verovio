@@ -464,11 +464,11 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         assert(note);
         dur = note->GetDrawingDur();
         if (note->IsMensuralDur() && !isInLigature) {
-            return doc->GetGlyphWidth(
-                       note->GetMensuralSmuflNoteHead(), staff->m_drawingStaffSize, this->GetDrawingCueSize())
-                / 2;
+            code = note->GetMensuralSmuflNoteHead();
         }
-        code = note->GetNoteheadGlyph(dur);
+        else {
+            code = note->GetNoteheadGlyph(dur);
+        }
     }
     else if (this->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(this);
@@ -495,6 +495,10 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
         }
     }
+
+    // The code should not be null at this stage. It can above but only with mensural notation.
+    // Maybe this can be refactored with a distinct method for radius in mensural notation.
+    assert(code);
 
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }

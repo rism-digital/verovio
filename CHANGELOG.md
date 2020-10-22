@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.0.1] - 2020-10-22
+* Fix bug with mensural notation notes
+
 ## [3.0.0] - 2020-10-05
 * Support for buzz roll tremolos (@rettinghaus)
 * Support for `Sprechgesang` stems (@rettinghaus)
