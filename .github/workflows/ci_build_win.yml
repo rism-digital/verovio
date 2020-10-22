@@ -1,4 +1,4 @@
-name: Verovio CI Build
+name: Verovio CI Build (Win)
 
 on:
   push:
