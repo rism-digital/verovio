@@ -65,6 +65,7 @@ jobs:
     # set matrix with config options
     # (runs the following steps for every target in parallel)
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-20.04
@@ -152,6 +153,14 @@ jobs:
             echo CXX=$(xcrun --find clang++) >> $GITHUB_ENV
           fi
 
+      - name: Check settings and dry-run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          echo "CC: ${CC}"
+          echo "CXX: ${CXX}"
+
+          cmake --version
+          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
