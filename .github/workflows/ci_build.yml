@@ -142,14 +142,10 @@ jobs:
             else
               # switch XCode version
               # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
-              echo "Found active $(xcodebuild -version). Switching to XCode ${{ matrix.version }}..."
-              sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+              echo "Found active $(xcodebuild -version | grep Xcode). Switching to XCode ${{ matrix.version }}..."
+              sudo xcode-select -s $TARGET_XCODE
               xcode-select --print-path
             fi
-
-            # switch XCode version
-            # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
-            # sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
             # set environment variables from XCode
             echo CC=$(xcrun --find clang) >> $GITHUB_ENV
