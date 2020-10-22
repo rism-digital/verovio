@@ -168,7 +168,7 @@ jobs:
   # Adapted from https://ariya.io/2020/07/on-github-actions-with-msys2 . #
   ###############################################################################################
   build_win:
-    name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.version }}
+    name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.msystem }}
     # This job runs on all the os specified in strategy.matrix.os
     runs-on: ${{ matrix.os }}
     continue-on-error: true
@@ -203,15 +203,24 @@ jobs:
 
       - name: Configure clang (MINGW 64)
         if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'clang') }}
-        run: pacman --noconfirm -S mingw-w64-x86_64-clang mingw-w64-x86_64-cmake
+        run: |
+          pacman --noconfirm -S mingw-w64-x86_64-clang mingw-w64-x86_64-cmake
+
+          # set environment variables
+          echo CC=clang >> $GITHUB_ENV
+          echo CXX=clang++ >> $GITHUB_ENV
 
       - name: Configure clang (MINGW 32)
         if: ${{ (matrix.msystem == 'MINGW32') && (matrix.compiler == 'clang') }}
-        run: pacman --noconfirm -S mingw-w64-i686-clang mingw-w64-i686-cmake
+        run: |
+          pacman --noconfirm -S mingw-w64-i686-clang mingw-w64-i686-cmake
+
+          # set environment variables
+          echo CC=clang >> $GITHUB_ENV
+          echo CXX=clang++ >> $GITHUB_ENV
 
       - name: Check settings and dry-run make
         working-directory: ${{ github.workspace }}/tools
-        # shell: bash
         run: |
           echo "CC: ${CC}"
           echo "CXX: ${CXX}"
@@ -220,6 +229,7 @@ jobs:
           which cmake
           cmake --version
 
+          cmake -G"MSYS Makefiles"
           cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
