@@ -99,6 +99,7 @@ jobs:
       - name: Run tests
         env:
           TEST_DIR: ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests
+          OUTPUT_DIR: ${{ github.workspace }}/${{ env.TEMP_DIR }}
         working-directory: ${{ github.workspace }}/tools
         run: |
           for testcategory in $TEST_DIR/*; do
@@ -130,7 +131,7 @@ jobs:
               echo "* Copying SVG files..."
               count=$(ls -1 $testcategory/*.svg 2>/dev/null | wc -l)
               if [ "$count" != 0 ]; then
-                mv $testcategory/*.svg $GITHUB_WORKSPACE/$TEMP_DIR;
+                mv $testcategory/*.svg $OUTPUT_DIR;
               else
                 echo "### No svg output to copy here..."
               fi
@@ -149,3 +150,8 @@ jobs:
 
           ls -al
 
+      - name: Upload test artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TEST_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
