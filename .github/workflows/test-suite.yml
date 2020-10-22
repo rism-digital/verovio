@@ -169,10 +169,20 @@ jobs:
         id: get_changed_files
         with:
           token: "${{secrets.GITHUB_TOKEN}}"
+      
+      - name: Echo changed files
+        run: | 
+          echo "all: ${{ steps.get_changed_files.outputs.all }}"
+          echo "added: ${{ steps.get_changed_files.outputs.added }}"
+          echo "modified: ${{ steps.get_changed_files.outputs.modified }}"
+          echo "deleted: ${{ steps.get_changed_files.outputs.deleted }}"
+          echo "renamed: ${{ steps.get_changed_files.outputs.renamed }}"
+      
       - name: Read changed files
         id: read_changes
         uses: komorebitech/read-files-action@v1.5
         with:
           files: "${{ steps.get_changed_files.outputs.modified }}"
-      - name: Echo changees
+      
+      - name: Echo changes
         run: echo "${{ steps.read_changes.outputs.content }}"
