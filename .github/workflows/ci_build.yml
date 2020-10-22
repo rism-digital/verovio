@@ -244,7 +244,8 @@ jobs:
           no-cache: true
 
       - name: Verify emscripten build
-        run: emcc -v
+        run: |
+          # emcc -v
 
 
   ##################################
