@@ -193,7 +193,7 @@ jobs:
           install: make git
 
       - name: Configure gcc (MINGW64)
-        if: ${{ (matrix.msystem == 'MINGW64') && ${{ matrix.compiler == 'gcc' }}
+        if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'gcc') }}
         run: |
           pacman --noconfirm -S gcc mingw-w64-x86_64-cmake
 
@@ -202,7 +202,7 @@ jobs:
           echo CXX=g++ >> $GITHUB_ENV
 
       - name: Configure gcc (MINGW32)
-        if: ${{ (matrix.msystem == 'MINGW32') && ${{ matrix.compiler == 'gcc' }}
+        if: ${{ (matrix.msystem == 'MINGW32') && (matrix.compiler == 'gcc') }}
         run: |
           pacman --noconfirm -S gcc mingw-w64-i686-cmake
 
