@@ -132,6 +132,9 @@ jobs:
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 
           else
+            # check XCode version
+            xcode-select -p
+
             # switch XCode version
             # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
             sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
