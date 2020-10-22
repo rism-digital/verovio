@@ -190,8 +190,7 @@ jobs:
 
       - name: Create temp dir
         working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p $TEMP_DIR/
+        run: mkdir -p $TEMP_DIR/
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
@@ -201,8 +200,7 @@ jobs:
 
       - name: Update cli.txt
         working-directory: ${{ github.workspace }}/tools
-        run: |
-          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
+        run: ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
         uses: actions/upload-artifact@v2
@@ -279,8 +277,7 @@ jobs:
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p $TEMP_DIR/
+        run: mkdir -p $TEMP_DIR/
 
       # Restore system libraries from cache
       - name: Restore cache
@@ -302,17 +299,13 @@ jobs:
       - name: Verify emscripten build
         run: emcc -v
 
-      - name: Build toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+      - name: ${{ matrix.toolkit.message }}
         working-directory: ${{ github.workspace }}/emscripten
-        run: |
-          echo "${{ matrix.toolkit.message }}"
-          ./buildToolkit ${{ matrix.toolkit.options }}
+        run: ./buildToolkit ${{ matrix.toolkit.options }}
 
       - name: Copy build into TEMP_DIR
         working-directory: ${{ github.workspace }}/emscripten
-        run: |
-          echo "Copy toolkit build into $TEMP_DIR..."
-          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
+        run: cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         uses: actions/upload-artifact@v2
