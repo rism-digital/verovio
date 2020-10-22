@@ -61,7 +61,7 @@ jobs:
               if [ "$testcategory" == "$TEST_DIR/ligature" ]
               then
                 echo "Found ligature"
-                continue
+                # continue
               fi
 
               for testfile in $testcategory/*.mei; do echo $testfile; done
@@ -79,7 +79,8 @@ jobs:
           # path for cache
           path: ${{ github.workspace }}/tools/verovio
           # key for cache
-          key: ${{ runner.os }}-verovio-build-${{ github.sha }}
+          key: ${{ runner.os }}-verovio-build
+          # key: ${{ runner.os }}-verovio-build-${{ github.sha }}
 
       # if no cache is found, build verovio
       - name: Run make
@@ -142,6 +143,9 @@ jobs:
         working-directory: ${{ github.WORKSPACE }}/${{ env.TEMP_DIR }}
         run: |
           pwd
+
+          count=$(ls -1 *.svg 2>/dev/null | wc -l)
+          echo "Found $count SVG files"
+
           ls -al
-          ls -R
 
