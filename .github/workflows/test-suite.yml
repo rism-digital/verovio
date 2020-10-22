@@ -161,3 +161,18 @@ jobs:
         run: |
           git config --get remote.origin.url
           git status
+
+          echo "-----------"
+          git diff ${{ github.sha }}~ ${{ github.sha }} 
+
+      - uses: lots0logs/gh-action-get-changed-files@2.1.4
+        id: get_changed_files
+        with:
+          token: "${{secrets.GITHUB_TOKEN}}"
+      - name: Read changed files
+        id: read_changes
+        uses: komorebitech/read-files-action@v1.5
+        with:
+          files: "${{ steps.get_changed_files.outputs.modified }}"
+      - name: Echo changees
+        run: echo "${{ steps.read_changes.outputs.content }}"
