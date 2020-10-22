@@ -133,13 +133,16 @@ jobs:
 
           else
             # check XCode version
-            echo "xcode select --print-path"
+            echo "----- xcode select --print-path"
             echo "$(xcode-select --print-path)"
 
-            echo "grep"
+            echo "----- grep print path"
             xcode-select --print-path | grep Xcode
 
-            echo "if"
+            echo "----- grep xcodebuild"
+            xcodebuild -version | grep Xcode
+
+            echo "----- if"
             if xcode-select --print-path | grep Xcode; then
               echo "HOORAY"
               xcode-select --print-path
