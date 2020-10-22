@@ -7,6 +7,7 @@ on:
     branches:
       # Push events on develop branch
       - develop
+      - '**'
       # Push events on ci-test branch (uncomment if needed for testing purposes)
       # - ci-test
 
@@ -38,8 +39,8 @@ env:
   DOXYGEN_BRANCH: master
 
   # emscripten
-  EMSCRIPTEN_VERSION: latest
-  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+  EM_VERSION: 2.0.7
+  EM_CACHE_FOLDER: 'emsdk-cache'
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
@@ -229,16 +230,15 @@ jobs:
         id: cache
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
 
       - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
-          no-cache: true
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
 
       - name: Verify emscripten build
         run: emcc -v
@@ -282,30 +282,22 @@ jobs:
         run: |
           mkdir -p $TEMP_DIR/
 
-      # Restore system libraries generated during build time from cache
+      # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
         uses: actions/cache@v2
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
 
       # Install and/or activate emsdk
-      - name: Set up emsdk (cache not found)
-        uses: mymindstorm/setup-emsdk@v7
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          no-cache: true
-      - name: Set up emsdk (cache found)
-        if: steps.restore_cache.outputs.cache-hit == 'true'
+      - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
-          no-cache: true
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
 
       - name: Verify emscripten build
         run: emcc -v
