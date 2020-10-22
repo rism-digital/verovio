@@ -136,7 +136,7 @@ jobs:
             echo $TARGET_XCODE
 
             # check XCode version
-            if [ (xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
+            if [ $(xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
               echo "XCode ${{ matrix.version }} already in use via..."
               xcode-select --print-path
             else
