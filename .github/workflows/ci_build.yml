@@ -174,7 +174,7 @@ jobs:
     continue-on-error: true
     defaults:
       run:
-        shell: bash
+        shell: msys2 {0}
 
     strategy:
       matrix:
@@ -242,6 +242,7 @@ jobs:
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
+        shell: bash
         run: |
           cmake -S ../cmake -G"MSYS Makefiles"
           make -j8
