@@ -192,10 +192,19 @@ jobs:
           msystem: ${{ matrix.msystem }}
           install: make git
 
-      - name: Configure gcc
-        if: ${{ matrix.compiler == 'gcc' }}
+      - name: Configure gcc (MINGW64)
+        if: ${{ (matrix.msystem == 'MINGW64') && ${{ matrix.compiler == 'gcc' }}
         run: |
-          pacman --noconfirm -S gcc cmake
+          pacman --noconfirm -S gcc mingw-w64-x86_64-cmake
+
+          # set environment variables
+          echo CC=gcc >> $GITHUB_ENV
+          echo CXX=g++ >> $GITHUB_ENV
+
+      - name: Configure gcc (MINGW32)
+        if: ${{ (matrix.msystem == 'MINGW32') && ${{ matrix.compiler == 'gcc' }}
+        run: |
+          pacman --noconfirm -S gcc mingw-w64-i686-cmake
 
           # set environment variables
           echo CC=gcc >> $GITHUB_ENV
@@ -229,14 +238,14 @@ jobs:
           which cmake
           cmake --version
 
-          cmake -G"MSYS Makefiles"
-          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+          cmake -S ../cmake -B debug -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
         run: |
           cmake ../cmake
           make -j8 CC=${{matrix.compiler}}
+
 
   ###########################
   # Build the CLI artifacts #
