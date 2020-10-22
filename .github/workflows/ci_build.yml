@@ -133,11 +133,14 @@ jobs:
 
           else
             # check XCode version
-            xcode-select -p
+            if [ xcode-select --print-path != "/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer" ]; then
+              xcode-select --print-path
+              echo /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
+            fi
 
             # switch XCode version
             # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
-            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
+            sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
             # set environment variables from XCode
             echo CC=$(xcrun --find clang) >> $GITHUB_ENV
