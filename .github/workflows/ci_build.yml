@@ -133,7 +133,7 @@ jobs:
 
           else
             # check XCode version
-            $(xcode-select --print-path)
+            echo "$(xcode-select --print-path)"
             if [ xcode-select --print-path != "/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer" ]; then
               xcode-select --print-path
               echo /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
