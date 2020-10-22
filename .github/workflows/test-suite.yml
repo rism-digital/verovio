@@ -162,7 +162,7 @@ jobs:
           git config --get remote.origin.url
           git status
 
-          echo "-----------"
+          echo "-------"
           git diff ${{ github.sha }}~ ${{ github.sha }} 
 
       - uses: lots0logs/gh-action-get-changed-files@2.1.4
