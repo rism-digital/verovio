@@ -133,7 +133,7 @@ jobs:
 
           else
             # check XCode version
-            TARGET_XCODE = /Applications/Xcode_${{ matrix.version }}.app/Contents/Developer
+            TARGET_XCODE = "/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
             echo $TARGET_XCODE
 
             echo "----- grep xcodebuild"
