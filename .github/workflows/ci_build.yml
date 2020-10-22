@@ -190,11 +190,16 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-          install: make
+          install: make git
 
       - name: Configure gcc
         if: ${{ matrix.compiler == 'gcc' }}
-        run: pacman --noconfirm -S gcc cmake
+        run: |
+          pacman --noconfirm -S gcc cmake
+
+          # set environment variables
+          echo CC=gcc >> $GITHUB_ENV
+          echo CXX=g++ >> $GITHUB_ENV
 
       - name: Configure clang (MINGW 64)
         if: ${{ (matrix.msystem == 'MINGW64') && (matrix.compiler == 'clang') }}
@@ -208,12 +213,14 @@ jobs:
         working-directory: ${{ github.workspace }}/tools
         # shell: bash
         run: |
+          echo "CC: ${CC}"
+          echo "CXX: ${CXX}"
           ${{ matrix.compiler }} --version
 
           which cmake
           cmake --version
 
-          cmake CC=${{matrix.compiler}} -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
