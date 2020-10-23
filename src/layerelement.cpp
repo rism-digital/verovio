@@ -7,6 +7,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <climits>
 #include <math.h>
@@ -644,7 +645,7 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
     return result;
 }
 
-bool LayerElement::AreElementsInUnison(
+int LayerElement::CountElementsInUnison(
     const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
 {
     // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
@@ -664,21 +665,40 @@ bool LayerElement::AreElementsInUnison(
     // 2. Location is lesser/greater than start/end of either - it's ok, overlapping notes can still be in unison
     if (!difference.empty()) {
         for (const auto &element : difference) {
-            if (((element > *firstChord.begin()) && (element < *firstChord.rbegin()))
-                || ((element > *secondChord.begin()) && (element < *secondChord.rbegin())))
-                return false;
+            if (((firstChord.size() <= secondChord.size()) && (element > *firstChord.begin())
+                    && (element < *firstChord.rbegin()))
+                || ((firstChord.size() > secondChord.size()) && (element > *secondChord.begin())
+                    && (element < *secondChord.rbegin())))
+                return 0;
         }
     }
+
     // If there are no `middle` notes, check whether chords can be in unison with regards of stem direction
     // With DOWN stem direction, highest note of the chord HAS to be in unison. If topmost location of the chord
     // is higher than topmost location of the opposing chord it means that these elements cannot be in unison.
     // Same applies to the UP stem direction, just with reversed condition
     if (stemDirection == STEMDIRECTION_down) {
-        return ((*firstChord.rbegin() <= *secondChord.rbegin()) && (*firstChord.begin() <= *secondChord.begin()));
+        if ((*firstChord.rbegin() > *secondChord.rbegin()) || (*firstChord.begin() > *secondChord.begin())) return 0;
     }
     else {
-        return ((*firstChord.rbegin() >= *secondChord.rbegin()) && (*firstChord.begin() >= *secondChord.begin()));
+        if ((*firstChord.rbegin() < *secondChord.rbegin()) || (*firstChord.begin() < *secondChord.begin())) return 0;
     }
+
+    // Finally, check if notes in unison are at the proper distance to be drawn as unison, as well as get number of
+    // elements in unison
+    std::vector<int> intersection;
+    intersection.resize(firstChord.size() > secondChord.size() ? firstChord.size() : secondChord.size());
+    auto it = std::set_intersection(
+        firstChord.begin(), firstChord.end(), secondChord.begin(), secondChord.end(), intersection.begin());
+    intersection.resize(it - intersection.begin());
+    if (intersection.empty()) return false;
+    for (int i = 0; i < intersection.size() - 1; ++i) {
+        if (std::abs(intersection.at(i) - intersection.at(i + 1)) == 1) {
+            return 0;
+        }
+    }
+
+    return intersection.size();
 }
 
 void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
@@ -688,53 +708,57 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
             Note *note = vrv_cast<Note *>(this);
             assert(note);
             if (note->GetParent()->Is(CHORD)) break;
-            auto [margin, inUnisonWith] = note->CalcNoteHorizontalOverlap(doc, otherElements, false);
-            if (inUnisonWith == -1)
-                note->SetDrawingXRel(note->GetDrawingXRel() + margin);
-            else
-                isUnison = true;
+            auto [margin, isInUnison] = note->CalcNoteHorizontalOverlap(doc, otherElements, false);
+            isUnison = isInUnison;
+            if (!isInUnison) note->SetDrawingXRel(note->GetDrawingXRel() + margin);
             break;
         }
         case CHORD: {
             Chord *chord = vrv_cast<Chord *>(this);
             assert(chord);
-            int lastElementInUnison = -1;
+            bool chordInUnison = false;
             int margin = 0;
-            std::set<int> chordElementLocations, otherElementLocations;
+            // get positions of other elements
+            std::set<int> otherElementLocations;
+            for (auto element : otherElements) {
+                if (element->Is(NOTE)) {
+                    Note *note = vrv_cast<Note *>(element);
+                    assert(note);
+                    otherElementLocations.insert(note->GetDrawingLoc());
+                }
+            }
+            // get current chord positions
+            std::set<int> chordElementLocations;
+            for (int i = 0; i < chord->GetChildCount(NOTE); ++i) {
+                Note *note = vrv_cast<Note *>(chord->GetChild(i, NOTE));
+                assert(note);
+                chordElementLocations.insert(note->GetDrawingLoc());
+            }
+            const int expectedElementsInUnison
+                = CountElementsInUnison(chordElementLocations, otherElementLocations, chord->GetDrawingStemDir());
+            bool test = (STEMDIRECTION_down == chord->GetDrawingStemDir()
+                && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
+            int actualElementsInUnison = 0;
             // process each note of the chord separately, storing locations in the set
             for (int i = 0; i < chord->GetChildCount(NOTE); ++i) {
                 Note *note = vrv_cast<Note *>(chord->GetChild(i, NOTE));
                 assert(note);
-                auto [overlap, inUnisonWith] = note->CalcNoteHorizontalOverlap(doc, otherElements, true);
-                if (overlap != 0) {
+                auto [overlap, isInUnison]
+                    = note->CalcNoteHorizontalOverlap(doc, otherElements, true, test, expectedElementsInUnison > 0);
+                if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin)))
+                {
                     margin = overlap;
-                    break;
                 }
+                if (isInUnison) ++actualElementsInUnison;
+            }
 
-                chordElementLocations.insert(note->GetDrawingLoc());
-                if (inUnisonWith != -1) lastElementInUnison = i;
+            if (expectedElementsInUnison && (expectedElementsInUnison == actualElementsInUnison)) {
+                isUnison = true; 
             }
-            if (!margin && (lastElementInUnison != -1)) {
-                for (auto element : otherElements) {
-                    if (element->Is(NOTE)) {
-                        Note *note = vrv_cast<Note *>(element);
-                        assert(note);
-                        otherElementLocations.insert(note->GetDrawingLoc());
-                    }
-                }
-                // if elements are not in unison (or not all of them are) calculate overlap ignoring unison for the
-                // last element in the unison (which will be overlap for other unison notes as well)
-                if (!AreElementsInUnison(chordElementLocations, otherElementLocations, chord->GetDrawingStemDir())) {
-                    Note *unisonNote = vrv_cast<Note *>(chord->GetChild(lastElementInUnison, NOTE));
-                    assert(unisonNote);
-                    auto [unisonOverlap, var] = unisonNote->CalcNoteHorizontalOverlap(doc, otherElements, true, true);
-                    margin = unisonOverlap;
-                }
-            }
-            if (margin)
+            else if (margin) {
                 chord->SetDrawingXRel(chord->GetDrawingXRel() + margin);
-            else if (lastElementInUnison != -1)
-                isUnison = true;
+            }
+                
             break;
         }
         // process stems

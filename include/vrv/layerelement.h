@@ -360,7 +360,7 @@ private:
      * their unison notes or if they should be placed separately.
      * Returns true if all elements can safely overlap.
      */
-    virtual bool AreElementsInUnison(
+    virtual int CountElementsInUnison(
         const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
 
 public:
