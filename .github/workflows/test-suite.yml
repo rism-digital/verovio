@@ -57,6 +57,7 @@ jobs:
   build_tests:
     name: Build Verovio Test Suite on ${{ matrix.name }}
     runs-on: ubuntu-20.04
+    needs: [cache_tests]
 
     strategy:
       fail-fast: false
