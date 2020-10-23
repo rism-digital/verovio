@@ -8,7 +8,7 @@ on:
       # Push events on develop branch
       - develop
       # Push events on ci-test branch (uncomment if needed for testing purposes)
-      # - ci-test
+      - ci-test
 
 # globals
 env:
@@ -137,6 +137,9 @@ jobs:
 
           else
             TARGET_XCODE="/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
+
+            echo "Grep Build Version: $(xcodebuild -version | grep "Build version" | cut -d' ' -f3)"
+            echo "Grep Xcode: $(xcodebuild -version | grep Xcode)"
 
             # check XCode version
             if [ $(xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
