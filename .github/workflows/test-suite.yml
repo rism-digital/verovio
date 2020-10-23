@@ -50,6 +50,12 @@ jobs:
         with:
           ref: ${{ matrix.ref }}
           path: ${{ matrix.path }}
+      
+      - name: Check git status after repo checkout
+        working-directory: ${{ matrix.path }}
+        run: |
+          git config --get remote.origin.url
+          git status
 
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v2
@@ -57,6 +63,12 @@ jobs:
           repository: ${{ env.GH_PAGES_REPO }}
           ref: ${{ env.GH_PAGES_BRANCH }}
           path: ${{ env.GH_PAGES_DIR }}
+
+      - name: Check git status before commit
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: |
+          git config --get remote.origin.url
+          git status
 
       - name: Verify
         run: |
