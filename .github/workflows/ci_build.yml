@@ -38,8 +38,8 @@ env:
   DOXYGEN_BRANCH: master
 
   # emscripten
-  EMSCRIPTEN_VERSION: latest
-  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+  EM_VERSION: latest
+  EM_CACHE_FOLDER: 'emsdk-cache'
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
@@ -168,13 +168,6 @@ jobs:
           cmake ../cmake
           make -j8
 
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/tools
-        run: |
-          pwd
-          ls -al
-
 
   ###########################
   # Build the CLI artifacts #
@@ -189,8 +182,7 @@ jobs:
 
       - name: Create temp dir
         working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p $TEMP_DIR/
+        run: mkdir -p $TEMP_DIR/
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
@@ -200,8 +192,7 @@ jobs:
 
       - name: Update cli.txt
         working-directory: ${{ github.workspace }}/tools
-        run: |
-          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
+        run: ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
         uses: actions/upload-artifact@v2
@@ -209,12 +200,6 @@ jobs:
           name: ${{ env.CLI_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
-        run: |
-          pwd
-          ls -al
 
   #####################################
   # Set up and cache emscripten build #
@@ -229,16 +214,15 @@ jobs:
         id: cache
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
 
       - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
-          no-cache: true
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
 
       - name: Verify emscripten build
         run: emcc -v
@@ -269,7 +253,7 @@ jobs:
             options: "-c -H -w -M"
             filepath: "verovio*wasm*"
           - target: default
-            message: "Building default toolkit (with humdrum)"
+            message: "Building default toolkit with humdrum"
             options: "-c -M"
             filepath: "*-hum.js*"
 
@@ -279,61 +263,41 @@ jobs:
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p $TEMP_DIR/
+        run: mkdir -p $TEMP_DIR/
 
-      # Restore system libraries generated during build time from cache
+      # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
         uses: actions/cache@v2
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
 
       # Install and/or activate emsdk
-      - name: Set up emsdk (cache not found)
-        uses: mymindstorm/setup-emsdk@v7
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          no-cache: true
-      - name: Set up emsdk (cache found)
-        if: steps.restore_cache.outputs.cache-hit == 'true'
+      - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
-          no-cache: true
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
 
       - name: Verify emscripten build
         run: emcc -v
 
-      - name: Build toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+      - name: ${{ matrix.toolkit.message }} (${{ matrix.toolkit.options }})
         working-directory: ${{ github.workspace }}/emscripten
-        run: |
-          echo "${{ matrix.toolkit.message }}"
-          ./buildToolkit ${{ matrix.toolkit.options }}
+        run: ./buildToolkit ${{ matrix.toolkit.options }}
 
       - name: Copy build into TEMP_DIR
         working-directory: ${{ github.workspace }}/emscripten
-        run: |
-          echo "Copy toolkit build into $TEMP_DIR..."
-          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
+        run: cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
-
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
-        run: |
-          pwd
-          ls -al
 
 
   ##################################
@@ -354,14 +318,13 @@ jobs:
       _IS_DRY_RUN: ${{ steps.settings.outputs.dry-run }}
 
     steps:
-      - name: Enable deployment for main repo owner
+      - name: Enable deploy steps for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        run: |
-          echo "Enabling deploy steps for main repo owner..."
-          echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
-
-          echo "Disabling dry-run mode for main repo owner..."
-          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+        run: echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
+      
+      - name: Disable dry-run mode for main repo owner
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        run: echo "IS_DRY_RUN=false" >> $GITHUB_ENV
 
       - name: Check deployment settings and set them as outputs
         id: settings
@@ -440,30 +403,19 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to gh-pages (dry-run)
+      - name: Push changes to gh-pages (dry-run mode)
         if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
-        run: |
-          # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go."
-
-          echo "Running git in dry-run mode..."
-          git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+        run: git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
 
       - name: Push changes to gh-pages
-        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
-        run: |
-          # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go."
-
-          echo "Pushing to Github..."
-          git push origin HEAD:$GH_PAGES_BRANCH
+        run: git push origin HEAD:$GH_PAGES_BRANCH
 
       - name: Congratulations
-        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
-        run: |
-          echo "🎉 New JS toolkit builds deployed 🎊"
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New JS toolkit builds deployed 🎊"
 
       - name: Skipped
         # skip deployment when deploy steps are disabled or when we are in dry-run mode
@@ -491,11 +443,10 @@ jobs:
       - name: Install doxygen
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends doxygen
+          sudo apt-get install -y -q --no-install-recommends doxygen
 
       - name: Check installation
-        run: |
-          doxygen --help
+        run: doxygen --help
 
       - name: Upgrade doxygen conf
         working-directory: ${{ github.workspace }}/doc
@@ -511,14 +462,6 @@ jobs:
         with:
           name: ${{ env.DOC_BUILD }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
-
-      - name: Check files
-        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
-        if: always()
-        run: |
-          pwd
-          ls -al
-          ls -R
 
 
   ###############################################
@@ -552,8 +495,7 @@ jobs:
           path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Copy build artifacts to DOXYGEN_DIR
-        run: |
-          cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+        run: cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
@@ -581,30 +523,19 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to doxygen (dry-run)
+      - name: Push changes to doxygen (dry-run mode)
         if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go."
-
-          echo "Running git in dry-run mode..."
-          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+        run: git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
 
       - name: Push changes to doxygen
-        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go."
-
-          echo "Pushing to Github..."
-          git push origin HEAD:$DOXYGEN_BRANCH
+        run: git push origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
-        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
-        run: |
-          echo "🎉 New documentation deployed 🎊"
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New documentation deployed 🎊"
 
       - name: Skipped
         # skip deployment when deploy steps are disabled or when we are in dry-run mode
