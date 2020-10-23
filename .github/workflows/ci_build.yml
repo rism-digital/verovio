@@ -7,6 +7,7 @@ on:
     branches:
       # Push events on develop branch
       - develop
+      - '**'
       # Push events on ci-test branch (uncomment if needed for testing purposes)
       # - ci-test
 
@@ -38,7 +39,7 @@ env:
   DOXYGEN_BRANCH: master
 
   # emscripten
-  EM_VERSION: 2.0.7
+  EM_VERSION: latest
   EM_CACHE_FOLDER: 'emsdk-cache'
 
   # gh-pages
