@@ -682,9 +682,18 @@ std::pair<int, bool> Note::CalcNoteHorizontalOverlap(Doc *doc, const std::vector
 
     // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
     // That way accidental will be near note that actually has accidental and not near lowest-layer note
-    if (isChordElement && unison && GetDrawingAccid() && (shift > 0)) shift = -shift;
+    if (isChordElement && unison && GetDrawingAccid() && (shift > 0)) shift *= -1;
 
     return { shift, isInUnison };
+}
+
+void Note::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    if (GetParent()->Is(CHORD)) return;
+
+    auto [margin, isInUnison] = CalcNoteHorizontalOverlap(doc, otherElements, false);
+    isUnison = isInUnison;
+    if (!isInUnison) SetDrawingXRel(GetDrawingXRel() + margin);
 }
 
 //----------------------------------------------------------------------------

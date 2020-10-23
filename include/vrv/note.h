@@ -213,6 +213,11 @@ public:
     char GetMIDIPitch();
     ///@}
 
+    /**
+     * Helper to adjust overlaping layers for notes
+     */
+    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+
 public:
     //----------//
     // Functors //
