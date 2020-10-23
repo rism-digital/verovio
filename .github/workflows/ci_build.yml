@@ -254,7 +254,7 @@ jobs:
             options: "-c -H -w -M"
             filepath: "verovio*wasm*"
           - target: default
-            message: "Building default toolkit (with humdrum)"
+            message: "Building default toolkit with humdrum"
             options: "-c -M"
             filepath: "*-hum.js*"
 
@@ -286,7 +286,7 @@ jobs:
       - name: Verify emscripten build
         run: emcc -v
 
-      - name: ${{ matrix.toolkit.message }} ({{ matrix.toolkit.options }})
+      - name: ${{ matrix.toolkit.message }} (${{ matrix.toolkit.options }})
         working-directory: ${{ github.workspace }}/emscripten
         run: ./buildToolkit ${{ matrix.toolkit.options }}
 
@@ -299,13 +299,6 @@ jobs:
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
-
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
-        run: |
-          pwd
-          ls -al
 
 
   ##################################
@@ -326,14 +319,13 @@ jobs:
       _IS_DRY_RUN: ${{ steps.settings.outputs.dry-run }}
 
     steps:
-      - name: Enable deployment for main repo owner
+      - name: Enable deploy steps for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        run: |
-          echo "Enabling deploy steps for main repo owner..."
-          echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
-
-          echo "Disabling dry-run mode for main repo owner..."
-          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+        run: echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
+      
+      - name: Disable dry-run mode for main repo owner
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        run: echo "IS_DRY_RUN=false" >> $GITHUB_ENV
 
       - name: Check deployment settings and set them as outputs
         id: settings
@@ -412,30 +404,19 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to gh-pages (dry-run)
+      - name: Push changes to gh-pages (dry-run mode)
         if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
-        run: |
-          # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go."
-
-          echo "Running git in dry-run mode..."
-          git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+        run: git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
 
       - name: Push changes to gh-pages
-        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
-        run: |
-          # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go."
-
-          echo "Pushing to Github..."
-          git push origin HEAD:$GH_PAGES_BRANCH
+        run: git push origin HEAD:$GH_PAGES_BRANCH
 
       - name: Congratulations
-        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
-        run: |
-          echo "🎉 New JS toolkit builds deployed 🎊"
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New JS toolkit builds deployed 🎊"
 
       - name: Skipped
         # skip deployment when deploy steps are disabled or when we are in dry-run mode
@@ -463,11 +444,10 @@ jobs:
       - name: Install doxygen
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends doxygen
+          sudo apt-get install -y -q --no-install-recommends doxygen
 
       - name: Check installation
-        run: |
-          doxygen --help
+        run: doxygen --help
 
       - name: Upgrade doxygen conf
         working-directory: ${{ github.workspace }}/doc
@@ -483,14 +463,6 @@ jobs:
         with:
           name: ${{ env.DOC_BUILD }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
-
-      - name: Check files
-        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
-        if: always()
-        run: |
-          pwd
-          ls -al
-          ls -R
 
 
   ###############################################
@@ -524,8 +496,7 @@ jobs:
           path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Copy build artifacts to DOXYGEN_DIR
-        run: |
-          cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+        run: cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
@@ -553,30 +524,19 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to doxygen (dry-run)
+      - name: Push changes to doxygen (dry-run mode)
         if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go."
-
-          echo "Running git in dry-run mode..."
-          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+        run: git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
 
       - name: Push changes to doxygen
-        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go."
-
-          echo "Pushing to Github..."
-          git push origin HEAD:$DOXYGEN_BRANCH
+        run: git push origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
-        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
-        run: |
-          echo "🎉 New documentation deployed 🎊"
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New documentation deployed 🎊"
 
       - name: Skipped
         # skip deployment when deploy steps are disabled or when we are in dry-run mode
