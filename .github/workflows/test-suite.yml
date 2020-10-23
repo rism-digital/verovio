@@ -12,7 +12,7 @@ on:
 env:
   # develop
   DEVELOP_BRANCH: develop
-  DEVELOP_DIR: develop
+  DEVELOP_DIR: develop-dir
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org
@@ -23,8 +23,8 @@ env:
 
   # temporary directories
   PR_DIR: pr-${{ github.event.pull_request.head.sha }}
-  GH_PAGES_DIR: gh-pages
-  TEMP_DIR: temp
+  GH_PAGES_DIR: gh-pages-dir
+  TEMP_DIR: temp-dir
 
 
 jobs:
@@ -61,8 +61,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           path: ${{ env.PR_DIR }}
 
-  build_develop:
-    name: Build develop branch
+  build_tests:
+    name: Build Verovio Test Suite on ${{ matrix.name }}
     runs-on: ubuntu-20.04
 
     strategy:
@@ -70,12 +70,12 @@ jobs:
       matrix:
         include: 
           - name: develop
-            ref: ${{ env.DEVELOP_BRANCH }}
-            path: ${{ env.DEVELOP_DIR }}
+            ref: develop
+            path: devlop-dir
           
           - name: PR
             ref: ${{ github.event.pull_request.head.sha }}
-            path: ${{ env.PR_DIR }}
+            path: pr-${{ github.event.pull_request.head.sha }}
 
     steps:
       - name: Checkout main repo
