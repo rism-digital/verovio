@@ -51,6 +51,7 @@
 #include "breath.h"
 #include "btrem.h"
 #include "chord.h"
+#include "custos.h"
 #include "dir.h"
 #include "dot.h"
 #include "dynam.h"
@@ -354,6 +355,8 @@ namespace humaux {
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
+        auto_custos = false;
+        suppress_manual_custos = false;
 
         std::fill(cue_size.begin(), cue_size.end(), false);
         std::fill(stem_type.begin(), stem_type.end(), 'X');
@@ -393,6 +396,8 @@ namespace humaux {
         out << prefix << "meter_bottom             =  " << meter_bottom << endl;
         // std::list<humaux::HumdrumTie> ties;
         out << prefix << "m_dynampos               =  " << m_dynampos << endl;
+        out << prefix << "auto_custos              =  " << auto_custos << endl;
+        out << prefix << "suppress_manual_custos   =  " << suppress_manual_custos << endl;
 
         return out;
     }
@@ -4187,8 +4192,8 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HumRegex hre;
     hum::HTp part = partstart;
     while (part && !part->getLine()->isData()) {
-        if (part->compare(0, 5, "*clef") == 0) {
 
+        if (part->compare(0, 5, "*clef") == 0) {
             if (cleftok) {
                 if (clef == *part) {
                     // there is already a clef found, and it is the same
@@ -8098,6 +8103,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handlePedalMark(layerdata[i]);
             handleStaffStateVariables(layerdata[i]);
             handleStaffDynamStateVariables(layerdata[i]);
+            handleCustos(elements, pointers, layerdata, i);
             if (*layerdata[i] == "*rep") {
                 int oldi = i;
                 i = insertRepetitionElement(elements, pointers, layerdata, i);
@@ -10730,7 +10736,6 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             }
         }
     }
-    // ggg
 }
 
 //////////////////////////////
@@ -15937,6 +15942,100 @@ std::string HumdrumInput::getEndIdForOttava(hum::HTp token)
     }
 
     return getLocationId(prefix, target);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleCustos --
+//
+
+void HumdrumInput::handleCustos(
+    std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index)
+{
+    hum::HTp token = tokens[index];
+    hum::HumRegex hre;
+    if (!hre.search(token, "^\\*(X*)custos(.*)")) {
+        return;
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int staffindex = m_currentstaff - 1;
+
+    std::string exes = hre.getMatch(1);
+    if (exes == "X") {
+        ss[staffindex].auto_custos = false;
+        return;
+    }
+    if (exes == "XX") {
+        ss[staffindex].suppress_manual_custos = true;
+        return;
+    }
+    std::string ending = hre.getMatch(2);
+    if (ending.empty()) {
+        ss[staffindex].auto_custos = false;
+        return;
+    }
+
+    if (ss[staffindex].suppress_manual_custos) {
+        // Do not print any explicit custodes.
+        return;
+    }
+
+    // add a manual custodes
+    hre.search(ending, ":?([^:]*)(.*)");
+    std::string kpitch = hre.getMatch(1);
+    std::string parameters = hre.getMatch(2);
+
+    if (kpitch.empty()) {
+        // suppressing a custos here (deal with
+        // this in the auto custos code elsewhere).
+    }
+    if ((kpitch == "x") || (kpitch == "X")) {
+        // alises for suppressing an automatic custos
+    }
+
+    if (!hre.search(kpitch, "^[A-Ga-g]+[#n-]*$")) {
+        // invalid manual custos (requires **kern pitch)
+        return;
+    }
+
+    int base40 = hum::Convert::kernToBase40(kpitch);
+    int oct = base40 / 40;
+    // int acc = hum::Convert::base40ToAccidental(base40);
+    int base7chroma = hum::Convert::base40ToDiatonic(base40) % 7;
+    Custos *custos = new Custos;
+
+    custos->SetOct(oct);
+    switch (base7chroma) {
+        case 0: custos->SetPname(PITCHNAME_c); break;
+        case 1: custos->SetPname(PITCHNAME_d); break;
+        case 2: custos->SetPname(PITCHNAME_e); break;
+        case 3: custos->SetPname(PITCHNAME_f); break;
+        case 4: custos->SetPname(PITCHNAME_g); break;
+        case 5: custos->SetPname(PITCHNAME_a); break;
+        case 6: custos->SetPname(PITCHNAME_b); break;
+    }
+
+    // switch (acc) {
+    //    case +3: custos->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
+    //    case +2: custos->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+    //    case +1: custos->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+    //    case 0:
+    //        if (kpitch.find("n") != string::npos) {
+    //                custos->SetAccid(ACCIDENTAL_WRITTEN_n);
+    //        }
+    //        break;
+    //    case -1: custos->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+    //    case -2: custos->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+    //    case -3: custos->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+    //}
+    setLocationId(custos, token);
+    appendElement(elements, pointers, custos);
+
+    if (hre.search(parameters, "color=['\"]?(.*?)['\":]")) {
+        std::string color = hre.getMatch(1);
+        custos->SetColor(color);
+    }
 }
 
 //////////////////////////////

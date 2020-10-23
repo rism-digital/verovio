@@ -277,12 +277,12 @@ namespace humaux {
 
         // meter_bottom == Used to keep track of bottom value of time signature.
         // This is needed to calculate tstamps (meter.unit).
-        hum::HumNum meter_bottom;
+        hum::HumNum meter_bottom = 4;
 
-        // meter_top == the top number of the time signature (meter.count).
-        int meter_top;
+        // meter_top == The top number of the time signature (meter.count).
+        int meter_top = 4;
 
-        // ties == keep track of ties for each staff/layer/pitch
+        // ties == Keep track of ties for each staff/layer/pitch
         // and allow for cross-layer ties (no cross staff ties, but that
         // could be easy to implement.
         // dimensions:
@@ -290,13 +290,21 @@ namespace humaux {
         // 2: all open ties for the staff
         std::list<humaux::HumdrumTie> ties;
 
-        // m_dynampos == dynamic position relativ to the staff:
+        // m_dynampos == Dynamic position relativ to the staff:
         // +1 = above, -1=below, 0=undefined (deal center between staves later)
         int m_dynampos = 0;
 
-        // m_notehead == notehead shape for notes on the staff.  This could be
+        // m_notehead == Notehead shape for notes on the staff.  This could be
         // expanded later into separate control by subspine and/or by pitch (staff/line).
         std::string m_notehead;
+
+        // auto_custos == Whether or not to generate automatic custodes
+        // at line breaks.
+        bool auto_custos = false;
+
+        // suppress_manual_custos == Do not render manually encoded custodes.
+        // at line breaks.
+        bool suppress_manual_custos = false;
     };
 } // namespace humaux
 
@@ -657,6 +665,8 @@ protected:
     int getNextBarlineIndex(hum::HumdrumFile &infile, int startline);
     std::string escapeFreeAmpersand(const std::string &value);
     void addHairpinAccent(hum::HTp token);
+    void handleCustos(
+        std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
