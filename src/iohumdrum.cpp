@@ -12321,34 +12321,12 @@ void HumdrumInput::addTextElement(
         std::string rawmusictext = hre.getMatch(2);
         std::string musictext = convertMusicSymbolNameToSmuflEntity(rawmusictext);
         std::string posttext = hre.getMatch(3);
-        if (pretext.empty() && musictext.empty()) {
-            // adjust last [] pair:
-            if (!posttext.empty()) {
-                if (posttext[0] == '[') {
-                    musictext = posttext;
-                    posttext = "";
-                }
-            }
-        }
-
-        if (!musictext.empty()) {
-            if (musictext[0] == '[') {
-                // Avoid recursion:
-                for (int k = 0; k < (int)musictext.size(); k++) {
-                    if (musictext[k] == '[') {
-                        pretext += "&#91;";
-                    }
-                    else if (musictext[k] == ']') {
-                        pretext += "&#93;";
-                    }
-                    else {
-                        pretext += musictext[k];
-                    }
-                }
-                musictext = "";
-            }
-            else {
-            }
+        if (musictext.empty()) {
+            hum::HumRegex hre2;
+            std::string newtext = rawmusictext;
+            hre.replaceDestructive(newtext, "&#91;", "\\[", "g");
+            hre.replaceDestructive(newtext, "&#93;", "\\]", "g");
+            pretext += newtext;
         }
 
         if (!pretext.empty()) {
@@ -16032,7 +16010,7 @@ void HumdrumInput::handleCustos(
     setLocationId(custos, token);
     appendElement(elements, pointers, custos);
 
-    if (hre.search(parameters, "color=['\"]?(.*?)['\":]")) {
+    if (hre.search(parameters, "color=['\"]?([^'\":]+)['\":]?")) {
         std::string color = hre.getMatch(1);
         custos->SetColor(color);
     }
