@@ -341,7 +341,7 @@ void View::DrawStaffGrp(
         const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
         DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
-    // actually draw the line, the brace or the bracket
+    // draw the group symbol
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
 
