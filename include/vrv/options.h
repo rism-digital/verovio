@@ -404,7 +404,7 @@ public:
     virtual void Init(const std::string &defaultValue);
 
     virtual bool SetValue(const std::string &jsonFilePath);
-    //virtual std::string GetStrValue() const;
+    // virtual std::string GetStrValue() const;
 
     int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
@@ -418,7 +418,6 @@ private:
     jsonxx::Object m_values;
     jsonxx::Object m_defaultValues;
 };
-
 
 //----------------------------------------------------------------------------
 // OptionGrp
@@ -566,7 +565,8 @@ public:
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
-    OptionDbl m_slurThickness;
+    OptionDbl m_slurEndpointThickness;
+    OptionDbl m_slurMidpointThickness;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;
@@ -582,7 +582,8 @@ public:
     OptionString m_textFont;
     OptionDbl m_textEnclosureThickness;
     OptionDbl m_thickBarlineThickness;
-    OptionDbl m_tieThickness;    
+    OptionDbl m_tieEndpointThickness;
+    OptionDbl m_tieMidpointThickness;
     OptionDbl m_tupletBracketThickness;
 
     /**
@@ -645,6 +646,14 @@ public:
     OptionDbl m_rightMarginRightBarLine;
     //
     OptionDbl m_topMarginHarm;
+
+    /**
+     * Deprecated options
+     */
+    OptionGrp m_deprecated;
+
+    OptionDbl m_slurThickness;
+    OptionDbl m_tieThickness;
 
 private:
     /** The array of style parameters */

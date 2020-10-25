@@ -1012,6 +1012,26 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     }
                 }
             }
+            else if (iter->first == "slurThickness") {
+                LogWarning("Option slurThickness is deprecated; use slurMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("slurThickness")) {
+                    double thickness = json.get<jsonxx::Number>("slurThickness");
+                    opt = m_options->GetItems()->at("slurMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
+                }
+            }
+            else if (iter->first == "tieThickness") {
+                vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("tieThickness")) {
+                    double thickness = json.get<jsonxx::Number>("tieThickness");
+                    opt = m_options->GetItems()->at("tieMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
+                }
+            }
             else {
                 LogError("Unsupported option '%s'", iter->first.c_str());
             }

@@ -496,8 +496,8 @@ protected:
     void DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength = 0);
     void DrawSmuflCode(
         DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
-    void DrawThickBezierCurve(
-        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0, int penStyle = AxSOLID);
+    void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth,
+        float angle = 0.0, int penStyle = AxSOLID);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams &params);
     void DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend);
@@ -598,6 +598,14 @@ protected:
      * It can change when drawing the m_currentElement, for example
      */
     int m_currentColour;
+
+    /**
+     * Values to adjust tie/slur thickness by to have proper MEI values for thickness
+     */
+    ///@{
+    double m_tieThicknessCoeficient;
+    double m_slurThicknessCoeficient;
+    ///@}
 
     /**
      * The current drawing score def.

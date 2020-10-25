@@ -38,8 +38,8 @@ env:
   DOXYGEN_BRANCH: master
 
   # emscripten
-  EMSCRIPTEN_VERSION: latest
-  EMSCRIPTEN_CACHE_FOLDER: emsdk-cache
+  EM_VERSION: latest
+  EM_CACHE_FOLDER: 'emsdk-cache'
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
@@ -58,21 +58,22 @@ jobs:
   # Adapted from https://github.com/DaanDeMeyer/reproc/blob/master/.github/workflows/main.yml . #
   ###############################################################################################
   build_cpp:
-    name: Build ${{ matrix.config.os }}-${{ matrix.config.compiler }}-${{ matrix.config.version }}
+    name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.version }}
     # This job runs on all the os specified in strategy.matrix.os
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ${{ matrix.os }}
 
     # set matrix with config options
     # (runs the following steps for every target in parallel)
     strategy:
+      fail-fast: false
       matrix:
-        config:
+        include:
           - os: ubuntu-20.04
-            compiler: gcc
+            compiler: g++
             version: "9"
 
           - os: ubuntu-20.04
-            compiler: gcc
+            compiler: g++
             version: "10"
 
           - os: ubuntu-20.04
@@ -87,99 +88,85 @@ jobs:
             compiler: clang
             version: "10"
 
-          #          - os: windows-latest
-          #            compiler: cl
-          #            version: "default"
-          #
-          #          - os: windows-latest
-          #            compiler: clang-cl
-          #            version: "latest"
-          #
-          #          - os: windows-latest
-          #            compiler: clang
-          #            version: "latest"
-          #
-          #          - os: windows-latest
-          #            compiler: gcc
-          #            version: "latest"
-
-          - os: macos-latest
+          - os: macos-10.15
             compiler: xcode
-            version: "default"
+            version: "11.7"
 
-          - os: macos-latest
-            compiler: gcc
-            version: "latest"
+          - os: macos-10.15
+            compiler: xcode
+            version: "12.1"
+
+          - os: macos-10.15
+            compiler: g++
+            version: "9"
 
     steps:
       - name: Checkout main repo
         uses: actions/checkout@v2
 
       # Installation step for Ubuntu
-      - name: Install Ubuntu (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+      - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'Linux'
         run: |
-          # TODO: Remove once https://github.com/actions/virtual-environments/issues/1536 is resolved.
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | sudo apt-key add -
-          sudo add-apt-repository 'deb http://apt.llvm.org/focal llvm-toolchain-focal-10 main' -y
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends ninja-build clang-tidy-10
-          sudo ln -s /usr/bin/clang-tidy-10 /usr/local/bin/clang-tidy
-          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
-            sudo apt-get install -y --no-install-recommends g++-${{ matrix.config.version }}
-            echo CC=gcc-${{ matrix.config.version }} >> $GITHUB_ENV
-            echo CXX=g++-${{ matrix.config.version }} >> $GITHUB_ENV
+          # check if compiler is available from runner by default
+          if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
+            echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
           else
-            sudo apt-get install -y --no-install-recommends clang-${{ matrix.config.version }}
-            echo CC=clang-${{ matrix.config.version }} >> $GITHUB_ENV
-            echo CXX=clang++-${{ matrix.config.version }} >> $GITHUB_ENV
+            # if not, install compiler
+            sudo apt-get update -q
+            sudo apt-get install -y -q --no-install-recommends ${{ matrix.compiler }}-${{ matrix.version }}
+          fi
+
+          # set environment variables
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
+            echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
+          else
+            echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
           fi
 
       # Installation step for MacOS
-      - name: Install macOS (${{ matrix.config.compiler }}-${{ matrix.config.version }})
+      - name: Configure macOS with ${{ matrix.compiler }}-${{ matrix.version }}
         if: runner.os == 'macOS'
         run: |
-          brew install ninja llvm
-          sudo ln -s /usr/local/opt/llvm/bin/clang-tidy /usr/local/bin/clang-tidy
-          if [ "${{ matrix.config.compiler }}" = "gcc" ]; then
-            echo CC=gcc >> $GITHUB_ENV
-            echo CXX=g++ >> $GITHUB_ENV
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
+            # set environment variables (use alias gcc-9)
+            echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
+
           else
-            echo CC=clang >> $GITHUB_ENV
-            echo CXX=clang++ >> $GITHUB_ENV
+            TARGET_XCODE="/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
+
+            # check XCode version
+            if [ $(xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
+              echo "XCode ${{ matrix.version }} already set..."
+            else
+              # switch XCode version
+              # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
+              echo "Found active $(xcodebuild -version | grep Xcode). Switching to XCode ${{ matrix.version }}..."
+              sudo xcode-select -s $TARGET_XCODE
+            fi
+
+            # set environment variables from XCode
+            echo CC=$(xcrun --find clang) >> $GITHUB_ENV
+            echo CXX=$(xcrun --find clang++) >> $GITHUB_ENV
           fi
 
-      # Installation step for Windows
-      - name: Install Windows (${{ matrix.config.compiler }}-${{ matrix.config.version }})
-        if: runner.os == 'windows'
+      - name: Check settings and dry-run make
+        working-directory: ${{ github.workspace }}/tools
         run: |
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-          scoop install ninja llvm --global
-          if ("${{ matrix.config.compiler }}" -eq "gcc") {
-            echo "::set-env name=CC::gcc"
-            echo "::set-env name=CXX::g++"
-          } elseif ("${{ matrix.config.compiler }}" -eq "clang") {
-            echo "::set-env name=CC::clang"
-            echo "::set-env name=CXX::clang++"
-          } else {
-            echo "::set-env name=CC::${{ matrix.config.compiler }}"
-            echo "::set-env name=CXX::${{ matrix.config.compiler }}"
-          }
-          # Make all PATH additions made by scoop and ourselves global.
-          echo "::set-env name=PATH::$env:PATH"
+          echo "CC: ${CC}"
+          echo "CXX: ${CXX}"
+
+          cmake --version
+          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
         run: |
           cmake ../cmake
           make -j8
-
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/tools
-        run: |
-          pwd
-          ls -al
 
 
   ###########################
@@ -195,8 +182,7 @@ jobs:
 
       - name: Create temp dir
         working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p $TEMP_DIR/
+        run: mkdir -p $TEMP_DIR/
 
       - name: Run make
         working-directory: ${{ github.workspace }}/tools
@@ -206,8 +192,7 @@ jobs:
 
       - name: Update cli.txt
         working-directory: ${{ github.workspace }}/tools
-        run: |
-          ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
+        run: ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
 
       - name: Upload cli artifact
         uses: actions/upload-artifact@v2
@@ -215,12 +200,6 @@ jobs:
           name: ${{ env.CLI_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
-        run: |
-          pwd
-          ls -al
 
   #####################################
   # Set up and cache emscripten build #
@@ -235,16 +214,15 @@ jobs:
         id: cache
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
 
       - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
-          no-cache: true
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
 
       - name: Verify emscripten build
         run: emcc -v
@@ -275,7 +253,7 @@ jobs:
             options: "-c -H -w -M"
             filepath: "verovio*wasm*"
           - target: default
-            message: "Building default toolkit (with humdrum)"
+            message: "Building default toolkit with humdrum"
             options: "-c -M"
             filepath: "*-hum.js*"
 
@@ -285,61 +263,41 @@ jobs:
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p $TEMP_DIR/
+        run: mkdir -p $TEMP_DIR/
 
-      # Restore system libraries generated during build time from cache
+      # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
         uses: actions/cache@v2
         with:
           # path for cache
-          path: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
+          path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EMSCRIPTEN_VERSION }}-${{ github.run_id }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
 
       # Install and/or activate emsdk
-      - name: Set up emsdk (cache not found)
-        uses: mymindstorm/setup-emsdk@v7
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          no-cache: true
-      - name: Set up emsdk (cache found)
-        if: steps.restore_cache.outputs.cache-hit == 'true'
+      - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v7
         with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: ${{ env.EMSCRIPTEN_CACHE_FOLDER }}-${{ github.run_id }}
-          no-cache: true
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
 
       - name: Verify emscripten build
         run: emcc -v
 
-      - name: Build toolkit (${{ matrix.toolkit.target }}) with options ${{ matrix.toolkit.options }}
+      - name: ${{ matrix.toolkit.message }} (${{ matrix.toolkit.options }})
         working-directory: ${{ github.workspace }}/emscripten
-        run: |
-          echo "${{ matrix.toolkit.message }}"
-          ./buildToolkit ${{ matrix.toolkit.options }}
+        run: ./buildToolkit ${{ matrix.toolkit.options }}
 
       - name: Copy build into TEMP_DIR
         working-directory: ${{ github.workspace }}/emscripten
-        run: |
-          echo "Copy toolkit build into $TEMP_DIR..."
-          cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
+        run: cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
-
-      - name: Check files
-        if: always()
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
-        run: |
-          pwd
-          ls -al
 
 
   ##################################
@@ -360,14 +318,13 @@ jobs:
       _IS_DRY_RUN: ${{ steps.settings.outputs.dry-run }}
 
     steps:
-      - name: Enable deployment for main repo owner
+      - name: Enable deploy steps for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        run: |
-          echo "Enabling deploy steps for main repo owner..."
-          echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
-
-          echo "Disabling dry-run mode for main repo owner..."
-          echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+        run: echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
+      
+      - name: Disable dry-run mode for main repo owner
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        run: echo "IS_DRY_RUN=false" >> $GITHUB_ENV
 
       - name: Check deployment settings and set them as outputs
         id: settings
@@ -446,30 +403,19 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to gh-pages (dry-run)
+      - name: Push changes to gh-pages (dry-run mode)
         if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
-        run: |
-          # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go."
-
-          echo "Running git in dry-run mode..."
-          git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+        run: git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
 
       - name: Push changes to gh-pages
-        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
         working-directory: ${{ env.GH_PAGES_DIR }}
-        run: |
-          # Push all changes in one commit to the gh-pages repo
-          echo "Build branch ready to go."
-
-          echo "Pushing to Github..."
-          git push origin HEAD:$GH_PAGES_BRANCH
+        run: git push origin HEAD:$GH_PAGES_BRANCH
 
       - name: Congratulations
-        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
-        run: |
-          echo "🎉 New JS toolkit builds deployed 🎊"
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New JS toolkit builds deployed 🎊"
 
       - name: Skipped
         # skip deployment when deploy steps are disabled or when we are in dry-run mode
@@ -497,11 +443,10 @@ jobs:
       - name: Install doxygen
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends doxygen
+          sudo apt-get install -y -q --no-install-recommends doxygen
 
       - name: Check installation
-        run: |
-          doxygen --help
+        run: doxygen --help
 
       - name: Upgrade doxygen conf
         working-directory: ${{ github.workspace }}/doc
@@ -517,14 +462,6 @@ jobs:
         with:
           name: ${{ env.DOC_BUILD }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
-
-      - name: Check files
-        working-directory: ${{ github.WORKSPACE }}/${{ env.DOXYGEN_DIR }}
-        if: always()
-        run: |
-          pwd
-          ls -al
-          ls -R
 
 
   ###############################################
@@ -558,8 +495,7 @@ jobs:
           path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Copy build artifacts to DOXYGEN_DIR
-        run: |
-          cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+        run: cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}
@@ -587,30 +523,19 @@ jobs:
       #          git config --get remote.origin.url
       #          git status
 
-      - name: Push changes to doxygen (dry-run)
+      - name: Push changes to doxygen (dry-run mode)
         if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go."
-
-          echo "Running git in dry-run mode..."
-          git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+        run: git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
 
       - name: Push changes to doxygen
-        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
         working-directory: ${{ env.DOXYGEN_DIR }}
-        run: |
-          # Push all changes in one commit to the doxygen repo
-          echo "Build branch ready to go."
-
-          echo "Pushing to Github..."
-          git push origin HEAD:$DOXYGEN_BRANCH
+        run: git push origin HEAD:$DOXYGEN_BRANCH
 
       - name: Congratulations
-        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN == 'false' }}
-        run: |
-          echo "🎉 New documentation deployed 🎊"
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New documentation deployed 🎊"
 
       - name: Skipped
         # skip deployment when deploy steps are disabled or when we are in dry-run mode

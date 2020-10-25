@@ -211,8 +211,8 @@ public:
     bool GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry);
 
     /**
-     * Helper to adjust overlaping layers for notes, chords, stems, etc. 
-     * 
+     * Helper to adjust overlaping layers for notes, chords, stems, etc.
+     *
      */
     void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
 

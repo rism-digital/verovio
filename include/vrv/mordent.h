@@ -51,7 +51,7 @@ public:
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
-     /**
+    /**
      * Get the SMuFL glyph for the mordent based on type, long attribute or glyph.num
      */
     wchar_t GetMordentGlyph() const;
