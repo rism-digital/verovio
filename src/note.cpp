@@ -587,8 +587,8 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     return dotMargin < 0;
 }
 
-std::pair<int, bool> Note::CalcNoteHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
-    bool isChordElement, bool isLowerElement, bool unison)
+std::pair<int, bool> Note::CalcNoteHorizontalOverlap(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool isLowerElement, bool unison)
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
@@ -655,7 +655,7 @@ std::pair<int, bool> Note::CalcNoteHorizontalOverlap(Doc *doc, const std::vector
             }
         }
 
-        if ((horizontalMargin >= 0) || isChordElement ) {
+        if ((horizontalMargin >= 0) || isChordElement) {
             // Nothing to do if we have no vertical overlap
             if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) continue;
 
@@ -663,7 +663,7 @@ std::pair<int, bool> Note::CalcNoteHorizontalOverlap(Doc *doc, const std::vector
             if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) continue;
 
             if (isLowerElement && isChordElement) {
-                shift -= HorizontalRightOverlap(otherElements.at(i), doc, - shift, verticalMargin);
+                shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
             }
             else {
                 shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
