@@ -698,7 +698,7 @@ int LayerElement::CountElementsInUnison(
         }
     }
 
-    return intersection.size();
+    return (int)intersection.size();
 }
 
 //----------------------------------------------------------------------------
