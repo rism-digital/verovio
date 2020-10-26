@@ -427,10 +427,12 @@ void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> 
             otherElementLocations.insert(note->GetDrawingLoc());
         }
     }
+    const ArrayOfObjects *notes = GetList(this);
+    assert(notes);
     // get current chord positions
     std::set<int> chordElementLocations;
-    for (int i = 0; i < GetChildCount(NOTE); ++i) {
-        Note *note = vrv_cast<Note *>(GetChild(i, NOTE));
+    for (auto iter : *notes) {
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
         chordElementLocations.insert(note->GetDrawingLoc());
     }
@@ -440,8 +442,8 @@ void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> 
         && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
     int actualElementsInUnison = 0;
     // process each note of the chord separately, storing locations in the set
-    for (int i = 0; i < GetChildCount(NOTE); ++i) {
-        Note *note = vrv_cast<Note *>(GetChild(i, NOTE));
+    for (auto iter : *notes) {
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
         auto [overlap, isInUnison]
             = note->CalcNoteHorizontalOverlap(doc, otherElements, true, isLowerPosition, expectedElementsInUnison > 0);

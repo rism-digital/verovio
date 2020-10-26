@@ -668,8 +668,9 @@ int LayerElement::CountElementsInUnison(
             if (((firstChord.size() <= secondChord.size()) && (element > *firstChord.begin())
                     && (element < *firstChord.rbegin()))
                 || ((firstChord.size() > secondChord.size()) && (element > *secondChord.begin())
-                    && (element < *secondChord.rbegin())))
+                    && (element < *secondChord.rbegin()))) {
                 return 0;
+            }
         }
     }
 
