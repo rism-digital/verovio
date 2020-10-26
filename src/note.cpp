@@ -599,9 +599,11 @@ std::pair<int, bool> Note::CalcNoteHorizontalOverlap(
     for (int i = 0; i < int(otherElements.size()); ++i) {
         int verticalMargin = 0;
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        bool isUnisonElement = false; 
         if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
+            isUnisonElement = IsUnissonWith(previousNote, true);
             // Unisson, look at the duration for the note heads
             if (unison && IsUnissonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
@@ -655,19 +657,18 @@ std::pair<int, bool> Note::CalcNoteHorizontalOverlap(
             }
         }
 
-        if ((horizontalMargin >= 0) || isChordElement) {
-            // Nothing to do if we have no vertical overlap
-            if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) continue;
+        // Nothing to do if we have no vertical overlap
+        if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) continue;
 
-            // Nothing to do either if we have no horizontal overlap
-            if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) continue;
+        // Nothing to do either if we have no horizontal overlap
+        if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) continue;
 
-            if (isLowerElement && isChordElement) {
-                shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
-            }
-            else {
-                shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
-            }
+        if (horizontalMargin < 0 || isLowerElement) {
+            shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
+            if (!isUnisonElement) shift -= horizontalMargin;
+        }
+        else if ((horizontalMargin >= 0) || isChordElement) {
+            shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
 
             // Make additional adjustments for cross-staff and unison notes
             if (m_crossStaff) shift -= horizontalMargin;
