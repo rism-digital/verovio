@@ -150,6 +150,11 @@ public:
      */
     bool HasNoteWithDots();
 
+    /**
+     * Helper to adjust overlaping layers for chords
+     */
+    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+
     //----------//
     // Functors //
     //----------//
