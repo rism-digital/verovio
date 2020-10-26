@@ -7,8 +7,11 @@ on:
     branches:
       # Push events on develop branch
       - develop
+      - '**'
       # Push events on ci-test branch (uncomment if needed for testing purposes)
       # - ci-test
+    paths-ignore:
+      - '**.md' # ignore changes to markdown files
 
 # globals
 env:
@@ -58,6 +61,9 @@ jobs:
   # Adapted from https://github.com/DaanDeMeyer/reproc/blob/master/.github/workflows/main.yml . #
   ###############################################################################################
   build_cpp:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
     name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.version }}
     # This job runs on all the os specified in strategy.matrix.os
     runs-on: ${{ matrix.os }}
@@ -173,6 +179,9 @@ jobs:
   # Build the CLI artifacts #
   ###########################
   build_cli:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
     name: Build cli
     runs-on: ubuntu-20.04
 
@@ -205,6 +214,9 @@ jobs:
   # Set up and cache emscripten build #
   #####################################
   setup_emscripten:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
     name: Set up and cache emscripten
     runs-on: ubuntu-20.04
 
