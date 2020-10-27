@@ -4908,6 +4908,11 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
         m_doc->SetMarkup(MARKUP_ANALYTICAL_FERMATA);
     }
 
+    if (m_version < MEI_4_0_0) {
+        // as mRest has no durationInterface we simply delete dur.ges on upgrade
+        if (mRest.attribute("dur.ges")) mRest.remove_attribute("dur.ges");
+    }
+
     parent->AddChild(vrvMRest);
     ReadUnsupportedAttr(mRest, vrvMRest);
     return true;
@@ -5330,6 +5335,10 @@ bool MEIInput::ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *in
 
 bool MEIInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
+    if (m_version < MEI_4_0_0) {
+        UpgradeDurGesTo_4_0_0(element, interface);
+    }
+
     interface->ReadAugmentDots(element);
     interface->ReadBeamSecondary(element);
     interface->ReadDurationGestural(element);
@@ -6240,6 +6249,25 @@ void MEIInput::UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRp
     }
     else if (value == "mixed") {
         vrvBeatRpt->SetSlash(BEATRPT_REND_mixed);
+    }
+}
+
+void MEIInput::UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface)
+{
+    if (element.attribute("dur.ges")) {
+        std::string durGes = element.attribute("dur.ges").as_string();
+        if (durGes.back() == 'p') {
+            interface->SetDurPpq(std::atoi(durGes.c_str()));
+        }
+        else if (durGes.back() == 'r') {
+            durGes.pop_back();
+            interface->SetDurRecip(durGes.c_str());
+        }
+        else if (durGes.back() == 's') {
+            durGes.pop_back();
+            interface->SetDurReal(std::atof(durGes.c_str()));
+        }
+        element.remove_attribute("dur.ges");
     }
 }
 
