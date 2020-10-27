@@ -1716,6 +1716,7 @@ void MEIOutput::WriteMRest(pugi::xml_node currentNode, MRest *mRest)
 
     WriteLayerElement(currentNode, mRest);
     WritePositionInterface(currentNode, mRest);
+    mRest->WriteColor(currentNode);
     mRest->WriteCue(currentNode);
     mRest->WriteFermataPresent(currentNode);
     mRest->WriteVisibility(currentNode);
@@ -1749,6 +1750,7 @@ void MEIOutput::WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest)
     assert(multiRest);
 
     WriteLayerElement(currentNode, multiRest);
+    multiRest->WriteColor(currentNode);
     multiRest->WriteMultiRestVis(currentNode);
     multiRest->WriteNumbered(currentNode);
 }
@@ -4900,6 +4902,7 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     ReadLayerElement(mRest, vrvMRest);
     ReadPositionInterface(mRest, vrvMRest);
 
+    vrvMRest->ReadColor(mRest);
     vrvMRest->ReadCue(mRest);
     vrvMRest->ReadFermataPresent(mRest);
     vrvMRest->ReadVisibility(mRest);
@@ -4952,6 +4955,7 @@ bool MEIInput::ReadMultiRest(Object *parent, pugi::xml_node multiRest)
     MultiRest *vrvMultiRest = new MultiRest();
     ReadLayerElement(multiRest, vrvMultiRest);
 
+    vrvMultiRest->ReadColor(multiRest);
     vrvMultiRest->ReadMultiRestVis(multiRest);
     vrvMultiRest->ReadNumbered(multiRest);
 
