@@ -599,7 +599,7 @@ std::pair<int, bool> Note::CalcNoteHorizontalOverlap(
     for (int i = 0; i < int(otherElements.size()); ++i) {
         int verticalMargin = 0;
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-        bool isUnisonElement = false; 
+        bool isUnisonElement = false;
         if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
