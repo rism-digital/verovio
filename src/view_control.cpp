@@ -705,7 +705,7 @@ void View::DrawOctave(
 
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
         // draw the ending vertical line if not the end of the system
-        if (spanningType == SPANNING_END) {
+        if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
             dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
                 ToDeviceContextY(y2 + lineWidth / 2));
         }
