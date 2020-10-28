@@ -359,6 +359,10 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
             // draw them
             for (i = 0; i < noteCount; ++i) {
                 idx = noteIndexes.at(i);
+                if (beamInterface->m_isCrossStaff) {
+                    if (BEAMPLACE_NONE == beamElementCoords->at(idx)->m_partialFlagPlace) continue;
+                    barY *= (BEAMPLACE_above == beamElementCoords->at(idx)->m_partialFlagPlace) ? 1 : -1;
+                }
                 if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_THROUGH) {
                     // through should never be set on the last one
                     assert(i < noteCount - 1);

@@ -105,6 +105,11 @@ void BeamSegment::CalcBeam(
 
     CalcBeamStemLength(staff, beamInterface->m_drawingPlace == BEAMPLACE_below ? STEMDIRECTION_down : STEMDIRECTION_up);
 
+    if (beamInterface->m_isCrossStaff) {
+        CalcCrossStaffBeamPlace(staff);
+        CalcPartialFlagPlace();
+    }
+
     // Set drawing stem positions
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
@@ -118,11 +123,9 @@ void BeamSegment::CalcBeam(
         // cross-staff or beam@place=mixed
         else {
             if (beamInterface->m_isCrossStaff) {
-                // TODO - look at staff@n and set the stem direction
-                Staff *currentCrossStaff = coord->m_element->m_crossStaff;
-                if (currentCrossStaff) {
-                    // if (currentCrossStaff->GetN() < staff->GetN()
-                }
+                data_STEMDIRECTION dir
+                    = (coord->m_beamRelativePlace == BEAMPLACE_above) ? STEMDIRECTION_up : STEMDIRECTION_down;
+                coord->SetDrawingStemDir(dir, staff, doc, this, beamInterface);
             }
             else {
                 data_STEMDIRECTION stemDir = coord->GetStemDir();
@@ -158,10 +161,15 @@ void BeamSegment::CalcBeam(
             BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
             if (!coord->m_stem) continue;
 
-            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+            if ((beamInterface->m_drawingPlace == BEAMPLACE_above)
+                || ((beamInterface->m_drawingPlace == BEAMPLACE_mixed)
+                    && (coord->m_beamRelativePlace == BEAMPLACE_above))) {
                 if (maxLength < coord->m_yBeam) maxLength = coord->m_yBeam;
             }
-            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+            else if ((beamInterface->m_drawingPlace == BEAMPLACE_below)
+                || ((beamInterface->m_drawingPlace == BEAMPLACE_mixed)
+                    && (coord->m_beamRelativePlace == BEAMPLACE_below)))
+                {
                 if (maxLength > coord->m_yBeam) maxLength = coord->m_yBeam;
             }
         }
@@ -189,9 +197,23 @@ void BeamSegment::CalcBeam(
                 y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
-            else {
+            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
                 y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+            }
+            else if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
+                int stemOffset = 0;
+                if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
+                    stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth / 2;
+                }
+                if (coord->m_beamRelativePlace == BEAMPLACE_below) {
+                    y1 -= stemOffset;
+                    y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+                }
+                else {
+                    y1 += stemOffset;
+                    y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+                }
             }
 
             if (coord->m_element->Is(CHORD)) {
@@ -521,6 +543,14 @@ bool BeamSegment::CalcBeamSlope(
             m_lastNoteOrChord->m_yBeam = m_firstNoteOrChord->m_yBeam + step;
         }
     }
+    else if (place == BEAMPLACE_mixed) {
+        if (m_beamSlope < 0.0) {
+
+        }
+        else {
+
+        }
+    }
 
     this->m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
         Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
@@ -747,13 +777,14 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     }
 
     // For now force it above
-    if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
+    //if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
 {
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     for (auto coord : m_beamElementCoordRefs) {
+        coord->SetClosestNote(stemDir);
         const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
         if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
             m_uniformStemLength = coordStemDir;
@@ -768,6 +799,81 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
                 break;
             }
         }
+    }
+}
+
+void BeamSegment::CalcCrossStaffBeamPlace(Staff *staff)
+{
+    const int currentStaffN = staff->GetN();
+    auto it = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+        [](auto coord) { return NULL != coord->m_element->m_crossStaff; });
+    if (it == m_beamElementCoordRefs.end()) return;
+
+    Staff *currentCrossStaff = (*it)->m_element->m_crossStaff;
+    const int crossStaffN = currentCrossStaff->GetN();
+
+    for (auto coord : m_beamElementCoordRefs) {
+        if (!coord->m_element->m_crossStaff) {
+            coord->m_beamRelativePlace = (currentStaffN < crossStaffN) ? BEAMPLACE_below : BEAMPLACE_above;
+        }
+        else {
+            coord->m_beamRelativePlace = (currentStaffN > crossStaffN) ? BEAMPLACE_below : BEAMPLACE_above;
+        }
+    }
+}
+
+void BeamSegment::CalcPartialFlagPlace()
+{
+    // Start from note that is shorter than DUR_8 - we do not care otherwise, since those do not have addiitonal beams
+    auto start = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+        [](BeamElementCoord *coord) { return coord->m_dur >= DUR_16; });
+    if (m_beamElementCoordRefs.end() == start) return;
+    while (start != m_beamElementCoordRefs.end()) {
+        auto subdivision = start;
+        data_BEAMPLACE place = (*start)->m_beamRelativePlace;
+        const int startDur = (*start)->m_dur;
+        int subdivisionCounter = 3;
+        bool ingoreLast = false;
+        bool isProcessed = false;
+        // Process beam as a collection of subdivision. Subdivision can change stem direction 3 times until a new one 
+        // has to be started. This way long cross-staff beams will broken in smaller segments. Cases where duration
+        // decreases/increases for cross-staff notes are also handled and those are separated into their own
+        // subdivisions
+        while (true) {
+            if (!subdivisionCounter) break;
+            // Find first note longer than 8th or first note that is cross-staff
+            auto found = std::find_if(subdivision, m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
+                return ((coord->m_beamRelativePlace != place) || (coord->m_dur <= DUR_8));
+            });
+            subdivision = found;
+            --subdivisionCounter;
+
+            // Handle different cases, where we either don't want to proceed (e.g. end of the beam reached) or we want
+            // to process them separately (e.g. on direction change from shorter to longer notes, or vice versa, we do
+            // not want last note of the subdivision to have additional beam, so that it's clearly distinguishable).
+            if (m_beamElementCoordRefs.end() == found) break;
+            if ((m_beamElementCoordRefs.end() - 1) == found) {
+                isProcessed = true;
+                break;
+            }
+            if ((*found)->m_dur <= DUR_8) break;
+            if ((*found)->m_dur < startDur) {
+                ingoreLast = true;
+                break;
+            }
+            // If no other conditions are hit - this is proper cross-staff case, so change drawing place to that of the
+            // new direction
+            place = (*found)->m_beamRelativePlace;
+        }
+        std::for_each(start, subdivision,
+            [place](BeamElementCoord *coord) { coord->m_partialFlagPlace = (data_BEAMPLACE)((place % 2) + 1); });
+        if (ingoreLast) {
+            (*subdivision - 1)->m_partialFlagPlace = BEAMPLACE_NONE;
+        }
+        if (isProcessed) break;
+        if (m_beamElementCoordRefs.end() != subdivision) ++subdivision;
+
+        start = subdivision;
     }
 }
 
@@ -1014,50 +1120,33 @@ void BeamElementCoord::SetDrawingStemDir(
     int ledgerLines = 0;
     int ledgerLinesOpposite = 0;
     this->m_shortened = false;
-    this->m_closestNote = NULL;
 
     this->m_yBeam = this->m_element->GetDrawingY();
-
-    if (this->m_element->Is(NOTE)) {
-        m_closestNote = dynamic_cast<Note *>(this->m_element);
-    }
-
-    if (stemDir == STEMDIRECTION_up) {
-        this->m_x += interface->m_stemXAbove[interface->m_cueSize];
-        if (this->m_element->Is(CHORD)) {
-            Chord *chord = vrv_cast<Chord *>(this->m_element);
-            assert(chord);
-            m_closestNote = chord->GetTopNote();
-        }
-        if (m_closestNote) {
-            this->m_yBeam = m_closestNote->GetDrawingY();
-            m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
-        }
-    }
-    else {
-        this->m_x += interface->m_stemXBelow[interface->m_cueSize];
-        if (this->m_element->Is(CHORD)) {
-            Chord *chord = vrv_cast<Chord *>(this->m_element);
-            assert(chord);
-            m_closestNote = chord->GetBottomNote();
-        }
-        if (m_closestNote) {
-            this->m_yBeam = m_closestNote->GetDrawingY();
-            m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
-        }
-    }
-
+    this->m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
+                                               : interface->m_stemXBelow[interface->m_cueSize];
     if (!m_closestNote) return;
 
+    this->m_yBeam = m_closestNote->GetDrawingY();
+    m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
+
+    int stemLen = segment->m_uniformStemLength;
+    if (interface->m_isCrossStaff) {
+        if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
+            stemLen *= -1;
+        }
+    }
     this->m_centered = segment->m_uniformStemLength % 2;
-    this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+    this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
     const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
     if (m_element->IsGraceNote() || isInGraceGroup) return;
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
+    if (interface->m_isCrossStaff) {
+        segment->m_extendedToCenter = false;
+    }
+    else if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
         || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= this->m_yBeam))) {
         this->m_yBeam = segment->m_verticalCenter;
         segment->m_extendedToCenter = true;
@@ -1118,6 +1207,19 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     }
 
     return stemLen;
+}
+
+void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir) 
+{
+    m_closestNote = NULL;
+    if (m_element->Is(NOTE)) {
+        m_closestNote = vrv_cast<Note *>(m_element);
+    }
+    else if (m_element->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(m_element);
+        assert(chord);
+        m_closestNote = (STEMDIRECTION_up == stemDir) ? chord->GetTopNote() : chord->GetBottomNote();
+    }
 }
 
 //----------------------------------------------------------------------------
