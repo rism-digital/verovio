@@ -1955,6 +1955,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
         }
 
+        if (node.select_node("sound")) {
+            const float dynamics = node.select_node("sound").node().attribute("dynamics").as_float(-1.0);
+            if (dynamics >= 0.0) {
+                dynam->SetVal(std::min(int((dynamics * 90) / 100), 127));
+            }
+        }
+
         TextRendition(dynamics, dynam);
         if (defaultY == 0) defaultY = dynamics.first().node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
