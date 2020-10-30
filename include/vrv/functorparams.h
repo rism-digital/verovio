@@ -577,6 +577,7 @@ public:
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
         m_doc = doc;
+        m_previousIsCrossStaff = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -587,6 +588,7 @@ public:
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
     bool m_hasMultipleLayer;
+    bool m_previousIsCrossStaff;
     Doc *m_doc;
 };
 

@@ -997,6 +997,8 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         iter->second->SetGraceAligmentXPos(params->m_doc);
     }
 
+    if (m_type == ALIGNMENT_CROSSSTAFF_NOTE) intervalXRel *= 1.6;
+
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;

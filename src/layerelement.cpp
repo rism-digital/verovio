@@ -966,6 +966,15 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->IsGraceNote()) {
         type = ALIGNMENT_GRACENOTE;
     }
+    else if (this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        if ((params->m_previousIsCrossStaff && !note->m_crossStaff)
+            || (!params->m_previousIsCrossStaff && note->m_crossStaff)) {
+            params->m_previousIsCrossStaff = !params->m_previousIsCrossStaff;
+            type = ALIGNMENT_CROSSSTAFF_NOTE;
+        }
+    }
 
     double duration = 0.0;
     // We have already an alignment with grace note children - skip this
