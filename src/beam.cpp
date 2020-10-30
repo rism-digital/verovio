@@ -1143,6 +1143,7 @@ void BeamElementCoord::SetDrawingStemDir(
     // Mark the segment as extendedToCenter since we then want a reduced slope
     if (interface->m_isCrossStaff) {
         segment->m_extendedToCenter = false;
+        this->m_yBeam -= interface->m_beamWidth;
     }
     else if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
         || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= this->m_yBeam))) {
