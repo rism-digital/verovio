@@ -2612,6 +2612,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
+        // dynamics (MIDI velocity)
+        const float dynamics = node.attribute("dynamics").as_float(-1.0);
+        if (dynamics >= 0.0) {
+            note->SetVel(std::min(int((dynamics * 90) / 100), 127));
+        }
+
         // notehead
         pugi::xpath_node notehead = node.select_node("notehead");
         if (notehead) {
