@@ -204,10 +204,10 @@ void BeamSegment::CalcBeam(
             else if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
                 int stemOffset = 0;
                 if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
-                    stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth / 2;
+                    stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
                 }
                 if (coord->m_beamRelativePlace == BEAMPLACE_below) {
-                    y1 -= stemOffset;
+                    y1 -=  doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + stemOffset;
                     y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
                 }
                 else {
@@ -437,7 +437,7 @@ bool BeamSegment::CalcBeamSlope(
     }
 
     // We can keep the current slope but only if curStep is not 0 and smaller than the step
-    if ((curStep != 0) && (curStep < step)) {
+    if ((curStep != 0) && (curStep < step) && (BEAMPLACE_mixed != place)) {
         LogDebug("Current %d step is lower than max step %d", curStep, step);
         return false;
     }
@@ -544,11 +544,17 @@ bool BeamSegment::CalcBeamSlope(
         }
     }
     else if (place == BEAMPLACE_mixed) {
-        if (m_beamSlope < 0.0) {
-
+        int heightDiff = m_lastNoteOrChord->m_yBeam - m_firstNoteOrChord->m_yBeam;
+        if (curStep < step) {
+            std::swap(m_firstNoteOrChord->m_yBeam, m_lastNoteOrChord->m_yBeam);
+        }
+        else if (m_beamSlope > 0.0) {
+            m_firstNoteOrChord->m_yBeam += (heightDiff - step) / 2;
+            m_lastNoteOrChord->m_yBeam -= (heightDiff - step) / 2;
         }
         else {
-
+            m_firstNoteOrChord->m_yBeam += (heightDiff + step) / 2;
+            m_lastNoteOrChord->m_yBeam -= (heightDiff + step) / 2;
         }
     }
 
@@ -832,44 +838,36 @@ void BeamSegment::CalcPartialFlagPlace()
         auto subdivision = start;
         data_BEAMPLACE place = (*start)->m_beamRelativePlace;
         const int startDur = (*start)->m_dur;
-        int subdivisionCounter = 3;
-        bool ingoreLast = false;
         bool isProcessed = false;
-        // Process beam as a collection of subdivision. Subdivision can change stem direction 3 times until a new one 
-        // has to be started. This way long cross-staff beams will broken in smaller segments. Cases where duration
-        // decreases/increases for cross-staff notes are also handled and those are separated into their own
-        // subdivisions
+        bool breakSec = false;
+        // Process beam as a collection of subdivision. Subdivision will extend as long as we don't encounter 8th note
+        // or direction changes
         while (true) {
-            if (!subdivisionCounter) break;
+            if (breakSec) break;
             // Find first note longer than 8th or first note that is cross-staff
             auto found = std::find_if(subdivision, m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-                return ((coord->m_beamRelativePlace != place) || (coord->m_dur <= DUR_8));
+                if (coord->m_element->Is(REST)) return false;
+                return ((coord->m_beamRelativePlace != place) || (coord->m_dur <= DUR_8) || (coord->m_breaksec));
             });
             subdivision = found;
-            --subdivisionCounter;
 
             // Handle different cases, where we either don't want to proceed (e.g. end of the beam reached) or we want
             // to process them separately (e.g. on direction change from shorter to longer notes, or vice versa, we do
             // not want last note of the subdivision to have additional beam, so that it's clearly distinguishable).
-            if (m_beamElementCoordRefs.end() == found) break;
+            if ((m_beamElementCoordRefs.end() == found) || ((*found)->m_dur <= DUR_8)) break;
+            if (((*found)->m_breaksec)) breakSec = true;
             if ((m_beamElementCoordRefs.end() - 1) == found) {
+                subdivision = m_beamElementCoordRefs.end();
                 isProcessed = true;
                 break;
             }
-            if ((*found)->m_dur <= DUR_8) break;
-            if ((*found)->m_dur < startDur) {
-                ingoreLast = true;
-                break;
-            }
+
             // If no other conditions are hit - this is proper cross-staff case, so change drawing place to that of the
             // new direction
             place = (*found)->m_beamRelativePlace;
         }
         std::for_each(start, subdivision,
             [place](BeamElementCoord *coord) { coord->m_partialFlagPlace = (data_BEAMPLACE)((place % 2) + 1); });
-        if (ingoreLast) {
-            (*subdivision - 1)->m_partialFlagPlace = BEAMPLACE_NONE;
-        }
         if (isProcessed) break;
         if (m_beamElementCoordRefs.end() != subdivision) ++subdivision;
 
