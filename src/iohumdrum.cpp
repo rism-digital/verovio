@@ -16589,7 +16589,6 @@ void HumdrumInput::convertMRest(MRest *rest, hum::HTp token, int subtoken, int s
 
 void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int staffindex)
 {
-
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     // Shouldn't be in a chord, so add rest duration here.
@@ -16674,6 +16673,7 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int sta
     else {
         tstring = token->getSubtoken(subtoken);
     }
+    addDurRecip(rest, tstring);
 
     int layer = m_currentlayer;
 
@@ -16793,6 +16793,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         tstring = token->getSubtoken(subtoken);
         stindex = subtoken;
     }
+    addDurRecip(note, tstring);
 
     std::string scordaturaGes;
     if (!m_scordatura_marker.empty()) {
@@ -17470,6 +17471,45 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
         addType(note, "scoredatura");
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addDurRecip -- Add the **recip duration of the note/rest
+//     as `@dur.recip`.  Only numeric **recip values are used, so breves
+//     encoded in a Humdrum file as "0" are converted to the numeric
+//     equivalent of "1%2".  Grace notes are then given a numeric value
+//     of "0", which is otherwise represented by "q" in Humdrum data.
+//     The augmentation dots position can be malformed and possibly
+//     placed elsewhere, but the function will not currently handle
+//     such cases.
+//
+
+template <class ELEMENT> void HumdrumInput::addDurRecip(ELEMENT element, const std::string &ttoken)
+{
+    if (ttoken.find('q') != std::string::npos) {
+        element->SetDurRecip("0");
+        return;
+    }
+    hum::HumRegex hre;
+    if (!hre.search(ttoken, "([0-9]+(?:%[0-9]+)?\\.*)")) {
+        // This is possible in an alternate compressed
+        // chord representation where the secondary
+        // notes in the chord do not have explicit durations.
+        // Currently ignore such cases.
+        return;
+    }
+    std::string recip = hre.getMatch(1);
+    if (hre.search(recip, "^(0+)")) {
+        // Convert symbolic rhythms to numeric equivalents
+        std::string zeros = hre.getMatch(1);
+        int zcount = (int)zeros.size();
+        int value = (int)pow(2.0, zcount);
+        std::string replacement = "1%";
+        replacement += to_string(value);
+        hre.replaceDestructive(recip, replacement, "^0+");
+    }
+    element->SetDurRecip(recip);
 }
 
 //////////////////////////////
