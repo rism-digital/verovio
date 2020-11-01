@@ -684,6 +684,7 @@ private:
     ///@{
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
+    void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
     void UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);

@@ -1550,7 +1550,10 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             if (!keySig) keySig = new KeySig();
             keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
         }
-        if (key.node().attribute("id")) keySig->SetUuid(key.node().attribute("id").as_string());
+        if (key.node().attribute("id")) {
+            if (!keySig) keySig = new KeySig();
+            keySig->SetUuid(key.node().attribute("id").as_string());
+        }
         // Add it if necessary
         if (keySig) {
             // Make it an attribute for now

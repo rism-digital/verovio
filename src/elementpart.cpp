@@ -295,6 +295,41 @@ bool Stem::IsSupportedChild(Object *child)
     return true;
 }
 
+void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    if (isUnison) {
+        isUnison = false;
+        return;
+    }
+    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    assert(staff);
+    // check if there is an overlap on the left or on the right and displace stem's parent correspondigly
+    for (auto element : otherElements) {
+        int right = HorizontalLeftOverlap(element, doc, 0, 0);
+        int left = HorizontalRightOverlap(element, doc, 0, 0);
+        if (!right || !left) continue;
+
+        LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+        assert(parent);
+        int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        Flag *currentFlag = NULL;
+        currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
+        if (currentFlag) {
+            wchar_t flagGlyph = currentFlag->GetSmuflCode(STEMDIRECTION_down);
+            const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
+            horizontalMargin += flagWidth;
+        }
+
+        if (right < left) {
+            parent->SetDrawingXRel(parent->GetDrawingXRel() + right + horizontalMargin);
+        }
+        else {
+            parent->SetDrawingXRel(parent->GetDrawingXRel() - horizontalMargin - left);
+        }
+        return;
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
