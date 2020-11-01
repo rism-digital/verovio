@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 21 21:42:12 PDT 2020
+// Last Modified: Sun Oct 25 21:32:07 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1654,7 +1654,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     hasStrophe                (void);
 		void     clearStrophe              (void);
 		bool     isStrophe                 (const std::string& label);
-		bool     getStropheStartIndex      (void);
+		int      getStropheStartIndex      (void);
 		bool     isFirstStrophe            (void);
 		bool     isPrimaryStrophe          (void);
 
