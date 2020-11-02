@@ -693,7 +693,7 @@ int LayerElement::CountElementsInUnison(
         firstChord.begin(), firstChord.end(), secondChord.begin(), secondChord.end(), intersection.begin());
     intersection.resize(it - intersection.begin());
     if (intersection.empty()) return false;
-    for (int i = 0; i < intersection.size() - 1; ++i) {
+    for (int i = 0; i < (int)intersection.size() - 1; ++i) {
         if (std::abs(intersection.at(i) - intersection.at(i + 1)) == 1) {
             return 0;
         }
