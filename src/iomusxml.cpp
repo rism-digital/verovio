@@ -3141,7 +3141,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // slur
-    pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
+    pugi::xpath_node_set slurs = node.select_nodes("notations/slur");
     for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
         pugi::xml_node slur = it->node();
         int slurNumber = slur.attribute("number").as_int();
