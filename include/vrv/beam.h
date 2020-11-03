@@ -61,6 +61,10 @@ public:
     void ClearCoordRefs();
 
 private:
+    // Helper to calculate positioning of the mixed beam
+    // Returns whether or not beam has to be horizontal for it to fit
+    bool AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit);
+
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     bool CalcBeamSlope(
@@ -77,7 +81,7 @@ private:
     void CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir);
 
     // Helper to calculate relative position of the beam to for each of the coordinates
-    void CalcCrossStaffBeamPlace(Staff *staff);
+    void CalcMixedBeamPlace(Staff *staff);
 
     // Helper to calculate proper positioning of the additional beamlines for notes
     void CalcPartialFlagPlace();

@@ -356,7 +356,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
             for (i = 0; i < noteCount; ++i) {
                 int barYPos = 0;
                 idx = noteIndexes.at(i);
-                if (beamInterface->m_isCrossStaff) {
+                if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
                     if (BEAMPLACE_NONE == beamElementCoords->at(idx)->m_partialFlagPlace) continue;
                     barYPos = barY * ((BEAMPLACE_above == beamElementCoords->at(idx)->m_partialFlagPlace) ? 1 : -1);
                 }

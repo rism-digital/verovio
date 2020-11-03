@@ -105,9 +105,12 @@ void BeamSegment::CalcBeam(
 
     CalcBeamStemLength(staff, beamInterface->m_drawingPlace == BEAMPLACE_below ? STEMDIRECTION_down : STEMDIRECTION_up);
 
-    if (beamInterface->m_isCrossStaff) {
-        CalcCrossStaffBeamPlace(staff);
+    if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
+        CalcMixedBeamPlace(staff);
         CalcPartialFlagPlace();
+        if (!AdjustMixedBeamPlacement(beamInterface, doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
+            horizontal = true;
+        }
     }
 
     // Set drawing stem positions
@@ -235,6 +238,68 @@ void BeamSegment::CalcBeam(
             stem->SetDrawingStemLen(y2 - y1);
         }
     }
+}
+
+bool BeamSegment::AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit)
+{
+    // Calculate midpoint for the beam with mixed placement
+    int min = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
+    int max = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
+    for (auto coord : m_beamElementCoordRefs) {
+        max = std::max(max, coord->m_element->GetDrawingY());
+        min = std::min(min, coord->m_element->GetDrawingY());
+    }
+    int midpoint = (max + min) / 2;
+
+    // Calculate whethere there's going to be an overlap with additional beams
+    int adjustmentCoeficient = 0;
+    int beamOverlap = 0;
+    for (auto coord : m_beamElementCoordRefs) {
+        if (coord->m_partialFlagPlace != coord->m_beamRelativePlace) {
+            beamOverlap = (BEAMPLACE_above == coord->m_partialFlagPlace) ? -1 : 1;
+        }
+        int overlap = coord->m_element->GetDrawingY()
+            + beamOverlap * beamInterface->m_beamWidth * (beamInterface->m_shortestDur - DUR_8) - midpoint;
+        if (overlap * beamOverlap >= -beamOverlap * beamInterface->m_beamWidth) {
+            adjustmentCoeficient = beamOverlap * beamInterface->m_beamWidth;
+        }
+    }
+    if (!adjustmentCoeficient) {
+        beamInterface->m_midPoint = adjustmentCoeficient;
+    }
+    else {
+        beamInterface->m_midPoint = midpoint + adjustmentCoeficient;
+    }
+
+    // Check for additional overlaps that might influence mixed beam positioning:
+    // 1. In case there's not enough space in between the element, we will need to draw beam above/below instead
+    // of mixed one.
+    // 2. In case there's enough space for the mixed beam, but not enough for the slope - always make it horizontal
+    bool invalidPlacement = false;
+    for (auto coord : m_beamElementCoordRefs) {
+        const int margin = abs(coord->m_element->GetDrawingY() - beamInterface->m_midPoint);
+        if (margin <= drawingDoubleUnit) {
+            invalidPlacement = true;
+        }
+        else if (margin <= 2 * drawingDoubleUnit) {
+            return false;
+        }
+    }
+
+    // Adjust beam placement based on the most frequent stem direction in case if there's no space for mixed (see above)
+    if (invalidPlacement) {
+        const int stemUpCount = std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_up; });
+        const int stemDownCount = std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_down; });
+        data_STEMDIRECTION newDirection = (stemUpCount >= stemDownCount) ? STEMDIRECTION_up : STEMDIRECTION_down;
+        beamInterface->m_drawingPlace = (newDirection == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
+        LogWarning("Insufficient space to draw mixed beam, starting at '%s'. Drawing '%s' instead.",
+            m_beamElementCoordRefs.at(0)->m_element->GetUuid().c_str(),
+            (beamInterface->m_drawingPlace == BEAMPLACE_above) ? "above" : "below");
+    }
+
+    return true;
 }
 
 void BeamSegment::CalcBeamInit(
@@ -548,7 +613,7 @@ bool BeamSegment::CalcBeamSlope(
         if (curStep < step) {
             std::swap(m_firstNoteOrChord->m_yBeam, m_lastNoteOrChord->m_yBeam);
         }
-        else if (m_beamSlope > 0.0) {
+        if (m_beamSlope > 0.0) {
             m_firstNoteOrChord->m_yBeam += (heightDiff - step) / 2;
             m_lastNoteOrChord->m_yBeam -= (heightDiff - step) / 2;
         }
@@ -808,22 +873,30 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
     }
 }
 
-void BeamSegment::CalcCrossStaffBeamPlace(Staff *staff)
+void BeamSegment::CalcMixedBeamPlace(Staff *staff)
 {
     const int currentStaffN = staff->GetN();
-    auto it = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+    const auto it = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
         [](auto coord) { return NULL != coord->m_element->m_crossStaff; });
-    if (it == m_beamElementCoordRefs.end()) return;
 
-    Staff *currentCrossStaff = (*it)->m_element->m_crossStaff;
-    const int crossStaffN = currentCrossStaff->GetN();
+    bool beamPlaceBelow = false;
+    if (it != m_beamElementCoordRefs.end()) {
+        Staff *currentCrossStaff = (*it)->m_element->m_crossStaff;
+        const int crossStaffN = currentCrossStaff->GetN();
+        beamPlaceBelow = currentStaffN < crossStaffN;
+    }
 
     for (auto coord : m_beamElementCoordRefs) {
-        if (!coord->m_element->m_crossStaff) {
-            coord->m_beamRelativePlace = (currentStaffN < crossStaffN) ? BEAMPLACE_below : BEAMPLACE_above;
+        if (it != m_beamElementCoordRefs.end()) {
+            if (!coord->m_element->m_crossStaff) {
+                coord->m_beamRelativePlace = beamPlaceBelow ? BEAMPLACE_below : BEAMPLACE_above;
+            }
+            else {
+                coord->m_beamRelativePlace = !beamPlaceBelow ? BEAMPLACE_below : BEAMPLACE_above;
+            }
         }
         else {
-            coord->m_beamRelativePlace = (currentStaffN > crossStaffN) ? BEAMPLACE_below : BEAMPLACE_above;
+            coord->m_beamRelativePlace = (STEMDIRECTION_up == coord->GetStemDir()) ? BEAMPLACE_above : BEAMPLACE_below;
         }
     }
 }
@@ -1128,7 +1201,7 @@ void BeamElementCoord::SetDrawingStemDir(
     m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
 
     int stemLen = segment->m_uniformStemLength;
-    if (interface->m_isCrossStaff) {
+    if (interface->m_isCrossStaff || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
         if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
             stemLen *= -1;
         }
@@ -1141,9 +1214,9 @@ void BeamElementCoord::SetDrawingStemDir(
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (interface->m_isCrossStaff) {
+    if (interface->m_isCrossStaff || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
         segment->m_extendedToCenter = false;
-        this->m_yBeam -= interface->m_beamWidth;
+        if (interface->m_midPoint) this->m_yBeam = interface->m_midPoint;        
     }
     else if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
         || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= this->m_yBeam))) {
