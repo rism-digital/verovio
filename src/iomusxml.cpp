@@ -582,6 +582,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
     if (!credits.empty()) {
+        bool hasHead = false;
+        bool hasFoot = false;
         PgHead *head = new PgHead();
         PgFoot *foot = new PgFoot();
         for (pugi::xpath_node_set::const_iterator it = credits.begin(); it != credits.end(); ++it) {
@@ -602,13 +604,19 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             rend->AddChild(text);
             if (words.node().attribute("default-y").as_float() < 2 * bottom) {
                 foot->AddChild(rend);
+                hasFoot = true;
             }
             else {
                 head->AddChild(rend);
+                hasHead = true;
             }
         }
-        m_doc->m_mdivScoreDef.AddChild(head);
-        m_doc->m_mdivScoreDef.AddChild(foot);
+        if (hasHead) {
+            m_doc->m_mdivScoreDef.AddChild(head);
+        }
+        if (hasFoot) {
+            m_doc->m_mdivScoreDef.AddChild(foot);
+        }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
