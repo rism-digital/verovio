@@ -90,6 +90,7 @@ void BeamDrawingInterface::Reset()
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
+    m_midPoint = 0;
 }
 
 void BeamDrawingInterface::ClearCoords()
