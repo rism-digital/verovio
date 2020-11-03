@@ -1697,7 +1697,9 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
     }
 
     // fermatas
+    int fermataCounter = 0;
     for (pugi::xml_node xmlFermata : node.children("fermata")) {
+        ++fermataCounter;
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
         if (HasAttributeWithValue(node, "location", "left")) {
@@ -1710,7 +1712,16 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             fermata->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
         }
         if (xmlFermata.attribute("id")) fermata->SetUuid(xmlFermata.attribute("id").as_string());
-        fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+
+        if (fermataCounter < 2) {
+            fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        }
+        else {
+            Staff *lastStaff = vrv_cast<Staff *>(measure->GetLast());
+            assert(lastStaff);
+            fermata->SetStaff(lastStaff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(lastStaff->GetN())));
+        }
+
         ShapeFermata(fermata, xmlFermata);
     }
 }
