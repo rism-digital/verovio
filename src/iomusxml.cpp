@@ -582,8 +582,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
     if (!credits.empty()) {
-        PgHead *head = new PgHead();
-        PgFoot *foot = new PgFoot();
+        PgHead *head = NULL;
+        PgFoot *foot = NULL;
         for (pugi::xpath_node_set::const_iterator it = credits.begin(); it != credits.end(); ++it) {
             pugi::xpath_node words = *it;
             Rend *rend = new Rend();
@@ -601,14 +601,24 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 rend->AttTypography::StrToFontweight(words.node().attribute("font-weight").as_string()));
             rend->AddChild(text);
             if (words.node().attribute("default-y").as_float() < 2 * bottom) {
+                if (!foot) {
+                    foot = new PgFoot();
+                }
                 foot->AddChild(rend);
             }
             else {
+                if (!head) {
+                    head = new PgHead();
+                }
                 head->AddChild(rend);
             }
         }
-        m_doc->m_mdivScoreDef.AddChild(head);
-        m_doc->m_mdivScoreDef.AddChild(foot);
+        if (head) {
+            m_doc->m_mdivScoreDef.AddChild(head);
+        }
+        if (foot) {
+            m_doc->m_mdivScoreDef.AddChild(foot);
+        }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
