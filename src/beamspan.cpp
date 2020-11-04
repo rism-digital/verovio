@@ -74,7 +74,7 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
         Object *parent = measure->GetParent();
 
         const int index = parent->GetChildIndex(measure);
-        Measure *nextMeasure = vrv_cast<Measure *>(parent->GetChild(index + 1));
+        Measure *nextMeasure = vrv_cast<Measure *>(parent->GetNext(measure, MEASURE));
         if (nextMeasure) {
             AttNIntegerComparison snc(STAFF, staff->GetN());
             Staff *nextStaff = vrv_cast<Staff *>(nextMeasure->FindDescendantByComparison(&snc));
