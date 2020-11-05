@@ -1,0 +1,66 @@
+name: Verovio CI Build
+
+on:
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - develop
+      # Push events on ci-test branch (uncomment if needed for testing purposes)
+      # - ci-test
+    paths-ignore:
+      - '**.md' # ignore changes to markdown files
+
+# globals
+env:
+  # general settings
+  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
+                                # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
+                                # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
+
+  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
+                                # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
+                                # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
+
+  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
+                                # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
+
+  # build artifacts
+  TOOLKIT_BUILD: toolkit-build
+
+  # gh-pages
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
+  GH_PAGES_BRANCH: gh-pages
+
+  # temporary directories
+  TEMP_DIR: temp-dir
+
+jobs:
+  ############################
+  # Build the Python toolkit #
+  ############################
+  build_python:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Build python
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Create temp dir
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      - name: Run make
+        working-directory: ${{ github.workspace }}
+        run: |
+          cd bindings/python
+          python setup.py build_ext --inplace
