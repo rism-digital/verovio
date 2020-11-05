@@ -42,14 +42,14 @@ env:
   TEMP_DIR: temp-dir
 
 jobs:
-  ############################
-  # Build the Python toolkit #
-  ############################
+  ###################################################
+  # Build the Python toolkit and run the test suite #
+  ###################################################
   build_python:
     # skip job if commit message contains "[skip-ci]"
     if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
 
-    name: Build python
+    name: Build the test suite
     runs-on: ubuntu-20.04
 
     steps:
@@ -67,11 +67,11 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: mkdir -p $TEMP_DIR/
 
-      - name: Run make
+      - name: Build Python toolkit and run the test suite
         working-directory: ${{ github.workspace }}/bindings/python
         run: |
           python3 setup.py build_ext --inplace
-          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests $TEMP_DIR/
+          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/
 
       - name: Verify
         working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
