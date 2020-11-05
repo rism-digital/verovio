@@ -57,6 +57,11 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ////@}
 
+    // Helper to append coordinates for the beamSpans that are drawn over systems
+    void AppendSpanningCoordinates(Measure *measure);
+
+    // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
+    // in between start and end of the beamSpan
     ArrayOfObjects GetBeamSpanElementList(Layer* layer, Staff* staff);
 
     //----------//
@@ -73,8 +78,23 @@ public:
      */
     virtual int ResolveBeamSpanElements(FunctorParams *);
 
+    /**
+     * See Object::ResolveSpanningBeamSpans
+     */
+    virtual int ResolveSpanningBeamSpans(FunctorParams *);
+
+    /**
+     * @name Getter/setter for spanningType
+     */
+    ///@{
+    void SetSpanningType(int systemIndex, int systemCount);
+    int GetSpanningType() const { return m_spanningType; }
+    ////@}
+
 private:
-    //
+    // Helper for breaking one big spanning beamSpan into smaller beamSpans
+    bool SeparateSpanningElements(ArrayOfObjects &newElements, Object *first, Doc *doc, bool clearElements);
+
 public:
     //
     BeamSegment m_beamSegment;
@@ -82,6 +102,8 @@ public:
 private:
     //
     ArrayOfObjects m_beamedElements;
+
+    int m_spanningType;
 };
 
 } // namespace vrv

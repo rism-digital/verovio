@@ -1291,6 +1291,16 @@ public:
     ///@}
 
     /**
+     * Resolve spinning beamspans by breaking it into separate parts, each belonging to the corresponding
+     * system/measure. BeamSpans get elements reassigned, so that each beamSpan can be drawn as control
+     * element. This allows free placement of beamSpan in the MEI tree and ensures that beamSpan will be
+     * drawn properly
+     */
+    ///@{
+    virtual int ResolveSpinningBeamSpans(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Export the object to a MidiFile
      */
     ///@{
