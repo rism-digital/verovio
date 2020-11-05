@@ -60,7 +60,7 @@ jobs:
         run: mkdir -p $TEMP_DIR/
 
       - name: Run make
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ github.workspace }}/bindings/python
         run: |
-          cd bindings/python
-          python setup.py build_ext --inplace
+          python3 setup.py build_ext --inplace
+          python3 ../../doc/test-suite.py $TEMP_DIR/
