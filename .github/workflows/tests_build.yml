@@ -98,5 +98,15 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/ ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/ ${{ github.workspace }}/$TEMP_DIR/$OUT_DIR/
           ls -al
 
-      
+      - name: Add comment with link
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Test suite regression test available at https://test-suite.verovio.org/${{ github.event.pull_request.head.sha }}'
+            })
 
