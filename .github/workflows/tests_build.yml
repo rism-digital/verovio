@@ -67,14 +67,14 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           path: $PR_DIR/
 
-      - name: Build Python toolkit and run the test suite
+      - name: Build Python toolkit and run the test suite for the PR
         working-directory: ${{ github.workspace }}/$PR_DIR/bindings/python
         run: |
           python3 setup.py build_ext --inplace
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
 
       - name: Verify
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}/$PR_DIR/
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
         run: |
           pwd
           ls -al
