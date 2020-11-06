@@ -94,7 +94,7 @@ jobs:
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/$DEV_DIR/doc
         run: |
-          python3 doc/test-suite-diff.py ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/ ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/ ${{ github.workspace }}/$TEMP_DIR/$OUT_DIR/
+          python3 ./test-suite-diff.py ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/ ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/ ${{ github.workspace }}/$TEMP_DIR/$OUT_DIR/
           ls -al
 
       
