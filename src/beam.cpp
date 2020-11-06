@@ -288,12 +288,14 @@ bool BeamSegment::AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, 
 
     // Adjust beam placement based on the most frequent stem direction in case if there's no space for mixed (see above)
     if (invalidPlacement) {
-        const int stemUpCount = std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+        const int stemUpCount = (int)std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_up; });
-        const int stemDownCount = std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+        const int stemDownCount = (int)std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_down; });
         data_STEMDIRECTION newDirection = (stemUpCount >= stemDownCount) ? STEMDIRECTION_up : STEMDIRECTION_down;
         beamInterface->m_drawingPlace = (newDirection == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
+        if ((newDirection == STEMDIRECTION_down) && (m_uniformStemLength > 0)) m_uniformStemLength *= -1;
+            
         LogWarning("Insufficient space to draw mixed beam, starting at '%s'. Drawing '%s' instead.",
             m_beamElementCoordRefs.at(0)->m_element->GetUuid().c_str(),
             (beamInterface->m_drawingPlace == BEAMPLACE_above) ? "above" : "below");
@@ -910,7 +912,6 @@ void BeamSegment::CalcPartialFlagPlace()
     while (start != m_beamElementCoordRefs.end()) {
         auto subdivision = start;
         data_BEAMPLACE place = (*start)->m_beamRelativePlace;
-        const int startDur = (*start)->m_dur;
         bool isProcessed = false;
         bool breakSec = false;
         // Process beam as a collection of subdivision. Subdivision will extend as long as we don't encounter 8th note
