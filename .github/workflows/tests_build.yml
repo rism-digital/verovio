@@ -1,16 +1,12 @@
 name: Verovio CI Build
 
 on:
-  push:
-    # Trigger the workflow on push,
-    # but only for the branches specified
-    branches:
-      # Push events on develop branch
-      - develop
-      # Push events on ci-test branch (uncomment if needed for testing purposes)
-      # - ci-test
-    paths-ignore:
-      - '**.md' # ignore changes to markdown files
+  pull_request:
+    branches: develop
+  # TODO: run this task only on PR in production; use push event for testing
+  #push:
+    #branches:
+    # - '**'
 
 # globals
 env:
@@ -40,22 +36,18 @@ env:
   # temporary directories
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
+  PR_DIR: pr-${{ github.event.pull_request.head.sha }}
+  DEV_DIR: dev-dir
 
 jobs:
   ###################################################
   # Build the Python toolkit and run the test suite #
   ###################################################
   build_python:
-    # skip job if commit message contains "[skip-ci]"
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
-
     name: Build the test suite
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v2
-
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v2
         with:
@@ -63,20 +55,26 @@ jobs:
           ref: ${{ env.GH_PAGES_BRANCH }}
           path: ${{ env.GH_PAGES_DIR }}
 
-      - name: Create temp dir
+      - name: Create temp directories
         working-directory: ${{ github.workspace }}
-        run: mkdir -p $TEMP_DIR/
+        run: |
+          mkdir -p $TEMP_DIR/$DEV_DIR/
+          mkdir -p $TEMP_DIR/$PR_DIR/
+
+      - name: Checkout the PR
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: $PR_DIR/
 
       - name: Build Python toolkit and run the test suite
-        working-directory: ${{ github.workspace }}/bindings/python
+        working-directory: ${{ github.workspace }}/$PR_DIR/bindings/python
         run: |
           python3 setup.py build_ext --inplace
-          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/
+          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
 
       - name: Verify
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}/$PR_DIR/
         run: |
           pwd
-          count=$(ls -1 *.svg 2>/dev/null | wc -l)
-          echo "Found $count SVG files"
           ls -al
