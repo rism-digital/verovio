@@ -64,7 +64,7 @@ jobs:
           mkdir -p $TEMP_DIR/$OUTPUT_DIR/
           sudo apt-get install librsvg2-bin
           rsvg-convert --version
-          python3 -m pip install diffimg lxml xmldiff
+          python3 -m pip install diffimg
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
