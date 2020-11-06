@@ -587,25 +587,25 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     return dotMargin < 0;
 }
 
-std::pair<int, int> Note::CalcNoteHorizontalOverlap(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool ignoreUnison)
+std::pair<int, bool> Note::CalcNoteHorizontalOverlap(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool isLowerElement, bool unison)
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    int overlappingPosition = -1;
+    bool isInUnison = false;
     int shift = 0;
-    bool hasUnison = false;
 
     for (int i = 0; i < int(otherElements.size()); ++i) {
         int verticalMargin = 0;
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        bool isUnisonElement = false;
         if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
+            isUnisonElement = IsUnissonWith(previousNote, true);
             // Unisson, look at the duration for the note heads
-            if (!hasUnison) hasUnison = IsUnissonWith(previousNote, true);
-            if (!ignoreUnison && IsUnissonWith(previousNote, false)) {
+            if (unison && IsUnissonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
                 const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
@@ -622,11 +622,11 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
                 }
                 if (!isPreviousCoord || isEdgeElement || isChordElement) {
                     if ((GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
-                        overlappingPosition = i;
+                        isInUnison = true;
                         continue;
                     }
                     else if ((GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
-                        overlappingPosition = i;
+                        isInUnison = true;
                         continue;
                     }
                 }
@@ -657,18 +657,22 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
             }
         }
 
-        if ((horizontalMargin >= 0) || isChordElement) {
-            // Nothing to do if we have no vertical overlap
-            if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) break;
+        // Nothing to do if we have no vertical overlap
+        if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) continue;
 
-            // Nothing to do either if we have no horizontal overlap
-            if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) break;
+        // Nothing to do either if we have no horizontal overlap
+        if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) continue;
 
+        if (horizontalMargin < 0 || isLowerElement) {
+            shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
+            if (!isUnisonElement) shift -= horizontalMargin;
+        }
+        else if ((horizontalMargin >= 0) || isChordElement) {
             shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
 
             // Make additional adjustments for cross-staff and unison notes
             if (m_crossStaff) shift -= horizontalMargin;
-            if (overlappingPosition != -1) shift *= -1;
+            if (isInUnison) shift *= -1;
         }
         else {
             // Otherwise move the appropriate parent to the right
@@ -679,9 +683,18 @@ std::pair<int, int> Note::CalcNoteHorizontalOverlap(
 
     // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
     // That way accidental will be near note that actually has accidental and not near lowest-layer note
-    if (hasUnison && GetDrawingAccid() && (shift > 0)) shift = -shift;
+    if (isChordElement && unison && GetDrawingAccid() && (shift > 0)) shift *= -1;
 
-    return { shift, overlappingPosition };
+    return { shift, isInUnison };
+}
+
+void Note::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    if (GetParent()->Is(CHORD)) return;
+
+    auto [margin, isInUnison] = CalcNoteHorizontalOverlap(doc, otherElements, false);
+    isUnison = isInUnison;
+    if (!isInUnison) SetDrawingXRel(GetDrawingXRel() + margin);
 }
 
 //----------------------------------------------------------------------------
