@@ -55,13 +55,13 @@ jobs:
           ref: ${{ env.GH_PAGES_BRANCH }}
           path: ${{ env.GH_PAGES_DIR }}
 
-      - name: Create temp directories
+      - name: Create temp directories and install packages
         working-directory: ${{ github.workspace }}
         run: |
-          sudo apt-get install librsvg2-bin
-          rsvg-convert --version
           mkdir -p $TEMP_DIR/$DEV_DIR/
           mkdir -p $TEMP_DIR/$PR_DIR/
+          sudo apt-get install librsvg2-bin
+          rsvg-convert --version
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
@@ -74,6 +74,7 @@ jobs:
         run: |
           python3 setup.py build_ext --inplace
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
+          ../../test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
 
       - name: Verify
         working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
@@ -92,4 +93,5 @@ jobs:
         run: |
           python3 setup.py build_ext --inplace
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
+          ../../test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
 
