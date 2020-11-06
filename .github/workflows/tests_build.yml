@@ -38,6 +38,7 @@ env:
   TEMP_DIR: temp-dir
   PR_DIR: pr-${{ github.event.pull_request.head.sha }}
   DEV_DIR: dev-dir
+  OUTPUT_DIR: output-dir
 
 jobs:
   ###################################################
@@ -60,6 +61,7 @@ jobs:
         run: |
           mkdir -p $TEMP_DIR/$DEV_DIR/
           mkdir -p $TEMP_DIR/$PR_DIR/
+          mkdir -p $TEMP_DIR/$OUTPUT_DIR/
           sudo apt-get install librsvg2-bin
           rsvg-convert --version
 
@@ -76,12 +78,6 @@ jobs:
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
           ../../test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
 
-      - name: Verify
-        working-directory: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
-        run: |
-          pwd
-          ls -al
-
       - name: Checkout the PR
         uses: actions/checkout@v2
         with:
@@ -94,4 +90,12 @@ jobs:
           python3 setup.py build_ext --inplace
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
           ../../test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
+
+      - name: Compare the tests
+        working-directory: ${{ github.workspace }}/$DEV_DIR/doc
+        run: |
+          python3 doc/test-suite-diff.py ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/ ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/ ${{ github.workspace }}/$TEMP_DIR/$OUT_DIR/
+          ls -al
+
+      
 

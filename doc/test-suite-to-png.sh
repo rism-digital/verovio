@@ -9,7 +9,7 @@ for testcategory in $DIR/*; do
     if [ -d "$testcategory" ]; then
         echo "* Converting SVG files for ${testcategory##*/}"
         for testfile in $testcategory/*.svg; do
-            rsvg-convert $testfile -f png -o ${testfile%.svg}.png
+            rsvg-convert --zoom=2.0 $testfile -f png -o ${testfile%.svg}.png
         done
     fi
 done
