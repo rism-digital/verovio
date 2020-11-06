@@ -76,7 +76,7 @@ jobs:
         run: |
           python3 setup.py build_ext --inplace
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
-          ../../test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
+          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
 
       - name: Checkout the PR
         uses: actions/checkout@v2
@@ -89,7 +89,7 @@ jobs:
         run: |
           python3 setup.py build_ext --inplace
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
-          ../../test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
+          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
 
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/$DEV_DIR/doc
