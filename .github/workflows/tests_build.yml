@@ -58,6 +58,7 @@ jobs:
       - name: Create temp directories
         working-directory: ${{ github.workspace }}
         run: |
+          sudo apt-get install librsvg2-bin
           rsvg-convert --version
           mkdir -p $TEMP_DIR/$DEV_DIR/
           mkdir -p $TEMP_DIR/$PR_DIR/
