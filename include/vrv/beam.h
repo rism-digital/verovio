@@ -63,7 +63,7 @@ public:
 private:
     // Helper to calculate positioning of the mixed beam
     // Returns whether or not beam has to be horizontal for it to fit
-    bool AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit);
+    void AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit);
 
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 

@@ -108,9 +108,7 @@ void BeamSegment::CalcBeam(
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         CalcMixedBeamPlace(staff);
         CalcPartialFlagPlace();
-        if (!AdjustMixedBeamPlacement(beamInterface, doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
-            horizontal = true;
-        }
+        AdjustMixedBeamPlacement(beamInterface, doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
     }
 
     // Set drawing stem positions
@@ -240,7 +238,7 @@ void BeamSegment::CalcBeam(
     }
 }
 
-bool BeamSegment::AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit)
+void BeamSegment::AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit)
 {
     // Calculate midpoint for the beam with mixed placement
     int min = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
@@ -281,9 +279,6 @@ bool BeamSegment::AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, 
         if (margin <= drawingDoubleUnit) {
             invalidPlacement = true;
         }
-        else if (margin <= 2 * drawingDoubleUnit) {
-            return false;
-        }
     }
 
     // Adjust beam placement based on the most frequent stem direction in case if there's no space for mixed (see above)
@@ -300,8 +295,6 @@ bool BeamSegment::AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, 
             m_beamElementCoordRefs.at(0)->m_element->GetUuid().c_str(),
             (beamInterface->m_drawingPlace == BEAMPLACE_above) ? "above" : "below");
     }
-
-    return true;
 }
 
 void BeamSegment::CalcBeamInit(
