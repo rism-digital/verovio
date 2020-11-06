@@ -56,8 +56,13 @@ if __name__ == "__main__":
     html, body = start_webpage()
     div = etree.Element('div', attrib={'class': 'container'})
     body.append(div)
+    text1 = etree.SubElement(div, 'h3')
+    text2 = etree.SubElement(div, 'p')
     ulTablist = etree.SubElement(div, 'ul', attrib={'class': 'nav nav-tabs', 'role': 'tablist'})
     divTabcontent = etree.SubElement(div, 'div', attrib={'class': 'tab-content'})
+
+    totalChanges = 0
+    categoryChanges = 0
 
     path_in1 = args.input_dir1
     path_in2 = args.input_dir2
@@ -142,6 +147,12 @@ if __name__ == "__main__":
             link.text = item1.capitalize() + ' '
             span = etree.SubElement(link, 'span', attrib={'class': 'badge'})
             span.text = str(nbChanges)
+
+            categoryChanges += 1
+            totalChanges += nbChanges
     
+    text1.text = 'Test suite visual regression test for PR'
+    text2.text = '{} change(s) detected in {} test category(ies)'.format(totalChanges, categoryChanges)
+
     htmlFileOut = os.path.join(path_out, 'index.html')
     end_webpage(html, body, htmlFileOut)
