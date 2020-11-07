@@ -143,28 +143,23 @@ set(all_SRC
 ##################
 # Shared library #
 ##################
+
 if (BUILD_AS_LIBRARY)
     message(STATUS "***** Building Verorio as shared library *****")
-    add_library (
-        verovio
-        SHARED
-		../tools/c_wrapper.cpp
-        ${all_SRC}
-    )
+    add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
+    
 ###########
 # WASM BC #
 ###########
+
 elseif (BUILD_AS_WASM)
     message(STATUS "***** Building Verorio as WASM BC *****")
-    add_library (
-        verovio
-        STATIC
-		../tools/c_wrapper.cpp
-        ${all_SRC}
-    )
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+
 #################
 # Python module #
 #################
+
 elseif (BUILD_AS_PYTHON)
     message(STATUS "***** Building Verorio as Python module *****")
 
@@ -191,22 +186,16 @@ elseif (BUILD_AS_PYTHON)
     swig_link_libraries(verovio_module verovio ${PYTHON_LIBRARIES})
     message(STATUS "***** Building for Python ${PYTHONLIBS_VERSION_STRING} *****")
 
-    add_library (
-        verovio
-        STATIC
-		../tools/c_wrapper.cpp
-        ${all_SRC}
-    )
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+
 #####################
 # Command-line tool #
 #####################
+
 else()
     message(STATUS "***** Building Verorio as command-line tool *****")
-    add_executable (
-        verovio
-        ../tools/main.cpp
-        ${all_SRC}
-    )
+    add_executable(verovio ../tools/main.cpp ${all_SRC})
+
 endif()
 
 install(
