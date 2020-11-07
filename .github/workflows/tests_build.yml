@@ -72,9 +72,10 @@ jobs:
           path: ${{ env.DEV_DIR }}/
 
       - name: Build Python toolkit and run the tests for the dev branch
-        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings/python
+        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings
         run: |
-          cmake ../../cmake -DBUILD_AS_PYTHON=ON
+          cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
+          cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.DEV_DIR }}/
           ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.DEV_DIR }}/
@@ -86,9 +87,10 @@ jobs:
           path: ${{ env.PR_DIR }}/
 
       - name: Build Python toolkit and run the tests for the PR
-        working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}/bindings/python
+        working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}/bindings
         run: |
-          cmake ../../cmake -DBUILD_AS_PYTHON=ON
+          cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
+          cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}//${{ env.PR_DIR }}/
           ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.PR_DIR }}/
