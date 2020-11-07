@@ -4,6 +4,11 @@
 setup.py file for Verovio
 """
 
+# deprecation warning
+print("***********************************************************************************")
+print("This setup file is deprecated. Use 'cmake ../../cmake -DBUILD_AS_PYTHON=ON' instead")
+print("***********************************************************************************")
+
 from glob import glob
 import os
 import platform
@@ -11,7 +16,6 @@ from setuptools import setup, Extension
 
 # generate the git commit include file
 os.system("cd ..;../tools/get_git_commit.sh")
-
 
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
