@@ -188,7 +188,7 @@ elseif (BUILD_AS_PYTHON)
     swig_add_module(verovio_module_${OUTPUT_VERSION_STRING} python ../bindings/python/verovio.i)
     swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${PYTHON_LIBRARIES})
 
-    add_library(verovio STATIC ../../tools/c_wrapper.cpp ${all_SRC})
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
 
 #####################
 # Command-line tool #
