@@ -75,7 +75,8 @@ jobs:
       - name: Build Python toolkit and run the tests for the dev branch
         working-directory: ${{ github.workspace }}/$DEV_DIR/bindings/python
         run: |
-          python3 setup.py build_ext --inplace
+          cmake ../../cmake -DBUILD_AS_PYTHON=ON
+          make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
           ../../doc/test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$DEV_DIR/
 
@@ -88,7 +89,8 @@ jobs:
       - name: Build Python toolkit and run the tests for the PR
         working-directory: ${{ github.workspace }}/$PR_DIR/bindings/python
         run: |
-          python3 setup.py build_ext --inplace
+          cmake ../../cmake -DBUILD_AS_PYTHON=ON
+          make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
           ../../doc/test-suite-to-png.sh ${{ github.workspace }}/$TEMP_DIR/$PR_DIR/
 
