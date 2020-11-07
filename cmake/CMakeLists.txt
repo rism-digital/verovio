@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.8)
 
 project(Verovio)
 
@@ -140,24 +140,68 @@ set(all_SRC
     ../libmei/atts_visual.cpp
 )
 
+##################
+# Shared library #
+##################
 if (BUILD_AS_LIBRARY)
-    message(STATUS "build verovio as library")
+    message(STATUS "***** Building Verorio as shared library *****")
     add_library (
         verovio
         SHARED
 		../tools/c_wrapper.cpp
         ${all_SRC}
     )
+###########
+# WASM BC #
+###########
 elseif (BUILD_AS_WASM)
-    message(STATUS "build verovio as wasm bc")
+    message(STATUS "***** Building Verorio as WASM BC *****")
     add_library (
         verovio
         STATIC
 		../tools/c_wrapper.cpp
         ${all_SRC}
     )
+#################
+# Python module #
+#################
+elseif (BUILD_AS_PYTHON)
+    message(STATUS "***** Building Verorio as Python module *****")
+
+    # clear out policies
+    cmake_policy(SET CMP0078 NEW)
+    cmake_policy(SET CMP0086 NEW)
+
+    find_package(SWIG REQUIRED)
+    include(${SWIG_USE_FILE})
+    
+    set(CMAKE_SWIG_FLAGS "")
+    set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)
+    swig_add_module(verovio_module python ../bindings/python/verovio.i)
+
+    ### For building for specific version of Python
+    #set(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
+    #set(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
+    #include_directories(${PYTHON_INCLUDE_DIR})
+    #swig_link_libraries(verovio_module verovio ${PYTHON_LIBRARY})
+
+    ### For building for found version of Python (comment when specific version is set)
+    find_package(PythonLibs)
+    include_directories(${PYTHON_INCLUDE_PATH})
+    swig_link_libraries(verovio_module verovio ${PYTHON_LIBRARIES})
+    message(STATUS "***** Building for Python ${PYTHONLIBS_VERSION_STRING} *****")
+
+    add_library (
+        verovio
+        STATIC
+		../tools/c_wrapper.cpp
+        ${all_SRC}
+    )
+#####################
+# Command-line tool #
+#####################
 else()
-    message(STATUS "build verovio as executable")
+    message(STATUS "***** Building Verorio as command-line tool *****")
     add_executable (
         verovio
         ../tools/main.cpp
