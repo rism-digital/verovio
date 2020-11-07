@@ -582,8 +582,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
     if (!credits.empty()) {
-        PgHead *head = new PgHead();
-        PgFoot *foot = new PgFoot();
+        PgHead *head = NULL;
+        PgFoot *foot = NULL;
         for (pugi::xpath_node_set::const_iterator it = credits.begin(); it != credits.end(); ++it) {
             pugi::xpath_node words = *it;
             Rend *rend = new Rend();
@@ -601,14 +601,24 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 rend->AttTypography::StrToFontweight(words.node().attribute("font-weight").as_string()));
             rend->AddChild(text);
             if (words.node().attribute("default-y").as_float() < 2 * bottom) {
+                if (!foot) {
+                    foot = new PgFoot();
+                }
                 foot->AddChild(rend);
             }
             else {
+                if (!head) {
+                    head = new PgHead();
+                }
                 head->AddChild(rend);
             }
         }
-        m_doc->m_mdivScoreDef.AddChild(head);
-        m_doc->m_mdivScoreDef.AddChild(foot);
+        if (head) {
+            m_doc->m_mdivScoreDef.AddChild(head);
+        }
+        if (foot) {
+            m_doc->m_mdivScoreDef.AddChild(foot);
+        }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
@@ -1697,7 +1707,9 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
     }
 
     // fermatas
+    int fermataCounter = 0;
     for (pugi::xml_node xmlFermata : node.children("fermata")) {
+        ++fermataCounter;
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
         if (HasAttributeWithValue(node, "location", "left")) {
@@ -1710,7 +1722,16 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             fermata->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
         }
         if (xmlFermata.attribute("id")) fermata->SetUuid(xmlFermata.attribute("id").as_string());
-        fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+
+        if (fermataCounter < 2) {
+            fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        }
+        else {
+            Staff *lastStaff = vrv_cast<Staff *>(measure->GetLast());
+            assert(lastStaff);
+            fermata->SetStaff(lastStaff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(lastStaff->GetN())));
+        }
+
         ShapeFermata(fermata, xmlFermata);
     }
 }
@@ -3141,7 +3162,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // slur
-    pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
+    pugi::xpath_node_set slurs = node.select_nodes("notations/slur");
     for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
         pugi::xml_node slur = it->node();
         int slurNumber = slur.attribute("number").as_int();
