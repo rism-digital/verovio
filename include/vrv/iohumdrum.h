@@ -291,8 +291,10 @@ namespace humaux {
         std::list<humaux::HumdrumTie> ties;
 
         // m_dynampos == Dynamic position relativ to the staff:
-        // +1 = above, -1=below, 0=undefined (deal center between staves later)
+        // +1 = above, -1=below, 2=centered (deal center between staves later)
         int m_dynampos = 0;
+        int m_dynamstaffadj = 0; // used for grand staff movement of dynamics to lower staff
+        bool m_dynamposdefined = false; // used for undefined positions since 0 used for center
 
         // m_notehead == Notehead shape for notes on the staff.  This could be
         // expanded later into separate control by subspine and/or by pitch (staff/line).
@@ -552,8 +554,10 @@ protected:
     int getPartNumberLabel(hum::HTp spinestart);
     bool isFirstTokenOnStaff(hum::HTp token);
     bool hasAboveParameter(hum::HTp token, const std::string &category);
+    bool hasAboveParameter(hum::HTp token, const std::string &category, int &output);
     bool hasBelowParameter(hum::HTp token, const std::string &category);
     bool hasBelowParameter(hum::HTp token, const std::string &category, int &output);
+    bool hasCenterParameter(hum::HTp token, const std::string &category, int &output);
     void prepareHeaderFooter();
     bool prepareHeader(
         std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
@@ -691,6 +695,7 @@ protected:
     template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
+    template <class ELEMENT> void setStaffBetween(ELEMENT element, int staffnum);
     template <class ELEMENT> void setN(ELEMENT element, int nvalue, hum::HTp tok = NULL);
     template <class ELEMENT> void assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex);
     template <class ELEMENT> KeySig *getKeySig(ELEMENT element);
