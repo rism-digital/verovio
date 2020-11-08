@@ -1244,19 +1244,23 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetInnerWidth();
-    int xCentered = multiRest->GetDrawingX();
+    const int measureWidth = measure->GetInnerWidth();
+    const int xCentered = multiRest->GetDrawingX();
 
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
 
     if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
-        int length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        if (multiRest->HasWidth()) {
+            width = multiRest->AttWidth::GetWidth();
+            if (width > measureWidth) LogWarning("measure too short");
+        }
 
         // a is the central point, claculate x and x2
-        x1 = xCentered - length / 2;
-        x2 = xCentered + length / 2;
+        x1 = xCentered - width / 2;
+        x2 = xCentered + width / 2;
 
         // Position centered in staff
         y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;

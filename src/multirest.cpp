@@ -13,11 +13,12 @@ namespace vrv {
 // MultiRest
 //----------------------------------------------------------------------------
 
-MultiRest::MultiRest() : LayerElement("multirest-"), AttColor(), AttMultiRestVis(), AttNumbered()
+MultiRest::MultiRest() : LayerElement("multirest-"), AttColor(), AttMultiRestVis(), AttNumbered(), AttWidth()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_MULTIRESTVIS);
     RegisterAttClass(ATT_NUMBERED);
+    RegisterAttClass(ATT_WIDTH);
     Reset();
 }
 
@@ -29,6 +30,7 @@ void MultiRest::Reset()
     ResetColor();
     ResetMultiRestVis();
     ResetNumbered();
+    ResetWidth();
 }
 
 } // namespace vrv
