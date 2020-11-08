@@ -37,6 +37,7 @@ env:
   GH_PAGES_DIR: gh-pages-dir
   PR_DIR: pr-${{ github.event.pull_request.head.sha }}
   DEV_DIR: dev-dir
+  TEMP_DIR: temp-dir
   OUTPUT_DIR: output-dir
 
 jobs:
@@ -58,9 +59,11 @@ jobs:
       - name: Create directories and install packages
         working-directory: ${{ github.workspace }}
         run: |
-          mkdir -p {{ env.DEV_DIR }}
-          mkdir -p {{ env.PR_DIR }}
-          mkdir -p {{ env.OUTPUT_DIR }}
+          mkdir -p ${{ env.DEV_DIR }}
+          mkdir -p ${{ env.PR_DIR }}
+          mkdir -p ${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
+          mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
+          mkdir -p ${{ env.OUTPUT_DIR }}
           sudo apt-get install librsvg2-bin
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
@@ -77,8 +80,8 @@ jobs:
           cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
           cd python
           make -j8
-          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.DEV_DIR }}/
-          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.DEV_DIR }}/
+          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
+          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
 
       - name: Checkout the PR
         uses: actions/checkout@v2
@@ -92,13 +95,13 @@ jobs:
           cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
           cd python
           make -j8
-          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}//${{ env.PR_DIR }}/
-          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.PR_DIR }}/
+          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
+          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
         run: |
-          python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+          python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
       - name: Add comment with link
