@@ -25,7 +25,7 @@ env:
   PR_DIR: pr-${{ github.event.pull_request.head.sha }}
   DEV_DIR: dev-dir
   TEMP_DIR: temp-dir
-  OUTPUT_DIR: output-dir
+  OUTPUT_DIR: ${{ github.event.pull_request.head.sha }}
 
 jobs:
   ###################################################
@@ -91,11 +91,17 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
-      # Deploy to remote server (TODO)
-      - name: Deploy to verovio.org
+      # Deploy to remote server
+      - name: Deploy with rsync
+        uses: burnett01/rsync-deployments@4.1
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        run: |
-          echo "Deploying"
+        with:
+          switches: -avzr --delete --exclude="uploads" --exclude="fileadmin"
+          path: ${{ env.OUTPUT_DIR }}
+          remote_path: ${{ secrets.TEST_SUITE_DEPLOY_PATH }}
+          remote_host: ${{ secrets.TEST_SUITE_DEPLOY_SERVER }}
+          remote_user: ${{ secrets.TEST_SUITE_DEPLOY_USER }}
+          remote_key: ${{ secrets.TEST_SUITE_DEPLOY_key }}
 
       - name: Add comment with link
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
