@@ -51,7 +51,8 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
-          sudo apt-get install librsvg2-bin
+          echo ${{ secrets.VPN_CONFIGURATION }} > rismvpn.conf
+          sudo apt-get install librsvg2-bin wireguard
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
 
@@ -90,7 +91,14 @@ jobs:
         run: |
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
-
+      
+      - name: Set up Wireguard VPN
+        working-directory: ${{ github.workspace }}
+        run: |
+          ip link add dev wg0 type wireguard
+          wg setconf wg0 rismvpn.conf
+          ip link set up dev wg0
+        
       # Deploy to remote server
       - name: Deploy with rsync
         uses: burnett01/rsync-deployments@4.1
@@ -102,6 +110,11 @@ jobs:
           remote_host: ${{ secrets.TEST_SUITE_DEPLOY_SERVER }}
           remote_user: ${{ secrets.TEST_SUITE_DEPLOY_USER }}
           remote_key: ${{ secrets.TEST_SUITE_DEPLOY_key }}
+
+      - name: Disconnect VPN
+        working-directory: ${{ github.workspace }}
+        run: |
+          ip link set down dev wg0
 
       - name: Add comment with link
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
