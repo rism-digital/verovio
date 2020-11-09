@@ -51,7 +51,7 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
-          sudo apt-get install librsvg2-bin wireguard
+          sudo apt-get install librsvg2-bin openresolv wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
