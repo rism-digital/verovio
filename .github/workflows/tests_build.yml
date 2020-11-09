@@ -56,22 +56,11 @@ jobs:
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
 
-     
-#       - name: Download and install userland wireguard
-#         working-directory: ${{ github.workspace }}
-#         run: |
-#           git clone https://git.zx2c4.com/wireguard-go
-#           cd wireguard-go
-#           make
-          
       - name: Set up Wireguard VPN
         working-directory: ${{ github.workspace }}
         run: |
           ls -alh
-          sudo wg-quick up ./wg0.conf
-          #sudo wg setconf wg0 rismvpn.conf
-          #sudo ip link set up dev wg0
-        
+          sudo wg-quick up ./wg0.conf     
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
@@ -124,7 +113,7 @@ jobs:
       - name: Disconnect VPN
         working-directory: ${{ github.workspace }}
         run: |
-          ip link set down dev wg0
+          sudo wg-quick down ./wg.conf
 
       - name: Add comment with link
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
