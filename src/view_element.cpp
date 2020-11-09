@@ -1443,7 +1443,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
         default:
             y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            DrawSmuflCode(dc, x, y, rest->GetRestGlyph(), staff->m_drawingStaffSize * 1.5, drawingCueSize);
+            DrawSmuflCode(dc, x, y, rest->GetRestGlyph(), staff->m_drawingStaffSize * 1.4, drawingCueSize);
     }
 
     /************ Draw children (dots) ************/
