@@ -12,19 +12,6 @@ on:
 env:
   # general settings
   MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
-                                # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
-                                # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
-
-  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
-                                # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
-                                # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
-                                # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
-                                # Will be programmatically set to 'false' for rism-ch repo.
-
-  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
-                                # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
-                                # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
-                                # Will be programmatically set to 'false' for rism-ch repo.
 
   # build artifacts
   TOOLKIT_BUILD: toolkit-build
@@ -104,7 +91,14 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
+      # Deploy to remote server (TODO)
+      - name: Deploy to verovio.org
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        run: |
+          echo "Deploying"
+
       - name: Add comment with link
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -115,4 +109,3 @@ jobs:
               repo: context.repo.repo,
               body: 'Test suite regression test available at https://test-suite.verovio.org/${{ github.event.pull_request.head.sha }}'
             })
-
