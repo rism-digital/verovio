@@ -51,7 +51,7 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
-          echo ${{ secrets.VPN_CONFIGURATION }} > rismvpn.conf
+          echo "${{ secrets.VPN_CONFIGURATION }}" > rismvpn.conf
           sudo apt-get install librsvg2-bin wireguard
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
