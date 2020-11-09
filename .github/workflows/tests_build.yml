@@ -52,7 +52,8 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
           sudo apt-get install librsvg2-bin golang-1.13 wireguard
-          printf "%s" "${{ secrets.VPN_CONFIGURATION }}" > rismvpn.conf
+          printf "%s" "${{ secrets.TEST_VPN_CONFIGURATION }}" > rismvpn.conf
+          cat rismvpn.conf
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
 
