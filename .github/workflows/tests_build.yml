@@ -56,6 +56,23 @@ jobs:
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
 
+     
+      - name: Download and install userland wireguard
+        working-directory: ${{ github.workspace }}
+        run: |
+          git clone https://git.zx2c4.com/wireguard-go
+          cd wireguard-go
+          make
+          
+      - name: Set up Wireguard VPN
+        working-directory: ${{ github.workspace }}/wireguard-go
+        run: |
+          ls -alh
+          ./wireguard-go wg0
+          wg setconf wg0 rismvpn.conf
+          ip link set up dev wg0
+        
+
       - name: Checkout the dev branch
         uses: actions/checkout@v2
         with:
@@ -91,21 +108,7 @@ jobs:
         run: |
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
-      
-      - name: Download and install userland wireguard
-        working-directory: ${{ github.workspace }}
-        run: |
-          git clone https://git.zx2c4.com/wireguard-go
-          cd wireguard-go
-          make
-          
-      - name: Set up Wireguard VPN
-        working-directory: ${{ github.workspace }}/wireguard-go
-        run: |
-          wireguard-go wg0
-          wg setconf wg0 rismvpn.conf
-          ip link set up dev wg0
-        
+ 
       # Deploy to remote server
       - name: Deploy with rsync
         uses: burnett01/rsync-deployments@4.1
