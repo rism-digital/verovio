@@ -51,9 +51,8 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
-          sudo apt-get install librsvg2-bin golang-1.13 wireguard
-          printf "%s" "${{ secrets.TEST_VPN_CONFIGURATION }}" > rismvpn.conf
-          cat rismvpn.conf
+          sudo apt-get install librsvg2-bin wireguard
+          echo "${{ secrets.TEST_VPN_CONFIGURATION }}" > /etc/wireguard/wg0.conf
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
 
@@ -69,10 +68,9 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           ls -alh
-          sudo ip link add dev wg0 type wireguard
-          #sudo ./wireguard-go wg0
-          sudo wg setconf wg0 rismvpn.conf
-          sudo ip link set up dev wg0
+          sudo wg-quick up wg0
+          #sudo wg setconf wg0 rismvpn.conf
+          #sudo ip link set up dev wg0
         
 
       - name: Checkout the dev branch
