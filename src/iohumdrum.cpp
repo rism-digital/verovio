@@ -3960,7 +3960,7 @@ std::string HumdrumInput::automaticHeaderCenter(
 
 //////////////////////////////
 //
-// HumdrumInput::getStaffNumberLabel -- Return number 12 in pattern *staff12.
+// HumdrumInput::getStaffNumberLabel -- Return number 13 in pattern *staff13.
 //
 
 int HumdrumInput::getStaffNumberLabel(hum::HTp spinestart)
@@ -4173,6 +4173,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string abbreviation;
     hum::HTp abbrtok = NULL;
     hum::HTp stafftok = NULL;
+    hum::HTp parttok = NULL;
 
     std::string stria; // number of staff lines
     hum::HTp striatok = NULL;
@@ -4225,6 +4226,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             if (hre.search(part, 6, "\\d")) {
                 m_oclef.emplace_back(partnumber, part);
             }
+        }
+        else if (part->compare(0, 5, "*part") == 0) {
+            parttok = part;
         }
         else if (part->compare(0, 6, "*staff") == 0) {
             stafftok = part;
@@ -4371,24 +4375,50 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         // dynamics position to centered if there is a slash in the *staff1/2 string.
         // In the future also check *part# to see if there are two staves for a part
         // with no **dynam for the lower staff (infer to be a grand staff).
-        hum::HTp current = stafftok;
-        current = current->getNextFieldToken();
-        while (current) {
-            if (current->isStaff()) {
-                break;
-            }
-            if (current->isDataType("**dynam")) {
-                if (current->compare(0, 6, "*staff") == 0) {
-                    if (current->find('/') != std::string::npos) {
-                        // the dynamics should be placed between
-                        // staves: the current one and the one below it.
-                        ss.at(partnumber - 1).m_dynampos = 0;
-                        ss.at(partnumber - 1).m_dynamstaffadj = 0;
-                        ss.at(partnumber - 1).m_dynamposdefined = true;
-                    }
+        hum::HTp dynamspine = getAssociatedDynamSpine(stafftok);
+        if (dynamspine != NULL) {
+            if (dynamspine->compare(0, 6, "*staff") == 0) {
+                if (dynamspine->find('/') != std::string::npos) {
+                    // the dynamics should be placed between
+                    // staves: the current one and the one below it.
+                    ss.at(partnumber - 1).m_dynampos = 0;
+                    ss.at(partnumber - 1).m_dynamstaffadj = 0;
+                    ss.at(partnumber - 1).m_dynamposdefined = true;
                 }
             }
-            current = current->getNextFieldToken();
+        }
+    }
+    if (parttok) {
+        hum::HTp dynamspine = getAssociatedDynamSpine(parttok);
+        int partnum = 0;
+        int dpartnum = 0;
+        int lpartnum = 0;
+        hum::HumRegex hre;
+
+        if (dynamspine) {
+            if (hre.search(dynamspine, "^\\*part(\\d+)")) {
+                dpartnum = hre.getMatchInt(1);
+            }
+        }
+        if (dpartnum > 0) {
+            if (hre.search(parttok, "^\\*part(\\d+)")) {
+                partnum = hre.getMatchInt(1);
+            }
+        }
+        if (partnum > 0) {
+            hum::HTp lspine = getPreviousStaffToken(parttok);
+            if (lspine) {
+                if (hre.search(lspine, "^\\*part(\\d+)")) {
+                    lpartnum = hre.getMatchInt(1);
+                }
+            }
+        }
+        if (lpartnum > 0) {
+            if ((lpartnum == partnum) && (dpartnum == partnum)) {
+                ss.at(partnumber - 1).m_dynampos = 0;
+                ss.at(partnumber - 1).m_dynamstaffadj = 0;
+                ss.at(partnumber - 1).m_dynamposdefined = true;
+            }
         }
     }
 
@@ -4494,6 +4524,78 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_white);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getAssociatedDynamSpine -- Return the first **dynam
+//     spine before another staff spine is found; or return NULL token
+//     first;
+//
+
+hum::HTp HumdrumInput::getAssociatedDynamSpine(hum::HTp stafftok)
+{
+    if (!stafftok) {
+        return NULL;
+    }
+    hum::HTp current = stafftok;
+    current = current->getNextFieldToken();
+    while (current) {
+        if (current->isStaff()) {
+            break;
+        }
+        if (current->isDataType("**dynam")) {
+            return current;
+        }
+        current = current->getNextFieldToken();
+    }
+    return NULL;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getPreviousStaffToken -- return the first staff token
+//    to the left which is not the same track as the current token, and
+//    also is the first subspine of that track.  Return NULL if no previous
+//    staff token.
+//
+
+hum::HTp HumdrumInput::getPreviousStaffToken(hum::HTp parttok)
+{
+    if (!parttok) {
+        return NULL;
+    }
+    int track = parttok->getTrack();
+    int ttrack = -1;
+    hum::HTp current = parttok->getPreviousFieldToken();
+    while (current) {
+        if (!current->isStaff()) {
+            current = current->getPreviousFieldToken();
+            continue;
+        }
+        ttrack = current->getTrack();
+        if (ttrack == track) {
+            current = current->getPreviousFieldToken();
+            continue;
+        }
+        break;
+    }
+    if (!current) {
+        return NULL;
+    }
+    track = ttrack;
+    hum::HTp lastc = current;
+    current = current->getPreviousFieldToken();
+    while (current) {
+        ttrack = current->getTrack();
+        if (ttrack == track) {
+            lastc = current;
+            current = current->getPreviousFieldToken();
+        }
+        break;
+    }
+
+    return lastc;
 }
 
 //////////////////////////////

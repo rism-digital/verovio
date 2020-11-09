@@ -671,6 +671,8 @@ protected:
     void addHairpinAccent(hum::HTp token);
     void handleCustos(
         std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
+    hum::HTp getAssociatedDynamSpine(hum::HTp stafftok);
+    hum::HTp getPreviousStaffToken(hum::HTp parttok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
