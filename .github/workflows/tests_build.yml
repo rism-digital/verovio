@@ -113,7 +113,7 @@ jobs:
       - name: Disconnect VPN
         working-directory: ${{ github.workspace }}
         run: |
-          sudo wg-quick down ./wg.conf
+          sudo wg-quick down ./wg0.conf
 
       - name: Add comment with link
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
