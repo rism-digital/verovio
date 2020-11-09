@@ -1,4 +1,4 @@
-name: Verovio CI Build
+name: Test Suite Evaluation
 
 on:
   pull_request:
