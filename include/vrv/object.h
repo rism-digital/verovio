@@ -257,7 +257,7 @@ public:
     /**
      * Return a const pointer to the children
      */
-    const ArrayOfObjects *GetChildren() const { return &m_children; }
+    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const { return &m_children; }
 
     /**
      * Return a pointer to the children that allows modification.
