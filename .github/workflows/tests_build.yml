@@ -52,9 +52,7 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
           sudo apt-get install librsvg2-bin wireguard
-          mkdir -p /etc/wireguard
-          sudo touch /etc/wireguard/wg0.conf 
-          sudo echo "${{ secrets.TEST_VPN_CONFIGURATION }}" > /etc/wireguard/wg0.conf
+          sudo echo "${{ secrets.TEST_VPN_CONFIGURATION }}" > wg0.conf
           rsvg-convert --version
           python3 -m pip install diffimg lxml xmldiff
 
@@ -70,7 +68,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           ls -alh
-          sudo wg-quick up wg0
+          sudo wg-quick up ./wg0.conf
           #sudo wg setconf wg0 rismvpn.conf
           #sudo ip link set up dev wg0
         
