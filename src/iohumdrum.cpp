@@ -8129,7 +8129,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     hum::HumNum remainingSplitDur;
 
     hum::HumRegex hre;
-    // ggg processGlobalDirections(token, staffindex);
+    // processGlobalDirections(token, staffindex);
 
     hum::HTp lastnote = NULL;
     for (int i = 0; i < (int)layerdata.size(); ++i) {
@@ -10246,7 +10246,14 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     bool yparam = hline->isDefined("LO", "TX", "Y");
 
     bool aparam = hline->getValueBool("LO", "TX", "a"); // place above staff
-    bool bparam = hline->getValueBool("LO", "TX", "b"); // place below staff
+    bool bparam = false;
+    bool cparam = false;
+    if (!aparam) {
+        bparam = hline->getValueBool("LO", "TX", "b"); // place below staff
+    }
+    if (!aparam && !bparam) {
+        cparam = hline->getValueBool("LO", "TX", "c"); // place below staff
+    }
 
     // default font for text string (later check for embedded fonts)
     bool italic = false;
@@ -10284,6 +10291,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     else if (bparam) {
         placement = "below";
     }
+    else if (cparam) {
+        placement = "between";
+    }
     else if (zparam) {
         Z = hline->getValueInt("LO", "TX", "Z");
         if (Z > 0) {
@@ -10307,7 +10317,12 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     }
 
     Dir *dir = new Dir;
-    setStaff(dir, m_currentstaff);
+    if (cparam) {
+        setStaffBetween(dir, m_currentstaff);
+    }
+    else {
+        setStaff(dir, m_currentstaff);
+    }
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     dir->SetTstamp(tstamp.getFloat());
@@ -10318,6 +10333,10 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     }
     else if (placement == "below") {
         setPlace(dir, "below");
+        addChildMeasureOrSection(dir);
+    }
+    else if (placement == "between") {
+        setPlace(dir, "between");
         addChildMeasureOrSection(dir);
     }
     else {
@@ -10369,7 +10388,14 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
     bool yparam = token->isDefined("LO", "TX", "Y");
 
     bool aparam = token->getValueBool("LO", "TX", "a"); // place above staff
-    bool bparam = token->getValueBool("LO", "TX", "b"); // place below staff
+    bool bparam = false;
+    bool cparam = false;
+    if (!aparam) {
+        bparam = token->getValueBool("LO", "TX", "b"); // place below staff
+    }
+    if (!aparam && !bparam) {
+        cparam = token->getValueBool("LO", "TX", "c"); // place below staff, centered with next one
+    }
 
     // default font for text string (later check for embedded fonts)
     bool italic = false;
@@ -10409,6 +10435,10 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
     else if (bparam) {
         placement = "below";
     }
+    else if (cparam) {
+        placement = "between";
+    }
+
     else if (zparam) {
         Z = token->getValueInt("LO", "TX", "Z");
         if (Z > 0) {
@@ -10504,6 +10534,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     bool yparam = false;
     bool aparam = false;
     bool bparam = false;
+    bool cparam = false;
 
     // maybe add center justification as an option later
     // justification == 0 means no explicit justification (mostly left justified)
@@ -10534,6 +10565,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
         else if (key == "b") {
             bparam = true;
+        }
+        else if (key == "c") {
+            cparam = true;
         }
         else if (key == "t") {
             text = value;
@@ -10608,6 +10642,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     else if (bparam) {
         placement = "below";
     }
+    else if (cparam) {
+        placement = "between";
+    }
     else if (zparam) {
         Z = token->getValueInt("LO", "TX", "Z");
         if (Z > 0) {
@@ -10677,7 +10714,12 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     Dir *dir = new Dir;
-    setStaff(dir, m_currentstaff);
+    if (placement == "between") {
+        setStaffBetween(dir, m_currentstaff);
+    }
+    else {
+        setStaff(dir, m_currentstaff);
+    }
     hum::HTp dirtok = hps->getToken();
     if (dirtok != NULL) {
         setLocationId(dir, dirtok);
@@ -10717,6 +10759,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
     else if (placement == "below") {
         setPlace(dir, "below");
+    }
+    else if (placement == "between") {
+        setPlace(dir, "between");
     }
     bool plain = !(italic || bold);
     bool needrend = plain || bold || justification || color.size();
@@ -10795,7 +10840,12 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     hum::HTp token, int staffindex, int justification, const std::string &color)
 {
     Tempo *tempo = new Tempo;
-    setStaff(tempo, m_currentstaff);
+    if (placement == "center") {
+        setStaffBetween(tempo, m_currentstaff);
+    }
+    else {
+        setStaff(tempo, m_currentstaff);
+    }
     setLocationId(tempo, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     if (token->isMens()) {
@@ -10813,6 +10863,9 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     }
     else if (placement == "below") {
         setPlace(tempo, "below");
+    }
+    else if (placement == "center") {
+        setPlace(tempo, "between");
     }
 
     bool status = setTempoContent(tempo, text);
@@ -11159,7 +11212,12 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
     }
 
     Dir *dir = new Dir;
-    setStaff(dir, m_currentstaff);
+    if (placement == "center") {
+        setStaffBetween(dir, m_currentstaff);
+    }
+    else {
+        setStaff(dir, m_currentstaff);
+    }
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     if (token->isMens()) {
@@ -11199,6 +11257,9 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
     }
     else if (placement == "below") {
         setPlace(dir, "below");
+    }
+    else if (placement == "center") {
+        setPlace(dir, "between");
     }
     bool plain = !(italic || bold);
     bool needrend = plain || bold || justification || color.size();
