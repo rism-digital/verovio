@@ -57,20 +57,21 @@ jobs:
           python3 -m pip install diffimg lxml xmldiff
 
      
-      - name: Download and install userland wireguard
-        working-directory: ${{ github.workspace }}
-        run: |
-          git clone https://git.zx2c4.com/wireguard-go
-          cd wireguard-go
-          make
+#       - name: Download and install userland wireguard
+#         working-directory: ${{ github.workspace }}
+#         run: |
+#           git clone https://git.zx2c4.com/wireguard-go
+#           cd wireguard-go
+#           make
           
       - name: Set up Wireguard VPN
         working-directory: ${{ github.workspace }}/wireguard-go
         run: |
           ls -alh
-          ./wireguard-go wg0
-          wg setconf wg0 rismvpn.conf
-          ip link set up dev wg0
+          sudo ip link add dev wg0 type wireguard
+          #sudo ./wireguard-go wg0
+          sudo wg setconf wg0 rismvpn.conf
+          sudo ip link set up dev wg0
         
 
       - name: Checkout the dev branch
