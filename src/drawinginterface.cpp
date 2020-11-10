@@ -90,6 +90,7 @@ void BeamDrawingInterface::Reset()
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
+    m_midPoint = 0;
 }
 
 void BeamDrawingInterface::ClearCoords()
@@ -231,7 +232,7 @@ bool BeamDrawingInterface::IsHorizontal()
 
     if (HasOneStepHeight()) return true;
 
-    if (m_drawingPlace == BEAMPLACE_mixed) return true;
+    //if (m_drawingPlace == BEAMPLACE_mixed) return true;
 
     if (m_drawingPlace == BEAMPLACE_NONE) return true;
 

@@ -61,6 +61,10 @@ public:
     void ClearCoordRefs();
 
 private:
+    // Helper to calculate positioning of the mixed beam
+    // Returns whether or not beam has to be horizontal for it to fit
+    void AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit);
+
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     bool CalcBeamSlope(
@@ -75,6 +79,12 @@ private:
 
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
     void CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+
+    // Helper to calculate relative position of the beam to for each of the coordinates
+    void CalcMixedBeamPlace(Staff *staff);
+
+    // Helper to calculate proper positioning of the additional beamlines for notes
+    void CalcPartialFlagPlace();
 
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
     void CalcSetValues(const int &elementCount);
@@ -207,6 +217,8 @@ public:
         m_closestNote = NULL;
         m_stem = NULL;
         m_overlapMargin = 0;
+        m_beamRelativePlace = BEAMPLACE_NONE;
+        m_partialFlagPlace = BEAMPLACE_NONE;
     }
     virtual ~BeamElementCoord();
 
@@ -218,6 +230,7 @@ public:
 
     void SetDrawingStemDir(
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
+    void SetClosestNote(data_STEMDIRECTION stemDir);
 
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
 
@@ -228,6 +241,7 @@ public:
     int m_overlapMargin;
     bool m_centered; // beam is centered on the line
     bool m_shortened; // stem is shortened because pointing oustide the staff
+    data_BEAMPLACE m_beamRelativePlace;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;
