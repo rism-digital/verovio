@@ -25,7 +25,6 @@ env:
   PR_DIR: pr-${{ github.event.pull_request.head.sha }}
   DEV_DIR: dev-dir
   TEMP_DIR: temp-dir
-  OUTPUT_DIR: ${{ github.event.pull_request.head.sha }}
 
 jobs:
   ###################################################
@@ -36,6 +35,11 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - name: Add additional environment variables for creating URL slugs
+        uses: FranzDiebold/github-env-vars-action@v1.2.1
+        run: |
+          echo "OUTPUT_DIR=$GITHUB_REF_NAME_SLUG/$GITHUB_SHA_SHORT" >> $GITHUB_ENV
+
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v2
         with:
@@ -51,6 +55,8 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
+          ls -alh
+          ls -alh ${{ env.OUTPUT_DIR }}
           sudo apt-get install librsvg2-bin openresolv wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
           rsvg-convert --version
@@ -59,7 +65,6 @@ jobs:
       - name: Set up Wireguard VPN
         working-directory: ${{ github.workspace }}
         run: |
-          ls -alh
           sudo wg-quick up ./wg0.conf     
 
       - name: Checkout the dev branch
@@ -104,13 +109,13 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
  
-      # Deploy to remote server
+      # Deploy to remote server. Uses the REF_NAME_SLUG to ensure that it maps to any existing directories on the deployment server.
       - name: Deploy with rsync
         uses: burnett01/rsync-deployments@4.1
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         with:
-          switches: -avzr --delete --exclude="uploads" --exclude="fileadmin"
-          path: ${{ env.OUTPUT_DIR }}
+          switches: -avzr --exclude="uploads" --exclude="fileadmin"
+          path: ${{ env.GITHUB_REF_NAME_SLUG }}
           remote_path: ${{ secrets.TEST_SUITE_DEPLOY_PATH }}
           remote_host: ${{ secrets.TEST_SUITE_DEPLOY_SERVER }}
           remote_user: ${{ secrets.TEST_SUITE_DEPLOY_USER }}
@@ -131,5 +136,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Test suite regression test available at https://test-suite.verovio.org/${{ github.event.pull_request.head.sha }}'
+              body: 'Test suite regression test available at https://test-suite.verovio.org/${{ env.OUTPUT_DIR }}'
             })
