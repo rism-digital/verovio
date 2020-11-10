@@ -171,7 +171,9 @@ elseif (BUILD_AS_PYTHON)
     include(${SWIG_USE_FILE})
     set(CMAKE_SWIG_FLAGS "")
     set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)
-    
+
+    # needed for static build on linux
+    add_definitions(-fPIC)
 
     ### For building for specific version of Python (example for 3.4 on OS X with MacPorts installation)
     #set(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
@@ -188,7 +190,7 @@ elseif (BUILD_AS_PYTHON)
     swig_add_module(verovio_module_${OUTPUT_VERSION_STRING} python ../bindings/python/verovio.i)
     swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${PYTHON_LIBRARIES})
 
-    add_library(verovio STATIC ../../tools/c_wrapper.cpp ${all_SRC})
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
 
 #####################
 # Command-line tool #
