@@ -4,11 +4,6 @@
 setup.py file for Verovio
 """
 
-# deprecation warning
-print("***********************************************************************************")
-print("This setup file is deprecated. Use 'cmake ../../cmake -DBUILD_AS_PYTHON=ON' instead")
-print("***********************************************************************************")
-
 from glob import glob
 import os
 import platform
