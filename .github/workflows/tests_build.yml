@@ -35,8 +35,8 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - uses: FranzDiebold/github-env-vars-action@v1.2.1
       - name: Add additional environment variables for creating URL slugs
-        uses: FranzDiebold/github-env-vars-action@v1.2.1
         run: |
           echo "OUTPUT_DIR=$GITHUB_REF_NAME_SLUG/$GITHUB_SHA_SHORT" >> $GITHUB_ENV
 
