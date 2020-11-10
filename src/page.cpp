@@ -587,7 +587,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(m_children.back());
+    System *last = dynamic_cast<System *>(GetChildren()->back());
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
@@ -611,7 +611,7 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto &child : m_children) {
+    for (auto &child : *this->GetChildren()) {
         System *system = dynamic_cast<System *>(child);
         if (system) {
             // we include the left margin and the right margin
