@@ -179,7 +179,7 @@ bool Doc::GenerateDocumentScoreDef()
 
 bool Doc::GenerateFooter()
 {
-    if (m_mdivScoreDef.FindDescendantByType(PGFOOT) || m_options->m_adjustPageHeight.GetValue()) {
+    if (m_mdivScoreDef.FindDescendantByType(PGFOOT)) {
         return false;
     }
 
