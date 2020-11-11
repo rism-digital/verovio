@@ -389,7 +389,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
             }
 
             testDur += 1;
-            
+
         } // end of while
     } // end of drawing partial bars
 }

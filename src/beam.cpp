@@ -118,7 +118,6 @@ void BeamSegment::CalcBeam(
         }
     }
 
-
     // ArrayOfBeamElementCoords stemUps;
     // ArrayOfBeamElementCoords stemDowns;
 
@@ -149,7 +148,7 @@ void BeamSegment::CalcBeam(
                     stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
                 }
                 if (coord->m_beamRelativePlace == BEAMPLACE_below) {
-                    y1 -=  doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + stemOffset;
+                    y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + stemOffset;
                     y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
                 }
                 else {
@@ -206,21 +205,20 @@ bool BeamSegment::DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, 
     return true;
 }
 
-bool BeamSegment::NeedToResetPosition(Staff* staff, Doc* doc, BeamDrawingInterface* beamInterface) 
+bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
 {
     const int unit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     // find shortest duration for above/below beams for the sake of calculating overlap with additional beams
     int topShortestDur = DUR_8;
     int bottomShortestDur = DUR_8;
-    std::for_each(
-        m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-            if (coord->m_partialFlagPlace == BEAMPLACE_above) {
-                topShortestDur = std::max(topShortestDur, coord->m_dur);
-            }
-            else if (coord->m_partialFlagPlace == BEAMPLACE_below) {
-                bottomShortestDur = std::max(bottomShortestDur, coord->m_dur);
-            }
-        });
+    std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
+        if (coord->m_partialFlagPlace == BEAMPLACE_above) {
+            topShortestDur = std::max(topShortestDur, coord->m_dur);
+        }
+        else if (coord->m_partialFlagPlace == BEAMPLACE_below) {
+            bottomShortestDur = std::max(bottomShortestDur, coord->m_dur);
+        }
+    });
     const int topOffset = (topShortestDur - DUR_8) * beamInterface->m_beamWidth + unit / 2;
     const int bottomOffset = (bottomShortestDur - DUR_8) * beamInterface->m_beamWidth + unit / 2;
 
@@ -230,7 +228,7 @@ bool BeamSegment::NeedToResetPosition(Staff* staff, Doc* doc, BeamDrawingInterfa
         = staffTop - doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 
     if (DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
-     
+
     // Calculate midpoint for the beam with mixed placement
     int min = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
     int max = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
@@ -252,7 +250,7 @@ bool BeamSegment::NeedToResetPosition(Staff* staff, Doc* doc, BeamDrawingInterfa
     // If midpoint if above the staff, try to place beam at the top edge of the staff
     if (!isMidpointWithinBounds && (midpoint > staffBottom)) {
         const int offset = (m_beamElementCoordRefs.front()->m_yBeam + m_beamElementCoordRefs.back()->m_yBeam
-                                  - 2 * (staffTop - topOffset))
+                               - 2 * (staffTop - topOffset))
             / 2;
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [offset](BeamElementCoord *coord) { coord->m_yBeam -= offset; });
@@ -260,7 +258,7 @@ bool BeamSegment::NeedToResetPosition(Staff* staff, Doc* doc, BeamDrawingInterfa
     // otherwise try placing it on the bottom edge
     else if (!isMidpointWithinBounds && (midpoint < staffTop)) {
         const int offset = (m_beamElementCoordRefs.front()->m_yBeam + m_beamElementCoordRefs.back()->m_yBeam
-                                     - 2 * (staffBottom + bottomOffset))
+                               - 2 * (staffBottom + bottomOffset))
             / 2;
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [offset](BeamElementCoord *coord) { coord->m_yBeam += offset; });
@@ -624,7 +622,7 @@ void BeamSegment::CalcBeamPosition(
 {
     // Set drawing stem positions
     for (auto coord : m_beamElementCoordRefs) {
-        //BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+        // BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
 
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             coord->SetDrawingStemDir(STEMDIRECTION_up, staff, doc, this, beamInterface);
@@ -693,8 +691,7 @@ void BeamSegment::CalcBeamPosition(
     }
 }
 
-void BeamSegment::CalcAdjustSlope(
-    Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step)
+void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step)
 {
     assert(staff);
     assert(doc);
@@ -903,7 +900,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     }
 
     // For now force it above
-    //if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
+    // if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
@@ -1333,7 +1330,7 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     return stemLen;
 }
 
-void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir) 
+void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
 {
     m_closestNote = NULL;
     if (m_element->Is(NOTE)) {
