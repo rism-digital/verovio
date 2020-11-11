@@ -88,7 +88,7 @@ void BeamSegment::CalcBeam(
     assert(staff);
     assert(doc);
 
-    int i, y1, y2;
+    int y1, y2;
     assert(m_beamElementCoordRefs.size() > 0);
 
     // For recursive calls, avoid to re-init values
@@ -676,10 +676,10 @@ void BeamSegment::CalcBeamPosition(
                 if (maxLength > coord->m_yBeam) maxLength = coord->m_yBeam;
             }
             else if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-                if ((coord->m_beamRelativePlace == BEAMPLACE_above)) {
+                if (coord->m_beamRelativePlace == BEAMPLACE_above) {
                     if (maxLength < coord->m_yBeam) maxLength = coord->m_yBeam;
                 }
-                else if ((coord->m_beamRelativePlace == BEAMPLACE_below)) {
+                else if (coord->m_beamRelativePlace == BEAMPLACE_below) {
                     if (maxLength > coord->m_yBeam) maxLength = coord->m_yBeam;
                 }
             }
