@@ -61,17 +61,15 @@ public:
     void ClearCoordRefs();
 
 private:
-    // Helper to calculate positioning of the mixed beam
-    // Returns whether or not beam has to be horizontal for it to fit
-    void AdjustMixedBeamPlacement(BeamDrawingInterface *beamInterface, int drawingDoubleUnit);
-
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     bool CalcBeamSlope(
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
 
+    void CalcBeamPosition(Doc *doc, Staff *staff, Layer *layer, BeamDrawingInterface *beamInterface, bool isHorizontal);
+
     void CalcAdjustSlope(
-        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step, const int &elementCount);
+        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
 
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
@@ -87,7 +85,13 @@ private:
     void CalcPartialFlagPlace();
 
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
-    void CalcSetValues(const int &elementCount);
+    void CalcSetValues();
+
+    // Helper to check wheter beam fits within certain bounds
+    bool DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset);
+
+    // Helper to check mixed beam positioning compared to other elements (ledger lines, staff) and adjust it accordingly
+    bool NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
 public:
     // values set by CalcBeam
