@@ -52,7 +52,7 @@ public:
     /**
      * Return the number of system (children are System object only)
      */
-    int GetSystemCount() const { return (int)m_children.size(); }
+    int GetSystemCount() const { return (int)GetChildren()->size(); }
 
     /**
      * @name Get and set the pixel per unit factor.
