@@ -119,7 +119,7 @@ jobs:
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         with:
           switches: -avzr --exclude="uploads" --exclude="fileadmin"
-          path: ${{ env.GITHUB_REF_NAME_SLUG }}
+          path: ${{ github.event.pull_request.number }}
           remote_path: ${{ secrets.TEST_SUITE_DEPLOY_PATH }}
           remote_host: ${{ secrets.TEST_SUITE_DEPLOY_SERVER }}
           remote_user: ${{ secrets.TEST_SUITE_DEPLOY_USER }}
