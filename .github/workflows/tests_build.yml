@@ -1,7 +1,7 @@
 name: Test Suite Evaluation
 
 on:
-  pull_request:
+  pull_request_target:
     branches: develop
   # TODO: run this task only on PR in production; use push event for testing
   #push:
@@ -36,9 +36,13 @@ jobs:
 
     steps:
       - uses: FranzDiebold/github-env-vars-action@v1.2.1
+      - name: Get Short SHA
+        run: |
+          echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
+          
       - name: Add additional environment variables for creating URL slugs
         run: |
-          echo "OUTPUT_DIR=$GITHUB_REF_NAME_SLUG/$GITHUB_SHA_SHORT" >> $GITHUB_ENV
+          echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
 
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v2
@@ -115,7 +119,7 @@ jobs:
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         with:
           switches: -avzr --exclude="uploads" --exclude="fileadmin"
-          path: ${{ env.GITHUB_REF_NAME_SLUG }}
+          path: ${{ github.event.pull_request.number }}
           remote_path: ${{ secrets.TEST_SUITE_DEPLOY_PATH }}
           remote_host: ${{ secrets.TEST_SUITE_DEPLOY_SERVER }}
           remote_user: ${{ secrets.TEST_SUITE_DEPLOY_USER }}
