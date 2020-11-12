@@ -38,7 +38,7 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v1.2.1
       - name: Add additional environment variables for creating URL slugs
         run: |
-          echo "OUTPUT_DIR=$GITHUB_REF_NAME_SLUG/$GITHUB_SHA_SHORT" >> $GITHUB_ENV
+          echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/{{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
 
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v2
