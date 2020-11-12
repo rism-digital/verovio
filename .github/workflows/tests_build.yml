@@ -36,9 +36,13 @@ jobs:
 
     steps:
       - uses: FranzDiebold/github-env-vars-action@v1.2.1
+      - name: Get Short SHA
+        run: |
+          echo "SHORT_SHA=`${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
+          
       - name: Add additional environment variables for creating URL slugs
         run: |
-          echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
 
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v2
