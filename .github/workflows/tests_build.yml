@@ -38,7 +38,7 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v1.2.1
       - name: Get Short SHA
         run: |
-          echo "SHORT_SHA=`${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
+          echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
           
       - name: Add additional environment variables for creating URL slugs
         run: |
