@@ -688,7 +688,7 @@ void BeamSegment::CalcBeamPosition(
             }
         }
 
-        if (VRV_UNSET != abs(maxLength)) {
+        if (-VRV_UNSET != abs(maxLength)) {
             m_beamElementCoordRefs.at(0)->m_yBeam = maxLength;
         }
 
@@ -940,7 +940,7 @@ void BeamSegment::CalcMixedBeamPlace(Staff *staff)
     if (it != m_beamElementCoordRefs.end()) {
         Staff *currentCrossStaff = (*it)->m_element->m_crossStaff;
         const int crossStaffN = currentCrossStaff->GetN();
-        beamPlaceBelow = currentStaffN < crossStaffN;
+        beamPlaceBelow = currentStaffN <= crossStaffN;
     }
 
     for (auto coord : m_beamElementCoordRefs) {
