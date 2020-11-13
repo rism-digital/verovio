@@ -591,10 +591,10 @@ int Page::GetContentHeight() const
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
-    // Not sure what to do with the footer when adjusted page height is requested...
-    // if (this->GetFooter()) {
-    //    height += this->GetFooter()->GetTotalHeight();
-    //}
+    // Properly account for margins and footer when adjustPageHeight is set.
+    if (this->GetFooter()) {
+        height += this->GetFooter()->GetTotalHeight();
+    }
 
     return height;
 }
