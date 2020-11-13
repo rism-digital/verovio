@@ -30,6 +30,8 @@ namespace vrv {
 
 HalfmRpt::HalfmRpt() : LayerElement("mrpt-")
 {
+    RegisterAttClass(ATT_COLOR);
+
     Reset();
 }
 
@@ -38,6 +40,7 @@ HalfmRpt::~HalfmRpt() {}
 void HalfmRpt::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
 }
 
 //----------------------------------------------------------------------------
@@ -46,7 +49,7 @@ void HalfmRpt::Reset()
 
 int HalfmRpt::GenerateMIDI(FunctorParams *functorParams)
 {
-    // GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     // assert(params);
 
     LogWarning("HalfmRpt produces empty MIDI output");
@@ -56,7 +59,7 @@ int HalfmRpt::GenerateMIDI(FunctorParams *functorParams)
 
 int HalfmRpt::PrepareRpt(FunctorParams *functorParams)
 {
-    // PrepareRptParams *params = dynamic_cast<PrepareRptParams *>(functorParams);
+    // PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
     // assert(params);
 
     return FUNCTOR_CONTINUE;

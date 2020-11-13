@@ -59,6 +59,7 @@ void BeamSegment::Reset()
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
+    m_uniformStemLength = 0;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -101,6 +102,8 @@ void BeamSegment::CalcBeam(
     // Beam@place has precedence - however, in some cases, CalcBeam is called recusively because we need to change the
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
+
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace == BEAMPLACE_below ? STEMDIRECTION_down : STEMDIRECTION_up);
 
     // Set drawing stem positions
     for (i = 0; i < elementCount; ++i) {
@@ -192,7 +195,7 @@ void BeamSegment::CalcBeam(
             }
 
             if (coord->m_element->Is(CHORD)) {
-                Chord *chord = dynamic_cast<Chord *>(coord->m_element);
+                Chord *chord = vrv_cast<Chord *>(coord->m_element);
                 assert(chord);
                 int yMax, yMin;
                 chord->GetYExtremes(yMax, yMin);
@@ -246,9 +249,9 @@ void BeamSegment::CalcBeamInit(
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
+    beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false)
         - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
+    beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, true)
         - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -277,7 +280,7 @@ void BeamSegment::CalcBeamInit(
         }
 
         if (coord->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>(coord->m_element);
+            Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
             chord->GetYExtremes(yMax, yMin);
 
@@ -297,7 +300,7 @@ void BeamSegment::CalcBeamInit(
             }
         }
         else if (coord->m_element->Is(NOTE)) {
-            Note *note = dynamic_cast<Note *>(coord->m_element);
+            Note *note = vrv_cast<Note *>(coord->m_element);
             assert(note);
             this->m_avgY += note->GetDrawingY();
 
@@ -747,6 +750,27 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
+void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+{
+    const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    for (auto coord : m_beamElementCoordRefs) {
+        const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
+        if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
+            m_uniformStemLength = coordStemDir;
+        }
+    }
+    // make adjustments for the grace notes length
+    for (auto coord : m_beamElementCoordRefs) {
+        if (coord->m_element) {
+            const bool isInGraceGroup = coord->m_element->GetFirstAncestor(GRACEGRP);
+            if (coord->m_element->IsGraceNote() || isInGraceGroup) {
+                m_uniformStemLength *= 0.75;
+                break;
+            }
+        }
+    }
+}
+
 void BeamSegment::CalcSetValues(const int &elementCount)
 {
     this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
@@ -840,24 +864,25 @@ void Beam::FilterList(ArrayOfObjects *childList)
             continue;
         }
         else {
-            LayerElement *element = dynamic_cast<LayerElement *>(*iter);
+            LayerElement *element = vrv_cast<LayerElement *>(*iter);
             assert(element);
             // if we are at the beginning of the beam
             // and the note is cueSize
             // assume all the beam is of grace notes
+            const bool isInGraceGroup = element->GetFirstAncestor(GRACEGRP);
             if (childList->begin() == iter) {
-                if (element->IsGraceNote()) firstNoteGrace = true;
+                if (element->IsGraceNote() || isInGraceGroup) firstNoteGrace = true;
             }
             // if the first note in beam was NOT a grace
             // we have grace notes embedded in a beam
             // drop them
-            if (!firstNoteGrace && element->IsGraceNote()) {
+            if (!firstNoteGrace && (element->IsGraceNote() || isInGraceGroup)) {
                 iter = childList->erase(iter);
                 continue;
             }
             // also remove notes within chords
             if (element->Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(element);
+                Note *note = vrv_cast<Note *>(element);
                 assert(note);
                 if (note->IsChordTone()) {
                     iter = childList->erase(iter);
@@ -868,11 +893,11 @@ void Beam::FilterList(ArrayOfObjects *childList)
         }
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     Staff *beamStaff = staff;
     if (this->HasBeamWith()) {
-        Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+        Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
         assert(measure);
         if (this->GetBeamWith() == OTHERSTAFF_below) {
             beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
@@ -899,7 +924,7 @@ int Beam::GetPosition(LayerElement *element)
     int position = this->GetListIndex(element);
     // Check if this is a note in the chord
     if ((position == -1) && (element->Is(NOTE))) {
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord) position = this->GetListIndex(chord);
@@ -971,6 +996,11 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(doc);
     assert(interface);
 
+    if (m_element->Is(REST)) {
+        this->m_x += m_element->GetDrawingRadius(doc);
+        return;
+    }
+
     if (!this->m_element->Is({ CHORD, NOTE })) return;
 
     StemmedDrawingInterface *stemInterface = this->m_element->GetStemmedDrawingInterface();
@@ -981,10 +1011,8 @@ void BeamElementCoord::SetDrawingStemDir(
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     this->m_stem->SetDrawingStemDir(stemDir);
-    bool onStaffLine = false;
     int ledgerLines = 0;
     int ledgerLinesOpposite = 0;
-    this->m_centered = false;
     this->m_shortened = false;
     this->m_closestNote = NULL;
 
@@ -994,49 +1022,79 @@ void BeamElementCoord::SetDrawingStemDir(
         m_closestNote = dynamic_cast<Note *>(this->m_element);
     }
 
-    int stemLen = 1;
-
     if (stemDir == STEMDIRECTION_up) {
         this->m_x += interface->m_stemXAbove[interface->m_cueSize];
         if (this->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>(this->m_element);
+            Chord *chord = vrv_cast<Chord *>(this->m_element);
             assert(chord);
             m_closestNote = chord->GetTopNote();
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
         }
     }
     else {
         this->m_x += interface->m_stemXBelow[interface->m_cueSize];
         if (this->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>(this->m_element);
+            Chord *chord = vrv_cast<Chord *>(this->m_element);
             assert(chord);
             m_closestNote = chord->GetBottomNote();
         }
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
-            onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
         }
-        stemLen = -1;
     }
 
     if (!m_closestNote) return;
 
+    this->m_centered = segment->m_uniformStemLength % 2;
+    this->m_yBeam += (segment->m_uniformStemLength * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+
+    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
+    if (m_element->IsGraceNote() || isInGraceGroup) return;
+
+    // Make sure the stem reaches the center of the staff
+    // Mark the segment as extendedToCenter since we then want a reduced slope
+    if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
+        || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= this->m_yBeam))) {
+        this->m_yBeam = segment->m_verticalCenter;
+        segment->m_extendedToCenter = true;
+        this->m_centered = false;
+    }
+    else {
+        segment->m_extendedToCenter = false;
+    }
+
+    // Make sure there is a at least one staff space before the ledger lines
+    if ((ledgerLines > 2) && (interface->m_shortestDur > DUR_32)) {
+        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
+    }
+    else if ((ledgerLines > 1) && (interface->m_shortestDur > DUR_16)) {
+        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
+    }
+
+    this->m_yBeam += m_overlapMargin;
+}
+
+int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+{
+    if (!m_closestNote) return 0;
+
+    const bool onStaffLine = m_closestNote->GetDrawingLoc() % 2;
     bool extend = onStaffLine;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
+    const int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
         this->m_shortened = true;
         extend = false;
     }
 
+    int stemLen = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     // For 8th notes, use the shortened stem (if shortened)
     if (this->m_dur == DUR_8) {
         if (stemLenInHalfUnits != standardStemLen) {
@@ -1059,48 +1117,67 @@ void BeamElementCoord::SetDrawingStemDir(
         }
     }
 
-    if (stemLen % 2) this->m_centered = true;
-    this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
-
-    // Make sure the stem reaches the center of the staff
-    // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (stemDir == STEMDIRECTION_up) {
-        if (this->m_yBeam <= segment->m_verticalCenter) {
-            this->m_yBeam = segment->m_verticalCenter;
-            segment->m_extendedToCenter = true;
-            this->m_centered = false;
-        }
-        else {
-            segment->m_extendedToCenter = false;
-        }
-    }
-    else {
-        if (segment->m_verticalCenter <= this->m_yBeam) {
-            this->m_yBeam = segment->m_verticalCenter;
-            segment->m_extendedToCenter = true;
-            this->m_centered = false;
-        }
-        else {
-            segment->m_extendedToCenter = false;
-        }
-    }
-
-    // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (this->m_dur > DUR_32)) {
-        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
-    }
-    else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
-        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
-    }
+    return stemLen;
 }
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Beam::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameas() && !this->GetChild(1)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // process highest-level beam
+    if (!params->m_beam) {
+        params->m_beam = this;
+        params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
+        params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
+        params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+        return FUNCTOR_CONTINUE;
+    }
+
+    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+
+    const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
+    const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
+
+    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
+    if (overlapMargin >= params->m_overlapMargin) {
+        Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+        assert(staff);
+        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params->m_overlapMargin = (overlapMargin + staffOffset) * params->m_directionBias;
+    }
+    return FUNCTOR_SIBLINGS;
+}
+
+int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (params->m_beam != this) return FUNCTOR_CONTINUE;
+
+    // set overlap margin for each coord in the beam
+    if (params->m_overlapMargin) {
+        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+            [overlap = params->m_overlapMargin](BeamElementCoord *coord) { coord->m_overlapMargin = overlap; });
+    }
+    params->m_beam = NULL;
+    params->m_overlapMargin = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Beam::CalcStem(FunctorParams *functorParams)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     const ArrayOfObjects *beamChildren = this->GetList(this);
@@ -1112,9 +1189,9 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
     this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());

@@ -70,7 +70,8 @@ BeamDrawingInterface::BeamDrawingInterface()
     Reset();
 }
 
-BeamDrawingInterface::~BeamDrawingInterface() {
+BeamDrawingInterface::~BeamDrawingInterface()
+{
     ClearCoords();
 }
 
@@ -228,6 +229,8 @@ bool BeamDrawingInterface::IsHorizontal()
         return true;
     }
 
+    if (HasOneStepHeight()) return true;
+
     if (m_drawingPlace == BEAMPLACE_mixed) return true;
 
     if (m_drawingPlace == BEAMPLACE_NONE) return true;
@@ -346,6 +349,25 @@ bool BeamDrawingInterface::IsRepeatedPattern()
     }
 
     return false;
+}
+
+bool BeamDrawingInterface::HasOneStepHeight()
+{
+    if (m_shortestDur < DUR_32) return false;
+
+    int top = -128;
+    int bottom = 128;
+    for (auto coord : m_beamElementCoords) {
+        if (coord->m_element) {
+            Note *note = vrv_cast<Note *>(coord->m_element);
+            assert(note);
+            int loc = note->GetDrawingLoc();
+            if (loc > top) top = loc;
+            if (loc < bottom) bottom = loc;
+        }
+    }
+
+    return (abs(top - bottom) <= 1);
 }
 
 //----------------------------------------------------------------------------
@@ -469,7 +491,7 @@ Point StemmedDrawingInterface::GetDrawingStemEnd(Object *object)
         if (!m_drawingStem) {
             // Somehow arbitrary for chord - stem end it the bottom with no stem
             if (object->Is(CHORD)) {
-                Chord *chord = dynamic_cast<Chord *>(object);
+                Chord *chord = vrv_cast<Chord *>(object);
                 assert(chord);
                 return Point(object->GetDrawingX(), chord->GetYBottom());
             }

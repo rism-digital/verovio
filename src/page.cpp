@@ -58,8 +58,7 @@ void Page::Reset()
     m_PPUFactor = 1.0;
 
     m_drawingJustifiableHeight = 0;
-    m_drawingJustifiableSystems = 0;
-    m_drawingJustifiableStaves = 0;
+    m_justificationSum = 0.;
 }
 
 bool Page::IsSupportedChild(Object *child)
@@ -125,7 +124,7 @@ void Page::LayOut(bool force)
     this->LayOutVertically();
     this->JustifyVertically();
 
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
     if (doc->GetOptions()->m_svgBoundingBoxes.GetValue()) {
         View view;
@@ -145,7 +144,7 @@ void Page::LayOutTranscription(bool force)
         return;
     }
 
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -204,16 +203,16 @@ void Page::LayOutTranscription(bool force)
     Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
     this->Process(&adjustXRelForTranscription, NULL);
 
-    FunctorDocParams calcLegerLinesParams(doc);
+    FunctorDocParams calcLedgerLinesParams(doc);
     Functor calcLedgerLines(&Object::CalcLedgerLines);
-    this->Process(&calcLedgerLines, &calcLegerLinesParams);
+    this->Process(&calcLedgerLines, &calcLedgerLinesParams);
 
     m_layoutDone = true;
 }
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -364,7 +363,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -375,9 +374,9 @@ void Page::LayOutVertically()
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
 
-    FunctorDocParams calcLegerLinesParams(doc);
+    FunctorDocParams calcLedgerLinesParams(doc);
     Functor calcLedgerLines(&Object::CalcLedgerLines);
-    this->Process(&calcLedgerLines, &calcLegerLinesParams);
+    this->Process(&calcLedgerLines, &calcLedgerLinesParams);
 
     // Align the content of the page using system aligners
     // After this:
@@ -404,6 +403,12 @@ void Page::LayOutVertically()
     FunctorDocParams adjustArticWithSlursParams(doc);
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
+
+    // Adjust the position of the beams in regards of layer elements
+    AdjustBeamParams adjustBeamParams(doc);
+    Functor adjustBeams(&Object::AdjustBeams);
+    Functor adjustBeamsEnd(&Object::AdjustBeamsEnd);
+    this->Process(&adjustBeams, &adjustBeamParams, &adjustBeamsEnd);
 
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsYParams(doc);
@@ -443,6 +448,12 @@ void Page::LayOutVertically()
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
 
+    // Adjust the positioners of floationg elements placed between staves
+    Functor adjustFloatingPositionersBetween(&Object::AdjustFloatingPositionersBetween);
+    AdjustFloatingPositionersBetweenParams adjustFloatingPositionersBetweenParams(
+        doc, &adjustFloatingPositionersBetween);
+    this->Process(&adjustFloatingPositionersBetween, &adjustFloatingPositionersBetweenParams);
+
     Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
     Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);
@@ -467,7 +478,7 @@ void Page::LayOutVertically()
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     if ((doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) || doc->GetOptions()->m_noJustification.GetValue()) {
@@ -494,7 +505,7 @@ void Page::JustifyHorizontally()
 
 void Page::JustifyVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -502,7 +513,7 @@ void Page::JustifyVertically()
     assert(this == doc->GetDrawingPage());
 
     // Nothing to justify
-    if (this->m_drawingJustifiableHeight < 0) {
+    if (m_drawingJustifiableHeight <= 0 || m_justificationSum <= 0) {
         return;
     }
 
@@ -511,42 +522,42 @@ void Page::JustifyVertically()
         return;
     }
 
-    bool systemsOnly = doc->GetOptions()->m_justifySystemsOnly.GetValue();
-    int stepSize = this->CalcJustificationStepSize(systemsOnly);
-
     // Last page and justification of last page is not enabled
     Pages *pages = doc->GetPages();
     assert(pages);
     if (pages->GetLast() == this) {
-        if (!doc->GetOptions()->m_justifyIncludeLastPage.GetValue()) {
-            return;
-        }
         int idx = this->GetIdx();
+        const int childSystems = GetChildCount(SYSTEM);
         if (idx > 0) {
             Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
             assert(penultimatePage);
-            if (!penultimatePage->m_layoutDone) {
-                doc->SetDrawingPage(idx - 1);
-                penultimatePage->LayOut();
-                doc->SetDrawingPage(idx);
+
+            if (penultimatePage->m_drawingJustifiableHeight < this->m_drawingJustifiableHeight) {
+                this->m_drawingJustifiableHeight = penultimatePage->m_drawingJustifiableHeight;
             }
-            int previousStepSize = penultimatePage->CalcJustificationStepSize(systemsOnly);
-            if (previousStepSize < stepSize) {
-                stepSize = previousStepSize;
+
+            const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
+            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
+                m_justificationSum = penultimatePage->m_justificationSum;
             }
+        }
+        else {
+            const int stavesPerSystem = m_drawingScoreDef.GetChildCount(STAFFDEF, UNLIMITED_DEPTH);
+            if (childSystems * stavesPerSystem < 8) return;
         }
     }
 
     // Justify Y position
     Functor justifyY(&Object::JustifyY);
     JustifyYParams justifyYParams(&justifyY, doc);
-    justifyYParams.m_stepSize = stepSize;
+    justifyYParams.m_justificationSum = this->m_justificationSum;
+    justifyYParams.m_spaceToDistribute = this->m_drawingJustifiableHeight;
     this->Process(&justifyY, &justifyYParams);
 }
 
 void Page::LayOutPitchPos()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -565,14 +576,18 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    System *last = dynamic_cast<System *>(m_children.back());
+    if (!GetChildCount()) {
+        return 0;
+    }
+
+    System *last = dynamic_cast<System *>(GetChildren()->back());
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
@@ -586,7 +601,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;
@@ -596,7 +611,7 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto &child : m_children) {
+    for (auto &child : *this->GetChildren()) {
         System *system = dynamic_cast<System *>(child);
         if (system) {
             // we include the left margin and the right margin
@@ -608,28 +623,6 @@ int Page::GetContentWidth() const
     doc = NULL;
 
     return maxWidth;
-}
-
-int Page::CalcJustificationStepSize(bool systemsOnly) const
-{
-    if (this->m_drawingJustifiableHeight < 0) {
-        return 0;
-    }
-
-    int stepCount = 0;
-    if (systemsOnly) {
-        stepCount = this->m_drawingJustifiableSystems - 1;
-    }
-    else {
-        stepCount = this->m_drawingJustifiableStaves - 1;
-    }
-
-    // Step should be greater than one...
-    if (stepCount == 0) {
-        return 0;
-    }
-
-    return this->m_drawingJustifiableHeight / stepCount;
 }
 
 void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
@@ -669,7 +662,7 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
 
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
 {
-    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     params->m_page = this;
@@ -706,11 +699,10 @@ int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift
-        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift = 0;
 
     // Also align the header and footer
 
@@ -732,11 +724,10 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 
 int Page::AlignSystems(FunctorParams *functorParams)
 {
-    AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
+    AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
-    params->m_justifiableSystems = 0;
-    params->m_justifiableStaves = 0;
+    params->m_justificationSum = 0;
 
     RunningElement *header = this->GetHeader();
     if (header) {
@@ -757,12 +748,11 @@ int Page::AlignSystems(FunctorParams *functorParams)
 
 int Page::AlignSystemsEnd(FunctorParams *functorParams)
 {
-    AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
+    AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
     this->m_drawingJustifiableHeight = params->m_shift;
-    this->m_drawingJustifiableSystems = params->m_justifiableSystems;
-    this->m_drawingJustifiableStaves = params->m_justifiableStaves;
+    this->m_justificationSum = params->m_justificationSum;
 
     RunningElement *footer = this->GetFooter();
     if (footer) {

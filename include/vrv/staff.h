@@ -56,6 +56,11 @@ public:
     virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
 
     /**
+     * Return a const pointer to the children
+     */
+    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const;
+
+    /**
      * Delete all the legder line arrays.
      */
     void ClearLedgerLines();
@@ -117,8 +122,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLegerLineAbove(int count, int left, int right, bool cueSize);
-    void AddLegerLineBelow(int count, int left, int right, bool cueSize);
+    void AddLedgerLineAbove(int count, int left, int right, bool cueSize);
+    void AddLedgerLineBelow(int count, int left, int right, bool cueSize);
     ///@}
 
     //----------//
@@ -203,7 +208,7 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
+    void AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
 
 public:
     /**

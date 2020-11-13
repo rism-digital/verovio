@@ -14,11 +14,13 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "btrem.h"
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "note.h"
 #include "rest.h"
@@ -73,11 +75,17 @@ bool Tuplet::IsSupportedChild(Object *child)
     else if (child->Is(TUPLET_BRACKET)) {
         assert(dynamic_cast<TupletBracket *>(child));
     }
+    else if (child->Is(BTREM)) {
+        assert(dynamic_cast<BTrem *>(child));
+    }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(FTREM)) {
+        assert(dynamic_cast<FTrem *>(child));
     }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
@@ -112,13 +120,15 @@ void Tuplet::AddChild(Object *child)
 
     child->SetParent(this);
 
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     // Num and bracket are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
-        m_children.insert(m_children.begin(), child);
+        children->insert(children->begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children->push_back(child);
     }
 
     Modify();
@@ -171,7 +181,7 @@ void Tuplet::CalcDrawingBracketAndNumPos()
     ArrayOfObjects::const_iterator iter = tupletChildren->begin();
     while (iter != tupletChildren->end()) {
         if ((*iter)->Is(CHORD)) {
-            Chord *currentChord = dynamic_cast<Chord *>(*iter);
+            Chord *currentChord = vrv_cast<Chord *>(*iter);
             assert(currentChord);
             if (currentChord->GetDrawingStemDir() == STEMDIRECTION_up) {
                 ups++;
@@ -181,7 +191,7 @@ void Tuplet::CalcDrawingBracketAndNumPos()
             }
         }
         else if ((*iter)->Is(NOTE)) {
-            Note *currentNote = dynamic_cast<Note *>(*iter);
+            Note *currentNote = vrv_cast<Note *>(*iter);
             assert(currentNote);
             if (!currentNote->IsChordTone() && (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)) {
                 ups++;
@@ -217,7 +227,7 @@ void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc)
         //
     }
     else if (m_drawingLeft->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(m_drawingLeft);
+        Chord *chord = vrv_cast<Chord *>(m_drawingLeft);
         assert(chord);
         XRelLeft = chord->GetXMin() - m_drawingLeft->GetDrawingX();
     }
@@ -231,7 +241,7 @@ void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc)
         XRelRight += m_drawingRight->GetSelfX2();
     }
     else if (m_drawingRight->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(m_drawingRight);
+        Chord *chord = vrv_cast<Chord *>(m_drawingRight);
         assert(chord);
         XRelRight = chord->GetXMax() - chord->GetDrawingX() + (2 * chord->GetDrawingRadius(doc));
     }
@@ -304,7 +314,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     // Nothing to do if there is no number
@@ -387,7 +397,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 
 int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     // Nothing to do if there is no number
@@ -404,7 +414,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     int staffSize = staff->m_drawingStaffSize;
 

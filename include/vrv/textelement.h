@@ -13,6 +13,8 @@
 
 namespace vrv {
 
+class Rend;
+
 //----------------------------------------------------------------------------
 // TextElement
 //----------------------------------------------------------------------------
@@ -91,10 +93,11 @@ public:
         m_width = 0;
         m_height = 0;
         m_laidOut = false;
-        m_newLine = false;
+        m_explicitPosition = false;
         m_verticalShift = false;
         m_alignment = HORIZONTALALIGNMENT_left;
         m_pointSize = 0;
+        m_actualWidth = 0;
     }
     virtual ~TextDrawingParams(){};
 
@@ -102,11 +105,15 @@ public:
     int m_y;
     int m_width;
     int m_height;
+    int m_actualWidth;
     bool m_laidOut;
-    bool m_newLine;
+    // used when X and Y has been changed manually or otherwise (e.g. newline <lb/> shift or shift for
+    // boxed enclosure for rend)
+    bool m_explicitPosition;
     bool m_verticalShift;
     data_HORIZONTALALIGNMENT m_alignment;
     int m_pointSize;
+    std::vector<TextElement *> m_boxedRend;
 };
 
 } // namespace vrv

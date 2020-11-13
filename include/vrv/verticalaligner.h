@@ -8,16 +8,18 @@
 #ifndef __VRV_VERTICAL_ALIGNER_H__
 #define __VRV_VERTICAL_ALIGNER_H__
 
-#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
 
 class AdjustFloatingPositionerGrpsParams;
+class AttSpacing;
 class FloatingObject;
+class ScoreDef;
 class StaffAlignment;
+class StaffDef;
+class System;
 class SystemAligner;
-class TimestampAttr;
 
 //----------------------------------------------------------------------------
 // SystemAligner
@@ -29,6 +31,11 @@ class TimestampAttr;
  */
 class SystemAligner : public Object {
 public:
+    /**
+     * Declares different spacing types between staves
+     */
+    enum class SpacingType { System, Staff, Brace, Bracket, None };
+
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
@@ -66,6 +73,12 @@ public:
     StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
 
     /**
+     * Get pointer to the parent system.
+     * Return NULL if parent is not set.
+     */
+    System *GetSystem();
+
+    /**
      * Find all the positioners pointing to an object;
      */
     void FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object);
@@ -75,9 +88,33 @@ public:
      */
     void FindAllIntersectionPoints(
         SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
+    /**
+     * Get System Overflows
+     */
+    int GetOverflowAbove(const Doc *doc) const;
+    int GetOverflowBelow(const Doc *doc) const;
+
+    /**
+     * Get justification sum
+     */
+    double GetJustificationSum(const Doc *doc) const;
+
+    /**
+     * Calculates and sets spacing for specified ScoreDef
+     */
+    void SetSpacing(ScoreDef *scoreDef);
 
 private:
-    //
+    /**
+     * Return above spacing type for passed staff.
+     * Calculates spacings if required.
+     */
+    SpacingType GetAboveSpacingType(Staff *staff);
+    /**
+     * Calculates above spacing type for staffDef
+     */
+    SpacingType CalculateSpacingAbove(StaffDef *staffDef) const;
+
 public:
     //
 private:
@@ -85,6 +122,14 @@ private:
      * A pointer to the left StaffAlignment object kept for the system bottom position
      */
     StaffAlignment *m_bottomAlignment;
+    /**
+     * Stores the above spacing type of staves (based on visibility)
+     */
+    std::map<int, SpacingType> m_spacingTypes;
+    /**
+     * A pointer to the parent system
+     */
+    System *m_system;
 };
 
 //----------------------------------------------------------------------------
@@ -144,13 +189,25 @@ public:
      */
     ///@{
     Staff *GetStaff() const { return m_staff; }
-    void SetStaff(Staff *staff, Doc *doc);
+    void SetStaff(Staff *staff, Doc *doc, SystemAligner::SpacingType spacingType);
     ///@}
+
+    /**
+     * @name Setter and getter of the system pointer to which the Alignment is belong to.
+     */
+    ///@{
+    System *GetParentSystem() const { return m_system; }
+    void SetParentSystem(System *system);
 
     /**
      * Returns the staff size (100 if no staff object is refered to)
      */
     int GetStaffSize() const;
+
+    /**
+     * Returns the spacing attribute object of correspond ScoreDef
+     */
+    const AttSpacing *GetAttSpacing() const;
 
     /**
      * @name Calculates the overlow (above or below for the bounding box.
@@ -160,6 +217,14 @@ public:
     ///@{
     int CalcOverflowAbove(BoundingBox *box);
     int CalcOverflowBelow(BoundingBox *box);
+    ///@}
+
+    /**
+     * @name Set of functions for spacing calculations
+     */
+    ///@{
+    int GetMinimumSpacing(const Doc *doc) const;
+    int CalcMinimumRequiredSpacing(const Doc *doc) const;
     ///@}
 
     /**
@@ -173,6 +238,13 @@ public:
     void SetOverlap(int overlap);
     int GetOverlap() const { return m_overlap; }
     int GetStaffHeight() const { return m_staffHeight; }
+    ///@}
+
+    /**
+     * @name Returns justification factor based on staff type
+     */
+    ///@{
+    double GetJustificationFactor(const Doc *doc) const;
     ///@}
 
     /**
@@ -222,6 +294,11 @@ public:
     virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustFloatingPositionersBetween
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustFloatingPositionerGrps
      */
     virtual int AdjustFloatingPositionerGrps(FunctorParams *functorParams);
@@ -237,10 +314,19 @@ public:
     virtual int JustifyY(FunctorParams *functorParams);
 
 private:
-    //
+    /**
+     * Returns minimus preset spacing
+     */
+    int GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const;
+
 public:
     //
 private:
+    /**
+     * Defines spacing type between current staff and previous one
+     */
+    SystemAligner::SpacingType m_spacingType = SystemAligner::SpacingType::None;
+
     /**
      * The list of FloatingPositioner for the staff.
      */
@@ -250,6 +336,11 @@ private:
      * This is necessary since we don't always have all the staves.
      */
     Staff *m_staff;
+    /**
+     * Stores a pointer to the system to which the Alignment is belong to
+     * This is necessary to reduce amount of dynamic_casts.
+     */
+    System *m_system;
     /**
      * Stores the position relative to the system.
      */

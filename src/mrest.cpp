@@ -22,9 +22,10 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttCue(), AttFermataPresent(), AttVisibility()
+MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_FERMATAPRESENT);
     RegisterAttClass(ATT_VISIBILITY);
@@ -38,6 +39,7 @@ void MRest::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
+    ResetColor();
     ResetCue();
     ResetFermataPresent();
     ResetVisibility();
@@ -49,7 +51,7 @@ void MRest::Reset()
 
 int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (this->HasFermata()) {

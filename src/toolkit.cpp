@@ -681,7 +681,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogWarning("Can not parse JSON std::string. Using default options.");
+        LogWarning("Cannot parse JSON std::string. Using default options.");
     }
     else {
         if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
@@ -875,7 +875,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         return false;
     }
 
@@ -1010,6 +1010,26 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     else {
                         opt->SetValue("auto");
                     }
+                }
+            }
+            else if (iter->first == "slurThickness") {
+                LogWarning("Option slurThickness is deprecated; use slurMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("slurThickness")) {
+                    double thickness = json.get<jsonxx::Number>("slurThickness");
+                    opt = m_options->GetItems()->at("slurMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
+                }
+            }
+            else if (iter->first == "tieThickness") {
+                vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("tieThickness")) {
+                    double thickness = json.get<jsonxx::Number>("tieThickness");
+                    opt = m_options->GetItems()->at("tieMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
                 }
             }
             else {
@@ -1478,9 +1498,9 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         if (!m_doc.HasMidiTimemap()) {
             LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
         }
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
-        Measure *measure = dynamic_cast<Measure *>(note->GetFirstAncestor(MEASURE));
+        Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
         // For now ignore repeats and access always the first
         timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
@@ -1500,7 +1520,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 
     jsonxx::Object o;
     if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast<Note *>(element);
         assert(note);
         int timeOfElement = this->GetTimeForElement(xmlId);
         int pitchOfElement = note->GetMIDIPitch();

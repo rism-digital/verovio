@@ -73,6 +73,9 @@ private:
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
+    // Helper to calculate the longest stem length of the beam (which will be used uniformely)
+    void CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
     void CalcSetValues(const int &elementCount);
 
@@ -87,6 +90,7 @@ public:
     int m_avgY;
     int m_ledgerLinesAbove;
     int m_ledgerLinesBelow;
+    int m_uniformStemLength;
 
     BeamElementCoord *m_firstNoteOrChord;
     BeamElementCoord *m_lastNoteOrChord;
@@ -148,6 +152,16 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustBeams
+     */
+    virtual int AdjustBeams(FunctorParams *);
+
+    /**
+     * See Object::AdjustBeamsEnd
+     */
+    virtual int AdjustBeamsEnd(FunctorParams *);
+
+    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
@@ -192,6 +206,7 @@ public:
         m_element = NULL;
         m_closestNote = NULL;
         m_stem = NULL;
+        m_overlapMargin = 0;
     }
     virtual ~BeamElementCoord();
 
@@ -204,10 +219,13 @@ public:
     void SetDrawingStemDir(
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
 
+    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+
     int m_x;
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration
     int m_breaksec;
+    int m_overlapMargin;
     bool m_centered; // beam is centered on the line
     bool m_shortened; // stem is shortened because pointing oustide the staff
     char m_partialFlags[MAX_DURATION_PARTIALS];

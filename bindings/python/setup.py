@@ -12,7 +12,6 @@ from setuptools import setup, Extension
 # generate the git commit include file
 os.system("cd ..;../tools/get_git_commit.sh")
 
-
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
     EXTRA_COMPILE_ARGS += ['-std=c++17',
@@ -61,7 +60,7 @@ verovio_module = Extension('_verovio',
                            )
 
 setup(name='verovio',
-      version='3.0.0-dev',
+      version='3.1.0-dev',
       url="www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       ext_modules=[verovio_module],

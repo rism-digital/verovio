@@ -99,6 +99,11 @@ public:
     bool IsRepeatedPattern();
 
     /**
+     * Checks whether difference between highest and lowest notes of the beam is just one step
+     */
+    bool HasOneStepHeight();
+
+    /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoords();

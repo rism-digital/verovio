@@ -221,7 +221,7 @@ public:
      */
     virtual void CloneReset();
 
-    std::string GetUuid() const { return m_uuid; }
+    const std::string &GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
@@ -255,9 +255,15 @@ public:
     Object *GetChild(int idx, const ClassId classId);
 
     /**
-     * Return a cont pointer to the children
+     * Return a const pointer to the children
      */
-    const ArrayOfObjects *GetChildren() { return &m_children; }
+    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const { return &m_children; }
+
+    /**
+     * Return a pointer to the children that allows modification.
+     * This method should be all only in AddChild overrides methods
+     */
+    ArrayOfObjects *GetChildrenForModification() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -287,8 +293,8 @@ public:
      * Returns NULL is not found
      */
     ///@{
-    Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
-    Object *GetPrevious(Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetNext(const Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetPrevious(const Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
@@ -457,6 +463,11 @@ public:
     Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1);
 
     /**
+     * Return the first child that is NOT of the specified type.
+     */
+    Object *GetFirstChildNot(const ClassId classId);
+
+    /**
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
@@ -572,6 +583,11 @@ public:
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
      */
     virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Look for all the layer elements that overlap with the time / duration within certain layer passed as parameter
+     */
+    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the layer elements spanned by two points
@@ -795,6 +811,16 @@ public:
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Calculate the vertical position adjustment for the beam if it overlaps with layer elements
+     */
+    virtual int AdjustBeams(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Apply position adjustment that has been calculated previously
+     */
+    virtual int AdjustBeamsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the postion position of slurs.
      */
     virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -814,9 +840,14 @@ public:
     ///@}
 
     /**
-     * Adjust the position of all floating positionner, staff by staff.
+     * Adjust the position of all floating positionners, staff by staff.
      */
     virtual int AdjustFloatingPositioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position of floating positionners placed between staves
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner that are grouped, staff by staff.
@@ -1051,6 +1082,13 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Go through all layer elements of the layer and return next/previous element relative to the specified
+     * layer element. It will search recursively through children elements until note, chord or ftrem is found.
+     * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
+     */
+    virtual int GetRelativeLayerElement(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     ///@}
 
     /**
@@ -1180,13 +1218,14 @@ public:
     ArrayOfStrAttr m_unsupported;
 
 protected:
+    //
+private:
     /**
      * A vector of child objects.
      * Unless SetAsReferenceObject is set or with detached and relinquished, the children are own by it.
      */
     ArrayOfObjects m_children;
 
-private:
     /**
      * A pointer to the parent object;
      */

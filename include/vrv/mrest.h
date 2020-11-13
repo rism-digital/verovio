@@ -23,6 +23,7 @@ namespace vrv {
  */
 class MRest : public LayerElement,
               public PositionInterface,
+              public AttColor,
               public AttCue,
               public AttFermataPresent,
               public AttVisibility {

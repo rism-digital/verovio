@@ -352,6 +352,11 @@ public:
     void IsVirtual(bool isVirtual) { m_isVirtual = isVirtual; }
     ///@}
 
+    /**
+     * Helper to adjust overlaping layers for stems
+     */
+    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+
     //----------//
     // Functors //
     //----------//

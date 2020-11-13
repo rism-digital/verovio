@@ -87,6 +87,11 @@ public:
     int GetHeight() const;
 
     /**
+     * Return the minimus system spacing
+     */
+    int GetMinimumSystemSpacing(const Doc *doc) const;
+
+    /**
      * Return the index position of the system in its page parent
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
@@ -226,6 +231,11 @@ public:
      * See Object::AdjustFloatingPositioners
      */
     virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustFloatingPositionersBetween
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustSlurs
