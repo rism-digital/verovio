@@ -163,9 +163,7 @@ void BeamSegment::CalcBeam(
                 int yMax, yMin;
                 chord->GetYExtremes(yMax, yMin);
                 if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-                    if (chord->m_crossStaff) {
-                        y2 += (coord->m_beamRelativePlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
-                    }
+                    if (coord->m_beamRelativePlace == BEAMPLACE_above) y2 += (yMin - yMax);
                 }
                 else {
                     y2 += (beamInterface->m_drawingPlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
