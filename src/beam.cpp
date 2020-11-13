@@ -162,7 +162,14 @@ void BeamSegment::CalcBeam(
                 assert(chord);
                 int yMax, yMin;
                 chord->GetYExtremes(yMax, yMin);
-                y2 += (beamInterface->m_drawingPlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
+                if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
+                    if (chord->m_crossStaff) {
+                        y2 += (coord->m_beamRelativePlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
+                    }
+                }
+                else {
+                    y2 += (beamInterface->m_drawingPlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
+                }
             }
 
             Stem *stem = stemmedInterface->GetDrawingStem();
