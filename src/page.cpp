@@ -739,25 +739,23 @@ int Page::AlignSystems(FunctorParams *functorParams)
     }
 
     RunningElement *footer = this->GetFooter();
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     if (footer) {
-        if (doc->GetOptions()->m_adjustPageHeight.GetValue()) {
+        if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
             int yRel = params->m_shift;
             if (GetChildCount()) {
                 for (Object *object : *GetChildren()) {
                     if (object->Is(SYSTEM)) {
                         System *system = vrv_cast<System *>(object);
                         yRel -= system->GetHeight();
-                        // TODO: Also subtract the system margin from yRel.
-                        // int systemMargin = system->GetIdx() ? params->m_systemMargin : 0;
-                        // if (systemMargin) {
-                        //    // One of these two...?
-                        //    const int margin
-                        //        = systemMargin - (params->m_prevBottomOverflow +
-                        //        system->m_systemAligner.GetOverflowAbove(params->m_doc));
-                        //    const int margin = doc->GetOptions()->m_spacingSystem.GetValue()) *
-                        //    doc->GetDrawingUnit(100); yRel -= margin > 0 ? margin : 0;
-                        //}
+                        // Also subtract the system margin from yRel, when there are multiple systems.
+                        int systemMargin = system->GetIdx() ? params->m_systemMargin : 0;
+                        if (systemMargin) {
+                            // TODO: Make sure this margin calculation is correct
+                            const int margin = systemMargin
+                                - (params->m_prevBottomOverflow
+                                    + system->m_systemAligner.GetOverflowAbove(params->m_doc) * 2);
+                            yRel -= margin > 0 ? margin : 0;
+                        }
                     }
                 }
             }
