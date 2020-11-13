@@ -1651,7 +1651,7 @@ void MEIOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
     assert(ligature);
 
     WriteLayerElement(currentNode, ligature);
-    ligature->WriteLigatureLog(currentNode);
+    ligature->WriteLigatureVis(currentNode);
 }
 
 void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
@@ -1660,11 +1660,9 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 
     if (mensur->IsAttribute()) {
         AttMensuralLog mensuralLog;
-        mensuralLog.SetMensurDot(mensur->GetDot());
+
         mensuralLog.SetProportNum(mensur->GetNum());
         mensuralLog.SetProportNumbase(mensur->GetNumbase());
-        mensuralLog.SetMensurSign(mensur->GetSign());
-        mensuralLog.SetMensurSlash(mensur->GetSlash());
         mensuralLog.WriteMensuralLog(currentNode);
         AttMensuralShared mensuralShared;
         mensuralShared.SetModusmaior(mensur->GetModusmaior());
@@ -1673,8 +1671,11 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
         mensuralShared.SetTempus(mensur->GetTempus());
         mensuralShared.WriteMensuralShared(currentNode);
         AttMensuralVis mensuralVis;
+        mensuralVis.SetMensurDot(mensur->GetDot());
         mensuralVis.SetMensurColor(mensur->GetColor());
         mensuralVis.SetMensurOrient(mensur->GetOrient());
+        mensuralVis.SetMensurSign(mensur->GetSign());
+        mensuralVis.SetMensurSlash(mensur->GetSlash());
         mensuralVis.WriteMensuralVis(currentNode);
         return;
     }
@@ -1800,8 +1801,8 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteExtSym(currentNode);
     note->WriteGraced(currentNode);
     note->WriteMidiVelocity(currentNode);
-    note->WriteNoteAnlMensural(currentNode);
     note->WriteNoteHeads(currentNode);
+    note->WriteNoteVisMensural(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiePresent(currentNode);
@@ -3441,15 +3442,15 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     AttMensuralVis mensuralVis;
     mensuralVis.ReadMensuralVis(element);
     if (mensuralShared.HasProlatio() || mensuralShared.HasTempus() || mensuralLog.HasProportNum()
-        || mensuralLog.HasProportNumbase() || mensuralLog.HasMensurSign()) {
+        || mensuralLog.HasProportNumbase() || mensuralVis.HasMensurSign()) {
         Mensur *vrvMensur = new Mensur();
         vrvMensur->IsAttribute(true);
         //
-        vrvMensur->SetDot(mensuralLog.GetMensurDot());
+        vrvMensur->SetDot(mensuralVis.GetMensurDot());
         vrvMensur->SetNum(mensuralLog.GetProportNum());
         vrvMensur->SetNumbase(mensuralLog.GetProportNumbase());
-        vrvMensur->SetSign(mensuralLog.GetMensurSign());
-        vrvMensur->SetSlash(mensuralLog.GetMensurSlash());
+        vrvMensur->SetSign(mensuralVis.GetMensurSign());
+        vrvMensur->SetSlash(mensuralVis.GetMensurSlash());
         //
         vrvMensur->SetModusmaior(mensuralShared.GetModusmaior());
         vrvMensur->SetModusminor(mensuralShared.GetModusminor());
@@ -4854,7 +4855,7 @@ bool MEIInput::ReadLigature(Object *parent, pugi::xml_node ligature)
     Ligature *vrvLigature = new Ligature();
     SetMeiUuid(ligature, vrvLigature);
 
-    vrvLigature->ReadLigatureLog(ligature);
+    vrvLigature->ReadLigatureVis(ligature);
 
     parent->AddChild(vrvLigature);
     ReadUnsupportedAttr(ligature, vrvLigature);
@@ -5024,8 +5025,8 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadExtSym(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadMidiVelocity(note);
-    vrvNote->ReadNoteAnlMensural(note);
     vrvNote->ReadNoteHeads(note);
+    vrvNote->ReadNoteVisMensural(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiePresent(note);

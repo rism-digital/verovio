@@ -55,8 +55,8 @@ Note::Note()
     , AttExtSym()
     , AttGraced()
     , AttMidiVelocity()
-    , AttNoteAnlMensural()
     , AttNoteHeads()
+    , AttNoteVisMensural()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -70,8 +70,8 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_NOTEHEADS);
+    RegisterAttClass(ATT_NOTEVISMENSURAL);
     RegisterAttClass(ATT_MIDIVELOCITY);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
@@ -95,8 +95,8 @@ void Note::Reset()
     ResetCue();
     ResetExtSym();
     ResetGraced();
-    ResetNoteAnlMensural();
     ResetNoteHeads();
+    ResetNoteVisMensural();
     ResetMidiVelocity();
     ResetStems();
     ResetStemsCmn();
