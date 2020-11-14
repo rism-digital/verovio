@@ -54,7 +54,7 @@ public:
     virtual void CloneReset();
 
     virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
-    
+
     /**
      * Return a const pointer to the children
      */
