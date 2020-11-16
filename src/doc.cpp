@@ -827,7 +827,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
         for (auto current : *m_mdivScoreDef.GetChildren()) {
             if (current->Is(STAFFGRP)) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(current);
-                grpSymNum += (staffGrp->HasSymbol())? 1 : 0;
+                grpSymNum += (staffGrp->HasSymbol()) ? 1 : 0;
             }
         }
         if (grpSymNum < 2) optimize = false;
