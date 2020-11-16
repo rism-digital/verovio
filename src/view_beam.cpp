@@ -357,8 +357,17 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                 int barYPos = 0;
                 idx = noteIndexes.at(i);
                 if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
-                    if (BEAMPLACE_NONE == beamElementCoords->at(idx)->m_partialFlagPlace) continue;
-                    barYPos = barY * ((BEAMPLACE_above == beamElementCoords->at(idx)->m_partialFlagPlace) ? 1 : -1);
+                    int elemIndex = idx;
+                    if (BEAMPLACE_NONE == beamElementCoords->at(idx)->m_partialFlagPlace) {
+                        if ((0 == i) || ((noteCount - 1) == i)
+                            || (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlagPlace
+                                != beamElementCoords->at(noteIndexes.at(i + 1))->m_partialFlagPlace)) {
+                            continue;
+                        }
+                        elemIndex = i - 1;
+                    }
+                    barYPos
+                        = barY * ((BEAMPLACE_above == beamElementCoords->at(elemIndex)->m_partialFlagPlace) ? 1 : -1);
                 }
                 else {
                     barYPos = shiftY * barY;
@@ -389,7 +398,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
             }
 
             testDur += 1;
-            
+
         } // end of while
     } // end of drawing partial bars
 }

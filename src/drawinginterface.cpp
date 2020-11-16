@@ -231,7 +231,7 @@ bool BeamDrawingInterface::IsHorizontal()
 
     if (HasOneStepHeight()) return true;
 
-    //if (m_drawingPlace == BEAMPLACE_mixed) return true;
+    // if (m_drawingPlace == BEAMPLACE_mixed) return true;
 
     if (m_drawingPlace == BEAMPLACE_NONE) return true;
 

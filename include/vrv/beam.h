@@ -68,8 +68,7 @@ private:
 
     void CalcBeamPosition(Doc *doc, Staff *staff, Layer *layer, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
-    void CalcAdjustSlope(
-        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
+    void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
 
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
