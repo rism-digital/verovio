@@ -591,10 +591,9 @@ int Page::GetContentHeight() const
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
-    // Not sure what to do with the footer when adjusted page height is requested...
-    // if (this->GetFooter()) {
-    //    height += this->GetFooter()->GetTotalHeight();
-    //}
+    if (this->GetFooter()) {
+        height += this->GetFooter()->GetTotalHeight();
+    }
 
     return height;
 }
@@ -737,12 +736,6 @@ int Page::AlignSystems(FunctorParams *functorParams)
         header->SetDrawingYRel(params->m_shift);
         params->m_shift -= header->GetTotalHeight() + bottomMarginPgHead;
     }
-    RunningElement *footer = this->GetFooter();
-    if (footer) {
-        // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight());
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -757,6 +750,18 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
     RunningElement *footer = this->GetFooter();
     if (footer) {
         this->m_drawingJustifiableHeight -= footer->GetTotalHeight();
+
+        if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
+            if (GetChildCount()) {
+                System *last = dynamic_cast<System *>(GetChildren()->back());
+                assert(last);
+                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight());
+            }
+        }
+        else {
+            // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
+            footer->SetDrawingYRel(footer->GetTotalHeight());
+        }
     }
 
     return FUNCTOR_CONTINUE;
