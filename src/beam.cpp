@@ -627,8 +627,6 @@ void BeamSegment::CalcBeamPosition(
 {
     // Set drawing stem positions
     for (auto coord : m_beamElementCoordRefs) {
-        // BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             coord->SetDrawingStemDir(STEMDIRECTION_up, staff, doc, this, beamInterface);
         }
