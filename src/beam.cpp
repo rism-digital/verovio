@@ -1251,7 +1251,12 @@ void BeamElementCoord::SetDrawingStemDir(
     if (!m_closestNote) return;
 
     this->m_yBeam = m_closestNote->GetDrawingY();
-    m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
+    if (stemDir == STEMDIRECTION_up) {
+        m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
+    }
+    else {
+        m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
+    }
 
     int stemLen = segment->m_uniformStemLength;
     if (interface->m_isCrossStaff || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
