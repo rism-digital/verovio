@@ -175,6 +175,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(NEUME)) {
         DrawNeume(dc, element, layer, staff, measure);
     }
+    else if (element->Is(PLICA)) {
+        DrawPlica(dc, element, layer, staff, measure);
+    }
     else if (element->Is(PROPORT)) {
         DrawProport(dc, element, layer, staff, measure);
     }

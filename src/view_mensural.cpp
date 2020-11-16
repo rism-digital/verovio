@@ -21,6 +21,7 @@
 #include "mensur.h"
 #include "note.h"
 #include "options.h"
+#include "plica.h"
 #include "proport.h"
 #include "rest.h"
 #include "smufl.h"
@@ -482,6 +483,21 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
 
     return;
+}
+
+void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+
+    Plica *plica = vrv_cast<Plica *>(element);
+    assert(plica);
+
+    dc->StartGraphic(plica, "", plica->GetUuid());
+
+    dc->EndGraphic(plica, this);
 }
 
 void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
