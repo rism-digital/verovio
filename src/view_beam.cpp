@@ -433,7 +433,7 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure)
     beamSpan->m_beamSegment.Reset();
     beamSpan->m_beamSegment.InitCoordRefs(&beamSpan->m_beamElementCoords);
     beamSpan->m_beamSegment.CalcBeam(layer, staff, m_doc, beamSpan, beamSpan->GetPlace());
-    beamSpan->AppendSpinningCoordinates(measure);
+    beamSpan->AppendSpanningCoordinates(measure);
 
     // Draw corresponding beam segment
     dc->StartGraphic(beamSpan, "", beamSpan->GetUuid());
