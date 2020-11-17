@@ -42,7 +42,7 @@ Options:
 EOT
 }
 
-chomp (my $EMCC = `which emcc`);
+chomp (my $EMCC = `which em++`);
 chomp (my $EMCMAKE = `which emcmake`);
 chomp (my $EMMAKE = `which emmake`);
 die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
