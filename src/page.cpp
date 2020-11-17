@@ -751,6 +751,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
     if (footer) {
         this->m_drawingJustifiableHeight -= footer->GetTotalHeight();
 
+        // Move it up below the last system
         if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
             if (GetChildCount()) {
                 System *last = dynamic_cast<System *>(GetChildren()->back());
@@ -759,7 +760,6 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
             }
         }
         else {
-            // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
             footer->SetDrawingYRel(footer->GetTotalHeight());
         }
     }

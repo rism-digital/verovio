@@ -4,6 +4,7 @@
 * Support for `mNum@fontsize` (@rettinghaus)
 * Support for `accidental-mark` in MusicXML import (@rettinghaus)
 * Improved barline rendition (@rettinghaus)
+* Option --footer extended with 'always' value to show footer with --adjust-page-height
 
 ## [3.0.1] - 2020-10-22
 * Fix bug with mensural notation notes
