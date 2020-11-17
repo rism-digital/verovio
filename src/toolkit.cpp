@@ -601,6 +601,9 @@ bool Toolkit::LoadData(const std::string &data)
     if (adjustPageHeight && (footerOption == FOOTER_always || footerOption == FOOTER_encoded)) {
         m_doc.GenerateFooter();
     }
+    if (!adjustPageHeight && (footerOption == FOOTER_auto)) {
+        m_doc.GenerateFooter();
+    }
     if (m_options->m_header.GetValue() == HEADER_auto) {
         m_doc.GenerateHeader();
     }
