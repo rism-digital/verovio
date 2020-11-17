@@ -5,6 +5,9 @@
 * Support for `accidental-mark` in MusicXML import (@rettinghaus)
 * Improved barline rendition (@rettinghaus)
 
+## [3.0.2] - 2020-11-17
+* Add missing default footer file
+
 ## [3.0.1] - 2020-10-22
 * Fix bug with mensural notation notes
 
