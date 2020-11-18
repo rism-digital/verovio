@@ -598,10 +598,7 @@ bool Toolkit::LoadData(const std::string &data)
     int footerOption = m_options->m_footer.GetValue();
     // With adjusted page height, show the footer if explicitly set (i.e., not with "auto")
     // generate the page header and footer if necessary
-    if (adjustPageHeight && (footerOption == FOOTER_always || footerOption == FOOTER_encoded)) {
-        m_doc.GenerateFooter();
-    }
-    if (!adjustPageHeight && (footerOption == FOOTER_auto)) {
+    if ((!adjustPageHeight && (footerOption == FOOTER_auto)) || (footerOption == FOOTER_always)) {
         m_doc.GenerateFooter();
     }
     if (m_options->m_header.GetValue() == HEADER_auto) {
