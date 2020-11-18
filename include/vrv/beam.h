@@ -25,6 +25,28 @@ class StaffAlignment;
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
 
 //----------------------------------------------------------------------------
+// BeamSegmentPlacementInfo
+//----------------------------------------------------------------------------
+
+// Structure for storing additional information regarding beamSegment placement (in case of beam/beamSpan spanning over
+// the systems
+struct BeamSegmentPlacementInfo {
+private:
+    using CoordIter = ArrayOfBeamElementCoords::iterator;
+public:
+    BeamSegmentPlacementInfo() : m_measure(NULL), m_staff(NULL), m_layer(NULL), m_spanningType(SPANNING_START_END) {}
+    Measure *m_measure;
+    Staff *m_staff;
+    Layer *m_layer;
+    int m_spanningType;
+    CoordIter m_begin;
+    CoordIter m_end;
+
+    // Set spanning type based on the positioning of the beam segment
+    void SetSpanningType(int systemIndex, int systemCount);
+};
+
+//----------------------------------------------------------------------------
 // BeamSegment
 //----------------------------------------------------------------------------
 
@@ -57,6 +79,12 @@ public:
      * This is called by Beam::FilterList
      */
     void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
+    
+    /**
+     * Initialize placement information for the segment. Should be used with beamSpan to specify which staff/layer it
+     * belongs to
+     */
+    void InitPlacementInformation(Measure *measure, Staff *staff, Layer *layer);
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
@@ -95,6 +123,9 @@ public:
     void InitSameasRoles(Beam *sameasBeam, data_BEAMPLACE &drawingPlace);
     void UpdateSameasRoles(data_BEAMPLACE place);
     ///@}
+
+    // Helper to append coordinates for the beamSpans that are drawn over systems
+    void AppendSpanningCoordinates(Measure *measure);
 
 private:
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
@@ -186,6 +217,11 @@ public:
     StemSameasDrawingRole m_stemSameasRole;
     StemSameasDrawingRole *m_stemSameasReverseRole;
     ///@}
+
+    /**
+     * Additional information on the relevant measure/staff/layer. Optional for plain beams
+     */
+    BeamSegmentPlacementInfo *m_placementInfo;
 };
 
 //----------------------------------------------------------------------------

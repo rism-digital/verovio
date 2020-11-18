@@ -426,18 +426,22 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure)
     assert(beamSpan);
     assert(measure);
 
-    Layer *layer = vrv_cast<Layer *>(beamSpan->GetStart()->GetFirstAncestor(LAYER));
-    Staff *staff = vrv_cast<Staff *>(beamSpan->GetStart()->GetFirstAncestor(STAFF));
-    if (!layer || !staff) return;
-
-    beamSpan->m_beamSegment.Reset();
-    beamSpan->m_beamSegment.InitCoordRefs(&beamSpan->m_beamElementCoords);
-    beamSpan->m_beamSegment.CalcBeam(layer, staff, m_doc, beamSpan, beamSpan->GetPlace());
-    beamSpan->AppendSpanningCoordinates(measure);
-
-    // Draw corresponding beam segment
+    // Draw all segements for the beamSpan
     dc->StartGraphic(beamSpan, "", beamSpan->GetUuid());
-    DrawBeamSegment(dc, &beamSpan->m_beamSegment, beamSpan, layer, staff, measure);
+    for (auto segment : beamSpan->m_beamSegments) {
+        // Reset current segment and set coordinates based on stored begin/end iterators for the ElementCoords
+        segment->Reset();
+        ArrayOfBeamElementCoords coord(segment->m_placementInfo->m_begin, segment->m_placementInfo->m_end);
+        segment->InitCoordRefs(&coord);
+        segment->CalcBeam(segment->m_placementInfo->m_layer, segment->m_placementInfo->m_staff, m_doc, beamSpan,
+            beamSpan->GetPlace());
+        segment->AppendSpanningCoordinates(segment->m_placementInfo->m_measure);
+
+        // Draw corresponding beam segment
+        DrawBeamSegment(dc, segment, beamSpan, segment->m_placementInfo->m_layer, segment->m_placementInfo->m_staff,
+            segment->m_placementInfo->m_measure);
+    }
+
     dc->EndGraphic(beamSpan, this);
 }
 

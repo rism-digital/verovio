@@ -34,6 +34,8 @@ class BeamSpan : public ControlElement,
                  public AttBeamedWith,
                  public AttBeamRend,
                  public AttColor {
+private:
+    using SpanIndexVector = std::vector<std::pair<vrv::ArrayOfObjects::iterator, Object *> >;
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -57,12 +59,17 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ////@}
 
-    // Helper to append coordinates for the beamSpans that are drawn over systems
-    void AppendSpanningCoordinates(Measure *measure);
-
     // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
     // in between start and end of the beamSpan
     ArrayOfObjects GetBeamSpanElementList(Layer* layer, Staff* staff);
+
+    /**
+     * @name Initialize and cleam beam segments
+     */
+    ///@{
+    void InitBeamSegments();
+    void ClearBeamSegments();
+    ////@}
 
     //----------//
     // Functors //
@@ -83,27 +90,17 @@ public:
      */
     virtual int ResolveSpanningBeamSpans(FunctorParams *);
 
-    /**
-     * @name Getter/setter for spanningType
-     */
-    ///@{
-    void SetSpanningType(int systemIndex, int systemCount);
-    int GetSpanningType() const { return m_spanningType; }
-    ////@}
-
 private:
     // Helper for breaking one big spanning beamSpan into smaller beamSpans
-    bool SeparateSpanningElements(ArrayOfObjects &newElements, Object *first, Doc *doc, bool clearElements);
+    bool AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
 
 public:
     //
-    BeamSegment m_beamSegment;
+    std::vector<BeamSegment *> m_beamSegments;
 
 private:
     //
     ArrayOfObjects m_beamedElements;
-
-    int m_spanningType;
 };
 
 } // namespace vrv

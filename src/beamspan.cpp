@@ -43,10 +43,15 @@ BeamSpan::BeamSpan()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_PLIST);
 
+    InitBeamSegments();
+
     Reset();
 }
 
-BeamSpan::~BeamSpan() {}
+BeamSpan::~BeamSpan() 
+{
+    ClearBeamSegments();
+}
 
 void BeamSpan::Reset()
 {
@@ -58,36 +63,20 @@ void BeamSpan::Reset()
     ResetBeamRend();
     ResetColor();
     ResetPlist();
-
-    m_spanningType = SPANNING_START_END;
 }
 
-void BeamSpan::AppendSpanningCoordinates(Measure *measure)
+void BeamSpan::InitBeamSegments() 
 {
-    const int spanningType = GetSpanningType();
-    if (SPANNING_START_END == spanningType) return;
-    
-    BarLine *bar = measure->GetRightBarLine();
-    const int rightSide = bar->GetDrawingX();
-    BeamElementCoord *front = m_beamSegment.m_beamElementCoordRefs.front();
-    BeamElementCoord *back = m_beamSegment.m_beamElementCoordRefs.back();
-    const double slope = (double)(back->m_yBeam - front->m_yBeam) / (double)(back->m_x - front->m_x);
+    // BeamSpan should have at least one segment to begin with
+    m_beamSegments.emplace_back(new BeamSegment());
+}
 
-    if ((SPANNING_START == spanningType) || (SPANNING_MIDDLE == spanningType)) {
-        BeamElementCoord *right = new BeamElementCoord(*back);
-        const int distance = rightSide - back->m_x;
-        right->m_x = rightSide;
-        right->m_yBeam += distance * slope;
-        m_beamSegment.m_beamElementCoordRefs.push_back(right);
+void BeamSpan::ClearBeamSegments()
+{
+    for (auto segment : m_beamSegments) {
+        delete segment;
     }
-    if ((SPANNING_END == spanningType) || (SPANNING_MIDDLE == spanningType)) {
-        BeamElementCoord *left = new BeamElementCoord(*front);
-        const int width = measure->GetInnerWidth();
-        const int offset = (back->m_x - front->m_x) / (m_beamSegment.m_beamElementCoordRefs.size() - 1) / 2;
-        left->m_x -= offset;
-        left->m_yBeam -= offset * slope;
-        m_beamSegment.m_beamElementCoordRefs.insert(m_beamSegment.m_beamElementCoordRefs.begin(), left);
-    }
+    m_beamSegments.clear();
 }
 
 ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
@@ -131,41 +120,43 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
     return beamSpanElements;
 }
 
-bool BeamSpan::SeparateSpanningElements(ArrayOfObjects &newElements, Object *first, Doc *doc, bool clearElements)
+bool BeamSpan::AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int index, bool newSegment)
 {
-    Layer *layer = vrv_cast<Layer *>(first->GetFirstAncestor(LAYER));
-    Staff *staff = vrv_cast<Staff *>(first->GetFirstAncestor(STAFF));
-    if (!layer || !staff) return false;
+    Layer *layer = vrv_cast<Layer *>((*elements.at(index).first)->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>((*elements.at(index).first)->GetFirstAncestor(STAFF));
+    Measure *measure = vrv_cast<Measure *>((*elements.at(index).first)->GetFirstAncestor(MEASURE));
+    if (!layer || !staff || !measure) return false;
 
-    m_beamedElements = newElements;
-    if (clearElements) m_beamElementCoords.clear();
-    InitCoords(&m_beamedElements, staff, GetPlace());
+    // get iterators for first and last coordinates in the range for the segment
+    auto coordsFirst = std::find_if(m_beamElementCoords.begin(), m_beamElementCoords.end(),
+        [&](BeamElementCoord *coord) { return coord->m_element == (*elements.at(index).first); });
+    auto coordsLast = std::find_if(m_beamElementCoords.begin(), m_beamElementCoords.end(),
+        [&](BeamElementCoord *coord) { return coord->m_element == *(elements.at(index + 1).first - 1); });
+    if ((coordsFirst == m_beamElementCoords.end()) || (coordsLast == m_beamElementCoords.end())) return false;
 
-    m_beamSegment.InitCoordRefs(&m_beamElementCoords);
-    m_beamSegment.CalcBeam(layer, staff, doc, this, GetPlace());
-    for (auto element : newElements) {
-        vrv_cast<LayerElement *>(element)->m_referencedElement = this;
-    }
-
-    // Reset Start and End based on the new elements of the beamSpan
-    TimePointInterface::Reset();
-    TimeSpanningInterface::Reset();
-    SetStart(vrv_cast<LayerElement *>(newElements.front()));
-    SetEnd(vrv_cast<LayerElement *>(newElements.back()));
-    return true;
-}
-
-void BeamSpan::SetSpanningType(int systemIndex, int systemCount)
-{
-    if (0 == systemIndex) {
-        m_spanningType = SPANNING_START;
-    }
-    else if ((systemCount - 1) == systemIndex) {
-        m_spanningType = SPANNING_END;
+    
+    BeamSegment *segment = NULL;
+    if (newSegment) {
+        segment = new BeamSegment();
     }
     else {
-        m_spanningType = SPANNING_MIDDLE;
+        segment = m_beamSegments.at(0);
     }
+
+    // Init segment with placement information (measure, staff, etc.) as well as begin/end coordinates
+    ArrayOfBeamElementCoords coords(coordsFirst, coordsLast + 1);
+    segment->InitPlacementInformation(measure, staff, layer);
+    segment->m_placementInfo->m_begin = coordsFirst;
+    segment->m_placementInfo->m_end = coordsLast + 1;
+    segment->InitCoordRefs(&coords);
+    segment->CalcBeam(layer, staff, doc, this, GetPlace());
+    segment->m_placementInfo->SetSpanningType(index, elements.size() - 1);
+
+    if (newSegment) {
+        m_beamSegments.push_back(segment);
+    }
+
+    return true;
 }
 
 //----------//
@@ -181,11 +172,17 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
 
     Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
+    Measure *measure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
 
     InitCoords(&m_beamedElements, staff, GetPlace());
 
-    m_beamSegment.InitCoordRefs(&m_beamElementCoords);
-    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, GetPlace());
+    m_beamSegments.at(0)->InitPlacementInformation(measure, staff, layer);
+    m_beamSegments.at(0)->m_placementInfo->m_begin = m_beamElementCoords.begin();
+    m_beamSegments.at(0)->m_placementInfo->m_end = m_beamElementCoords.end();
+    ArrayOfBeamElementCoords coord(
+        m_beamSegments.at(0)->m_placementInfo->m_begin, m_beamSegments.at(0)->m_placementInfo->m_end);
+    m_beamSegments.at(0)->InitCoordRefs(&coord);
+    m_beamSegments.at(0)->CalcBeam(layer, staff, params->m_doc, this, GetPlace());
 
     return FUNCTOR_CONTINUE;
 }
@@ -246,7 +243,7 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
     // Find layerElements that belong to another system and store then in the vector alongside
     // the system they belong to. This will allow us to break down beamSpan based on the systems
     auto iter = m_beamedElements.begin();
-    std::vector<std::pair<vrv::ArrayOfObjects::iterator, Object *> > elements;
+    SpanIndexVector elements;
     Object *firstSystem = startSystem;
     while (iter != m_beamedElements.end()) {
         elements.push_back({ iter, firstSystem });
@@ -268,19 +265,9 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
             currentSystemIndex = i;
             continue;
         }
-
-        BeamSpan *beamSpan = vrv_cast<BeamSpan *>(Clone());
-        ArrayOfObjects newElements(elements.at(i).first, elements.at(i + 1).first);
-        beamSpan->SeparateSpanningElements(newElements, *elements.at(i).first, params->m_doc, true);
-        beamSpan->SetSpanningType(i, elements.size() - 1);
-
-        Measure *measure = vrv_cast<Measure *>((*elements.at(i).first)->GetFirstAncestor(MEASURE));
-        measure->AddChild(beamSpan);
+        AddSpanningSegment(params->m_doc, elements, i);
     }
-
-    ArrayOfObjects newElements(elements.at(currentSystemIndex).first, elements.at(currentSystemIndex + 1).first);
-    SeparateSpanningElements(newElements, GetStart(), params->m_doc, false);
-    SetSpanningType(currentSystemIndex, elements.size() - 1);
+    AddSpanningSegment(params->m_doc, elements, currentSystemIndex, false);
 
     return FUNCTOR_CONTINUE;
 }
