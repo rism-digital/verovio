@@ -562,7 +562,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     Section *section = new Section();
     score->AddChild(section);
     // initialize layout
-    if (root.select_node("/score-partwise/identification/encoding/supports[@element='print']")) {
+    if (root.select_node("/score-partwise/part/measure/print")) {
         m_hasLayoutInformation = true;
         // always start with a new page
         Pb *pb = new Pb();
@@ -570,7 +570,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
-    float bottom = layout.node().select_node("page-margins/bottom-margin").node().text().as_float();
+    const float bottom = layout.node().select_node("page-margins/bottom-margin").node().text().as_float();
 
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
