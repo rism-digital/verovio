@@ -442,6 +442,70 @@ double Measure::GetRealTimeOffsetMilliseconds(int repeat) const
     return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
 
+Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
+{
+    // previous measure right -> current measure left -> expected barlines (previous, current)
+    static std::map<data_BARRENDITION, std::map<data_BARRENDITION, BarlineRenditionPair> > drawingLines = {
+        // previous right barline is dotted
+        { BARRENDITION_dotted,
+            { { BARRENDITION_dotted, { BARRENDITION_dotted, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is dashed
+        { BARRENDITION_dashed,
+            { { BARRENDITION_dotted, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dashed, BARRENDITION_dotted } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is single
+        { BARRENDITION_single,
+            { { BARRENDITION_dotted, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_single, BARRENDITION_dotted } },
+                { BARRENDITION_dbldashed, { BARRENDITION_single, BARRENDITION_dashed } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double dotted
+        { BARRENDITION_dbldotted,
+            { { BARRENDITION_dotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dotted, BARRENDITION_dashed } },
+                { BARRENDITION_single, { BARRENDITION_dotted, BARRENDITION_single } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double dashed
+        { BARRENDITION_dbldashed,
+            { { BARRENDITION_dotted, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_dashed, BARRENDITION_single } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double
+        { BARRENDITION_dbl,
+            { { BARRENDITION_dotted, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+    };
+
+    const BarlineRenditionPair defaultValue = { previous->GetRight(), GetLeft() };
+    auto previousRight = drawingLines.find(previous->GetRight());
+    if (previousRight == drawingLines.end()) return defaultValue;
+
+    auto currentLeft = previousRight->second.find(GetLeft());
+    if (currentLeft == previousRight->second.end()) return defaultValue;
+
+    return currentLeft->second;
+}
+
 void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
 {
     // First set the right barline. If none then set a single one.
@@ -485,9 +549,11 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             previous->SetDrawingRightBarLine(BARRENDITION_invis);
             this->SetDrawingLeftBarLine(BARRENDITION_rptboth);
         }
-        // nothing we can do with any other value?
+        // handle other possible barline interactions
         else {
-            this->SetDrawingLeftBarLine(this->GetLeft());
+            auto [right, left] = SelectDrawingBarLines(previous);
+            previous->SetDrawingRightBarLine(right);
+            this->SetDrawingLeftBarLine(left);
         }
     }
     else {

@@ -39,7 +39,8 @@ class Measure : public Object,
                 public AttNNumberLike,
                 public AttPointing,
                 public AttTyped {
-
+private:
+    using BarlineRenditionPair = std::pair<data_BARRENDITION, data_BARRENDITION>;
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -118,6 +119,12 @@ public:
     data_BARRENDITION GetDrawingRightBarLine() const { return m_rightBarLine.GetForm(); }
     void SetDrawingRightBarLine(data_BARRENDITION type) { m_rightBarLine.SetForm(type); }
     ///@}
+
+    /**
+     * Select drawing barlines based on the previous right and current left barlines (to avoid duplicated doubles or
+     * singles). In certain cases drawn barlines would be simplified if they can be overlapped, e.g. single with dbl
+     */
+    BarlineRenditionPair SelectDrawingBarLines(Measure *previous);
 
     /**
      * Set the drawing barlines for the measure.

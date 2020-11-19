@@ -865,6 +865,10 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
         DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength);
     }
+    else if (barLine->GetForm() == BARRENDITION_dbldotted) {
+        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
+        DrawVerticalSegmentedLine(dc, x2, line, barLineWidth, dotLength);
+    }
     else {
         // Use solid barline as fallback
         LogWarning("%s bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()).c_str());
