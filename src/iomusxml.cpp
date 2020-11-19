@@ -564,9 +564,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // initialize layout
     if (root.select_node("/score-partwise/part/measure/print")) {
         m_hasLayoutInformation = true;
-        // always start with a new page
-        Pb *pb = new Pb();
-        section->AddChild(pb);
+        if (!root.select_node("/score-partwise/part[1]/measure[1]/print")) {
+            // always start with a new page
+            Pb *pb = new Pb();
+            section->AddChild(pb);
+        }
     }
 
     pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
