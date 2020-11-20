@@ -553,7 +553,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak)
         // handle other possible barline interactions
         else {
             auto [right, left] = SelectDrawingBarLines(previous);
-            if (right == left) {
+            if (right != left) {
                 previous->SetDrawingRightBarLine(right);
                 this->SetDrawingLeftBarLine(left);
             }
