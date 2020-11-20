@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Oct 25 21:32:07 PDT 2020
+// Last Modified: Sun Nov 15 23:12:30 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -47251,6 +47251,881 @@ ostream& Options::getParseError(ostream& out) {
 
 
 
+//////////////////////////////
+//
+// PixelColor::PixelColor --
+//
+
+PixelColor::PixelColor(void) { 
+	// do nothing
+}
+
+PixelColor::PixelColor(const PixelColor& color) { 
+	Red   = color.Red;
+	Green = color.Green;
+	Blue  = color.Blue;
+}
+
+
+PixelColor::PixelColor(const string& color) {
+	setColor(color);
+}
+
+
+PixelColor::PixelColor(int red, int green, int blue) { 
+	Red   = (unsigned int)limit(red, 0, 255);
+	Green = (unsigned int)limit(green, 0, 255);
+	Blue  = (unsigned int)limit(blue, 0, 255);
+}
+
+PixelColor::PixelColor(float red, float green, float blue) {
+	Red   = (unsigned int)floatToChar(red);
+	Green = (unsigned int)floatToChar(green);
+	Blue  = (unsigned int)floatToChar(blue);
+}
+
+PixelColor::PixelColor(double red, double green, double blue) {
+	Red   = (unsigned int)limit(floatToChar((float)red), 0, 255);
+	Green = (unsigned int)limit(floatToChar((float)green), 0, 255);
+	Blue  = (unsigned int)limit(floatToChar((float)blue), 0, 255);
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::~PixelColor --
+//
+
+PixelColor::~PixelColor() { 
+	// do nothing
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::invert -- negate the color.
+//
+
+void PixelColor::invert(void) {
+	Red   = ~Red;
+	Green = ~Green;
+	Blue  = ~Blue;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::setColor -- set the contents to the specified value.
+//
+
+PixelColor& PixelColor::setColor(const string& colorstring) { 
+	PixelColor color;
+	color = getColor(colorstring);
+	Red   = color.Red;
+	Green = color.Green;
+	Blue  = color.Blue;
+
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getRed --
+//
+
+int PixelColor::getRed(void) {
+	return Red;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getGreen --
+//
+
+int PixelColor::getGreen(void) {
+	return Green;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getBlue --
+//
+
+int PixelColor::getBlue(void) {
+	return Blue;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::setRed --
+//
+
+void PixelColor::setRed(int value) { 
+	Red = (unsigned char)limit(value, 0, 255);
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::setGreen --
+//
+
+void PixelColor::setGreen(int value) {
+	Green = (unsigned char)limit(value, 0, 255);
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::setBlue --
+//
+
+void PixelColor::setBlue(int value) {
+	Blue = (unsigned char)limit(value, 0, 255);
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getRedF --
+//
+
+float PixelColor::getRedF(void) { 
+	return charToFloat(Red);
+}
+
+
+//////////////////////////////
+//
+// PixelColor::getGreenF --
+//
+
+float PixelColor::getGreenF(void) {
+	return charToFloat(Green);
+}
+
+
+//////////////////////////////
+//
+// PixelColor::getBlueF --
+//
+
+float PixelColor::getBlueF(void) {
+	return charToFloat(Blue);
+}
+
+
+//////////////////////////////
+//
+// PixelColor::setRedF --
+//
+
+void PixelColor::setRedF(float value) { 
+	Red = (unsigned int)floatToChar(value);
+}
+
+
+//////////////////////////////
+//
+// PixelColor::setGreenF --
+//
+
+void PixelColor::setGreenF(float value) {
+	Green = (unsigned int)floatToChar(value);
+}
+
+
+//////////////////////////////
+//
+// PixelColor::setBlueF --
+//
+
+void PixelColor::setBlueF(float value) {
+	Blue = (unsigned int)floatToChar(value);
+}
+
+
+//////////////////////////////
+//
+// PixelColor::setColor --
+//
+
+void PixelColor::setColor(PixelColor color) { 
+	Red   = color.Red;
+	Green = color.Green;
+	Blue  = color.Blue;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::setColor --
+//
+
+PixelColor& PixelColor::setColor(int red, int green, int blue) {
+	Red   = (unsigned int)limit(red, 0, 255);
+	Green = (unsigned int)limit(green, 0, 255);
+	Blue  = (unsigned int)limit(blue, 0, 255);
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::makeGrey --
+//
+
+PixelColor& PixelColor::makeGrey(void) { 
+	unsigned char average = limit((int)(((int)Red+(int)Green+(int)Blue)/3.0+0.5),0,255);
+	Red = Green = Blue = average;
+	return *this;
+}
+
+
+//////////////////////////////
+//
+// PixelColor::setGrayNormalized --  input in the range from 0.0 to 1.0.
+//
+
+PixelColor& PixelColor::setGrayNormalized(double value) {
+	int graylevel = int(value * 256.0);
+	if (graylevel >= 256) {
+		graylevel = 255;
+	}
+	if (graylevel < 0) {
+		graylevel = 0;
+	}
+	Red = Green = Blue = graylevel;
+	return *this;
+}
+
+PixelColor& PixelColor::setGreyNormalized(double value) {
+	return setGrayNormalized(value);
+}
+
+
+//////////////////////////////
+//
+// PixelColor::makeGray --
+//
+
+PixelColor& PixelColor::makeGray(void) { 
+	return makeGrey();
+}
+
+
+//////////////////////////////
+//
+// PixelColor::operator> --
+//
+
+int PixelColor::operator>(int number) {
+	if (Red   <= number) return 0;
+	if (Green <= number) return 0;
+	if (Blue  <= number) return 0;
+	return 1;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator< --
+//
+
+int PixelColor::operator<(int number) {
+	if (Red   >= number) return 0;
+	if (Green >= number) return 0;
+	if (Blue  >= number) return 0;
+	return 1;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator== --
+//
+
+int PixelColor::operator==(PixelColor color) {
+	if (Red != color.Red) {
+		return 0;
+	}
+	if (Green != color.Green) {
+		return 0;
+	}
+	if (Blue != color.Blue) {
+		return 0;
+	}
+	return 1;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator!= --
+//
+
+int PixelColor::operator!=(PixelColor color) {
+	if ((Red == color.Red) && (Green == color.Green) && (Blue == color.Blue)) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator*= --
+//
+
+PixelColor& PixelColor::operator*=(double number) {
+	Red = (unsigned char)limit(floatToChar(charToFloat(Red)*number),     0, 255);
+	Green = (unsigned char)limit(floatToChar(charToFloat(Green)*number), 0, 255);
+	Blue = (unsigned char)limit(floatToChar(charToFloat(Blue)*number),   0, 255);
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator= --
+//
+
+PixelColor& PixelColor::operator=(PixelColor color) { 
+	if (this == &color) {
+		return *this;
+	}
+	Red   = color.Red;
+	Green = color.Green;
+	Blue  = color.Blue;
+	return *this;
+}
+
+
+PixelColor& PixelColor::operator=(int value) { 
+	Red   = (unsigned char)limit(value, 0, 255);
+	Green = Red;
+	Blue  = Red;
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator+ --
+//
+
+PixelColor PixelColor::operator+(PixelColor color) { 
+	PixelColor output;
+	output.Red   = (unsigned char)limit((int)Red   + color.Red,   0, 255);
+	output.Green = (unsigned char)limit((int)Green + color.Green, 0, 255);
+	output.Blue  = (unsigned char)limit((int)Blue  + color.Blue,  0, 255);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator+= --
+//
+
+PixelColor& PixelColor::operator+=(int number) { 
+	setRed(getRed()     + number);
+	setGreen(getGreen() + number);
+	setBlue(getBlue()   + number);
+	return *this;
+}
+
+//////////////////////////////
+//
+// PixelColor::operator- --
+//
+
+PixelColor PixelColor::operator-(PixelColor color) { 
+	PixelColor output;
+	output.Red   = (unsigned char)limit((int)Red   - color.Red,   0, 255);
+	output.Green = (unsigned char)limit((int)Green - color.Green, 0, 255);
+	output.Blue  = (unsigned char)limit((int)Blue  - color.Blue,  0, 255);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator* --
+//
+
+PixelColor PixelColor::operator*(PixelColor color) { 
+	PixelColor output;
+	output.Red   = (unsigned char)limit(floatToChar(charToFloat(Red)*charToFloat(color.Red)), 0, 255);
+	output.Green = (unsigned char)limit(floatToChar(charToFloat(Green)*charToFloat(color.Green)), 0, 255);
+	output.Blue  = (unsigned char)limit(floatToChar(charToFloat(Blue)*charToFloat(color.Blue)), 0, 255);
+	return output;
+}
+
+
+PixelColor PixelColor::operator*(double number) { 
+	PixelColor output;
+	output.Red   = (unsigned char)limit(floatToChar(charToFloat(Red)*number),   0, 255);
+	output.Green = (unsigned char)limit(floatToChar(charToFloat(Green)*number), 0, 255);
+	output.Blue  = (unsigned char)limit(floatToChar(charToFloat(Blue)*number),  0, 255);
+	return output;
+}
+
+
+PixelColor PixelColor::operator*(int number) { 
+	PixelColor output;
+	output.Red   = (unsigned char)limit(floatToChar(charToFloat(Red)*number),   0, 255);
+	output.Green = (unsigned char)limit(floatToChar(charToFloat(Green)*number), 0, 255);
+	output.Blue  = (unsigned char)limit(floatToChar(charToFloat(Blue)*number),  0, 255);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::operator/ --
+//
+
+PixelColor PixelColor::operator/(double number) { 
+	PixelColor output;
+	output.Red   = (unsigned char)limit(floatToChar(charToFloat(Red)/number),   0, 255);
+	output.Green = (unsigned char)limit(floatToChar(charToFloat(Green)/number), 0, 255);
+	output.Blue  = (unsigned char)limit(floatToChar(charToFloat(Blue)/number),  0, 255);
+	return output;
+}
+
+PixelColor PixelColor::operator/(int number) { 
+	PixelColor output;
+	output.Red   = (unsigned char)limit(floatToChar(charToFloat(Red)/(double)number),   0, 255);
+	output.Green = (unsigned char)limit(floatToChar(charToFloat(Green)/(double)number), 0, 255);
+	output.Blue  = (unsigned char)limit(floatToChar(charToFloat(Blue)/(double)number),  0, 255);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getColor -- Switch named colors to SVG list.
+//
+
+PixelColor PixelColor::getColor(const string& colorstring) {
+	PixelColor output;
+	int i = 0;
+	int start = 0;
+	int hasdigit  = 0;
+	int length = (int)colorstring.size();
+	if (length > 128) {
+		cout << "ERROR: color string too long: " << colorstring << endl;
+		exit(1);
+	}
+	if (length == 7) {
+		if (colorstring[0] == '#') {
+			hasdigit = 1;
+			start = 1;
+		}
+	} else if (length == 6) {
+		int allxdigit = 1;
+		start = 0;
+		for (i=start; i<length; i++) {
+			allxdigit = allxdigit && isxdigit(colorstring[i]);
+		}
+		if (allxdigit) {
+			hasdigit = 1;
+		} else {
+			hasdigit = 0;
+		}
+	}
+
+	// check for decimal strings with spaces around numbers: "255 255 255"
+	if ((colorstring.find(' ') != string::npos) || 
+		 (colorstring.find('\t') != string::npos)) {
+		char buffer[256] = {0};
+		strcpy(buffer, colorstring.c_str());
+		char* ptr = strtok(buffer, " \t\n:;");
+		int tred   = -1;
+		int tgreen = -1;
+		int tblue  = -1;
+		if (ptr != NULL) {
+			sscanf(ptr, "%d", &tred);
+			ptr = strtok(NULL, " \t\n;:");
+		}
+		if (ptr != NULL) {
+			sscanf(ptr, "%d", &tgreen);
+			ptr = strtok(NULL, " \t\n;:");
+		}
+		if (ptr != NULL) {
+			sscanf(ptr, "%d", &tblue);
+			ptr = strtok(NULL, " \t\n;:");
+		}
+		if (tred > 0 && tgreen > 0 && tblue > 0) {
+			output.setColor(tred, tgreen, tblue);
+			return output;
+		}
+	}
+		
+	if (hasdigit) {
+		char rv[3] = {0};
+		char gv[3] = {0};
+		char bv[3] = {0};
+		string piece1 = colorstring.substr(start, 2);
+		string piece2 = colorstring.substr(start+2, 2);
+		string piece3 = colorstring.substr(start+4, 2);
+
+		strcpy(rv, piece1.c_str());
+		strcpy(gv, piece1.c_str());
+		strcpy(bv, piece1.c_str());
+		int rval = strtol(rv, NULL, 16);
+		int gval = strtol(gv, NULL, 16);
+		int bval = strtol(bv, NULL, 16);
+		output.setColor(rval, gval, bval);
+		return output;
+	}
+
+	// color string
+	char buffer[128] = {0};
+	strncpy(buffer, colorstring.c_str(), 100);
+	length = strlen(buffer);
+	for (i=0; i<length; i++) {
+		buffer[i] = std::tolower(buffer[i]);
+	}
+	output.setColor(0,0,0);
+
+	if (strcmp("aliceblue",          buffer) == 0)  return getColor("#f0f8ff");
+	if (strcmp("antiquewhite",       buffer) == 0)  return getColor("#faebd7");
+	if (strcmp("aqua",               buffer) == 0)  return getColor("#00ffff");
+	if (strcmp("aquamarine",         buffer) == 0)  return getColor("#7fffd4");
+	if (strcmp("azure",              buffer) == 0)  return getColor("#f0ffff");
+	if (strcmp("beige",              buffer) == 0)  return getColor("#f5f5dc");
+	if (strcmp("bisque",             buffer) == 0)  return getColor("#ffe4c4");
+	if (strcmp("black",              buffer) == 0)  return getColor("#000000");
+	if (strcmp("blanchediamond",     buffer) == 0)  return getColor("#ffebcd");
+	if (strcmp("blue",               buffer) == 0)  return getColor("#0000ff");
+	if (strcmp("blueviolet",         buffer) == 0)  return getColor("#8a2be2");
+	if (strcmp("brown",              buffer) == 0)  return getColor("#a52a2a");
+	if (strcmp("burlywood",          buffer) == 0)  return getColor("#ffe4c4");
+	if (strcmp("cadetblue",          buffer) == 0)  return getColor("#5f9ea0");
+	if (strcmp("chartreuse",         buffer) == 0)  return getColor("#7fff00");
+	if (strcmp("coral",              buffer) == 0)  return getColor("#ff7f50");
+	if (strcmp("cornflowerblue",     buffer) == 0)  return getColor("#6495ed");
+	if (strcmp("cornsilk",           buffer) == 0)  return getColor("#fff8dc");
+	if (strcmp("crimson",            buffer) == 0)  return getColor("#dc143c");
+	if (strcmp("cyan",               buffer) == 0)  return getColor("#00ffff");
+	if (strcmp("darkblue",           buffer) == 0)  return getColor("#00008b");
+	if (strcmp("darkcyan",           buffer) == 0)  return getColor("#008b8b");
+	if (strcmp("darkgoldenrod",      buffer) == 0)  return getColor("#b8860b");
+	if (strcmp("darkgray",           buffer) == 0)  return getColor("#a9a9a9");
+	if (strcmp("darkgreen",          buffer) == 0)  return getColor("#006400");
+	if (strcmp("darkkhaki",          buffer) == 0)  return getColor("#bdb76b");
+	if (strcmp("darkmagenta",        buffer) == 0)  return getColor("#8b008b");
+	if (strcmp("darkolivegreen",     buffer) == 0)  return getColor("#556b2f");
+	if (strcmp("darkorange",         buffer) == 0)  return getColor("#ff8c00");
+	if (strcmp("darkorchid",         buffer) == 0)  return getColor("#9932cc");
+	if (strcmp("darkred",            buffer) == 0)  return getColor("#8b0000");
+	if (strcmp("darksalmon",         buffer) == 0)  return getColor("#e9967a");
+	if (strcmp("darkseagreen",       buffer) == 0)  return getColor("#8dbc8f");
+	if (strcmp("darkslateblue",      buffer) == 0)  return getColor("#483d8b");
+	if (strcmp("darkslategray",      buffer) == 0)  return getColor("#2e4e4e");
+	if (strcmp("darkturquoise",      buffer) == 0)  return getColor("#00ded1");
+	if (strcmp("darkviolet",         buffer) == 0)  return getColor("#9400d3");
+	if (strcmp("deeppink",           buffer) == 0)  return getColor("#ff1493");
+	if (strcmp("deepskyblue",        buffer) == 0)  return getColor("#00bfff");
+	if (strcmp("dimgray",            buffer) == 0)  return getColor("#696969");
+	if (strcmp("dodgerblue",         buffer) == 0)  return getColor("#1e90ff");
+	if (strcmp("firebrick",          buffer) == 0)  return getColor("#b22222");
+	if (strcmp("floralwhite",        buffer) == 0)  return getColor("#fffaf0");
+	if (strcmp("forestgreen",        buffer) == 0)  return getColor("#228b22");
+	if (strcmp("fuchsia",            buffer) == 0)  return getColor("#ff00ff");
+	if (strcmp("gainsboro",          buffer) == 0)  return getColor("#dcdcdc");
+	if (strcmp("ghostwhite",         buffer) == 0)  return getColor("#f8f8ff");
+	if (strcmp("gold",               buffer) == 0)  return getColor("#ffd700");
+	if (strcmp("goldenrod",          buffer) == 0)  return getColor("#daa520");
+	if (strcmp("gray",               buffer) == 0)  return getColor("#808080");
+	if (strcmp("gray",               buffer) == 0)  return getColor("#808080");
+	if (strcmp("green",              buffer) == 0)  return getColor("#008000");
+	if (strcmp("greenyellow",        buffer) == 0)  return getColor("#adff2f");
+	if (strcmp("honeydew",           buffer) == 0)  return getColor("#f0fff0");
+	if (strcmp("hotpink",            buffer) == 0)  return getColor("#ff69b4");
+	if (strcmp("indianred",          buffer) == 0)  return getColor("#cd5c5c");
+	if (strcmp("indigo",             buffer) == 0)  return getColor("#4b0082");
+	if (strcmp("ivory",              buffer) == 0)  return getColor("#fffff0");
+	if (strcmp("khaki",              buffer) == 0)  return getColor("#f0e68c");
+	if (strcmp("lavenderblush",      buffer) == 0)  return getColor("#fff0f5");
+	if (strcmp("lavender",           buffer) == 0)  return getColor("#e6e6fa");
+	if (strcmp("lawngreen",          buffer) == 0)  return getColor("#7cfc00");
+	if (strcmp("lemonchiffon",       buffer) == 0)  return getColor("#fffacd");
+	if (strcmp("lightblue",          buffer) == 0)  return getColor("#add8e6");
+	if (strcmp("lightorange",        buffer) == 0)  return getColor("#ff9c00");
+	if (strcmp("lightcoral",         buffer) == 0)  return getColor("#f08080");
+	if (strcmp("lightcyan",          buffer) == 0)  return getColor("#e0ffff");
+	if (strcmp("lightgoldenrodyellow",buffer)== 0)  return getColor("#fafad2");
+	if (strcmp("lightgreen",         buffer) == 0)  return getColor("#90ee90");
+	if (strcmp("lightgrey",          buffer) == 0)  return getColor("#d3d3d3");
+	if (strcmp("lightpink",          buffer) == 0)  return getColor("#ffb6c1");
+	if (strcmp("lightsalmon",        buffer) == 0)  return getColor("#ffa07a");
+	if (strcmp("lightseagreen",      buffer) == 0)  return getColor("#20b2aa");
+	if (strcmp("lightskyblue",       buffer) == 0)  return getColor("#87cefa");
+	if (strcmp("lightslategray",     buffer) == 0)  return getColor("#778899");
+	if (strcmp("lightsteelblue",     buffer) == 0)  return getColor("#b0c4de");
+	if (strcmp("lightyellow",        buffer) == 0)  return getColor("#ffffe0");
+	if (strcmp("lime",               buffer) == 0)  return getColor("#00ff00");
+	if (strcmp("limegreen",          buffer) == 0)  return getColor("#32cd32");
+	if (strcmp("linen",              buffer) == 0)  return getColor("#faf0e6");
+	if (strcmp("magenta",            buffer) == 0)  return getColor("#ff00ff");
+	if (strcmp("maroon",             buffer) == 0)  return getColor("#800000");
+	if (strcmp("maroon",             buffer) == 0)  return getColor("#800000");
+	if (strcmp("mediumaquamarine",   buffer) == 0)  return getColor("#66cdaa");
+	if (strcmp("mediumblue",         buffer) == 0)  return getColor("#0000cd");
+	if (strcmp("mediumorchid",       buffer) == 0)  return getColor("#ba55d3");
+	if (strcmp("mediumpurple",       buffer) == 0)  return getColor("#9370db");
+	if (strcmp("mediumseagreen",     buffer) == 0)  return getColor("#3cb371");
+	if (strcmp("mediumslateblue",    buffer) == 0)  return getColor("#7b68ee");
+	if (strcmp("mediumspringgreen",  buffer) == 0)  return getColor("#00fa9a");
+	if (strcmp("mediumturquoise",    buffer) == 0)  return getColor("#48d1cc");
+	if (strcmp("mediumvioletred",    buffer) == 0)  return getColor("#c71585");
+	if (strcmp("midnightblue",       buffer) == 0)  return getColor("#191970");
+	if (strcmp("mintcream",          buffer) == 0)  return getColor("#f5fffa");
+	if (strcmp("mistyrose",          buffer) == 0)  return getColor("#ffe4e1");
+	if (strcmp("moccasin",           buffer) == 0)  return getColor("#ffe4b5");
+	if (strcmp("navajowhite",        buffer) == 0)  return getColor("#ffdead");
+	if (strcmp("navy",               buffer) == 0)  return getColor("#000080");
+	if (strcmp("navy",               buffer) == 0)  return getColor("#000080");
+	if (strcmp("oldlace",            buffer) == 0)  return getColor("#fdf5e6");
+	if (strcmp("olive",              buffer) == 0)  return getColor("#6b8e23");
+	if (strcmp("olivedrab",          buffer) == 0)  return getColor("#6b8e23");
+	if (strcmp("orange",             buffer) == 0)  return getColor("#ff4500");
+	if (strcmp("orangered",          buffer) == 0)  return getColor("#ff4500");
+	if (strcmp("orchid",             buffer) == 0)  return getColor("#da70d6");
+	if (strcmp("palegoldenrod",      buffer) == 0)  return getColor("#eee8aa");
+	if (strcmp("palegreen",          buffer) == 0)  return getColor("#98fb98");
+	if (strcmp("paleturquoise",      buffer) == 0)  return getColor("#afeeee");
+	if (strcmp("palevioletred",      buffer) == 0)  return getColor("#db7093");
+	if (strcmp("papayawhip",         buffer) == 0)  return getColor("#ffefd5");
+	if (strcmp("peachpuff",          buffer) == 0)  return getColor("#ffdab9");
+	if (strcmp("peru",               buffer) == 0)  return getColor("#cd853f");
+	if (strcmp("pink",               buffer) == 0)  return getColor("#ffc8cb");
+	if (strcmp("plum",               buffer) == 0)  return getColor("#dda0dd");
+	if (strcmp("powderblue",         buffer) == 0)  return getColor("#b0e0e6");
+	if (strcmp("purple",             buffer) == 0)  return getColor("#800080");
+	if (strcmp("purple",             buffer) == 0)  return getColor("#800080");
+	if (strcmp("quartz",             buffer) == 0)  return getColor("#c9c9f3");
+	if (strcmp("red",                buffer) == 0)  return getColor("#ff0000");
+	if (strcmp("rosybrown",          buffer) == 0)  return getColor("#bc8f8f");
+	if (strcmp("royalblue",          buffer) == 0)  return getColor("#4169e1");
+	if (strcmp("saddlebrown",        buffer) == 0)  return getColor("#8b4513");
+	if (strcmp("salmon",             buffer) == 0)  return getColor("#fa8072");
+	if (strcmp("sandybrown",         buffer) == 0)  return getColor("#f4a460");
+	if (strcmp("seagreen",           buffer) == 0)  return getColor("#2e8b57");
+	if (strcmp("seashell",           buffer) == 0)  return getColor("#fff5ee");
+	if (strcmp("sienna",             buffer) == 0)  return getColor("#a0522d");
+	if (strcmp("silver",             buffer) == 0)  return getColor("#c0c0c0");
+	if (strcmp("silver",             buffer) == 0)  return getColor("#c0c0c0");
+	if (strcmp("skyblue",            buffer) == 0)  return getColor("#87ceeb");
+	if (strcmp("slateblue",          buffer) == 0)  return getColor("#6a5acd");
+	if (strcmp("snow",               buffer) == 0)  return getColor("#fffafa");
+	if (strcmp("steelblue",          buffer) == 0)  return getColor("#4682b4");
+	if (strcmp("tan",                buffer) == 0)  return getColor("#d2b48c");
+	if (strcmp("teal",               buffer) == 0)  return getColor("#008080");
+	if (strcmp("thistle",            buffer) == 0)  return getColor("#d8bfd8");
+	if (strcmp("tomato",             buffer) == 0)  return getColor("#ff6347");
+	if (strcmp("turquoise",          buffer) == 0)  return getColor("#40e0d0");
+	if (strcmp("violet",             buffer) == 0)  return getColor("#ee82ee");
+	if (strcmp("wheat",              buffer) == 0)  return getColor("#f5deb3");
+	if (strcmp("white",              buffer) == 0)  return getColor("#ffffff");
+	if (strcmp("white",              buffer) == 0)  return getColor("#ffffff");
+	if (strcmp("whitesmoke",         buffer) == 0)  return getColor("#f5f5f5");
+	if (strcmp("yellow",             buffer) == 0)  return getColor("#ffff00");
+	if (strcmp("yellowgreen",        buffer) == 0)  return getColor("#9acd32");
+
+// References: 
+//            http://netdancer.com/rgbblk.htm
+//            http://www.htmlhelp.com/cgi-bin/color.cgi?rgb=FFFFFF
+//            http://www.brobstsystems.com/colors1.htm
+	
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::writePpm6 -- write the pixel in PPM 6 format.
+//
+
+void PixelColor::writePpm6(ostream& out) {
+	out << (unsigned char)getRed() << (unsigned char)getGreen() << (unsigned char)getBlue();
+}
+
+void PixelColor::writePpm3(ostream& out) {
+	out << (int)getRed()   << " " 
+		 << (int)getGreen() << " " 
+		 << (int)getBlue()  << " ";
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::setHue --
+//
+
+PixelColor& PixelColor::setHue(float value) {
+	double fraction = value - (int)value;
+	if (fraction < 0) {
+		fraction = fraction + 1.0;
+	}
+
+	if (fraction < 1.0/6.0) {
+		Red   = 255;
+		Green = (unsigned char)limit(floatToChar(6.0 * fraction), 0, 255);
+		Blue  = 0;
+	} else if (fraction < 2.0/6.0) {
+		Red   = (unsigned char)limit(255 - floatToChar(6.0 * (fraction - 1.0/6.0)), 0,255);
+		Green = 255;
+		Blue  = 0;
+	} else if (fraction < 3.0/6.0) {
+		Red   = 0;
+		Green = 255;
+		Blue  = (unsigned char)limit(floatToChar(6.0 * (fraction - 2.0/6.0)), 0,255);
+	} else if (fraction < 4.0/6.0) {
+		Red   = 0;
+		Blue  = 255;
+		Green = (unsigned char)limit(255 - floatToChar(6.0 * (fraction - 3.0/6.0)), 0,255);
+	} else if (fraction < 5.0/6.0) {
+		Red   = 0;
+		Green = (unsigned char)limit(floatToChar(6.0 * (fraction - 4.0/6.0)), 0,255);
+		Blue  = 255;
+	} else {
+		Red   = 255;
+		Green = 0;
+		Blue  = (unsigned char)limit(255 - floatToChar(6.0 * (fraction - 5.0/6.0)), 0,255);
+	}
+
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::setTriHue -- Red, Green, Blue with a little overlap
+//
+
+PixelColor& PixelColor::setTriHue(float value) {
+	double fraction = value - (int)value;
+	if (fraction < 0) {
+		fraction = fraction + 1.0;
+	}
+	if (fraction < 1.0/3.0) {
+		Green = (unsigned char)limit(floatToChar(3.0 * fraction), 0, 255);
+		Red   = (unsigned char)limit(255 - Green, 0, 255);
+		Blue  = 0;
+	} else if (fraction < 2.0/3.0) {
+		setBlue(floatToChar(3.0 * (fraction - 1.0/3.0)));
+		setGreen(255 - getBlue());
+		setRed(0);
+	} else {
+		setRed(floatToChar(3.0 * (fraction - 2.0/3.0)));
+		setBlue(255 - Red);
+		setGreen(0);
+	}
+
+	return *this;
+}
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+// private functions:
+//
+
+
+//////////////////////////////
+//
+// PixelColor::charToFloat --
+//
+
+float PixelColor::charToFloat(int value) { 
+	return value / 255.0;
+}
+
+
+//////////////////////////////
+//
+// PixelColor::floatToChar --
+//
+
+int PixelColor::floatToChar(float value) { 
+	return limit((int)(value * 255.0 + 0.5), 0, 255);
+}
+
+
+//////////////////////////////
+//
+// limit --
+//
+
+int PixelColor::limit(int value, int min, int max) {
+	if (value < min) {
+		value = min;
+	} else if (value > max) {
+		value = max;
+	}
+	return value;
+} 
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// other functions
+//
+
+
+//////////////////////////////
+//
+// operator<< --
+//
+// for use with P3 ASCII pnm images: print red green blue triplet.
+//
+
+ostream& operator<<(ostream& out, PixelColor apixel) {
+	out << apixel.getRed() << ' ';
+	out << apixel.getGreen() << ' ';
+	out << apixel.getBlue();
+	return out;
+}
+
+
+
+
 /////////////////////////////////
 //
 // Tool_autobeam::Tool_autobeam -- Set the recognized options for the tool.
@@ -61028,6 +61903,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(satb2gs, infile, commands[i].second, status);
 		} else if (commands[i].first == "scordatura") {
 			RUNTOOL(scordatura, infile, commands[i].second, status);
+		} else if (commands[i].first == "semitones") {
+			RUNTOOL(semitones, infile, commands[i].second, status);
 		} else if (commands[i].first == "sic") {
 			RUNTOOL(sic, infile, commands[i].second, status);
 		} else if (commands[i].first == "simat") {
@@ -84428,6 +85305,713 @@ void Tool_scordatura::prepareTranspositionInterval(void) {
 	m_transposition += to_string(m_diatonic);
 	m_transposition += "c";
 	m_transposition += to_string(m_chromatic);
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_semitones::Tool_semitones -- Set the recognized options for the tool.
+//
+
+Tool_semitones::Tool_semitones(void) {
+	define("1|first=b", "mark only the first note of intervals");
+	define("2|second=b", "mark only the second note of intervals");
+	define("A|O|no-analysis|no-output=b", "do not print analysis spines");
+	define("I|no-input=b", "do not print input data spines");
+	define("M|no-mark|no-marks=b", "do not mark notes");
+	define("R|no-rests=b", "ignore rests");
+	define("T|no-ties=b", "do not mark ties");
+	define("X|include|only=s", "include only **kern tokens with given pattern");
+	define("color=s:red", "mark color");
+	define("c|cdata=b", "store resulting data as **cdata (allowing display in VHV");
+	define("d|down=b", "highlight notes that that have a negative semitone interval");
+	define("j|jump=i:3", "starting interval defining leaps");
+	define("l|leap=b", "highlight notes that have leap motion");
+	define("mark=s:@", "mark character");
+	define("m|midi=b", "show MIDI note number for pitches");
+	define("n|count=b", "output count of intervals being marked");
+	define("r|same|repeat|repeated=b", "highlight notes that are repeated ");
+	define("s|step=b", "highlight notes that have step-wise motion");
+	define("u|up=b", "highlight notes that that have a positive semitone interval");
+	define("x|exclude=s", "exclude **kern tokens with given pattern");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_semitones::run -- Do the main work of the tool.
+//
+
+bool Tool_semitones::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_semitones::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_semitones::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_semitones::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_semitones::initialize(void) {
+	// processing of options goes here
+
+	m_cdataQ      = getBoolean("cdata");
+	m_count       = getBoolean("count");
+	m_downQ       = getBoolean("down");
+	m_firstQ      = getBoolean("first");
+	m_leapQ       = getBoolean("leap");
+	m_midiQ       = getBoolean("midi");
+	m_noanalysisQ = getBoolean("no-analysis");
+	m_noinputQ    = getBoolean("no-input");
+	m_nomarkQ     = getBoolean("no-marks");
+	m_notiesQ     = getBoolean("no-ties");
+	m_repeatQ     = getBoolean("repeat");
+	m_norestsQ    = getBoolean("no-rests");
+	m_secondQ     = getBoolean("second");
+	m_stepQ       = getBoolean("step");
+	m_upQ         = getBoolean("up");
+
+	m_leap        = getInteger("jump");
+
+	m_color       = getString("color");
+	m_exclude     = getString("exclude");
+	m_include     = getString("include");
+	m_marker      = getString("mark");
+
+	if (!m_firstQ && !m_secondQ) {
+		m_firstQ  = true;
+		m_secondQ = true;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::processFile --
+//
+
+void Tool_semitones::processFile(HumdrumFile& infile) {
+	m_markCount = 0;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		analyzeLine(infile, i);
+	}
+	if (m_markCount > 0) {
+		m_humdrum_text << "!!!RDF**kern: ";
+		m_humdrum_text << m_marker;
+		m_humdrum_text << " = marked note";
+		if (getBoolean("color")) {
+			m_humdrum_text << ", color=" << m_color;
+		}
+		m_humdrum_text << '\n';
+	}
+	if (m_count) {
+		showCount();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::showCount -- Give a count for the number of
+//     intervals that were marked.
+//
+
+void Tool_semitones::showCount(void) {
+	m_humdrum_text << "!!semitone_count: " << m_markCount;
+	if (m_repeatQ) {
+		m_humdrum_text << " REPEAT";
+	}
+	if (m_upQ) {
+		m_humdrum_text << " UP";
+	}
+	if (m_downQ) {
+		m_humdrum_text << " DOWN";
+	}
+	if (m_stepQ) {
+		m_humdrum_text << " STEP";
+	}
+	if (m_leapQ) {
+		m_humdrum_text << " LEAP";
+	}
+	if ((m_stepQ || m_leapQ) && (m_leap != 3)) {
+		m_humdrum_text << " JUMP:" << m_leap;
+	}
+	if (m_marker != "@") {
+		m_humdrum_text << " MARK:" << m_marker;
+	}
+	m_humdrum_text << '\n';
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::analyzeLine --  Append analysis spines after every **kern
+//   spine.
+//
+
+void Tool_semitones::analyzeLine(HumdrumFile& infile, int line) {
+	int group = 0;
+	if (!infile[line].hasSpines()) {
+		m_humdrum_text << infile[line] << "\n";
+		return;
+	}
+	for (int i=0; i<infile[line].getFieldCount(); i++) {
+		HTp token = infile.token(line, i);
+		if (!m_noinputQ) {
+			if (!token->isKern()) {
+				m_humdrum_text << token;
+				if (i < infile[line].getFieldCount() - 1) {
+					m_humdrum_text << '\t';
+				}
+				continue;
+			}
+		}
+		i = processKernSpines(infile, line, i, group++);
+		if (!m_noinputQ) {
+			if (i < infile[line].getFieldCount() - 1) {
+				m_humdrum_text << '\t';
+			}
+		}
+	}
+	m_humdrum_text << '\n';
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::processKernSpine --
+//
+
+int Tool_semitones::processKernSpines(HumdrumFile& infile, int line, int start, int kspine) {
+	HTp token = infile.token(line, start);
+	if (!token->isKern()) {
+		return start;
+	}
+	int track = token->getTrack();
+	vector<HTp> toks;
+	toks.push_back(token);
+	for (int i=start+1; i<infile[line].getFieldCount(); i++) {
+		HTp newtok = infile.token(line, i);
+		int newtrack = newtok->getTrack();
+		if (newtrack == track) {
+			toks.push_back(newtok);
+			continue;
+		}
+		break;
+	}
+
+	int toksize = (int)toks.size();
+
+	// calculate intervals/MIDI note numbers if appropriate
+	bool allQ = m_stepQ || m_leapQ || m_upQ || m_downQ || m_repeatQ;
+	bool dirQ = m_upQ || m_downQ;
+	bool typeQ = m_stepQ || m_leapQ;
+	vector<string> intervals(toksize);
+	if (infile[line].isData()) {
+		for (int i=0; i<toksize; i++) {
+			intervals[i] = getTwelveToneIntervalString(toks[i]);
+		}
+		if (allQ && !m_midiQ) {
+			for (int i=0; i<(int)intervals.size(); i++) {
+				if (intervals[i].empty()) {
+					continue;
+				}
+            if (!isdigit(intervals[i].back())) {
+					continue;
+				}
+				int value = stoi(intervals[i]);
+				if (m_upQ && m_stepQ && (value > 0) && (value < m_leap)) {
+					markInterval(toks[i]);
+				} else if (m_downQ && m_stepQ && (value < 0) && (value > -m_leap)) {
+					markInterval(toks[i]);
+				} else if (!dirQ && m_stepQ && (value != 0) && (abs(value) < m_leap)) {
+					markInterval(toks[i]);
+
+				} else if (m_upQ && m_leapQ && (value > 0) && (value >= m_leap)) {
+					markInterval(toks[i]);
+				} else if (m_downQ && m_leapQ && (value < 0) && (value <= -m_leap)) {
+					markInterval(toks[i]);
+				} else if (!dirQ && m_leapQ && (value != 0) && (abs(value) >= m_leap)) {
+					markInterval(toks[i]);
+
+				} else if (m_repeatQ && (value == 0)) {
+					markInterval(toks[i]);
+				} else if (!typeQ && m_upQ && (value > 0)) {
+					markInterval(toks[i]);
+				} else if (!typeQ && m_downQ && (value < 0)) {
+					markInterval(toks[i]);
+				}
+			}
+		}
+	}
+
+	// print the **kern fields
+	if (!m_noinputQ) {
+		for (int i=0; i<toksize; i++) {
+			m_humdrum_text << toks[i];
+			if (i < toksize - 1) {
+				m_humdrum_text << '\t';
+			}
+		}
+	}
+
+	// then print the parallel analysis fields
+
+	if (!m_noanalysisQ) {
+		if (!m_noinputQ) {
+			m_humdrum_text << '\t';
+		} else if (m_noinputQ && (kspine != 0)) {
+			m_humdrum_text << '\t';
+		}
+		if (!infile[line].isData()) {
+			if (infile[line].isLocalComment()) {
+				printTokens("!", toksize);
+	 		} else if (infile[line].isInterpretation()) {
+				if (toks[0]->compare(0, 2, "**") == 0) { 
+					if (m_cdataQ) {
+						printTokens("**cdata", toksize);
+					} else if (m_midiQ) {
+						printTokens("**mnn", toksize);
+					} else {
+						printTokens("**tti", toksize);
+					}
+				} else {
+					for (int i=0; i<toksize; i++) {
+						m_humdrum_text << toks[i];
+						if (i < toksize - 1) {
+							m_humdrum_text << '\t';
+						}
+					}
+				}
+	 		} else if (infile[line].isBarline()) {
+				printTokens(*toks[0], toksize);
+			} else {
+				cerr << "STRANGE ERROR " << toks[0] << endl;
+			}
+			return start + toksize - 1;
+		}
+		// print twelve-tone analyses.
+		string value;
+		for (int i=0; i<toksize; i++) {
+			value = getTwelveToneIntervalString(toks[i]);
+			m_humdrum_text << value;
+			if (i < toksize - 1) {
+				m_humdrum_text << '\t';
+			}
+		}
+	}
+
+	return start + toksize - 1;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::markInterval -- mark the current note, any notes tied
+//    after it, and then the next note and any tied notes attached to
+//    that note.
+//
+
+void Tool_semitones::markInterval(HTp token) {
+	if (!token->isData()) {
+		return;
+	}
+	if (!token->isKern()) {
+		return;
+	}
+	if (token->isNull()) {
+		return;
+	}
+	if (token->isRest()) {
+		return;
+	}
+	if (token->isUnpitched()) {
+		return;
+	}
+	m_markCount++;
+	token = markNote(token, m_firstQ);
+	if (m_firstQ && !m_secondQ) {
+		return;
+	}
+	// find next note
+	HTp current = token->getNextToken();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		markNote(current, m_secondQ);
+		break;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::markNote -- make note and any tied notes after it.
+//      Return the last note of a tied note (or the note if no tied notes
+//      after it).
+//
+
+HTp Tool_semitones::markNote(HTp token, bool markQ) {
+	string subtok = token->getSubtoken(0);
+	bool hasTieEnd = false;
+	if (subtok.find('_') != string::npos) {
+		hasTieEnd = true;
+	} else if (subtok.find(']') != string::npos) {
+		hasTieEnd = true;
+	}
+
+	if (!(hasTieEnd && m_notiesQ)) {
+		if (markQ) {
+			addMarker(token);
+		}
+	}
+
+	bool hasTie = false;
+	if (subtok.find('[') != string::npos) {
+		hasTie = true;
+	} else if (subtok.find('_') != string::npos) {
+		hasTie = true;
+	}
+
+	if (!hasTie) {
+		return token;
+	}
+	HTp current = token->getNextToken();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		subtok = current->getSubtoken(0);
+		bool hasTie = false;
+		if (subtok.find('[') != string::npos) {
+			hasTie = true;
+		} else if (subtok.find('_') != string::npos) {
+			hasTie = true;
+		}
+		if (!hasTie) {
+			if (subtok.find(']') != string::npos) {
+				markNote(current, markQ);
+			}
+			return current;
+		} else {
+			return markNote(current, markQ);
+		}
+		break;
+	}
+	return NULL;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::addMarker --
+//
+
+void Tool_semitones::addMarker(HTp token) {
+	if (!m_nomarkQ) {
+		string contents = m_marker;
+		contents += token->getText();
+		token->setText(contents);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::printTokens --
+//
+
+void Tool_semitones::printTokens(const string& value, int count) {
+	for (int i=0; i<count; i++) {
+		m_humdrum_text << value;
+		if (i < count - 1) {
+			m_humdrum_text << '\t';
+		}
+	}
+}
+
+
+
+///////////////////////////////
+//
+// Tool_semitones::getTwelveToneIntervalString --
+//
+
+string Tool_semitones::getTwelveToneIntervalString(HTp token) {
+	if (token->isNull()) {
+		return ".";
+	}
+	if (token->isRest()) {
+		if (m_midiQ) {
+			return "r";
+		} else {
+			return ".";
+		}
+	}
+	if (token->isUnpitched()) {
+		if (m_midiQ) {
+			return "R";
+		} else {
+			return ".";
+		}
+	}
+	if ((m_include.size() > 0) || (m_exclude.size() > 0)) {
+		int status = filterData(token);
+		if (status == 0) {
+			return ".";
+		} else if (status < 0) {
+			return "x"; // excluded note
+		}
+	}
+	string tok = token->getSubtoken(0);
+	if (tok.find(']') != string::npos) {
+		return ".";
+	}
+	if (tok.find('_') != string::npos) {
+		return ".";
+	}
+	int value = Convert::kernToMidiNoteNumber(tok);
+
+	if (m_midiQ) {
+		string output;
+		output = to_string(value);
+		return output;
+	}
+
+	string nexttok = getNextNoteAttack(token);
+	if (nexttok.empty()) {
+		return ".";
+	}
+	if (nexttok.find('r') != string::npos) {
+		// no interval since next note is a rest
+		return "r";
+	}
+	int value2 = Convert::kernToMidiNoteNumber(nexttok);
+	int interval =  value2 - value;
+	string output = to_string(interval);
+	return output;
+}
+
+
+
+///////////////////////////////
+//
+// Tool_semitones::getNextNoteAttack -- Or rest.
+//
+
+string Tool_semitones::getNextNoteAttack(HTp token) {
+	HTp current = token;
+	current = current->getNextToken();
+	string tok;
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isRest()) {
+			if (!m_norestsQ) {
+				return "r";
+			} else {
+				current = current->getNextToken();
+				continue;
+			}
+		}
+		if (current->isUnpitched()) {
+			return "R";
+		}
+		string tok = current->getSubtoken(0);
+		if (tok.find(']') != string::npos) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (tok.find('_') != string::npos) {
+			current = current->getNextToken();
+			continue;
+		}
+		return tok;
+	}
+
+	if (!current) {
+		return "";
+	}
+	if (!current->isData()) {
+		return "";
+	}
+	// Some other strange problem.
+	return ".";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::filterData -- select or deselect an interval based
+//    on regular expression pattern.  Return true if the note should
+//    be kept; otherwise, return false.
+//
+
+int Tool_semitones::filterData(HTp token) {
+	vector<HTp> toks = getTieGroup(token);
+	HumRegex hre;
+	if (!m_exclude.empty()) {
+		for (int i=0; i<(int)toks.size(); i++) {
+			if (hre.search(toks[i], m_exclude)) {
+				return -1;
+			}
+		}
+		return 1;
+	} else if (!m_include.empty()) {
+		for (int i=0; i<(int)toks.size(); i++) {
+			if (hre.search(toks[i], m_include)) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+	return 0;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::getTieGroup --
+//
+
+vector<HTp> Tool_semitones::getTieGroup(HTp token) {
+	vector<HTp> output;
+	if (!token) {
+		return output;
+	}
+	if (token->isNull()) {
+		return output;
+	}
+	if (!token->isData()) {
+		return output;
+	}
+	output.push_back(token);
+	if (token->isRest()) {
+		return output;
+	}
+	string subtok = token->getSubtoken(0);
+	bool continues = hasTieContinue(subtok);
+	HTp current = token;
+	while (continues) {
+		current = getNextNote(current);
+		if (!current) {
+			break;
+		}
+		string subtok = current->getSubtoken(0);
+		if (subtok.find(']') != string::npos) {
+			output.push_back(current);
+			break;
+		}
+		continues = hasTieContinue(subtok);
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_semitones::hasTieContinue --
+//
+
+bool Tool_semitones::hasTieContinue(const string& value) {
+	if (value.find('_') != string::npos) {
+		return true;
+	}
+	if (value.find('[') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// getNextNote --
+//
+
+HTp Tool_semitones::getNextNote(HTp token) {
+	HTp current = token->getNextToken();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		break;
+	}
+	return current;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Oct 25 21:32:07 PDT 2020
+// Last Modified: Sun Nov 15 23:12:30 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3910,6 +3910,76 @@ class Convert {
 		static std::string getReferenceKeyMeaning(const std::string& token);
 		static std::string getLanguageName(const std::string& abbreviation);
 };
+
+
+
+class PixelColor {
+	public:
+		             PixelColor     (void);
+		             PixelColor     (const std::string& color);
+		             PixelColor     (const PixelColor& color);
+		             PixelColor     (int red, int green, int blue);
+		             PixelColor     (float red, float green, float blue);
+		             PixelColor     (double red, double green, double blue);
+		            ~PixelColor     ();
+
+		void         invert         (void);
+		PixelColor&  setColor       (const std::string& colorstring);
+		PixelColor&  setColor       (int red, int green, int blue);
+		int          getRed         (void);
+		int          getGreen       (void);
+		int          getBlue        (void);
+		void         setRed         (int value);
+		void         setGreen       (int value);
+		void         setBlue        (int value);
+		float        getRedF        (void);
+		float        getGreenF      (void);
+		float        getBlueF       (void);
+		void         setRedF        (float value);
+		void         setGreenF      (float value);
+		void         setBlueF       (float value);
+		void         setColor       (PixelColor color);
+		PixelColor&  setHue         (float value);
+		PixelColor&  setTriHue      (float value);
+		PixelColor&  makeGrey       (void);
+		PixelColor&  makeGray       (void);
+		PixelColor&  setGrayNormalized(double value);
+		PixelColor&  setGreyNormalized(double value);
+		int          operator>      (int number);
+		int          operator<      (int number);
+		int          operator==     (PixelColor color);
+		int          operator!=     (PixelColor color);
+		PixelColor&  operator=      (PixelColor color);
+		PixelColor&  operator=      (int value);
+		PixelColor   operator+      (PixelColor color);
+		PixelColor&  operator+=     (int number);
+		PixelColor   operator-      (PixelColor color);
+		PixelColor&  operator*=     (double number);
+		PixelColor   operator*      (PixelColor color);
+		PixelColor   operator*      (double color);
+		PixelColor   operator*      (int color);
+		PixelColor   operator/      (double number);
+		PixelColor   operator/      (int number);
+
+		static PixelColor getColor  (const std::string& colorstring);
+
+		void         writePpm6      (std::ostream& out);
+		void         writePpm3      (std::ostream& out);
+
+	public:
+		unsigned char   Red; 
+		unsigned char   Green;
+		unsigned char   Blue;
+
+	private:
+		float   charToFloat         (int value);
+		int     floatToChar         (float value);
+		int     limit               (int value, int min, int max);
+};
+
+
+// for use with P3 ASCII pnm images: print red green blue triplet.
+std::ostream& operator<<(std::ostream& out, PixelColor apixel);
 
 
 
@@ -7967,6 +8037,63 @@ class Tool_scordatura : public HumTool {
 		std::string    m_string;
 
 };
+
+
+class Tool_semitones : public HumTool {
+	public:
+		      Tool_semitones   (void);
+		     ~Tool_semitones   () {};
+
+		bool  run              (HumdrumFileSet& infiles);
+		bool  run              (HumdrumFile& infile);
+		bool  run              (const std::string& indata, std::ostream& out);
+		bool  run              (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void        processFile(HumdrumFile& infile);
+		void        initialize(void);
+		void        analyzeLine(HumdrumFile& infile, int line);
+		int         processKernSpines(HumdrumFile& infile, int line, int start, int kspine);
+		void        printTokens(const std::string& value, int count);
+		std::string getTwelveToneIntervalString(HTp token);
+		std::string getNextNoteAttack(HTp token);
+		void        markInterval(HTp token);
+		HTp         markNote(HTp token, bool markQ);
+		void        addMarker(HTp token);
+		void        showCount(void);
+		int         filterData(HTp token);
+		std::vector<HTp> getTieGroup(HTp token);
+		HTp         getNextNote(HTp token);
+		bool        hasTieContinue(const string& value);
+
+	private:
+
+		bool        m_cdataQ      = false; // used **cdata (to display in VHV notation)
+		bool        m_downQ       = false; // mark/count notes in downward interval
+		bool        m_firstQ      = false; // mark only first note in interval
+		bool        m_leapQ       = false; // mark/count notes in leap motion
+		bool        m_midiQ       = false; // give the MIDI note number rather than inteval.
+		bool        m_noanalysisQ = false; // do not print analysis spines
+		bool        m_noinputQ    = false; // do not print input data
+		bool        m_nomarkQ     = false; // do not mark notes (just count intervals)
+		bool        m_norestsQ    = false; // ignore rests
+		bool        m_notiesQ     = false; // do not mark secondary tied notes
+		bool        m_repeatQ     = false; // make/count notes that repeat
+		bool        m_secondQ     = false; // mark only second note in interval
+		bool        m_stepQ       = false; // mark/count notes in stepwise motion
+		bool        m_upQ         = false; // mark/count notes in upward interval
+      bool        m_count       = false; // count the number of intervals being marked
+
+		int         m_markCount = 0;
+		int         m_leap      = 3;
+
+      std::string m_marker  = "@";
+		std::string m_color   = "red";
+		std::string m_include;
+		std::string m_exclude;
+
+};
+
 
 
 class Tool_shed : public HumTool {
