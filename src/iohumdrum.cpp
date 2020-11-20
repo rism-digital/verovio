@@ -358,6 +358,8 @@ namespace humaux {
         auto_custos = false;
         suppress_manual_custos = false;
 
+        verse_labels.clear();
+
         std::fill(cue_size.begin(), cue_size.end(), false);
         std::fill(stem_type.begin(), stem_type.end(), 'X');
     }
@@ -6640,8 +6642,9 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             if (token->isNull()) {
                 continue;
             }
+            bool isCData = token->getDataType().compare(0, 7, "**cdata") == 0;
             if (!(token->isDataType("**mxhm") || token->isDataType("**harm") || token->isDataType("**rhrm")
-                    || (token->getDataType().compare(0, 7, "**cdata") == 0))) {
+                    || isCData)) {
                 continue;
             }
             Harm *harm = new Harm;
@@ -6694,6 +6697,9 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             else if (token->isDataType("**rhrm")) {
                 setPlace(harm, "below");
                 content = cleanHarmString3(*token);
+            }
+            else if (isCData) {
+                content = UTF8to16(*token);
             }
             else {
                 content = cleanHarmString(*token);
@@ -8050,6 +8056,40 @@ void HumdrumInput::fillEmptyLayer(
 
 //////////////////////////////
 //
+// HumdrumInput::checkForVerseLabels --
+//
+
+void HumdrumInput::checkForVerseLabels(hum::HTp token)
+{
+    if (!token) {
+        return;
+    }
+    if (!token->isInterpretation()) {
+        return;
+    }
+    std::vector<int> &rkern = m_rkern;
+    int track = token->getTrack();
+    int staffindex = rkern[track];
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    hum::HTp current = token->getNextFieldToken();
+    while (current && (track == current->getTrack())) {
+        current = current->getNextFieldToken();
+    }
+    while (current && !current->isStaff()) {
+        if (!current->isDataType("**text")) {
+            current = current->getNextFieldToken();
+            continue;
+        }
+        if (current->compare(0, 3, "*v:") == 0) {
+            ss[staffindex].verse_labels.push_back(current);
+        }
+        current = current->getNextFieldToken();
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::fillContentsOfLayer -- Fill the layer with musical data.
 //
 
@@ -8248,6 +8288,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
         if (layerdata[i]->isInterpretation()) {
+
+            if (ss[staffindex].verse) {
+                checkForVerseLabels(layerdata[i]);
+            }
             handleOttavaMark(layerdata[i], note);
             handleLigature(layerdata[i]);
             handleColoration(layerdata[i]);
@@ -18080,6 +18124,37 @@ void HumdrumInput::setAccid(Accid *accid, const std::string &loaccid)
 
 //////////////////////////////
 //
+// HumdrumInput::getVerseLabels --
+//
+
+std::vector<hum::HTp> HumdrumInput::getVerseLabels(hum::HTp token, int staff)
+{
+    std::vector<hum::HTp> output;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    if (ss[staff].verse_labels.empty()) {
+        return output;
+    }
+    std::vector<hum::HTp> remainder;
+    std::string spineinfo = token->getSpineInfo();
+    for (int i = 0; i < (int)ss[staff].verse_labels.size(); i++) {
+        if (ss[staff].verse_labels[i]->getSpineInfo() == spineinfo) {
+            output.push_back(ss[staff].verse_labels[i]);
+        }
+        else {
+            remainder.push_back(ss[staff].verse_labels[i]);
+        }
+    }
+    if (output.empty()) {
+        return output;
+    }
+    else {
+        ss[staff].verse_labels = remainder;
+    }
+    return output;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::convertVerses --
 //
 
@@ -18160,6 +18235,15 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             }
         }
 
+        std::vector<hum::HTp> labels;
+        std::string verselabel;
+        if (!ss[staff].verse_labels.empty()) {
+            labels = getVerseLabels(line.token(i), staff);
+            if (!labels.empty()) {
+                verselabel = getVerseLabelText(labels[0]);
+            }
+        }
+
         vtexts.clear();
         vtoks.clear();
         vcolor.clear();
@@ -18204,6 +18288,15 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             }
             appendElement(element, verse);
             verse->SetN(versenum);
+
+            if (!verselabel.empty()) {
+                Label *label = new Label;
+                Text *text = new Text;
+                std::wstring wtext = UTF8to16(verselabel);
+                text->SetText(wtext);
+                verse->AddChild(label);
+                label->AddChild(text);
+            }
 
             Syl *syl = new Syl;
             std::vector<Syl *> syls; // verse can have multiple syls if elision(s) present
@@ -18401,6 +18494,35 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getVerseLabelText --
+//
+
+std::string HumdrumInput::getVerseLabelText(hum::HTp token)
+{
+    if (!token) {
+        return "";
+    }
+    if (!token->isInterpretation()) {
+        return "";
+    }
+    if (token->compare(0, 3, "*v:") != 0) {
+        return "";
+    }
+    std::string contents = token->substr(3);
+    std::string output;
+    hum::HumRegex hre;
+    if (hre.search(contents, "^\\d+$")) {
+        output = contents;
+        output += '.';
+    }
+    else {
+        output = contents;
+    }
+    return output;
 }
 
 //////////////////////////////

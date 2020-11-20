@@ -175,6 +175,10 @@ namespace humaux {
         // **text spines which will be converted into lyrics.
         bool verse;
 
+        // verse_labels == List of verse labels that need to be added to the
+        // current staff.
+        std::vector<hum::HTp> verse_labels;
+
         // suppress_tuplet_number == keeps track of whether or not beams should
         // display beam tuplet numbers.
         bool suppress_tuplet_number;
@@ -673,6 +677,9 @@ protected:
         std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
     hum::HTp getAssociatedDynamSpine(hum::HTp stafftok);
     hum::HTp getPreviousStaffToken(hum::HTp parttok);
+    void checkForVerseLabels(hum::HTp token);
+    std::vector<hum::HTp> getVerseLabels(hum::HTp token, int staff);
+    std::string getVerseLabelText(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
