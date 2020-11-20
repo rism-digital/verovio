@@ -224,11 +224,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
     // Find voice number of node
-    int layerNum = 1;
-    std::string layerNumStr = GetContentOfChild(node, "voice");
-    if (!layerNumStr.empty()) {
-        layerNum = atoi(layerNumStr.c_str());
-    }
+    int layerNum = node.child("voice").text().as_int();
     if (layerNum < 1) {
         LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
         layerNum = 1;
@@ -247,13 +243,10 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
                 return SelectLayer(layerNum, staff);
             }
         }
+        if ((*staff->GetChildren()).empty()) return SelectLayer(layerNum, staff);
     }
     // if not, take staff info of node element
-    int staffNum = 1;
-    std::string staffNumStr = GetContentOfChild(node, "staff");
-    if (!staffNumStr.empty()) {
-        staffNum = atoi(staffNumStr.c_str());
-    }
+    int staffNum = node.child("staff").text().as_int();
     if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
@@ -569,21 +562,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     Section *section = new Section();
     score->AddChild(section);
     // initialize layout
-    if (root.select_node("/score-partwise/identification/encoding/supports[@element='print']")) {
+    if (root.select_node("/score-partwise/part/measure/print")) {
         m_hasLayoutInformation = true;
-        // always start with a new page
-        Pb *pb = new Pb();
-        section->AddChild(pb);
+        if (!root.select_node("/score-partwise/part[1]/measure[1]/print")) {
+            // always start with a new page
+            Pb *pb = new Pb();
+            section->AddChild(pb);
+        }
     }
 
     pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
-    float bottom = layout.node().select_node("page-margins/bottom-margin").node().text().as_float();
+    const float bottom = layout.node().select_node("page-margins/bottom-margin").node().text().as_float();
 
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
     if (!credits.empty()) {
-        PgHead *head = new PgHead();
-        PgFoot *foot = new PgFoot();
+        PgHead *head = NULL;
+        PgFoot *foot = NULL;
         for (pugi::xpath_node_set::const_iterator it = credits.begin(); it != credits.end(); ++it) {
             pugi::xpath_node words = *it;
             Rend *rend = new Rend();
@@ -601,14 +596,24 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 rend->AttTypography::StrToFontweight(words.node().attribute("font-weight").as_string()));
             rend->AddChild(text);
             if (words.node().attribute("default-y").as_float() < 2 * bottom) {
+                if (!foot) {
+                    foot = new PgFoot();
+                }
                 foot->AddChild(rend);
             }
             else {
+                if (!head) {
+                    head = new PgHead();
+                }
                 head->AddChild(rend);
             }
         }
-        m_doc->m_mdivScoreDef.AddChild(head);
-        m_doc->m_mdivScoreDef.AddChild(foot);
+        if (head) {
+            m_doc->m_mdivScoreDef.AddChild(head);
+        }
+        if (foot) {
+            m_doc->m_mdivScoreDef.AddChild(foot);
+        }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
@@ -871,6 +876,65 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     m_doc->ConvertToPageBasedDoc();
+
+    // clean up stacks
+    if (!m_ClefChangeStack.empty()) {
+        for (musicxml::ClefChange iter : m_ClefChangeStack) {
+            if (iter.isFirst)
+                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
+                    iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
+        }
+        m_ClefChangeStack.clear();
+    }
+    if (!m_tieStack.empty()) {
+        LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
+        m_tieStack.clear();
+    }
+    if (!m_slurStack.empty()) { // There are slurs left open
+        std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
+        for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
+            LogWarning("MusicXML import: slur '%s' could not be ended", iter->first->GetUuid().c_str());
+        }
+        m_slurStack.clear();
+    }
+    if (!m_slurStopStack.empty()) { // There are slurs ends without opening
+        std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
+        for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
+            LogWarning("MusicXML import: slur ending for element '%s' could not be "
+                       "matched to a start element",
+                iter->first->GetUuid().c_str());
+        }
+        m_slurStopStack.clear();
+    }
+    if (!m_openDashesStack.empty()) { // open dashes without ending
+        std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
+        for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+            LogWarning(
+                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetUuid().c_str());
+        }
+        m_openDashesStack.clear();
+    }
+    if (!m_bracketStack.empty()) { // open brackets without ending
+        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
+        }
+        m_bracketStack.clear();
+    }
+    if (!m_glissStack.empty()) {
+        std::vector<Gliss *>::iterator iter;
+        for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
+            LogWarning("MusicXML import: gliss for '%s' could not be closed", (*iter)->GetUuid().c_str());
+        }
+        m_glissStack.clear();
+    }
+    if (!m_trillStack.empty()) { // open trills without ending
+        std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
+            LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter->first->GetUuid().c_str());
+        }
+        m_trillStack.clear();
+    }
 
     return true;
 }
@@ -1143,6 +1207,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     else
                         meterSig->SetForm(METERFORM_norm);
                 }
+                if (time.node().select_node("senza-misura")) {
+                    meterSig->SetForm(METERFORM_invis);
+                }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
                 }
@@ -1242,64 +1309,6 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
             }
         }
         i++;
-    }
-
-    if (!m_ClefChangeStack.empty()) {
-        for (musicxml::ClefChange iter : m_ClefChangeStack) {
-            if (iter.isFirst)
-                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
-                    iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
-        }
-        m_ClefChangeStack.clear();
-    }
-    if (!m_tieStack.empty()) {
-        LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
-        m_tieStack.clear();
-    }
-    if (!m_slurStack.empty()) { // There are slurs left open
-        std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
-        for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: slur '%s' could not be ended", iter->first->GetUuid().c_str());
-        }
-        m_slurStack.clear();
-    }
-    if (!m_slurStopStack.empty()) { // There are slurs ends without opening
-        std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
-        for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
-            LogWarning("MusicXML import: slur ending for element '%s' could not be "
-                       "matched to a start element",
-                iter->first->GetUuid().c_str());
-        }
-        m_slurStopStack.clear();
-    }
-    if (!m_openDashesStack.empty()) { // open dashes without ending
-        std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
-        for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
-            LogWarning(
-                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetUuid().c_str());
-        }
-        m_openDashesStack.clear();
-    }
-    if (!m_bracketStack.empty()) { // open brackets without ending
-        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
-        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
-        }
-        m_bracketStack.clear();
-    }
-    if (!m_glissStack.empty()) {
-        std::vector<Gliss *>::iterator iter;
-        for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
-            LogWarning("MusicXML import: gliss for '%s' could not be closed", (*iter)->GetUuid().c_str());
-        }
-        m_glissStack.clear();
-    }
-    if (!m_trillStack.empty()) { // open trills without ending
-        std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
-        for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
-            LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter->first->GetUuid().c_str());
-        }
-        m_trillStack.clear();
     }
 
     return false;
@@ -1697,7 +1706,9 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
     }
 
     // fermatas
+    int fermataCounter = 0;
     for (pugi::xml_node xmlFermata : node.children("fermata")) {
+        ++fermataCounter;
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
         if (HasAttributeWithValue(node, "location", "left")) {
@@ -1710,7 +1721,16 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             fermata->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
         }
         if (xmlFermata.attribute("id")) fermata->SetUuid(xmlFermata.attribute("id").as_string());
-        fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+
+        if (fermataCounter < 2) {
+            fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        }
+        else {
+            Staff *lastStaff = vrv_cast<Staff *>(measure->GetLast());
+            assert(lastStaff);
+            fermata->SetStaff(lastStaff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(lastStaff->GetN())));
+        }
+
         ShapeFermata(fermata, xmlFermata);
     }
 }
@@ -3141,12 +3161,15 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // slur
-    pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
+    pugi::xpath_node_set slurs = node.select_nodes("notations/slur");
     for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
         pugi::xml_node slur = it->node();
         int slurNumber = slur.attribute("number").as_int();
         slurNumber = (slurNumber < 1) ? 1 : slurNumber;
-        if (HasAttributeWithValue(slur, "type", "start")) {
+        if (HasAttributeWithValue(slur, "type", "stop")) {
+            CloseSlur(measure, slurNumber, element);
+        }
+        else if (HasAttributeWithValue(slur, "type", "start")) {
             Slur *meiSlur = new Slur();
             // color
             meiSlur->SetColor(slur.attribute("color").as_string());
@@ -3158,9 +3181,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(measure, slurNumber, meiSlur);
-        }
-        else if (HasAttributeWithValue(slur, "type", "stop")) {
-            CloseSlur(measure, slurNumber, element);
         }
     }
 

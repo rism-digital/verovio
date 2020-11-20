@@ -179,7 +179,7 @@ bool Doc::GenerateDocumentScoreDef()
 
 bool Doc::GenerateFooter()
 {
-    if (m_mdivScoreDef.FindDescendantByType(PGFOOT) || m_options->m_adjustPageHeight.GetValue()) {
+    if (m_mdivScoreDef.FindDescendantByType(PGFOOT)) {
         return false;
     }
 
@@ -822,9 +822,15 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     // By default, optimize scores
     bool optimize = (m_mdivScoreDef.GetOptimize() != BOOLEAN_false);
     // However, if nothing specified, do not if there is only one staffGrp
-    if ((m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE)
-        && (m_mdivScoreDef.GetChildCount(STAFFGRP, UNLIMITED_DEPTH) < 2)) {
-        optimize = false;
+    if (m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE) {
+        int grpSymNum = 0;
+        for (auto current : *m_mdivScoreDef.GetChildren()) {
+            if (current->Is(STAFFGRP)) {
+                StaffGrp *staffGrp = vrv_cast<StaffGrp *>(current);
+                grpSymNum += (staffGrp->HasSymbol()) ? 1 : 0;
+            }
+        }
+        if (grpSymNum < 2) optimize = false;
     }
 
     this->SetCurrentScoreDefDoc();

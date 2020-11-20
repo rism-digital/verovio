@@ -195,13 +195,15 @@ void Rest::AddChild(Object *child)
 
     child->SetParent(this);
 
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     // Dots are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is(DOTS)) {
-        m_children.insert(m_children.begin(), child);
+        children->insert(children->begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children->push_back(child);
     }
     Modify();
 }

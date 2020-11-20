@@ -9421,7 +9421,7 @@ void HumdrumInput::convertMensuralToken(
         Note *note = new Note;
         setLocationId(note, token);
         if (embeddedobliqua) {
-            note->SetLig(noteAnlMensural_LIG_obliqua);
+            note->SetLig(LIGATUREFORM_obliqua);
         }
         appendElement(elements, pointers, note);
         convertNote(note, token, 0, staffindex);

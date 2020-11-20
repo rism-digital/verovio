@@ -648,6 +648,7 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
 int LayerElement::CountElementsInUnison(
     const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
 {
+    if (firstChord.empty() || secondChord.empty()) return 0;
     // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
     // of how they are encoded in the MEI file
     std::set<int> difference;
@@ -1200,9 +1201,9 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     assert(params);
 
     // ignore elements that are not in the beam or are direct children of the beam
-    if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetParent() == params->m_beam) && !IsGraceNote()))
+    if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam) && !IsGraceNote()))
         return FUNCTOR_SIBLINGS;
-    if (Is(GRACEGRP)) return FUNCTOR_CONTINUE;
+    if (Is({ GRACEGRP, TUPLET })) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
