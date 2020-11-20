@@ -130,7 +130,7 @@ public:
      * Set the drawing barlines for the measure.
      * Also adjust the right barline of the previous measure and the left one if necessary.
      */
-    void SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert);
+    void SetDrawingBarLines(Measure *previous, bool systemBreak);
 
     /**
      * @name Set and get the barlines.

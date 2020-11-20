@@ -444,6 +444,7 @@ double Measure::GetRealTimeOffsetMilliseconds(int repeat) const
 
 Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
 {
+    // Barlines are stored in the map in the following format:
     // previous measure right -> current measure left -> expected barlines (previous, current)
     static std::map<data_BARRENDITION, std::map<data_BARRENDITION, BarlineRenditionPair> > drawingLines = {
         // previous right barline is dotted
@@ -506,7 +507,7 @@ Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
     return currentLeft->second;
 }
 
-void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
+void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak)
 {
     // First set the right barline. If none then set a single one.
     data_BARRENDITION rightBarline = (this->HasRight()) ? this->GetRight() : BARRENDITION_single;
@@ -527,7 +528,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             this->SetDrawingLeftBarLine(this->GetLeft());
         }
     }
-    else if (!scoreDefInsert) {
+    else {
         // we have rptboth split in the two measures, make them one rptboth
         if ((previous->GetRight() == BARRENDITION_rptend) && (this->GetLeft() == BARRENDITION_rptstart)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
@@ -555,10 +556,6 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             previous->SetDrawingRightBarLine(right);
             this->SetDrawingLeftBarLine(left);
         }
-    }
-    else {
-        // with a scoredef in-between always set it to what we have in the encoding
-        this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
 
