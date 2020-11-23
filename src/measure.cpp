@@ -507,7 +507,7 @@ Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
     return currentLeft->second;
 }
 
-void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak)
+void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
 {
     // First set the right barline. If none then set a single one.
     data_BARRENDITION rightBarline = (this->HasRight()) ? this->GetRight() : BARRENDITION_single;
@@ -517,7 +517,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak)
     if (!previous) {
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
-    else if (systemBreak) {
+    else if (barlineDrawingFlags & BarlineDrawingFlags::SYSTEM_BREAK) {
         // we have rptboth on one of the two sides, split them (ignore any other value)
         if ((previous->GetRight() == BARRENDITION_rptboth) || (this->GetLeft() == BARRENDITION_rptboth)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptend);
@@ -528,7 +528,9 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak)
             this->SetDrawingLeftBarLine(this->GetLeft());
         }
     }
-    else {
+    else if (!((barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT)
+        || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+        || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS))) {
         // we have rptboth split in the two measures, make them one rptboth
         if ((previous->GetRight() == BARRENDITION_rptend) && (this->GetLeft() == BARRENDITION_rptstart)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
@@ -558,6 +560,15 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak)
                 this->SetDrawingLeftBarLine(left);
             }
         }
+    }
+    else {
+        if ((barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS)
+            && !(barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+            && (this->GetLeft() == BARRENDITION_NONE)) {
+            this->SetLeft(BARRENDITION_single);
+        }
+        // with a scoredef inbetween always set it to what we have in the encoding
+        this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
 

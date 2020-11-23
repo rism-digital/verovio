@@ -349,6 +349,28 @@ private:
     DurExtreme m_extremeType;
 };
 
+
+//----------------------------------------------------------------------------
+// AttVisibilityComparison
+//----------------------------------------------------------------------------
+/**
+ * This class evaluates if the object is visible
+ */
+class AttVisibilityComparison : public ClassIdComparison {
+
+public:
+    AttVisibilityComparison(ClassId classId) : ClassIdComparison(classId){};
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        if (!object->HasAttClass(ATT_VISIBILITY)) return false;
+        AttVisibility *visibility = dynamic_cast<AttVisibility *>(object);
+        assert(visibility);
+        return (visibility->GetVisible() != BOOLEAN_false);
+    }
+};
+
 //----------------------------------------------------------------------------
 // MeasureAlignerTypeComparison
 //----------------------------------------------------------------------------

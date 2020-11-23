@@ -1511,10 +1511,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(MEASURE)) {
         Measure *measure = vrv_cast<Measure *>(this);
         assert(measure);
-        bool systemBreak = false;
+        int drawingFlags = 0;
         // This is the first measure of the system - more to do...
         if (params->m_currentSystem) {
-            systemBreak = true;
+            drawingFlags |= Measure::BarlineDrawingFlags::SYSTEM_BREAK;
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
@@ -1538,7 +1538,26 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
-        measure->SetDrawingBarLines(params->m_previousMeasure, systemBreak);
+
+        // set other flags based on score def change
+        if (params->m_upcomingScoreDef->m_insertScoreDef) {
+            drawingFlags |= Measure::BarlineDrawingFlags::SCORE_DEF_INSERT;
+            params->m_upcomingScoreDef->m_insertScoreDef = false;
+        }
+
+        // check if we need to draw barlines for current/previous measures (in cases when all staves are invisible in
+        // them)
+        ListOfObjects current_objects, previous_objects;
+        AttVisibilityComparison comparison(STAFF);
+        measure->FindAllDescendantByComparison(&current_objects, &comparison);
+        if (current_objects.empty()) drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
+        if (params->m_previousMeasure) {
+            params->m_previousMeasure->FindAllDescendantByComparison(&previous_objects, &comparison);
+            if (previous_objects.empty()) drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
+        }
+
+        measure->SetDrawingBarLines(params->m_previousMeasure, drawingFlags);
+        
         params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }
@@ -1550,6 +1569,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
         params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
+        params->m_upcomingScoreDef->m_insertScoreDef = true;
         return FUNCTOR_CONTINUE;
     }
 

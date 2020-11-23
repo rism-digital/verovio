@@ -130,7 +130,7 @@ public:
      * Set the drawing barlines for the measure.
      * Also adjust the right barline of the previous measure and the left one if necessary.
      */
-    void SetDrawingBarLines(Measure *previous, bool systemBreak);
+    void SetDrawingBarLines(Measure *previous, int barlineDrawingFlags);
 
     /**
      * @name Set and get the barlines.
@@ -438,6 +438,13 @@ public:
     virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
 
 public:
+    // flags for drawing measure barline based on visibility or other conditions
+    enum BarlineDrawingFlags {
+        SYSTEM_BREAK = 0x1,
+        SCORE_DEF_INSERT = 0x2,
+        INVISIBLE_MEASURE_CURRENT = 0x4,
+        INVISIBLE_MEASURE_PREVIOUS = 0x8
+    };
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.
      * This is the left and right position of the measure.

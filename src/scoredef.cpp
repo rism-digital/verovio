@@ -213,6 +213,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
 {
     assert(newScoreDef);
 
+    m_insertScoreDef = false;
     m_setAsDrawing = true;
 
     bool drawClef = false;
