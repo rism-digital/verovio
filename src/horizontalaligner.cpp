@@ -544,7 +544,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
             }
             // staffN and layerN remain unused for barLine attributes and timestamps
             else {
-                assert(element->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR }));
+                assert(element->Is({ BARLINE, BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR }));
             }
         }
     }

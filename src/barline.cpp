@@ -72,6 +72,7 @@ bool BarLine::HasRepetitionDots() const
 BarLineAttr::BarLineAttr() : BarLine()
 {
     m_isLeft = false;
+    m_noAttr = false;
 }
 
 BarLineAttr::~BarLineAttr() {}

@@ -563,9 +563,11 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
     }
     else {
         if ((barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS)
-            && !(barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
-            && (this->GetLeft() == BARRENDITION_NONE)) {
-            this->SetLeft(BARRENDITION_single);
+            && !(barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)) {
+            if (this->GetLeft() == BARRENDITION_NONE) {
+                this->SetLeft(BARRENDITION_single);
+            }
+            vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
         }
         // with a scoredef inbetween always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
