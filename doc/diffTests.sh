@@ -14,8 +14,8 @@ outdir="/Users/laurent/tmp/test-output-diff"
 # The path to the directory containing the develop branch - used only for rebuilding
 devdir="/Users/laurent/projects/verovio_lpugin"
 
-# The version of python we want to use
-PYTHON=python3.8
+# The version of python we want to use (we can be more specific here, e.g., python3.8)
+PYTHON=python3
 
 # Store the path where we are
 home=`pwd`
@@ -26,7 +26,7 @@ if [ ! -z $build_dev ]; then
     cd $devdir
     git pull
     cd bindings
-    cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMBRUM_SUPPORT=ON
+    cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON
     cd python
     make -j8
 
@@ -37,7 +37,7 @@ if [ ! -z $build_dev ]; then
 fi
 
 cd ../bindings
-cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMBRUM_SUPPORT=ON
+cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON
 cd python
 make -j8
 
