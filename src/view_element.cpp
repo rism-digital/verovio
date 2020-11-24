@@ -363,7 +363,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
 
-    DrawBarLine(dc, yTop + offset, yBottom - offset, barLine);
+    DrawBarLine(dc, yTop + offset, yBottom - offset, barLine, barLine->GetForm());
     if (barLine->HasRepetitionDots()) {
         DrawBarLineDots(dc, staff, barLine);
     }

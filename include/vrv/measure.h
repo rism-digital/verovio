@@ -118,7 +118,14 @@ public:
     void SetDrawingLeftBarLine(data_BARRENDITION type) { m_leftBarLine.SetForm(type); }
     data_BARRENDITION GetDrawingRightBarLine() const { return m_rightBarLine.GetForm(); }
     void SetDrawingRightBarLine(data_BARRENDITION type) { m_rightBarLine.SetForm(type); }
+    data_BARRENDITION GetDrawingLeftBarLineByStaffN(int staffN) const;
+    data_BARRENDITION GetDrawingRightBarLineByStaffN(int staffN) const;
     ///@}
+
+    /**
+     * Return whether there is mapping of barline values to invisible staves present in measure
+     */
+    bool HasInvisibleStaffBarlines() const { return !m_invisibleStaffBarlines.empty();}
 
     /**
      * Select drawing barlines based on the previous right and current left barlines (to avoid duplicated doubles or
@@ -131,6 +138,12 @@ public:
      * Also adjust the right barline of the previous measure and the left one if necessary.
      */
     void SetDrawingBarLines(Measure *previous, int barlineDrawingFlags);
+
+    /**
+     * Create mapping of original barline values to staves in the measure that are neighbored by invisible staves. This
+     * will allow to draw proper barline when invisible staff hides overlaping barline
+     */
+    void SetInvisibleStaffBarlines(Measure *previous, ListOfObjects &currentInvisble, ListOfObjects &previoustInvisble);
 
     /**
      * @name Set and get the barlines.
@@ -504,6 +517,8 @@ private:
     std::vector<double> m_scoreTimeOffset;
     std::vector<double> m_realTimeOffsetMilliseconds;
     int m_currentTempo;
+
+    std::map<int, std::pair<data_BARRENDITION, data_BARRENDITION> > m_invisibleStaffBarlines;
 };
 
 } // namespace vrv

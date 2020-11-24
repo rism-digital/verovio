@@ -1547,15 +1547,19 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
 
         // check if we need to draw barlines for current/previous measures (in cases when all staves are invisible in
         // them)
-        ListOfObjects current_objects, previous_objects;
-        AttVisibilityComparison comparison(STAFF);
-        measure->FindAllDescendantByComparison(&current_objects, &comparison);
-        if (current_objects.empty()) drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
+        ListOfObjects currentObjects, previousObjects;
+        AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
+        measure->FindAllDescendantByComparison(&currentObjects, &comparison);
+        if (currentObjects.size() == measure->GetChildCount(STAFF)) {
+            drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
+        }
         if (params->m_previousMeasure) {
-            params->m_previousMeasure->FindAllDescendantByComparison(&previous_objects, &comparison);
-            if (previous_objects.empty()) drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
+            params->m_previousMeasure->FindAllDescendantByComparison(&previousObjects, &comparison);
+            if (previousObjects.size() == params->m_previousMeasure->GetChildCount(STAFF))
+                drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
         }
 
+        measure->SetInvisibleStaffBarlines(params->m_previousMeasure, currentObjects, previousObjects);
         measure->SetDrawingBarLines(params->m_previousMeasure, drawingFlags);
         
         params->m_previousMeasure = measure;

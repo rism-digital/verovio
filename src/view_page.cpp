@@ -675,6 +675,16 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 if (staff->GetVisible() == BOOLEAN_false) {
                     continue;
                 }
+                // Get current form. If neighboring invisible staff make sure that at least some kind of barline is drawn
+                data_BARRENDITION form = barLine->GetForm();
+                if (measure->HasInvisibleStaffBarlines()) {
+                    data_BARRENDITION barlineRend = barLine->Is(BARLINE_ATTR_RIGHT)
+                        ? measure->GetDrawingRightBarLineByStaffN(childStaffDef->GetN())
+                        : measure->GetDrawingLeftBarLineByStaffN(childStaffDef->GetN());
+                    if (barlineRend != BARRENDITION_NONE) form = barlineRend;
+                }
+                if (form == BARRENDITION_NONE) continue;
+
                 // for the bottom position we need to take into account the number of lines and the staff size
                 int yBottom = staff->GetDrawingY()
                     - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -691,7 +701,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                     yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 }
-                DrawBarLine(dc, yTop, yBottom, barLine);
+                DrawBarLine(dc, yTop, yBottom, barLine, form/*form*/);
                 if (barLine->HasRepetitionDots()) {
                     DrawBarLineDots(dc, staff, barLine);
                 }
@@ -699,6 +709,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
     }
     else {
+        if (barLine->GetForm() == BARRENDITION_NONE) return;
         const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
         if (staffDefs->empty()) {
             return;
@@ -754,7 +765,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (isLastMeasure && barLine->Is(BARLINE_ATTR_RIGHT)) {
             eraseIntersections = false;
         }
-        DrawBarLine(dc, yTop, yBottom, barLine, eraseIntersections);
+        DrawBarLine(dc, yTop, yBottom, barLine, barLine->GetForm(), eraseIntersections);
 
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
@@ -777,7 +788,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     }
 }
 
-void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, bool eraseIntersections)
+void View::DrawBarLine(
+    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form, bool eraseIntersections)
 {
     assert(dc);
     assert(barLine);
@@ -803,18 +815,18 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         if (system) {
             int minX = x - barLineWidth / 2;
             int maxX = x2 + barLineWidth / 2;
-            if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_end)) {
+            if ((form == BARRENDITION_rptend) || (form == BARRENDITION_end)) {
                 minX = x - barLineWidth / 2;
                 maxX = x2 + barLineThickWidth / 2;
             }
-            else if (barLine->GetForm() == BARRENDITION_rptboth) {
+            else if (form == BARRENDITION_rptboth) {
                 maxX = x2 + barLineWidth / 2;
             }
-            else if (barLine->GetForm() == BARRENDITION_rptstart) {
+            else if (form == BARRENDITION_rptstart) {
                 minX = x - barLineThickWidth / 2;
                 maxX = x2 + barLineWidth / 2;
             }
-            else if ((barLine->GetForm() == BARRENDITION_dbl) || (barLine->GetForm() == BARRENDITION_dbldashed)) {
+            else if ((form == BARRENDITION_dbl) || (form == BARRENDITION_dbldashed)) {
                 minX = x - barLineWidth / 2;
                 maxX = x2 + barLineWidth / 2;
             }
@@ -827,45 +839,45 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         }
     }
 
-    if (barLine->GetForm() == BARRENDITION_single) {
+    if (form == BARRENDITION_single) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_dashed) {
+    else if (form == BARRENDITION_dashed) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
     }
-    else if (barLine->GetForm() == BARRENDITION_dotted) {
+    else if (form == BARRENDITION_dotted) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
     }
-    else if (barLine->GetForm() == BARRENDITION_rptend) {
+    else if (form == BARRENDITION_rptend) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
         DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_rptboth) {
+    else if (form == BARRENDITION_rptboth) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
         DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
         DrawVerticalSegmentedLine(dc, x2 + barLineSeparation + barLinesGap, line, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_rptstart) {
+    else if (form == BARRENDITION_rptstart) {
         DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
         DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth / 2, line, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_invis) {
+    else if (form == BARRENDITION_invis) {
         barLine->SetEmptyBB();
     }
-    else if (barLine->GetForm() == BARRENDITION_end) {
+    else if (form == BARRENDITION_end) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
         DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_dbl) {
+    else if (form == BARRENDITION_dbl) {
         // Narrow the bars a little bit - should be centered?
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
         DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_dbldashed) {
+    else if (form == BARRENDITION_dbldashed) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
         DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength);
     }
-    else if (barLine->GetForm() == BARRENDITION_dbldotted) {
+    else if (form == BARRENDITION_dbldotted) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
         DrawVerticalSegmentedLine(dc, x2, line, barLineWidth, dotLength);
     }
@@ -953,11 +965,11 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     if (measure->IsMeasuredMusic()) {
         System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
         assert(system);
-        if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
+        if ((measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) || measure->HasInvisibleStaffBarlines()) {
             DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetLeftBarLine()->GetDrawingX(),
                 measure->GetLeftBarLine());
         }
-        if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
+        if ((measure->GetDrawingRightBarLine() != BARRENDITION_NONE) || measure->HasInvisibleStaffBarlines()) {
             bool isLast = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD)) ? true : false;
             DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetRightBarLine()->GetDrawingX(),
                 measure->GetRightBarLine(), isLast);

@@ -359,7 +359,10 @@ private:
 class AttVisibilityComparison : public ClassIdComparison {
 
 public:
-    AttVisibilityComparison(ClassId classId) : ClassIdComparison(classId){};
+    AttVisibilityComparison(ClassId classId, data_BOOLEAN isVisible) : ClassIdComparison(classId)
+    {
+        m_isVisible = isVisible;
+    };
 
     virtual bool operator()(Object *object)
     {
@@ -367,8 +370,11 @@ public:
         if (!object->HasAttClass(ATT_VISIBILITY)) return false;
         AttVisibility *visibility = dynamic_cast<AttVisibility *>(object);
         assert(visibility);
-        return (visibility->GetVisible() != BOOLEAN_false);
+        return (visibility->GetVisible() == m_isVisible);
     }
+
+private:
+    data_BOOLEAN m_isVisible;
 };
 
 //----------------------------------------------------------------------------

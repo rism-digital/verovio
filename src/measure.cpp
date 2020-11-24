@@ -442,6 +442,20 @@ double Measure::GetRealTimeOffsetMilliseconds(int repeat) const
     return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
 
+data_BARRENDITION Measure::GetDrawingLeftBarLineByStaffN(int staffN) const
+{
+    auto elementIter = m_invisibleStaffBarlines.find(staffN);
+    if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.first;
+    return GetDrawingLeftBarLine();
+}
+
+data_BARRENDITION Measure::GetDrawingRightBarLineByStaffN(int staffN) const
+{
+    auto elementIter = m_invisibleStaffBarlines.find(staffN);
+    if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.second;
+    return GetDrawingRightBarLine();
+}
+
 Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
 {
     // Barlines are stored in the map in the following format:
@@ -558,6 +572,7 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
             if (right != left) {
                 previous->SetDrawingRightBarLine(right);
                 this->SetDrawingLeftBarLine(left);
+                if (this->HasInvisibleStaffBarlines()) vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
             }
         }
     }
@@ -571,6 +586,32 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
         }
         // with a scoredef inbetween always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
+    }
+}
+
+void Measure::SetInvisibleStaffBarlines(
+    Measure *previous, ListOfObjects &currentInvisble, ListOfObjects &previoustInvisble)
+{
+    if (!previous) return;
+
+    // Process invisible staves in the current measure and set right barline values for previous measure
+    for (const auto object : currentInvisble) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        data_BARRENDITION right = previous->GetRight();
+        if (right == BARRENDITION_NONE) right = BARRENDITION_single;
+        auto [iter, result]
+            = previous->m_invisibleStaffBarlines.insert({ staff->GetN(), { BARRENDITION_NONE, right } });
+        if (!result) iter->second.second = right;
+    }
+    // Then process invisible staves in the previous measure and set left barline values in the current measure
+    for (const auto object : previoustInvisble) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        data_BARRENDITION left = GetLeft();
+        if (left == BARRENDITION_NONE) left = BARRENDITION_single;
+        auto [iter, result] = m_invisibleStaffBarlines.insert({ staff->GetN(), { left, BARRENDITION_NONE } });
+        if (!result) iter->second.first = left;
     }
 }
 
