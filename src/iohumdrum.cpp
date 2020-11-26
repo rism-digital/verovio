@@ -20692,10 +20692,13 @@ void HumdrumInput::checkForRehearsal(int line)
             continue;
         }
         Reh *reh = new Reh;
+        Rend *rend = new Rend;
         Text *text = new Text;
         std::wstring wtext = UTF8to16(tvalue);
         text->SetText(wtext);
-        reh->AddChild(text);
+        reh->AddChild(rend);
+        rend->AddChild(text);
+        rend->SetRend(TEXTRENDITION_box);
         addChildMeasureOrSection(reh);
         // Add to top staff for now, but add to top of
         // each instrumentalgoup probably in the future.
