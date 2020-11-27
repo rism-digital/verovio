@@ -350,6 +350,12 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         DrawFilledRectangle(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, bottomRight.y);
     }
 
+    if (note->FindDescendantByType(PLICA)) {
+        // Right side is a stem - end the notehead first
+        dc->EndCustomGraphic();
+        return;
+    }
+
     // serifs and / or stem
     DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[1]);
 
@@ -495,7 +501,62 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Plica *plica = vrv_cast<Plica *>(element);
     assert(plica);
 
+    Note *note = vrv_cast<Note *>(plica->GetFirstAncestor(NOTE));
+    assert(note);
+
+    /** code duplicated from View::DrawMaximaToBrevis */
+    bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    bool fillNotehead = (isMensuralBlack || note->GetColored()) && !(isMensuralBlack && note->GetColored());
+
+    int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    int strokeWidth = 2.8 * stemWidth;
+    /** end code duplicated */
+
+    bool isLonga = (note->GetActualDur() == DUR_LG);
+    bool up = (plica->GetDir() == STEMDIRECTION_basic_up);
+
+    int shape = LIGATURE_DEFAULT;
+    Point topLeft, bottomRight;
+    int sides[4];
+    this->CalcBrevisPoints(note, staff, &topLeft, &bottomRight, sides, shape, isMensuralBlack);
+
+    int stem = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    stem *= (!isMensuralBlack) ? 7 : 5;
+    int shortStem = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    shortStem *= (!isMensuralBlack) ? 3.5 : 2.5;
+
     dc->StartGraphic(plica, "", plica->GetUuid());
+
+    if (!fillNotehead) {
+        // double the bases of rectangles
+        DrawObliquePolygon(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, topLeft.y, -strokeWidth);
+        DrawObliquePolygon(
+            dc, topLeft.x + stemWidth, bottomRight.y, bottomRight.x - stemWidth, bottomRight.y, strokeWidth);
+    }
+    else {
+        DrawFilledRectangle(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, bottomRight.y);
+    }
+
+    if (up) {
+        if (isLonga) {
+            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + shortStem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + stem);
+        }
+        else {
+            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + stem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + shortStem);
+        }
+    }
+    else {
+        if (isLonga) {
+            DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - shortStem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - stem);
+        }
+        else {
+            DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - stem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - shortStem);
+        }
+    }
 
     dc->EndGraphic(plica, this);
 }
