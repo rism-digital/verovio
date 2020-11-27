@@ -11,6 +11,7 @@
 #include "atts_mei.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "grpsym.h"
 #include "object.h"
 
 namespace vrv {
@@ -91,6 +92,8 @@ private:
      * By default the value is OPTIMIZATION_NONE
      */
     VisibilityOptimization m_drawingVisibility;
+
+    GrpSym *m_groupSymbol;
 };
 
 } // namespace vrv

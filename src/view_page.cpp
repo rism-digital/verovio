@@ -342,26 +342,7 @@ void View::DrawStaffGrp(
         DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
     // draw the group symbol
-    if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
-        const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
-
-        DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
-        x -= 2 * lineWidth;
-    }
-    else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
-        DrawBrace(dc, x, yTop, yBottom, staffSize);
-        x -= 2.5 * m_doc->GetDrawingUnit(staffSize);
-    }
-    else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
-        DrawBracket(dc, x, yTop, yBottom, staffSize);
-        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue()
-            + m_doc->GetDrawingUnit(staffSize);
-    }
-    else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracketsq) {
-        DrawBracketsq(dc, x, yTop, yBottom, staffSize);
-        x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue()
-            + m_doc->GetDrawingUnit(staffSize);
-    }
+    DrawGrpSym(dc, staffGrp, yTop, yBottom, x);
 
     // recursively draw the children
     StaffGrp *childStaffGrp = NULL;
@@ -415,6 +396,42 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
         this->DrawLabels(dc, system, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
+    }
+}
+
+void View::DrawGrpSym(DeviceContext *dc, StaffGrp *staffGrp, int yTop, int yBottom, int &x)
+{
+    int staffSize = staffGrp->GetMaxStaffSize();
+    // draw the group symbol
+    auto groupSymbol = vrv_cast<GrpSym*>(staffGrp->FindDescendantByType(GRPSYM, 1));
+    if (!groupSymbol) return;
+
+    switch (groupSymbol->GetSymbol()) {
+        case staffGroupingSym_SYMBOL_line: {
+            const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
+
+            DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
+            x -= 2 * lineWidth;
+            break;
+        }
+        case staffGroupingSym_SYMBOL_brace: {
+            DrawBrace(dc, x, yTop, yBottom, staffSize);
+            x -= 2.5 * m_doc->GetDrawingUnit(staffSize);
+            break;
+        }
+        case staffGroupingSym_SYMBOL_bracket: {
+            DrawBracket(dc, x, yTop, yBottom, staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue()
+                + m_doc->GetDrawingUnit(staffSize);
+            break;
+        }
+        case staffGroupingSym_SYMBOL_bracketsq: {
+            DrawBracketsq(dc, x, yTop, yBottom, staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue()
+                + m_doc->GetDrawingUnit(staffSize);
+            break;
+        }
+        default: break;
     }
 }
 

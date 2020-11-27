@@ -52,6 +52,7 @@
 #include "functorparams.h"
 #include "gliss.h"
 #include "gracegrp.h"
+#include "grpsym.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
 #include "harm.h"
@@ -1027,6 +1028,23 @@ void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *
     WriteXmlId(currentNode, runningElement);
     runningElement->WriteHorizontalAlign(currentNode);
     runningElement->WriteTyped(currentNode);
+}
+
+void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
+{
+    assert(grpSym);
+
+    // Only write att.symbol if representing an attribute
+    if (grpSym->IsAttribute()) {
+        grpSym->WriteStaffGroupingSym(currentNode);
+        return;
+    }
+
+    grpSym->WriteStaffGroupingSym(currentNode);
+    grpSym->WriteGrpSymLog(currentNode);
+    grpSym->WriteStartId(currentNode);
+    grpSym->WriteStartEndId(currentNode);
+
 }
 
 void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
@@ -3536,6 +3554,9 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "clef") {
             success = ReadClef(parent, current);
         }
+        else if (std::string(current.name()) == "grpSYm") {
+            success = ReadGrpSym(parent, current);
+        }
         else if (std::string(current.name()) == "keySig") {
             success = ReadKeySig(parent, current);
         }
@@ -3586,7 +3607,14 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
 
     vrvStaffGrp->ReadBasic(staffGrp);
     vrvStaffGrp->ReadLabelled(staffGrp);
-    vrvStaffGrp->ReadStaffGroupingSym(staffGrp);
+    AttStaffGroupingSym groupingSym;
+    groupingSym.ReadStaffGroupingSym(staffGrp);
+    if (groupingSym.HasSymbol()) { 
+        GrpSym *vrvGrpSym = new GrpSym();
+        vrvGrpSym->IsAttribute(true);
+        vrvGrpSym->SetSymbol(groupingSym.GetSymbol());
+        vrvStaffGrp->AddChild(vrvGrpSym);
+    }
     vrvStaffGrp->ReadStaffGrpVis(staffGrp);
     vrvStaffGrp->ReadTyped(staffGrp);
 
@@ -3608,6 +3636,9 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
+        else if (std::string(current.name()) == "grpSym") {
+            success = ReadGrpSym(parent, current);
+        }
         else if (std::string(current.name()) == "instrDef") {
             success = ReadInstrDef(parent, current);
         }
@@ -3640,6 +3671,26 @@ bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object
     object->ReadHorizontalAlign(element);
     object->ReadTyped(element);
 
+    return true;
+}
+
+bool MEIInput::ReadGrpSym(Object *parent, pugi::xml_node grpSym)
+{
+    GrpSym *vrvGrpSym = new GrpSym();
+
+    vrvGrpSym->ReadStaffGroupingSym(grpSym);
+
+    if (vrvGrpSym->HasLevel() || vrvGrpSym->HasStartid() || vrvGrpSym->HasEndid()) {
+        if (!parent->Is(SCOREDEF)) {
+            LogWarning("@level, @startId and @endId attributes are supported only under <scoreDef>");
+            return false;
+        }
+        vrvGrpSym->ReadGrpSymLog(grpSym);
+        vrvGrpSym->ReadStartId(grpSym);
+        vrvGrpSym->ReadStartEndId(grpSym);
+    }
+    parent->AddChild(vrvGrpSym);
+   
     return true;
 }
 

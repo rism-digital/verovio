@@ -15,6 +15,7 @@
 
 #include "editorial.h"
 #include "functorparams.h"
+#include "grpsym.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -61,7 +62,10 @@ void StaffGrp::Reset()
 
 bool StaffGrp::IsSupportedChild(Object *child)
 {
-    if (child->Is(INSTRDEF)) {
+    if (child->Is(GRPSYM)) {
+        assert(dynamic_cast<GrpSym *>(child));
+    }
+    else if (child->Is(INSTRDEF)) {
         assert(dynamic_cast<InstrDef *>(child));
     }
     else if (child->Is(LABEL)) {

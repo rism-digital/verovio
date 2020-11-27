@@ -8,6 +8,8 @@
 #ifndef __VRV_GRPSYM_H__
 #define __VRV_GRPSYM_H__
 
+#include "atts_mei.h"
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -19,7 +21,11 @@ namespace vrv {
 /**
  * This class represents a MEI grpSym.
  */
-class GrpSym : public Object {
+class GrpSym : public Object
+    , public AttStaffGroupingSym
+    , public AttGrpSymLog
+    , public AttStartId
+    , public AttStartEndId {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -31,7 +37,7 @@ public:
     virtual Object *Clone() const { return new GrpSym(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "GrpSym"; }
-    //virtual ClassId GetClassId() const { return GRPSYM; }
+    virtual ClassId GetClassId() const { return GRPSYM; }
     ///@}
 
 private:
