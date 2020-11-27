@@ -917,6 +917,9 @@ private:
     // m_sections == keep track of thru sections and 1st/second endings.
     std::vector<hum::HTp> m_sectionlabels;
 
+    // m_numberlesslabels == The last section label without a number at the end.
+    std::vector<hum::HTp> m_numberlesslabels;
+
     // m_endingnum == keep track of current ending.
     int m_endingnum = 0;
 

@@ -20527,12 +20527,34 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
     int endnum = 0;
     bool ending = false;
+    bool fakenum = false;
     bool newsection = false;
     if (isdigit(currentsection.back())) {
-        ending = true;
-        std::smatch matches;
-        if (regex_search(currentsection, matches, regex("(\\d+)$"))) {
-            endnum = stoi(matches[1]);
+        hum::HTp withnum = m_sectionlabels[startline];
+        hum::HTp nonum = m_numberlesslabels[startline];
+        std::string withnumstr;
+        std::string nonumstr;
+        if (withnum) {
+            withnumstr = *withnum;
+        }
+        if (nonum) {
+            nonumstr = *nonum;
+        }
+        if (withnumstr.compare(0, nonumstr.size(), nonumstr) == 0) {
+            ending = true;
+        }
+        else {
+            fakenum = true;
+            ending = false;
+        }
+        if (ending) {
+            std::smatch matches;
+            if (regex_search(currentsection, matches, regex("(\\d+)$"))) {
+                endnum = stoi(matches[1]);
+            }
+            else {
+                endnum = 0;
+            }
         }
         else {
             endnum = 0;
@@ -20573,7 +20595,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
-    else if (isdigit(currentsection.back())) {
+    else if ((!fakenum) && isdigit(currentsection.back())) {
         // inside a current ending
         m_currentending->AddChild(m_measure);
     }
@@ -22221,16 +22243,21 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 void HumdrumInput::prepareSections()
 {
     std::vector<hum::HTp> &sectionlabels = m_sectionlabels;
+    std::vector<hum::HTp> &numberlesslabels = m_numberlesslabels;
     hum::HumdrumFile &infile = m_infiles[0];
 
     sectionlabels.resize(infile.getLineCount());
+    numberlesslabels.resize(infile.getLineCount());
     for (int i = 0; i < (int)sectionlabels.size(); ++i) {
         sectionlabels[i] = NULL;
+        numberlesslabels[i] = NULL;
     }
     hum::HTp secname = NULL;
+    hum::HTp nonumname = NULL;
 
     for (int i = 0; i < infile.getLineCount(); ++i) {
         sectionlabels[i] = secname;
+        numberlesslabels[i] = nonumname;
         if (!infile[i].isInterpretation()) {
             continue;
         }
@@ -22259,6 +22286,25 @@ void HumdrumInput::prepareSections()
                 break;
             }
             sectionlabels[j] = sectionlabels[i];
+        }
+
+        if (!isdigit(secname->back())) {
+            nonumname = secname;
+            sectionlabels[i] = nonumname;
+            for (int j = i - 1; j >= 0; j--) {
+                if (infile[j].isData()) {
+                    break;
+                }
+                numberlesslabels[j] = numberlesslabels[i];
+            }
+        }
+    }
+
+    for (int i = (int)numberlesslabels.size() - 2; i >= 0; i--) {
+        if (numberlesslabels[i] == NULL) {
+            if (numberlesslabels[i + 1]) {
+                numberlesslabels[i] = numberlesslabels[i + 1];
+            }
         }
     }
 }
