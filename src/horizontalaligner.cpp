@@ -800,7 +800,7 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             auto parent = measure->GetParent();
             Measure *previous = vrv_cast<Measure *>(parent->GetPrevious(measure, MEASURE));
             if (previous) {
-                Alignment* alignment = previous->m_measureAligner.GetRightBarLineAlignment();
+                Alignment *alignment = previous->m_measureAligner.GetRightBarLineAlignment();
                 alignment->GetLeftRight(-1, minLeft, maxRight);
                 if (maxRight != VRV_UNSET) {
                     const int previousWidth = previous->GetWidth();
