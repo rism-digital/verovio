@@ -20540,7 +20540,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         if (nonum) {
             nonumstr = *nonum;
         }
-        if (withnumstr.compare(0, nonumstr.size(), nonumstr) == 0) {
+        if ((!nonumstr.empty()) && (withnumstr.compare(0, nonumstr.size(), nonumstr) == 0)) {
             ending = true;
         }
         else {
