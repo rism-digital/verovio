@@ -327,7 +327,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
             parent->SetDrawingXRel(parent->GetDrawingXRel() - horizontalMargin - left);
         }
         return;
-	}
+    }
 }
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
