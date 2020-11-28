@@ -504,13 +504,8 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Note *note = vrv_cast<Note *>(plica->GetFirstAncestor(NOTE));
     assert(note);
 
-    /** code duplicated from View::DrawMaximaToBrevis */
     bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-    bool fillNotehead = (isMensuralBlack || note->GetColored()) && !(isMensuralBlack && note->GetColored());
-
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    int strokeWidth = 2.8 * stemWidth;
-    /** end code duplicated */
 
     bool isLonga = (note->GetActualDur() == DUR_LG);
     bool up = (plica->GetDir() == STEMDIRECTION_basic_up);
@@ -527,30 +522,21 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(plica, "", plica->GetUuid());
 
-    if (!fillNotehead) {
-        // double the bases of rectangles
-        DrawObliquePolygon(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, topLeft.y, -strokeWidth);
-        DrawObliquePolygon(
-            dc, topLeft.x + stemWidth, bottomRight.y, bottomRight.x - stemWidth, bottomRight.y, strokeWidth);
-    }
-    else {
-        DrawFilledRectangle(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, bottomRight.y);
-    }
-
-    if (up) {
-        if (isLonga) {
+    if (isLonga) {
+        if (up) {
             DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + shortStem);
             DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + stem);
         }
         else {
-            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + stem);
-            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + shortStem);
-        }
-    }
-    else {
-        if (isLonga) {
             DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - shortStem);
             DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - stem);
+        }
+    }
+    // brevis
+    else {
+        if (up) {
+            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + stem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + shortStem);
         }
         else {
             DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - stem);
