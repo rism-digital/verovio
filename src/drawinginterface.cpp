@@ -358,8 +358,8 @@ bool BeamDrawingInterface::HasOneStepHeight()
     int top = -128;
     int bottom = 128;
     for (auto coord : m_beamElementCoords) {
-        if (coord->m_element) {
-            Note *note = vrv_cast<Note *>(coord->m_element);
+        if (coord->m_closestNote) {
+            Note *note = vrv_cast<Note *>(coord->m_closestNote);
             assert(note);
             int loc = note->GetDrawingLoc();
             if (loc > top) top = loc;
