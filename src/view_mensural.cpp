@@ -508,6 +508,23 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
     Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
+    int position = ligature->GetListIndex(note);
+    assert(position != -1);
+    int shape = ligature->m_drawingShapes.at(position);
+    bool isLast = (position == (int)ligature->m_drawingShapes.size() - 1);
+
+    int y = note->GetDrawingY();
+    int x = note->GetDrawingX();
+    if (!isLast && (shape & LIGATURE_OBLIQUE)) {
+        x += note->GetDrawingRadius(m_doc, true);
+        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+    else {
+        x += 3 * note->GetDrawingRadius(m_doc, true);
+    }
+
+    DrawDotsPart(dc, x, y, 1, staff);
+
     return;
 }
 
