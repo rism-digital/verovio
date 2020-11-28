@@ -1976,19 +1976,19 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Hairpins
-    pugi::xpath_node wedge = type.select_node("wedge");
-    if (wedge) {
-        int hairpinNumber = wedge.node().attribute("number").as_int();
+    pugi::xpath_node_set wedges = node.select_nodes("direction-type/wedge");
+    for (pugi::xpath_node_set::const_iterator wedge = wedges.begin(); wedge != wedges.end(); ++wedge) {
+        int hairpinNumber = wedge->node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
-        if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
+        if (HasAttributeWithValue(wedge->node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
             std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> >::iterator iter;
             for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
                 if (iter->second.m_dirN == hairpinNumber) {
                     int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
                     iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
-                    if (wedge.node().attribute("spread")) {
-                        iter->first->SetOpening(wedge.node().attribute("spread").as_double() / 5);
+                    if (wedge->node().attribute("spread")) {
+                        iter->first->SetOpening(wedge->node().attribute("spread").as_double() / 5);
                     }
                     m_hairpinStack.erase(iter);
                     return;
@@ -2001,20 +2001,20 @@ void MusicXmlInput::ReadMusicXmlDirection(
         else {
             Hairpin *hairpin = new Hairpin();
             musicxml::OpenSpanner openHairpin(hairpinNumber, m_measureCounts.at(measure));
-            if (HasAttributeWithValue(wedge.node(), "type", "crescendo")) {
+            if (HasAttributeWithValue(wedge->node(), "type", "crescendo")) {
                 hairpin->SetForm(hairpinLog_FORM_cres);
             }
-            else if (HasAttributeWithValue(wedge.node(), "type", "diminuendo")) {
+            else if (HasAttributeWithValue(wedge->node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
             }
             // hairpin->SetLform(hairpin->AttLineRendBase::StrToLineform(wedge.node().attribute("line-type").as_string()));
-            if (wedge.node().attribute("niente")) {
-                hairpin->SetNiente(ConvertWordToBool(wedge.node().attribute("niente").as_string()));
+            if (wedge->node().attribute("niente")) {
+                hairpin->SetNiente(ConvertWordToBool(wedge->node().attribute("niente").as_string()));
             }
-            hairpin->SetColor(wedge.node().attribute("color").as_string());
+            hairpin->SetColor(wedge->node().attribute("color").as_string());
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             hairpin->SetTstamp(timeStamp);
-            if (wedge.node().attribute("id")) hairpin->SetUuid(wedge.node().attribute("id").as_string());
+            if (wedge->node().attribute("id")) hairpin->SetUuid(wedge->node().attribute("id").as_string());
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -2024,7 +2024,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
-            int defaultY = wedge.node().attribute("default-y").as_int();
+            int defaultY = wedge->node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align hairpins
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             hairpin->SetVgrp(defaultY);
@@ -2234,7 +2234,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     // other cases
     if (!containsWords && !containsDynamics && !coda && !bracket && !lead && !metronome && !segno && !xmlShift
-        && !xmlPedal && !wedge && !dashes && !rehearsal) {
+        && !xmlPedal && !wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.first_child().name());
     }
 }

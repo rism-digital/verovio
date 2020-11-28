@@ -24,6 +24,7 @@
 #include "glyph.h"
 #include "layer.h"
 #include "ligature.h"
+#include "plica.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -140,6 +141,9 @@ bool Note::IsSupportedChild(Object *child)
     }
     else if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
+    }
+    else if (child->Is(PLICA)) {
+        assert(dynamic_cast<Plica *>(child));
     }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));

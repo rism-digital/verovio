@@ -91,6 +91,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "phrase.h"
+#include "plica.h"
 #include "proport.h"
 #include "rdg.h"
 #include "ref.h"
@@ -574,6 +575,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(NOTE)) {
         m_currentNode = m_currentNode.append_child("note");
         WriteNote(m_currentNode, dynamic_cast<Note *>(object));
+    }
+    else if (object->Is(PLICA)) {
+        m_currentNode = m_currentNode.append_child("plica");
+        WritePlica(m_currentNode, dynamic_cast<Plica *>(object));
     }
     else if (object->Is(PROPORT)) {
         m_currentNode = m_currentNode.append_child("proport");
@@ -1821,6 +1826,14 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     rest->WriteRestVisMensural(currentNode);
 }
 
+void MEIOutput::WritePlica(pugi::xml_node currentNode, Plica *plica)
+{
+    assert(plica);
+
+    WriteLayerElement(currentNode, plica);
+    plica->WritePlicaVis(currentNode);
+}
+
 void MEIOutput::WriteProport(pugi::xml_node currentNode, Proport *proport)
 {
     assert(proport);
@@ -2647,6 +2660,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "artic") {
+            return true;
+        }
+        else if (element == "plica") {
             return true;
         }
         else if (element == "syl") {
@@ -4564,6 +4580,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "multiRpt") {
             success = ReadMultiRpt(parent, xmlElement);
         }
+        else if (elementName == "plica") {
+            success = ReadPlica(parent, xmlElement);
+        }
         else if (elementName == "proport") {
             success = ReadProport(parent, xmlElement);
         }
@@ -5076,6 +5095,18 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
     parent->AddChild(vrvRest);
     ReadUnsupportedAttr(rest, vrvRest);
     return ReadLayerChildren(vrvRest, rest, vrvRest);
+}
+
+bool MEIInput::ReadPlica(Object *parent, pugi::xml_node plica)
+{
+    Plica *vrvPlica = new Plica();
+    ReadLayerElement(plica, vrvPlica);
+
+    vrvPlica->ReadPlicaVis(plica);
+
+    parent->AddChild(vrvPlica);
+    ReadUnsupportedAttr(plica, vrvPlica);
+    return true;
 }
 
 bool MEIInput::ReadProport(Object *parent, pugi::xml_node proport)

@@ -206,6 +206,7 @@ enum ClassId {
     NC,
     NOTE,
     NEUME,
+    PLICA,
     PROPORT,
     REST,
     SPACE,
