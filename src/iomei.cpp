@@ -2647,7 +2647,10 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for ligature
     else if (filterParent->Is(LIGATURE)) {
-        if (element == "note") {
+        if (element == "dot") {
+            return true;
+        }
+        else if (element == "note") {
             return true;
         }
         else {

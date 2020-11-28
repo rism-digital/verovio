@@ -15,6 +15,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "dot.h"
 #include "elementpart.h"
 #include "layer.h"
 #include "ligature.h"
@@ -487,6 +488,25 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     if (!nextNote) {
         DrawFilledRoundedRectangle(dc, bottomRight->x - stemWidth, sides[2], bottomRight->x, sides[3], stemWidth / 3);
     }
+
+    return;
+}
+
+void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+
+    Dot *dot = vrv_cast<Dot *>(element);
+    assert(dot);
+
+    Note *note = dot->m_drawingNote;
+    assert(dot->m_drawingNote);
+
+    Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
+    assert(ligature);
 
     return;
 }
