@@ -521,6 +521,7 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
     }
     else {
         x += 3 * note->GetDrawingRadius(m_doc, true);
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     DrawDotsPart(dc, x, y, 1, staff);
