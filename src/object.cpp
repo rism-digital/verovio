@@ -1569,7 +1569,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         Beam *beam = vrv_cast<Beam *>(this);
         assert(beam);
         // Ignore it if it has cross-staff content but is not entirely cross-staff itself
-        if (beam->m_isCrossStaff && !beam->m_crossStaff) return FUNCTOR_CONTINUE;
+        if (beam->m_hasCrossStaffContent && !beam->m_crossStaff) return FUNCTOR_CONTINUE;
     }
 
     // Take into account stem for notes in cross-staff situation and in beams
