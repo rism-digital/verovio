@@ -1126,6 +1126,7 @@ void Beam::FilterList(ArrayOfObjects *childList)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     Staff *beamStaff = staff;
+    /*
     if (this->HasBeamWith()) {
         Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
         assert(measure);
@@ -1144,6 +1145,7 @@ void Beam::FilterList(ArrayOfObjects *childList)
             }
         }
     }
+    */
 
     InitCoords(childList, beamStaff, this->GetPlace());
 }
