@@ -844,23 +844,28 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int x = element->GetDrawingX();
-    int y = element->GetDrawingY();
-
-    if (m_doc->GetType() != Transcription) {
-        // Use the note to which the points to for position
-        if (dot->m_drawingNote && !dot->m_drawingNextElement) {
-            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
-            y = dot->m_drawingNote->GetDrawingY();
-        }
-        if (dot->m_drawingNote && dot->m_drawingNextElement) {
-            x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingNote->GetDrawingX()) / 2);
-            x += dot->m_drawingNote->GetDrawingRadius(m_doc);
-            y = dot->m_drawingNote->GetDrawingY();
-        }
+    if (dot->m_drawingNote && dot->m_drawingNote->IsInLigature()) {
+        this->DrawDotInLigature(dc, element, layer, staff, measure);
     }
+    else {
+        int x = element->GetDrawingX();
+        int y = element->GetDrawingY();
 
-    DrawDotsPart(dc, x, y, 1, staff);
+        if (m_doc->GetType() != Transcription) {
+            // Use the note to which the points to for position
+            if (dot->m_drawingNote && !dot->m_drawingNextElement) {
+                x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
+                y = dot->m_drawingNote->GetDrawingY();
+            }
+            if (dot->m_drawingNote && dot->m_drawingNextElement) {
+                x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingNote->GetDrawingX()) / 2);
+                x += dot->m_drawingNote->GetDrawingRadius(m_doc);
+                y = dot->m_drawingNote->GetDrawingY();
+            }
+        }
+
+        DrawDotsPart(dc, x, y, 1, staff);
+    }
 
     dc->EndGraphic(element, this);
 }
