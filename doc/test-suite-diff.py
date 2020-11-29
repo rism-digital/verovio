@@ -106,8 +106,8 @@ if __name__ == "__main__":
             pngFile1 = os.path.join(path_in1, item1, name + '.png')
             pngFile2 = os.path.join(path_in2, item1, name + '.png')
             pngFileOut = os.path.join(path_out, item1, name + '.png')
-            pngFile1Out = os.path.join(path_out, item1, name +  '.before.png')
-            pngFile2Out = os.path.join(path_out, item1, name + '.after.png')
+            pngFile1Out = os.path.join(path_out, item1, name +  '.after.png')
+            pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
             print(pngFile1, pngFile2)
 
             diffValue = diffimg.diff(pngFile1, pngFile2, delete_diff_file=True)
