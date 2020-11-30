@@ -3554,7 +3554,7 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "clef") {
             success = ReadClef(parent, current);
         }
-        else if (std::string(current.name()) == "grpSYm") {
+        else if (std::string(current.name()) == "grpSym") {
             success = ReadGrpSym(parent, current);
         }
         else if (std::string(current.name()) == "keySig") {
@@ -3679,16 +3679,18 @@ bool MEIInput::ReadGrpSym(Object *parent, pugi::xml_node grpSym)
     GrpSym *vrvGrpSym = new GrpSym();
 
     vrvGrpSym->ReadStaffGroupingSym(grpSym);
+    vrvGrpSym->ReadGrpSymLog(grpSym);
+    vrvGrpSym->ReadStartId(grpSym);
+    vrvGrpSym->ReadStartEndId(grpSym);
 
-    if (vrvGrpSym->HasLevel() || vrvGrpSym->HasStartid() || vrvGrpSym->HasEndid()) {
-        if (!parent->Is(SCOREDEF)) {
-            LogWarning("@level, @startId and @endId attributes are supported only under <scoreDef>");
-            return false;
+    if (parent->Is(SCOREDEF)) {
+        if (!vrvGrpSym->HasLevel() || !vrvGrpSym->HasStartid() || !vrvGrpSym->HasEndid()) {
+            LogWarning("<%s>' nested under <scoreDef> must have @level, @startId and @endId attributes", grpSym.name());
+            delete vrvGrpSym;
+            return true;
         }
-        vrvGrpSym->ReadGrpSymLog(grpSym);
-        vrvGrpSym->ReadStartId(grpSym);
-        vrvGrpSym->ReadStartEndId(grpSym);
     }
+
     parent->AddChild(vrvGrpSym);
    
     return true;

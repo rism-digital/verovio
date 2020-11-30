@@ -11,6 +11,7 @@
 #include "atts_mei.h"
 #include "atts_shared.h"
 #include "object.h"
+#include "staffdef.h"
 
 namespace vrv {
 
@@ -40,12 +41,33 @@ public:
     virtual ClassId GetClassId() const { return GRPSYM; }
     ///@}
 
+    /**
+     * @name Setter and getter for startDef/endDef
+     */
+    ///@{
+    void SetStartDef(StaffDef *start);
+    StaffDef *GetStartDef() const { return m_startDef; };
+    void SetEndDef(StaffDef *end);
+    StaffDef *GetEndDef() const { return m_endDef; };
+    ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::PrepareGroupSymbols
+     */
+    virtual int PrepareGroupSymbols(FunctorParams *functorParams);
+
 private:
     //
 public:
     //
 private:
     //
+    StaffDef *m_startDef;
+    StaffDef *m_endDef;
 };
 
 } // namespace vrv

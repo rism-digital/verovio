@@ -19,7 +19,6 @@
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
-#include "staffdef.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -58,6 +57,7 @@ void StaffGrp::Reset()
     ResetTyped();
 
     m_drawingVisibility = OPTIMIZATION_NONE;
+    m_groupSymbol = NULL;
 }
 
 bool StaffGrp::IsSupportedChild(Object *child)
@@ -126,6 +126,45 @@ int StaffGrp::GetMaxStaffSize()
     }
 
     return max;
+}
+
+std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
+{
+    const ArrayOfObjects *staffDefs = GetList(this);
+    if (staffDefs->empty()) {
+        return {NULL, NULL};
+    }
+
+    StaffDef *firstDef = NULL;
+    ArrayOfObjects::const_iterator iter;
+    for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>(*iter);
+        assert(staffDef);
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+            firstDef = staffDef;
+            break;
+        }
+    }
+
+    StaffDef *lastDef = NULL;
+    ArrayOfObjects::const_reverse_iterator riter;
+    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>(*riter);
+        assert(staffDef);
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+            lastDef = staffDef;
+            break;
+        }
+    }
+
+    return { firstDef, lastDef };
+}
+
+void StaffGrp::SetGroupSymbol(GrpSym *grpSym) 
+{
+    if (!m_groupSymbol && grpSym) {
+        m_groupSymbol = grpSym;
+    }
 }
 
 //----------------------------------------------------------------------------
