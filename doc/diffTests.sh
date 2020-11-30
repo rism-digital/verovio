@@ -15,7 +15,7 @@ outdir="/Users/laurent/tmp/test-output-diff"
 devdir="/Users/laurent/projects/verovio_lpugin"
 
 # The version of python we want to use (we can be more specific here, e.g., python3.8)
-PYTHON=python3
+PYTHON=python3.9
 
 # Store the path where we are
 home=`pwd`

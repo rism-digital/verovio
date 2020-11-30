@@ -116,7 +116,7 @@ public:
     bool m_beamHasChord;
     bool m_hasMultipleStemDir;
     bool m_cueSize;
-    bool m_isCrossStaff;
+    bool m_hasCrossStaffContent;
     int m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
