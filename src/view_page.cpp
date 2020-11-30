@@ -544,13 +544,13 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
         FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
         const int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
         const int height = 8 * m_doc->GetDrawingUnit(staffSize);
-        const float scale = vrv_cast<float>(y1 - y2) / height;
+        const float scale = static_cast<float>(y1 - y2) / height;
         // We want the brace width always to be 2 units
         const int braceWidth = m_doc->GetDrawingDoubleUnit(staffSize);
         x -= braceWidth;
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
         const float widthAfterScalling = width * scale;
-        font->SetWidthToHeightRatio(vrv_cast<float>(braceWidth) / widthAfterScalling);
+        font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
         dc->StartCustomGraphic("grpSym");
         DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
         dc->EndCustomGraphic();

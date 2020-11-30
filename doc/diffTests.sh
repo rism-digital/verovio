@@ -20,6 +20,20 @@ PYTHON=python3
 # Store the path where we are
 home=`pwd`
 
+# Ask if we want to empty the files previously generated
+read -p "Do you want to empty $indir1 $indir2 and $outdir ? [Y]" -n 1 -r
+echo    # move to a new line
+if [[ $REPLY =~ ^[Y]$ ]]
+then   
+    echo "Emptying directories ..."
+    rm $indir1/*/*.png
+    rm $indir1/*/*.svg
+    rm $indir2/*/*.png
+    rm $indir2/*/*.svg
+    rm $outdir/*/*.png
+    rm $outdir/index.html
+fi
+
 # Check if we need to rebuild the develop (reference) branch and tests
 build_dev=$1
 if [ ! -z $build_dev ]; then

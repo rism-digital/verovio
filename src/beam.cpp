@@ -1361,7 +1361,7 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
 
-    if (this->HasSameas() && !this->GetChild(1)) {
+    if (this->HasSameas() || !this->GetChildCount()) {
         return FUNCTOR_CONTINUE;
     }
 
