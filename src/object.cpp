@@ -1574,9 +1574,9 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     // Take into account stem for notes in cross-staff situation and in beams
     if (this->Is(STEM)) {
-        Note *note = dynamic_cast<Note *>(this->GetParent());
-        if (note && note->m_crossStaff && note->IsInBeam()) {
-            Beam *beam = vrv_cast<Beam *>(note->GetFirstAncestor(BEAM));
+        LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
+        if (noteOrChord && noteOrChord->m_crossStaff && noteOrChord->IsInBeam()) {
+            Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
             assert(beam);
             // Ignore it but only if the beam is not entirely cross-staff itself
             if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
