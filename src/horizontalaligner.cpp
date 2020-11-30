@@ -506,7 +506,8 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         Layer *layerRef = NULL;
         Staff *staffRef = element->GetCrossStaff(layerRef);
         // We have a cross-staff situation
-        if (staffRef) {
+        // For grace notes, we want to keep the original staffN because they need to be aligned together
+        if (staffRef && !element->IsGraceNote()) {
             assert(layerRef);
             // We set cross-staff layers to the negative value in the alignment references in order to distinct them
             layerN = -layerRef->GetN();
