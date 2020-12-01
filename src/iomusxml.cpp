@@ -886,6 +886,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
         m_ClefChangeStack.clear();
     }
+    if (!m_hairpinStack.empty() || !m_hairpinStopStack.empty()) {
+        LogWarning(
+            "MusicXML import: There are %d hairpins left open", m_hairpinStack.size() + m_hairpinStopStack.size());
+        m_hairpinStack.clear();
+        m_hairpinStopStack.clear();
+    }
     if (!m_tieStack.empty()) {
         LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
         m_tieStack.clear();
@@ -1763,7 +1769,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 // if this is empty, most likely we're dealing with an extender
             }
             else {
-                int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
+                const int measureDifference
+                    = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
                 m_bracketStack.front().first->SetLendsym(
                     ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
                 m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
@@ -1817,8 +1824,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (HasAttributeWithValue(dashes.node(), "type", "stop")) {
             std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter = m_openDashesStack.begin();
             while (iter != m_openDashesStack.end()) {
-                int measureDifference = m_measureCounts.at(measure) - iter->second.m_measureCount;
                 if (iter->second.m_dirN == dashesNumber && iter->second.m_staffNum == staffNum) {
+                    const int measureDifference = m_measureCounts.at(measure) - iter->second.m_measureCount;
                     if (iter->first->Is(DYNAM))
                         dynamic_cast<Dynam *>(iter->first)
                             ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
@@ -1985,7 +1992,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> >::iterator iter;
             for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
                 if (iter->second.m_dirN == hairpinNumber) {
-                    int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
+                    const int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
                     iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                     if (wedge->node().attribute("spread")) {
                         iter->first->SetOpening(wedge->node().attribute("spread").as_double() / 5);
@@ -2007,6 +2014,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
             else if (HasAttributeWithValue(wedge->node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
             }
+            else {
+                return;
+            }
             // hairpin->SetLform(hairpin->AttLineRendBase::StrToLineform(wedge.node().attribute("line-type").as_string()));
             if (wedge->node().attribute("niente")) {
                 hairpin->SetNiente(ConvertWordToBool(wedge->node().attribute("niente").as_string()));
@@ -2015,14 +2025,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             hairpin->SetTstamp(timeStamp);
             if (wedge->node().attribute("id")) hairpin->SetUuid(wedge->node().attribute("id").as_string());
-            pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode) {
-                hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
-                    std::to_string(staffNode.node().text().as_int() + staffOffset)));
-            }
-            else if (m_prevLayer) {
-                hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
-                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+            int staffNum = node.select_node("staff").node().text().as_int();
+            staffNum = !staffNum ? dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN() : staffNum;
+            if (staffNum != 0) {
+                hairpin->SetStaff(
+                    hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum + staffOffset)));
             }
             int defaultY = wedge->node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align hairpins
@@ -2031,12 +2038,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
             // match new hairpin to existing hairpin stop
             std::vector<std::tuple<int, double, musicxml::OpenSpanner> >::iterator iter;
             for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
+                const int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
-                    int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
-                    hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
-                    hairpin->SetStaff(
-                        hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(std::get<0>(*iter))));
-                    m_controlElements.push_back(std::make_pair(measureNum, hairpin));
+                    if (measureDifference >= 0) {
+                        hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
+                        m_controlElements.push_back(std::make_pair(measureNum, hairpin));
+                    }
                     m_hairpinStopStack.erase(iter);
                     return;
                 }
@@ -2140,7 +2147,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         int voiceNumber = lead.node().attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(lead.node(), "type", "stop")) {
-            int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
+            const int measureDifference
+                = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
             m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
             m_bracketStack.erase(m_bracketStack.begin());
         }
@@ -2234,7 +2242,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     // other cases
     if (!containsWords && !containsDynamics && !coda && !bracket && !lead && !metronome && !segno && !xmlShift
-        && !xmlPedal && !wedges.empty() && !dashes && !rehearsal) {
+        && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.first_child().name());
     }
 }
@@ -3067,7 +3075,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             = notations.node().select_node("ornaments/wavy-line[@type='stop']").node().attribute("number").as_int();
         std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter = m_trillStack.begin();
         while (iter != m_trillStack.end()) {
-            int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
+            const int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
             if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
                 (iter->first)
                     ->SetTstamp2(std::pair<int, double>(
@@ -3273,20 +3281,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_tempoStack.clear();
-    }
-    // add staff to hairpins
-    if (!m_hairpinStack.empty()) {
-        std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> >::iterator iter;
-        for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
-            if (!iter->first->HasStaff())
-                iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        }
-    }
-    if (!m_hairpinStopStack.empty()) {
-        std::vector<std::tuple<int, double, musicxml::OpenSpanner> >::iterator iter;
-        for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
-            if (std::get<0>(*iter) == 0) std::get<0>(*iter) = staff->GetN();
-        }
     }
 }
 
