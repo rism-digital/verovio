@@ -1518,9 +1518,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            bool afterBarline = false; // read after-barline attribute of clef; default is false (thus: before barline)
-            std::string afterBarlineText = clef.node().attribute("after-barline").as_string();
-            if (!afterBarlineText.empty() && afterBarlineText.compare("yes") == 0) afterBarline = true;
+            bool afterBarline = clef.node().attribute("after-barline").as_bool();
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
