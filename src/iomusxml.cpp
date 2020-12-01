@@ -1446,7 +1446,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
-            staff->AddChild(new Layer());
+            Layer *emptyLayer = new Layer();
+            emptyLayer->AddChild(new MSpace());
+            staff->AddChild(emptyLayer);
         }
         // add clef changes that might occur just before a bar line and remove inserted clefs from stack
         if (!m_ClefChangeStack.empty()) {
