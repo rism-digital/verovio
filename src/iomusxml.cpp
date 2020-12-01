@@ -817,7 +817,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // do nothing
         }
     }
-    // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
+    // here we could check that there is only one staffGrp left in m_staffGrpStack
 
     Measure *measure = NULL;
     std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
