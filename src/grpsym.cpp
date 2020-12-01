@@ -25,11 +25,7 @@ namespace vrv {
 // GrpSym
 //----------------------------------------------------------------------------
 
-GrpSym::GrpSym() : Object("grpsym-")
-    , AttStaffGroupingSym()
-    , AttGrpSymLog()
-    , AttStartId()
-    , AttStartEndId()
+GrpSym::GrpSym() : Object("grpsym-"), AttGrpSymLog(), AttStaffGroupingSym(), AttStartId(), AttStartEndId()
 {
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_GRPSYMLOG);
@@ -41,7 +37,7 @@ GrpSym::GrpSym() : Object("grpsym-")
 
 GrpSym::~GrpSym() {}
 
-void GrpSym::Reset() 
+void GrpSym::Reset()
 {
     Object::Reset();
     ResetStaffGroupingSym();
@@ -53,12 +49,12 @@ void GrpSym::Reset()
     m_endDef = NULL;
 }
 
-void GrpSym::SetStartDef(StaffDef* start)
+void GrpSym::SetStartDef(StaffDef *start)
 {
     if (start && !m_startDef) m_startDef = start;
 }
 
-void GrpSym::SetEndDef(StaffDef* end)
+void GrpSym::SetEndDef(StaffDef *end)
 {
     if (end && !m_endDef) m_endDef = end;
 }

@@ -444,18 +444,18 @@ private:
  * This class evaluates if the object is of a certain ClassId has a certain Uuid
  */
 class UuidComparison : public ClassIdComparison {
-    
-public:
-    UuidComparison(ClassId classId, const std::string& uuid) : ClassIdComparison(classId) { m_uuid = uuid; }
 
-    void SetUuid(const std::string& uuid) { m_uuid = uuid; }
+public:
+    UuidComparison(ClassId classId, const std::string &uuid) : ClassIdComparison(classId) { m_uuid = uuid; }
+
+    void SetUuid(const std::string &uuid) { m_uuid = uuid; }
 
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
         return object->GetUuid() == m_uuid;
     }
-    
+
 private:
     std::string m_uuid;
 };

@@ -1044,7 +1044,6 @@ void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
     grpSym->WriteGrpSymLog(currentNode);
     grpSym->WriteStartId(currentNode);
     grpSym->WriteStartEndId(currentNode);
-
 }
 
 void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
@@ -3609,7 +3608,7 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
     vrvStaffGrp->ReadLabelled(staffGrp);
     AttStaffGroupingSym groupingSym;
     groupingSym.ReadStaffGroupingSym(staffGrp);
-    if (groupingSym.HasSymbol()) { 
+    if (groupingSym.HasSymbol()) {
         GrpSym *vrvGrpSym = new GrpSym();
         vrvGrpSym->IsAttribute(true);
         vrvGrpSym->SetSymbol(groupingSym.GetSymbol());
@@ -3692,7 +3691,7 @@ bool MEIInput::ReadGrpSym(Object *parent, pugi::xml_node grpSym)
     }
 
     parent->AddChild(vrvGrpSym);
-   
+
     return true;
 }
 

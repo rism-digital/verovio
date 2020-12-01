@@ -22,11 +22,7 @@ namespace vrv {
 /**
  * This class represents a MEI grpSym.
  */
-class GrpSym : public Object
-    , public AttStaffGroupingSym
-    , public AttGrpSymLog
-    , public AttStartId
-    , public AttStartEndId {
+class GrpSym : public Object, public AttGrpSymLog, public AttStaffGroupingSym, public AttStartId, public AttStartEndId {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

@@ -132,7 +132,7 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 {
     const ArrayOfObjects *staffDefs = GetList(this);
     if (staffDefs->empty()) {
-        return {NULL, NULL};
+        return { NULL, NULL };
     }
 
     StaffDef *firstDef = NULL;
@@ -160,7 +160,7 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
     return { firstDef, lastDef };
 }
 
-void StaffGrp::SetGroupSymbol(GrpSym *grpSym) 
+void StaffGrp::SetGroupSymbol(GrpSym *grpSym)
 {
     if (!m_groupSymbol && grpSym) {
         m_groupSymbol = grpSym;
