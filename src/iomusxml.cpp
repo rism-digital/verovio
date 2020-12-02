@@ -34,6 +34,7 @@
 #include "fing.h"
 #include "ftrem.h"
 #include "gliss.h"
+#include "grpsym.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "instrdef.h"
@@ -635,17 +636,21 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 StaffGrp *staffGrp = new StaffGrp();
                 // read the group-symbol (MEI @symbol)
                 std::string groupGymbol = GetContentOfChild(xpathNode.node(), "group-symbol");
-                if (groupGymbol == "brace") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
-                }
-                else if (groupGymbol == "line") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_line);
-                }
-                else if (groupGymbol == "bracket") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracket);
-                }
-                else if (groupGymbol == "square") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
+                if (!groupGymbol.empty()) {
+                    GrpSym *grpSym = new GrpSym();
+                    if (groupGymbol == "brace") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                    }
+                    else if (groupGymbol == "line") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_line);
+                    }
+                    else if (groupGymbol == "bracket") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+                    }
+                    else if (groupGymbol == "square") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
+                    }
+                    staffGrp->AddChild(grpSym);
                 }
                 const std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
                 staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
