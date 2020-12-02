@@ -318,7 +318,7 @@ bool MEIOutput::WriteObject(Object *object)
 
     // ScoreDef related
     else if (object->Is(GRPSYM)) {
-        m_currentNode = m_currentNode.append_child("grpSym");
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("grpSym");
         WriteGrpSym(m_currentNode, dynamic_cast<GrpSym *>(object));
     }
     else if (object->Is(INSTRDEF)) {
