@@ -61,6 +61,18 @@ void GrpSym::SetEndDef(StaffDef *end)
     if (end && !m_endDef) m_endDef = end;
 }
 
+int GrpSym::GetDrawingX() const
+{
+    m_cachedDrawingX = 0;
+    return m_cachedDrawingX;
+}
+
+int GrpSym::GetDrawingY() const
+{
+    m_cachedDrawingY = 0;
+    return m_cachedDrawingX;
+}
+
 //----------------------------------------------------------------------------
 // GrpSym functor methods
 //----------------------------------------------------------------------------

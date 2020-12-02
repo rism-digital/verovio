@@ -380,6 +380,8 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
     GrpSym *groupSymbol = vrv_cast<GrpSym *>(staffGrp->GetGroupSymbol());
     if (!groupSymbol) return;
 
+    dc->StartGraphic(groupSymbol, "", groupSymbol->GetUuid());
+
     // Get the corresponding staff looking at the previous (or first) measure
     AttNIntegerComparison comparisonFirst(STAFF, groupSymbol->GetStartDef()->GetN());
     Staff *first = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
@@ -427,6 +429,8 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
         }
         default: break;
     }
+
+    dc->EndGraphic(groupSymbol, this);
 }
 
 void View::DrawLabels(

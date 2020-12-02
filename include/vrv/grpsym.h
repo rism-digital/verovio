@@ -51,6 +51,14 @@ public:
     void SetEndDef(StaffDef *end);
     StaffDef *GetEndDef() const { return m_endDef; };
     ///@}
+    
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
 
     //----------//
     // Functors //
