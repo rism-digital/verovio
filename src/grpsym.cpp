@@ -25,10 +25,11 @@ namespace vrv {
 // GrpSym
 //----------------------------------------------------------------------------
 
-GrpSym::GrpSym() : Object("grpsym-"), AttGrpSymLog(), AttStaffGroupingSym(), AttStartId(), AttStartEndId()
+GrpSym::GrpSym() : Object("grpsym-"), AttColor(), AttGrpSymLog(), AttStaffGroupingSym(), AttStartId(), AttStartEndId()
 {
-    RegisterAttClass(ATT_STAFFGROUPINGSYM);
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_GRPSYMLOG);
+    RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STARTID);
     RegisterAttClass(ATT_STARTENDID);
 
@@ -40,8 +41,9 @@ GrpSym::~GrpSym() {}
 void GrpSym::Reset()
 {
     Object::Reset();
-    ResetStaffGroupingSym();
+    ResetColor();
     ResetGrpSymLog();
+    ResetStaffGroupingSym();
     ResetStartId();
     ResetStartEndId();
 

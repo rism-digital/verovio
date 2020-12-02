@@ -1040,8 +1040,9 @@ void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
         return;
     }
 
-    grpSym->WriteStaffGroupingSym(currentNode);
+    grpSym->WriteColor(currentNode);
     grpSym->WriteGrpSymLog(currentNode);
+    grpSym->WriteStaffGroupingSym(currentNode);
     grpSym->WriteStartId(currentNode);
     grpSym->WriteStartEndId(currentNode);
 }
@@ -3677,8 +3678,9 @@ bool MEIInput::ReadGrpSym(Object *parent, pugi::xml_node grpSym)
 {
     GrpSym *vrvGrpSym = new GrpSym();
 
-    vrvGrpSym->ReadStaffGroupingSym(grpSym);
+    vrvGrpSym->ReadColor(grpSym);
     vrvGrpSym->ReadGrpSymLog(grpSym);
+    vrvGrpSym->ReadStaffGroupingSym(grpSym);
     vrvGrpSym->ReadStartId(grpSym);
     vrvGrpSym->ReadStartEndId(grpSym);
 
