@@ -3699,7 +3699,7 @@ bool MEIInput::ReadGrpSym(Object *parent, pugi::xml_node grpSym)
     }
 
     parent->AddChild(vrvGrpSym);
-
+    ReadUnsupportedAttr(grpSym, vrvGrpSym);
     return true;
 }
 
