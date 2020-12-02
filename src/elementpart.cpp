@@ -368,7 +368,11 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
     const int displacementMargin = (position - ledgerPosition) * directionBias;
 
     if (displacementMargin < 0) {
-        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias;
+        int offset = 0;
+        if ((stemDirection == STEMDIRECTION_down) && (displacementMargin % adjustmentStep > -adjustmentStep / 6)) {
+            offset = adjustmentStep / 2;
+        }
+        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
         SetDrawingStemLen(GetDrawingStemLen() + heightToAdjust);
         flag->SetDrawingYRel(-GetDrawingStemLen());
     }
