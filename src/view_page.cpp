@@ -514,14 +514,10 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     const int x2 = x - basicDist;
     const int x1 = x2 - bracketThickness;
 
-    dc->StartCustomGraphic("grpSym");
-
     DrawSmuflCode(dc, x1, y1 + offset + bracketThickness / 2, SMUFL_E003_bracketTop, staffSize, false);
     DrawSmuflCode(dc, x1, y2 - offset - bracketThickness / 2, SMUFL_E004_bracketBottom, staffSize, false);
 
     DrawFilledRectangle(dc, x1, y1 + 2 * offset + bracketThickness / 2, x2, y2 - 2 * offset - bracketThickness / 2);
-
-    dc->EndCustomGraphic();
 
     return;
 }
@@ -536,13 +532,9 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
     const int bracketWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
     x -= basicDist;
 
-    dc->StartCustomGraphic("grpSym");
-
     DrawFilledRectangle(dc, x, y1 + offset, x - bracketWidth, y2 - offset); // left
     DrawFilledRectangle(dc, x, y1 + offset, x + basicDist, y1 - offset); // top
     DrawFilledRectangle(dc, x, y2 + offset, x + basicDist, y2 - offset); // bottom
-
-    dc->EndCustomGraphic();
 
     return;
 }
@@ -609,8 +601,6 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->StartCustomGraphic("grpSym");
-
     dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
@@ -639,8 +629,6 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     dc->ResetPen();
     dc->ResetBrush();
-
-    dc->EndCustomGraphic();
 
     return;
 }

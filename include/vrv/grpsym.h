@@ -51,7 +51,7 @@ public:
     void SetEndDef(StaffDef *end);
     StaffDef *GetEndDef() const { return m_endDef; };
     ///@}
-    
+
     /**
      * @name Get the X and Y drawing position
      */
