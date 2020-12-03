@@ -2322,7 +2322,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
     if (bass) {
         harmText += "/" + GetContentOfChild(node, "bass/bass-step");
         pugi::xpath_node alter = node.select_node("bass/bass-alter");
-        harmText += ConvertAlterToSymbol(GetContent(alter.node()));
+        if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     }
     Harm *harm = new Harm();
     Text *text = new Text();
