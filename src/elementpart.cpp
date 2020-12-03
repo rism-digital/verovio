@@ -333,6 +333,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
 {
     Note *note = vrv_cast<Note *>(GetFirstAncestor(NOTE));
+    if (!note) return;
 
     const data_STEMDIRECTION stemDirection = GetDrawingStemDir();
     // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
@@ -368,7 +369,11 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
     const int displacementMargin = (position - ledgerPosition) * directionBias;
 
     if (displacementMargin < 0) {
-        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias;
+        int offset = 0;
+        if ((stemDirection == STEMDIRECTION_down) && (displacementMargin % adjustmentStep > -adjustmentStep / 3)) {
+            offset = adjustmentStep / 2;
+        }
+        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
         SetDrawingStemLen(GetDrawingStemLen() + heightToAdjust);
         flag->SetDrawingYRel(-GetDrawingStemLen());
     }
