@@ -1254,8 +1254,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         if (multiRest->HasWidth()) {
-            width = multiRest->AttWidth::GetWidth();
-            if (width > measureWidth) LogWarning("measure too short");
+            const int fixedWidth = multiRest->AttWidth::GetWidth() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            width = (width > fixedWidth) ? fixedWidth : width;
         }
 
         // a is the central point, claculate x and x2
@@ -1264,6 +1264,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         // Position centered in staff
         y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
+        if (multiRest->HasLoc()) {
+            y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
+        }
         y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // bounding box is not relevant for the multi-rest rectangle
