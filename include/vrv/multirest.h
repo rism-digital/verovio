@@ -23,7 +23,12 @@ namespace vrv {
 /**
  * This class models the MEI <multiRest> element.
  */
-class MultiRest : public LayerElement, public PositionInterface, public AttColor, public AttMultiRestVis, public AttNumbered, public AttWidth {
+class MultiRest : public LayerElement,
+                  public PositionInterface,
+                  public AttColor,
+                  public AttMultiRestVis,
+                  public AttNumbered,
+                  public AttWidth {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

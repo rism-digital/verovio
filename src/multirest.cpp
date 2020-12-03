@@ -13,7 +13,8 @@ namespace vrv {
 // MultiRest
 //----------------------------------------------------------------------------
 
-MultiRest::MultiRest() : LayerElement("multirest-"), PositionInterface(), AttColor(), AttMultiRestVis(), AttNumbered(), AttWidth()
+MultiRest::MultiRest()
+    : LayerElement("multirest-"), PositionInterface(), AttColor(), AttMultiRestVis(), AttNumbered(), AttWidth()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
