@@ -2026,7 +2026,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             hairpin->SetTstamp(timeStamp);
             if (wedge->node().attribute("id")) hairpin->SetUuid(wedge->node().attribute("id").as_string());
             int staffNum = node.select_node("staff").node().text().as_int();
-            staffNum = !staffNum ? dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN() : staffNum;
+            staffNum = (!staffNum && m_prevLayer) ? dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN() : staffNum;
             if (staffNum != 0) {
                 hairpin->SetStaff(
                     hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum + staffOffset)));
