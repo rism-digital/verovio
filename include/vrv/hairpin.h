@@ -73,6 +73,12 @@ public:
     ControlElement *GetRightLink() { return m_rightLink; }
     ///@}
 
+    /**
+     * Get left/right adjustments that needs to be done to the hairpin with set coordinates (leftX, rightX) for it not
+     * to overlap with parent measure's barlines
+     */
+    std::pair<int, int> GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX);
+
     //----------//
     // Functors //
     //----------//
