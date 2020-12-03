@@ -172,7 +172,8 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
         if (leftBarline->GetForm() == BARRENDITION_rptstart) margin *= 1.5;
         if (diff < margin) leftAdjustment = margin - diff;
     }
-    // Same calculation is done for the right barline, with it having two barline forms that we need to consider as opposed to only one for the left barline
+    // Same calculation is done for the right barline, with it having two barline forms that we need to consider
+    // as opposed to only one for the left barline
     int rightAdjustment = 0;
     BarLine *rightBarline = endMeasure->GetRightBarLine();
     if (rightBarline) {
