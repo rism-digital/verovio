@@ -1958,7 +1958,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (node.select_node("sound")) {
             const float dynamics = node.select_node("sound").node().attribute("dynamics").as_float(-1.0);
             if (dynamics >= 0.0) {
-                dynam->SetVal(std::min(int((dynamics * 90) / 100), 127));
+                dynam->SetVal(ConvertDynamicsToMidiVal(dynamics));
             }
         }
 
@@ -2622,7 +2622,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         // dynamics (MIDI velocity)
         const float dynamics = node.attribute("dynamics").as_float(-1.0);
         if (dynamics >= 0.0) {
-            note->SetVel(std::min(int((dynamics * 90) / 100), 127));
+            note->SetVel(ConvertDynamicsToMidiVal(dynamics));
         }
 
         // notehead
@@ -3646,6 +3646,15 @@ data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(const std::string &v
     }
 
     return LINESTARTENDSYMBOL_NONE;
+}
+
+data_MIDIVALUE MusicXmlInput::ConvertDynamicsToMidiVal(const float dynamics)
+{
+    if (dynamics > 0.0) {
+        int mididynam = int(dynamics * 90.0 / 100.0 + 0.5);
+        return std::max(1, std::min(127, mididynam));
+    }
+    return 0;
 }
 
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
