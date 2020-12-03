@@ -506,7 +506,8 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         Layer *layerRef = NULL;
         Staff *staffRef = element->GetCrossStaff(layerRef);
         // We have a cross-staff situation
-        if (staffRef) {
+        // For grace notes, we want to keep the original staffN because they need to be aligned together
+        if (staffRef && !element->IsGraceNote()) {
             assert(layerRef);
             // We set cross-staff layers to the negative value in the alignment references in order to distinct them
             layerN = -layerRef->GetN();
@@ -794,6 +795,22 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             this->GetLeftRight(-1, minLeft, maxRight);
         }
 
+        // Make sure that there is no overlap with right barline of the previous measure
+        if ((maxRight == VRV_UNSET) && (m_type == ALIGNMENT_MEASURE_LEFT_BARLINE)) {
+            Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+            auto parent = measure->GetParent();
+            Measure *previous = vrv_cast<Measure *>(parent->GetPrevious(measure, MEASURE));
+            if (previous) {
+                Alignment *alignment = previous->m_measureAligner.GetRightBarLineAlignment();
+                alignment->GetLeftRight(-1, minLeft, maxRight);
+                if (maxRight != VRV_UNSET) {
+                    const int previousWidth = previous->GetWidth();
+                    minLeft -= previousWidth;
+                    maxRight -= previousWidth;
+                }
+            }
+        }
+
         // Nothing, just continue
         if (maxRight == VRV_UNSET) {
             ++iter;
@@ -802,7 +819,7 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
 
         int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
         // HARDCODED
-        overlap += params->m_doc->GetDrawingUnit(100) / 2;
+        overlap += params->m_doc->GetDrawingUnit(100) / 2 * 3;
         // LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
         if (overlap > 0) {
             ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), overlap) };

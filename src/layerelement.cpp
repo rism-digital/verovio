@@ -1511,15 +1511,42 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    DurationInterface *durElement = this->GetDurationInterface();
-    if (!durElement) return FUNCTOR_CONTINUE;
-
-    // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
-    // in the the children of one element. We do not consider this now because it seems over the top
-    // We would need to look at the @n attribute and to have a stack to handle this properly
-    if (durElement->HasStaff()) {
-        params->m_currentCrossStaff = NULL;
-        params->m_currentCrossLayer = NULL;
+    DurationInterface *durInterface = this->GetDurationInterface();
+    if (durInterface) {
+        // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
+        // in the the children of one element. We do not consider this now because it seems over the top
+        // We would need to look at the @n attribute and to have a stack to handle this properly
+        if (durInterface->HasStaff()) {
+            params->m_currentCrossStaff = NULL;
+            params->m_currentCrossLayer = NULL;
+        }
+    }
+    else {
+        // For other elements (e.g., beams, tuplets) check if all their children duration element are cross-staff
+        // If yes, make them cross-staff themselves.
+        ListOfObjects durations;
+        InterfaceComparison hasInterface(INTERFACE_DURATION);
+        this->FindAllDescendantByComparison(&durations, &hasInterface);
+        Staff *crossStaff = NULL;
+        Layer *crossLayer = NULL;
+        for (auto object : durations) {
+            LayerElement *durElement = vrv_cast<LayerElement *>(object);
+            assert(durElement);
+            // The duration element is not cross-staff, of the cross-staff is not that same staff (very rare)
+            if (!durElement->m_crossStaff || (crossStaff && (durElement->m_crossStaff != crossStaff))) {
+                crossStaff = NULL;
+                // We can stop here
+                break;
+            }
+            else {
+                crossStaff = durElement->m_crossStaff;
+                crossLayer = durElement->m_crossLayer;
+            }
+        }
+        if (crossStaff) {
+            this->m_crossStaff = crossStaff;
+            this->m_crossLayer = crossLayer;
+        }
     }
 
     return FUNCTOR_CONTINUE;
