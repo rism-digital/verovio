@@ -3341,6 +3341,11 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         // find start and end of the beam
         const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
         const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
+
+        if (beamEndIterator == currentMeasureNodes.end()) {
+            LogError("MusicXML import: Beam ending point has not been found for <'%s'>", layer->GetUuid().c_str());
+            return;
+        }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
         std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
         bool isTupletStartInBeam
