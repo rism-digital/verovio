@@ -680,6 +680,8 @@ protected:
     void checkForVerseLabels(hum::HTp token);
     std::vector<hum::HTp> getVerseLabels(hum::HTp token, int staff);
     std::string getVerseLabelText(hum::HTp token);
+    void addPlicaUp(Note *note);
+    void addPlicaDown(Note *note);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

@@ -89,6 +89,7 @@
 #include "pb.h"
 #include "pedal.h"
 #include "pghead.h"
+#include "plica.h"
 #include "rdg.h"
 #include "reh.h"
 #include "rend.h"
@@ -9425,6 +9426,12 @@ void HumdrumInput::convertMensuralToken(
         }
         appendElement(elements, pointers, note);
         convertNote(note, token, 0, staffindex);
+        if (token->find("p") != std::string::npos) {
+            addPlicaUp(note);
+        }
+        if (token->find("P") != std::string::npos) {
+            addPlicaDown(note);
+        }
         processSlurs(token);
         processPhrases(token);
         processDirections(token, staffindex);
@@ -9472,6 +9479,30 @@ void HumdrumInput::convertMensuralToken(
     if (ooff) {
         ss[staffindex].ligature_obliqua = false;
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addPlicaDown --
+//
+
+void HumdrumInput::addPlicaDown(Note *note)
+{
+    Plica *plica = new Plica;
+    plica->SetDir(STEMDIRECTION_basic_down);
+    note->AddChild(plica);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addPlicaUp --
+//
+
+void HumdrumInput::addPlicaUp(Note *note)
+{
+    Plica *plica = new Plica;
+    plica->SetDir(STEMDIRECTION_basic_up);
+    note->AddChild(plica);
 }
 
 //////////////////////////////
