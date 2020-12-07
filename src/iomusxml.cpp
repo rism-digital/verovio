@@ -1493,7 +1493,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1));
+        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
         assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
@@ -2026,7 +2026,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             hairpin->SetTstamp(timeStamp);
             if (wedge->node().attribute("id")) hairpin->SetUuid(wedge->node().attribute("id").as_string());
             int staffNum = node.select_node("staff").node().text().as_int();
-            staffNum = !staffNum ? dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN() : staffNum;
+            staffNum = (!staffNum && m_prevLayer) ? dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN() : staffNum;
             if (staffNum != 0) {
                 hairpin->SetStaff(
                     hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum + staffOffset)));
@@ -2322,7 +2322,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
     if (bass) {
         harmText += "/" + GetContentOfChild(node, "bass/bass-step");
         pugi::xpath_node alter = node.select_node("bass/bass-alter");
-        harmText += ConvertAlterToSymbol(GetContent(alter.node()));
+        if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     }
     Harm *harm = new Harm();
     Text *text = new Text();
@@ -3341,6 +3341,11 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         // find start and end of the beam
         const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
         const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
+
+        if (beamEndIterator == currentMeasureNodes.end()) {
+            LogError("MusicXML import: Beam ending point has not been found for <'%s'>", layer->GetUuid().c_str());
+            return;
+        }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
         std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
         bool isTupletStartInBeam
