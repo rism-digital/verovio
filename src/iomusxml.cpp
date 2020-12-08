@@ -2904,11 +2904,18 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         dynam->SetStartid(m_ID);
-        std::string dynamStr = GetContentOfChild(xmlDynam.node(), "other-dynamics");
-        if (dynamStr.empty()) dynamStr = xmlDynam.node().first_child().name();
         if (xmlDynam.node().attribute("id")) dynam->SetUuid(xmlDynam.node().attribute("id").as_string());
         // place
         dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.node().attribute("placement").as_string()));
+        std::string dynamStr;
+        for (pugi::xml_node xmlDynamPart : xmlDynam.node().children()) {
+            if (xmlDynamPart.text()) {
+                dynamStr += xmlDynamPart.text().as_string();
+            }
+            else {
+                dynamStr += xmlDynamPart.name();
+            }
+        }
         Text *text = new Text();
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
