@@ -1777,7 +1777,10 @@ void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff, bool cue
 
     y1 = y;
     int height = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    if (cueSize) height *= m_options->m_graceFactor.GetValue();
+    if (cueSize) {
+        y1 += height * (1 - m_options->m_graceFactor.GetValue()) / 2;
+        height *= m_options->m_graceFactor.GetValue();
+    }
     y2 = y1 + height;
 
     DrawFilledRectangle(dc, x1, y2, x2, y1);
