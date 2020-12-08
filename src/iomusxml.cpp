@@ -243,7 +243,6 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
                 return SelectLayer(layerNum, staff);
             }
         }
-        if ((*staff->GetChildren()).empty()) return SelectLayer(layerNum, staff);
     }
     // if not, take staff info of node element
     int staffNum = node.child("staff").text().as_int();
