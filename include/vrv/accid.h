@@ -115,9 +115,12 @@ public:
         else if (first->GetDrawingY() > second->GetDrawingY()) {
             return false;
         }
-        // with unissons, natural should always be the last accidental
         else {
-            return (first->GetAccid() != ACCIDENTAL_WRITTEN_n);
+            // with unissons, natural should always be the last accidental (assuming there is a natural)
+            if ((first->GetAccid() == ACCIDENTAL_WRITTEN_n) || (second->GetAccid() == ACCIDENTAL_WRITTEN_n)) {
+                return (first->GetAccid() != ACCIDENTAL_WRITTEN_n);
+            }
+            return first->GetDrawingY() < second->GetDrawingY();
         }
     }
 };
