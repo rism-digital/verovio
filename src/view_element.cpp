@@ -1171,9 +1171,10 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
         if (!mRest->HasLoc()) y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        const int offset = drawingCueSize?  m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_graceFactor.GetValue() / 2 : m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
-        DrawRestBreve(
-            dc, mRest->GetDrawingX() - offset, y, staff, drawingCueSize);
+        const int offset = drawingCueSize
+            ? m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_graceFactor.GetValue() / 2
+            : m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        DrawRestBreve(dc, mRest->GetDrawingX() - offset, y, staff, drawingCueSize);
     }
     else
         DrawRestWhole(dc,
