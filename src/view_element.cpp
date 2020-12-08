@@ -1456,7 +1456,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     switch (drawingDur) {
         case DUR_LG: DrawRestLong(dc, x, y, staff); break;
-        case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
+        case DUR_BR: DrawRestBreve(dc, x, y, staff, drawingCueSize); break;
         case DUR_1:
         case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
         default:
