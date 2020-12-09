@@ -3941,7 +3941,7 @@ void MusicXmlInput::SetChordStaff(Layer *layer)
     });
     if (it != chord->GetChildren()->end()) return;
 
-    // if all notes have @staff attribute, but it's not the same staff at least ofr one note - leave it as is
+    // if all notes have @staff attribute, but it's not the same staff at least of one note - leave it as is
     const auto chordStaff = vrv_cast<Note *>(chord->GetFirst(NOTE))->GetStaff();
     it = find_if(children->begin(), children->end(), [&chordStaff](Object *object) {
         if (!object->Is(NOTE)) return false;
