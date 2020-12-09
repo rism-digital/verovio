@@ -2876,6 +2876,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // if we are ending a chord remove it from the stack
         if (!nextIsChord) {
             if (!m_elementStackMap.at(layer).empty() && m_elementStackMap.at(layer).back()->Is(CHORD)) {
+                SetChordStaff(layer);
+
                 RemoveLastFromStack(CHORD, layer);
             }
         }
@@ -3923,6 +3925,34 @@ std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
     };
 
     return precomposedNames.end() != precomposedNames.find(attributes) ? precomposedNames[attributes] : "";
+}
+
+void MusicXmlInput::SetChordStaff(Layer *layer)
+{
+    // if all notes in the chord have @staff attribute set one for the chord as well
+    Chord *chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
+    if (!chord) return;
+
+    const ArrayOfObjects *children = chord->GetChildren();
+    auto it = find_if(children->begin(), children->end(), [](Object *object) {
+        if (!object->Is(NOTE)) return false;
+        Note *note = vrv_cast<Note *>(object);
+        return !note->HasStaff();
+    });
+
+    if (it == chord->GetChildren()->end()) {
+        const auto chordStaff = vrv_cast<Note *>(chord->GetFirst(NOTE))->GetStaff();
+        chord->SetStaff(chordStaff);
+
+        //Now that chord has @staff set, we need to clear it from the notes
+        for_each(children->begin(), children->end(), [&chordStaff](Object *object) {
+            if (!object->Is(NOTE)) return false;
+            Note *note = vrv_cast<Note *>(object);
+            if (chordStaff == note->GetStaff()) {
+                note->ResetStaffIdent();
+            }
+        });
+    }
 }
 
 } // namespace vrv
