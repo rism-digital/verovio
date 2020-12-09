@@ -3939,20 +3939,24 @@ void MusicXmlInput::SetChordStaff(Layer *layer)
         Note *note = vrv_cast<Note *>(object);
         return !note->HasStaff();
     });
+    if (it != chord->GetChildren()->end()) return;
 
-    if (it == chord->GetChildren()->end()) {
-        const auto chordStaff = vrv_cast<Note *>(chord->GetFirst(NOTE))->GetStaff();
-        chord->SetStaff(chordStaff);
+    // if all notes have @staff attribute, but it's not the same staff at least ofr one note - leave it as is
+    const auto chordStaff = vrv_cast<Note *>(chord->GetFirst(NOTE))->GetStaff();
+    it = find_if(children->begin(), children->end(), [&chordStaff](Object *object) {
+        if (!object->Is(NOTE)) return false;
+        Note *note = vrv_cast<Note *>(object);
+        return (chordStaff != note->GetStaff());
+    });
+    if (it != chord->GetChildren()->end()) return;
 
-        //Now that chord has @staff set, we need to clear it from the notes
-        for_each(children->begin(), children->end(), [&chordStaff](Object *object) {
-            if (!object->Is(NOTE)) return false;
-            Note *note = vrv_cast<Note *>(object);
-            if (chordStaff == note->GetStaff()) {
-                note->ResetStaffIdent();
-            }
-        });
-    }
+    // Now that we're sure that cross-staff is the same for all notes, we can set it to chord and clear of notes
+    chord->SetStaff(chordStaff);
+    for_each(children->begin(), children->end(), [](Object *object) {
+        if (!object->Is(NOTE)) return;
+        Note *note = vrv_cast<Note *>(object);
+        note->ResetStaffIdent();
+    });
 }
 
 } // namespace vrv
