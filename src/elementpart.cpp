@@ -332,7 +332,8 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
 {
-    Note *note = vrv_cast<Note *>(GetFirstAncestor(NOTE));
+    LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+    if (!parent) return;
 
     const data_STEMDIRECTION stemDirection = GetDrawingStemDir();
     // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
@@ -344,7 +345,7 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
     // only downward ones
     const int adjustmentStep = doc->GetDrawingUnit(staffSize);
     if (stemDirection == STEMDIRECTION_down) {
-        const int noteheadMargin = GetDrawingStemLen() - (glyphHeight + note->GetDrawingRadius(doc));
+        const int noteheadMargin = GetDrawingStemLen() - (glyphHeight + parent->GetDrawingRadius(doc));
         if ((duration > DURATION_16) && (noteheadMargin < 0)) {
             int offset = 0;
             if (noteheadMargin % adjustmentStep < -adjustmentStep / 3 * 2) offset = adjustmentStep / 2;
@@ -354,9 +355,16 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
         }
     }
 
+    Note *note = NULL;
+    if (parent->Is(NOTE)) {
+        note = vrv_cast<Note *>(parent);
+    }
+    else if (parent->Is(CHORD)) {
+        note = vrv_cast<Chord *>(parent)->GetTopNote();
+    }
     int ledgerAbove = 0;
     int ledgerBelow = 0;
-    if (!note->HasLedgerLines(ledgerAbove, ledgerBelow)) return;
+    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow)) return;
     if (((stemDirection == STEMDIRECTION_up) && !ledgerBelow)
         || ((stemDirection == STEMDIRECTION_down) && !ledgerAbove))
         return;
@@ -368,7 +376,11 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
     const int displacementMargin = (position - ledgerPosition) * directionBias;
 
     if (displacementMargin < 0) {
-        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias;
+        int offset = 0;
+        if ((stemDirection == STEMDIRECTION_down) && (displacementMargin % adjustmentStep > -adjustmentStep / 3)) {
+            offset = adjustmentStep / 2;
+        }
+        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
         SetDrawingStemLen(GetDrawingStemLen() + heightToAdjust);
         flag->SetDrawingYRel(-GetDrawingStemLen());
     }
