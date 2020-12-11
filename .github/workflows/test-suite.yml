@@ -4,9 +4,9 @@ on:
   # pull_request:
   #  branches: develop
   # TODO: run this task only on PR in production; use push event for testing
-  push:
-    branches:
-      - '**'
+  # push:
+  #  branches:
+  #    - '**'
 
 # globals
 env:
