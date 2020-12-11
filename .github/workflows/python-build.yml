@@ -50,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine # cibuildwheel==1.7.1
+          pip install setuptools wheel twine
       
       #- name: Install cibuildwheel
       #  run: |
@@ -62,19 +62,12 @@ jobs:
           choco install vcpython27 -f -y
       
       - name: Build wheels
-        env:
-          CIBW_SKIP: "*-win32 *-manylinux_i686 pp* cp27-* cp35-* cp39-*"
-
-          CIBW_BEFORE_BUILD_WINDOWS: nuget install swigwintools -Version 4.0.0 -OutputDirectory C:\\cibw
-          CIBW_BEFORE_BUILD_LINUX: yum install swig
-          CIBW_BEFORE_BUILD_MACOS: brew install swig
         working-directory: bindings/python
         run: |
-          python setup.py build_ext --inplace sdist bdist_wheel
-          # python -m cibuildwheel --output-dir wheelhouse
- 
+          python setup.py sdist bdist_wheel
  
       - uses: actions/upload-artifact@v2
         with:
-          path: dist/${{ runner.os }}-python-${{ matrix.python-version }}
+          name: ${{ runner.os }}-python-${{ matrix.python-version }}
+          path: bindings/python/dist/*.whl
           # path: ./wheelhouse/*.whl
