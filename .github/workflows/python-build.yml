@@ -53,7 +53,7 @@ jobs:
           CIBW_BEFORE_BUILD_MACOS: brew install swig
         working-directory: bindings/python
         run: |
-          python setup.py sdist bdist_wheel
+          python setup.py build_ext --inplace sdist bdist_wheel
           # python -m cibuildwheel --output-dir wheelhouse
  
  
