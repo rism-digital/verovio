@@ -34,19 +34,19 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      
+      - name: Verify Python version
+        run: python -c "import sys; print(sys.version)"
   
+      #===============================================#
+      # SWIG
       #===============================================#
       - name: Install swig
         if: runner.os == 'Windows'
         run: |
-          # nuget install swigwintools -Version 4.0.0
           choco install vcpython27 -f -y
           choco install swig -f -y
-          # cf. https://stackoverflow.com/questions/60169752/how-to-update-the-path-in-a-github-action-workflow-file-for-a-windows-latest-hos
-          # (New-Object System.Net.WebClient).DownloadFile("http://prdownloads.sourceforge.net/swig/swigwin-4.0.0.zip","swigwin-4.0.0.zip");
-          # Expand-Archive .\swigwin-4.0.0.zip .;
-          # echo "$((Get-Item .).FullName)/swigwin-4.0.0" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        
+          
       - name: Install swig
         if: runner.os == 'macOS'
         run: brew install swig
@@ -56,17 +56,21 @@ jobs:
         run: |
           sudo apt-get update -q
           sudo apt-get install swig
-      #===============================================#
       
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+      - name: Verify swig
+        run: swig -version
+      #===============================================#
+      - name: Check compiler version
+        run: gcc -version
       
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
           
-       #===============================================#
+      #===============================================#
+      # WHEELS
+      #===============================================#
       - name: Build wheels
         working-directory: bindings/python
         run: |
@@ -97,34 +101,31 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      
+      - name: Verify Python version
+        run: python -c "import sys; print(sys.version)"
   
       #===============================================#
-      - name: Install swig
-        if: runner.os == 'Windows'
-        run: |
-          nuget install swigwintools -Version 4.0.0
-          nuget install vcpython27 -f -y
-        
-      - name: Install swig
-        if: runner.os == 'macOS'
-        run: brew install swig
-    
+      # SWIG
+      #===============================================#
       - name: Install swig
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -q
           sudo apt-get install swig
+      
+      - name: Verify swig
+        run: swig -version
       #===============================================#
-      
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
-      
+    
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
           
-       #===============================================#
+      #===============================================#
+      # SDIST
+      #===============================================#
       - name: Build source distribution
         working-directory: bindings/python
         run: python setup.py sdist
