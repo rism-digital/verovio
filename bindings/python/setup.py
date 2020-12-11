@@ -18,7 +18,7 @@ if platform.system() != 'Windows':
     EXTRA_COMPILE_ARGS += ['-std=c++17',
                            '-Wno-write-strings', '-Wno-overloaded-virtual']
 else:
-    EXTRA_COMPILE_ARGS += ['-std=c++17',
+    EXTRA_COMPILE_ARGS += ['/std=c++17',
                            '-DNO_PAE_SUPPORT']
 
 verovio_module = Extension('_verovio',
