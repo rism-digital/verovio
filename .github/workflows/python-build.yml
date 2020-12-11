@@ -41,20 +41,17 @@ jobs:
       #===============================================#
       # SWIG
       #===============================================#
-      - name: Install swig on ${{ matrix.os }}
+      - name: Install swig on Windows
         if: runner.os == 'Windows'
         run: |
           # choco install vcpython27 -f -y
           choco install swig -f -y
-          echo CC=gcc | Add-Content -Path $env:GITHUB_PATH -Encoding utf8
-          echo CXX=g++ | Add-Content -Path $env:GITHUB_PATH -Encoding utf8
-          echo "PATH=$env:PATH" | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
           
-      - name: Install swig on ${{ matrix.os }}
+      - name: Install swig on macOs
         if: runner.os == 'macOS'
         run: brew install swig
     
-      - name: Install swig on ${{ matrix.os }}
+      - name: Install swig on Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -q
@@ -75,9 +72,14 @@ jobs:
       # WHEELS
       #===============================================#
       - name: Build wheels
+        if: runner.os != 'Windows'
         working-directory: bindings/python
-        run: |
-          python setup.py bdist_wheel
+        run: python setup.py bdist_wheel
+      
+      - name: Build wheels
+        if: runner.os == 'Windows'
+        working-directory: bindings/python
+        run: python setup.py bdist_wheel --compiler=mingw32
  
       - name: "List result"
         run: ls -l bindings/python/dist
