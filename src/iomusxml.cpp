@@ -1954,6 +1954,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
         }
 
+        if (node.select_node("sound")) {
+            const float dynamics = node.select_node("sound").node().attribute("dynamics").as_float(-1.0);
+            if (dynamics >= 0.0) {
+                dynam->SetVal(ConvertDynamicsToMidiVal(dynamics));
+            }
+        }
+
         TextRendition(dynamics, dynam);
         if (defaultY == 0) defaultY = dynamics.first().node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
@@ -2609,6 +2616,12 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
                 accid->SetAccidGes(ConvertAlterToAccid(std::atof(alterStr.c_str())));
             }
+        }
+
+        // dynamics (MIDI velocity)
+        const float dynamics = node.attribute("dynamics").as_float(-1.0);
+        if (dynamics >= 0.0) {
+            note->SetVel(ConvertDynamicsToMidiVal(dynamics));
         }
 
         // notehead
@@ -3644,6 +3657,15 @@ data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(const std::string &v
     }
 
     return LINESTARTENDSYMBOL_NONE;
+}
+
+data_MIDIVALUE MusicXmlInput::ConvertDynamicsToMidiVal(const float dynamics)
+{
+    if (dynamics > 0.0) {
+        int mididynam = int(dynamics * 90.0 / 100.0 + 0.5);
+        return std::max(1, std::min(127, mididynam));
+    }
+    return 0;
 }
 
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
