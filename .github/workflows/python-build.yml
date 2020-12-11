@@ -13,14 +13,20 @@ jobs:
   build_wheels:
     name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.win }}
     strategy:
       matrix:
         os: [ubuntu-18.04, macos-latest]
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        python-version: [3.7] # [2.7, 3.5, 3.6, 3.7, 3.8]
+        win: [false]
         exclude:
           - os: macos-latest
             python-version: 2.7
-
+        include:
+          - python-version: 3.7
+            os: windows-latest
+            win: true
+        
     steps:
       - uses: actions/checkout@v2
 
