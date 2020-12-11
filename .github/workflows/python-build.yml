@@ -76,5 +76,5 @@ jobs:
  
       - uses: actions/upload-artifact@v2
         with:
-          path: dist/*
+          path: dist/${{ runner.os }}-python-${{ matrix.python-version }}
           # path: ./wheelhouse/*.whl
