@@ -61,6 +61,7 @@ class FloatingElement;
 class FTrem;
 class Gliss;
 class GraceGrp;
+class GrpSym;
 class Hairpin;
 class HalfmRpt;
 class Harm;
@@ -235,6 +236,7 @@ private:
     void WriteSystem(pugi::xml_node currentNode, System *system);
     void WriteBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
+    void WriteGrpSym(pugi::xml_node currentNode, GrpSym *grmSym);
     void WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot);
     void WritePgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2);
     void WritePgHead(pugi::xml_node currentNode, PgHead *pgHead);
@@ -481,6 +483,7 @@ private:
     bool ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd);
     bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
     bool ReadPgFoot(Object *parent, pugi::xml_node pgFoot);
     bool ReadPgFoot2(Object *parent, pugi::xml_node pgFoot2);
     bool ReadPgHead(Object *parent, pugi::xml_node pgHead);

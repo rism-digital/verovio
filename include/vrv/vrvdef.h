@@ -85,6 +85,7 @@ enum ClassId {
     DOC,
     FACSIMILE,
     FB,
+    GRPSYM,
     GRACE_ALIGNER,
     INSTRDEF,
     KEYSIG_ATTR,

@@ -762,6 +762,12 @@ void Doc::PrepareDrawing()
         }
     }
 
+    /************ Resolve group symbols ************/
+    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attirbutes that determine
+    // their positioning
+    Functor prepareGroupSymbols(&Object::PrepareGroupSymbols);
+    m_mdivScoreDef.Process(&prepareGroupSymbols, NULL);
+
     // LogElapsedTimeEnd ("Preparing drawing");
 
     m_drawingPreparationDone = true;

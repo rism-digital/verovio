@@ -16,6 +16,7 @@
 #include "clef.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "grpsym.h"
 #include "keysig.h"
 #include "label.h"
 #include "mensur.h"
@@ -172,6 +173,9 @@ bool ScoreDef::IsSupportedChild(Object *child)
 {
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(GRPSYM)) {
+        assert(dynamic_cast<GrpSym *>(child));
     }
     else if (child->Is(KEYSIG)) {
         assert(dynamic_cast<KeySig *>(child));

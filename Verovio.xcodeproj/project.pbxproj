@@ -1164,6 +1164,12 @@
 		BBC19FBF22B37CA000100F42 /* all.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FBE22B37CA000100F42 /* all.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FC222B38C1400100F42 /* VerovioFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BBC19FC922B39AC400100F42 /* git_commit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDC366C72576AF9300E4D826 /* grpsym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDC366C52576AF9300E4D826 /* grpsym.cpp */; };
+		BDC366CC2576AF9B00E4D826 /* grpsym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDC366C52576AF9300E4D826 /* grpsym.cpp */; };
+		BDC366D12576AF9C00E4D826 /* grpsym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDC366C52576AF9300E4D826 /* grpsym.cpp */; };
+		BDC366D62576AF9C00E4D826 /* grpsym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDC366C52576AF9300E4D826 /* grpsym.cpp */; };
+		BDC366DB2576AFA400E4D826 /* grpsym.h in Headers */ = {isa = PBXBuildFile; fileRef = BDC366C62576AF9300E4D826 /* grpsym.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDC366E02576AFA500E4D826 /* grpsym.h in Headers */ = {isa = PBXBuildFile; fileRef = BDC366C62576AF9300E4D826 /* grpsym.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1598,6 +1604,8 @@
 		BB4C4BCA22A941F9001F6AF0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = SOURCE_ROOT; };
 		BBC19FBE22B37CA000100F42 /* all.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = all.h; path = bindings/iOS/all.h; sourceTree = SOURCE_ROOT; };
 		BBC19FC222B38C1400100F42 /* VerovioFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VerovioFramework.h; sourceTree = "<group>"; };
+		BDC366C52576AF9300E4D826 /* grpsym.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grpsym.cpp; path = src/grpsym.cpp; sourceTree = "<group>"; };
+		BDC366C62576AF9300E4D826 /* grpsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grpsym.h; path = include/vrv/grpsym.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2080,6 +2088,8 @@
 		8F086F38188539F00037FD8E /* containers */ = {
 			isa = PBXGroup;
 			children = (
+				BDC366C52576AF9300E4D826 /* grpsym.cpp */,
+				BDC366C62576AF9300E4D826 /* grpsym.h */,
 				40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */,
 				40D45EC0204EEAE0009C1EC9 /* instrdef.h */,
 				4D4C26EC1EF7E75400681770 /* label.cpp */,
@@ -2364,6 +2374,7 @@
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
 				4DB3D8B31F83D07A00B5FC2B /* git_commit.h in Headers */,
+				BDC366E02576AFA500E4D826 /* grpsym.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
 				4DA0EAFA22BB78EA00A7EBEB /* atts_facsimile.h in Headers */,
@@ -2484,6 +2495,7 @@
 				BB4C4BC722A93317001F6AF0 /* unchecked.h in Headers */,
 				BB4C4AF622A932BC001F6AF0 /* ref.h in Headers */,
 				BB4C4B6022A932D7001F6AF0 /* mrest.h in Headers */,
+				BDC366DB2576AFA400E4D826 /* grpsym.h in Headers */,
 				BB4C4B0622A932C3001F6AF0 /* pgfoot.h in Headers */,
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
 				BB4C4B2422A932CF001F6AF0 /* dynam.h in Headers */,
@@ -2973,6 +2985,7 @@
 				4DC3B9E7239E2AE1007F185E /* transposition.cpp in Sources */,
 				40ACDEAA24079F9000F82B8C /* reh.cpp in Sources */,
 				4D1694531E3A44F300569BF4 /* atts_cmn.cpp in Sources */,
+				BDC366D62576AF9C00E4D826 /* grpsym.cpp in Sources */,
 				4D6DF9F720E1074100C12BBD /* subst.cpp in Sources */,
 				4D1694541E3A44F300569BF4 /* floatingobject.cpp in Sources */,
 				40BD9392206B950C0037BF8E /* annot.cpp in Sources */,
@@ -3145,6 +3158,7 @@
 				4DB787632022F0B700394520 /* jsonxx.cc in Sources */,
 				4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */,
 				4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */,
+				BDC366C72576AF9300E4D826 /* grpsym.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,
 				4DEC4D8E21C81DEE00D1D273 /* damage.cpp in Sources */,
 				4D6DF9F520E1071F00C12BBD /* subst.cpp in Sources */,
@@ -3368,6 +3382,7 @@
 				4DC3B9E9239E2AE3007F185E /* transposition.cpp in Sources */,
 				40ACDEAB24079F9000F82B8C /* reh.cpp in Sources */,
 				4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */,
+				BDC366D12576AF9C00E4D826 /* grpsym.cpp in Sources */,
 				40D45EC4204EEB03009C1EC9 /* instrdef.cpp in Sources */,
 				4D766F0420ACAD6E006875D8 /* syllable.cpp in Sources */,
 				4DF28A061A754DF000BA9F7D /* floatingobject.cpp in Sources */,
@@ -3566,6 +3581,7 @@
 				4DC3B9E8239E2AE2007F185E /* transposition.cpp in Sources */,
 				40ACDEAC24079F9000F82B8C /* reh.cpp in Sources */,
 				BB4C4A9822A9328F001F6AF0 /* horizontalaligner.cpp in Sources */,
+				BDC366CC2576AF9B00E4D826 /* grpsym.cpp in Sources */,
 				BB4C4BAC22A932EB001F6AF0 /* view_control.cpp in Sources */,
 				BB4C4B2B22A932CF001F6AF0 /* mordent.cpp in Sources */,
 				BB4C4AA622A932A0001F6AF0 /* bboxdevicecontext.cpp in Sources */,
