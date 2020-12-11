@@ -61,7 +61,7 @@ jobs:
         run: swig -version
       #===============================================#
       - name: Check compiler version
-        run: gcc -version
+        run: gcc --version
       
       - name: Install dependencies
         run: |
