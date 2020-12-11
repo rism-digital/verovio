@@ -46,6 +46,8 @@ jobs:
         run: |
           # choco install vcpython27 -f -y
           choco install swig -f -y
+          echo CC=gcc | Add-Content -Path $env:GITHUB_PATH -Encoding utf8
+          echo CXX=g++ | Add-Content -Path $env:GITHUB_PATH -Encoding utf8
           
       - name: Install swig
         if: runner.os == 'macOS'
