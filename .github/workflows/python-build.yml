@@ -41,7 +41,7 @@ jobs:
       #===============================================#
       # SWIG
       #===============================================#
-      - name: Install swig
+      - name: Install swig on ${{ matrix.os }}
         if: runner.os == 'Windows'
         run: |
           # choco install vcpython27 -f -y
@@ -50,11 +50,11 @@ jobs:
           echo CXX=g++ | Add-Content -Path $env:GITHUB_PATH -Encoding utf8
           echo "PATH=$env:PATH" | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
           
-      - name: Install swig
+      - name: Install swig on ${{ matrix.os }}
         if: runner.os == 'macOS'
         run: brew install swig
     
-      - name: Install swig
+      - name: Install swig on ${{ matrix.os }}
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -q
