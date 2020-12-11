@@ -9,7 +9,6 @@ on:
       # Push events on develop branch
       - ci-test
 
-
 jobs:
   build_wheels:
     name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
@@ -36,13 +35,13 @@ jobs:
         
       - name: Install swig
         if: runner.os == 'macOS'
-        run: |
-          brew install swig
+        run: brew install swig
     
       - name: Install swig
         if: runner.os == 'Linux'
         run: |
-          sudo apt install swig
+          sudo apt-get update -q
+          sudo apt-get install swig
       #===============================================#
       
       - name: Display Python version
@@ -52,19 +51,35 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
-      
-      #- name: Install cibuildwheel
-      #  run: |
-      #     python -m pip install cibuildwheel==1.7.1
-
-      
+          
+       #===============================================#
       - name: Build wheels
         working-directory: bindings/python
         run: |
-          python setup.py sdist bdist_wheel
+          python setup.py bdist_wheel
+ 
+      - name: "List result"
+        run: ls -l bindings/python/dist
+      - name: "Check with Twine"
+        run: python -m twine check bindings/python/dist/*
  
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
           path: bindings/python/dist/*.whl
-          # path: ./wheelhouse/*.whl
+    
+       #===============================================#
+      - name: Build source distribution
+        working-directory: bindings/python
+        run: python setup.py sdist
+ 
+      - name: "List result"
+        run: ls -l bindings/python/dist
+      - name: "Check with Twine"
+        run: python -m twine check bindings/python/dist/*
+ 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
+          path: bindings/python/dist/*.whl
+          
