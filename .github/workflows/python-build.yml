@@ -51,10 +51,13 @@ jobs:
           CIBW_BEFORE_BUILD_WINDOWS: nuget install swigwintools -Version 4.0.0 -OutputDirectory C:\\cibw
           CIBW_BEFORE_BUILD_LINUX: yum install swig
           CIBW_BEFORE_BUILD_MACOS: brew install swig
+        working-directory: bindings/python
         run: |
-          cd bindings/python
-          python -m cibuildwheel --output-dir wheelhouse
-      
+          python setup.py sdist bdist_wheel
+          # python -m cibuildwheel --output-dir wheelhouse
+ 
+ 
       - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/*.whl
+          path: dist/*
+          # path: ./wheelhouse/*.whl
