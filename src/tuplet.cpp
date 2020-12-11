@@ -463,6 +463,10 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin);
         }
         else {
+            if (m_crossStaff) {
+                yReference = m_crossStaff->GetDrawingY();
+            }
+
             // Default position is above or below the staff
             int yRel
                 = (m_drawingBracketPos == STAFFREL_basic_above) ? 0 : -params->m_doc->GetDrawingStaffSize(staffSize);
@@ -509,12 +513,14 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             int numVerticalMargin = verticalMargin;
             numVerticalMargin *= (m_drawingNumPos == STAFFREL_basic_above) ? 1 : -1;
 
+            if (m_crossStaff) {
+                yReference = m_crossStaff->GetDrawingY();
+            }
+
             Beam *beam = this->GetNumAlignedBeam();
             // If we have a beam first move it to the appropriate postion
             if (beam) {
-                if (m_crossStaff) {
-                    yReference = m_crossStaff->GetDrawingY();
-                }
+                
                 int xMid = tupletNum->GetDrawingXMid(params->m_doc);
                 int yMid = beam->m_beamSegment.m_startingY
                     + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
