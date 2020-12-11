@@ -48,6 +48,7 @@ jobs:
           choco install swig -f -y
           echo CC=gcc | Add-Content -Path $env:GITHUB_PATH -Encoding utf8
           echo CXX=g++ | Add-Content -Path $env:GITHUB_PATH -Encoding utf8
+          echo "PATH=$env:PATH" | Add-Content -Path $env:GITHUB_ENV -Encoding utf8
           
       - name: Install swig
         if: runner.os == 'macOS'
