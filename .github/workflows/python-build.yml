@@ -44,7 +44,7 @@ jobs:
       - name: Install swig
         if: runner.os == 'Windows'
         run: |
-          choco install vcpython27 -f -y
+          # choco install vcpython27 -f -y
           choco install swig -f -y
           
       - name: Install swig
