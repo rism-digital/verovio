@@ -994,7 +994,7 @@ void Doc::CastOffEncodingDoc()
     this->ResetDrawingPage();
     this->SetCurrentScoreDefDoc(true);
 
-    if (this->m_options->m_condenseEncoded.GetValue()) {
+    if (this->m_options->m_condense.GetValue() != CONDENSE_none) {
         this->OptimizeScoreDefDoc();
     }
 }

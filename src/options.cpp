@@ -24,6 +24,9 @@ namespace vrv {
 std::map<int, std::string> Option::s_breaks
     = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_line, "line" }, { BREAKS_encoded, "encoded" } };
 
+std::map<int, std::string> Option::s_condense
+    = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
+
 std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -623,9 +626,9 @@ Options::Options()
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
 
-    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
-    m_condenseEncoded.Init(false);
-    this->Register(&m_condenseEncoded, "condenseEncoded", &m_general);
+    m_condense.SetInfo("Condense", "Control condensed score layout");
+    m_condense.Init(CONDENSE_auto, &Option::s_condense);
+    this->Register(&m_condense, "condense", &m_general);
 
     m_condenseFirstPage.SetInfo("Condense first page", "When condensing a score also condense the first page");
     m_condenseFirstPage.Init(false);
