@@ -39,10 +39,11 @@ jobs:
       - name: Install swig
         if: runner.os == 'Windows'
         run: |
-          nuget install swigwintools -Version 4.0.0
-          nuget install vcpython27 -f -y
-          # (New-Object System.Net.WebClient).DownloadFile("http://prdownloads.sourceforge.net/swig/swigwin-4.0.1.zip","swigwin-4.0.1.zip");
-          # Expand-Archive .\swigwin-4.0.1.zip .;
+          # nuget install swigwintools -Version 4.0.0
+          choco install vcpython27 -f -y
+          # cf. https://stackoverflow.com/questions/60169752/how-to-update-the-path-in-a-github-action-workflow-file-for-a-windows-latest-hos
+          (New-Object System.Net.WebClient).DownloadFile("http://prdownloads.sourceforge.net/swig/swigwin-4.0.0.zip","swigwin-4.0.0.zip");
+          Expand-Archive .\swigwin-4.0.0.zip .;
           echo "$((Get-Item .).FullName)/swigwin-4.0.0" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         
       - name: Install swig
