@@ -17,6 +17,9 @@ jobs:
       matrix:
         os: [ubuntu-18.04, macos-latest]
         python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        exclude:
+          - os: macos-latest
+            python-version: 2.7
 
     steps:
       - uses: actions/checkout@v2
@@ -67,7 +70,49 @@ jobs:
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
           path: bindings/python/dist/*.whl
+  
+  build_sdist:
+    name: Build sdist (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+        python-version: [3.7]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+  
+      #===============================================#
+      - name: Install swig
+        if: runner.os == 'Windows'
+        run: |
+          nuget install swigwintools -Version 4.0.0
+          nuget install vcpython27 -f -y
+        
+      - name: Install swig
+        if: runner.os == 'macOS'
+        run: brew install swig
     
+      - name: Install swig
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install swig
+      #===============================================#
+      
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+          
        #===============================================#
       - name: Build source distribution
         working-directory: bindings/python
@@ -81,5 +126,5 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
-          path: bindings/python/dist/*.whl
+          path: bindings/python/dist/*.tar.gz
           
