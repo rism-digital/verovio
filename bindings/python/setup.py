@@ -9,6 +9,11 @@ import os
 import platform
 from setuptools import setup, Extension
 
+# Utility function to read the README file into the long_description.
+# Cf. https://pythonhosted.org/an_example_pypi_project/setuptools.html#setting-up-setup-py
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 # generate the git commit include file
 os.system("cd ..;../tools/get_git_commit.sh")
 
@@ -18,7 +23,7 @@ if platform.system() != 'Windows':
     EXTRA_COMPILE_ARGS += ['-std=c++17',
                            '-Wno-write-strings', '-Wno-overloaded-virtual']
 else:
-    EXTRA_COMPILE_ARGS += ['/std=c++17',
+    EXTRA_COMPILE_ARGS += ['-std=c++17',
                            '-DNO_PAE_SUPPORT']
 
 verovio_module = Extension('_verovio',
@@ -65,6 +70,7 @@ setup(name='verovio',
       version='3.1.0-dev',
       url="www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
+      long_description=read('../../README'),
       ext_modules=[verovio_module],
       py_modules=["verovio"],
       )
