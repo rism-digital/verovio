@@ -73,5 +73,6 @@ setup(name='verovio',
       long_description=read('../../README.md'),
       long_description_content_type="text/markdown",
       ext_modules=[verovio_module],
+      py_modules=["verovio"],
       include_package_data=True
       )
