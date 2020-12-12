@@ -71,6 +71,7 @@ setup(name='verovio',
       url="www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       long_description=read('../../README.md'),
+      long_description_content_type="text/markdown",
       ext_modules=[verovio_module],
       py_modules=["verovio"],
       include_package_data=True
