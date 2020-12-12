@@ -1,1 +1,1 @@
-recursive-include ../../data/ *
+graft ../../data
