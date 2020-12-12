@@ -75,6 +75,8 @@ jobs:
       #===============================================#
       - name: Build wheels
         working-directory: bindings/python
+        env:
+          CIBW_BUILD: cp37-*
         run: python -m cibuildwheel --output-dir wheelhouse
  
       - name: "List result"
