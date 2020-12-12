@@ -80,6 +80,7 @@ jobs:
         working-directory: bindings/python/dist
         run: twine check *.whl
       - name: "Check with check-wheel-contents"
+        if: runner.os != 'Windows'
         working-directory: bindings/python/dist
         run: check-wheel-contents *.whl
       - name: "Check with wheel-inspect"
