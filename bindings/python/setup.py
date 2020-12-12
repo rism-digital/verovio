@@ -15,7 +15,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 # generate the git commit include file
-os.system("cd .;../../tools/get_git_commit.sh")
+os.system("./tools/get_git_commit.sh")
 
 
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
@@ -70,7 +70,7 @@ setup(name='verovio',
       version='3.1.0-dev',
       url="www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
-      long_description=read('../../README.md'),
+      long_description=read('README.md'),
       ext_modules=[verovio_module],
       py_modules=["verovio"],
       )
