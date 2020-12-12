@@ -176,19 +176,19 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          path: bindings/python/dist/
+          path: bindings/python/artifacts/
       
       - name: Display structure of downloaded files
-        working-directory: bindings/python/dist/
+        working-directory: bindings/python/artifacts/
         run: ls -R
      
-      - name: Copy artifacts to output folder
+      - name: Copy artifacts to dist folder
         working-directory: bindings/python/
         run: | 
-          mkdir -p ./output
-          cp -r dist/*-3.7/* output/
+          mkdir -p ./dist
+          cp artifacts/*-3.7/* dist/
       
-      - name: Verify output folder
+      - name: Verify dist folder
         working-directory: bindings/python/dist/
         run: ls -R
       
@@ -200,7 +200,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
         run: | 
           echo "upload to TestPyPi"
-          # twine upload --repository testpypi output/*
+          # twine upload --repository testpypi dist/*
       
       - name: Download from TestPyPi
         working-directory: bindings/python
