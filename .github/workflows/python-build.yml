@@ -166,14 +166,17 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          path: artifacts
+          path: bindings/python/dist/
       
       - name: Display structure of downloaded files
-        working-directory: artifacts/
+        working-directory: bindings/python/dist/
         run: ls -R
      
-      - name: Copy artifacts to gh-pages
-        run: cp -r artifacts/*-3.7/* bindings/python/dist/
+      - name: Copy artifacts to output folder
+        working-directory: bindings/python/
+        run: | 
+          mkdir -p ./output
+          cp -r dist/*-3.7/* output/
       
       # probably needs account
       - name: Upload to TestPyPi
@@ -181,7 +184,7 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
-        run: twine upload --repository testpypi dist/*
+        run: twine upload --repository testpypi output/*
       
       - name: Download from TestPyPi
         working-directory: bindings/python
