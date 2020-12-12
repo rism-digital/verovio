@@ -65,22 +65,22 @@ jobs:
       
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install cibuildwheel==1.7.1 twine
+            python -m pip install --upgrade pip
+            pip install cibuildwheel==1.7.1 twine
           
       #===============================================#
       # WHEELS
       #===============================================#
       - name: Get Build Identifier
-        working-directory: bindings/python
-        run: python -m cibuildwheel --print-build-identifiers
+        # working-directory: bindings/python
+        run: python -m cibuildwheel package_dir bindings/python --print-build-identifiers
     
       - name: Build wheels
-        working-directory: bindings/python
+        # working-directory: bindings/python
         env:
           CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/../../tools/"
           CIBW_BUILD: cp37-*
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel  package_dir bindings/python --output-dir wheelhouse
  
       - name: "List result"
         working-directory: bindings/python
