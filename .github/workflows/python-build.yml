@@ -198,9 +198,7 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
-        run: | 
-          echo "upload to TestPyPi"
-          # twine upload --repository testpypi dist/*
+        run: twine upload --repository testpypi dist/*
       
       - name: Download from TestPyPi
         working-directory: bindings/python
