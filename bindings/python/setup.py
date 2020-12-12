@@ -15,7 +15,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 # generate the git commit include file
-os.system("cd ..;../tools/get_git_commit.sh")
+os.system("cd .;../../tools/get_git_commit.sh")
 
 
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
