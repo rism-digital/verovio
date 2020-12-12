@@ -43,10 +43,8 @@ jobs:
       #===============================================#
       - name: Install swig on Windows
         if: runner.os == 'Windows'
-        run: |
-          pacman -Syu
-          pacman -S swig
-          
+        run: choco install swig -f -y
+        
       - name: Install swig on macOs
         if: runner.os == 'macOS'
         run: |
