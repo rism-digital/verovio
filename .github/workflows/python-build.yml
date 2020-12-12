@@ -84,6 +84,7 @@ jobs:
         working-directory: bindings/python/dist
         run: check-wheel-contents *.whl
       - name: "Check with wheel-inspect"
+        if: runner.os != 'Windows'
         working-directory: bindings/python/dist
         run: wheel2json *.whl
       
@@ -172,7 +173,7 @@ jobs:
         run: ls -R
      
       - name: Copy artifacts to gh-pages
-        run: cp artifacts/*-3.7/* bindings/python/dist/
+        run: cp -r artifacts/*-3.7/* bindings/python/dist/
       
       # probably needs account
       - name: Upload to TestPyPi
