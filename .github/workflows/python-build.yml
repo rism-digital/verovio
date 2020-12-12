@@ -164,12 +164,15 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          path: bindings/python/dist/
+          path: artifacts
       
       - name: Display structure of downloaded files
-        working-directory: bindings/python/dist/
+        working-directory: artifacts/
         run: ls -R
-        
+     
+      - name: Copy artifacts to gh-pages
+        run: cp artifacts/*-3.7/* bindings/python/dist/
+      
       # probably needs account
       - name: Upload to TestPyPi
         working-directory: bindings/python
