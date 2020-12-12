@@ -1,0 +1,90 @@
+name: Python Build
+
+on:
+  workflow_dispatch: # manual trigger
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - ci-test
+
+jobs:
+  build_wheels:
+    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.win }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, macos-latest]
+        python-version: [3.7] # [2.7, 3.5, 3.6, 3.7, 3.8]
+        win: [false]
+        exclude:
+          - os: macos-latest
+            python-version: 2.7
+        include:
+          - python-version: 3.7
+            os: windows-latest
+            win: true
+        
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Verify Python version
+        run: python -c "import sys; print(sys.version)"
+  
+      #===============================================#
+      # SWIG
+      #===============================================#
+      - name: Install swig on Windows
+        if: runner.os == 'Windows'
+        run: |
+          pacman -Syu
+          pacman -S swig
+          
+      - name: Install swig on macOs
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install swig
+    
+      - name: Install swig on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install swig
+      
+      - name: Verify swig
+        run: swig -version
+      #===============================================#
+      - name: Check compiler version
+        run: gcc --version
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cibuildwheel==1.7.1 twine
+          
+      #===============================================#
+      # WHEELS
+      #===============================================#
+      - name: Build wheels
+        working-directory: bindings/python
+        run: python -m cibuildwheel --output-dir wheelhouse
+ 
+      - name: "List result"
+        working-directory: bindings/python
+        run: ls -l ./wheelhouse
+      - name: "Check with Twine"
+        working-directory: bindings/python
+        run: python -m twine check ./wheelhouse/*
+ 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ runner.os }}-python-${{ matrix.python-version }}
+          path: ./wheelhouse/*.whl
