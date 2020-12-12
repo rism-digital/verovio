@@ -73,6 +73,10 @@ jobs:
       #===============================================#
       # WHEELS
       #===============================================#
+      - name: Get Build Identifier
+        working-directory: bindings/python
+        run: python -m cibuildwheel --print-build-identifiers
+    
       - name: Build wheels
         working-directory: bindings/python
         env:
