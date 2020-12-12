@@ -39,12 +39,16 @@ Dynam::Dynam()
     , TimeSpanningInterface()
     , AttExtender()
     , AttLineRendBase()
+    , AttMidiValue()
+    , AttMidiValue2()
     , AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_EXTENDER);
     RegisterAttClass(ATT_LINERENDBASE);
+    RegisterAttClass(ATT_MIDIVALUE);
+    RegisterAttClass(ATT_MIDIVALUE2);
     RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();

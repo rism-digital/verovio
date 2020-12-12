@@ -8,6 +8,7 @@
 #ifndef __VRV_DYNAM_H__
 #define __VRV_DYNAM_H__
 
+#include "atts_midi.h"
 #include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
@@ -26,6 +27,8 @@ class Dynam : public ControlElement,
               public TimeSpanningInterface,
               public AttExtender,
               public AttLineRendBase,
+              public AttMidiValue,
+              public AttMidiValue2,
               public AttVerticalGroup {
 public:
     /**

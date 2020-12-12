@@ -2390,7 +2390,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     Measure *measure = NULL;
     char spanningType = SPANNING_START_END;
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
+    // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         measure = ending->GetMeasure();
         x1 = measure->GetDrawingX();
