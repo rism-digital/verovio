@@ -73,5 +73,5 @@ setup(name='verovio',
       long_description=read('../../README.md'),
       ext_modules=[verovio_module],
       py_modules=["verovio"],
-      data_files=[('data', ['../../data/*'])],
+      data_files=[('data', ['../../data'])],
       )
