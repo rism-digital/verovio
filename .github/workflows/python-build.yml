@@ -64,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine check-wheel-contents wheel-inspect
+          pip install setuptools wheel check-wheel-contents wheel-inspect
           
       #===============================================#
       # WHEELS
@@ -163,6 +163,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install twine
+          
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
@@ -178,13 +188,19 @@ jobs:
           mkdir -p ./output
           cp -r dist/*-3.7/* output/
       
+      - name: Verify output folder
+        working-directory: bindings/python/dist/
+        run: ls -R
+      
       # probably needs account
       - name: Upload to TestPyPi
         working-directory: bindings/python
         env:
           TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
-        run: twine upload --repository testpypi output/*
+        run: | 
+          echo "upload to TestPyPi"
+          # twine upload --repository testpypi output/*
       
       - name: Download from TestPyPi
         working-directory: bindings/python
