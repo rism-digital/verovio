@@ -75,7 +75,7 @@ jobs:
  
       - name: "List result"
         working-directory: bindings/python/dist
-        run: ls -l
+        run: ls -R
       - name: "Check with Twine"
         working-directory: bindings/python/dist
         run: python -m twine check *.whl
