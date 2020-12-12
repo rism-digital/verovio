@@ -78,6 +78,7 @@ jobs:
       - name: Build wheels
         working-directory: bindings/python
         env:
+          CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/../../tools/"
           CIBW_BUILD: cp37-*
         run: python -m cibuildwheel --output-dir wheelhouse
  
