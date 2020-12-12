@@ -75,10 +75,10 @@ jobs:
  
       - name: "List result"
         working-directory: bindings/python/dist
-        run: ls -l .
+        run: ls -R
       - name: "Check with Twine"
         working-directory: bindings/python/dist
-        run: python -m twine check *.whl
+        run: twine check *.whl
       - name: "Check with check-wheel-contents"
         working-directory: bindings/python/dist
         run: check-wheel-contents *.whl
@@ -142,7 +142,7 @@ jobs:
         run: ls -l dist
       - name: "Check with Twine"
         working-directory: bindings/python
-        run: python -m twine check dist/*
+        run: twine check dist/*
  
       - uses: actions/upload-artifact@v2
         with:
@@ -173,8 +173,10 @@ jobs:
       # probably needs account
       - name: Upload to TestPyPi
         working-directory: bindings/python
-        run: |
-          python -m twine upload --repository testpypi dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
+        run: twine upload --repository testpypi dist/*
       
       - name: Download from TestPyPi
         working-directory: bindings/python
