@@ -72,14 +72,8 @@ jobs:
       # WHEELS
       #===============================================#
       - name: Build wheels
-        if: runner.os != 'Windows'
         working-directory: bindings/python
         run: python setup.py bdist_wheel
-      
-      - name: Build wheels
-        if: runner.os == 'Windows'
-        working-directory: bindings/python
-        run: python setup.py bdist_wheel --compiler=mingw32
  
       - name: "List result"
         run: ls -l bindings/python/dist
