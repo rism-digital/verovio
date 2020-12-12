@@ -2,12 +2,12 @@ name: Python Build
 
 on:
   workflow_dispatch: # manual trigger
-  push:
+  #push:
     # Trigger the workflow on push,
     # but only for the branches specified
-    branches:
+   # branches:
       # Push events on develop branch
-      - ci-test
+    #  - ci-test
 
 jobs:
   build_wheels:
@@ -44,12 +44,14 @@ jobs:
       - name: Install swig on Windows
         if: runner.os == 'Windows'
         run: |
-          # choco install vcpython27 -f -y
-          choco install swig -f -y
+          pacman -Syu
+          pacman -S swig
           
       - name: Install swig on macOs
         if: runner.os == 'macOS'
-        run: brew install swig
+        run: |
+          brew update
+          brew install swig
     
       - name: Install swig on Linux
         if: runner.os == 'Linux'
