@@ -97,15 +97,16 @@ jobs:
         working-directory: bindings/python/dist
         run: twine check *.whl
       - name: "Check with check-wheel-contents"
-        if: runner.os != 'Windows'
+        if: always() && runner.os != 'Windows'
         working-directory: bindings/python/dist
         run: check-wheel-contents *.whl
       - name: "Check with wheel-inspect"
-        if: runner.os != 'Windows'
+        if: always() && runner.os != 'Windows'
         working-directory: bindings/python/dist
         run: wheel2json *.whl
       
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
           path: bindings/python/dist/*.whl
