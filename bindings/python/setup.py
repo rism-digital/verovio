@@ -74,5 +74,6 @@ setup(name='oivorev',
       long_description_content_type="text/markdown",
       ext_modules=[verovio_module],
       py_modules=["verovio"],
-      include_package_data=True
+      include_package_data=True,
+      packages=['data']
       )
