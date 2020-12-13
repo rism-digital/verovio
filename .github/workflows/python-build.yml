@@ -71,7 +71,7 @@ jobs:
       #===============================================#   
       - name: Symlink data folder
         working-directory: bindings/python
-        run: ln -s ../../data data
+        run: ln -s -T -v ../../data data
       
       - name: Create MANIFEST.in with recursively included data
         working-directory: bindings/python
@@ -144,7 +144,20 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
-          
+
+      #===============================================#
+      # SET UP DATA RESOURCES
+      #===============================================#   
+      - name: Symlink data folder
+        working-directory: bindings/python
+        run: ln -s -T -v ../../data data
+      
+      - name: Create MANIFEST.in with recursively included data
+        working-directory: bindings/python
+        run: |
+          touch MANIFEST.in
+          echo "recursive-include data *" > MANIFEST.in
+ 
       #===============================================#
       # SDIST
       #===============================================#
