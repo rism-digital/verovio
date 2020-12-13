@@ -73,6 +73,10 @@ jobs:
         working-directory: bindings/python
         run: ln -s -v ../../data data
       
+      - name: Create __init__.py in data folder
+        working-directory: bindings/python/data
+        run: touch __init__.py
+      
       - name: Create MANIFEST.in with recursively included data
         working-directory: bindings/python
         run: |
