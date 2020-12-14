@@ -538,7 +538,8 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 if (!descendant->HasSelfBB()) {
                     continue;
                 }
-                if (!tupletNum->HorizontalSelfOverlap(descendant) && !tupletNum->VerticalSelfOverlap(descendant)) {
+                if (!tupletNum->HorizontalSelfOverlap(descendant)
+                    && !tupletNum->VerticalSelfOverlap(descendant, verticalMargin)) {
                     continue;
                 }
                 if (m_drawingNumPos == STAFFREL_basic_above) {
