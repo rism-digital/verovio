@@ -13,19 +13,34 @@ jobs:
   build_wheels:
     name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.win }}
     strategy:
+      # Ensure that a wheel builder finishes even if another fails
+      fail-fast: false
+      # Build the wheels for Linux, Windows and macOS for Python 3.6 and newer
       matrix:
-        os: [ubuntu-18.04, macos-latest]
-        python-version: [3.7] # [2.7, 3.5, 3.6, 3.7, 3.8]
-        win: [false]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        python: [ 36, 37, 38, 39 ]
+        bitness: [ 32, 64 ]
+        include:
+          # Run 32 and 64 bit version in parallel for Linux and Windows
+          - os: windows-latest
+            bitness: 64
+            platform_id: win_amd64
+          - os: windows-latest
+            bitness: 32
+            platform_id: win32
+          - os: ubuntu-latest
+            bitness: 64
+            platform_id: manylinux_x86_64
+          - os: ubuntu-latest
+            bitness: 32
+            platform_id: manylinux_i686
+          - os: macos-latest
+            bitness: 64
+            platform_id: macosx_x86_64
         exclude:
           - os: macos-latest
-            python-version: 2.7
-        include:
-          - python-version: 3.7
-            os: windows-latest
-            win: true
+            bitness: 32
         
     steps:
       - uses: actions/checkout@v2
@@ -37,29 +52,6 @@ jobs:
       
       - name: Verify Python version
         run: python -c "import sys; print(sys.version)"
-  
-      #===============================================#
-      # SWIG
-      #===============================================#
-      - name: Install swig on Windows
-        if: runner.os == 'Windows'
-        run: choco install swig -f -y
-        
-      - name: Install swig on macOs
-        if: runner.os == 'macOS'
-        run: |
-          brew update
-          brew install swig
-    
-      - name: Install swig on Linux
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install swig
-      
-      - name: Verify swig
-        run: swig -version
-      #===============================================#
       
       - name: Install dependencies
         run: |
@@ -93,8 +85,10 @@ jobs:
     
       - name: Build wheels
         env:
-          CIBW_BUILD: cp37-*
+          CIBW_BUILD: cp${{ matrix.python }}-${{ matrix.platform_id }}
           CIBW_BEFORE_ALL_LINUX: yum install -y swig
+          CIBW_BEFORE_ALL_MACOS: brew install swig
+          CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
           CIBW_BEFORE_BUILD: swig -version
         run: python -m cibuildwheel . --output-dir wheelhouse
  
