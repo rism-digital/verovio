@@ -11,9 +11,8 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }}-${{ matrix.architecture }})
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.win }}
     strategy:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
