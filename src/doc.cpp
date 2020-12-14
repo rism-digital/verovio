@@ -825,18 +825,17 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
         return;
     }
 
-    // By default, optimize scores
-    bool optimize = (m_mdivScoreDef.GetOptimize() != BOOLEAN_false);
-    // However, if nothing specified, do not if there is only one staffGrp
-    if (m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE) {
-        int grpSymNum = 0;
-        for (auto current : *m_mdivScoreDef.GetChildren()) {
-            if (current->Is(STAFFGRP)) {
-                StaffGrp *staffGrp = vrv_cast<StaffGrp *>(current);
-                grpSymNum += (staffGrp->HasSymbol()) ? 1 : 0;
-            }
-        }
-        if (grpSymNum < 2) optimize = false;
+    // optimize scores only if encoded
+    bool optimize = (m_mdivScoreDef.HasOptimize() && m_mdivScoreDef.GetOptimize() == BOOLEAN_true);
+    // if nothing specified, do not if there is only one grpSym
+    if ((this->m_options->m_condense.GetValue() == CONDENSE_auto) && !m_mdivScoreDef.HasOptimize()) {
+        ListOfObjects symbols;
+        ClassIdComparison matchClassId(GRPSYM);
+        m_mdivScoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
+        optimize = (symbols.size() > 1);
+    }
+    else if (this->m_options->m_condense.GetValue() == CONDENSE_none) {
+        optimize = false;
     }
 
     this->SetCurrentScoreDefDoc();
