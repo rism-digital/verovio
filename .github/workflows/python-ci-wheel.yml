@@ -16,7 +16,7 @@ jobs:
     continue-on-error: ${{ matrix.win }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-18.04, macos-latest]
         python-version: [3.7] # [2.7, 3.5, 3.6, 3.7, 3.8]
         win: [false]
         exclude:
@@ -70,7 +70,7 @@ jobs:
       # SET UP DATA RESOURCES
       #===============================================#
       - name: Move python bindgins to top level
-        run: mv bindings/python/* .
+        run: mv bindings/python/setup.py .
 
       - name: Create __init__.py in data folder
         working-directory: data
