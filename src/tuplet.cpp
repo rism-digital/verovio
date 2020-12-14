@@ -422,7 +422,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
     int verticalLine = params->m_doc->GetDrawingUnit(staffSize);
     int verticalMargin = 2 * verticalLine;
-    int yReference = staff->GetDrawingY();
+    const int yReference = m_crossStaff ? m_crossStaff->GetDrawingY() : staff->GetDrawingY();
 
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
@@ -463,10 +463,6 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin);
         }
         else {
-            if (m_crossStaff) {
-                yReference = m_crossStaff->GetDrawingY();
-            }
-
             // Default position is above or below the staff
             int yRel
                 = (m_drawingBracketPos == STAFFREL_basic_above) ? 0 : -params->m_doc->GetDrawingStaffSize(staffSize);
@@ -513,10 +509,6 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             int numVerticalMargin = verticalMargin;
             numVerticalMargin *= (m_drawingNumPos == STAFFREL_basic_above) ? 1 : -1;
 
-            if (m_crossStaff) {
-                yReference = m_crossStaff->GetDrawingY();
-            }
-
             Beam *beam = this->GetNumAlignedBeam();
             // If we have a beam first move it to the appropriate postion
             if (beam) {
@@ -546,7 +538,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 if (!descendant->HasSelfBB()) {
                     continue;
                 }
-                if (!tupletNum->HorizontalSelfOverlap(descendant)) {
+                if (!tupletNum->HorizontalSelfOverlap(descendant) && !tupletNum->VerticalSelfOverlap(descendant)) {
                     continue;
                 }
                 if (m_drawingNumPos == STAFFREL_basic_above) {
