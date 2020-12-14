@@ -11,7 +11,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.platform_id }})
     runs-on: ${{ matrix.os }}
     strategy:
       # Ensure that a wheel builder finishes even if another fails
@@ -19,7 +19,7 @@ jobs:
       # Build the wheels for Linux, Windows and macOS for Python 3.6 and newer
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
-        python: [ 36, 37, 38, 39 ]
+        python-version: [ 39 ]
         bitness: [ 32, 64 ]
         include:
           # Run 32 and 64 bit version in parallel for Linux and Windows
@@ -85,7 +85,7 @@ jobs:
     
       - name: Build wheels
         env:
-          CIBW_BUILD: cp${{ matrix.python }}-${{ matrix.platform_id }}
+          CIBW_BUILD: cp${{ matrix.python-version }}-${{ matrix.platform_id }}
           CIBW_BEFORE_ALL_LINUX: yum install -y swig
           CIBW_BEFORE_ALL_MACOS: brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y

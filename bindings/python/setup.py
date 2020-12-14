@@ -10,9 +10,8 @@ import platform
 from setuptools import setup, Extension
 
 # Utility function to read the README file into the long_description.
-# Cf. https://pythonhosted.org/an_example_pypi_project/setuptools.html#setting-up-setup-py
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+with open('README.md', 'r') as fh:
+     long_description = fh.read()
 
 # generate the git commit include file
 os.system("cd tools; ./get_git_commit.sh")
@@ -69,7 +68,7 @@ setup(name='oivorev',
       version='3.1.0-dev',
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
-      long_description=read('README.md'),
+      long_description=long_description,
       long_description_content_type="text/markdown",
       ext_modules=[verovio_module],
       py_modules=["verovio"],
