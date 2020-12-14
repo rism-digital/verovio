@@ -70,7 +70,7 @@ jobs:
       # SET UP DATA RESOURCES
       #===============================================#   
       - name: Move python bindgins to top level
-        run: mv bindings/python/* .
+        run: mv bindings/python/setup.py .
       
       #- name: Symlink data folder
       #  working-directory: bindings/python
@@ -160,7 +160,7 @@ jobs:
       # SET UP DATA RESOURCES
       #===============================================#   
       - name: Move python bindings to top level
-        run: mv bindings/python/* .
+        run: mv bindings/python/setup.py .
       
       #- name: Symlink data folder
       #  working-directory: bindings/python
