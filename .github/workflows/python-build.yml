@@ -29,11 +29,11 @@ jobs:
             architecture: x86
           - os: ubuntu-latest
             architecture: x64
-          - os: ubuntu-latest
-            architecture: x86
           - os: macos-latest
             architecture: x64
         exclude:
+          - os: ubuntu-latest
+            architecture: x86
           - os: macos-latest
             architecture: x86
 
@@ -126,7 +126,7 @@ jobs:
       - name: Check wheel installation
         # if: always() && runner.os != 'Windows'
         run: |
-          python -m pip install dist/*.whl
+          pip install ./dist/*.whl
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
       
       - uses: actions/upload-artifact@v2
