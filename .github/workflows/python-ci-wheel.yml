@@ -19,7 +19,7 @@ jobs:
       # Build the wheels for Linux, Windows and macOS for Python 3.6 and newer
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
-        python-version: [ 39 ]
+        python-version: [ 39 ] # [36, 37, 38, 39]
         bitness: [ 32, 64 ]
         include:
           # Run 32 and 64 bit version in parallel for Linux and Windows

@@ -15,17 +15,29 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.win }}
     strategy:
+      # Ensure that a wheel builder finishes even if another fails
+      fail-fast: false
+      # Build the wheels for Linux, Windows and macOS for Python 3.6 and newer
       matrix:
-        os: [ubuntu-18.04, macos-latest]
-        python-version: [3.7] # [2.7, 3.5, 3.6, 3.7, 3.8]
-        win: [false]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        python-version: [ 3.9 ] # [3.6, 3.7, 3.8, 3.9]
+        architecture: [ x86, x64 ]
+        include:
+          # Run 32 and 64 bit version in parallel for Linux and Windows
+          - os: windows-latest
+            architecture: x64
+          - os: windows-latest
+            architecture: x86
+          - os: ubuntu-latest
+            architecture: x64
+          - os: ubuntu-latest
+            architecture: x86
+          - os: macos-latest
+            architecture: x64
         exclude:
           - os: macos-latest
-            python-version: 2.7
-        include:
-          - python-version: 3.7
-            os: windows-latest
-            win: true
+            architecture: x86
+
         
     steps:
       - uses: actions/checkout@v2
@@ -34,6 +46,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
       
       - name: Verify Python version
         run: python -c "import sys; print(sys.version)"
@@ -140,6 +153,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
       
       - name: Verify Python version
         run: python -c "import sys; print(sys.version)"
@@ -218,6 +232,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
           
       - name: Install dependencies
         run: |
