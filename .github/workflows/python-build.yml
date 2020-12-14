@@ -69,16 +69,21 @@ jobs:
       #===============================================#
       # SET UP DATA RESOURCES
       #===============================================#   
-      - name: Symlink data folder
-        working-directory: bindings/python
-        run: ln -s -v ../../data data
+      - name: Move setup.py to top level
+        run: mv bindings/python/setup.py .
+      
+      - name: Verify
+        run: ls -R
+       
+      #- name: Symlink data folder
+      #  working-directory: bindings/python
+      #  run: ln -s -v ../../data data
       
       - name: Create __init__.py in data folder
-        working-directory: bindings/python/data
+        working-directory: data
         run: touch __init__.py
       
       - name: Create MANIFEST.in with recursively included data
-        working-directory: bindings/python
         run: |
           touch MANIFEST.in
           echo "recursive-include data *" > MANIFEST.in
@@ -87,29 +92,27 @@ jobs:
       # WHEELS
       #===============================================#
       - name: Build wheels
-        working-directory: bindings/python
         run: python setup.py sdist bdist_wheel
  
       - name: "List result"
-        working-directory: bindings/python/dist
         run: ls -R
       - name: "Check with Twine"
-        working-directory: bindings/python/dist
+        working-directory: dist
         run: twine check *.whl
       - name: "Check with check-wheel-contents"
         if: always() && runner.os != 'Windows'
-        working-directory: bindings/python/dist
+        working-directory: dist
         run: check-wheel-contents *.whl
       - name: "Check with wheel-inspect"
         if: always() && runner.os != 'Windows'
-        working-directory: bindings/python/dist
+        working-directory: dist
         run: wheel2json *.whl
       
       - uses: actions/upload-artifact@v2
         if: always()
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
-          path: bindings/python/dist/*.whl
+          path: dist/*.whl
       
    
   
@@ -153,12 +156,17 @@ jobs:
       #===============================================#
       # SET UP DATA RESOURCES
       #===============================================#   
-      - name: Symlink data folder
-        working-directory: bindings/python
-        run: ln -s -v ../../data data
+      - name: Move setup.py to top level
+        run: mv bindings/python/setup.py .
+      
+      - name: Verify
+        run: ls -R
+      
+      #- name: Symlink data folder
+      #  working-directory: bindings/python
+      #  run: ln -s -v ../../data data
       
       - name: Create MANIFEST.in with recursively included data
-        working-directory: bindings/python
         run: |
           touch MANIFEST.in
           echo "recursive-include data *" > MANIFEST.in
@@ -167,20 +175,17 @@ jobs:
       # SDIST
       #===============================================#
       - name: Build source distribution
-        working-directory: bindings/python
         run: python setup.py sdist
  
       - name: "List result"
-        working-directory: bindings/python
         run: ls -l dist
       - name: "Check with Twine"
-        working-directory: bindings/python
         run: twine check dist/*
  
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
-          path: bindings/python/dist/*.tar.gz
+          path: dist/*.tar.gz
           
   upload_testpypi:
     name: Upload to TestPyPi
