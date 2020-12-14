@@ -124,9 +124,16 @@ jobs:
         run: wheel2json *.whl
 
       - name: Check wheel installation
-        # if: always() && runner.os != 'Windows'
+        if: always() && runner.os != 'Windows'
         run: |
           pip install ./dist/*.whl
+          python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+
+      - name: Check wheel installation
+        if: always() && runner.os == 'Windows'
+        shell: bash
+        run: |
+          pip install ./dist/*.whl | bash
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
       
       - uses: actions/upload-artifact@v2
