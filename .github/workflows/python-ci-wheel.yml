@@ -102,6 +102,18 @@ jobs:
           CIBW_BEFORE_BUILD: swig -version
         run: python -m cibuildwheel . --output-dir wheelhouse
 
+      - name: Get wheelhouse file on Windows
+        working-directory: ./wheelhouse
+        if: always() && runner.os == 'Windows'
+        run: |
+          echo WHEELHOUSE_WIN=(get-item .\*.whl).FullName >> $GITHUB_ENV
+
+      - name: Check wheelhouse file on Windows
+        working-directory: ./wheelhouse
+        if: always() && runner.os == 'Windows'
+        run: |
+          echo ${{ env.WHEELHOUSE_WIN }}
+
       - name: "List result"
         run: ls -R
       - name: "Check with Twine"
@@ -121,7 +133,7 @@ jobs:
         working-directory: ./wheelhouse
         if: always() && runner.os == 'Windows'
         run: |
-          pip install (get-item .\*.whl).FullName
+          pip install ${{ env.WHEELHOUSE_WIN }}
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
 
       - uses: actions/upload-artifact@v2
