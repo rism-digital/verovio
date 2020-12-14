@@ -109,31 +109,31 @@ jobs:
       - name: Build bdist wheel
         run: python setup.py bdist_wheel
  
-      - name: "List result"
+      - name: List result
         run: ls -R
-      - name: "Check with Twine"
+      - name: Check with Twine
         working-directory: dist
         run: twine check *.whl
     #  - name: "Check with check-wheel-contents"
     #    if: always() && runner.os != 'Windows'
     #    working-directory: dist
     #    run: check-wheel-contents *.whl --ignore W002
-      - name: "Check with wheel-inspect"
+      - name: Check with wheel-inspect
         if: always() && runner.os != 'Windows'
         working-directory: dist
         run: wheel2json *.whl
 
       - name: Check wheel installation
         if: always() && runner.os != 'Windows'
+        working-directory: dist
         run: |
-          pip install ./dist/*.whl
+          pip install ./*.whl
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
-
-      - name: Check wheel installation
+      - name: Check wheel installation on Windows
         if: always() && runner.os == 'Windows'
-        shell: bash
+        working-directory: dist
         run: |
-          pip install ./dist/*.whl | bash
+          pip install (get-item .\*.whl).FullName
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
       
       - uses: actions/upload-artifact@v2

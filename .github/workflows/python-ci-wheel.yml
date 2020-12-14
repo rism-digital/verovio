@@ -101,12 +101,26 @@ jobs:
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
           CIBW_BEFORE_BUILD: swig -version
         run: python -m cibuildwheel . --output-dir wheelhouse
- 
+
       - name: "List result"
-        run: ls -l ./wheelhouse
+        run: ls -R
       - name: "Check with Twine"
-        run: python -m twine check ./wheelhouse/*
- 
+        working-directory: ./wheelhouse
+        run: twine check *.whl
+
+      - name: Check wheel installation on Non-Windows
+        if: always() && runner.os != 'Windows'
+        working-directory: ./wheelhouse
+        run: |
+          pip install ./*.whl
+          python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+      - name: Check wheel installation on Windows
+        working-directory: ./wheelhouse
+        if: always() && runner.os == 'Windows'
+        run: |
+          pip install (get-item .\*.whl).FullName
+          python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+
       - uses: actions/upload-artifact@v2
         with:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}
