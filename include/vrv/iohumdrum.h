@@ -311,6 +311,9 @@ namespace humaux {
         // suppress_manual_custos == Do not render manually encoded custodes.
         // at line breaks.
         bool suppress_manual_custos = false;
+
+        // toggle for black/white mensural notation.  0=white, 1=black
+        int mensuration_type = 0;
     };
 } // namespace humaux
 

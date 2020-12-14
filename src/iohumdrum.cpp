@@ -363,6 +363,8 @@ namespace humaux {
 
         std::fill(cue_size.begin(), cue_size.end(), false);
         std::fill(stem_type.begin(), stem_type.end(), 'X');
+
+        mensuration_type = 0;
     }
 
     ostream &StaffStateVariables::print(ostream &out, const std::string &prefix)
@@ -403,6 +405,7 @@ namespace humaux {
         out << prefix << "m_dynamposdefined        =  " << m_dynamposdefined << endl;
         out << prefix << "auto_custos              =  " << auto_custos << endl;
         out << prefix << "suppress_manual_custos   =  " << suppress_manual_custos << endl;
+        out << prefix << "mensuration_type         =  " << mensuration_type << endl;
 
         return out;
     }
@@ -4522,9 +4525,11 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     if (partstart->isMens()) {
         if (isBlackNotation(partstart)) {
             m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_black);
+            ss.at(partnumber - 1).mensuration_type = 1;
         }
         else {
             m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_white);
+            ss.at(partnumber - 1).mensuration_type = 0;
         }
     }
 }
@@ -9417,6 +9422,13 @@ void HumdrumInput::convertMensuralToken(
         setLocationId(rest, token);
         appendElement(elements, pointers, rest);
         convertRest(rest, token, -1, staffindex);
+        if (token->find("~") != std::string::npos) {
+            // rest->SetColored(BOOLEAN_true);
+            if (ss.at(staffindex).mensuration_type == 1) {
+                // black notation so add red coloring of colored rest
+                rest->SetColor("red");
+            }
+        }
     }
     else if (token->isNote()) {
         Note *note = new Note;
@@ -9426,6 +9438,13 @@ void HumdrumInput::convertMensuralToken(
         }
         appendElement(elements, pointers, note);
         convertNote(note, token, 0, staffindex);
+        if (token->find("~") != std::string::npos) {
+            note->SetColored(BOOLEAN_true);
+            if (ss.at(staffindex).mensuration_type == 1) {
+                // black notation so add red coloring of colored note
+                note->SetColor("red");
+            }
+        }
         if (token->find("p") != std::string::npos) {
             addPlicaUp(note);
         }
@@ -11491,7 +11510,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool forceAboveQ = false;
     bool forceBelowQ = false;
     bool forceCenterQ = false;
-    //int forcebelowadj = 0;
+    // int forcebelowadj = 0;
     // int forceaboveadj = 0;
     int trackdiff = 0;
     int staffadj = ss[staffindex].m_dynamstaffadj;
