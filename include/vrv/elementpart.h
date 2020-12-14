@@ -383,7 +383,7 @@ private:
     /**
      * Addjusts flag placement and stem length if they are crossing notehead or ledger lines
      */
-    void AdjustFlagPlacement(Doc *doc, Flag* flag, int staffSize, int verticalCenter, int duration);
+    void AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
 
 public:
     //
