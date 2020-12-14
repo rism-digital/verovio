@@ -106,13 +106,14 @@ jobs:
         working-directory: ./wheelhouse
         if: always() && runner.os == 'Windows'
         run: |
-          echo WHEELHOUSE_WIN=(get-item .\*.whl).FullName >> $GITHUB_ENV
+          $file = Get-ChildItem .\*.whl | Select-Object -Expand FullName
+          echo WHEELHOUSE_WIN=$file >> $GITHUB_ENV
 
       - name: Check wheelhouse file on Windows
         working-directory: ./wheelhouse
         if: always() && runner.os == 'Windows'
         run: |
-          echo ${{ env.WHEELHOUSE_WIN }}
+          Write-Host "WHEELHOUSE_WIN : ${{ env.WHEELHOUSE_WIN }}"
 
       - name: "List result"
         run: ls -R
@@ -133,7 +134,8 @@ jobs:
         working-directory: ./wheelhouse
         if: always() && runner.os == 'Windows'
         run: |
-          pip install ${{ env.WHEELHOUSE_WIN }}
+          $file = Get-ChildItem .\*.whl | Select-Object -Expand FullName
+          pip install $file
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
 
       - uses: actions/upload-artifact@v2
