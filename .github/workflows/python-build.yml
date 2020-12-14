@@ -69,12 +69,9 @@ jobs:
       #===============================================#
       # SET UP DATA RESOURCES
       #===============================================#   
-      - name: Move setup.py to top level
-        run: mv bindings/python/setup.py .
+      - name: Move python bindgins to top level
+        run: mv bindings/python/* .
       
-      - name: Verify
-        run: ls -R
-       
       #- name: Symlink data folder
       #  working-directory: bindings/python
       #  run: ln -s -v ../../data data
@@ -87,7 +84,10 @@ jobs:
         run: |
           touch MANIFEST.in
           echo "recursive-include data *" > MANIFEST.in
-          
+      
+      - name: Verify
+        run: ls -R
+         
       #===============================================#
       # WHEELS
       #===============================================#
@@ -102,7 +102,7 @@ jobs:
       - name: "Check with check-wheel-contents"
         if: always() && runner.os != 'Windows'
         working-directory: dist
-        run: check-wheel-contents *.whl
+        run: check-wheel-contents *.whl --ignore W002
       - name: "Check with wheel-inspect"
         if: always() && runner.os != 'Windows'
         working-directory: dist
@@ -156,20 +156,24 @@ jobs:
       #===============================================#
       # SET UP DATA RESOURCES
       #===============================================#   
-      - name: Move setup.py to top level
-        run: mv bindings/python/setup.py .
-      
-      - name: Verify
-        run: ls -R
+      - name: Move python bindings to top level
+        run: mv bindings/python/* .
       
       #- name: Symlink data folder
       #  working-directory: bindings/python
       #  run: ln -s -v ../../data data
       
+      - name: Create __init__.py in data folder
+        working-directory: data
+        run: touch __init__.py
+        
       - name: Create MANIFEST.in with recursively included data
         run: |
           touch MANIFEST.in
           echo "recursive-include data *" > MANIFEST.in
+ 
+      - name: Verify
+        run: ls -R
  
       #===============================================#
       # SDIST
@@ -186,7 +190,9 @@ jobs:
         with:
           name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
           path: dist/*.tar.gz
-          
+  
+  
+  
   upload_testpypi:
     name: Upload to TestPyPi
     needs: [build_wheels, build_sdist]
