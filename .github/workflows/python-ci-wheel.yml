@@ -114,6 +114,9 @@ jobs:
         run: |
           pip install ./*.whl
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+
+      # Wildcard use is different with PowerShell
+      # cf. https://stackoverflow.com/a/43900040
       - name: Check wheel installation on Windows
         working-directory: ./wheelhouse
         if: always() && runner.os == 'Windows'
