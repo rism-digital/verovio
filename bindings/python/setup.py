@@ -72,6 +72,19 @@ setup(name='verovio',
       long_description_content_type="text/markdown",
       ext_modules=[verovio_module],
       py_modules=["verovio"],
-      include_package_data=True,
-      packages=['data']
+      packages=['verovio'],
+      package_data={'verovio.data': [
+                                    'Bravura.xml',
+                                    'Gootville.xml',
+                                    'Leipzig.xml',
+                                    'Petaluma.xml',
+                                    'woff.xml',
+                                    'Bravura/*.xml',
+                                    'Gootville/*.xml',
+                                    'Leipzig/*.xml',
+                                    'Petaluma/*.xml',
+                                    'text/*.xml'
+                                    ],
+
+                    }
       )
