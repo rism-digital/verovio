@@ -9,7 +9,8 @@ import os
 import platform
 from setuptools import setup, Extension
 from setuptools.command.sdist import sdist as _sdist
-from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+from setuptools.command.build_ext import build_ext as _build_ext
+# from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
 # There is no task common to both sdist and bdist_wheel, so we override both commands to
 # generate the git version header file
@@ -20,11 +21,11 @@ class sdist(_sdist):
         _sdist.run(self)
 
 
-class bdist_wheel(_bdist_wheel):
+class build_ext(_build_ext):
     def run(self):
         # generate the git commit include file
         os.system("cd tools; ./get_git_commit.sh")
-        _bdist_wheel.run(self)
+        _build_ext.run(self)
 
 # Utility function to read the README file into the long_description.
 with open('README.md', 'r') as fh:
@@ -80,7 +81,7 @@ verovio_module = Extension('verovio._verovio',
                            )
 
 setup(name='verovio',
-      cmdclass={'sdist': sdist, 'bdist_wheel': bdist_wheel},
+      cmdclass={'sdist': sdist, 'build_ext': build_ext},
       version='3.1.0-dev',
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
