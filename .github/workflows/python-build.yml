@@ -216,8 +216,8 @@ jobs:
         working-directory: bindings/python/
         run: ls -R
       - name: Check with Twine
-        working-directory: bindings/python/dist
-        run: twine check *.whl
+        working-directory: bindings/python
+        run: twine check dist/*
  
       - uses: actions/upload-artifact@v2
         with:

@@ -14,7 +14,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 # generate the git commit include file
-os.system("cd tools; ./tools/get_git_commit.sh")
+os.system("cd tools; ./get_git_commit.sh")
 
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
@@ -50,7 +50,7 @@ verovio_module = Extension('_verovio',
                                        './libmei/atts_shared.cpp',
                                        './libmei/atts_visual.cpp',
                                        'bindings/python/src/verovio/verovio.i'],
-                           swig_opts=['-c++'],
+                           swig_opts=['-c++', '-outdir', 'bindings/python/src/verovio'],
                            include_dirs=['/usr/local/include',
                                          './include',
                                          './include/vrv',
