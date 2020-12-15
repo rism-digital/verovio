@@ -84,16 +84,16 @@ jobs:
       #- name: Move python bindgins to top level
       #  run: mv bindings/python/setup.py .
       
-      - name: Symlink data folder
-        working-directory: verovio
-        run: ln -s -v ../data data
-      
-      - name: Create __init__.py in data folder
-        working-directory: verovio/data
-        run: touch __init__.py
-      
-      - name: Verify
-        run: ls -R
+#      - name: Symlink data folder
+#        working-directory: verovio
+#        run: ln -s -v ../data data
+#
+#      - name: Create __init__.py in data folder
+#        working-directory: verovio/data
+#        run: touch __init__.py
+#
+#      - name: Verify
+#        run: ls -R
          
       #===============================================#
       # WHEELS
@@ -105,9 +105,10 @@ jobs:
         run: python setup.py bdist_wheel
  
       - name: List result
+        working-directory: dist
         run: ls -R
       - name: Check with Twine
-        working-directory: verovio/dist
+        working-directory: dist
         run: twine check *.whl
     #  - name: "Check with check-wheel-contents"
     #    if: always() && runner.os != 'Windows'
@@ -115,12 +116,12 @@ jobs:
     #    run: check-wheel-contents *.whl --ignore W002
       - name: Check with wheel-inspect
         if: always() && runner.os != 'Windows'
-        working-directory: verovio/dist
+        working-directory: dist
         run: wheel2json *.whl
 
       - name: Check wheel installation
         if: always() && runner.os != 'Windows'
-        working-directory: verovio/dist
+        working-directory: dist
         run: |
           pip install ./*.whl
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
@@ -129,7 +130,7 @@ jobs:
       # cf. https://stackoverflow.com/a/43900040
       - name: Check wheel installation on Windows
         if: always() && runner.os == 'Windows'
-        working-directory: verovio/dist
+        working-directory: dist
         run: |
           pip install (get-item .\*.whl).FullName
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
@@ -138,7 +139,7 @@ jobs:
         if: always()
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
-          path: verovio/dist/*.whl
+          path: dist/*.whl
       
    
   
@@ -208,16 +209,16 @@ jobs:
         run: python setup.py sdist
  
       - name: List result
-        working-directory: verovio
+        working-directory: dist
         run: ls -R
       - name: Check with Twine
-        working-directory: verovio
-        run: twine check dist/*
+        working-directory: dist
+        run: twine check *
  
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
-          path: verovio/dist/*.tar.gz
+          path: dist/*.tar.gz
   
   
   
