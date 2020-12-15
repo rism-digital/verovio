@@ -7,15 +7,30 @@ setup.py file for Verovio
 from glob import glob
 import os
 import platform
-from setuptools import setup, Extension, find_packages
+from setuptools import setup, Extension
+from setuptools.command.sdist import sdist as _sdist
+from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+
+# There is no task common to both sdist and bdist_wheel, so we override both commands to
+# generate the git version header file
+class sdist(_sdist):
+    def run(self):
+        # generate the git commit include file
+        os.system("cd tools; ./get_git_commit.sh")
+        _sdist.run(self)
+
+
+class bdist_wheel(_bdist_wheel):
+    def run(self):
+        # generate the git commit include file
+        os.system("cd tools; ./get_git_commit.sh")
+        _bdist_wheel.run(self)
 
 # Utility function to read the README file into the long_description.
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
-# generate the git commit include file
-os.system("cd tools; ./get_git_commit.sh")
-
+# extra compile arguments
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
     EXTRA_COMPILE_ARGS += ['-std=c++17',
@@ -65,11 +80,27 @@ verovio_module = Extension('verovio._verovio',
                            )
 
 setup(name='verovio',
+      cmdclass={'sdist': sdist, 'bdist_wheel': bdist_wheel},
       version='3.1.0-dev',
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       long_description=long_description,
       long_description_content_type="text/markdown",
       ext_modules=[verovio_module],
-      packages=['verovio']
+      packages=['verovio',
+                'verovio.data',
+                'verovio.data.Bravura',
+                'verovio.data.Gootville',
+                'verovio.data.Leipzig',
+                'verovio.data.Petaluma',
+                'verovio.data.text'],
+      package_dir={'verovio.data': 'data'},
+      package_data={
+          'verovio.data': [f for f in os.listdir('./data') if f.endswith(".xml")],
+          'verovio.data.Bravura': os.listdir('./data/Bravura'),
+          'verovio.data.Gootville': os.listdir('./data/Gootville'),
+          'verovio.data.Leipzig': os.listdir('./data/Leipzig'),
+          'verovio.data.Petaluma': os.listdir('./data/Petaluma'),
+          'verovio.data.text': os.listdir('./data/text'),
+      }
       )
