@@ -119,21 +119,21 @@ jobs:
         working-directory: dist
         run: wheel2json *.whl
 
-      - name: Check wheel installation
+      - name: Install wheel
         if: always() && runner.os != 'Windows'
         working-directory: dist
-        run: |
-          pip install ./*.whl
-          python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+        run: pip install ./*.whl
 
       # Wildcard use is different with PowerShell
       # cf. https://stackoverflow.com/a/43900040
-      - name: Check wheel installation on Windows
+      - name: Install wheel on Windows
         if: always() && runner.os == 'Windows'
         working-directory: dist
-        run: |
-          pip install (get-item .\*.whl).FullName
-          python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+        run: pip install (get-item .\*.whl).FullName
+
+      - name: Check wheel installation
+        working-directory: dist
+        run: python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
       
       - uses: actions/upload-artifact@v2
         if: always()
@@ -214,7 +214,23 @@ jobs:
       - name: Check with Twine
         working-directory: dist
         run: twine check *
- 
+
+      - name: Install from source
+        if: always() && runner.os != 'Windows'
+        working-directory: dist
+        run: pip install ./*.tar.gz
+
+      # Wildcard use is different with PowerShell
+      # cf. https://stackoverflow.com/a/43900040
+      - name: Install from source on Windows
+        if: always() && runner.os == 'Windows'
+        working-directory: dist
+        run: pip install (get-item .\*.tar.gz).FullName
+
+      - name: Check source installation
+        working-directory: dist
+        run: python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
