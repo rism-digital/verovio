@@ -84,21 +84,16 @@ jobs:
       #- name: Move python bindgins to top level
       #  run: mv bindings/python/setup.py .
       
-      #- name: Symlink data folder
-      #  working-directory: bindings/python
-      #  run: ln -s -v ../../data data
+      - name: Symlink data folder
+        working-directory: verovio
+        run: ln -s -v ../data data
       
-      #- name: Create __init__.py in data folder
-      #  working-directory: data
-      #  run: touch __init__.py
+      - name: Create __init__.py in data folder
+        working-directory: verovio/data
+        run: touch __init__.py
       
-      #- name: Create MANIFEST.in with recursively included data
-      #  run: |
-      #    touch MANIFEST.in
-      #    echo "recursive-include data *" > MANIFEST.in
-      
-      #- name: Verify
-      #  run: ls -R
+      - name: Verify
+        run: ls -R
          
       #===============================================#
       # WHEELS
@@ -107,12 +102,12 @@ jobs:
         run: python setup.py build_ext
 
       - name: Build bdist wheel
-        run: python setup.py bdist_wheel --dist-dir=bindings/python/dist
+        run: python setup.py bdist_wheel
  
       - name: List result
         run: ls -R
       - name: Check with Twine
-        working-directory: bindings/python/dist
+        working-directory: verovio/dist
         run: twine check *.whl
     #  - name: "Check with check-wheel-contents"
     #    if: always() && runner.os != 'Windows'
@@ -120,12 +115,12 @@ jobs:
     #    run: check-wheel-contents *.whl --ignore W002
       - name: Check with wheel-inspect
         if: always() && runner.os != 'Windows'
-        working-directory: bindings/python/dist
+        working-directory: verovio/dist
         run: wheel2json *.whl
 
       - name: Check wheel installation
         if: always() && runner.os != 'Windows'
-        working-directory: bindings/python/dist
+        working-directory: verovio/dist
         run: |
           pip install ./*.whl
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
@@ -134,7 +129,7 @@ jobs:
       # cf. https://stackoverflow.com/a/43900040
       - name: Check wheel installation on Windows
         if: always() && runner.os == 'Windows'
-        working-directory: dist
+        working-directory: verovio/dist
         run: |
           pip install (get-item .\*.whl).FullName
           python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
@@ -143,7 +138,7 @@ jobs:
         if: always()
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
-          path: bindings/python/dist/*.whl
+          path: verovio/dist/*.whl
       
    
   
@@ -210,19 +205,19 @@ jobs:
       # SDIST
       #===============================================#
       - name: Build source distribution
-        run: python setup.py sdist --dist-dir=bindings/python/dist
+        run: python setup.py sdist
  
       - name: List result
-        working-directory: bindings/python/
+        working-directory: verovio
         run: ls -R
       - name: Check with Twine
-        working-directory: bindings/python
+        working-directory: verovio
         run: twine check dist/*
  
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
-          path: bindings/python/dist/*.tar.gz
+          path: verovio/dist/*.tar.gz
   
   
   
