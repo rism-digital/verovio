@@ -73,7 +73,7 @@ setup(name='verovio',
       ext_modules=[verovio_module],
       py_modules=["verovio"],
       packages=['verovio'],
-      package_data={'verovio.data': [
+      package_data={'data': [
                                     'Bravura.xml',
                                     'Gootville.xml',
                                     'Leipzig.xml',
