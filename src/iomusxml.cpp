@@ -2483,8 +2483,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
-    std::string noteID = node.attribute("id").as_string();
-    int duration = node.select_node("duration").node().text().as_int();
+    const std::string noteID = node.attribute("id").as_string();
+    const int duration = node.select_node("duration").node().text().as_int();
+    const int noteStaffNum = node.select_node("staff").node().text().as_int();
     pugi::xpath_node rest = node.select_node("rest");
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
@@ -2499,6 +2500,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 if (!noteID.empty()) {
                     space->SetUuid(noteID);
                 }
+                // set @staff attribute, if existing and different from parent staff number
+                if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
+                    space->SetStaff(
+                        space->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
                 AddLayerElement(layer, space, duration);
             }
             else {
@@ -2543,6 +2548,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!noteID.empty()) {
                 rest->SetUuid(noteID);
             }
+            // set @staff attribute, if existing and different from parent staff number
+            if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
+                rest->SetStaff(
+                    rest->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
             AddLayerElement(layer, rest, duration);
         }
     }
@@ -2555,7 +2564,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetUuid(noteID);
         }
         note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
-        int noteStaffNum = atoi(GetContentOfChild(node, "staff").c_str());
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
             note->SetStaff(
