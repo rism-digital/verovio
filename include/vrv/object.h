@@ -865,6 +865,11 @@ public:
     virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Calculate the y relative position of tupletNum based on overlaps with other elements
+     */
+    virtual int AdjustTupletNumOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }

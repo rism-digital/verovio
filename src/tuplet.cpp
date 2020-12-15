@@ -527,32 +527,27 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 tupletNum->SetDrawingYRel(yRel);
             }
 
-            int yRel = tupletNum->GetDrawingY();
-
-            // Check for overlap with content - beam is not taken into account
+            // Find if there is a mix of cross-staf and non-cross-staff elements in the tuplet
             ListOfObjects descendants;
-            ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, DOT, FLAG, NOTE, REST, STEM });
+            ClassIdsComparison comparison({ CHORD, NOTE, REST });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 
-            for (auto &descendant : descendants) {
-                if (!descendant->HasSelfBB()) {
-                    continue;
-                }
-                if (!tupletNum->HorizontalSelfOverlap(descendant)
-                    && !tupletNum->VerticalSelfOverlap(descendant, verticalMargin)) {
-                    continue;
-                }
-                if (m_drawingNumPos == STAFFREL_basic_above) {
-                    int dist = descendant->GetSelfTop();
-                    if (yRel < dist) yRel = dist;
-                }
-                else {
-                    int dist = descendant->GetSelfBottom();
-                    if (yRel > dist) yRel = dist;
-                }
-            }
+            auto it = std::find_if(descendants.begin(), descendants.end(), [](Object *object) {
+                LayerElement *element = vrv_cast<LayerElement *>(object);
+                if (!element) return false;
+                return !element->m_crossStaff;
+            });
 
-            yRel -= yReference;
+            // Calculate relative Y for the tupletNum
+            AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
+            adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
+            adjustTupletNumOverlapParams.m_ignoreCrossStaff = false;
+            adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
+            adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
+            Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
+            this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
+
+            const int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
             tupletNum->SetDrawingYRel(yRel + numVerticalMargin);
         }
     }
