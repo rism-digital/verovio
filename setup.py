@@ -24,7 +24,7 @@ else:
     EXTRA_COMPILE_ARGS += ['/std:c++17',
                            '-DNO_PAE_SUPPORT']
 
-verovio_module = Extension('_verovio',
+verovio_module = Extension('verovio._verovio',
                            sources=glob('./src/*.cpp') + glob('./src/hum/*.cpp') +
                                    [
                                        './src/json/jsonxx.cc',
@@ -50,7 +50,7 @@ verovio_module = Extension('_verovio',
                                        './libmei/atts_shared.cpp',
                                        './libmei/atts_visual.cpp',
                                        'bindings/python/src/verovio/verovio.i'],
-                           swig_opts=['-c++', '-outdir', 'bindings/python/src/verovio'],
+                           swig_opts=['-c++', '-outdir', 'verovio'],
                            include_dirs=['/usr/local/include',
                                          './include',
                                          './include/vrv',
@@ -71,18 +71,5 @@ setup(name='verovio',
       long_description=long_description,
       long_description_content_type="text/markdown",
       ext_modules=[verovio_module],
-
-      # packages=['verovio'],
-      package_dir={'': 'src'},
-      packages=find_packages(where='src'),
-      # OR
-      # py_modules=['verovio'],
-      data_files=[
-         ('', glob('./data/*.xml', recursive=True)),
-         ('Bravura', glob('./data/Bravura/*', recursive=True)),
-         ('Gootville', glob('./data/Gootville/*', recursive=True)),
-         ('Leipzig', glob('./data/Leipzig/*', recursive=True)),
-         ('Petaluma', glob('./data/Petaluma/*', recursive=True)),
-         ('text', glob('./data/text/*', recursive=True))
-                ]
+      packages=['verovio']
       )

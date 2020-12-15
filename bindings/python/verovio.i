@@ -17,13 +17,13 @@
 %ignore vrv::Toolkit::SetShowBoundingBoxes( bool );
 %ignore vrv::Toolkit::SetCString( const std::string & );
 
-%module (package="verovio") verovio
+%module(package="verovio") verovio
 %include "std_string.i"
-%include "../../../../include/vrv/toolkit.h"
+%include "../../include/vrv/toolkit.h"
 
 
 %{
-    #include "../../../../include/vrv/toolkit.h"
+    #include "../../include/vrv/toolkit.h"
     
     using namespace vrv;
     using namespace std;
