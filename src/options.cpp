@@ -37,7 +37,7 @@ std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
 
 std::map<int, std::string> Option::s_systemDivider
-    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
@@ -966,7 +966,7 @@ Options::Options()
     this->Register(&m_subBracketThickness, "subBracketThickness", &m_generalLayout);
 
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
-    m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
+    m_systemDivider.Init(SYSTEMDIVIDER_auto, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
     m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
