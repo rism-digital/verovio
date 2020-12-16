@@ -10,21 +10,32 @@ import platform
 from setuptools import setup, Extension
 from setuptools.command.sdist import sdist as _sdist
 from setuptools.command.build_ext import build_ext as _build_ext
-# from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+
+
+# Utility function to call tools/get_git_commit.sh on any platform
+def get_commit():
+    if os.path.exists("./tools"):
+        os.system("bash -c 'cd tools; ./get_git_commit.sh'")
+        # print("Running tools/get_git_commit.sh")
+        # if platform.system() == "Windows":
+        #     os.system("bash -c 'cd tools; ./get_git_commit.sh'")
+        # else:
+        #     os.system("cd tools; ./get_git_commit.sh")
+    else:
+        print("Can't change to tools directory")
 
 # There is no task common to both sdist and bdist_wheel, so we override both commands to
 # generate the git version header file
 class sdist(_sdist):
     def run(self):
         # generate the git commit include file
-        os.system("cd tools; ./get_git_commit.sh")
+        get_commit()
         _sdist.run(self)
-
 
 class build_ext(_build_ext):
     def run(self):
         # generate the git commit include file
-        os.system("cd tools; ./get_git_commit.sh")
+        get_commit()
         _build_ext.run(self)
 
 # Utility function to read the README file into the long_description.
