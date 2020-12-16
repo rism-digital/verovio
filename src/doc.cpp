@@ -798,6 +798,22 @@ void Doc::SetCurrentScoreDefDoc(bool force)
     m_currentScoreDefDone = true;
 }
 
+bool Doc::IsOptimizationNeeded()
+{
+    if (m_options->m_condense.GetValue() == CONDENSE_none) return false;
+    // optimize scores only if encoded
+    bool optimize = (m_mdivScoreDef.HasOptimize() && m_mdivScoreDef.GetOptimize() == BOOLEAN_true);
+    // if nothing specified, do not if there is only one grpSym
+    if ((m_options->m_condense.GetValue() == CONDENSE_auto) && !m_mdivScoreDef.HasOptimize()) {
+        ListOfObjects symbols;
+        ClassIdComparison matchClassId(GRPSYM);
+        m_mdivScoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
+        optimize = (symbols.size() > 1);
+    }
+
+    return optimize;
+}
+
 void Doc::OptimizeScoreDefDoc()
 {
     Functor optimizeScoreDef(&Object::OptimizeScoreDef);
@@ -823,19 +839,6 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     if (pages->GetChildCount() != 1) {
         LogDebug("Document is already cast off");
         return;
-    }
-
-    // optimize scores only if encoded
-    bool optimize = (m_mdivScoreDef.HasOptimize() && m_mdivScoreDef.GetOptimize() == BOOLEAN_true);
-    // if nothing specified, do not if there is only one grpSym
-    if ((this->m_options->m_condense.GetValue() == CONDENSE_auto) && !m_mdivScoreDef.HasOptimize()) {
-        ListOfObjects symbols;
-        ClassIdComparison matchClassId(GRPSYM);
-        m_mdivScoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
-        optimize = (symbols.size() > 1);
-    }
-    else if (this->m_options->m_condense.GetValue() == CONDENSE_none) {
-        optimize = false;
     }
 
     this->SetCurrentScoreDefDoc();
@@ -870,6 +873,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     }
     delete contentSystem;
 
+    bool optimize = IsOptimizationNeeded();
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDefDoc(true);
     if (optimize) {
@@ -999,7 +1003,7 @@ void Doc::CastOffEncodingDoc()
     this->ResetDrawingPage();
     this->SetCurrentScoreDefDoc(true);
 
-    if (this->m_options->m_condense.GetValue() != CONDENSE_none) {
+    if (IsOptimizationNeeded()) {
         this->OptimizeScoreDefDoc();
     }
 }
