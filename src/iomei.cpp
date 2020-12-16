@@ -1214,6 +1214,8 @@ void MEIOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTimeSpanningInterface(currentNode, dynam);
     dynam->WriteExtender(currentNode);
     dynam->WriteLineRendBase(currentNode);
+    dynam->WriteMidiValue(currentNode);
+    dynam->WriteMidiValue2(currentNode);
     dynam->WriteVerticalGroup(currentNode);
 }
 
@@ -1491,6 +1493,7 @@ void MEIOutput::WriteBarLine(pugi::xml_node currentNode, BarLine *barLine)
     WriteLayerElement(currentNode, barLine);
     barLine->WriteBarLineLog(currentNode);
     barLine->WriteColor(currentNode);
+    barLine->WriteNNumberLike(currentNode);
     barLine->WriteVisibility(currentNode);
 }
 
@@ -4089,6 +4092,8 @@ bool MEIInput::ReadDynam(Object *parent, pugi::xml_node dynam)
     ReadTimeSpanningInterface(dynam, vrvDynam);
     vrvDynam->ReadExtender(dynam);
     vrvDynam->ReadLineRendBase(dynam);
+    vrvDynam->ReadMidiValue(dynam);
+    vrvDynam->ReadMidiValue2(dynam);
     vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
@@ -4671,6 +4676,7 @@ bool MEIInput::ReadBarLine(Object *parent, pugi::xml_node barLine)
 
     vrvBarLine->ReadBarLineLog(barLine);
     vrvBarLine->ReadColor(barLine);
+    vrvBarLine->ReadNNumberLike(barLine);
     vrvBarLine->ReadVisibility(barLine);
 
     parent->AddChild(vrvBarLine);

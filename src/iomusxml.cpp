@@ -243,7 +243,6 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
                 return SelectLayer(layerNum, staff);
             }
         }
-        //if ((*staff->GetChildren()).empty()) return SelectLayer(layerNum, staff);
     }
     // if not, take staff info of node element
     int staffNum = node.child("staff").text().as_int();
@@ -817,7 +816,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // do nothing
         }
     }
-    // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
+    // here we could check that there is only one staffGrp left in m_staffGrpStack
 
     Measure *measure = NULL;
     std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
@@ -1446,7 +1445,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
-            staff->AddChild(new Layer());
+            Layer *emptyLayer = new Layer();
+            emptyLayer->AddChild(new MSpace());
+            staff->AddChild(emptyLayer);
         }
         // add clef changes that might occur just before a bar line and remove inserted clefs from stack
         if (!m_ClefChangeStack.empty()) {
@@ -1516,9 +1517,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            bool afterBarline = false; // read after-barline attribute of clef; default is false (thus: before barline)
-            std::string afterBarlineText = clef.node().attribute("after-barline").as_string();
-            if (!afterBarlineText.empty() && afterBarlineText.compare("yes") == 0) afterBarline = true;
+            bool afterBarline = clef.node().attribute("after-barline").as_bool();
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
@@ -1953,6 +1952,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
         else if (m_prevLayer) {
             dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
                 std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+        }
+
+        if (node.select_node("sound")) {
+            const float dynamics = node.select_node("sound").node().attribute("dynamics").as_float(-1.0);
+            if (dynamics >= 0.0) {
+                dynam->SetVal(ConvertDynamicsToMidiVal(dynamics));
+            }
         }
 
         TextRendition(dynamics, dynam);
@@ -2612,6 +2618,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
+        // dynamics (MIDI velocity)
+        const float dynamics = node.attribute("dynamics").as_float(-1.0);
+        if (dynamics >= 0.0) {
+            note->SetVel(ConvertDynamicsToMidiVal(dynamics));
+        }
+
         // notehead
         pugi::xpath_node notehead = node.select_node("notehead");
         if (notehead) {
@@ -2904,11 +2916,18 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         dynam->SetStartid(m_ID);
-        std::string dynamStr = GetContentOfChild(xmlDynam.node(), "other-dynamics");
-        if (dynamStr.empty()) dynamStr = xmlDynam.node().first_child().name();
         if (xmlDynam.node().attribute("id")) dynam->SetUuid(xmlDynam.node().attribute("id").as_string());
         // place
         dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.node().attribute("placement").as_string()));
+        std::string dynamStr;
+        for (pugi::xml_node xmlDynamPart : xmlDynam.node().children()) {
+            if (xmlDynamPart.text()) {
+                dynamStr += xmlDynamPart.text().as_string();
+            }
+            else {
+                dynamStr += xmlDynamPart.name();
+            }
+        }
         Text *text = new Text();
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
@@ -3638,6 +3657,15 @@ data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(const std::string &v
     }
 
     return LINESTARTENDSYMBOL_NONE;
+}
+
+data_MIDIVALUE MusicXmlInput::ConvertDynamicsToMidiVal(const float dynamics)
+{
+    if (dynamics > 0.0) {
+        int mididynam = int(dynamics * 90.0 / 100.0 + 0.5);
+        return std::max(1, std::min(127, mididynam));
+    }
+    return 0;
 }
 
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
