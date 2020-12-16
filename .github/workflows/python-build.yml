@@ -123,6 +123,7 @@ jobs:
         run: wheel2json *.whl
 
       - name: Create install dir
+        shell: bash
         run: mkdir - p ${{ env.CHECK_INSTALL_DIR }}
 
       - name: Install wheel
@@ -222,6 +223,7 @@ jobs:
         run: twine check *.tar.gz
 
       - name: Create install dir
+        shell: bash
         run: mkdir - p ${{ env.CHECK_INSTALL_DIR }}
 
       - name: Install from source
