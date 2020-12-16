@@ -11,15 +11,19 @@ on:
 
 env:
   CHECK_INSTALL_DIR: check_install_dir
+  PACKAGE_NAME: verovio
 
 jobs:
+  #===============================================#
+  #         BUILD WHEEL DISTRIBUTION              #
+  #===============================================#
   build_wheels:
     name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }}-${{ matrix.architecture }})
     runs-on: ${{ matrix.os }}
     strategy:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
-      # Build the wheels for Linux, Windows and macOS for Python 3.6 and newer
+      # Build the wheels for Linux, Windows and macOS for specified python-version
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
         python-version: [ 3.9 ] # [3.6, 3.7, 3.8, 3.9]
@@ -42,6 +46,8 @@ jobs:
 
         
     steps:
+      #===============================================#
+      # Set up
       - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -54,8 +60,7 @@ jobs:
         run: python -c "import sys; print(sys.version)"
   
       #===============================================#
-      # SWIG
-      #===============================================#
+      # Swig
       - name: Install swig on Windows
         if: runner.os == 'Windows'
         run: choco install swig -f -y
@@ -74,39 +79,24 @@ jobs:
       
       - name: Verify swig
         run: swig -version
+
       #===============================================#
-  
+      # Dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install setuptools wheel twine check-wheel-contents wheel-inspect
-        
-      #===============================================#
-      # SET UP DATA RESOURCES
-      #===============================================#   
-      #- name: Move python bindgins to top level
-      #  run: mv bindings/python/setup.py .
-      
-#      - name: Symlink data folder
-#        working-directory: verovio
-#        run: ln -s -v ../data data
-#
-#      - name: Create __init__.py in data folder
-#        working-directory: verovio/data
-#        run: touch __init__.py
-#
-#      - name: Verify
-#        run: ls -R
          
       #===============================================#
-      # WHEELS
-      #===============================================#
+      # wheels
       - name: Build ext
         run: python setup.py build_ext
 
       - name: Build bdist wheel
         run: python setup.py bdist_wheel
- 
+
+      #===============================================#
+      # Check build
       - name: List result
         working-directory: dist
         run: ls -R
@@ -141,15 +131,18 @@ jobs:
       - name: Check wheel installation
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
         run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
-      
+
+      #===============================================#
+      # Upload artifact
       - uses: actions/upload-artifact@v2
-        if: always()
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
           path: dist/*.whl
-      
-   
-  
+
+
+  #===============================================#
+  #         BUILD SOURCE DISTRIBUTION             #
+  #===============================================#
   build_sdist:
     name: Build sdist (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -159,6 +152,8 @@ jobs:
         python-version: [3.9]
 
     steps:
+      #===============================================#
+      # Set up
       - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -170,8 +165,7 @@ jobs:
         run: python -c "import sys; print(sys.version)"
   
       #===============================================#
-      # SWIG
-      #===============================================#
+      # Swig
       - name: Install swig
         if: runner.os == 'Linux'
         run: |
@@ -180,22 +174,24 @@ jobs:
       
       - name: Verify swig
         run: swig -version
+
       #===============================================#
-    
+      # Dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install setuptools wheel twine
  
       #===============================================#
-      # SDIST
-      #===============================================#
+      # sdist
       - name: Build ext
         run: python setup.py build_ext
 
       - name: Build source distribution
         run: python setup.py sdist
- 
+
+      #===============================================#
+      # Check build
       - name: List result
         working-directory: dist
         run: ls -R
@@ -215,63 +211,85 @@ jobs:
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
         run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
 
+      #===============================================#
+      # Upload artifact
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
           path: dist/*.tar.gz
-  
-  
-  
-#  upload_testpypi:
-#    name: Upload to TestPyPi
-#    needs: [build_wheels, build_sdist]
-#    runs-on: ${{ matrix.os }}
-#    strategy:
-#      matrix:
-#        os: [ubuntu-18.04]
-#        python-version: [3.7]
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Python ${{ matrix.python-version }}
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: ${{ matrix.python-version }}
-#
-#      - name: Install dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          python -m pip install twine
-#
-#      - name: Download artifacts
-#        uses: actions/download-artifact@v2
-#        with:
-#          path: bindings/python/artifacts/
-#
-#      - name: Display structure of downloaded files
-#        working-directory: bindings/python/artifacts/
-#        run: ls -R
-#
-#      - name: Copy artifacts to dist folder
-#        working-directory: bindings/python/
-#        run: |
-#          mkdir -p ./dist
-#          cp artifacts/*-3.7/* dist/
-#
-#      - name: Verify dist folder
-#        working-directory: bindings/python/dist/
-#        run: ls -R
-#
-#      # probably needs account
-#      - name: Upload to TestPyPi
-#        working-directory: bindings/python
-#        env:
-#          TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
-#          TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
-#        run: twine upload --repository testpypi dist/*
-#
-#      - name: Download from TestPyPi
-#        working-directory: bindings/python
-#        run: |
-#          python -m pip install --index-url https://test.pypi.org/simple/ verovio
+
+
+  #===============================================#
+  #         UPLOAD TO PACKAGE INDEX               #
+  #===============================================#
+  upload_testpypi:
+    name: Upload to TestPyPi
+    needs: [build_wheels, build_sdist]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+        python-version: [3.9]
+        architecture: [ x64 ]
+
+    steps:
+      #===============================================#
+      # Set up
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
+
+      #===============================================#
+      # Dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install twine
+
+      #===============================================#
+      # Prepare artifacts
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: bindings/python/artifacts/
+
+      - name: Display structure of downloaded files
+        working-directory: bindings/python/artifacts/
+        run: ls -R
+
+      - name: Copy artifacts to dist folder
+        working-directory: bindings/python/
+        run: |
+          mkdir -p ./dist
+          cp artifacts/*-${{ matrix.python-version }}/* dist/
+
+      - name: Verify dist folder
+        working-directory: bindings/python/dist/
+        run: ls -R
+
+      #===============================================#
+      # Upload to package index
+      - name: Upload to TestPyPi
+        working-directory: bindings/python
+        env:
+          TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
+        run: twine upload --repository testpypi dist/*
+
+      #===============================================#
+      # Check build
+      - name: Create install dir
+        shell: bash
+        run: mkdir - p ${{ env.CHECK_INSTALL_DIR }}
+
+      - name: Install from package index
+        working-directory: ${{ env.CHECK_INSTALL_DIR }}
+        run: python -m pip install --index-url https://test.pypi.org/simple/ ${{ env.PACKAGE_NAME }}
+
+      - name: Check source installation
+        working-directory: ${{ env.CHECK_INSTALL_DIR }}
+        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
