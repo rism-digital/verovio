@@ -140,7 +140,7 @@ jobs:
 
       - name: Check wheel installation
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
-        run: python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
       
       - uses: actions/upload-artifact@v2
         if: always()
@@ -211,7 +211,7 @@ jobs:
 
       - name: Check source installation
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
-        run: python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
 
       - uses: actions/upload-artifact@v2
         with:
