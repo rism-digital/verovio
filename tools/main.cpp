@@ -282,7 +282,7 @@ int main(int argc, char **argv)
                 // Handle deprecated options
                 if (key == "condense-encoded") {
                     vrv::LogWarning("Option --condense-encoded is deprecated; use --condense encoded instead");
-                    options->m_condenseEncoded.SetValue(optarg);
+                    options->m_condense.SetValue("encoded");
                     break;
                 }
                 if (key == "slur-thickness") {
