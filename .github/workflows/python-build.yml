@@ -191,7 +191,7 @@ jobs:
       # SDIST
       #===============================================#
       - name: Build ext
-          run: python setup.py build_ext
+        run: python setup.py build_ext
 
       - name: Build source distribution
         run: python setup.py sdist
