@@ -251,7 +251,7 @@ void Doc::CalculateMidiTimemap()
 {
     m_MIDITimemapTempo = 0.0;
 
-    // This happens if the document was never cast off (no-layout option in the toolkit)
+    // This happens if the document was never cast off (layout none option in the toolkit)
     if (!m_drawingPage && GetPageCount() == 1) {
         Page *page = this->SetDrawingPage(0);
         if (!page) {

@@ -654,6 +654,7 @@ public:
      */
     OptionGrp m_deprecated;
 
+    OptionBool m_condenseEncoded;
     OptionDbl m_slurThickness;
     OptionDbl m_tieThickness;
 

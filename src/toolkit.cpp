@@ -956,7 +956,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             else if (iter->first == "condenseEncoded") {
                 LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
                 Option *opt = NULL;
-                opt = m_options->GetItems()->at("encoded");
+                opt = m_options->GetItems()->at("condense");
                 assert(opt);
                 if (json.has<jsonxx::Number>("condenseEncoded")) {
                     if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {

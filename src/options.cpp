@@ -1205,6 +1205,10 @@ Options::Options()
     m_deprecated.SetLabel("Deprecated options", "Deprecated");
     m_grps.push_back(&m_deprecated);
 
+    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
+    m_condenseEncoded.Init(false);
+    this->Register(&m_condenseEncoded, "condenseEncoded", &m_deprecated);
+
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
     m_slurThickness.Init(0.6, 0.2, 2);
     this->Register(&m_slurThickness, "slurThickness", &m_deprecated);
