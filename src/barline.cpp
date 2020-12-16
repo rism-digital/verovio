@@ -29,7 +29,7 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttVisibility()
+BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
     RegisterAttClass(ATT_BARLINELOG);
     RegisterAttClass(ATT_COLOR);
