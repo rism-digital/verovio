@@ -15,8 +15,8 @@ from setuptools.command.build_ext import build_ext as _build_ext
 # Utility function to call tools/get_git_commit.sh on any platform
 def get_commit():
     if os.path.exists("./tools"):
+        print("Running tools/get_git_commit.sh")
         os.system("bash -c 'cd tools; ./get_git_commit.sh'")
-        # print("Running tools/get_git_commit.sh")
         # if platform.system() == "Windows":
         #     os.system("bash -c 'cd tools; ./get_git_commit.sh'")
         # else:

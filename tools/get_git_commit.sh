@@ -7,6 +7,8 @@ COMMIT=$(git describe --abbrev=7 --always --dirty)
 if [ -z "$COMMIT" ]; then
     echo "Undefined git commit version"
     COMMIT="[undefined]"
+else
+  echo "Got commit $COMMIT"
 fi
 
 echo "////////////////////////////////////////////////////////" > $output
