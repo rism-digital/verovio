@@ -400,8 +400,16 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
         return GetContent(node);
     }
     if (IsElement(node, "dynamics")) {
-        std::string dynamStr = GetContentOfChild(node, "other-dynamics");
-        return dynamStr.empty() ? node.first_child().name() : dynamStr;
+        std::string dynamStr;
+        for (pugi::xml_node xmlDynamPart : node.children()) {
+            if (xmlDynamPart.text()) {
+                dynamStr += xmlDynamPart.text().as_string();
+            }
+            else {
+                dynamStr += xmlDynamPart.name();
+            }
+        }
+        return dynamStr;
     }
     return std::string();
 }
