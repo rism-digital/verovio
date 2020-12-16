@@ -9445,12 +9445,6 @@ void HumdrumInput::convertMensuralToken(
                 note->SetColor("red");
             }
         }
-        if (token->find("p") != std::string::npos) {
-            addPlicaUp(note);
-        }
-        if (token->find("P") != std::string::npos) {
-            addPlicaDown(note);
-        }
         if (token->find("k") != std::string::npos) {
             addPlicaUp(note);
         }
