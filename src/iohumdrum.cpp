@@ -11491,7 +11491,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool forceAboveQ = false;
     bool forceBelowQ = false;
     bool forceCenterQ = false;
-    //int forcebelowadj = 0;
+    // int forcebelowadj = 0;
     // int forceaboveadj = 0;
     int trackdiff = 0;
     int staffadj = ss[staffindex].m_dynamstaffadj;
