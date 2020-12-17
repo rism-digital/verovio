@@ -90,6 +90,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build ext
+        shell: bash
         run: python setup.py build_ext
 
       - name: Build bdist wheel
@@ -185,6 +186,7 @@ jobs:
       #===============================================#
       # sdist
       - name: Build ext
+        shell: bash
         run: python setup.py build_ext
 
       - name: Build source distribution
