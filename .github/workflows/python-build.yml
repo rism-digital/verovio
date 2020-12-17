@@ -138,7 +138,7 @@ jobs:
       # Upload artifacts
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ runner.os }}-python-${{ matrix.python-version }}
+          name: wheel-${{ runner.os }}-python-${{ matrix.python-version }}
           path: dist/*.whl
 
 
@@ -217,7 +217,7 @@ jobs:
       # Upload artifact
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ runner.os }}-sdist-python-${{ matrix.python-version }}
+          name: sdist-${{ runner.os }}-python-${{ matrix.python-version }}
           path: dist/*.tar.gz
 
 

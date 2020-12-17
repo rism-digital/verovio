@@ -4,12 +4,12 @@
 setup.py file for Verovio
 """
 
-from glob import glob
-import os
-import platform
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as _build_ext
 from setuptools.command.sdist import sdist as _sdist
+from glob import glob
+import platform
+import os
 
 
 # Utility function to call tools/get_git_commit.sh on any platform
@@ -76,8 +76,8 @@ verovio_module = Extension('verovio._verovio',
                                        './libmei/atts_pagebased.cpp',
                                        './libmei/atts_shared.cpp',
                                        './libmei/atts_visual.cpp',
-                                       'bindings/python/verovio.i'],
-                           swig_opts=['-c++', '-outdir', 'verovio'],
+                                       './bindings/python/verovio.i'],
+                           swig_opts=['-c++', '-outdir', './bindings/python'],
                            include_dirs=['/usr/local/include',
                                          './include',
                                          './include/vrv',
@@ -106,7 +106,9 @@ setup(name='verovio',
                 'verovio.data.Leipzig',
                 'verovio.data.Petaluma',
                 'verovio.data.text'],
-      package_dir={'verovio.data': 'data'},
+      # cf. https://docs.python.org/3/distutils/examples.html#pure-python-distribution-by-package
+      package_dir={'verovio': './bindings/python',
+                   'verovio.data': './data'},
       package_data={
           'verovio.data': [f for f in os.listdir('./data') if f.endswith(".xml")],
           'verovio.data.Bravura': os.listdir('./data/Bravura'),
