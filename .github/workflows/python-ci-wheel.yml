@@ -16,6 +16,9 @@ env:
 
 
 jobs:
+  #===============================================#
+  #         BUILD WHEEL DISTRIBUTION              #
+  #===============================================#
   build_wheels:
     name: Build wheels (${{ matrix.python-version }}, ${{ matrix.platform_id }})
     runs-on: ${{ matrix.os }}
@@ -50,6 +53,8 @@ jobs:
             architecture: x86
 
     steps:
+      #===============================================#
+      # Set up
       - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -61,28 +66,12 @@ jobs:
       - name: Verify Python version
         run: python -c "import sys; print(sys.version)"
 
+      #===============================================#
+      # Dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install cibuildwheel==1.7.1 twine
-
-      #===============================================#
-      # SET UP DATA RESOURCES
-      #===============================================#
-      - name: Move python bindgins to top level
-        run: mv bindings/python/setup.py .
-
-      - name: Create __init__.py in data folder
-        working-directory: data
-        run: touch __init__.py
-
-      - name: Create MANIFEST.in with recursively included data
-        run: |
-          touch MANIFEST.in
-          echo "recursive-include data *" > MANIFEST.in
-
-      - name: Verify
-        run: ls -R
+          python -m pip install cibuildwheel==1.7.1 twine
 
       #===============================================#
       # WHEELS
@@ -101,6 +90,8 @@ jobs:
       - name: Get Build Identifiers
         run: python -m cibuildwheel --print-build-identifiers
 
+      #===============================================#
+      # wheels
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
@@ -110,7 +101,10 @@ jobs:
           CIBW_BEFORE_BUILD: swig -version
         run: python -m cibuildwheel --output-dir wheelhouse
 
+      #===============================================#
+      # Check build
       - name: "List result"
+        working-directory: wheelhouse
         run: ls -R
 
       - name: Check with Twine
@@ -120,19 +114,21 @@ jobs:
       - name: Check wheel installation on Non-Windows
         if: always() && runner.os != 'Windows'
         working-directory: wheelhouse
-        run: |
-          pip install ./*.whl
-          python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+        run: python -m pip pip install ./*.whl
 
       # Wildcard use is different with PowerShell
       # cf. https://stackoverflow.com/a/43900040
       - name: Check wheel installation on Windows
         working-directory: wheelhouse
         if: always() && runner.os == 'Windows'
-        run: |
-          pip install (get-item .\*.whl).FullName
-          python -c "import verovio; tk = verovio.toolkit(); tk.getVersion()"
+        run: python -m pip install (get-item .\*.whl).FullName
 
+      - name: Check wheel installation
+        working-directory: wheelhouse
+        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
+
+      #===============================================#
+      # Upload artifacts
       - uses: actions/upload-artifact@v2
         with:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}

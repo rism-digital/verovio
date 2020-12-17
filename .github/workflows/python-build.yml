@@ -94,6 +94,7 @@ jobs:
         run: python setup.py build_ext
 
       - name: Build bdist wheel
+        shell: bash
         run: python setup.py bdist_wheel
 
       #===============================================#
@@ -134,7 +135,7 @@ jobs:
         run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
 
       #===============================================#
-      # Upload artifact
+      # Upload artifacts
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-python-${{ matrix.python-version }}
@@ -186,7 +187,6 @@ jobs:
       #===============================================#
       # sdist
       - name: Build ext
-        shell: bash
         run: python setup.py build_ext
 
       - name: Build source distribution
