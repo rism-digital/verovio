@@ -1305,15 +1305,10 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     // Draw the text above
-    // convert to string
-    std::wstring wtext = IntToTimeSigFigures(num);
-
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-    TextExtend extend;
-    dc->GetSmuflTextExtent(wtext, &extend);
     int y = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                                         : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    DrawSmuflString(dc, xCentered, y, wtext, HORIZONTALALIGNMENT_center);
+    DrawSmuflString(dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center);
     dc->ResetFont();
 
     dc->EndGraphic(element, this);
