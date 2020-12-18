@@ -331,7 +331,7 @@ void View::DrawThickBezierCurve(
     }
     else {
         // Dashed or Dotted Thick Bezier Curves have a uniform line width.
-        dc->SetPen(m_currentColour, penWidth, penStyle);
+        dc->SetPen(m_currentColour, (thickness + penWidth) / 2, penStyle);
         dc->DrawSimpleBezierPath(bez1);
     }
     dc->ResetPen();

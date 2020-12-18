@@ -372,7 +372,7 @@ public:
      */
     virtual bool CopyChildren() const { return false; }
 
-    int GetAlignmentCount() const { return (int)m_children.size(); }
+    int GetAlignmentCount() const { return (int)GetChildren()->size(); }
 
     //----------//
     // Functors //

@@ -338,11 +338,10 @@ void View::DrawStaffGrp(
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
         // int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
-        int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-        x += barLineWidth / 2;
-        DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
+        const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+        DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
-    // actually draw the line, the brace or the bracket
+    // draw the group symbol
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
 
@@ -351,7 +350,7 @@ void View::DrawStaffGrp(
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
         DrawBrace(dc, x, yTop, yBottom, staffSize);
-        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
+        x -= 2.5 * m_doc->GetDrawingUnit(staffSize);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
         DrawBracket(dc, x, yTop, yBottom, staffSize);
@@ -375,7 +374,7 @@ void View::DrawStaffGrp(
 
     // DrawStaffGrpLabel
     System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
-    int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
+    const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
     this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space);
@@ -537,20 +536,24 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
 
-    x -= m_doc->GetDrawingBeamWhiteWidth(staffSize, false); // distance between bar and start brace
+    const int basicDist = m_doc->GetDrawingUnit(staffSize);
+
+    x -= basicDist;
 
     if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
         FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
-        int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
-        int height = 8 * m_doc->GetDrawingUnit(staffSize);
-        const float scale = vrv_cast<float>(y1 - y2) / height;
+        const int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
+        const int height = 8 * m_doc->GetDrawingUnit(staffSize);
+        const float scale = static_cast<float>(y1 - y2) / height;
         // We want the brace width always to be 2 units
-        int braceWidth = m_doc->GetDrawingDoubleUnit(staffSize);
+        const int braceWidth = m_doc->GetDrawingDoubleUnit(staffSize);
         x -= braceWidth;
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
         const float widthAfterScalling = width * scale;
-        font->SetWidthToHeightRatio(vrv_cast<float>(braceWidth) / widthAfterScalling);
+        font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
+        dc->StartCustomGraphic("grpSym");
         DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
+        dc->EndCustomGraphic();
         font->SetWidthToHeightRatio(currentWidthToHeightRatio);
         return;
     }
@@ -559,17 +562,15 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     Point bez1[4];
     Point bez2[4];
 
-    int penWidth;
-    penWidth = m_doc->GetDrawingStemWidth(staffSize);
+    const int penWidth = m_doc->GetDrawingStemWidth(staffSize);
     y1 -= penWidth;
     y2 += penWidth;
+    x += penWidth;
     BoundingBox::Swap(y1, y2);
 
-    int ymed, xdec, fact;
-
-    ymed = (y1 + y2) / 2;
-    fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
-    xdec = ToDeviceContextX(fact);
+    const int fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
+    const int xdec = ToDeviceContextX(fact);
+    const int ymed = (y1 + y2) / 2;
 
     points[0].x = ToDeviceContextX(x);
     points[0].y = ToDeviceContextY(y1);
@@ -974,7 +975,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
         // HARDCODED
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = staff->GetDrawingX();
-        params.m_y = staff->GetDrawingY() + 1.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        params.m_y = staff->GetDrawingY() + m_doc->GetDrawingLyricFont(60)->GetPointSize();
         if (mnum->HasFontsize()) {
             data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
             if (fs->GetType() == FONTSIZE_fontSizeNumeric) {

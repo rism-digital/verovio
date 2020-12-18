@@ -255,9 +255,15 @@ public:
     Object *GetChild(int idx, const ClassId classId);
 
     /**
-     * Return a cont pointer to the children
+     * Return a const pointer to the children
      */
-    const ArrayOfObjects *GetChildren() { return &m_children; }
+    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const { return &m_children; }
+
+    /**
+     * Return a pointer to the children that allows modification.
+     * This method should be all only in AddChild overrides methods
+     */
+    ArrayOfObjects *GetChildrenForModification() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -1212,13 +1218,14 @@ public:
     ArrayOfStrAttr m_unsupported;
 
 protected:
+    //
+private:
     /**
      * A vector of child objects.
      * Unless SetAsReferenceObject is set or with detached and relinquished, the children are own by it.
      */
     ArrayOfObjects m_children;
 
-private:
     /**
      * A pointer to the parent object;
      */

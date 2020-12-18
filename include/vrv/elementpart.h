@@ -352,6 +352,11 @@ public:
     void IsVirtual(bool isVirtual) { m_isVirtual = isVirtual; }
     ///@}
 
+    /**
+     * Helper to adjust overlaping layers for stems
+     */
+    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+
     //----------//
     // Functors //
     //----------//
@@ -375,7 +380,11 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
-    //
+    /**
+     * Addjusts flag placement and stem length if they are crossing notehead or ledger lines
+     */
+    void AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
+
 public:
     //
 private:

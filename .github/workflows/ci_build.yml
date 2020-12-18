@@ -1,0 +1,579 @@
+name: Verovio CI Build
+
+on:
+  push:
+    # Trigger the workflow on push,
+    # but only for the branches specified
+    branches:
+      # Push events on develop branch
+      - develop
+      # Push events on ci-test branch (uncomment if needed for testing purposes)
+      # - ci-test
+    paths-ignore:
+      - '**.md' # ignore changes to markdown files
+
+# globals
+env:
+  # general settings
+  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
+                                # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
+                                # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
+
+  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
+                                # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
+                                # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
+
+  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
+                                # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
+                                # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
+                                # Will be programmatically set to 'false' for rism-ch repo.
+
+  # build artifacts
+  CLI_BUILD: cli-build
+  DOC_BUILD: doc-build
+  TOOLKIT_BUILD: toolkit-build
+
+  # doxygen
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-ch and from forks
+  DOXYGEN_BRANCH: master
+
+  # emscripten
+  EM_VERSION: latest
+  EM_CACHE_FOLDER: 'emsdk-cache'
+
+  # gh-pages
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
+  GH_PAGES_BRANCH: gh-pages
+
+  # temporary directories
+  DOXYGEN_DIR: doxygen-dir
+  GH_PAGES_DIR: gh-pages-dir
+  TEMP_DIR: temp-dir
+
+
+
+jobs:
+  ###############################################################################################
+  # Build c++ code on different os in parallel.                                                 #
+  # Adapted from https://github.com/DaanDeMeyer/reproc/blob/master/.github/workflows/main.yml . #
+  ###############################################################################################
+  build_cpp:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Build ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.version }}
+    # This job runs on all the os specified in strategy.matrix.os
+    runs-on: ${{ matrix.os }}
+
+    # set matrix with config options
+    # (runs the following steps for every target in parallel)
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            compiler: g++
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: g++
+            version: "10"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "6.0"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "9"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "10"
+
+          - os: macos-10.15
+            compiler: xcode
+            version: "11.7"
+
+          - os: macos-10.15
+            compiler: xcode
+            version: "12.1"
+
+          - os: macos-10.15
+            compiler: g++
+            version: "9"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      # Installation step for Ubuntu
+      - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
+        if: runner.os == 'Linux'
+        run: |
+          # check if compiler is available from runner by default
+          if dpkg -l | grep ${{ matrix.compiler }}-${{ matrix.version }}; then
+            echo "${{ matrix.compiler }}-${{ matrix.version }} available from runner..."
+          else
+            # if not, install compiler
+            sudo apt-get update -q
+            sudo apt-get install -y -q --no-install-recommends ${{ matrix.compiler }}-${{ matrix.version }}
+          fi
+
+          # set environment variables
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
+            echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
+          else
+            echo CC=clang-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=clang++-${{ matrix.version }} >> $GITHUB_ENV
+          fi
+
+      # Installation step for MacOS
+      - name: Configure macOS with ${{ matrix.compiler }}-${{ matrix.version }}
+        if: runner.os == 'macOS'
+        run: |
+          if [ "${{ matrix.compiler }}" == "g++" ]; then
+            # set environment variables (use alias gcc-9)
+            echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
+            echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
+
+          else
+            TARGET_XCODE="/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
+
+            # check XCode version
+            if [ $(xcode-select --print-path | grep Xcode) == $TARGET_XCODE ] ; then
+              echo "XCode ${{ matrix.version }} already set..."
+            else
+              # switch XCode version
+              # cf. https://github.com/actions/virtual-environments/issues/257#issuecomment-573562956
+              echo "Found active $(xcodebuild -version | grep Xcode). Switching to XCode ${{ matrix.version }}..."
+              sudo xcode-select -s $TARGET_XCODE
+            fi
+
+            # set environment variables from XCode
+            echo CC=$(xcrun --find clang) >> $GITHUB_ENV
+            echo CXX=$(xcrun --find clang++) >> $GITHUB_ENV
+          fi
+
+      - name: Check settings and dry-run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          echo "CC: ${CC}"
+          echo "CXX: ${CXX}"
+
+          cmake --version
+          cmake -S ../cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          cmake ../cmake
+          make -j8
+
+
+  ###########################
+  # Build the CLI artifacts #
+  ###########################
+  build_cli:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Build cli
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Create temp dir
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      - name: Run make
+        working-directory: ${{ github.workspace }}/tools
+        run: |
+          cmake ../cmake
+          make -j8
+
+      - name: Update cli.txt
+        working-directory: ${{ github.workspace }}/tools
+        run: ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
+
+      - name: Upload cli artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CLI_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
+
+
+  #####################################
+  # Set up and cache emscripten build #
+  #####################################
+  setup_emscripten:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Set up and cache emscripten
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Set up cache
+        uses: actions/cache@v2
+        id: cache
+        with:
+          # path for cache
+          path: ${{ env.EM_CACHE_FOLDER }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
+
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+
+  ##################################
+  # Build the JS toolkit artifacts #
+  ##################################
+  build_js:
+    name: Build JS toolkit
+    runs-on: ubuntu-20.04
+    needs: [setup_emscripten]
+
+    # set matrix with toolkit options (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        toolkit:
+          - target: nohumdrum
+            message: "Building toolkit without humdrum"
+            options: "-c -H -M"
+            filepath: "verovio-toolkit.js*"
+          - target: light
+            message: "Building toolkit without humdrum as light version"
+            options: "-c -H -l -M"
+            filepath: "verovio-toolkit-light.js*"
+          - target: wasm
+            message: "Building toolkit without humdrum as wasm"
+            options: "-c -H -w -M"
+            filepath: "verovio*wasm*"
+          - target: default
+            message: "Building default toolkit with humdrum"
+            options: "-c -M"
+            filepath: "*-hum.js*"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      # Restore system libraries from cache
+      - name: Restore cache
+        id: restore_cache
+        uses: actions/cache@v2
+        with:
+          # path for cache
+          path: ${{ env.EM_CACHE_FOLDER }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
+
+      # Install and/or activate emsdk
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+      - name: ${{ matrix.toolkit.message }} (${{ matrix.toolkit.options }})
+        working-directory: ${{ github.workspace }}/emscripten
+        run: ./buildToolkit ${{ matrix.toolkit.options }}
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/emscripten
+        run: cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload js build artifact (${{ matrix.toolkit.target }})
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
+
+
+  ##################################
+  # Check settings for deployment  #
+  ##################################
+  check_deploy_settings:
+    name: Check settings for deployment
+    runs-on: ubuntu-20.04
+    # run deployment only after finishing the build jobs
+    needs: [ build_cpp, build_cli, build_js ]
+
+    # Github Environment Variables persist only on job level.
+    # To transfer values to later jobs, outputs mechanism has to be used.
+    # Cf. https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idoutputs
+    # So global envs are reset here as outputs.
+    outputs:
+      _DISABLE_DEPLOY_STEPS: ${{ steps.settings.outputs.disable }}
+      _IS_DRY_RUN: ${{ steps.settings.outputs.dry-run }}
+
+    steps:
+      - name: Enable deploy steps for main repo owner
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        run: echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
+      
+      - name: Disable dry-run mode for main repo owner
+        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        run: echo "IS_DRY_RUN=false" >> $GITHUB_ENV
+
+      - name: Check deployment settings and set them as outputs
+        id: settings
+        run: |
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
+          echo "::set-output name=disable::${DISABLE_DEPLOY_STEPS}"
+          echo "::set-output name=dry-run::${IS_DRY_RUN}"
+
+
+  #########################################
+  # Deploy the toolkit builds to gh-pages #
+  #########################################
+  deploy_toolkit:
+    name: Deploy JS toolkit
+    runs-on: ubuntu-20.04
+    if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
+    # run deployment only after finishing the build jobs
+    needs: [build_cpp, build_cli, build_js, check_deploy_settings]
+
+    steps:
+      - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
+        uses: actions/checkout@v2
+        with:
+          # repository to check out
+          repository: ${{ env.GH_PAGES_REPO }}
+          # Deploy key as secret for accessing <owner>/<GH_PAGES_REPO>;
+          # cf. explanation in https://github.com/rism-ch/verovio/pull/1751
+          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY }}
+          # ref (branch, tag or SHA) to check out
+          ref: ${{ env.GH_PAGES_BRANCH }}
+          # relative path under $GITHUB_WORKSPACE to place the repository
+          path: ${{ env.GH_PAGES_DIR }}
+
+      - name: Download CLI_BUILD artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.CLI_BUILD }}
+          path: artifacts/${{ env.CLI_BUILD }}
+
+      - name: Download TOOLKIT_BUILD artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: artifacts/${{ env.TOOLKIT_BUILD }}
+
+      - name: Copy artifacts to gh-pages
+        run: |
+          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
+          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+
+      - name: Check git status before commit
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: |
+          git config --get remote.origin.url
+          git status
+
+      - name: Configure git
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: |
+          echo "Configuring git"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+
+      - name: Commit files
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: |
+          echo "Running git commit"
+          git add .
+          git commit -m "Auto-commit of toolkit build for ${{ github.repository }}@${{ github.sha }}"
+
+      #      - name: Check git status after commit
+      #        working-directory: ${{ env.DOXYGEN_DIR }}
+      #        run: |
+      #          git config --get remote.origin.url
+      #          git status
+
+      - name: Push changes to gh-pages (dry-run mode)
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: git push -v --dry-run origin HEAD:$GH_PAGES_BRANCH
+
+      - name: Push changes to gh-pages
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        working-directory: ${{ env.GH_PAGES_DIR }}
+        run: git push origin HEAD:$GH_PAGES_BRANCH
+
+      - name: Congratulations
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New JS toolkit builds deployed 🎊"
+
+      - name: Skipped
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
+        run: |
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
+
+  ###################################
+  # Build the doxygen documentation #
+  ###################################
+  build_docs:
+    name: Build documentation
+    runs-on: ubuntu-20.04
+    # run only after finishing other build jobs
+    needs: [build_cpp, build_cli, build_js]
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Install doxygen
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends doxygen
+
+      - name: Check installation
+        run: doxygen --help
+
+      - name: Upgrade doxygen conf
+        working-directory: ${{ github.workspace }}/doc
+        run: doxygen -u verovio.conf
+
+      - name: Build documentation with (updated) doxygen conf
+        working-directory: ${{ github.workspace }}/doc
+        if: ${{ success() }}
+        run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
+
+      - name: Upload doxygen build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DOC_BUILD }}
+          path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
+
+
+  ###############################################
+  # Deploy the documentation to verovio-doxygen #
+  ###############################################
+  deploy_docs:
+    name: Deploy documentation
+    runs-on: ubuntu-20.04
+    if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
+    # run deployment only after finishing the build job
+    needs: [build_docs, check_deploy_settings]
+
+    steps:
+      - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
+        uses: actions/checkout@v2
+        with:
+          # repository to check out
+          repository: ${{ env.DOXYGEN_REPO }}
+          # Deploy key as secret for accessing <owner>/<DOXYGEN_REPO>;
+          # cf. explanation in https://github.com/rism-ch/verovio/pull/1751
+          ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
+          # ref (branch, tag or SHA) to check out
+          ref: ${{ env.DOXYGEN_BRANCH }}
+          # relative path under $GITHUB_WORKSPACE to place the repository
+          path: ${{ env.DOXYGEN_DIR }}
+
+      - name: Download DOC_BUILD artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.DOC_BUILD }}
+          path: artifacts/${{ env.DOC_BUILD }}
+
+      - name: Copy build artifacts to DOXYGEN_DIR
+        run: cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+
+      - name: Check git status before commit
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          git config --get remote.origin.url
+          git status
+
+      - name: Configure git
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          echo "Configuring git..."
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+
+      - name: Commit files
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: |
+          echo "Running git commit..."
+          git add .
+          git commit -m "Auto-commit of documentation build for ${{ github.repository }}@${{ github.sha }}"
+
+      #      - name: Check git status after commit
+      #        working-directory: ${{ env.DOXYGEN_DIR }}
+      #        run: |
+      #          git config --get remote.origin.url
+      #          git status
+
+      - name: Push changes to doxygen (dry-run mode)
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: git push -v --dry-run origin HEAD:$DOXYGEN_BRANCH
+
+      - name: Push changes to doxygen
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        working-directory: ${{ env.DOXYGEN_DIR }}
+        run: git push origin HEAD:$DOXYGEN_BRANCH
+
+      - name: Congratulations
+        if: ${{ success() && needs.check_deploy_settings.outputs._IS_DRY_RUN != 'true' }}
+        run: echo "🎉 New documentation deployed 🎊"
+
+      - name: Skipped
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        if: ${{ needs.check_deploy_settings.outputs._IS_DRY_RUN == 'true' }}
+        run: |
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+
+
+  ###############################################
+  # Skip deployment steps according to settings #
+  ###############################################
+  skip_deploy:
+    name: Skip deployment if set
+    runs-on: ubuntu-20.04
+    # always() is needed here to meet if-condition even if earlier steps failed
+    # cf. https://github.com/actions/runner/issues/491
+    if: ${{ always() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
+    needs: [ check_deploy_settings, deploy_toolkit, deploy_docs ]
+
+    steps:
+      - name: Skipped
+        # skip deployment when deploy steps are disabled or when we are in dry-run mode
+        run: |
+          echo "Deploy job skipped due to deployment settings..."
+
+          echo "DISABLE_DEPLOY_STEPS (env) = ${DISABLE_DEPLOY_STEPS}"
+          echo "IS_DRY_RUN (env) = ${IS_DRY_RUN}"

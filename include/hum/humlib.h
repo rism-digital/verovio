@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 12 19:49:01 PDT 2020
+// Last Modified: Sun Nov 15 23:12:30 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1647,6 +1647,17 @@ class HumdrumToken : public std::string, public HumHash {
 		void     setTrack                  (int aTrack);
 		void     copyStructure             (HTp token);
 
+		// strophe related functions:
+		HTp      getStrophe                (void);
+		std::string getStropheLabel        (void);
+		void     setStrophe                (HTp strophe);
+		bool     hasStrophe                (void);
+		void     clearStrophe              (void);
+		bool     isStrophe                 (const std::string& label);
+		int      getStropheStartIndex      (void);
+		bool     isFirstStrophe            (void);
+		bool     isPrimaryStrophe          (void);
+
 	protected:
 		void     setLineIndex              (int lineindex);
 		void     setFieldIndex             (int fieldlindex);
@@ -1735,6 +1746,10 @@ class HumdrumToken : public std::string, public HumHash {
 		// m_rhythm_analyzed: Set to true when HumdrumFile assigned duration
 		bool m_rhythm_analyzed = false;
 
+		// m_strophe: Starting point of a strophe that the token belongs to.
+		// NULL means that it is not in a strophe.
+		HTp m_strophe = NULL;
+
 	friend class HumdrumLine;
 	friend class HumdrumFileBase;
 	friend class HumdrumFileStructure;
@@ -1812,6 +1827,7 @@ class HumFileAnalysis {
 			m_slurs_analyzed     = false;
 			m_phrases_analyzed   = false;
 			m_nulls_analyzed     = false;
+			m_strophes_analyzed  = false;
 
 			m_barlines_analyzed  = false;
 			m_barlines_different = false;
@@ -1828,6 +1844,10 @@ class HumFileAnalysis {
 		// m_strands_analyzed: Used to keep track of whether or not
 		// file strands have been analyzed.
 		bool m_strands_analyzed = false;
+
+		// m_strophes_analyzed: Used to keep track of whether or not
+		// file strands have been analyzed.
+		bool m_strophes_analyzed = false;
 
 		// m_slurs_analyzed: Used to keep track of whether or not
 		// slur endpoints have been linked or not.
@@ -1887,6 +1907,7 @@ class HumdrumFileBase : public HumHash {
 		bool          isStructureAnalyzed      (void);
 		bool          isRhythmAnalyzed         (void);
 		bool          areStrandsAnalyzed       (void);
+		bool          areStrophesAnalyzed      (void);
 
     	template <class TYPE>
 		   void       initializeArray          (std::vector<std::vector<TYPE>>& array, TYPE value);
@@ -2118,6 +2139,12 @@ class HumdrumFileBase : public HumHash {
 		// m_strands2d: two-dimensional list of spine strands.
 		std::vector<std::vector<TokenPair> > m_strand2d;
 
+		// m_strophes1d: one-dimensional list of all *strophe/*Xstrophe pairs.
+		std::vector<TokenPair> m_strophes1d;
+
+		// m_strophes2d: two-dimensional list of all *strophe/*Xstrophe pairs.
+		std::vector<std::vector<TokenPair> > m_strophes2d;
+
 		// m_quietParse: Set to true if error messages should not be
 		// printed to the console when reading.
 		bool m_quietParse;
@@ -2224,7 +2251,10 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		std::ostream& printDurationInfo            (std::ostream& out = std::cout);
 		int           tpq                          (void);
 
+		void          resolveNullTokens (void);
+
 		// strand functionality:
+		int           getStrandCount    (void);
 		HTp           getStrandStart    (int index);
 		HTp           getStrandBegin    (int index) { return getStrandStart(index); }
 		HTp           getStrandEnd      (int index);
@@ -2233,14 +2263,26 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		HTp           getStrandBegin    (int sindex, int index) { return getStrandStart(sindex, index); }
 		HTp           getStrandEnd      (int sindex, int index);
 		HTp           getStrandStop     (int sindex, int index) { return getStrandEnd(sindex, index); }
-		int           getStrandCount    (void);
 		int           getStrandCount    (int spineindex);
-		void          resolveNullTokens (void);
 
 		HTp           getStrand                    (int index)
 		                                        { return getStrandStart(index); }
 		HTp           getStrand                    (int sindex, int index)
 		                                { return getStrandStart(sindex, index); }
+
+		// strophe functionality (located in src/HumdrumFileStructure-strophe.cpp)
+		bool         analyzeStrophes    (void);
+		void         analyzeStropheMarkers(void);
+		int          getStropheCount    (void);
+		int          getStropheCount    (int spineindex);
+		HTp          getStropheStart    (int index);
+		HTp          getStropheBegin    (int index) { return getStropheStart(index); }
+		HTp          getStropheEnd      (int index);
+		HTp          getStropheStop     (int index) { return getStropheStart(index); }
+		HTp          getStropheStart    (int spine, int index);
+		HTp          getStropheBegin    (int spine, int index) { return getStropheStart(index); }
+		HTp          getStropheEnd      (int spine, int index);
+		HTp          getStropheStop     (int spine, int index) { return getStropheStart(index); }
 
 		// barline/measure functionality:
 		int           getBarlineCount              (void) const;
@@ -2259,6 +2301,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		std::string   getKernAboveSignifier        (void);
 		std::string   getKernBelowSignifier        (void);
 
+
 	protected:
 		bool          analyzeRhythm                (void);
 		bool          assignRhythmFromRecip        (HTp spinestart);
@@ -2267,7 +2310,6 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		bool          analyzeGlobalParameters      (void);
 		bool          analyzeLocalParameters       (void);
 		// bool          analyzeParameters            (void);
-		bool          analyzeStrophes              (void);
 		bool          analyzeDurationsOfNonRhythmicSpines(void);
 		HumNum        getMinDur                    (std::vector<HumNum>& durs,
 		                                            std::vector<HumNum>& durstate);
@@ -3868,6 +3910,76 @@ class Convert {
 		static std::string getReferenceKeyMeaning(const std::string& token);
 		static std::string getLanguageName(const std::string& abbreviation);
 };
+
+
+
+class PixelColor {
+	public:
+		             PixelColor     (void);
+		             PixelColor     (const std::string& color);
+		             PixelColor     (const PixelColor& color);
+		             PixelColor     (int red, int green, int blue);
+		             PixelColor     (float red, float green, float blue);
+		             PixelColor     (double red, double green, double blue);
+		            ~PixelColor     ();
+
+		void         invert         (void);
+		PixelColor&  setColor       (const std::string& colorstring);
+		PixelColor&  setColor       (int red, int green, int blue);
+		int          getRed         (void);
+		int          getGreen       (void);
+		int          getBlue        (void);
+		void         setRed         (int value);
+		void         setGreen       (int value);
+		void         setBlue        (int value);
+		float        getRedF        (void);
+		float        getGreenF      (void);
+		float        getBlueF       (void);
+		void         setRedF        (float value);
+		void         setGreenF      (float value);
+		void         setBlueF       (float value);
+		void         setColor       (PixelColor color);
+		PixelColor&  setHue         (float value);
+		PixelColor&  setTriHue      (float value);
+		PixelColor&  makeGrey       (void);
+		PixelColor&  makeGray       (void);
+		PixelColor&  setGrayNormalized(double value);
+		PixelColor&  setGreyNormalized(double value);
+		int          operator>      (int number);
+		int          operator<      (int number);
+		int          operator==     (PixelColor color);
+		int          operator!=     (PixelColor color);
+		PixelColor&  operator=      (PixelColor color);
+		PixelColor&  operator=      (int value);
+		PixelColor   operator+      (PixelColor color);
+		PixelColor&  operator+=     (int number);
+		PixelColor   operator-      (PixelColor color);
+		PixelColor&  operator*=     (double number);
+		PixelColor   operator*      (PixelColor color);
+		PixelColor   operator*      (double color);
+		PixelColor   operator*      (int color);
+		PixelColor   operator/      (double number);
+		PixelColor   operator/      (int number);
+
+		static PixelColor getColor  (const std::string& colorstring);
+
+		void         writePpm6      (std::ostream& out);
+		void         writePpm3      (std::ostream& out);
+
+	public:
+		unsigned char   Red; 
+		unsigned char   Green;
+		unsigned char   Blue;
+
+	private:
+		float   charToFloat         (int value);
+		int     floatToChar         (float value);
+		int     limit               (int value, int min, int max);
+};
+
+
+// for use with P3 ASCII pnm images: print red green blue triplet.
+std::ostream& operator<<(std::ostream& out, PixelColor apixel);
 
 
 
@@ -5573,6 +5685,23 @@ class Tool_cint : public HumTool {
 };
 
 
+class Tool_colorgroups : public HumTool {
+	public:
+		         Tool_colorgroups  (void);
+		        ~Tool_colorgroups  () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+
+};
+
+
 class Tool_colortriads : public HumTool {
 	public:
 		         Tool_colortriads  (void);
@@ -6039,12 +6168,14 @@ class Tool_flipper : public HumTool {
 		                             HumdrumFile& infile, int index);
 
 	private:
-		bool     m_allQ    = false;
-		bool     m_keepQ   = false;
-		bool     m_kernQ   = false;
+		bool     m_allQ         = false;
+		bool     m_keepQ        = false;
+		bool     m_kernQ        = false;
+		bool     m_stropheQ     = false;
 		std::string m_interp;
 		std::vector<bool> m_flipState;
 		std::vector<bool> m_fliplines;
+		std::vector<bool> m_strophe;
 
 };
 
@@ -6796,10 +6927,10 @@ class SonorityNoteData {
 				m_tok = *token;
 				m_index = 0;
 			}
-			if (m_tok.find('_') != string::npos) {
+			if (m_tok.find('_') != std::string::npos) {
 				m_attackQ = false;
 			}
-			if (m_tok.find(']') != string::npos) {
+			if (m_tok.find(']') != std::string::npos) {
 				m_attackQ = false;
 			}
 			m_base7 = Convert::kernToBase7(m_tok);
@@ -6814,21 +6945,21 @@ class SonorityNoteData {
 			m_token = NULL;
 			m_index = 0;
 			m_tok = tok;
-			if (m_tok.find('_') != string::npos) {
+			if (m_tok.find('_') != std::string::npos) {
 				m_attackQ = false;
 			}
-			if (m_tok.find(']') != string::npos) {
+			if (m_tok.find(']') != std::string::npos) {
 				m_attackQ = false;
 			}
 			m_base7 = Convert::kernToBase7(m_tok);
 			m_base12 = Convert::kernToBase12(m_tok);
 			m_base40 = Convert::kernToBase40(m_tok);
 
-			if (m_tok.find('n') != string::npos) {
+			if (m_tok.find('n') != std::string::npos) {
 				m_accidentalQ = true;
-			} if (m_tok.find('-') != string::npos) {
+			} if (m_tok.find('-') != std::string::npos) {
 				m_accidentalQ = true;
-			} if (m_tok.find('#') != string::npos) {
+			} if (m_tok.find('#') != std::string::npos) {
 				m_accidentalQ = true;
 			}
 			for (int i=0; i<(int)m_tok.size(); i++) {
@@ -6864,7 +6995,7 @@ class SonorityNoteData {
 
 	private:
 		HTp m_token;
-		string m_tok;       // note string from token
+		std::string m_tok;  // note string from token
 		bool m_accidentalQ; // note contains an accidental
 		bool m_upperQ;      // Diatonic note name contains an upper case letter
 		bool m_attackQ;     // true if note is an attack
@@ -7095,12 +7226,13 @@ class Tool_msearch : public HumTool {
 		void    markNote           (HTp token, int index);
 		int     checkHarmonicPitchMatch (SonorityNoteData& query,
 		                           SonorityDatabase& sonorities, bool suppressQ);
-		bool    checkVerticalOnly  (const string& input);
+		bool    checkVerticalOnly  (const std::string& input);
+		void    makeLowerCase      (std::string& inout);
 
 	private:
 	 	vector<HTp> m_kernspines;
-		string      m_text;
-		string      m_marker;
+		std::string m_text;
+		std::string m_marker;
 		bool        m_verticalOnlyQ = false;
 		bool        m_markQ      = false;
 		bool        m_quietQ     = false;
@@ -7907,6 +8039,63 @@ class Tool_scordatura : public HumTool {
 };
 
 
+class Tool_semitones : public HumTool {
+	public:
+		      Tool_semitones   (void);
+		     ~Tool_semitones   () {};
+
+		bool  run              (HumdrumFileSet& infiles);
+		bool  run              (HumdrumFile& infile);
+		bool  run              (const std::string& indata, std::ostream& out);
+		bool  run              (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void        processFile(HumdrumFile& infile);
+		void        initialize(void);
+		void        analyzeLine(HumdrumFile& infile, int line);
+		int         processKernSpines(HumdrumFile& infile, int line, int start, int kspine);
+		void        printTokens(const std::string& value, int count);
+		std::string getTwelveToneIntervalString(HTp token);
+		std::string getNextNoteAttack(HTp token);
+		void        markInterval(HTp token);
+		HTp         markNote(HTp token, bool markQ);
+		void        addMarker(HTp token);
+		void        showCount(void);
+		int         filterData(HTp token);
+		std::vector<HTp> getTieGroup(HTp token);
+		HTp         getNextNote(HTp token);
+		bool        hasTieContinue(const string& value);
+
+	private:
+
+		bool        m_cdataQ      = false; // used **cdata (to display in VHV notation)
+		bool        m_downQ       = false; // mark/count notes in downward interval
+		bool        m_firstQ      = false; // mark only first note in interval
+		bool        m_leapQ       = false; // mark/count notes in leap motion
+		bool        m_midiQ       = false; // give the MIDI note number rather than inteval.
+		bool        m_noanalysisQ = false; // do not print analysis spines
+		bool        m_noinputQ    = false; // do not print input data
+		bool        m_nomarkQ     = false; // do not mark notes (just count intervals)
+		bool        m_norestsQ    = false; // ignore rests
+		bool        m_notiesQ     = false; // do not mark secondary tied notes
+		bool        m_repeatQ     = false; // make/count notes that repeat
+		bool        m_secondQ     = false; // mark only second note in interval
+		bool        m_stepQ       = false; // mark/count notes in stepwise motion
+		bool        m_upQ         = false; // mark/count notes in upward interval
+      bool        m_count       = false; // count the number of intervals being marked
+
+		int         m_markCount = 0;
+		int         m_leap      = 3;
+
+      std::string m_marker  = "@";
+		std::string m_color   = "red";
+		std::string m_include;
+		std::string m_exclude;
+
+};
+
+
+
 class Tool_shed : public HumTool {
 	public:
 		         Tool_shed       (void);
@@ -8173,6 +8362,33 @@ class Tool_spinetrace : public HumTool {
 
 };
 
+
+
+class Tool_strophe : public HumTool {
+	public:
+		         Tool_strophe       (void);
+		        ~Tool_strophe       () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		void     displayStropheVariants(HumdrumFile& infile);
+		void     markWithColor     (HumdrumFile& infile);
+		int      markStrophe       (HTp strophestart, HTp stropheend);
+
+	private:
+		bool         m_listQ;      // boolean for showing a list of variants
+		bool         m_markQ;      // boolean for marking strophes 
+		std::string  m_marker;     // character for marking strophes 
+		std::string  m_color;      // color for strphe notes/rests
+      std::set<std::string> m_variants;  // used for --list option
+
+};
 
 
 class Tool_tabber : public HumTool {

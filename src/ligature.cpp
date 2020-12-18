@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "dot.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "note.h"
@@ -27,9 +28,9 @@ namespace vrv {
 // Ligature
 //----------------------------------------------------------------------------
 
-Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureLog()
+Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureVis()
 {
-    RegisterAttClass(ATT_LIGATURELOG);
+    RegisterAttClass(ATT_LIGATUREVIS);
 
     Reset();
 }
@@ -42,7 +43,7 @@ Ligature::~Ligature()
 void Ligature::Reset()
 {
     LayerElement::Reset();
-    ResetLigatureLog();
+    ResetLigatureVis();
 
     ClearClusters();
 }
@@ -51,8 +52,11 @@ void Ligature::ClearClusters() {}
 
 bool Ligature::IsSupportedChild(Object *child)
 {
-    if (child->Is(NOTE)) {
-        assert(dynamic_cast<LayerElement *>(child));
+    if (child->Is(DOT)) {
+        assert(dynamic_cast<Dot *>(child));
+    }
+    else if (child->Is(NOTE)) {
+        assert(dynamic_cast<Note *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -151,7 +155,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
         }
 
         // Look at the @lig attribute on the previous note
-        if (previousNote->GetLig() == noteAnlMensural_LIG_obliqua) oblique = true;
+        if (previousNote->GetLig() == LIGATUREFORM_obliqua) oblique = true;
         int dur1 = previousNote->GetActualDur();
         int dur2 = note->GetActualDur();
         // Same treatment for Mx and LG execpt for positionning, which is done above
@@ -241,7 +245,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
                 // nothing to change
             }
             // only set the oblique with the SB if the following B is not the start of an oblique
-            else if (note->GetLig() != noteAnlMensural_LIG_obliqua) {
+            else if (note->GetLig() != LIGATUREFORM_obliqua) {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
                 if (n1 > 0) {
                     m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;

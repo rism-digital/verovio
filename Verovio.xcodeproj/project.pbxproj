@@ -292,6 +292,12 @@
 		4D64137E2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D64137F2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D6413802035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
+		4D674B3F255F40AC008AEF4C /* plica.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D674B3E255F40AC008AEF4C /* plica.h */; };
+		4D674B40255F40AC008AEF4C /* plica.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D674B3E255F40AC008AEF4C /* plica.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D674B46255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
+		4D674B47255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
+		4D674B48255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
+		4D674B49255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
 		4D6DF9F520E1071F00C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F720E1074100C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F820E1074200C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
@@ -1307,6 +1313,8 @@
 		4D6413772035F58200BB630E /* pages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pages.cpp; path = src/pages.cpp; sourceTree = "<group>"; };
 		4D64137B2035F67C00BB630E /* mdiv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mdiv.h; path = include/vrv/mdiv.h; sourceTree = "<group>"; };
 		4D64137D2035F68600BB630E /* mdiv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mdiv.cpp; path = src/mdiv.cpp; sourceTree = "<group>"; };
+		4D674B3E255F40AC008AEF4C /* plica.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plica.h; path = include/vrv/plica.h; sourceTree = "<group>"; };
+		4D674B45255F40B7008AEF4C /* plica.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plica.cpp; path = src/plica.cpp; sourceTree = "<group>"; };
 		4D6DF9F420E1071E00C12BBD /* subst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = subst.cpp; path = src/subst.cpp; sourceTree = "<group>"; };
 		4D6DF9F620E1072B00C12BBD /* subst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = subst.h; path = include/vrv/subst.h; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
@@ -2151,6 +2159,8 @@
 				8F59291218854BF800FE51AD /* clef.h */,
 				4DC34BA619BC4A83006175CD /* custos.cpp */,
 				4DC34BA019BC4A70006175CD /* custos.h */,
+				4D674B45255F40B7008AEF4C /* plica.cpp */,
+				4D674B3E255F40AC008AEF4C /* plica.h */,
 				4DC34BA719BC4A83006175CD /* dot.cpp */,
 				4DC34BA119BC4A70006175CD /* dot.h */,
 				4DEEDE631E617C930087E8BC /* elementpart.cpp */,
@@ -2305,6 +2315,7 @@
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				4DB3D8AD1F83D04A00B5FC2B /* atts_mensural.h in Headers */,
 				4D4FCD0A1F5455F10009C455 /* staffgrp.h in Headers */,
+				4D674B3F255F40AC008AEF4C /* plica.h in Headers */,
 				4DB3D8C41F83D0F300B5FC2B /* anchoredtext.h in Headers */,
 				40ACDEA624079F6900F82B8C /* reh.h in Headers */,
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
@@ -2539,6 +2550,7 @@
 				BB4C4B7022A932D7001F6AF0 /* proport.h in Headers */,
 				BB4C4ABA22A932A6001F6AF0 /* iopae.h in Headers */,
 				BB4C4B8C22A932DF001F6AF0 /* rend.h in Headers */,
+				4D674B40255F40AC008AEF4C /* plica.h in Headers */,
 				BB4C4ABC22A932B6001F6AF0 /* instrdef.h in Headers */,
 				BB4C4B7622A932D7001F6AF0 /* syl.h in Headers */,
 				BB4C4AEA22A932BC001F6AF0 /* del.h in Headers */,
@@ -2955,6 +2967,7 @@
 				4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */,
 				4D6331F61F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4D1694501E3A44F300569BF4 /* attconverter.cpp in Sources */,
+				4D674B47255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */,
 				4D1694521E3A44F300569BF4 /* syl.cpp in Sources */,
 				4DC3B9E7239E2AE1007F185E /* transposition.cpp in Sources */,
@@ -2995,6 +3008,7 @@
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
 				40E1CEDE205060E20007C8AF /* labelabbr.cpp in Sources */,
+				4D674B46255F40B7008AEF4C /* plica.cpp in Sources */,
 				403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				4D766EFD20ACAD63006875D8 /* neume.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
@@ -3348,6 +3362,7 @@
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4DB3D8DC1F83D14900B5FC2B /* artic.cpp in Sources */,
+				4D674B48255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4D4335CB1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
 				4DC3B9E9239E2AE3007F185E /* transposition.cpp in Sources */,
@@ -3545,6 +3560,7 @@
 				BB4C4AF922A932BC001F6AF0 /* restore.cpp in Sources */,
 				BB4C4AFD22A932BC001F6AF0 /* subst.cpp in Sources */,
 				BB4C4BBE22A932FC001F6AF0 /* MidiFile.cpp in Sources */,
+				4D674B49255F40B7008AEF4C /* plica.cpp in Sources */,
 				BB4C4A9C22A9328F001F6AF0 /* options.cpp in Sources */,
 				BB4C4A6222A9321F001F6AF0 /* atts_cmn.cpp in Sources */,
 				4DC3B9E8239E2AE2007F185E /* transposition.cpp in Sources */,
@@ -3639,7 +3655,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -3690,7 +3706,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					./include/vrv/,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "";

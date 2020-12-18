@@ -493,6 +493,11 @@ void View::DrawHairpin(
     FloatingPositioner *leftLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetLeftLink());
     FloatingPositioner *rightLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetRightLink());
 
+    const auto [leftOverlap, rightOverlap]
+        = hairpin->GetBarlineOverlapAdjustment(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2);
+    x1 += leftOverlap;
+    x2 -= rightOverlap;
+
     int adjustedX1 = x1;
     if (leftLink) {
         adjustedX1 = leftLink->GetContentRight() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
@@ -509,7 +514,7 @@ void View::DrawHairpin(
         }
     }
 
-    // In any case, a hairpin should not be sorter than 2 units.
+    // In any case, a hairpin should not be shorter than 2 units.
     // If shorter, with groups, this will screw up vertical alignment and push everything down - to be improved by
     // deactivating grp?
     if ((adjustedX2 - adjustedX1) >= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2) {
@@ -705,7 +710,7 @@ void View::DrawOctave(
 
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
         // draw the ending vertical line if not the end of the system
-        if (spanningType == SPANNING_END) {
+        if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
             dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
                 ToDeviceContextY(y2 + lineWidth / 2));
         }
@@ -2390,7 +2395,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     Measure *measure = NULL;
     char spanningType = SPANNING_START_END;
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
+    // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         measure = ending->GetMeasure();
         x1 = measure->GetDrawingX();
