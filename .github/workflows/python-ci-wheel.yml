@@ -95,12 +95,20 @@ jobs:
         env:
           CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          CIBW_BEFORE_ALL_LINUX: yum install swig -y
-          CIBW_BEFORE_ALL_MACOS: brew install swig
-          CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
-          CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
+          CIBW_BEFORE_ALL_LINUX: |
+            # cf. https://github.com/DanielBok/nlopt-python/blob/master/.github/workflows/build.yml#L78
+            if [[ ! -e $(command -v swig) ]]; then
+              curl -L https://sourceforge.net/projects/swig/files/swig/swig-4.0.2/swig-4.0.2.tar.gz/download --output /tmp/swig.tar.gz
+              mkdir /tmp/swig
+              tar -xvzf /tmp/swig.tar.gz -C /tmp/swig --strip-components 1 &> /dev/null
+              pushd /tmp/swig
+              ./configure --without-alllang --with-python3 && make -j2 && make install > /dev/null
+              popd
+            fi
+          CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
+          CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
         run: python -m cibuildwheel --output-dir wheelhouse
 
       #===============================================#
