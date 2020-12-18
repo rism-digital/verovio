@@ -292,6 +292,6 @@ jobs:
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
         run: python -m pip install --index-url https://test.pypi.org/simple/ ${{ env.PACKAGE_NAME }}
 
-      - name: Check source installation
+      - name: Check installation
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
         run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
