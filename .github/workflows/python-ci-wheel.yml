@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS for Python 3.6 and newer
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        os: [ windows-latest, ubuntu-18.04, macos-latest ]
         python-version: [ 3.9 ] # [3.6, 3.7, 3.8, 3.9]
         architecture: [ x86, x64 ]
         # platform_id: [win_amd64, win32, manylinux_x86_64, manylinux_i686, macosx_x86_64]
@@ -95,7 +95,7 @@ jobs:
         env:
           CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          CIBW_BEFORE_ALL_LINUX: sudo apt update -q && sudo apt install swig
+          CIBW_BEFORE_ALL_LINUX: yum install swig -y 
           CIBW_BEFORE_ALL_MACOS: brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
           CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
