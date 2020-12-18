@@ -74,8 +74,8 @@ jobs:
       - name: Install swig on Linux
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update -q
-          sudo apt-get install swig
+          sudo apt update -q
+          sudo apt install swig
       
       - name: Verify swig
         run: swig -version
@@ -171,8 +171,8 @@ jobs:
       - name: Install swig
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update -q
-          sudo apt-get install swig
+          sudo apt update -q
+          sudo apt install swig
       
       - name: Verify swig
         run: swig -version
