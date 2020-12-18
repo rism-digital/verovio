@@ -2,12 +2,12 @@ name: Python Build
 
 on:
   workflow_dispatch: # manual trigger
-  push:
+  #push:
     # Trigger the workflow on push,
     # but only for the branches specified
-    branches:
+    #branches:
       # Push events on develop branch
-      - ci-test
+      #- ci-test
 
 env:
   CHECK_INSTALL_DIR: check_install_dir
