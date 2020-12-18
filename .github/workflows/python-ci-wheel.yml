@@ -6,13 +6,13 @@ on:
     # Trigger the workflow on push,
     # but only for the branches specified
     branches:
-      # Push events on develop branch
-      - ci-test
+      # Push events on specified branch
+      - develop-wheel
 
 
 # globals
 env:
-  PACKAGE_NAME: oivorev
+  PACKAGE_NAME: verovio
   CHECK_INSTALL_DIR: check_install_dir
   CIBW_BUILD_IDENTIFIER: ''
 
