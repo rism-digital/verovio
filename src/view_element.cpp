@@ -1168,11 +1168,10 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     const bool drawingCueSize = mRest->GetDrawingCueSize();
     int x = mRest->GetDrawingX();
     int y = element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    wchar_t rest;
+    wchar_t rest
+        = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
 
-    rest = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2))? rest = SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
-    
-    x -= m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, drawingCueSize) /2;
+    x -= m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, drawingCueSize) / 2;
 
     DrawSmuflCode(dc, x, y, rest, staff->m_drawingStaffSize, drawingCueSize);
 
@@ -1256,7 +1255,13 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     const int xCentered = multiRest->GetDrawingX();
 
     // We do not support more than three chars
-    int num = std::min(multiRest->GetNum(), 999);
+    const int num = std::min(multiRest->GetNum(), 999);
+
+    // Position centered in staff
+    y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
+    if (multiRest->HasLoc()) {
+        y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
+    }
 
     if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
@@ -1270,11 +1275,6 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         x1 = xCentered - width / 2;
         x2 = xCentered + width / 2;
 
-        // Position centered in staff
-        y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
-        if (multiRest->HasLoc()) {
-            y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
-        }
         y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // bounding box is not relevant for the multi-rest rectangle
@@ -1293,35 +1293,27 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         dc->ReactivateGraphic();
     }
     else {
-        // Draw the base rect
-        x1 = xCentered - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3;
-        x2 = xCentered + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3;
-
         // Position centered in staff
-        y1 = staff->GetDrawingY()
-            - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * int((staff->m_drawingLines) / 2);
-        if (staff->m_drawingLines > 1) y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        y2 = y1 - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        if (num == 2)
-            DrawFilledRectangle(dc, x1, y1 + 4, x2, y2 - 4);
-        else
-            DrawRestWhole(dc, xCentered - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false) * 2 / 3,
-                y1, DUR_1, false, staff);
+        y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        if ((staff->m_drawingLines > 1) && (num == 1)) y2 = y1;
+
+        wchar_t rest = (num == 2) ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
+        x1 = xCentered - m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, false) / 2;
+
+        DrawSmuflCode(dc, x1, y2, rest, staff->m_drawingStaffSize, false);
     }
 
     // Draw the text above
-    int start_offset = 0; // offset from x to center text
-
     // convert to string
     std::wstring wtext = IntToTimeSigFigures(num);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     TextExtend extend;
     dc->GetSmuflTextExtent(wtext, &extend);
-    start_offset = (x2 - x1 - extend.m_width) / 2; // calculate offset to center text
     int y = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                                         : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    DrawSmuflString(dc, x1 + start_offset, y, wtext, HORIZONTALALIGNMENT_left);
+    DrawSmuflString(dc, xCentered, y, wtext, HORIZONTALALIGNMENT_center);
     dc->ResetFont();
 
     dc->EndGraphic(element, this);
