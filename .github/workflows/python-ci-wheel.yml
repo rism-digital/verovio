@@ -12,6 +12,7 @@ on:
 
 # globals
 env:
+  PACKAGE_NAME: oivorev
   CHECK_INSTALL_DIR: check_install_dir
   CIBW_BUILD_IDENTIFIER: ''
 
