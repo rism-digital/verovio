@@ -46,8 +46,13 @@ jobs:
           - os: ubuntu-20.04
             architecture: x64
             platform_id: manylinux_x86_64
-
-
+        exclude:
+          - os: macos-latest
+            architecture: x86
+          - os: ubuntu-18.04
+            architecture: x86
+          - os: ubuntu-20.04
+            architecture: x86
 
     steps:
       #===============================================#
