@@ -39,14 +39,14 @@ jobs:
           - os: windows-latest
             architecture: x86
             platform_id: win32
-          - os: ubuntu-latest
+          - os: ubuntu--18.04
             architecture: x64
             platform_id: manylinux_x86_64
           - os: macos-latest
             architecture: x64
             platform_id: macosx_x86_64
         exclude:
-          - os: ubuntu-latest
+          - os: ubuntu--18.04
             architecture: x86
             # platform_id: manylinux_i686
           - os: macos-latest
@@ -95,7 +95,7 @@ jobs:
         env:
           CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          CIBW_BEFORE_ALL_LINUX: yum install swig -y 
+          CIBW_BEFORE_ALL_LINUX: yum install swig -y
           CIBW_BEFORE_ALL_MACOS: brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
           CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
