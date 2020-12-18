@@ -1263,7 +1263,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
     }
 
-    if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
+    if (((num > 4) && !multiRest->HasBlock()) || (num > 15) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         if (multiRest->HasWidth()) {
@@ -1296,12 +1296,29 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Position centered in staff
         y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        if ((staff->m_drawingLines > 1) && (num == 1)) y2 = y1;
 
-        wchar_t rest = (num == 2) ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
-        x1 = xCentered - m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, false) / 2;
+        const int lgWidth = m_doc->GetGlyphWidth(SMUFL_E4E1_restLonga, staff->m_drawingStaffSize, false);
+        const int brWidth = m_doc->GetGlyphWidth(SMUFL_E4E2_restDoubleWhole, staff->m_drawingStaffSize, false);
+        const int sbWidth = m_doc->GetGlyphWidth(SMUFL_E4E3_restWhole, staff->m_drawingStaffSize, false);
 
-        DrawSmuflCode(dc, x1, y2, rest, staff->m_drawingStaffSize, false);
+        int width = (num / 4) * (lgWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        width += ((num % 4) / 2) * (brWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        width = (num % 2) ? width + sbWidth : width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+        x1 = xCentered - width / 2;
+
+        int count = num;
+        while ((count / 4)) {
+            DrawSmuflCode(dc, x1, y2, SMUFL_E4E1_restLonga, staff->m_drawingStaffSize, false);
+            x1 += lgWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            count -= 4;
+        }
+        while ((count / 2)) {
+            DrawSmuflCode(dc, x1, y2, SMUFL_E4E2_restDoubleWhole, staff->m_drawingStaffSize, false);
+            x1 += brWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            count -= 2;
+        }
+        if (count) DrawSmuflCode(dc, x1, y1, SMUFL_E4E3_restWhole, staff->m_drawingStaffSize, false);
     }
 
     // Draw the text above
