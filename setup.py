@@ -91,11 +91,10 @@ verovio_module = Extension('verovio._verovio',
                            extra_compile_args=EXTRA_COMPILE_ARGS
                            )
 
-setup(name='verovio',
-      cmdclass={'sdist': sdist, 'build_ext': build_ext},
-      version='3.1.0-dev',
+
 setup(name='oivorev',
       version= '3.1.0-dev1', # '3.1.0-dev',
+      cmdclass={'sdist': sdist, 'build_ext': build_ext},
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       long_description=long_description,
