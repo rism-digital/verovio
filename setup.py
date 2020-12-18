@@ -12,27 +12,23 @@ import platform
 import os
 
 
-# Utility function to call tools/get_git_commit.sh on any platform
 def get_commit():
+    """Utility function to call tools/get_git_commit.sh on any platform"""
     if os.path.exists("./tools"):
         print("Running tools/get_git_commit.sh")
         os.system("bash -c 'cd tools; ./get_git_commit.sh'")
-        # if platform.system() == "Windows":
-        #     os.system("bash -c 'cd tools; ./get_git_commit.sh'")
-        # else:
-        #     os.system("cd tools; ./get_git_commit.sh")
     else:
         print("Can't change to tools directory")
 
-# Override build_ext and sdist commands to
-# generate the git version header file
 class build_ext(_build_ext):
+    """Override build_ext and sdist commands to generate the git version header file"""
     def run(self):
         # generate the git commit include file
         get_commit()
         _build_ext.run(self)
 
 class sdist(_sdist):
+    """Override build_sdist and sdist commands to generate the git version header file"""
     def run(self):
         # generate the git commit include file
         get_commit()
@@ -95,6 +91,7 @@ verovio_module = Extension('verovio._verovio',
 setup(name='oivorev',
       version= '3.1.0-dev1', # '3.1.0-dev',
       cmdclass={'sdist': sdist, 'build_ext': build_ext},
+      version= '3.1.0-dev2', # '3.1.0-dev',
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       long_description=long_description,

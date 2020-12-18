@@ -67,9 +67,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
 
-      - name: Verify Python version
-        run: python -c "import sys; print(sys.version)"
-
       #===============================================#
       # Dependencies
       - name: Install dependencies
@@ -86,11 +83,13 @@ jobs:
           id=cp$(echo ${{ matrix.python-version }} | sed -e 's/\.//g')-${{ matrix.platform_id }}
           echo CIBW_BUILD_IDENTIFIER=$id >> $GITHUB_ENV
 
+      # TODO: Can be removed when everything is set up
       - name: Check CIBW_BUILD_IDENTIFIER
         shell: bash
         run: echo ${{ env.CIBW_BUILD_IDENTIFIER }}
 
-      - name: Get Build Identifiers
+      # TODO: Can be removed when everything is set up
+      - name: Get Build Identifiers provided by cibuildwheel for ${{ matrix.os }}-${{ matrix.architecture }}
         run: python -m cibuildwheel --print-build-identifiers
 
       #===============================================#
@@ -109,6 +108,8 @@ jobs:
 
       #===============================================#
       # Check build
+
+      # TODO: Can be removed when everything is set up
       - name: "List result"
         working-directory: wheelhouse
         run: ls -R
@@ -117,14 +118,14 @@ jobs:
         working-directory: wheelhouse
         run: twine check *.whl
 
-      - name: Check wheel installation on Non-Windows
+      - name: Install from wheel on Unix
         if: always() && runner.os != 'Windows'
         working-directory: wheelhouse
         run: python -m pip install ./*.whl
 
       # Wildcard use is different with PowerShell
       # cf. https://stackoverflow.com/a/43900040
-      - name: Check wheel installation on Windows
+      - name: Install from wheel on Windows
         working-directory: wheelhouse
         if: always() && runner.os == 'Windows'
         run: python -m pip install (get-item .\*.whl).FullName
@@ -139,6 +140,8 @@ jobs:
         with:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
+
+
   #===============================================#
   #         BUILD SOURCE DISTRIBUTION             #
   #===============================================#
@@ -159,9 +162,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Verify Python version
-        run: python -c "import sys; print(sys.version)"
 
       #===============================================#
       # Swig
@@ -191,9 +191,12 @@ jobs:
 
       #===============================================#
       # Check build
+
+      # TODO: Can be removed when everything is set up
       - name: List result
         working-directory: dist
         run: ls -R
+
       - name: Check with Twine
         working-directory: dist
         run: twine check *.tar.gz
@@ -216,6 +219,7 @@ jobs:
         with:
           name: sdist-${{ runner.os }}-python-${{ matrix.python-version }}
           path: dist/*.tar.gz
+
 
   #===============================================#
   #         UPLOAD TO PACKAGE INDEX               #
@@ -255,6 +259,7 @@ jobs:
         with:
           path: bindings/python/artifacts/
 
+      # TODO: Can be removed when everything is set up
       - name: Display structure of downloaded files
         working-directory: bindings/python/artifacts/
         run: ls -R
@@ -265,6 +270,7 @@ jobs:
           mkdir -p ./dist
           cp artifacts/*-${{ matrix.python-version }}/* dist/
 
+      # TODO: Can be removed when everything is set up
       - name: Verify dist folder
         working-directory: bindings/python/dist/
         run: ls -R
