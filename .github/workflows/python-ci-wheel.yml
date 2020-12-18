@@ -39,14 +39,14 @@ jobs:
           - os: windows-latest
             architecture: x86
             platform_id: win32
-          - os: ubuntu--18.04
+          - os: ubuntu-18.04
             architecture: x64
             platform_id: manylinux_x86_64
           - os: macos-latest
             architecture: x64
             platform_id: macosx_x86_64
         exclude:
-          - os: ubuntu--18.04
+          - os: ubuntu-18.04
             architecture: x86
             # platform_id: manylinux_i686
           - os: macos-latest
