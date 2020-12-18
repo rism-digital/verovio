@@ -1165,21 +1165,16 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     mRest->CenterDrawingX();
 
-    int y = element->GetDrawingY();
+    const bool drawingCueSize = mRest->GetDrawingCueSize();
+    int x = mRest->GetDrawingX();
+    int y = element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    wchar_t rest;
 
-    bool drawingCueSize = element->GetDrawingCueSize();
+    rest = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2))? rest = SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
+    
+    x -= m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, drawingCueSize) /2;
 
-    if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
-        if (!mRest->HasLoc()) y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        const int offset = drawingCueSize
-            ? m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_graceFactor.GetValue() / 2
-            : m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
-        DrawRestBreve(dc, mRest->GetDrawingX() - offset, y, staff, drawingCueSize);
-    }
-    else
-        DrawRestWhole(dc,
-            mRest->GetDrawingX() - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, drawingCueSize) * 2 / 3,
-            y, DUR_1, drawingCueSize, staff);
+    DrawSmuflCode(dc, x, y, rest, staff->m_drawingStaffSize, drawingCueSize);
 
     dc->EndGraphic(element, this);
 }
