@@ -2657,6 +2657,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 AddLayerElement(layer, chord, duration);
                 m_elementStackMap.at(layer).push_back(chord);
                 element = chord;
+                if (cue) chord->SetCue(BOOLEAN_true);
                 if (grace) {
                     if (grace.attribute("slash")) {
                         chord->SetGrace(GRACE_unacc);
@@ -2683,7 +2684,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!cue) {
                 chord->SetCue(BOOLEAN_NONE);
             }
-            else if (chord->GetCue() != BOOLEAN_NONE) {
+            else if (cue && chord->GetCue() != BOOLEAN_NONE) {
                 chord->SetCue(BOOLEAN_true);
             }
             grace = pugi::xml_node();
