@@ -1450,20 +1450,31 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
-    bool drawingCueSize = rest->GetDrawingCueSize();
-    int drawingDur = rest->GetActualDur();
+    const bool drawingCueSize = rest->GetDrawingCueSize();
+    const int drawingDur = rest->GetActualDur();
+    const wchar_t drawingGlyph = rest->GetRestGlyph();
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    switch (drawingDur) {
-        case DUR_LG: DrawRestLong(dc, x, y, staff); break;
-        case DUR_BR: DrawRestBreve(dc, x, y, staff, drawingCueSize); break;
-        case DUR_1:
-        case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
-        default:
-            y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            DrawSmuflCode(dc, x, y, rest->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
+    DrawSmuflCode(dc, x, y, drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
+
+    // single legder line for half and whole rests
+    if ((drawingDur == DUR_1 || drawingDur == DUR_2)
+        && (y > (int)staff->GetDrawingY()
+            || y < staff->GetDrawingY()
+                    - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
+        const int width = m_doc->GetGlyphWidth(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
+        int ledgerLineThickness
+            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int ledgerLineExtension
+            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (drawingCueSize) {
+            ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
+            ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
+        }
+
+        DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
     }
 
     /************ Draw children (dots) ************/
