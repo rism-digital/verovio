@@ -430,7 +430,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
             element->AddChild(rend);
             textParent = rend;
         }
-        else if (soundNode && !soundNode.attribute("@tempo")) {
+        else if (soundNode && !soundNode.attribute("tempo")) {
             Rend *rend = new Rend();
             rend->SetHalign(HORIZONTALALIGNMENT_right);
             element->AddChild(rend);
@@ -2489,8 +2489,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
-    std::string noteID = node.attribute("id").as_string();
-    int duration = node.select_node("duration").node().text().as_int();
+    const std::string noteID = node.attribute("id").as_string();
+    const int duration = node.select_node("duration").node().text().as_int();
+    const int noteStaffNum = node.select_node("staff").node().text().as_int();
     pugi::xpath_node rest = node.select_node("rest");
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
@@ -2505,6 +2506,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 if (!noteID.empty()) {
                     space->SetUuid(noteID);
                 }
+                // set @staff attribute, if existing and different from parent staff number
+                if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
+                    space->SetStaff(
+                        space->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
                 AddLayerElement(layer, space, duration);
             }
             else {
@@ -2549,6 +2554,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!noteID.empty()) {
                 rest->SetUuid(noteID);
             }
+            // set @staff attribute, if existing and different from parent staff number
+            if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
+                rest->SetStaff(
+                    rest->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
             AddLayerElement(layer, rest, duration);
         }
     }
@@ -2561,7 +2570,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetUuid(noteID);
         }
         note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
-        int noteStaffNum = atoi(GetContentOfChild(node, "staff").c_str());
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
             note->SetStaff(
@@ -2889,6 +2897,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // if we are ending a chord remove it from the stack
         if (!nextIsChord) {
             if (!m_elementStackMap.at(layer).empty() && m_elementStackMap.at(layer).back()->Is(CHORD)) {
+                SetChordStaff(layer);
+
                 RemoveLastFromStack(CHORD, layer);
             }
         }
@@ -3952,6 +3962,38 @@ std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
     };
 
     return precomposedNames.end() != precomposedNames.find(attributes) ? precomposedNames[attributes] : "";
+}
+
+void MusicXmlInput::SetChordStaff(Layer *layer)
+{
+    // if all notes in the chord have @staff attribute set one for the chord as well
+    Chord *chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
+    if (!chord) return;
+
+    const ArrayOfObjects *children = chord->GetChildren();
+    auto it = find_if(children->begin(), children->end(), [](Object *object) {
+        if (!object->Is(NOTE)) return false;
+        Note *note = vrv_cast<Note *>(object);
+        return !note->HasStaff();
+    });
+    if (it != chord->GetChildren()->end()) return;
+
+    // if all notes have @staff attribute, but it's not the same staff at least of one note - leave it as is
+    const auto chordStaff = vrv_cast<Note *>(chord->GetFirst(NOTE))->GetStaff();
+    it = find_if(children->begin(), children->end(), [&chordStaff](Object *object) {
+        if (!object->Is(NOTE)) return false;
+        Note *note = vrv_cast<Note *>(object);
+        return (chordStaff != note->GetStaff());
+    });
+    if (it != chord->GetChildren()->end()) return;
+
+    // Now that we're sure that cross-staff is the same for all notes, we can set it to chord and clear of notes
+    chord->SetStaff(chordStaff);
+    for_each(children->begin(), children->end(), [](Object *object) {
+        if (!object->Is(NOTE)) return;
+        Note *note = vrv_cast<Note *>(object);
+        note->ResetStaffIdent();
+    });
 }
 
 } // namespace vrv
