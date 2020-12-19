@@ -292,7 +292,7 @@ jobs:
 
       - name: Install from package index
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
-        run: python -m pip install --index-url https://test.pypi.org/simple/ ${{ env.PACKAGE_NAME }}
+        run: python -m pip install --index-url https://test.pypi.org/simple/ --pre ${{ env.PACKAGE_NAME }}
 
       - name: Check installation
         working-directory: ${{ env.CHECK_INSTALL_DIR }}
