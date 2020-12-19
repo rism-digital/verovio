@@ -53,6 +53,11 @@ std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
     = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
           { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
 
+void SetDefaultResourcePath(const std::string &path)
+{
+    Resources::SetPath(path);
+}
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
