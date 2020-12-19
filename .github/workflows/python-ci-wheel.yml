@@ -7,7 +7,7 @@ on:
     # but only for the branches specified
     branches:
       # Push events on specified branch
-      - develop-wheel
+      - develop-pypi
 
 
 # globals
