@@ -1373,6 +1373,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         if (it->select_node(".//multiple-rest")) {
             const int multiRestLength = it->select_node(".//multiple-rest").node().text().as_int();
             MultiRest *multiRest = new MultiRest;
+            if (it->select_node(".//multiple-rest[@use-symbols='yes']")) multiRest->SetBlock(BOOLEAN_false);
             multiRest->SetNum(multiRestLength);
             Layer *layer = SelectLayer(1, measure);
             AddLayerElement(layer, multiRest);
@@ -1513,7 +1514,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             // clef octave change
             pugi::xpath_node clefOctaveChange = clef.node().select_node("clef-octave-change");
             if (clefOctaveChange.node().text()) {
-                int change = clefOctaveChange.node().text().as_int();
+                const int change = clefOctaveChange.node().text().as_int();
                 if (abs(change) == 1)
                     meiClef->SetDis(OCTAVE_DIS_8);
                 else if (abs(change) == 2)
@@ -1525,7 +1526,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            bool afterBarline = clef.node().attribute("after-barline").as_bool();
+            const bool afterBarline = clef.node().attribute("after-barline").as_bool();
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
@@ -1539,7 +1540,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         KeySig *keySig = NULL;
         if (key.node().select_node("fifths")) {
             if (!keySig) keySig = new KeySig();
-            int fifths = key.node().select_node("fifths").node().text().as_int();
+            const int fifths = key.node().select_node("fifths").node().text().as_int();
             std::string keySigStr;
             if (fifths < 0)
                 keySigStr = StringFormat("%df", abs(fifths));
@@ -2270,7 +2271,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        bool paren = node.attribute("parentheses").as_bool();
+        const bool paren = node.attribute("parentheses").as_bool();
 
         // std::string textColor = node.attribute("color").as_string();
         // std::string textStyle = node.attribute("font-style").as_string();
