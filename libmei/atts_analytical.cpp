@@ -32,7 +32,7 @@ namespace vrv {
 
 AttHarmAnl::AttHarmAnl() : Att()
 {
-  ResetHarmAnl();
+    ResetHarmAnl();
 }
 
 AttHarmAnl::~AttHarmAnl()
