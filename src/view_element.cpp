@@ -1167,14 +1167,19 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     int y = element->GetDrawingY();
 
+    bool drawingCueSize = element->GetDrawingCueSize();
+
     if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
-        y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawRestBreve(dc, mRest->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2, y, staff);
+        if (!mRest->HasLoc()) y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        const int offset = drawingCueSize
+            ? m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_graceFactor.GetValue() / 2
+            : m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        DrawRestBreve(dc, mRest->GetDrawingX() - offset, y, staff, drawingCueSize);
     }
     else
         DrawRestWhole(dc,
-            mRest->GetDrawingX() - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false) * 2 / 3, y,
-            DUR_1, false, staff);
+            mRest->GetDrawingX() - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, drawingCueSize) * 2 / 3,
+            y, DUR_1, drawingCueSize, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -1453,7 +1458,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     switch (drawingDur) {
         case DUR_LG: DrawRestLong(dc, x, y, staff); break;
-        case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
+        case DUR_BR: DrawRestBreve(dc, x, y, staff, drawingCueSize); break;
         case DUR_1:
         case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
         default:
@@ -1763,15 +1768,22 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int
     }
 }
 
-void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
+void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff, bool cueSize)
 {
     int x1, x2, y1, y2;
 
     x1 = x;
-    x2 = x + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int width = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (cueSize) width *= m_options->m_graceFactor.GetValue();
+    x2 = x + width;
 
     y1 = y;
-    y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int height = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    if (cueSize) {
+        y1 += height * (1 - m_options->m_graceFactor.GetValue()) / 2;
+        height *= m_options->m_graceFactor.GetValue();
+    }
+    y2 = y1 + height;
 
     DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
@@ -1794,6 +1806,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
     int x1, x2, y1, y2, vertic;
     y1 = y;
     vertic = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (cueSize) vertic *= m_options->m_graceFactor.GetValue();
 
     int off
         = m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, cueSize) * 2 / 3; // i.e., la moitie de la ronde

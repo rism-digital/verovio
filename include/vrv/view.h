@@ -324,7 +324,7 @@ protected:
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
     void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
-    void DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff);
+    void DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff, bool cueSize = false);
     void DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSize, Staff *staff);
     ///@}

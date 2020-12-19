@@ -325,9 +325,16 @@ private:
      * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
      */
     ///@{
-    ///@}
     std::string GetOrnamentGlyphNumber(int attributes) const;
-
+    ///@}
+    
+    /*
+     * @name Helper method for setting @staff attribute for chords
+     */
+    ///@{
+    void SetChordStaff(Layer *layer);
+    ///@}
+    
     /*
      * @name Methods for converting MusicXML values to MEI attributes.
      */
