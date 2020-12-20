@@ -26,6 +26,7 @@ enum FileFormat {
     AUTO,
     MEI,
     HUMDRUM,
+    HUMMEI,
     PAE,
     ABC,
     DARMS,
