@@ -974,6 +974,11 @@ public:
     ///@}
 
     /**
+     * Prepare group symbol starting and ending staffDefs for drawing
+     */
+    virtual int PrepareGroupSymbols(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Associate LayerElement with @facs to the appropriate zone
      */
     virtual int PrepareFacsimile(FunctorParams *functorParams);
