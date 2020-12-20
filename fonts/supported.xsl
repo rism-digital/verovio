@@ -1172,11 +1172,11 @@
         </holdsAndPauses>
         <rests>
             <description>Rests</description>
-            <!--<glyph glyph-code="E4E0" smufl-name="restMaxima"/>-->
-            <!--<glyph glyph-code="E4E1" smufl-name="restLonga"/>-->
-            <!--<glyph glyph-code="E4E2" smufl-name="restDoubleWhole"/>-->
-            <!--<glyph glyph-code="E4E3" smufl-name="restWhole"/>-->
-            <!--<glyph glyph-code="E4E4" smufl-name="restHalf"/>-->
+            <glyph glyph-code="E4E0" smufl-name="restMaxima"/>
+            <glyph glyph-code="E4E1" smufl-name="restLonga"/>
+            <glyph glyph-code="E4E2" smufl-name="restDoubleWhole"/>
+            <glyph glyph-code="E4E3" smufl-name="restWhole"/>
+            <glyph glyph-code="E4E4" smufl-name="restHalf"/>
             <glyph glyph-code="E4E5" smufl-name="restQuarter"/>
             <glyph glyph-code="E4E6" smufl-name="rest8th"/>
             <glyph glyph-code="E4E7" smufl-name="rest16th"/>
