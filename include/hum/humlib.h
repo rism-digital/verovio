@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Nov 15 23:12:30 PST 2020
+// Last Modified: Thu Dec 17 23:34:26 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1491,11 +1491,18 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isInvisible               (void);
 		bool     isGrace                   (void);
 		bool     isClef                    (void);
+		bool     isModernClef              (void);
+		bool     isOriginalClef            (void);
 		bool     isKeySignature            (void);
+		bool     isModernKeySignature      (void);
+		bool     isOriginalKeySignature    (void);
 		bool     isKeyDesignation          (void);
 		bool     isTimeSignature           (void);
 		bool     isTempo                   (void);
 		bool     isMensurationSymbol       (void);
+		bool     isMensuration             (void) { return isMensurationSymbol(); }
+		bool     isOriginalMensurationSymbol(void);
+		bool     isOriginalMensuration     (void) { return isOriginalMensurationSymbol(); }
 		bool     isInstrumentDesignation   (void);
 		bool     isInstrumentName          (void);
 		bool     isInstrumentAbbreviation  (void);
@@ -2250,6 +2257,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		HumNum        getScoreDuration             (void) const;
 		std::ostream& printDurationInfo            (std::ostream& out = std::cout);
 		int           tpq                          (void);
+		int           getTpq                       (void) { return tpq(); }
 
 		void          resolveNullTokens (void);
 
@@ -6884,6 +6892,46 @@ class Tool_metlev : public HumTool {
 
 
 
+class Tool_modori : public HumTool {
+	public:
+		         Tool_modori         (void);
+		        ~Tool_modori         () {};
+
+		bool     run                 (HumdrumFileSet& infiles);
+		bool     run                 (HumdrumFile& infile);
+		bool     run                 (const string& indata, ostream& out);
+		bool     run                 (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile         (HumdrumFile& infile);
+		void     initialize          (void);
+		void     printInfo           (void);
+		void     switchModernOriginal(HumdrumFile& infile);
+		bool     swapKeyStyle        (HTp one, HTp two);
+		bool     swapClefStyle       (HTp one, HTp two);
+		bool     flipMensurationStyle(HTp token);
+		void     convertKeySignatureToModern  (HTp token);
+		void     convertKeySignatureToOriginal(HTp token);
+		void     convertKeySignatureToRegular (HTp token);
+		void     convertClefToModern          (HTp token);
+		void     convertClefToOriginal        (HTp token);
+		void     convertClefToRegular         (HTp token);
+
+	private:
+		bool m_modernQ        = false; // show modern key/clef/time signatures
+		bool m_originalQ      = false; // show original key/clef/mensuration
+		bool m_infoQ          = false; // show key/clef/mensuration tokens in data
+		bool m_nokeyQ         = false; // -K option: don't change key signatures
+		bool m_noclefQ        = false; // -C option: don't change clefs
+		bool m_nomensurationQ = false; // -M option: don't change mensurations
+
+		std::vector<std::map<HumNum, std::vector<HTp>>> m_keys;
+		std::vector<std::map<HumNum, std::vector<HTp>>> m_clefs;
+		std::vector<std::map<HumNum, std::vector<HTp>>> m_mensurations;
+
+};
+
+
 
 class SonorityNoteData {
 	public:
@@ -8078,6 +8126,7 @@ class Tool_semitones : public HumTool {
 		bool        m_nomarkQ     = false; // do not mark notes (just count intervals)
 		bool        m_norestsQ    = false; // ignore rests
 		bool        m_notiesQ     = false; // do not mark secondary tied notes
+		bool        m_pcQ         = false; // give pitch class rather than MIDI note num.
 		bool        m_repeatQ     = false; // make/count notes that repeat
 		bool        m_secondQ     = false; // mark only second note in interval
 		bool        m_stepQ       = false; // mark/count notes in stepwise motion
