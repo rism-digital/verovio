@@ -401,8 +401,16 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
         return GetContent(node);
     }
     if (IsElement(node, "dynamics")) {
-        std::string dynamStr = GetContentOfChild(node, "other-dynamics");
-        return dynamStr.empty() ? node.first_child().name() : dynamStr;
+        std::string dynamStr;
+        for (pugi::xml_node xmlDynamPart : node.children()) {
+            if (xmlDynamPart.text()) {
+                dynamStr += xmlDynamPart.text().as_string();
+            }
+            else {
+                dynamStr += xmlDynamPart.name();
+            }
+        }
+        return dynamStr;
     }
     return std::string();
 }
@@ -1372,6 +1380,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         if (it->select_node(".//multiple-rest")) {
             const int multiRestLength = it->select_node(".//multiple-rest").node().text().as_int();
             MultiRest *multiRest = new MultiRest;
+            if (it->select_node(".//multiple-rest[@use-symbols='yes']")) multiRest->SetBlock(BOOLEAN_false);
             multiRest->SetNum(multiRestLength);
             Layer *layer = SelectLayer(1, measure);
             AddLayerElement(layer, multiRest);
@@ -1512,7 +1521,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             // clef octave change
             pugi::xpath_node clefOctaveChange = clef.node().select_node("clef-octave-change");
             if (clefOctaveChange.node().text()) {
-                int change = clefOctaveChange.node().text().as_int();
+                const int change = clefOctaveChange.node().text().as_int();
                 if (abs(change) == 1)
                     meiClef->SetDis(OCTAVE_DIS_8);
                 else if (abs(change) == 2)
@@ -1524,7 +1533,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            bool afterBarline = clef.node().attribute("after-barline").as_bool();
+            const bool afterBarline = clef.node().attribute("after-barline").as_bool();
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
@@ -1532,13 +1541,14 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     // key and time change
     pugi::xpath_node key = node.select_node("key");
     pugi::xpath_node time = node.select_node("time");
-    // for now only read first part and make it change in scoreDef
-    if ((key || time) && node.select_node("ancestor::part[not(preceding-sibling::part)]")) {
+    // for now only read first key change in first part and update scoreDef
+    if ((key || time) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
+        && !node.select_node("preceding-sibling::attributes/key")) {
         ScoreDef *scoreDef = new ScoreDef();
         KeySig *keySig = NULL;
         if (key.node().select_node("fifths")) {
             if (!keySig) keySig = new KeySig();
-            int fifths = key.node().select_node("fifths").node().text().as_int();
+            const int fifths = key.node().select_node("fifths").node().text().as_int();
             std::string keySigStr;
             if (fifths < 0)
                 keySigStr = StringFormat("%df", abs(fifths));
@@ -1570,6 +1580,10 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         if (key.node().select_node("mode")) {
             if (!keySig) keySig = new KeySig();
             keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
+        }
+        if (key.node().select_node("cancel")) {
+            if (!keySig) keySig = new KeySig();
+            keySig->SetSigShowchange(BOOLEAN_true);
         }
         if (key.node().attribute("id")) {
             if (!keySig) keySig = new KeySig();
@@ -2269,7 +2283,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        bool paren = node.attribute("parentheses").as_bool();
+        const bool paren = node.attribute("parentheses").as_bool();
 
         // std::string textColor = node.attribute("color").as_string();
         // std::string textStyle = node.attribute("font-style").as_string();
