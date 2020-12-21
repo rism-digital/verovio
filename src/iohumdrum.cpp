@@ -831,6 +831,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     if (linebreaki > 0) {
         hum::HTp token = infile[linebreaki].token(0);
         Sb *sb = new Sb;
+        this->m_hasLayoutInformation = true;
         setLocationId(sb, token);
         m_sections.back()->AddChild(sb);
         // Maybe allow other types of line breaks here, but
@@ -842,6 +843,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     else if (pagebreaki > 0) {
         hum::HTp token = infile[pagebreaki].token(0);
         Pb *pb = new Pb;
+        this->m_hasLayoutInformation = true;
         setLocationId(pb, token);
         m_sections.back()->AddChild(pb);
         // Maybe allow other types of line breaks here, but
@@ -5695,6 +5697,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
+        this->m_hasLayoutInformation = true;
         if (m_currentending) {
             m_currentending->AddChild(sb);
         }
@@ -5710,6 +5713,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Pb *pb = new Pb;
+        this->m_hasLayoutInformation = true;
         if (m_currentending) {
             m_currentending->AddChild(pb);
         }
@@ -20570,6 +20574,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
     if (hasMensuralStaff(&infile[startline])) {
         m_measure = NULL;
+        //m_measure = new Measure(false);
     }
     else {
         m_measure = new Measure();
@@ -21074,6 +21079,7 @@ void HumdrumInput::setupMeiDocument()
         // breaks encoded in the file to be activated, so adding a
         // dummy page break here:
         Pb *pb = new Pb;
+        this->m_hasLayoutInformation = true;
         section->AddChild(pb);
     }
 }
@@ -22640,6 +22646,8 @@ void HumdrumInput::markOtherClefsAsChange(hum::HTp clef)
         current = current->getPreviousFieldToken();
     }
 }
+
+
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
