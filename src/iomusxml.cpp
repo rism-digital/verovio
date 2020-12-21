@@ -1534,8 +1534,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     // key and time change
     pugi::xpath_node key = node.select_node("key");
     pugi::xpath_node time = node.select_node("time");
-    // for now only read first part and make it change in scoreDef
-    if ((key || time) && node.select_node("ancestor::part[not(preceding-sibling::part)]")) {
+    // for now only read first key change in first part and update scoreDef
+    if ((key || time) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
+        && !node.select_node("preceding-sibling::attributes/key")) {
         ScoreDef *scoreDef = new ScoreDef();
         KeySig *keySig = NULL;
         if (key.node().select_node("fifths")) {
@@ -1572,6 +1573,10 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         if (key.node().select_node("mode")) {
             if (!keySig) keySig = new KeySig();
             keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
+        }
+        if (key.node().select_node("cancel")) {
+            if (!keySig) keySig = new KeySig();
+            keySig->SetSigShowchange(BOOLEAN_true);
         }
         if (key.node().attribute("id")) {
             if (!keySig) keySig = new KeySig();
