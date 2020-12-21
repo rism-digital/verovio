@@ -118,17 +118,17 @@ RestOffsets g_defaultRests{
         { { RA_none,
             { { RLP_restOnTopLayer,
                   { { RNP_noteInSpace,
-                        { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 3 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 },
+                        { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 1 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 },
                             { DUR_64, 5 }, { DUR_128, 5 }, { DUR_LG, 3 }, { DUR_BR, 1 } } },
                       { RNP_noteOnLine,
                           { { DUR_1, 0 }, { DUR_2, 0 }, { DUR_4, 2 }, { DUR_8, 2 }, { DUR_16, 2 }, { DUR_32, 2 },
                               { DUR_64, 4 }, { DUR_128, 4 }, { DUR_LG, 2 }, { DUR_BR, 2 } } } } },
                 { RLP_restOnBottomLayer,
                     { { RNP_noteInSpace,
-                          { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -3 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 },
+                          { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -1 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 },
                               { DUR_64, -3 }, { DUR_128, -5 }, { DUR_LG, -3 }, { DUR_BR, -3 } } },
                         { RNP_noteOnLine,
-                            { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -4 }, { DUR_8, -2 }, { DUR_16, -2 },
+                            { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -2 }, { DUR_8, -2 }, { DUR_16, -2 },
                                 { DUR_32, -4 }, { DUR_64, -4 }, { DUR_128, -6 }, { DUR_LG, -2 },
                                 { DUR_BR, -2 } } } } } } } } }
 };
@@ -265,10 +265,13 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (layerCount != 2) return defaultLocation;
 
+    Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
+
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
-    staff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer(vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
+    realStaff->FindAllDescendantByComparison(&layers, &matchType);
+    const bool isTopLayer((m_crossStaff && (staff->GetN() < m_crossStaff->GetN()))
+        || (vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN()));
 
     // find best rest location relative to elements on other layers
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
@@ -282,6 +285,14 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         std::pair<int, RestAccidental> currentLayerRelativeLocationInfo(currentLayerRelativeLocation, RA_none);
         currentLayerRelativeLocation
             += GetRestOffsetFromOptions(RL_sameLayer, currentLayerRelativeLocationInfo, isTopLayer);
+    }
+    if (m_crossStaff) {
+        if (isTopLayer) {
+            otherLayerRelativeLocation += defaultLocation + 2;
+        }            
+        else {
+            otherLayerRelativeLocation -= defaultLocation + 2;
+        }
     }
 
     return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
@@ -420,6 +431,12 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
         }
         return isTopLayer ? *std::max_element(btremElements.begin(), btremElements.end())
                           : *std::min_element(btremElements.begin(), btremElements.end());
+    }
+    if (object->Is(REST)) {
+        if (!m_crossStaff) return { VRV_UNSET, RA_none };
+        Rest *rest = vrv_cast<Rest *>(object);
+        assert(rest);
+        return { rest->GetDrawingLoc(), RA_none };
     }
     return { VRV_UNSET, RA_none };
 }

@@ -1183,8 +1183,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                         loc++;
                 }
             }
-            else if (hasMultipleLayer) {
-                loc = rest->GetOptimalLayerLocation(staffY, layerY, loc);
+            else if (hasMultipleLayer || m_crossStaff) {
+                Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+                assert(staff);
+                loc = rest->GetOptimalLayerLocation(staff, layer, loc);
             }
         }
         loc = rest->GetRestLocOffset(loc);
