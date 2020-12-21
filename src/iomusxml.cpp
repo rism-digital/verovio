@@ -34,6 +34,7 @@
 #include "fing.h"
 #include "ftrem.h"
 #include "gliss.h"
+#include "grpsym.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "instrdef.h"
@@ -634,17 +635,21 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 StaffGrp *staffGrp = new StaffGrp();
                 // read the group-symbol (MEI @symbol)
                 std::string groupGymbol = GetContentOfChild(xpathNode.node(), "group-symbol");
-                if (groupGymbol == "brace") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
-                }
-                else if (groupGymbol == "line") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_line);
-                }
-                else if (groupGymbol == "bracket") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracket);
-                }
-                else if (groupGymbol == "square") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
+                if (!groupGymbol.empty()) {
+                    GrpSym *grpSym = new GrpSym();
+                    if (groupGymbol == "brace") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                    }
+                    else if (groupGymbol == "line") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_line);
+                    }
+                    else if (groupGymbol == "bracket") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+                    }
+                    else if (groupGymbol == "square") {
+                        grpSym->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
+                    }
+                    staffGrp->AddChild(grpSym);
                 }
                 const std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
                 staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
@@ -703,7 +708,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     partId.c_str());
                 continue;
             }
-            int staves = partFirstMeasure.node().select_node("attributes/staves").node().text().as_int();
             Label *label = NULL;
             LabelAbbr *labelAbbr = NULL;
             InstrDef *instrdef = NULL;
@@ -773,8 +777,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
+            const int staves = partFirstMeasure.node().select_node("attributes/staves").node().text().as_int();
             if (staves > 1) {
+                partStaffGrp->SetBarThru(BOOLEAN_true);
                 partStaffGrp->SetUuid(partId.c_str());
+                if (!m_staffGrpStack.back()->GetChild(0, GRPSYM)) {
+                    GrpSym *partGrpSym = new GrpSym();
+                    partGrpSym->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                    partStaffGrp->AddChild(partGrpSym);
+                }
                 if (label) partStaffGrp->AddChild(label);
                 if (labelAbbr) partStaffGrp->AddChild(labelAbbr);
                 if (instrdef) partStaffGrp->AddChild(instrdef);
@@ -783,10 +794,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
-                if (m_staffGrpStack.back()->GetSymbol() != staffGroupingSym_SYMBOL_brace) {
-                    partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
-                }
-                partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
             else {
@@ -1641,7 +1648,7 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, co
     assert(node);
     assert(measure);
 
-    m_durTotal -= atoi(GetContentOfChild(node, "duration").c_str());
+    m_durTotal -= node.child("duration").text().as_int();
 }
 
 void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, const std::string &measureNum)

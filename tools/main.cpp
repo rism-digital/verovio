@@ -280,6 +280,11 @@ int main(int argc, char **argv)
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
                 
                 // Handle deprecated options
+                if (key == "condense-encoded") {
+                    vrv::LogWarning("Option --condense-encoded is deprecated; use --condense encoded instead");
+                    options->m_condense.SetValue("encoded");
+                    break;
+                }
                 if (key == "slur-thickness") {
                     vrv::LogWarning("Option --slur-thickness is deprecated; use --slur-midpoint-thickness instead");
                     options->m_slurMidpointThickness.SetValue(optarg);

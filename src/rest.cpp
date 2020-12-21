@@ -212,6 +212,10 @@ wchar_t Rest::GetRestGlyph() const
 {
     int symc = 0;
     switch (this->GetActualDur()) {
+        case DUR_LG: symc = SMUFL_E4E1_restLonga; break;
+        case DUR_BR: symc = SMUFL_E4E2_restDoubleWhole; break;
+        case DUR_1: symc = SMUFL_E4E3_restWhole; break;
+        case DUR_2: symc = SMUFL_E4E4_restHalf; break;
         case DUR_4: symc = SMUFL_E4E5_restQuarter; break;
         case DUR_8: symc = SMUFL_E4E6_rest8th; break;
         case DUR_16: symc = SMUFL_E4E7_rest16th; break;
@@ -228,19 +232,8 @@ wchar_t Rest::GetRestGlyph() const
 int Rest::GetRestLocOffset(int loc)
 {
     switch (this->GetActualDur()) {
-        case DUR_MX: loc -= 0; break;
-        case DUR_LG: loc -= 0; break;
-        case DUR_BR: loc += 0; break;
         case DUR_1: loc += 2; break;
-        case DUR_2: loc += 0; break;
-        case DUR_4: loc -= 2; break;
-        case DUR_8: loc -= 2; break;
-        case DUR_16: loc -= 2; break;
-        case DUR_32: loc -= 2; break;
-        case DUR_64: loc -= 2; break;
-        case DUR_128: loc -= 2; break;
-        case DUR_256: loc -= 2; break;
-        default: loc -= 1; break;
+        default: loc += 0; break;
     }
 
     return loc;
@@ -515,13 +508,13 @@ int Rest::CalcDots(FunctorParams *functorParams)
     switch (this->GetActualDur()) {
         case DUR_1: loc += 0; break;
         case DUR_2: loc += 0; break;
-        case DUR_4: loc += 2; break;
-        case DUR_8: loc += 2; break;
-        case DUR_16: loc += 2; break;
-        case DUR_32: loc += 4; break;
-        case DUR_64: loc += 4; break;
-        case DUR_128: loc += 6; break;
-        case DUR_256: loc += 6; break;
+        case DUR_4: loc += 0; break;
+        case DUR_8: loc += 0; break;
+        case DUR_16: loc += 0; break;
+        case DUR_32: loc += 2; break;
+        case DUR_64: loc += 2; break;
+        case DUR_128: loc += 4; break;
+        case DUR_256: loc += 4; break;
         default: break;
     }
 

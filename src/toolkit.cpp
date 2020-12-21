@@ -953,6 +953,20 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                 }
                 opt->SetValueArray(queries);
             }
+            else if (iter->first == "condenseEncoded") {
+                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("condense");
+                assert(opt);
+                if (json.has<jsonxx::Number>("condenseEncoded")) {
+                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
+                        opt->SetValue("encoded");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
             else if (iter->first == "ignoreLayout") {
                 LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
                 Option *opt = NULL;
