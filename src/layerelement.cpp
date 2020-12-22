@@ -1310,20 +1310,20 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::AdjustTupletNumOverlap(FunctorParams* functorParams) 
+int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams)
 {
     AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);
     assert(params);
 
     if (!Is({ ARTIC, ARTIC_PART, ACCID, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !HasSelfBB()) return FUNCTOR_CONTINUE;
-    
+
     if (params->m_ignoreCrossStaff && Is({ CHORD, NOTE, REST }) && m_crossStaff) return FUNCTOR_SIBLINGS;
 
     if (!params->m_tupletNum->HorizontalSelfOverlap(this)
         && !params->m_tupletNum->VerticalSelfOverlap(this, params->m_verticalMargin)) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (params->m_drawingNumPos == STAFFREL_basic_above) {
         int dist = GetSelfTop();
         if (params->m_yRel < dist) params->m_yRel = dist;
@@ -1331,7 +1331,7 @@ int LayerElement::AdjustTupletNumOverlap(FunctorParams* functorParams)
     else {
         int dist = GetSelfBottom();
         if (params->m_yRel > dist) params->m_yRel = dist;
-    }               
+    }
 
     return FUNCTOR_CONTINUE;
 }
