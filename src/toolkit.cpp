@@ -442,6 +442,7 @@ bool Toolkit::LoadData(const std::string &data)
 
         // Read embedded options from input Humdrum file:
         ((HumdrumInput *)input)->parseEmbeddedOptions(m_doc);
+        ((HumdrumInput *)input)->finalizeDocument(m_doc);
     }
     else if (inputFormat == HUMMEI) {
         // convert first to MEI and then load MEI data via MEIInput.  This

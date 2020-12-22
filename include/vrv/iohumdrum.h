@@ -378,6 +378,7 @@ public:
     virtual bool Import(const std::string &humdrum);
 
     void parseEmbeddedOptions(vrv::Doc &doc);
+    void finalizeDocument(vrv::Doc &doc);
 
 #ifndef NO_HUMDRUM_SUPPORT
 

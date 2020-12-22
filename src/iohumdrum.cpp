@@ -19670,10 +19670,19 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
 //////////////////////////////
 //
 // HumdrumInput::addMordent -- Add mordent for note.
-//      M = upper mordent, major second interval
-//      m = upper mordent, minor second interval
-//      W = lower mordent, major second interval
-//      w = lower mordent, minor second interval
+//      M  = upper mordent, major second interval
+//      MM = double upper mordent, major second interval
+//      m  = upper mordent, minor second interval
+//      mm = double upper mordent, minor second interval
+//      W  = lower mordent, major second interval
+//      WW = double lower mordent, major second interval
+//      w  = lower mordent, minor second interval
+//      ww = double lower mordent, minor second interval
+//  also:
+//      Mm  = upper mordent with unknown interval
+//      MMm = double upper mordent with unknown interval
+//      Ww  = lower mordent with unknown interval
+//      WWw = lower mordent with unknown interval
 //
 //
 
@@ -19792,6 +19801,19 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
                 case +2: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
             }
         }
+    }
+
+    if (token->find("MM") != std::string::npos) {
+        mordent->SetLong(BOOLEAN_true);
+    }
+    else if (token->find("mm") != std::string::npos) {
+        mordent->SetLong(BOOLEAN_true);
+    }
+    else if (token->find("WW") != std::string::npos) {
+        mordent->SetLong(BOOLEAN_true);
+    }
+    else if (token->find("ww") != std::string::npos) {
+        mordent->SetLong(BOOLEAN_true);
     }
 }
 
@@ -20573,8 +20595,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     if (hasMensuralStaff(&infile[startline])) {
-        m_measure = NULL;
-        //m_measure = new Measure(false);
+        // m_measure = NULL;
+        m_measure = new Measure(false);
     }
     else {
         m_measure = new Measure();
@@ -22647,7 +22669,14 @@ void HumdrumInput::markOtherClefsAsChange(hum::HTp clef)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::finalizeDocument -- For use when loaded a Humdrum file directly
+//     into Verovio rather than indirectly through MEIInput class.  These functions
+//     are taken from MEIInput::ReadDoc().
+//
 
+void HumdrumInput::finalizeDocument(Doc &doc) {}
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
