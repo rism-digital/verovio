@@ -385,6 +385,9 @@ private:
     std::map<Layer *, int> m_layerEndTimes;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
+    /* To remember current layer to properly handle layers/staves/cross-staff elements */
+    Layer *m_currentLayer = NULL;
+    bool m_isLayerInitialized = false;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */

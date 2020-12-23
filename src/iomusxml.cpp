@@ -224,27 +224,23 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
+    // If value is iniatialized - get current layer
+    if (m_isLayerInitialized) return m_currentLayer;
+
+    // If not initialized and layer is not set - get first layer in the first staff
+    if (!m_currentLayer) {
+        m_currentLayer = SelectLayer(1, measure);
+        m_isLayerInitialized = true;
+        return m_currentLayer;
+    }
+
     // Find voice number of node
     int layerNum = (node.child("voice")) ? node.child("voice").text().as_int() : 1;
     if (layerNum < 1) {
         LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
         layerNum = 1;
     }
-    // Check if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
-    for (auto item : *measure->GetChildren()) {
-        if (!item->Is(STAFF)) {
-            continue;
-        }
-        Staff *staff = dynamic_cast<Staff *>(item);
-        assert(staff);
-        for (auto layer : *staff->GetChildren()) {
-            assert(layer);
-            // Now look for the layer with the corresponding voice
-            if (layerNum == dynamic_cast<Layer *>(layer)->GetN()) {
-                return SelectLayer(layerNum, staff);
-            }
-        }
-    }
+
     // if not, take staff info of node element
     int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
     if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
@@ -254,7 +250,9 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     staffNum--;
     Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
-    return SelectLayer(layerNum, staff);
+    m_currentLayer = SelectLayer(layerNum, staff);
+    m_isLayerInitialized = true;
+    return m_currentLayer;
 }
 
 Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
@@ -1494,6 +1492,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // clear prevLayer
     m_prevLayer = NULL;
 
+    // clear current layer
+    m_isLayerInitialized = false;
+    m_currentLayer = NULL;
+
     return true;
 }
 
@@ -1663,6 +1665,8 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, co
     assert(measure);
 
     m_durTotal -= node.child("duration").text().as_int();
+
+    m_isLayerInitialized = false;
 }
 
 void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, const std::string &measureNum)
