@@ -36,8 +36,8 @@ std::map<int, std::string> Option::s_header
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
 
-std::map<int, std::string> Option::s_systemDivider
-    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
+    { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"

@@ -512,7 +512,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             Beam *beam = this->GetNumAlignedBeam();
             // If we have a beam first move it to the appropriate postion
             if (beam) {
-                
+
                 int xMid = tupletNum->GetDrawingXMid(params->m_doc);
                 int yMid = beam->m_beamSegment.m_startingY
                     + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
