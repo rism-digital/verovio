@@ -227,18 +227,20 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     // If value is iniatialized - get current layer
     if (m_isLayerInitialized) return m_currentLayer;
 
-    // If not initialized and layer is not set - get first layer in the first staff
-    if (!m_currentLayer) {
-        m_currentLayer = SelectLayer(1, measure);
-        m_isLayerInitialized = true;
-        return m_currentLayer;
-    }
-
     // Find voice number of node
     int layerNum = (node.child("voice")) ? node.child("voice").text().as_int() : 1;
     if (layerNum < 1) {
         LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
         layerNum = 1;
+    }
+
+    // If not initialized and layer is not set - get first layer in the first staff
+    if (!m_currentLayer) {
+        Staff *staff = vrv_cast<Staff *>(measure->GetChild(0, STAFF));
+        assert(staff);
+        m_currentLayer = SelectLayer(layerNum, staff);
+        m_isLayerInitialized = true;
+        return m_currentLayer;
     }
 
     // if not, take staff info of node element
@@ -2374,13 +2376,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(node);
     assert(measure);
 
-    Layer *layer;
-    if (!node.select_node("voice") && m_prevLayer) { // if no layer info, stay at previous layer
-        layer = m_prevLayer;
-    }
-    else {
-        layer = SelectLayer(node, measure);
-    }
+    Layer *layer = SelectLayer(node, measure);
     assert(layer);
     m_prevLayer = layer;
 
@@ -2401,15 +2397,14 @@ void MusicXmlInput::ReadMusicXmlNote(
                 if (iter->isFirst) { // add clef when first in staff
                     // if afterBarline is false at beginning of measure, move before barline
                     if (!iter->m_afterBarline && m_durTotal == 0) {
-                        ListOfObjects objects;
-                        ClassIdComparison matchClassId(LAYER);
-                        section->FindAllDescendantByComparison(&objects, &matchClassId);
-                        Layer *prevLayer = NULL;
-                        ListOfObjects::reverse_iterator rit = objects.rbegin();
-                        for (; rit != objects.rend(); ++rit) {
-                            prevLayer = dynamic_cast<Layer *>(*rit);
-                            if (prevLayer->GetN() == layer->GetN()) break;
-                        }
+                        AttNNumberLikeComparison comparisonMeasure(MEASURE, measureNum);
+                        Object *currentMeasure = section->FindDescendantByComparison(&comparisonMeasure);
+                        Object *previousMeasure = section->GetPrevious(currentMeasure, MEASURE);
+                        if (!previousMeasure) AddLayerElement(layer, iter->m_clef);
+                        AttNIntegerComparison comparisonStaff(STAFF, staff->GetN());
+                        Object *previousStaff = previousMeasure->FindDescendantByComparison(&comparisonStaff);
+                        AttNIntegerComparison comparisonLayer(LAYER, layer->GetN());
+                        Object *prevLayer = previousStaff->FindDescendantByComparison(&comparisonLayer);
                         if (prevLayer == NULL) {
                             AddLayerElement(layer, iter->m_clef);
                         }
