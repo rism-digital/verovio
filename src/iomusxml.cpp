@@ -225,7 +225,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
     // Find voice number of node
-    int layerNum = node.child("voice").text().as_int();
+    int layerNum = (node.child("voice")) ? node.child("voice").text().as_int() : 1;
     if (layerNum < 1) {
         LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
         layerNum = 1;
@@ -246,7 +246,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         }
     }
     // if not, take staff info of node element
-    int staffNum = node.child("staff").text().as_int();
+    int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
     if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;

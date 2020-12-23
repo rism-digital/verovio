@@ -1167,7 +1167,9 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     const bool drawingCueSize = mRest->GetDrawingCueSize();
     int x = mRest->GetDrawingX();
-    int y = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : element->GetDrawingY();
+    int y = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2))
+        ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
+        : element->GetDrawingY();
     wchar_t rest
         = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
 

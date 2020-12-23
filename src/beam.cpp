@@ -197,6 +197,7 @@ bool BeamSegment::DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, 
     auto overlapping
         = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
               assert(coord->m_element);
+              if (!coord->m_element->Is({ NOTE, CHORD })) return false;
               int elemY = coord->m_element->GetDrawingY();
               if (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_down) {
                   if (elemY <= coord->m_yBeam + topOffset) return true;
