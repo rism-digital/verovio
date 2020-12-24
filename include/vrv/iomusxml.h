@@ -202,6 +202,11 @@ private:
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     ///@}
 
+     /*
+     * Add clef changes to all layers of a given measure, staff, and time stamp
+     */
+    void AddClef(Section *section, Measure *measure, Staff *staff, const std::string &measureNum);
+
     /*
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
