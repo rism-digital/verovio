@@ -256,6 +256,11 @@ public:
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
     ///@}
 
+     /**
+     * See Object::AdjustTupletNumOverlap
+     */
+    virtual int AdjustTupletNumOverlap(FunctorParams *functorParams);
+
     /**
      * See Object::AdjustXPos
      */

@@ -24,6 +24,9 @@ namespace vrv {
 std::map<int, std::string> Option::s_breaks
     = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_line, "line" }, { BREAKS_encoded, "encoded" } };
 
+std::map<int, std::string> Option::s_condense
+    = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
+
 std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -33,8 +36,8 @@ std::map<int, std::string> Option::s_header
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
 
-std::map<int, std::string> Option::s_systemDivider
-    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
+    { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
@@ -623,9 +626,9 @@ Options::Options()
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
 
-    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
-    m_condenseEncoded.Init(false);
-    this->Register(&m_condenseEncoded, "condenseEncoded", &m_general);
+    m_condense.SetInfo("Condense", "Control condensed score layout");
+    m_condense.Init(CONDENSE_auto, &Option::s_condense);
+    this->Register(&m_condense, "condense", &m_general);
 
     m_condenseFirstPage.SetInfo("Condense first page", "When condensing a score also condense the first page");
     m_condenseFirstPage.Init(false);
@@ -963,7 +966,7 @@ Options::Options()
     this->Register(&m_subBracketThickness, "subBracketThickness", &m_generalLayout);
 
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
-    m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
+    m_systemDivider.Init(SYSTEMDIVIDER_auto, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
     m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
@@ -1201,6 +1204,10 @@ Options::Options()
 
     m_deprecated.SetLabel("Deprecated options", "Deprecated");
     m_grps.push_back(&m_deprecated);
+
+    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
+    m_condenseEncoded.Init(false);
+    this->Register(&m_condenseEncoded, "condenseEncoded", &m_deprecated);
 
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
     m_slurThickness.Init(0.6, 0.2, 2);

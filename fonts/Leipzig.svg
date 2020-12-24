@@ -49,14 +49,15 @@ Version 5.2.43 - adding buzz roll glyph
 Version 5.2.44 - adding anchor points to noteheads
 Version 5.2.45 - adding precomposed ornaments
 Version 5.2.46 - adding single P and S for piano pedal
+Version 5.2.47 - adding glyphs for longer rests
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20200314 at Mon Sep 14 14:29:33 2020
+Created by FontForge 20201107 at Fri Dec 18 13:33:54 2020
  By Klaus Rettinghaus
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.46
+Version 5.2.47
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
@@ -1314,5 +1315,15 @@ c-5 -15 -9 -31 -11 -46s-3 -34 -3 -57c0 -21 7 -43 21 -68l54 -90c3 -13 4 -25 4 -37
 d="M302 535c37 0 47 -24 47 -62c0 -46 -31 -61 -61 -61c-4 0 -9 -1 -13 0c-76 10 -78 30 -130 30c-36 0 -106 -44 -106 -104c0 -59 38 -83 61 -83c46 0 93 52 168 52c54 0 110 -16 110 -117c0 -136 -89 -190 -142 -190c-46 0 -95 32 -127 56c-13 10 -35 23 -45 23
 c-23 0 -34 -35 -45 -68c-3 -8 -1 -25 -11 -25c-7 0 -8 4 -8 9v4c0 36 19 77 32 99c16 26 33 33 51 33c54 0 62 -32 115 -62c26 -15 44 -26 62 -26c6 0 13 1 20 4c21 9 77 27 77 118c0 56 -44 78 -70 80c-6 1 -12 0 -17 0c-68 0 -74 -41 -149 -41c-54 0 -99 48 -99 127
 c0 110 78 152 154 152c51 0 81 -25 132 -25c17 0 26 15 26 31c0 17 -8 33 -25 33c-11 0 -16 4 -16 7s3 5 9 6z" />
+    <glyph glyph-name="uniE4E4" unicode="&#xe4e4;" horiz-adv-x="300" 
+d="M0 10v105c0 9 1 10 10 10h280c9 0 10 -1 10 -10v-105c0 -9 -1 -10 -10 -10h-280c-9 0 -10 1 -10 10z" />
+    <glyph glyph-name="uniE4E3" unicode="&#xe4e3;" horiz-adv-x="300" 
+d="M0 -115v105c0 9 1 10 10 10h280c9 0 10 -1 10 -10v-105c0 -9 -1 -10 -10 -10h-280c-9 0 -10 1 -10 10z" />
+    <glyph glyph-name="uniE4E2" unicode="&#xe4e2;" horiz-adv-x="125" 
+d="M0 10v230c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-230c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10z" />
+    <glyph glyph-name="uniE4E1" unicode="&#xe4e1;" horiz-adv-x="125" 
+d="M0 -240v480c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10z" />
+    <glyph glyph-name="uniE4E0" unicode="&#xe4e0;" horiz-adv-x="375" 
+d="M250 -240v480c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10zM0 -240v480c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10z" />
   </font>
 </defs></svg>

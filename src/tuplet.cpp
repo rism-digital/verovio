@@ -422,7 +422,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
     int verticalLine = params->m_doc->GetDrawingUnit(staffSize);
     int verticalMargin = 2 * verticalLine;
-    int yReference = staff->GetDrawingY();
+    const int yReference = m_crossStaff ? m_crossStaff->GetDrawingY() : staff->GetDrawingY();
 
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
@@ -512,6 +512,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             Beam *beam = this->GetNumAlignedBeam();
             // If we have a beam first move it to the appropriate postion
             if (beam) {
+
                 int xMid = tupletNum->GetDrawingXMid(params->m_doc);
                 int yMid = beam->m_beamSegment.m_startingY
                     + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
@@ -526,31 +527,27 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 tupletNum->SetDrawingYRel(yRel);
             }
 
-            int yRel = tupletNum->GetDrawingY();
-
-            // Check for overlap with content - beam is not taken into account
+            // Find if there is a mix of cross-staf and non-cross-staff elements in the tuplet
             ListOfObjects descendants;
-            ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, DOT, FLAG, NOTE, REST, STEM });
+            ClassIdsComparison comparison({ CHORD, NOTE, REST });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 
-            for (auto &descendant : descendants) {
-                if (!descendant->HasSelfBB()) {
-                    continue;
-                }
-                if (!tupletNum->HorizontalSelfOverlap(descendant)) {
-                    continue;
-                }
-                if (m_drawingNumPos == STAFFREL_basic_above) {
-                    int dist = descendant->GetSelfTop();
-                    if (yRel < dist) yRel = dist;
-                }
-                else {
-                    int dist = descendant->GetSelfBottom();
-                    if (yRel > dist) yRel = dist;
-                }
-            }
+            auto it = std::find_if(descendants.begin(), descendants.end(), [](Object *object) {
+                LayerElement *element = vrv_cast<LayerElement *>(object);
+                if (!element) return false;
+                return !element->m_crossStaff;
+            });
 
-            yRel -= yReference;
+            // Calculate relative Y for the tupletNum
+            AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
+            adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
+            adjustTupletNumOverlapParams.m_ignoreCrossStaff = false;
+            adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
+            adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
+            Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
+            this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
+
+            const int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
             tupletNum->SetDrawingYRel(yRel + numVerticalMargin);
         }
     }
