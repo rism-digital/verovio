@@ -2400,7 +2400,11 @@ void MusicXmlInput::ReadMusicXmlNote(
                         AttNNumberLikeComparison comparisonMeasure(MEASURE, measureNum);
                         Object *currentMeasure = section->FindDescendantByComparison(&comparisonMeasure);
                         Object *previousMeasure = section->GetPrevious(currentMeasure, MEASURE);
-                        if (!previousMeasure) AddLayerElement(layer, iter->m_clef);
+                        if (!previousMeasure) {
+                            AddLayerElement(layer, iter->m_clef);
+                            iter->isFirst = false;
+                            continue;
+                        }
                         AttNIntegerComparison comparisonStaff(STAFF, staff->GetN());
                         Object *previousStaff = previousMeasure->FindDescendantByComparison(&comparisonStaff);
                         AttNIntegerComparison comparisonLayer(LAYER, layer->GetN());
