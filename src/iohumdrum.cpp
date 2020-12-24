@@ -20845,6 +20845,11 @@ void HumdrumInput::addFTremSlurs()
 
 void HumdrumInput::storeOriginalClefMensurationKeyApp()
 {
+    if ((1)) {
+        // currently deactivated (use modori filter to switch between
+        // modern and original clef/key/mensuration).
+        return;
+    }
     if (m_oclef.empty() && m_omet.empty() && m_okey.empty()) {
         return;
     }
