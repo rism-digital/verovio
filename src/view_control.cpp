@@ -493,11 +493,6 @@ void View::DrawHairpin(
     FloatingPositioner *leftLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetLeftLink());
     FloatingPositioner *rightLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetRightLink());
 
-    const auto [leftOverlap, rightOverlap]
-        = hairpin->GetBarlineOverlapAdjustment(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2);
-    x1 += leftOverlap;
-    x2 -= rightOverlap;
-
     int adjustedX1 = x1;
     if (leftLink) {
         adjustedX1 = leftLink->GetContentRight() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
@@ -524,6 +519,11 @@ void View::DrawHairpin(
 
     // Store the full drawing length
     if (spanningType == SPANNING_START_END) {
+        const auto [leftOverlap, rightOverlap]
+            = hairpin->GetBarlineOverlapAdjustment(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2);
+        x1 += leftOverlap;
+        x2 -= rightOverlap;
+
         hairpin->SetDrawingLength(x2 - x1);
     }
 
