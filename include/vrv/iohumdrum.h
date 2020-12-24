@@ -377,8 +377,8 @@ public:
 
     virtual bool Import(const std::string &humdrum);
 
-    void parseEmbeddedOptions(vrv::Doc &doc);
-    void finalizeDocument(vrv::Doc &doc);
+    void parseEmbeddedOptions(vrv::Doc *doc);
+    void finalizeDocument(vrv::Doc *doc);
 
 #ifndef NO_HUMDRUM_SUPPORT
 
@@ -592,6 +592,7 @@ protected:
     void promoteInstrumentsForStaffGroup(StaffGrp *group);
     void promoteInstrumentAbbreviationsToGroup();
     void promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group);
+    void setGroupSymbol(StaffGrp *sg, staffGroupingSym_SYMBOL symbol);
     std::string getInstrumentName(StaffDef *sd);
     std::string getInstrumentAbbreviation(StaffDef *sd);
     std::string getInstrumentClass(hum::HTp start);
