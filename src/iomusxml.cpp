@@ -1158,7 +1158,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
                 }
                 else if (key.node().child("key-step")) {
-                    keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
                     for (pugi::xml_node keyStep : key.node().children("key-step")) {
                         KeyAccid *keyAccid = new KeyAccid();
                         keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
@@ -1181,7 +1180,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // add it if necessary
             if (keySig) {
-                keySig->IsAttribute(true);
                 staffDef->AddChild(keySig);
             }
 
@@ -1560,7 +1558,6 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
         else if (key.node().child("key-step")) {
             if (!keySig) keySig = new KeySig();
-            keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
             for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
                  keyStep = keyStep.next_sibling("key-step")) {
                 KeyAccid *keyAccid = new KeyAccid();
@@ -1592,7 +1589,6 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // Add it if necessary
         if (keySig) {
             // Make it an attribute for now
-            keySig->IsAttribute(true);
             scoreDef->AddChild(keySig);
         }
 
