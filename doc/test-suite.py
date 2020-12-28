@@ -6,7 +6,7 @@ import sys
 import xml.etree as etree
 import xml.etree.ElementTree as ET
 
-# Add path for tookit built in-place
+# Add path for toolkit built in-place
 sys.path.append('.')
 import verovio
 
