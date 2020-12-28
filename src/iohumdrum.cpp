@@ -17119,32 +17119,9 @@ void HumdrumInput::convertMRest(MRest *rest, hum::HTp token, int subtoken, int s
         tstring = token->getSubtoken(subtoken);
     }
 
-    int layer = m_currentlayer;
-
     if (tstring.find(";") != std::string::npos) {
-        if ((tstring.find("yy") == std::string::npos) && (tstring.find(";y") == std::string::npos)) {
-            int direction = getDirection(tstring, ";");
-            if (direction < 0) {
-                rest->SetFermata(STAFFREL_basic_below);
-            }
-            else if (direction > 0) {
-                rest->SetFermata(STAFFREL_basic_above);
-            }
-            else if (layer == 1) {
-                rest->SetFermata(STAFFREL_basic_above);
-            }
-            else if (layer == 2) {
-                rest->SetFermata(STAFFREL_basic_below);
-            }
-            else {
-                // who knows, maybe check the stem direction or see
-                // if another note/rest in a different layer already
-                // has a fermata (so you would not want to overwrite them).
-                rest->SetFermata(STAFFREL_basic_above);
-            }
-        }
+        addFermata(rest, tstring);
     }
-
     processDynamics(token, staffindex);
     setLocationId(rest, token);
     if (m_doc->GetOptions()->m_humType.GetValue()) {
@@ -17249,8 +17226,6 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int sta
     }
     // addDurRecip(rest, tstring);
 
-    int layer = m_currentlayer;
-
     if (m_signifiers.above) {
         std::string pattern = "[ra-gA-G]+[-#nxXyY\\/]*";
         pattern.push_back(m_signifiers.above);
@@ -17273,27 +17248,7 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int sta
     }
 
     if (tstring.find(";") != std::string::npos) {
-        if ((tstring.find("yy") == std::string::npos) && (tstring.find(";y") == std::string::npos)) {
-            int direction = getDirection(tstring, ";");
-            if (direction < 0) {
-                rest->SetFermata(STAFFREL_basic_below);
-            }
-            else if (direction > 0) {
-                rest->SetFermata(STAFFREL_basic_above);
-            }
-            else if (layer == 1) {
-                rest->SetFermata(STAFFREL_basic_above);
-            }
-            else if (layer == 2) {
-                rest->SetFermata(STAFFREL_basic_below);
-            }
-            else {
-                // who knows, maybe check the stem direction or see
-                // if another note/rest in a different layer already
-                // has a fermata (so you would not want to overwrite them).
-                rest->SetFermata(STAFFREL_basic_above);
-            }
-        }
+        addFermata(rest, tstring);
     }
 
     if (m_doc->GetOptions()->m_humType.GetValue()) {
@@ -19110,6 +19065,40 @@ int HumdrumInput::getStaffAdjustment(hum::HTp token)
 // HumdrumInput::addFermata -- Add floating fermatas for note/chord.
 //     default value: parent = NULL
 //
+
+template <class ELEMENT> void HumdrumInput::addFermata(ELEMENT *rest, const std::string &tstring)
+{
+
+    if ((tstring.find("yy") == std::string::npos) && (tstring.find(";y") == std::string::npos)) {
+        // Inform the document that there are analytic fermatas in the data
+        // (@fermata as opposed to (or in addition to <fermata>).
+        // This allows verovio to render the fermata on the rest in the
+        // SVG conversion.  Input can be Rest or MRest.
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_FERMATA);
+
+        int layer = m_currentlayer;
+
+        int direction = getDirection(tstring, ";");
+        if (direction < 0) {
+            rest->SetFermata(STAFFREL_basic_below);
+        }
+        else if (direction > 0) {
+            rest->SetFermata(STAFFREL_basic_above);
+        }
+        else if (layer == 1) {
+            rest->SetFermata(STAFFREL_basic_above);
+        }
+        else if (layer == 2) {
+            rest->SetFermata(STAFFREL_basic_below);
+        }
+        else {
+            // who knows, maybe check the stem direction or see
+            // if another note/rest in a different layer already
+            // has a fermata (so you would not want to overwrite them).
+            rest->SetFermata(STAFFREL_basic_above);
+        }
+    }
+}
 
 void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 {

@@ -753,6 +753,7 @@ protected:
     void insertTwoRhythmsAndTextBetween(
         ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2);
     template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
+    template <class ELEMENT> void addFermata(ELEMENT *rest, const std::string &tstring);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
