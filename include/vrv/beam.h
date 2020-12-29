@@ -186,6 +186,8 @@ private:
     // Helper to check mixed beam positioning compared to other elements (ledger lines, staff) and adjust it accordingly
     bool NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
+    std::vector<int> GetSegmentYPositions() const;
+
 public:
     // values set by CalcBeam
     int m_nbNotesOrChords;

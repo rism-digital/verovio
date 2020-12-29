@@ -434,7 +434,7 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure)
         ArrayOfBeamElementCoords coord(segment->m_placementInfo->m_begin, segment->m_placementInfo->m_end);
         segment->InitCoordRefs(&coord);
         segment->CalcBeam(segment->m_placementInfo->m_layer, segment->m_placementInfo->m_staff, m_doc, beamSpan,
-            beamSpan->GetPlace());
+            beamSpan->m_drawingPlace);
         segment->AppendSpanningCoordinates(segment->m_placementInfo->m_measure);
 
         // Draw corresponding beam segment

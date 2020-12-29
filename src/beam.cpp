@@ -144,6 +144,17 @@ void BeamSegment::AppendSpanningCoordinates(Measure *measure)
     }
 }
 
+std::vector<int> BeamSegment::GetSegmentYPositions() const
+{
+    std::vector<int> items;
+    for (auto coord : m_beamElementCoordRefs) {
+        if (!coord->m_stem || !coord->m_closestNote) continue;
+
+        items.push_back(coord->m_closestNote->GetDrawingY());
+    }
+    return items;
+}
+
 void BeamSegment::CalcBeam(
     Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
 {
@@ -171,7 +182,7 @@ void BeamSegment::CalcBeam(
     else {
         beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
-        horizontal = beamInterface->IsHorizontal();
+        horizontal = beamInterface->IsHorizontal(this->GetSegmentYPositions());
         // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change
         // the place This occurs when mixed makes no sense and the beam is placed above or below instead.
         this->CalcBeamPlace(layer, beamInterface, place);
@@ -1771,7 +1782,8 @@ void BeamElementCoord::SetDrawingStemDir(
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (!interface->m_crossStaffContent && (BEAMPLACE_mixed != interface->m_drawingPlace)) {
+    if (!interface->m_isSpanningElement && !interface->m_crossStaffContent
+        && (BEAMPLACE_mixed != interface->m_drawingPlace)) {
         if (((stemDir == STEMDIRECTION_up) && (m_yBeam <= segment->m_verticalCenter))
             || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= m_yBeam))) {
             m_yBeam = segment->m_verticalCenter;

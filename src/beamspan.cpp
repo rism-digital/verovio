@@ -43,9 +43,8 @@ BeamSpan::BeamSpan()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_PLIST);
 
-    InitBeamSegments();
-
     Reset();
+    InitBeamSegments();   
 }
 
 BeamSpan::~BeamSpan() 
@@ -63,12 +62,16 @@ void BeamSpan::Reset()
     ResetBeamRend();
     ResetColor();
     ResetPlist();
+
+    ClearBeamSegments();
 }
 
 void BeamSpan::InitBeamSegments() 
 {
     // BeamSpan should have at least one segment to begin with
     m_beamSegments.emplace_back(new BeamSegment());
+
+    m_isSpanningElement = true;
 }
 
 void BeamSpan::ClearBeamSegments()
@@ -149,7 +152,7 @@ bool BeamSpan::AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int
     segment->m_placementInfo->m_begin = coordsFirst;
     segment->m_placementInfo->m_end = coordsLast + 1;
     segment->InitCoordRefs(&coords);
-    segment->CalcBeam(layer, staff, doc, this, GetPlace());
+    segment->CalcBeam(layer, staff, doc, this, m_drawingPlace);
     segment->m_placementInfo->SetSpanningType(index, elements.size() - 1);
 
     if (newSegment) {
@@ -233,7 +236,7 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    if (m_beamedElements.empty() || !GetStart()) return FUNCTOR_CONTINUE;
+    if (m_beamedElements.empty() || !GetStart() || !GetEnd()) return FUNCTOR_CONTINUE;
 
     Object *startSystem = GetStart()->GetFirstAncestor(SYSTEM);
     Object *endSystem = GetEnd()->GetFirstAncestor(SYSTEM);
