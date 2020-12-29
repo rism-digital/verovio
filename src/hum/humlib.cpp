@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Dec 17 23:34:26 PST 2020
+// Last Modified: Tue Dec 29 12:33:37 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -27825,107 +27825,8 @@ string HumdrumLine::getReferenceValue(void) const {
 
 //////////////////////////////
 //
-// HumdrumLine::getUniversalReferenceKey -- Return reference key if a
+// HumdrumLine::getUniversalReferenceValue -- Return reference value if a
 //     universal reference record.  Otherwise returns an empty string.
-//
-
-string HumdrumLine::getUniversalReferenceKey(void) const {
-	if (this->size() < 6) {
-		return "";
-	}
-	if (this->substr(0, 4) != "!!!!") {
-		return "";
-	}
-	if ((*this)[4] == '!') {
-		return "";
-	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
-		return "";
-	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
-		return "";
-	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
-		return "";
-	}
-	return this->substr(4, colloc - 4);
-}
-
-
-
-//////////////////////////////
-//
-// HumdrumLine::getGlobalReferenceKey -- Return reference key if a
-//     universal reference record.  Otherwise returns an empty string.
-//
-
-string HumdrumLine::getGlobalReferenceKey(void) const {
-	if (this->size() < 6) {
-		return "";
-	}
-	if (this->substr(0, 3) != "!!!") {
-		return "";
-	}
-	if ((*this)[4] == '!') {
-		return "";
-	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
-		return "";
-	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
-		return "";
-	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
-		return "";
-	}
-	return this->substr(3, colloc - 3);
-}
-
-
-
-//////////////////////////////
-//
-// HumdrumLine::getGlobalReferenceValue -- Return reference value if a reference
-//     record.  Otherwise returns an empty string.
-//
-
-string HumdrumLine::getGlobalReferenceValue(void) const {
-	if (this->size() < 5) {
-		return "";
-	}
-	if (this->substr(0, 3) != "!!!") {
-		return "";
-	}
-	if ((*this)[3] == '!') {
-		return "";
-	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
-		return "";
-	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
-		return "";
-	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
-		return "";
-	}
-	return Convert::trimWhiteSpace(this->substr(colloc+1));
-}
-
-
-
-//////////////////////////////
-//
-// HumdrumLine::getUniversalReferenceValue -- Return reference value if a reference
-//     record.  Otherwise returns an empty string.
 //
 
 string HumdrumLine::getUniversalReferenceValue(void) const {
@@ -27938,19 +27839,162 @@ string HumdrumLine::getUniversalReferenceValue(void) const {
 	if ((*this)[4] == '!') {
 		return "";
 	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
+
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
 		return "";
 	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
+	int index = (int)colloc + 1;
+	for (int i=index; i<(int)this->size(); i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)this->size()) {
 		return "";
 	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
+	string output = this->substr(index);
+	for (int i=(int)output.size() - 1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getGlobalReferenceValue -- Return reference value if a
+//     global reference record.  Otherwise returns an empty string.
+//
+
+string HumdrumLine::getGlobalReferenceValue(void) const {
+	if (this->size() < 6) {
 		return "";
 	}
-	return Convert::trimWhiteSpace(this->substr(colloc+1));
+	if (this->substr(0, 3) != "!!!") {
+		return "";
+	}
+	if ((*this)[4] == '!') {
+		return "";
+	}
+
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
+		return "";
+	}
+	int index = (int)colloc + 1;
+	for (int i=index; i<(int)this->size(); i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)this->size()) {
+		return "";
+	}
+	string output = this->substr(index);
+	for (int i=(int)output.size() - 1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getGlobalReferenceKey -- Return reference key if a reference
+//     record.  Otherwise returns an empty string.
+//
+
+string HumdrumLine::getGlobalReferenceKey(void) const {
+
+	if (this->size() < 5) {
+		return "";
+	}
+	if (this->substr(0, 3) != "!!!") {
+		return "";
+	}
+	if ((*this)[3] == '!') {
+		return "";
+	}
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
+		return "";
+	}
+	int index = 3;
+	for (int i=index; i<(int)colloc; i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)colloc) {
+		return "";
+	}
+	int length = colloc - index;
+	string output = this->substr(index, length);
+	for (int i=(int)output.size()-1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+		}
+	}
+	return output;
+
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getUniversalReferenceKey -- Return reference key if a reference
+//     record.  Otherwise returns an empty string.
+//
+
+string HumdrumLine::getUniversalReferenceKey(void) const {
+
+	if (this->size() < 6) {
+		return "";
+	}
+	if (this->substr(0, 4) != "!!!!") {
+		return "";
+	}
+	if ((*this)[4] == '!') {
+		return "";
+	}
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
+		return "";
+	}
+	int index = 4;
+	for (int i=index; i<(int)colloc; i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)colloc) {
+		return "";
+	}
+	int length = colloc - index;
+	string output = this->substr(index, length);
+	for (int i=(int)output.size()-1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+		}
+	}
+	return output;
+
 }
 
 
@@ -29057,8 +29101,10 @@ ostream& HumdrumLine::printXml(ostream& out, int level, const string& indent) {
 		out << "/>\n";
 
 		out << Convert::repeatString(indent, level) << "<frameType>";
-		if (isReference()) {
+		if (isGlobalReference()) {
 			out << "reference";
+		} else if (isUniversalReference()) {
+			out << "ureference";
 		} else if (isBlank()) {
 			out << "empty";
 		} else {
