@@ -716,25 +716,17 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     partId.c_str());
                 continue;
             }
-            Label *label = NULL;
-            LabelAbbr *labelAbbr = NULL;
-            InstrDef *instrdef = NULL;
             // part-name should be revised, as soon MEI can suppress labels
             std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
             std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
             pugi::xpath_node midiInstrument = xpathNode.node().select_node("midi-instrument");
-            pugi::xpath_node midiChannel = midiInstrument.node().select_node("midi-channel");
-            pugi::xpath_node midiName = midiInstrument.node().select_node("midi-name");
-            // pugi::xpath_node midiPan = midiInstrument.node().select_node("pan");
-            pugi::xpath_node midiProgram = midiInstrument.node().select_node("midi-program");
-            pugi::xpath_node midiVolume = midiInstrument.node().select_node("volume");
             if (!partName.empty()) {
-                label = new Label();
+                m_label = new Label();
                 if (xpathNode.node().select_node("part-name-display[not(@print-object='no')]")) {
                     std::string name = StyleLabel(xpathNode.node().select_node("part-name-display").node());
                     Text *text = new Text();
                     text->SetText(UTF8to16(name));
-                    label->AddChild(text);
+                    m_label->AddChild(text);
                 }
                 else {
                     std::stringstream sstream(partName);
@@ -742,22 +734,22 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     bool firstLine = true;
                     while (std::getline(sstream, line)) {
                         if (!firstLine) {
-                            label->AddChild(new Lb());
+                            m_label->AddChild(new Lb());
                         }
                         Text *text = new Text();
                         text->SetText(UTF8to16(line));
-                        label->AddChild(text);
+                        m_label->AddChild(text);
                         firstLine = false;
                     }
                 }
             }
             if (!partAbbr.empty()) {
-                labelAbbr = new LabelAbbr();
+                m_labelAbbr = new LabelAbbr();
                 if (xpathNode.node().select_node("part-abbreviation-display[not(@print-object='no')]")) {
                     std::string name = StyleLabel(xpathNode.node().select_node("part-abbreviation-display").node());
                     Text *text = new Text();
                     text->SetText(UTF8to16(name));
-                    labelAbbr->AddChild(text);
+                    m_labelAbbr->AddChild(text);
                 }
                 else {
                     std::stringstream sstream(partAbbr);
@@ -765,53 +757,44 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     bool firstLine = true;
                     while (std::getline(sstream, line)) {
                         if (!firstLine) {
-                            labelAbbr->AddChild(new Lb());
+                            m_labelAbbr->AddChild(new Lb());
                         }
                         Text *text = new Text();
                         text->SetText(UTF8to16(line));
-                        labelAbbr->AddChild(text);
+                        m_labelAbbr->AddChild(text);
                         firstLine = false;
                     }
                 }
             }
             if (midiInstrument) {
-                instrdef = new InstrDef;
-                instrdef->SetMidiInstrname(
-                    instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
-                if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
+                m_instrdef = new InstrDef;
+                m_instrdef->SetMidiInstrname(m_instrdef->AttMidiInstrument::StrToMidinames(
+                    midiInstrument.node().select_node("midi-name").node().text().as_string()));
+                pugi::xpath_node midiChannel = midiInstrument.node().select_node("midi-channel");
+                if (midiChannel) m_instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
+                // pugi::xpath_node midiPan = midiInstrument.node().select_node("pan");
                 // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
-                if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
-                if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
+                pugi::xpath_node midiProgram = midiInstrument.node().select_node("midi-program");
+                if (midiProgram) m_instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
+                pugi::xpath_node midiVolume = midiInstrument.node().select_node("volume");
+                if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.node().text().as_int());
             }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
-            const int staves = partFirstMeasure.node().select_node("attributes/staves").node().text().as_int();
-            if (staves > 1) {
+            partStaffGrp->SetUuid(partId.c_str());
+            const int nbStaves
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
+            // if we have more than one staff in the part we create a new staffGrp
+            if (nbStaves > 1) {
                 partStaffGrp->SetBarThru(BOOLEAN_true);
-                partStaffGrp->SetUuid(partId.c_str());
                 if (!m_staffGrpStack.back()->GetChild(0, GRPSYM)) {
                     GrpSym *partGrpSym = new GrpSym();
                     partGrpSym->SetSymbol(staffGroupingSym_SYMBOL_brace);
                     partStaffGrp->AddChild(partGrpSym);
                 }
-                if (label) partStaffGrp->AddChild(label);
-                if (labelAbbr) partStaffGrp->AddChild(labelAbbr);
-                if (instrdef) partStaffGrp->AddChild(instrdef);
-            }
-            const int nbStaves
-                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
-            // if we have more than one staff in the part we create a new staffGrp
-            if (nbStaves > 1) {
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
             else {
-                StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindDescendantByType(STAFFDEF));
-                if (staffDef) {
-                    staffDef->SetUuid(partId.c_str());
-                    if (label) staffDef->AddChild(label);
-                    if (labelAbbr) staffDef->AddChild(labelAbbr);
-                    if (instrdef) staffDef->AddChild(instrdef);
-                }
                 m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
                 delete partStaffGrp;
             }
@@ -1058,17 +1041,27 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         if (staves) {
             nbStaves = staves.node().text().as_int();
         }
+        if (nbStaves > 1) {
+            if (m_label) staffGrp->AddChild(m_label);
+            if (m_labelAbbr) staffGrp->AddChild(m_labelAbbr);
+            if (m_instrdef) staffGrp->AddChild(m_instrdef);
+        }
 
-        int i;
         std::string xpath;
         // Create as many staffDef
-        for (i = 0; i < nbStaves; i++) {
+        for (int i = 0; i < nbStaves; ++i) {
             // Find or create the staffDef
             AttNIntegerComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
             StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
+                if (i == 0 && nbStaves == 1) {
+                    staffDef->SetUuid(staffGrp->GetUuid());
+                    if (m_label) staffDef->AddChild(m_label);
+                    if (m_labelAbbr) staffDef->AddChild(m_labelAbbr);
+                    if (m_instrdef) staffDef->AddChild(m_instrdef);
+                }
                 staffGrp->AddChild(staffDef);
                 // set initial octave shift
                 m_octDis.push_back(0);
@@ -1133,7 +1126,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             // add it if necessary
             if (clef) {
                 // Make it an attribute for now
-                clef->IsAttribute(true);
                 staffDef->AddChild(clef);
             }
 
@@ -1252,7 +1244,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             // add it if necessary
             if (meterSig) {
                 // Make it an attribute for now
-                meterSig->IsAttribute(true);
                 staffDef->AddChild(meterSig);
             }
 
