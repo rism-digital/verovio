@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Dec 29 12:33:37 PST 2020
+// Last Modified: Tue Dec 29 13:14:55 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -27859,7 +27859,9 @@ string HumdrumLine::getUniversalReferenceValue(void) const {
 	for (int i=(int)output.size() - 1; i>=0; i--) {
 		if (isspace(output.at(i))) {
 			output.resize((int)output.size() - 1);
+			continue;
 		}
+		break;
 	}
 	return output;
 }
@@ -27902,7 +27904,9 @@ string HumdrumLine::getGlobalReferenceValue(void) const {
 	for (int i=(int)output.size() - 1; i>=0; i--) {
 		if (isspace(output.at(i))) {
 			output.resize((int)output.size() - 1);
+			continue;
 		}
+		break;
 	}
 	return output;
 }
