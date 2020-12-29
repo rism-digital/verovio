@@ -19759,6 +19759,12 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     }
     // also "long" form to consider
 
+    int layer = m_currentlayer;
+    if (layer == 2) {
+        // Force the mordent below the staff by default:
+        setPlace(mordent, "below");
+    }
+
     hum::HumRegex hre;
     std::string query;
     if (m_signifiers.above) {
@@ -19878,9 +19884,10 @@ void HumdrumInput::addTrill(hum::HTp token)
     setStaff(trill, staff);
 
     int staffindex = m_currentstaff - 1;
-    int layer = m_currentlayer;
 
+    int layer = m_currentlayer;
     if (layer == 2) {
+        // Force the trill below the staff by default:
         setPlace(trill, "below");
     }
 
