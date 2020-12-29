@@ -19759,18 +19759,20 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     }
     // also "long" form to consider
 
+    hum::HumRegex hre;
+    std::string query;
     if (m_signifiers.above) {
-        if (tpos < token->size() - 1) {
-            if ((*token)[tpos + 1] == m_signifiers.above) {
-                setPlace(mordent, "above");
-            }
+        query = "[Mm]+";
+        query += m_signifiers.above;
+        if (hre.search(token, query)) {
+            setPlace(mordent, "above");
         }
     }
     if (m_signifiers.below) {
-        if (tpos < token->size() - 1) {
-            if ((*token)[tpos + 1] == m_signifiers.below) {
-                setPlace(mordent, "below");
-            }
+        query = "[Mm]+";
+        query += m_signifiers.below;
+        if (hre.search(token, query)) {
+            setPlace(mordent, "below");
         }
     }
 
