@@ -12011,11 +12011,21 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp(tstamp.getFloat());
                 // See issue https://github.com/rism-ch/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
-                double endingCorrection = 0.03;
+                // and https://github.com/rism-ch/verovio/pull/1876
+                // double endingCorrection = 0.03;
+                double endingCorrection = 0.00;
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
-                addType(hairpin, "endbar03");
+                if (endingCorrection > 0.00) {
+                    std::string tag = "endbar";
+                    int value = (int)((endingCorrection * 100.0) + 0.5);
+                    if (value < 10) {
+                        tag += "0";
+                        tag += to_string(value);
+                    }
+                    addType(hairpin, tag);
+                }
                 addChildMeasureOrSection(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
@@ -12154,11 +12164,22 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp(tstamp.getFloat());
                 // See issue https://github.com/rism-ch/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
-                double endingCorrection = 0.03;
+                // and https://github.com/rism-ch/verovio/pull/1876
+                // double endingCorrection = 0.03;
+                double endingCorrection = 0.00;
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
-                addType(hairpin, "endbar03");
+
+                if (endingCorrection > 0.00) {
+                    std::string tag = "endbar";
+                    int value = (int)((endingCorrection * 100.0) + 0.5);
+                    if (value < 10) {
+                        tag += "0";
+                        tag += to_string(value);
+                    }
+                    addType(hairpin, tag);
+                }
                 addChildMeasureOrSection(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
