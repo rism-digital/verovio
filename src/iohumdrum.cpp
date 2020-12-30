@@ -9054,15 +9054,10 @@ void HumdrumInput::addSlur(FTrem *ftrem, hum::HTp start, hum::HTp ending)
     hum::HumRegex hre;
     hre.replaceDestructive(slurid, "slur", "^note");
 
-    Slur *slur = new Slur;
-    slur->SetUuid(slurid);
-    slur->SetEndid("#" + secondid);
-    slur->SetStartid("#" + firstid);
-    // check for slur direction here
-
-    addType(slur, "ftrem");
-    setStaff(slur, m_currentstaff);
-    m_ftrem_slurs.push_back(slur);
+    // maybe a problem if not all of the slurs on ending token
+    // are ftrem (may result in multiple slurs for non-ftren slurs.
+    processSlurs(ending);
+    // addType(slur, "ftrem");
 }
 
 //////////////////////////////
@@ -13132,12 +13127,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             setStaff(slur, staff);
         }
 
-        if (hasAboveParameter(slurstart, "S")) {
-            slur->SetCurvedir(curvature_CURVEDIR_above);
-        }
-        else if (hasBelowParameter(slurstart, "S")) {
-            slur->SetCurvedir(curvature_CURVEDIR_below);
-        }
+        setLayoutSlurDirection(slur, slurstart);
 
         if (slurendnumber < 0) {
             continue;
@@ -13199,6 +13189,21 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 }
             }
         }
+    }
+}
+
+//////////////////////////////
+//
+// setLayoutSlurDirection --
+//
+
+void HumdrumInput::setLayoutSlurDirection(Slur *slur, hum::HTp token)
+{
+    if (hasAboveParameter(token, "S")) {
+        slur->SetCurvedir(curvature_CURVEDIR_above);
+    }
+    else if (hasBelowParameter(token, "S")) {
+        slur->SetCurvedir(curvature_CURVEDIR_below);
     }
 }
 

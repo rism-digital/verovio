@@ -687,6 +687,7 @@ protected:
     std::string getVerseLabelText(hum::HTp token);
     void addPlicaUp(Note *note);
     void addPlicaDown(Note *note);
+    void setLayoutSlurDirection(Slur *slur, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
