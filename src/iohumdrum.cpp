@@ -11175,10 +11175,9 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 {
     hum::HumRegex hre;
     if (!hre.search(text, "(.*)\\[([^=\\]]*)\\]\\s*=\\s*(\\d+.*)")) {
-        // This function is only used to force spaces around
-        // equalis sign in metronome markings, so handle
-        // other tempo directives elsewhere.
-        return false;
+        // no musical characters to unescape
+        addTextElement(tempo, text);
+        return true;
     }
     std::string first = hre.getMatch(1);
     std::string second = hre.getMatch(2);
@@ -11352,10 +11351,6 @@ std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string 
     if (hre.search(second, "-dot$")) {
         dot = true;
         second.resize((int)second.size() - 4);
-    }
-    else if (hre.search(second, "\\.$")) {
-        dot = true;
-        second.resize((int)second.size() - 1);
     }
 
     std::string output;
