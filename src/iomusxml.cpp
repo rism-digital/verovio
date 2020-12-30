@@ -3236,7 +3236,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (HasAttributeWithValue(tremolo.node(), "type", "stop")) {
             RemoveLastFromStack(FTREM, layer);
         }
-        else if (!HasAttributeWithValue(tremolo.node(), "type", "start") && !nextIsChord) {
+        else if (!HasAttributeWithValue(tremolo.node(), "type", "start") && !isChord) {
             RemoveLastFromStack(BTREM, layer);
         }
     }
