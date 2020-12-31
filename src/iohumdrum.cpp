@@ -10474,6 +10474,11 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     bool italic = false;
     bool bold = false;
 
+    int vgroup = -1;
+    if (hline->isDefined("LO", "TX", "vgrp")) { // italic
+        vgroup = hline->getValueInt("LO", "TX", "vgrp");
+    }
+
     if (hline->isDefined("LO", "TX", "i")) { // italic
         italic = true;
     }
@@ -10541,6 +10546,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     dir->SetTstamp(tstamp.getFloat());
+    if (vgroup > 0) {
+        dir->SetVgrp(vgroup);
+    }
 
     if (placement == "above") {
         setPlace(dir, "above");
@@ -10616,6 +10624,11 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
     bool italic = false;
     bool bold = false;
 
+    int vgroup = -1;
+    if (token->isDefined("LO", "TX", "vgrp")) { // italic
+        vgroup = token->getValueInt("LO", "TX", "vgrp");
+    }
+
     if (token->isDefined("LO", "TX", "i")) { // italic
         italic = true;
     }
@@ -10676,7 +10689,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         placement = "above";
     }
 
-    addDirection(text, placement, bold, italic, token, staffindex, justification, color);
+    addDirection(text, placement, bold, italic, token, staffindex, justification, color, vgroup);
 }
 
 //////////////////////////////
@@ -10736,6 +10749,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     std::string namespace2 = hps->getNamespace2();
     bool textQ = namespace2 == "TX";
     bool sicQ = namespace2 == "SIC";
+    int vgroup = -1;
 
     if (!(textQ || sicQ)) {
         // not a text direction so ignore
@@ -10841,6 +10855,11 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
         if (key == "type") {
             typevalue = value;
+        }
+        if (key == "vgrp") {
+            if ((!value.empty()) && std::isdigit(value[0])) {
+                vgroup = std::stoi(value);
+            }
         }
     }
 
@@ -10955,6 +10974,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
     // bool problemQ = false;
     // bool sicQ = false;
+    if (vgroup > 0) {
+        dir->SetVgrp(vgroup);
+    }
 
     if (problemQ) {
         addType(dir, "problem");
@@ -11406,7 +11428,7 @@ std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string 
 //
 
 void HumdrumInput::addDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
-    hum::HTp token, int staffindex, int justification, const std::string &color)
+    hum::HTp token, int staffindex, int justification, const std::string &color, int vgroup)
 {
 
     hum::HumRegex hre;
@@ -11438,6 +11460,10 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
     }
     else {
         dir->SetTstamp(tstamp.getFloat());
+    }
+
+    if (vgroup > 0) {
+        dir->SetVgrp(vgroup);
     }
 
     // convert to HPS input value in the future:
@@ -12902,7 +12928,14 @@ void HumdrumInput::addTextElement(
         }
 
         if (!pretext.empty()) {
-            addTextElement(element, pretext, fontstyle, addSpacer);
+            hre.replaceDestructive(pretext, "[", "&#91;", "g");
+            hre.replaceDestructive(pretext, "]", "&#93;", "g");
+            Rend *rend = new Rend;
+            element->AddChild(rend);
+            rend->AddChild(text);
+            text->SetText(UTF8to16(pretext));
+            setFontStyle(rend, fontstyle);
+            // addTextElement(element, pretext, fontstyle, addSpacer);
         }
         if (!musictext.empty()) {
             addVerovioTextElement(element, rawmusictext);
@@ -12940,20 +12973,11 @@ void HumdrumInput::addTextElement(
             }
         }
         else {
-            Rend *rend = new Rend;
-            element->AddChild(rend);
             if (text != NULL) {
+                Rend *rend = new Rend;
+                element->AddChild(rend);
                 rend->AddChild(text);
-            }
-            if (fontstyle == "normal") {
-                rend->SetFontstyle(FONTSTYLE_normal);
-            }
-            else if (fontstyle == "bold") {
-                rend->SetFontweight(FONTWEIGHT_bold);
-                rend->SetFontstyle(FONTSTYLE_normal);
-            }
-            else if (fontstyle == "bold-italic") {
-                rend->SetFontweight(FONTWEIGHT_bold);
+                setFontStyle(rend, fontstyle);
             }
         }
 
@@ -12963,6 +12987,25 @@ void HumdrumInput::addTextElement(
             element->AddChild(lb);
             text = new Text;
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setFontStyle --
+//
+
+void HumdrumInput::setFontStyle(Rend *rend, const string &fontstyle)
+{
+    if (fontstyle == "normal") {
+        rend->SetFontstyle(FONTSTYLE_normal);
+    }
+    else if (fontstyle == "bold") {
+        rend->SetFontweight(FONTWEIGHT_bold);
+        rend->SetFontstyle(FONTSTYLE_normal);
+    }
+    else if (fontstyle == "bold-italic") {
+        rend->SetFontweight(FONTWEIGHT_bold);
     }
 }
 

@@ -29,6 +29,7 @@
 #include "options.h"
 #include "pedal.h"
 #include "reh.h"
+#include "rend.h"
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
@@ -547,7 +548,7 @@ protected:
     hum::HTp getHighestSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
-        int staffindex, int justification = 0, const std::string &color = "");
+        int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1);
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
         hum::HTp token, int staffindex, int justification, const std::string &color);
     bool setTempoContent(Tempo *tempo, const std::string &text);
@@ -688,6 +689,7 @@ protected:
     void addPlicaUp(Note *note);
     void addPlicaDown(Note *note);
     void setLayoutSlurDirection(Slur *slur, hum::HTp token);
+    void setFontStyle(Rend *rend, const string &fontstyle);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
