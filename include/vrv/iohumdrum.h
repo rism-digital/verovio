@@ -751,7 +751,6 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
-    template <class ELEMENT> void addType(ELEMENT element, const std::string &aType);
     template <class ELEMENT>
     void insertTwoRhythmsAndTextBetween(
         ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2);
