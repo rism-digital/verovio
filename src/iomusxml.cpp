@@ -1780,7 +1780,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
                 m_bracketStack.front().first->SetLendsym(
                     ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
-                m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                if (measureDifference >= 0) {
+                    m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                }
                 m_bracketStack.erase(m_bracketStack.begin());
             }
         }
@@ -1833,12 +1835,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
             while (iter != m_openDashesStack.end()) {
                 if (iter->second.m_dirN == dashesNumber && iter->second.m_staffNum == staffNum) {
                     const int measureDifference = m_measureCounts.at(measure) - iter->second.m_measureCount;
-                    if (iter->first->Is(DYNAM))
-                        dynamic_cast<Dynam *>(iter->first)
-                            ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
-                    if (iter->first->Is(DIR))
-                        dynamic_cast<Dir *>(iter->first)
-                            ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    if (measureDifference >= 0) {
+                        if (iter->first->Is(DYNAM))
+                            dynamic_cast<Dynam *>(iter->first)
+                                ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                        if (iter->first->Is(DIR))
+                            dynamic_cast<Dir *>(iter->first)
+                                ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    }
                     iter = m_openDashesStack.erase(iter);
                 }
                 else {
@@ -2007,7 +2011,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
             for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
                 if (iter->second.m_dirN == hairpinNumber) {
                     const int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
-                    iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    if (measureDifference >= 0) {
+                        iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    }
                     if (wedge->node().attribute("spread")) {
                         iter->first->SetOpening(wedge->node().attribute("spread").as_double() / 5);
                     }
@@ -2164,7 +2170,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (HasAttributeWithValue(lead.node(), "type", "stop")) {
             const int measureDifference
                 = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
-            m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+            if (measureDifference >= 0) {
+                m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+            }
             m_bracketStack.erase(m_bracketStack.begin());
         }
         else {
