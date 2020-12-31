@@ -556,6 +556,8 @@ string HumdrumInput::GetHumdrumString()
 
 bool HumdrumInput::convertHumdrum()
 {
+    importVerovioOptions(m_doc);
+
     if (GetOutputFormat() == "humdrum") {
         // allow for filtering within toolkit.
         return true;
@@ -6138,21 +6140,21 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
 
     if (token->isDataType("**fba")) {
         if (m_placement[spinetrack] == 0) {
-            setPlace(harm, "above");
+            setPlace(harm, "above", false);
         }
         else if (m_placement[spinetrack] == -1) {
-            setPlace(harm, "below");
+            setPlace(harm, "below", false);
         }
         else if (m_placement[spinetrack] == +1) {
-            setPlace(harm, "above");
+            setPlace(harm, "above", false);
         }
     }
     else {
         if (m_placement[spinetrack] == -1) {
-            setPlace(harm, "below");
+            setPlace(harm, "below", false);
         }
         else if (m_placement[spinetrack] == +1) {
-            setPlace(harm, "above");
+            setPlace(harm, "above", false);
         }
     }
     harm->AddChild(fb);
@@ -6318,21 +6320,21 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
 
             if (token->isDataType("**fba")) {
                 if (m_placement[spinetrack] == 0) {
-                    setPlace(harm, "above");
+                    setPlace(harm, "above", false);
                 }
                 else if (m_placement[spinetrack] == -1) {
-                    setPlace(harm, "below");
+                    setPlace(harm, "below", false);
                 }
                 else if (m_placement[spinetrack] == +1) {
-                    setPlace(harm, "above");
+                    setPlace(harm, "above", false);
                 }
             }
             else {
                 if (m_placement[spinetrack] == -1) {
-                    setPlace(harm, "below");
+                    setPlace(harm, "below", false);
                 }
                 else if (m_placement[spinetrack] == +1) {
-                    setPlace(harm, "above");
+                    setPlace(harm, "above", false);
                 }
             }
             harm->AddChild(fb);
@@ -6489,10 +6491,10 @@ void HumdrumInput::insertFingerNumberInMeasure(
     dir->AddChild(rend);
     appendTypeTag(dir, "fingering");
     if (aboveQ) {
-        setPlace(dir, "above");
+        setPlace(dir, "above", false);
     }
     else {
-        setPlace(dir, "below");
+        setPlace(dir, "below", false);
     }
     addChildMeasureOrSection(dir);
     setLocationId(dir, token);
@@ -6721,11 +6723,11 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
             std::wstring content;
             if (token->isDataType("**harm")) {
-                setPlace(harm, "below");
+                setPlace(harm, "below", false);
                 content = cleanHarmString2(*token);
             }
             else if (token->isDataType("**rhrm")) {
-                setPlace(harm, "below");
+                setPlace(harm, "below", false);
                 content = cleanHarmString3(*token);
             }
             else if (isCData) {
@@ -7974,8 +7976,8 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         }
     }
 
+    int direction = 0;
     if (tg.beamstart || tg.gbeamstart) {
-        int direction = 0;
         if (m_signifiers.above) {
             std::string pattern = "[LJKk]+";
             pattern.push_back(m_signifiers.above);
@@ -8005,11 +8007,17 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
             insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
                 ss[staffindex].suppress_tuplet_bracket);
             beam = insertBeam(elements, pointers, tg);
+            if (direction) {
+                appendTypeTag(beam, "placed");
+            }
             checkBeamWith(beam, tgs, layerdata, layerindex);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
         }
         else {
             beam = insertBeam(elements, pointers, tg);
+            if (direction) {
+                appendTypeTag(beam, "placed");
+            }
             setBeamLocationId(beam, tgs, layerdata, layerindex);
             checkBeamWith(beam, tgs, layerdata, layerindex);
             insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
@@ -8018,6 +8026,9 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
     }
     else if (tg.beamstart) {
         beam = insertBeam(elements, pointers, tg);
+        if (direction) {
+            appendTypeTag(beam, "placed");
+        }
         checkBeamWith(beam, tgs, layerdata, layerindex);
         setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
@@ -8030,6 +8041,9 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         // Grace note beams should not interact with
         // regular beams or tuplets.
         beam = insertGBeam(elements, pointers, tg);
+        if (direction) {
+            appendTypeTag(beam, "placed");
+        }
         checkBeamWith(beam, tgs, layerdata, layerindex);
         setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
@@ -8175,7 +8189,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             if (trest) {
                 setLocationId(mrest, trest);
-                if (m_doc->GetOptions()->m_humType.GetValue()) {
+                if (m_humtype) {
                     embedQstampInClass(mrest, trest, *trest);
                 }
             }
@@ -8950,9 +8964,11 @@ void HumdrumInput::addHairpinAccent(hum::HTp token)
         return;
     }
     int position = -1; // place below by default (may change based on layer position later).
+    bool setpos = false;
     if ((int)pos < (int)token->size() - 1) {
         if (m_signifiers.above == token->at(pos + 1)) {
             position = +1;
+            setpos = true;
         }
     }
 
@@ -8967,11 +8983,11 @@ void HumdrumInput::addHairpinAccent(hum::HTp token)
     dir->SetTstamp(tstamp.getFloat());
 
     if (position > 0) {
-        setPlace(dir, "above");
+        setPlace(dir, "above", setpos);
         addChildBackMeasureOrSection(dir);
     }
     else if (position < 0) {
-        setPlace(dir, "below");
+        setPlace(dir, "below", setpos);
         addChildBackMeasureOrSection(dir);
     }
     else {
@@ -9073,6 +9089,7 @@ void HumdrumInput::addSlur(FTrem *ftrem, hum::HTp start, hum::HTp ending)
 void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
 {
     int direction = 0;
+    int showplace = false;
     if (start->find('/') != std::string::npos) {
         direction = +1;
     }
@@ -9086,6 +9103,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
             value += m_signifiers.above;
             if (hre.search(start, value)) {
                 direction = +1;
+                showplace = true;
             }
         }
         else if (m_signifiers.below) {
@@ -9093,6 +9111,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
             value += m_signifiers.below;
             if (hre.search(start, value)) {
                 direction = -1;
+                showplace = true;
             }
         }
     }
@@ -9109,9 +9128,15 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
         if (obj->GetClassName() == "Note") {
             if (direction > 0) {
                 ((Note *)obj)->SetStemDir(STEMDIRECTION_up);
+                if (m_humtype && showplace) {
+                    appendTypeTag((Note *)obj, "placed");
+                }
             }
             else {
                 ((Note *)obj)->SetStemDir(STEMDIRECTION_down);
+                if (m_humtype && showplace) {
+                    appendTypeTag((Note *)obj, "placed");
+                }
             }
         }
     }
@@ -9595,6 +9620,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     // store artics in random access grid, along with their staff positions:
     vector<int> articloc(256, 0);
     vector<int> articpos(256, 0);
+    vector<bool> showpos(256, 0);
     vector<int> articges(256, 0); // is it a gestural articulation?
     char ch;
     char posch;
@@ -9638,9 +9664,11 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
 
         if ((posch != 0) && (posch == m_signifiers.above)) {
             articpos.at(ch) = 1;
+            showpos.at(ch) = true;
         }
         else if ((posch != 0) && (posch == m_signifiers.below)) {
             articpos.at(ch) = -1;
+            showpos.at(ch) = true;
         }
         else {
             articpos.at(ch) = 0;
@@ -9650,6 +9678,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     // second position is the staff position (-1=below, 0=undefined, 1=above)
     std::vector<data_ARTICULATION> artics;
     std::vector<int> positions;
+    std::vector<bool> showingpositions;
     std::vector<int> gestural;
 
     // place articulations in stacking order (nearest to furthest from note):
@@ -9657,41 +9686,49 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         artics.push_back(ARTICULATION_stacc);
         positions.push_back(articpos['\'']);
         gestural.push_back(articges['\'']);
+        showingpositions.push_back(showpos['\'']);
     }
     if (articloc['`']) {
         artics.push_back(ARTICULATION_stacciss);
         positions.push_back(articpos['`']);
         gestural.push_back(articges['`']);
+        showingpositions.push_back(showpos['`']);
     }
     if (articloc['~']) {
         artics.push_back(ARTICULATION_ten);
         positions.push_back(articpos['~']);
         gestural.push_back(articges['~']);
+        showingpositions.push_back(showpos['~']);
     }
     if (articloc[6]) {
         artics.push_back(ARTICULATION_marc);
         positions.push_back(articpos[6]);
         gestural.push_back(articges['6']);
+        showingpositions.push_back(showpos['6']);
     }
     if (articloc['^']) {
         artics.push_back(ARTICULATION_acc);
         positions.push_back(articpos['^']);
         gestural.push_back(articges['^']);
+        showingpositions.push_back(showpos['^']);
     }
     if (articloc['o']) {
         artics.push_back(ARTICULATION_harm);
         positions.push_back(articpos['o']);
         gestural.push_back(articges['o']);
+        showingpositions.push_back(showpos['o']);
     }
     if (articloc['v']) {
         artics.push_back(ARTICULATION_upbow);
         positions.push_back(articpos['v']);
         gestural.push_back(articges['v']);
+        showingpositions.push_back(showpos['v']);
     }
     if (articloc['u']) {
         artics.push_back(ARTICULATION_dnbow);
         positions.push_back(articpos['u']);
         gestural.push_back(articges['u']);
+        showingpositions.push_back(showpos['u']);
     }
 
     if (artics.empty()) {
@@ -9713,10 +9750,10 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             artic->SetArtic(artics);
         }
         if (positions.at(0) > 0) {
-            setPlace(artic, "above");
+            setPlace(artic, "above", showingpositions.at(0));
         }
         else if (positions.at(0) < 0) {
-            setPlace(artic, "below");
+            setPlace(artic, "below", showingpositions.at(0));
         }
         setLocationId(artic, token);
         return;
@@ -9734,13 +9771,17 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     std::vector<data_ARTICULATION> articsabove;
     std::vector<data_ARTICULATION> articsbelow;
     std::vector<data_ARTICULATION> articsdefault; // no placment parameter
+    std::vector<bool> showposabove;
+    std::vector<bool> showposbelow;
 
     for (int i = 0; i < (int)artics.size(); ++i) {
         if (positions[i] > 0) {
             articsabove.push_back(artics[i]);
+            showposabove.push_back(showingpositions.at(i));
         }
         else if (positions[i] < 0) {
             articsbelow.push_back(artics[i]);
+            showposbelow.push_back(showingpositions.at(i));
         }
         else {
             articsdefault.push_back(artics[i]);
@@ -9751,7 +9792,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         Artic *artic = new Artic;
         appendElement(element, artic);
         artic->SetArtic(articsabove);
-        setPlace(artic, "above");
+        setPlace(artic, "above", showposabove.at(0));
         artic->SetUuid(getLocationId(element, token, 0) + "-above");
     }
 
@@ -9759,7 +9800,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         Artic *artic = new Artic;
         appendElement(element, artic);
         artic->SetArtic(articsbelow);
-        setPlace(artic, "below");
+        setPlace(artic, "below", showposabove.at(0));
         artic->SetUuid(getLocationId(element, token, 0) + "-below");
     }
 
@@ -10037,9 +10078,12 @@ void HumdrumInput::colorVerse(Verse *verse, std::string &token)
 // setPlace --
 //
 
-template <class ELEMENT> void HumdrumInput::setPlace(ELEMENT *element, const std::string &place)
+template <class ELEMENT> void HumdrumInput::setPlace(ELEMENT *element, const std::string &place, bool showplace)
 {
     element->SetPlace(element->AttPlacement::StrToStaffrel(place));
+    if (m_humtype && showplace) {
+        appendTypeTag(element, "placed");
+    }
 }
 
 /////////////////////////////
@@ -10487,32 +10531,40 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 
     double Y = 0.0;
     double Z = 0.0;
+    bool showplace = false;
     std::string placement;
     if (aparam) {
         placement = "above";
+        showplace = true;
     }
     else if (bparam) {
         placement = "below";
+        showplace = true;
     }
     else if (cparam) {
         placement = "between";
+        showplace = true;
     }
     else if (zparam) {
         Z = hline->getValueInt("LO", "TX", "Z");
         if (Z > 0) {
             placement = "above";
+            showplace = true;
         }
         else {
             placement = "below";
+            showplace = true;
         }
     }
     else if (yparam) {
         Y = hline->getValueInt("LO", "TX", "Y");
         if (Y > 0) {
             placement = "below";
+            showplace = true;
         }
         else {
             placement = "above";
+            showplace = true;
         }
     }
     else {
@@ -10534,15 +10586,15 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     }
 
     if (placement == "above") {
-        setPlace(dir, "above");
+        setPlace(dir, "above", showplace);
         addChildBackMeasureOrSection(dir);
     }
     else if (placement == "below") {
-        setPlace(dir, "below");
+        setPlace(dir, "below", showplace);
         addChildMeasureOrSection(dir);
     }
     else if (placement == "between") {
-        setPlace(dir, "between");
+        setPlace(dir, "between", showplace);
         addChildMeasureOrSection(dir);
     }
     else {
@@ -10853,31 +10905,39 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     double Y = 0.0;
     double Z = 0.0;
     std::string placement;
+    bool showplace = false;
     if (aparam) {
         placement = "above";
+        showplace = true;
     }
     else if (bparam) {
         placement = "below";
+        showplace = true;
     }
     else if (cparam) {
         placement = "between";
+        showplace = true;
     }
     else if (zparam) {
         Z = token->getValueInt("LO", "TX", "Z");
         if (Z > 0) {
             placement = "above";
+            showplace = true;
         }
         else {
             placement = "below";
+            showplace = true;
         }
     }
     else if (yparam) {
         Y = token->getValueInt("LO", "TX", "Y");
         if (Y > 0) {
             placement = "below";
+            showplace = true;
         }
         else {
             placement = "above";
+            showplace = true;
         }
     }
     else {
@@ -10975,13 +11035,13 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
     addChildMeasureOrSection(dir);
     if (placement == "above") {
-        setPlace(dir, "above");
+        setPlace(dir, "above", showplace);
     }
     else if (placement == "below") {
-        setPlace(dir, "below");
+        setPlace(dir, "below", showplace);
     }
     else if (placement == "between") {
-        setPlace(dir, "between");
+        setPlace(dir, "between", showplace);
     }
     bool plain = !(italic || bold);
     bool needrend = plain || bold || justification || color.size();
@@ -11079,13 +11139,13 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     }
 
     if (placement == "above") {
-        setPlace(tempo, "above");
+        setPlace(tempo, "above", false);
     }
     else if (placement == "below") {
-        setPlace(tempo, "below");
+        setPlace(tempo, "below", false);
     }
     else if (placement == "center") {
-        setPlace(tempo, "between");
+        setPlace(tempo, "between", false);
     }
 
     bool status = setTempoContent(tempo, text);
@@ -11472,13 +11532,13 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
 
     addChildMeasureOrSection(dir);
     if (placement == "above") {
-        setPlace(dir, "above");
+        setPlace(dir, "above", false);
     }
     else if (placement == "below") {
-        setPlace(dir, "below");
+        setPlace(dir, "below", false);
     }
     else if (placement == "center") {
-        setPlace(dir, "between");
+        setPlace(dir, "between", false);
     }
     bool plain = !(italic || bold);
     bool needrend = plain || bold || justification || color.size();
@@ -11570,6 +11630,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool aboveQ = false;
     bool belowQ = false;
     bool centerQ = false;
+    bool showpos = false;
 
     auto loc = token->rfind("z");
     if (token->find("zy") != std::string::npos) {
@@ -11594,12 +11655,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             aboveQ = true;
             belowQ = false;
             centerQ = false;
+            showpos = true;
         }
         if (!aboveQ) {
             if (hasBelowParameter(token, "DY", staffadj)) {
                 aboveQ = false;
                 belowQ = true;
                 centerQ = false;
+                showpos = true;
                 if (belowQ && staffadj) {
                     staffadj--;
                 }
@@ -11613,16 +11676,20 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 aboveQ = false;
                 belowQ = false;
                 centerQ = true;
+                showpos = true;
             }
         }
 
+        // This code block should probably be deleted.
         if (m_signifiers.below && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.below)) {
             aboveQ = false;
             belowQ = true;
+            showpos = true;
         }
         if (m_signifiers.above && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.above)) {
             aboveQ = true;
             belowQ = false;
+            showpos = true;
         }
 
         Dynam *dynam = new Dynam;
@@ -11671,22 +11738,22 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         dynam->SetTstamp(barstamp.getFloat());
 
         if (aboveQ) {
-            setPlace(dynam, "above");
+            setPlace(dynam, "above", showpos);
         }
         else if (belowQ) {
-            setPlace(dynam, "below");
+            setPlace(dynam, "below", showpos);
         }
         else if (centerQ) {
-            setPlace(dynam, "between");
+            setPlace(dynam, "between", showpos);
         }
         else if (forceAboveQ) {
-            setPlace(dynam, "above");
+            setPlace(dynam, "above", showpos);
         }
         else if (forceBelowQ) {
-            setPlace(dynam, "below");
+            setPlace(dynam, "below", showpos);
         }
         else if (forceCenterQ) {
-            setPlace(dynam, "between");
+            setPlace(dynam, "between", showpos);
         }
     }
 
@@ -11775,14 +11842,17 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
             bool aboveQ = hasAboveParameter(dyntok, "DY", staffadj);
             bool belowQ = false;
+            bool showplace = aboveQ;
             if (!aboveQ) {
                 belowQ = hasBelowParameter(dyntok, "DY", staffadj);
+                showplace = belowQ;
             }
             if (!aboveQ && !belowQ) {
                 if (hasCenterParameter(dyntok, "DY", staffadj)) {
                     aboveQ = false;
                     belowQ = false;
                     centerQ = true;
+                    showplace = centerQ;
                 }
             }
 
@@ -11916,25 +11986,25 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
             if (trackdiff == 1) {
                 // case needed for grace notes in the bottom staff of a grand staff.
-                setPlace(dynam, "above");
+                setPlace(dynam, "above", false);
             }
             if (aboveQ) {
-                setPlace(dynam, "above");
+                setPlace(dynam, "above", showplace);
             }
             else if (belowQ) {
-                setPlace(dynam, "below");
+                setPlace(dynam, "below", showplace);
             }
             else if (centerQ) {
-                setPlace(dynam, "between");
+                setPlace(dynam, "between", showplace);
             }
             else if (forceAboveQ) {
-                setPlace(dynam, "above");
+                setPlace(dynam, "above", false);
             }
             else if (forceBelowQ) {
-                setPlace(dynam, "below");
+                setPlace(dynam, "below", false);
             }
             else if (forceCenterQ) {
-                setPlace(dynam, "between");
+                setPlace(dynam, "between", false);
             }
         }
         if (hairpins.find("<") != std::string::npos) {
@@ -11953,14 +12023,17 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             bool aboveQ = hasAboveParameter(dyntok, "HP", staffadj);
             bool belowQ = false;
             bool centerQ = false;
+            bool showplace = aboveQ;
             if (!aboveQ) {
                 belowQ = hasBelowParameter(dyntok, "HP", staffadj);
+                showplace = belowQ;
             }
             if (!aboveQ && !belowQ) {
                 if (hasCenterParameter(dyntok, "HP", staffadj)) {
                     aboveQ = false;
                     belowQ = false;
                     centerQ = true;
+                    showplace = centerQ;
                 }
             }
 
@@ -11975,21 +12048,21 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 if ((centerQ || forceCenterQ) && !aboveQ && !belowQ) {
                     setStaffBetween(hairpin, newstaff);
-                    setPlace(hairpin, "between");
+                    setPlace(hairpin, "between", showplace);
                 }
                 else {
                     setStaff(hairpin, newstaff);
                     if (aboveQ) {
-                        setPlace(hairpin, "above");
+                        setPlace(hairpin, "above", showplace);
                     }
                     else if (belowQ) {
-                        setPlace(hairpin, "below");
+                        setPlace(hairpin, "below", showplace);
                     }
                     else if (forceAboveQ) {
-                        setPlace(hairpin, "above");
+                        setPlace(hairpin, "above", showplace);
                     }
                     else if (forceBelowQ) {
-                        setPlace(hairpin, "below");
+                        setPlace(hairpin, "below", showplace);
                     }
                 }
                 setLocationId(hairpin, dyntok, -1);
@@ -12055,22 +12128,22 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 if ((centerQ || forceCenterQ) && !aboveQ && !belowQ) {
                     setStaffBetween(dir, newstaff);
-                    setPlace(dir, "between");
+                    setPlace(dir, "between", showplace);
                 }
                 else {
                     setStaff(dir, newstaff);
 
                     if (aboveQ) {
-                        setPlace(dir, "above");
+                        setPlace(dir, "above", showplace);
                     }
                     else if (belowQ) {
-                        setPlace(dir, "below");
+                        setPlace(dir, "below", showplace);
                     }
                     else if (forceAboveQ) {
-                        setPlace(dir, "above");
+                        setPlace(dir, "above", false);
                     }
                     else if (forceBelowQ) {
-                        setPlace(dir, "below");
+                        setPlace(dir, "below", false);
                     }
                 }
                 setLocationId(dir, dyntok);
@@ -12111,11 +12184,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             bool aboveQ = hasAboveParameter(dyntok, "HP", staffadj);
             bool belowQ = false;
             bool centerQ = false;
+            bool showplace = aboveQ;
             if (!aboveQ) {
                 belowQ = hasBelowParameter(dyntok, "HP", staffadj);
+                showplace = belowQ;
             }
             if (!aboveQ && !belowQ) {
                 centerQ = hasCenterParameter(dyntok, "HP", staffadj);
+                showplace = centerQ;
             }
 
             if (endtok != NULL) {
@@ -12130,21 +12206,21 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 if ((centerQ || forceCenterQ) && !aboveQ && !belowQ) {
                     setStaffBetween(hairpin, newstaff);
-                    setPlace(hairpin, "between");
+                    setPlace(hairpin, "between", showplace);
                 }
                 else {
                     setStaff(hairpin, newstaff);
                     if (aboveQ) {
-                        setPlace(hairpin, "above");
+                        setPlace(hairpin, "above", showplace);
                     }
                     else if (belowQ) {
-                        setPlace(hairpin, "below");
+                        setPlace(hairpin, "below", showplace);
                     }
                     else if (forceAboveQ) {
-                        setPlace(hairpin, "above");
+                        setPlace(hairpin, "above", showplace);
                     }
                     else if (forceBelowQ) {
-                        setPlace(hairpin, "below");
+                        setPlace(hairpin, "below", showplace);
                     }
                 }
                 setLocationId(hairpin, dyntok, -1);
@@ -12218,22 +12294,22 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
                 if ((centerQ || forceCenterQ) && !aboveQ && !belowQ) {
                     setStaffBetween(dir, newstaff);
-                    setPlace(dir, "between");
+                    setPlace(dir, "between", showplace);
                 }
                 else {
                     setStaff(dir, newstaff);
 
                     if (aboveQ) {
-                        setPlace(dir, "above");
+                        setPlace(dir, "above", showplace);
                     }
                     else if (belowQ) {
-                        setPlace(dir, "below");
+                        setPlace(dir, "below", showplace);
                     }
                     else if (forceAboveQ) {
-                        setPlace(dir, "above");
+                        setPlace(dir, "above", showplace);
                     }
                     else if (forceBelowQ) {
-                        setPlace(dir, "below");
+                        setPlace(dir, "below", showplace);
                     }
                 }
 
@@ -13196,6 +13272,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 if (count == slurstartnumber) {
                     if (slurstart->at(k + 1) == m_signifiers.above) {
                         slur->SetCurvedir(curvature_CURVEDIR_above);
+                        appendTypeTag(slur, "placed");
                     }
                     break;
                 }
@@ -13210,6 +13287,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 if (count == slurstartnumber) {
                     if (slurstart->at(k + 1) == m_signifiers.below) {
                         slur->SetCurvedir(curvature_CURVEDIR_below);
+                        appendTypeTag(slur, "placed");
                     }
                     break;
                 }
@@ -13227,9 +13305,11 @@ void HumdrumInput::setLayoutSlurDirection(Slur *slur, hum::HTp token)
 {
     if (hasAboveParameter(token, "S")) {
         slur->SetCurvedir(curvature_CURVEDIR_above);
+        appendTypeTag(slur, "placed");
     }
     else if (hasBelowParameter(token, "S")) {
         slur->SetCurvedir(curvature_CURVEDIR_below);
+        appendTypeTag(slur, "placed");
     }
 }
 
@@ -16925,9 +17005,11 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     // Overwrite cross-stem direction if there is an explicit stem direction.
     if (token->find("/") != std::string::npos) {
         chord->SetStemDir(STEMDIRECTION_up);
+        appendTypeTag(chord, "placed");
     }
     else if (token->find("\\") != std::string::npos) {
         chord->SetStemDir(STEMDIRECTION_down);
+        appendTypeTag(chord, "placed");
     }
 
     checkForAutoStem(chord, token);
@@ -17944,9 +18026,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     if (!chordQ) {
         if (tstring.find("/") != std::string::npos) {
             note->SetStemDir(STEMDIRECTION_up);
+            appendTypeTag(note, "placed");
         }
         else if (tstring.find("\\") != std::string::npos) {
             note->SetStemDir(STEMDIRECTION_down);
+            appendTypeTag(note, "placed");
         }
         checkForAutoStem(note, token);
     }
@@ -19039,16 +19123,16 @@ void HumdrumInput::addBreath(hum::HTp token, Object *parent)
 
         int direction = getDirection(*token, ",");
         if (direction < 0) {
-            setPlace(breath, "below");
+            setPlace(breath, "below", false);
         }
         else if (direction > 0) {
-            setPlace(breath, "above");
+            setPlace(breath, "above", false);
         }
         else if (layer == 1) {
-            setPlace(breath, "above");
+            setPlace(breath, "above", false);
         }
         else if (layer == 2) {
-            setPlace(breath, "below");
+            setPlace(breath, "below", false);
         }
     }
 }
@@ -19224,23 +19308,23 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
         }
 
         if (fermata2) {
-            setPlace(fermata, "above");
-            setPlace(fermata2, "below");
+            setPlace(fermata, "above", false);
+            setPlace(fermata2, "below", false);
             return;
         }
 
         int direction = getDirection(*token, ";");
         if (direction < 0) {
-            setPlace(fermata, "below");
+            setPlace(fermata, "below", false);
         }
         else if (direction > 0) {
-            setPlace(fermata, "above");
+            setPlace(fermata, "above", false);
         }
         else if (layer == 1) {
-            setPlace(fermata, "above");
+            setPlace(fermata, "above", false);
         }
         else if (layer == 2) {
-            setPlace(fermata, "below");
+            setPlace(fermata, "below", false);
         }
     }
 }
@@ -19667,14 +19751,14 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     if (m_signifiers.above) {
         if (turnend < (int)token->size() - 1) {
             if ((*token)[turnend + 1] == m_signifiers.above) {
-                setPlace(turn, "above");
+                setPlace(turn, "above", true);
             }
         }
     }
     if (m_signifiers.below) {
         if (turnend < (int)token->size() - 1) {
             if ((*token)[turnend + 1] == m_signifiers.below) {
-                setPlace(turn, "below");
+                setPlace(turn, "below", true);
             }
         }
     }
@@ -19809,7 +19893,7 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     int layer = m_currentlayer;
     if (layer == 2) {
         // Force the mordent below the staff by default:
-        setPlace(mordent, "below");
+        setPlace(mordent, "below", false);
     }
 
     hum::HumRegex hre;
@@ -19818,14 +19902,14 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         query = "[Mm]+";
         query += m_signifiers.above;
         if (hre.search(token, query)) {
-            setPlace(mordent, "above");
+            setPlace(mordent, "above", true);
         }
     }
     if (m_signifiers.below) {
         query = "[Mm]+";
         query += m_signifiers.below;
         if (hre.search(token, query)) {
-            setPlace(mordent, "below");
+            setPlace(mordent, "below", true);
         }
     }
 
@@ -19935,7 +20019,7 @@ void HumdrumInput::addTrill(hum::HTp token)
     int layer = m_currentlayer;
     if (layer == 2) {
         // Force the trill below the staff by default:
-        setPlace(trill, "below");
+        setPlace(trill, "below", false);
     }
 
     trill->SetStartid("#" + getLocationId("note", token, subtok));
@@ -19947,14 +20031,14 @@ void HumdrumInput::addTrill(hum::HTp token)
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
-                setPlace(trill, "above");
+                setPlace(trill, "above", true);
             }
         }
     }
     if (m_signifiers.below) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.below) {
-                setPlace(trill, "below");
+                setPlace(trill, "below", true);
             }
         }
     }
@@ -22737,6 +22821,16 @@ void HumdrumInput::markOtherClefsAsChange(hum::HTp clef)
         current->setValue("auto", "clefChange", 1);
         current = current->getPreviousFieldToken();
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::importVerovioOptions -- Set any options coming from the toolkit interface here.
+//
+
+void HumdrumInput::importVerovioOptions(Doc *doc)
+{
+    m_humtype = doc->GetOptions()->m_humType.GetValue();
 }
 
 //////////////////////////////

@@ -690,6 +690,7 @@ protected:
     void addPlicaDown(Note *note);
     void setLayoutSlurDirection(Slur *slur, hum::HTp token);
     void setFontStyle(Rend *rend, const string &fontstyle);
+    void importVerovioOptions(Doc *doc);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -741,7 +742,7 @@ protected:
     template <class ELEMENT> void addVerovioTextElement(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
-    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
+    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place, bool showplace);
     template <class ELEMENT>
     void setMeterSymbol(
         ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL, hum::HTp metertok = NULL);
@@ -1023,6 +1024,10 @@ private:
 
     // m_scordatura_transposition == used to transpose scordatura notes;
     std::vector<hum::HumTransposer *> m_scordatura_transposition;
+
+    // m_humtype == input option boolean to include extra @type information that will
+    // be converted into @class in SVG conversion.
+    int m_humtype = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
