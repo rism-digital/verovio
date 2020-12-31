@@ -8819,6 +8819,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
                 appendElement(ftrem, note);
+                addArticulations(note, layerdata[i]);
                 if (second) {
                     // ignoring slurs, ties, ornaments, articulations
                     if (second->isChord()) {
@@ -8832,6 +8833,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         setLocationId(note2, second);
                         appendElement(ftrem, note2);
                         convertNote(note2, second, 0, staffindex);
+                        addArticulations(note2, second);
                     }
                     addSlur(ftrem, layerdata[i], second);
                 }
