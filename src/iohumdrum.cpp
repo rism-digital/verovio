@@ -16892,6 +16892,8 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     bool allinvis = true;
 
     std::vector<std::string> tstrings = token->getSubtokens();
+    std::vector<Note *> notes;
+
     for (int i = 0; i < (int)tstrings.size(); ++i) {
         if (tstrings[i].find("yy") == std::string::npos) {
             allinvis = false;
@@ -16949,6 +16951,7 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         setLocationId(note, token, j);
         appendElement(chord, note);
         convertNote(note, token, staffadj, staffindex, j);
+        notes.push_back(note);
     }
 
     if (allinvis) {
@@ -17012,6 +17015,8 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         appendTypeTag(chord, "placed");
     }
 
+    adjustChordNoteDurations(chord, notes, tstrings);
+
     checkForAutoStem(chord, token);
 
     token->setValue("MEI", "xml:id", chord->GetUuid());
@@ -17025,6 +17030,142 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     }
 
     convertVerses(chord, token);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::adjustChordNoteDurations -- If the notes in a chord do not have
+//    all of the same duration, set the duration of the notes which do not match
+//    the chord's duration.  The chords duration is the duration of the first
+//    note in the chord.  If a note does not have a duration, then it takes
+//    the duration of the previous note (the first note requires a duration, or
+//    it will be assigned a duration of a quarter note.
+//
+
+void HumdrumInput::adjustChordNoteDurations(Chord *chord, std::vector<Note *> &notes, std::vector<string> &tstrings)
+{
+    if (notes.size() != tstrings.size()) {
+        return;
+    }
+
+    std::vector<hum::HumNum> durations(tstrings.size(), 0);
+    hum::HumNum value;
+    for (int i = 0; i < (int)tstrings.size(); i++) {
+        value = hum::Convert::recipToDuration(tstrings.at(i));
+        if (value == 0) {
+            if (i == 0) {
+                value = 1;
+            }
+            else {
+                value = durations.at(i - 1);
+            }
+        }
+        durations.at(i) = value;
+    }
+    bool same = true;
+    for (int i = 1; i < (int)durations.size(); i++) {
+        if (durations[0] != durations[i]) {
+            same = false;
+            break;
+        }
+    }
+    if (same) {
+        return;
+    }
+    cerr << "Chord notes are not the same. " << endl;
+
+    int dots = chord->GetDots();
+    int dur = chord->GetDur();
+    // dur is a power of two, where 2 = whole note, 1 = breve, 0 = long, -1 = maxima
+    // 3 = half note, 4 = quarter, 5 = eighth, etc.
+    hum::HumNum hdur = 1;
+    int powtwo = dur - 2;
+    if (powtwo > 0) {
+        hdur /= 1 << powtwo;
+    }
+    else if (powtwo < 0) {
+        hdur = 1 << -powtwo;
+    }
+
+    for (int i = 1; i < (int)durations.size(); i++) {
+        if (durations[0] != durations[i]) {
+            hum::HumNum factor = durations[i] / durations[0];
+            adjustChordNoteDuration(notes.at(i), hdur, dur, dots, durations[0], tstrings[i], factor);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::adjustChordNoteDuration --
+//
+// dots == -1 means no @dots parameter.
+
+void HumdrumInput::adjustChordNoteDuration(
+    Note *note, hum::HumNum hdur, int meidur, int dots, hum::HumNum chorddur, const string &tstring, hum::HumNum factor)
+{
+    if (factor.isPowerOfTwo()) {
+        // Handle simple case where dots are the same:
+        int adjustment = (int)log2(factor.getFloat());
+        setNoteMeiDur(note, meidur - adjustment);
+        return;
+    }
+
+    // There is a difference in dot counts that also needs to be taken into account.
+    int ndots = 0;
+    for (int i = 0; i < (int)tstring.size(); i++) {
+        if (tstring[i] == '.') {
+            ndots++;
+        }
+    }
+
+    int dotdiff;
+    if (dots < 0) {
+        dotdiff = ndots;
+    }
+    else {
+        dotdiff = ndots - dots;
+    }
+    if (dotdiff == 0) {
+        // something strange happened
+        return;
+    }
+
+    // check if the @dur of the note needs to be set
+    hum::HumNum nodots = hum::Convert::recipToDurationNoDots(tstring);
+
+    if (nodots != hdur) {
+        // different @dur, so set for note
+        setRhythmFromDuration(note, nodots);
+    }
+
+    note->SetDots(ndots);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setNoteMeiDur -- Set the @dur attribute of a note.
+//
+
+void HumdrumInput::setNoteMeiDur(Note *note, int meidur)
+{
+    switch (meidur) {
+        case -1: note->SetDur(DURATION_maxima); break;
+        case 0: note->SetDur(DURATION_long); break;
+        case 1: note->SetDur(DURATION_breve); break;
+        case 2: note->SetDur(DURATION_1); break;
+        case 3: note->SetDur(DURATION_2); break;
+        case 4: note->SetDur(DURATION_4); break;
+        case 5: note->SetDur(DURATION_8); break;
+        case 6: note->SetDur(DURATION_16); break;
+        case 7: note->SetDur(DURATION_32); break;
+        case 8: note->SetDur(DURATION_64); break;
+        case 9: note->SetDur(DURATION_128); break;
+        case 10: note->SetDur(DURATION_256); break;
+        case 11: note->SetDur(DURATION_512); break;
+        case 12: note->SetDur(DURATION_1024); break;
+        default: cerr << "UNKNOWN MEI DUR: " << meidur << endl;
+    }
 }
 
 //////////////////////////////
@@ -20599,6 +20740,10 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 64)) {
         element->SetDur(DURATION_256);
+        return duration;
+    }
+    else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 128)) {
+        element->SetDur(DURATION_512);
         return duration;
     }
     if (duration > 4) {

@@ -691,6 +691,10 @@ protected:
     void setLayoutSlurDirection(Slur *slur, hum::HTp token);
     void setFontStyle(Rend *rend, const string &fontstyle);
     void importVerovioOptions(Doc *doc);
+    void adjustChordNoteDurations(Chord *chord, std::vector<Note *> &notes, std::vector<string> &tstrings);
+    void adjustChordNoteDuration(Note *note, hum::HumNum hdur, int dur, int dots, hum::HumNum chorddur,
+        const string &tstring, hum::HumNum factor);
+    void setNoteMeiDur(Note *note, int meidur);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
