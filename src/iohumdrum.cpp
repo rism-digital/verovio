@@ -17072,14 +17072,13 @@ void HumdrumInput::adjustChordNoteDurations(Chord *chord, std::vector<Note *> &n
     if (same) {
         return;
     }
-    cerr << "Chord notes are not the same. " << endl;
 
     int dots = chord->GetDots();
-    int dur = chord->GetDur();
-    // dur is a power of two, where 2 = whole note, 1 = breve, 0 = long, -1 = maxima
+    int meidur = chord->GetDur();
+    // meidur is a power of two, where 2 = whole note, 1 = breve, 0 = long, -1 = maxima
     // 3 = half note, 4 = quarter, 5 = eighth, etc.
     hum::HumNum hdur = 1;
-    int powtwo = dur - 2;
+    int powtwo = meidur - 2;
     if (powtwo > 0) {
         hdur /= 1 << powtwo;
     }
@@ -17090,7 +17089,7 @@ void HumdrumInput::adjustChordNoteDurations(Chord *chord, std::vector<Note *> &n
     for (int i = 1; i < (int)durations.size(); i++) {
         if (durations[0] != durations[i]) {
             hum::HumNum factor = durations[i] / durations[0];
-            adjustChordNoteDuration(notes.at(i), hdur, dur, dots, durations[0], tstrings[i], factor);
+            adjustChordNoteDuration(notes.at(i), hdur, meidur, dots, durations[0], tstrings[i], factor);
         }
     }
 }
@@ -17100,6 +17099,7 @@ void HumdrumInput::adjustChordNoteDurations(Chord *chord, std::vector<Note *> &n
 // HumdrumInput::adjustChordNoteDuration --
 //
 // dots == -1 means no @dots parameter.
+//
 
 void HumdrumInput::adjustChordNoteDuration(
     Note *note, hum::HumNum hdur, int meidur, int dots, hum::HumNum chorddur, const string &tstring, hum::HumNum factor)
@@ -17134,7 +17134,8 @@ void HumdrumInput::adjustChordNoteDuration(
     // check if the @dur of the note needs to be set
     hum::HumNum nodots = hum::Convert::recipToDurationNoDots(tstring);
 
-    if (nodots != hdur) {
+    // converting hdur to whole-note units for comparison
+    if ((nodots) != hdur * 4) {
         // different @dur, so set for note
         setRhythmFromDuration(note, nodots);
     }
