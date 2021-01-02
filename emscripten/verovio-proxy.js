@@ -152,8 +152,8 @@ verovio.toolkit.prototype.getMEI = function ( param1, scoreBased )
     }
     else
     {
-        console.warn( "Parameters deprecated; use JSON string options instead" );
         options = { "pageNo": param1, "scoreBased": scoreBased };
+        console.warn( "Deprecated getMEI() arguments, use JSON object instead. Adjusted input:", options );
         return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringify( options ) );
     }
 };
