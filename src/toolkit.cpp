@@ -219,14 +219,14 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         std::cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << std::endl;
         return UNKNOWN;
     }
+    size_t searchLimit = 600;
+    std::string initial = data.substr(0, searchLimit);
     if (data[0] == '<') {
-        size_t searchLimit = 600;
         // <mei> == root node for standard organization of MEI data
         // <pages> == root node for pages organization of MEI data
         // <score-partwise> == root node for part-wise organization of MusicXML data
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
-        std::string initial = data.substr(0, searchLimit);
 
         if (initial.find("<mei ") != std::string::npos) {
             return MEI;
@@ -273,15 +273,15 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("\n!!") != std::string::npos) {
-            return HUMDRUM;
-        }
-        if (initial.find("\n**") != std::string::npos) {
-            return HUMDRUM;
-        }
 
         std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
+    }
+    if (initial.find("\n!!") != std::string::npos) {
+        return HUMDRUM;
+    }
+    if (initial.find("\n**") != std::string::npos) {
+        return HUMDRUM;
     }
 
     // Assume that the input is MEI if other input types were not detected.
