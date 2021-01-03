@@ -586,7 +586,6 @@ protected:
     void initializeSpineColor(hum::HumdrumFile &infile);
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
-    void storeExpansionList(Section *section, hum::HTp etok);
     int getStaffAdjustment(hum::HTp token);
     void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
     void promoteInstrumentNamesToGroup();
@@ -695,6 +694,7 @@ protected:
     void adjustChordNoteDuration(Note *note, hum::HumNum hdur, int dur, int dots, hum::HumNum chorddur,
         const string &tstring, hum::HumNum factor);
     void setNoteMeiDur(Note *note, int meidur);
+    void storeExpansionListsInChoice(Section *section, std::vector<hum::HTp> &expansions);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -761,6 +761,7 @@ protected:
         ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2);
     template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
     template <class ELEMENT> void addFermata(ELEMENT *rest, const std::string &tstring);
+    template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

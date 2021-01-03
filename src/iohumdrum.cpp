@@ -50,6 +50,7 @@
 #include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
+#include "choice.h"
 #include "chord.h"
 #include "custos.h"
 #include "dir.h"
@@ -85,12 +86,14 @@
 #include "note.h"
 #include "num.h"
 #include "octave.h"
+#include "orig.h"
 #include "page.h"
 #include "pb.h"
 #include "pedal.h"
 #include "pghead.h"
 #include "plica.h"
 #include "rdg.h"
+#include "reg.h"
 #include "reh.h"
 #include "rend.h"
 #include "rest.h"
@@ -22708,6 +22711,8 @@ void HumdrumInput::checkForColorSpine(hum::HumdrumFile &infile)
 void HumdrumInput::storeExpansionLists(Section *section, hum::HTp starting)
 {
     hum::HTp current = starting;
+    std::vector<hum::HTp> expansions;
+
     while (current) {
         if (current->isData()) {
             // only look for expansion lists before first data line
@@ -22725,17 +22730,69 @@ void HumdrumInput::storeExpansionLists(Section *section, hum::HTp starting)
             current = current->getNextToken();
             continue;
         }
-        storeExpansionList(section, current);
+        expansions.push_back(current);
         current = current->getNextToken();
+    }
+
+    if (expansions.empty()) {
+        return;
+    }
+    else if (expansions.size() == 1) {
+        storeExpansionList(section, current);
+    }
+    else {
+        storeExpansionListsInChoice(section, expansions);
     }
 }
 
 //////////////////////////////
 //
-// storeExpansionList --
+// HumdrumInput::storeExpansionListsInChoice --
 //
 
-void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
+void HumdrumInput::storeExpansionListsInChoice(Section *section, std::vector<hum::HTp> &expansions)
+{
+    Choice *choice = new Choice;
+    section->AddChild(choice);
+
+    // Extract the variant labels:
+    std::vector<string> labels(expansions.size());
+    hum::HumRegex hre;
+    for (int i = 0; i < (int)expansions.size(); ++i) {
+        if (hre.search(expansions.at(i), "\\*>([^[]+)[[]")) {
+            labels.at(i) = hre.getMatch(1);
+        }
+    }
+
+    // Store the primary expansion:
+    for (int i = 0; i < (int)labels.size(); ++i) {
+        if (labels.at(i).empty()) {
+            Orig *orig = new Orig;
+            choice->AddChild(orig);
+            storeExpansionList(orig, expansions.at(i));
+            break; // if there is more than one primary,
+                   // the secondary ones will be ignored.
+        }
+    }
+
+    // Store the secondary expansions:
+    for (int i = 0; i < (int)labels.size(); ++i) {
+        if (labels.at(i).empty()) {
+            continue;
+        }
+        Reg *reg = new Reg;
+        choice->AddChild(reg);
+        reg->SetType(labels.at(i));
+        storeExpansionList(reg, expansions.at(i));
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::storeExpansionList --
+//
+
+template <class ELEMENT> void HumdrumInput::storeExpansionList(ELEMENT *parent, hum::HTp etok)
 {
     std::string expansion = *etok;
     std::string variant;
@@ -22786,7 +22843,7 @@ void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
 
     Expansion *exp = new Expansion;
     exp->SetUuid(getLocationId(exp, etok, -1));
-    section->AddChild(exp);
+    parent->AddChild(exp);
     if (!variant.empty()) {
         exp->SetType(variant);
     }
@@ -22989,7 +23046,7 @@ void HumdrumInput::importVerovioOptions(Doc *doc)
 void HumdrumInput::finalizeDocument(Doc *doc)
 {
     doc->ConvertScoreDefMarkupDoc();
-    doc->ExpandExpansions();
+    // doc->ExpandExpansions();
     doc->ConvertToPageBasedDoc();
     doc->ConvertMarkupDoc();
 }
