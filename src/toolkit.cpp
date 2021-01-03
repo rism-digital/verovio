@@ -273,13 +273,19 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
             return musicxmlDefault;
         }
+        if (initial.find("\n!!") != std::string::npos) {
+            return HUMDRUM;
+        }
+        if (initial.find("\n**") != std::string::npos) {
+            return HUMDRUM;
+        }
 
         std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
     }
 
     // Assume that the input is MEI if other input types were not detected.
-    // This means that DARMS cannot be auto detected.
+    // This means that DARMS cannot be auto-detected.
     return MEI;
 }
 
