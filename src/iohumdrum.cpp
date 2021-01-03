@@ -22738,7 +22738,7 @@ void HumdrumInput::storeExpansionLists(Section *section, hum::HTp starting)
         return;
     }
     else if (expansions.size() == 1) {
-        storeExpansionList(section, current);
+        storeExpansionList(section, expansions.at(0));
     }
     else {
         storeExpansionListsInChoice(section, expansions);
