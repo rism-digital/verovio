@@ -71,7 +71,7 @@
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ### Changed
-* Single file buundle for WASM build
+* Single file bundle for WASM build
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15

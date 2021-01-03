@@ -2042,6 +2042,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 hairpin->SetForm(hairpinLog_FORM_dim);
             }
             else {
+                delete hairpin;
                 return;
             }
             // hairpin->SetLform(hairpin->AttLineRendBase::StrToLineform(wedge.node().attribute("line-type").as_string()));
