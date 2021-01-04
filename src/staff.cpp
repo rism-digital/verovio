@@ -96,6 +96,11 @@ void Staff::CloneReset()
     m_drawingStaffDef = NULL;
 }
 
+const ArrayOfObjects *Staff::GetChildren(bool docChildren) const
+{
+    return Object::GetChildren(true);
+}
+
 void Staff::ClearLedgerLines()
 {
     if (m_ledgerLinesAbove) {

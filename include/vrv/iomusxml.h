@@ -325,11 +325,18 @@ private:
      * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
      */
     ///@{
-    ///@}
     std::string GetOrnamentGlyphNumber(int attributes) const;
-
+    ///@}
+    
     /*
-     * @name Methods for converting MusicXML string values to MEI attributes.
+     * @name Helper method for setting @staff attribute for chords
+     */
+    ///@{
+    void SetChordStaff(Layer *layer);
+    ///@}
+    
+    /*
+     * @name Methods for converting MusicXML values to MEI attributes.
      */
     ///@{
     static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
@@ -340,6 +347,7 @@ private:
     static data_DURATION ConvertTypeToDur(const std::string &value);
     static data_HEADSHAPE ConvertNotehead(const std::string &value);
     static data_LINESTARTENDSYMBOL ConvertLineEndSymbol(const std::string &value);
+    static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
     static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
     static data_TEXTRENDITION ConvertEnclosure(const std::string &value);
     static curvature_CURVEDIR InferCurvedir(const pugi::xml_node slurOrTie);

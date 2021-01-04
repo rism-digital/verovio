@@ -128,14 +128,16 @@ void Chord::AddChild(Object *child)
         return;
     }
 
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        m_children.insert(m_children.begin(), child);
+        children->insert(children->begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children->push_back(child);
     }
     Modify();
 }
@@ -438,7 +440,7 @@ void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> 
     }
     const int expectedElementsInUnison
         = CountElementsInUnison(chordElementLocations, otherElementLocations, GetDrawingStemDir());
-    const bool isLowerPosition = (STEMDIRECTION_down == GetDrawingStemDir()
+    const bool isLowerPosition = (STEMDIRECTION_down == GetDrawingStemDir() && (otherElementLocations.size() > 0)
         && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
     int actualElementsInUnison = 0;
     // process each note of the chord separately, storing locations in the set

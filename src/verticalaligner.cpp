@@ -52,15 +52,17 @@ void SystemAligner::Reset()
 
 StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc)
 {
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     // The last one is always the bottomAlignment (unless if not created)
     if (m_bottomAlignment) {
         // remove it temporarily
-        this->m_children.pop_back();
+        children->pop_back();
     }
 
     if (idx < GetChildCount()) {
-        this->m_children.push_back(m_bottomAlignment);
-        return dynamic_cast<StaffAlignment *>(m_children.at(idx));
+        children->push_back(m_bottomAlignment);
+        return dynamic_cast<StaffAlignment *>(GetChildren()->at(idx));
     }
     // check that we are searching for the next one (not a gap)
     assert(idx == GetChildCount());
@@ -72,10 +74,10 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc
     alignment->SetStaff(staff, doc, GetAboveSpacingType(staff));
     alignment->SetParent(this);
     alignment->SetParentSystem(GetSystem());
-    m_children.push_back(alignment);
+    children->push_back(alignment);
 
     if (m_bottomAlignment) {
-        this->m_children.push_back(m_bottomAlignment);
+        children->push_back(m_bottomAlignment);
     }
 
     return alignment;
@@ -85,7 +87,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
     for (int i = 0; i < this->GetChildCount(); ++i) {
-        alignment = vrv_cast<StaffAlignment *>(m_children.at(i));
+        alignment = vrv_cast<StaffAlignment *>(GetChildren()->at(i));
         assert(alignment);
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
@@ -109,7 +111,7 @@ void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *posi
     positioners->clear();
 
     StaffAlignment *alignment = NULL;
-    for (const auto child : m_children) {
+    for (const auto child : *this->GetChildren()) {
         alignment = vrv_cast<StaffAlignment *>(child);
         assert(alignment);
         FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
@@ -123,7 +125,7 @@ void SystemAligner::FindAllIntersectionPoints(
     SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin)
 {
     StaffAlignment *alignment = NULL;
-    for (const auto child : m_children) {
+    for (const auto child : *this->GetChildren()) {
         alignment = vrv_cast<StaffAlignment *>(child);
         assert(alignment);
         alignment->FindAllIntersectionPoints(line, boundingBox, classIds, margin);
@@ -153,7 +155,7 @@ double SystemAligner::GetJustificationSum(const Doc *doc) const
     assert(doc);
 
     double justificationSum = 0.;
-    for (const auto child : m_children) {
+    for (const auto child : *this->GetChildren()) {
         StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(child);
         justificationSum += alignment ? alignment->GetJustificationFactor(doc) : 0.;
     }
@@ -835,7 +837,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     std::vector<FloatingCurvePositioner *> positioners;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
+        if (!positioner->GetObject()->Is({ PHRASE, SLUR, TIE })) continue;
         Slur *slur = vrv_cast<Slur *>(positioner->GetObject());
         assert(slur);
 

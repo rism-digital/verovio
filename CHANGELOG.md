@@ -1,9 +1,16 @@
 # Changelog
 
 ## [unreleased]
+* Support for "old style" multiple measure rests (@rettinghaus)
+* Support for `note@vel` and `dynamics@val` in MusicXML import (@earboxer)
+* Support for `multiRest@loc` (@rettinghaus)
 * Support for `mNum@fontsize` (@rettinghaus)
 * Support for `accidental-mark` in MusicXML import (@rettinghaus)
 * Improved barline rendition (@rettinghaus)
+* Option --footer extended with 'always' value to show footer with --adjust-page-height
+
+## [3.0.2] - 2020-11-17
+* Add missing default footer file
 
 ## [3.0.1] - 2020-10-22
 * Fix bug with mensural notation notes
@@ -64,7 +71,7 @@
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ### Changed
-* Single file buundle for WASM build
+* Single file bundle for WASM build
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15

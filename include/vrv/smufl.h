@@ -161,6 +161,11 @@ enum {
     SMUFL_E4C8_fermataVeryLongAbove = 0xE4C8,
     SMUFL_E4C9_fermataVeryLongBelow = 0xE4C9,
     SMUFL_E4CE_breathMarkComma = 0xE4CE,
+    SMUFL_E4E0_restMaxima = 0xE4E0,
+    SMUFL_E4E1_restLonga = 0xE4E1,
+    SMUFL_E4E2_restDoubleWhole = 0xE4E2,
+    SMUFL_E4E3_restWhole = 0xE4E3,
+    SMUFL_E4E4_restHalf = 0xE4E4,
     SMUFL_E4E5_restQuarter = 0xE4E5,
     SMUFL_E4E6_rest8th = 0xE4E6,
     SMUFL_E4E7_rest16th = 0xE4E7,
@@ -241,9 +246,9 @@ enum {
     SMUFL_E5BC_ornamentPrecompPortDeVoixMordent = 0xE5BC,
     SMUFL_E5BD_ornamentPrecompTrillWithMordent = 0xE5BD,
     SMUFL_E5BE_ornamentPrecompCadence = 0xE5BE,
-    SMUFL_E5BF_ornamentPrecompCadenceWithTurn = 0xE5BF,
+    SMUFL_E5BF_ornamentPrecompCadenceWithTurn  = 0xE5BF,
     SMUFL_E5C0_ornamentPrecompDoubleCadenceLowerPrefix = 0xE5C0,
-    SMUFL_E5C1_ornamentPrecompCadenceUpperPrefix = 0xE5C1,
+    SMUFL_E5C1_ornamentPrecompCadenceUpperPrefix  = 0xE5C1,
     SMUFL_E5C2_ornamentPrecompCadenceUpperPrefixTurn = 0xE5C2,
     SMUFL_E5C3_ornamentPrecompDoubleCadenceUpperPrefix = 0xE5C3,
     SMUFL_E5C4_ornamentPrecompDoubleCadenceUpperPrefixTurn = 0xE5C4,
@@ -358,7 +363,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 333
+#define SMUFL_COUNT 338
 
 } // namespace vrv
 

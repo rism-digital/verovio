@@ -24,6 +24,7 @@
 #include "glyph.h"
 #include "layer.h"
 #include "ligature.h"
+#include "plica.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -55,8 +56,8 @@ Note::Note()
     , AttExtSym()
     , AttGraced()
     , AttMidiVelocity()
-    , AttNoteAnlMensural()
     , AttNoteHeads()
+    , AttNoteVisMensural()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -70,8 +71,8 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_NOTEHEADS);
+    RegisterAttClass(ATT_NOTEVISMENSURAL);
     RegisterAttClass(ATT_MIDIVELOCITY);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
@@ -95,8 +96,8 @@ void Note::Reset()
     ResetCue();
     ResetExtSym();
     ResetGraced();
-    ResetNoteAnlMensural();
     ResetNoteHeads();
+    ResetNoteVisMensural();
     ResetMidiVelocity();
     ResetStems();
     ResetStemsCmn();
@@ -141,6 +142,9 @@ bool Note::IsSupportedChild(Object *child)
     else if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
     }
+    else if (child->Is(PLICA)) {
+        assert(dynamic_cast<Plica *>(child));
+    }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
     }
@@ -168,13 +172,15 @@ void Note::AddChild(Object *child)
 
     child->SetParent(this);
 
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        m_children.insert(m_children.begin(), child);
+        children->insert(children->begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children->push_back(child);
     }
     Modify();
 }

@@ -56,6 +56,11 @@ public:
     virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
 
     /**
+     * Return a const pointer to the children
+     */
+    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const;
+
+    /**
      * Delete all the legder line arrays.
      */
     void ClearLedgerLines();

@@ -11,6 +11,9 @@ import xmldiff.main as main
 
 ns = {'svg': 'http://www.w3.org/2000/svg'}
 
+linkToTestSuiteCat = 'https://www.verovio.org/test-suite.xhtml?cat='
+linkToTestInEditor = 'https://editor.verovio.org/?file=https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/_tests/'
+
 def start_webpage():
     html = etree.Element('html')
     head = etree.Element('head')
@@ -37,6 +40,10 @@ def end_webpage(html, body, htmlOutFile):
             e.preventDefault();
             $(this).tab('show');
         });
+        $("a.before-after").click(function(e){
+            e.preventDefault();
+            $(this).parent().next('.img-before-after').toggle();
+        });
     });
     """
     script = etree.SubElement(body, 'script', attrib={'type': 'text/javascript'})
@@ -58,7 +65,7 @@ if __name__ == "__main__":
     body.append(div)
     text1 = etree.SubElement(div, 'h3')
     text2 = etree.SubElement(div, 'p')
-    ulTablist = etree.SubElement(div, 'ul', attrib={'class': 'nav nav-tabs', 'role': 'tablist'})
+    ulTablist = etree.SubElement(div, 'ul', attrib={'class': 'nav nav-pills', 'role': 'tablist'})
     divTabcontent = etree.SubElement(div, 'div', attrib={'class': 'tab-content'})
 
     totalChanges = 0
@@ -67,7 +74,8 @@ if __name__ == "__main__":
     path_in1 = args.input_dir1
     path_in2 = args.input_dir2
     path_out = args.output_dir
-    for item1 in os.listdir(path_in1):
+    dir1 = sorted(os.listdir(path_in1))
+    for item1 in dir1:
         if not(os.path.isdir(os.path.join(path_in1, item1))): continue
 
         # create the output directory if necessary
@@ -75,11 +83,16 @@ if __name__ == "__main__":
             os.mkdir(os.path.join(path_out, item1))
 
         divTab = etree.SubElement(divTabcontent, 'div', attrib={'id': item1, 'class': 'tab-pane', 'role': 'tabpanel'})
+        etree.SubElement(divTab, 'hr')
+        h4 = etree.SubElement(divTab, 'h4')
+        a = etree.SubElement(h4, 'a', attrib={'href': linkToTestSuiteCat + item1, 'target': '_blank'})
+        a.text = 'Open the test suite for this category'
         table = etree.SubElement(divTab, 'table', attrib={'class': 'table table-bordered'})
 
         nbChanges = 0
         
-        for item2 in os.listdir(os.path.join(path_in1, item1)):
+        dir2 = sorted(os.listdir(os.path.join(path_in1, item1)))
+        for item2 in dir2:
             # skip directories
             if not(os.path.isfile(os.path.join(path_in1, item1, item2))): continue
             # skip hidden files and not SVG files
@@ -93,6 +106,8 @@ if __name__ == "__main__":
             pngFile1 = os.path.join(path_in1, item1, name + '.png')
             pngFile2 = os.path.join(path_in2, item1, name + '.png')
             pngFileOut = os.path.join(path_out, item1, name + '.png')
+            pngFile1Out = os.path.join(path_out, item1, name +  '.after.png')
+            pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
             print(pngFile1, pngFile2)
 
             diffValue = diffimg.diff(pngFile1, pngFile2, delete_diff_file=True)
@@ -101,12 +116,25 @@ if __name__ == "__main__":
                 row = etree.SubElement(table, 'tr')
                 col = etree.SubElement(row, 'td')
                 p = etree.SubElement(col, 'p')
-                p.text = name + ' (diff:' + str(diffValue) + ')'
-                img = etree.SubElement(col, 'img', attrib={'src': item1 + '/' + name + '.png', 'class': 'img-responsive'})
+                p.text = name + ' (diff:' + str(diffValue) + ') - '
+                # link to Verovio editor
+                a = etree.SubElement(p, 'a', attrib={'href': linkToTestInEditor + item1 + '/' + name + '.mei', 'target': "_blank"})
+                a.text = 'Open this test in the Verovio Editor'
+                etree.SubElement(col, 'img', attrib={'src': item1 + '/' + name + '.png', 'class': 'img-responsive'})
+                # link to show before - after
+                p = etree.SubElement(col, 'p')
+                a = etree.SubElement(p, 'a', attrib={'href': '#', 'class': "before-after"})
+                a.text = 'Show before / after'
+                divBeforeAfter = etree.SubElement(col, 'div', attrib={'class': 'img-before-after', 'style': 'display: none'})
+                etree.SubElement(divBeforeAfter, 'img', attrib={'src': item1 + '/' + name + '.before.png', 'class': 'img-responsive'})
+                etree.SubElement(divBeforeAfter, 'img', attrib={'src': item1 + '/' + name + '.after.png', 'class': 'img-responsive'})
+
                 nbChanges += 1
 
                 im1 = Image.open(pngFile1)
+                im1.save(pngFile1Out)
                 im2 = Image.open(pngFile2)
+                im2.save(pngFile2Out)
                 difference = ImageChops.difference(im1, im2)
 
                 diffIm1 = ImageOps.fit(im2, difference.size)

@@ -40,14 +40,16 @@ if __name__ == "__main__":
 
     path1 = args.test_suite_dir
     path2 = args.output_dir
-    for item1 in os.listdir(path1):
+    dir1 = sorted(os.listdir(path1))
+    for item1 in dir1:
         if not(os.path.isdir(os.path.join(path1, item1))): continue
 
         # create the output directory if necessary
         if not(os.path.isdir(os.path.join(path2, item1))):
             os.mkdir(os.path.join(path2, item1))
         
-        for item2 in os.listdir(os.path.join(path1, item1)):
+        dir2 = sorted(os.listdir(os.path.join(path1, item1)))
+        for item2 in dir2:
             # skip directories
             if not(os.path.isfile(os.path.join(path1, item1, item2))): continue
             # skip hidden files

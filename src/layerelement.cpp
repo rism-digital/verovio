@@ -648,6 +648,7 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
 int LayerElement::CountElementsInUnison(
     const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
 {
+    if (firstChord.empty() || secondChord.empty()) return 0;
     // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
     // of how they are encoded in the MEI file
     std::set<int> difference;
@@ -1200,9 +1201,9 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     assert(params);
 
     // ignore elements that are not in the beam or are direct children of the beam
-    if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetParent() == params->m_beam) && !IsGraceNote()))
+    if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam) && !IsGraceNote()))
         return FUNCTOR_SIBLINGS;
-    if (Is(GRACEGRP)) return FUNCTOR_CONTINUE;
+    if (Is({ GRACEGRP, TUPLET, TUPLET_NUM, TUPLET_BRACKET })) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
@@ -1307,6 +1308,32 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams)
+{
+    AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);
+    assert(params);
+
+    if (!Is({ ARTIC, ARTIC_PART, ACCID, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !HasSelfBB()) return FUNCTOR_CONTINUE;
+
+    if (params->m_ignoreCrossStaff && Is({ CHORD, NOTE, REST }) && m_crossStaff) return FUNCTOR_SIBLINGS;
+
+    if (!params->m_tupletNum->HorizontalSelfOverlap(this)
+        && !params->m_tupletNum->VerticalSelfOverlap(this, params->m_verticalMargin)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (params->m_drawingNumPos == STAFFREL_basic_above) {
+        int dist = GetSelfTop();
+        if (params->m_yRel < dist) params->m_yRel = dist;
+    }
+    else {
+        int dist = GetSelfBottom();
+        if (params->m_yRel > dist) params->m_yRel = dist;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int LayerElement::AdjustXPos(FunctorParams *functorParams)
@@ -1510,15 +1537,42 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    DurationInterface *durElement = this->GetDurationInterface();
-    if (!durElement) return FUNCTOR_CONTINUE;
-
-    // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
-    // in the the children of one element. We do not consider this now because it seems over the top
-    // We would need to look at the @n attribute and to have a stack to handle this properly
-    if (durElement->HasStaff()) {
-        params->m_currentCrossStaff = NULL;
-        params->m_currentCrossLayer = NULL;
+    DurationInterface *durInterface = this->GetDurationInterface();
+    if (durInterface) {
+        // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
+        // in the the children of one element. We do not consider this now because it seems over the top
+        // We would need to look at the @n attribute and to have a stack to handle this properly
+        if (durInterface->HasStaff()) {
+            params->m_currentCrossStaff = NULL;
+            params->m_currentCrossLayer = NULL;
+        }
+    }
+    else {
+        // For other elements (e.g., beams, tuplets) check if all their children duration element are cross-staff
+        // If yes, make them cross-staff themselves.
+        ListOfObjects durations;
+        InterfaceComparison hasInterface(INTERFACE_DURATION);
+        this->FindAllDescendantByComparison(&durations, &hasInterface);
+        Staff *crossStaff = NULL;
+        Layer *crossLayer = NULL;
+        for (auto object : durations) {
+            LayerElement *durElement = vrv_cast<LayerElement *>(object);
+            assert(durElement);
+            // The duration element is not cross-staff, of the cross-staff is not that same staff (very rare)
+            if (!durElement->m_crossStaff || (crossStaff && (durElement->m_crossStaff != crossStaff))) {
+                crossStaff = NULL;
+                // We can stop here
+                break;
+            }
+            else {
+                crossStaff = durElement->m_crossStaff;
+                crossLayer = durElement->m_crossLayer;
+            }
+        }
+        if (crossStaff) {
+            this->m_crossStaff = crossStaff;
+            this->m_crossLayer = crossLayer;
+        }
     }
 
     return FUNCTOR_CONTINUE;

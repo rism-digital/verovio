@@ -594,8 +594,11 @@ bool Toolkit::LoadData(const std::string &data)
         return false;
     }
 
+    bool adjustPageHeight = m_options->m_adjustPageHeight.GetValue();
+    int footerOption = m_options->m_footer.GetValue();
+    // With adjusted page height, show the footer if explicitly set (i.e., not with "auto")
     // generate the page header and footer if necessary
-    if (m_options->m_footer.GetValue() == FOOTER_auto) {
+    if ((!adjustPageHeight && (footerOption == FOOTER_auto)) || (footerOption == FOOTER_always)) {
         m_doc.GenerateFooter();
     }
     if (m_options->m_header.GetValue() == HEADER_auto) {
@@ -949,6 +952,20 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
                 }
                 opt->SetValueArray(queries);
+            }
+            else if (iter->first == "condenseEncoded") {
+                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("condense");
+                assert(opt);
+                if (json.has<jsonxx::Number>("condenseEncoded")) {
+                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
+                        opt->SetValue("encoded");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
             }
             else if (iter->first == "ignoreLayout") {
                 LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");

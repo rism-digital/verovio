@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "functorparams.h"
+#include "measure.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -151,6 +152,41 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
         return;
     }
     rightLink->SetDrawingGrpId(grpId);
+}
+
+std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX)
+{
+    Measure *startMeasure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
+    Measure *endMeasure = vrv_cast<Measure *>(GetEnd()->GetFirstAncestor(MEASURE));
+
+    if (!startMeasure || !endMeasure) return { 0, 0 };
+
+    // Calculate adjustment that needs to be made for hairpin not to touch the left barline. We take doubleUnit for the
+    // default margin to consider them overlapping, which is adjusted in case we have wider barline on the left
+    int leftAdjustment = 0;
+    BarLine *leftBarline = startMeasure->GetLeftBarLine();
+    if (leftBarline) {
+        int margin = doubleUnit;
+        const int leftBarlineX = leftBarline->GetDrawingX();
+        const int diff = leftX - leftBarlineX;
+        if (leftBarline->GetForm() == BARRENDITION_rptstart) margin *= 1.5;
+        if (diff < margin) leftAdjustment = margin - diff;
+    }
+    // Same calculation is done for the right barline, with it having two barline forms that we need to consider
+    // as opposed to only one for the left barline
+    int rightAdjustment = 0;
+    BarLine *rightBarline = endMeasure->GetRightBarLine();
+    if (rightBarline) {
+        int margin = doubleUnit;
+        const int rightBarlineX = rightBarline->GetDrawingX();
+        const int diff = rightBarlineX - rightX;
+        if ((rightBarline->GetForm() == BARRENDITION_rptend) || (rightBarline->GetForm() == BARRENDITION_end)) {
+            margin *= 1.5;
+        }
+        if (diff < margin) rightAdjustment = margin - diff;
+    }
+
+    return { leftAdjustment, rightAdjustment };
 }
 
 //----------------------------------------------------------------------------

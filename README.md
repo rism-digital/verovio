@@ -74,6 +74,7 @@ Example resources using verovio
 | [MoVI](https://dme.mozarteum.at/movi/en) | repertory | The digital Mozart digital score VIewer at the [Mozarteum](https://mozarteum.at) |
 | [Tasso in Music Project](https://www.tassomusic.org/work/?id=Trm0047m) | repertory | Musical settings of the poetry of [Torquato Tasso](https://en.wikipedia.org/wiki/Torquato_Tasso)
 | [Measuring Polyphony](https://measuringpolyphony.org/display.html?/assets/mensural/325_MENSURAL.mei) | repertory | Late medieval music in black mensural and modern notations |
+| [Probstücke Digital](http://probstuecke-digital.de) | repertory | open and critical digital edition of Mattheson's test pieces |
 | [370 Bach Chorales](https://chorales.sapp.org) | repertory | Online edition of Bach chorales, including an interactive [typesetter page](https://chorales.sapp.org/typesetter) that allows for creating musical examples for online display or use in papers. |
 | [Humdrum Notation Plugin](https://plugin.humdrum.org) | tool | Javascript interface to verovio for displaying multiple musical examples on a webpage |
 | [Music Sheet Viewer](http://www.partitionnumerique.com/music-sheet-viewer-wordpress-plugin) | tool | WordPress plugin for displaying graphical music from MEI data | 

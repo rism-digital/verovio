@@ -1009,7 +1009,7 @@ void AttCoordinated::ResetCoordinated()
     m_uly = 0;
     m_lrx = 0;
     m_lry = 0;
-    m_rotate = 0;
+    m_rotate = 0.0;
 }
 
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
@@ -1091,10 +1091,10 @@ bool AttCoordinated::HasLry() const
 
 bool AttCoordinated::HasRotate() const
 {
-    return (m_rotate != 0);
+    return (m_rotate != 0.0);
 }
 
-/* include <attlry> */
+/* include <attrotate> */
 
 //----------------------------------------------------------------------------
 // AttCue
@@ -6242,6 +6242,7 @@ void AttStems::ResetStems()
     m_stemLen = -1;
     m_stemMod = STEMMODIFIER_NONE;
     m_stemPos = STEMPOSITION_NONE;
+    m_stemSameas = "";
     m_stemVisible = BOOLEAN_NONE;
     m_stemX = 0.0;
     m_stemY = 0.0;
@@ -6268,6 +6269,11 @@ bool AttStems::ReadStems(pugi::xml_node element)
     if (element.attribute("stem.pos")) {
         this->SetStemPos(StrToStemposition(element.attribute("stem.pos").value()));
         element.remove_attribute("stem.pos");
+        hasAttribute = true;
+    }
+    if (element.attribute("stem.sameas")) {
+        this->SetStemSameas(StrToStr(element.attribute("stem.sameas").value()));
+        element.remove_attribute("stem.sameas");
         hasAttribute = true;
     }
     if (element.attribute("stem.visible")) {
@@ -6307,6 +6313,10 @@ bool AttStems::WriteStems(pugi::xml_node element)
         element.append_attribute("stem.pos") = StempositionToStr(this->GetStemPos()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasStemSameas()) {
+        element.append_attribute("stem.sameas") = StrToStr(this->GetStemSameas()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasStemVisible()) {
         element.append_attribute("stem.visible") = BooleanToStr(this->GetStemVisible()).c_str();
         wroteAttribute = true;
@@ -6340,6 +6350,11 @@ bool AttStems::HasStemMod() const
 bool AttStems::HasStemPos() const
 {
     return (m_stemPos != STEMPOSITION_NONE);
+}
+
+bool AttStems::HasStemSameas() const
+{
+    return (m_stemSameas != "");
 }
 
 bool AttStems::HasStemVisible() const
@@ -8129,6 +8144,10 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetLry(att->StrToInt(attrValue));
             return true;
         }
+        if (attrType == "rotate") {
+            att->SetRotate(att->StrToDbl(attrValue));
+            return true;
+        }
     }
     if (element->HasAttClass(ATT_CUE)) {
         AttCue *att = dynamic_cast<AttCue *>(element);
@@ -9145,6 +9164,10 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetStemPos(att->StrToStemposition(attrValue));
             return true;
         }
+        if (attrType == "stem.sameas") {
+            att->SetStemSameas(att->StrToStr(attrValue));
+            return true;
+        }
         if (attrType == "stem.visible") {
             att->SetStemVisible(att->StrToBoolean(attrValue));
             return true;
@@ -9629,6 +9652,9 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasLry()) {
             attributes->push_back(std::make_pair("lry", att->IntToStr(att->GetLry())));
+        }
+        if (att->HasRotate()) {
+            attributes->push_back(std::make_pair("rotate", att->DblToStr(att->GetRotate())));
         }
     }
     if (element->HasAttClass(ATT_CUE)) {
@@ -10479,6 +10505,9 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasStemPos()) {
             attributes->push_back(std::make_pair("stem.pos", att->StempositionToStr(att->GetStemPos())));
+        }
+        if (att->HasStemSameas()) {
+            attributes->push_back(std::make_pair("stem.sameas", att->StrToStr(att->GetStemSameas())));
         }
         if (att->HasStemVisible()) {
             attributes->push_back(std::make_pair("stem.visible", att->BooleanToStr(att->GetStemVisible())));
