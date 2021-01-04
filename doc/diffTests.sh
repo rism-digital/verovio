@@ -44,7 +44,7 @@ if [ ! -z $build_dev ]; then
     cd python
     make -j8
 
-    $PYTHON ../../doc/test-suite.py "$testdir" $indir1
+    $PYTHON ../../doc/test-suite.py "$testdir" "$indir1"
     ../../doc/test-suite-to-png.sh $indir1
 
     cd $home
@@ -55,9 +55,9 @@ cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON
 cd python
 make -j8
 
-$PYTHON ../../doc/test-suite.py "$testdir" $indir2
+$PYTHON ../../doc/test-suite.py "$testdir" "$indir2"
 ../../doc/test-suite-to-png.sh $indir2
 
-$PYTHON ../../doc/test-suite-diff.py $indir2 $indir1 $outdir
+$PYTHON ../../doc/test-suite-diff.py "$indir2" "$indir1" "$outdir"
 
 open $outdir/index.html
