@@ -90,7 +90,6 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     OUTPUT_VARIABLE GIT_COMMIT
 )
 
