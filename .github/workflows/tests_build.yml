@@ -1,4 +1,4 @@
-name: Verovio CI Build
+name: Test Suite Evaluation
 
 on:
   pull_request:
@@ -25,7 +25,6 @@ env:
   PR_DIR: pr-${{ github.event.pull_request.head.sha }}
   DEV_DIR: dev-dir
   TEMP_DIR: temp-dir
-  OUTPUT_DIR: output-dir
 
 jobs:
   ###################################################
@@ -36,6 +35,15 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - uses: FranzDiebold/github-env-vars-action@v1.2.1
+      - name: Get Short SHA
+        run: |
+          echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
+          
+      - name: Add additional environment variables for creating URL slugs
+        run: |
+          echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
+
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v2
         with:
@@ -51,15 +59,24 @@ jobs:
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}
           mkdir -p ${{ env.TEMP_DIR }}/${{ env.PR_DIR }}
           mkdir -p ${{ env.OUTPUT_DIR }}
-          sudo apt-get install librsvg2-bin
+          ls -alh
+          ls -alh ${{ env.OUTPUT_DIR }}
+          sudo apt-get install librsvg2-bin openresolv wireguard
+          sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
           rsvg-convert --version
-          python3 -m pip install diffimg lxml xmldiff
+          python3 -m pip install diffimg lxml xmldiff   
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
         with:
           ref: develop
           path: ${{ env.DEV_DIR }}/
+                    
+      - name: Install the VerovioText font
+        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/
+        run: |
+          sudo cp ./fonts/VerovioText-1.0.ttf /usr/local/share/fonts
+          sudo fc-cache -f -v
 
       - name: Build Python toolkit and run the tests for the dev branch
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings
@@ -91,14 +108,8 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
-      # Deploy to remote server (TODO)
-      - name: Deploy to verovio.org
-        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        run: |
-          echo "Deploying"
-
       - name: Add comment with link
-        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        #if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -107,5 +118,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Test suite regression test available at https://test-suite.verovio.org/${{ github.event.pull_request.head.sha }}'
+              body: 'Test suite regression test available at https://test-suite.verovio.org/${{ env.OUTPUT_DIR }}'
             })
