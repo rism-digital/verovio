@@ -3148,8 +3148,9 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
 
 void HumdrumInput::setGroupSymbol(StaffGrp *sg, staffGroupingSym_SYMBOL symbol)
 {
-    // Set as an attribute on <StaffGrp> (for MEI export):
-    sg->SetSymbol(symbol);
+    // Do not set the symbol on the StaffGrp, since it will be taken from
+    // the GrpSym child element and inserted into StaffGrp when writing MEI.
+    // sg->SetSymbol(symbol);
 
     // Then add as a child element of <StaffGrp> which verovio uses to
     // display group symbol in SVG export:
