@@ -64,6 +64,7 @@ if __name__ == "__main__":
             # filenames (input MEI and output SVG)
             meiFile = os.path.join(path1, item1, item2)
             name, ext = os.path.splitext(item2)
+            svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
 
             # parse the MEI file
@@ -78,11 +79,12 @@ if __name__ == "__main__":
 
             tk.setOptions(json.dumps(options))
             tk.loadFile(meiFile)
-            svgStream = tk.renderToSVG(1)
-            svgStream = svgStream.replace(
+            svgString = tk.renderToSVG(1)
+            svgString = svgString.replace(
                 "overflow=\"inherit\"", "overflow=\"visible\"")
             try:
-                cairosvg.svg2png(bytestring=svgStream,
+                ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
+                cairosvg.svg2png(bytestring=svgString,
                                  scale=2, write_to=pngFile)
             except:
                 continue
