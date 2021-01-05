@@ -536,10 +536,12 @@ int Staff::CalcStem(FunctorParams *)
     if (layers.size() < 2) {
         Layer *layer = vrv_cast<Layer *>(layers.front());
         assert(layer);
-        if (layer->HasCrossStaffFromBelow())
+        if (layer->HasCrossStaffFromBelow()) {
             layer->SetDrawingStemDir(STEMDIRECTION_up);
-        else if (layer->HasCrossStaffFromAbove())
+        }
+        else if (layer->HasCrossStaffFromAbove()) {
             layer->SetDrawingStemDir(STEMDIRECTION_down);
+        }
         return FUNCTOR_CONTINUE;
     }
 
