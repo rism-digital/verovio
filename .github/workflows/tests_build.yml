@@ -61,10 +61,9 @@ jobs:
           mkdir -p ${{ env.OUTPUT_DIR }}
           ls -alh
           ls -alh ${{ env.OUTPUT_DIR }}
-          sudo apt-get install librsvg2-bin openresolv wireguard
+          sudo apt-get install openresolv wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
-          rsvg-convert --version
-          python3 -m pip install diffimg lxml xmldiff   
+          python3 -m pip install diffimg lxml xmldiff cairosvg
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
