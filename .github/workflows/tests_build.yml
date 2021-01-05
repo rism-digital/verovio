@@ -1,7 +1,7 @@
 name: Test Suite Evaluation
 
 on:
-  pull_request_target:
+  pull_request:
     branches: develop
   # TODO: run this task only on PR in production; use push event for testing
   #push:
@@ -64,12 +64,7 @@ jobs:
           sudo apt-get install librsvg2-bin openresolv wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
           rsvg-convert --version
-          python3 -m pip install diffimg lxml xmldiff
-
-      - name: Set up Wireguard VPN
-        working-directory: ${{ github.workspace }}
-        run: |
-          sudo wg-quick up ./wg0.conf     
+          python3 -m pip install diffimg lxml xmldiff   
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
@@ -112,33 +107,33 @@ jobs:
         run: |
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
- 
-      # Deploy to remote server. Uses the REF_NAME_SLUG to ensure that it maps to any existing directories on the deployment server.
-      - name: Deploy with rsync
-        uses: burnett01/rsync-deployments@4.1
-        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        with:
-          switches: -avzr --exclude="uploads" --exclude="fileadmin"
-          path: ${{ github.event.pull_request.number }}
-          remote_path: ${{ secrets.TEST_SUITE_DEPLOY_PATH }}
-          remote_host: ${{ secrets.TEST_SUITE_DEPLOY_SERVER }}
-          remote_user: ${{ secrets.TEST_SUITE_DEPLOY_USER }}
-          remote_key: ${{ secrets.TEST_SUITE_DEPLOY_key }}
 
-      - name: Disconnect VPN
-        working-directory: ${{ github.workspace }}
+      - name: "Upload results"
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-suite-diff
+          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+
+      - name: Check file existence
+        id: check_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
+
+      - id: get-comment-body
+        if: steps.check_files.outputs.files_exists == 'true'
         run: |
-          sudo wg-quick down ./wg0.conf
+          link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          body="$link$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}" 
+          echo ::set-output name=body::$body
 
       - name: Add comment with link
-        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        uses: actions/github-script@v3
+        if: steps.check_files.outputs.files_exists == 'true'
+        uses: actions-ecosystem/action-create-comment@v1
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Test suite regression test available at https://test-suite.verovio.org/${{ env.OUTPUT_DIR }}'
-            })
+          github_token: ${{ secrets.github_token }}
+          body: |
+            ${{ steps.get-comment-body.outputs.body }}
