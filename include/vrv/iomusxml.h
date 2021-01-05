@@ -202,6 +202,11 @@ private:
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     ///@}
 
+     /*
+     * Add clef changes to all layers of a given measure, staff, and time stamp
+     */
+    void AddClef(Section *section, Measure *measure, Staff *staff, const std::string &measureNum);
+
     /*
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
@@ -385,6 +390,9 @@ private:
     std::map<Layer *, int> m_layerEndTimes;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
+    /* To remember current layer to properly handle layers/staves/cross-staff elements */
+    Layer *m_currentLayer = NULL;
+    bool m_isLayerInitialized = false;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */
