@@ -90,7 +90,6 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     OUTPUT_VARIABLE GIT_COMMIT
 )
 
@@ -180,7 +179,7 @@ elseif (BUILD_AS_PYTHON)
     #set(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
     #set(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
     #include_directories(${PYTHON_INCLUDE_DIR})
-    #swig_add_module(verovio_module_custom python ../bindings/python/verovio.i)
+    #swig_add_library(verovio_module_custom LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
     #swig_link_libraries(verovio_module_custom verovio ${PYTHON_LIBRARY})
 
     ### For building for found version of Python (comment when specific version is set)
@@ -188,7 +187,7 @@ elseif (BUILD_AS_PYTHON)
     include_directories(${PYTHON_INCLUDE_PATH})
     message(STATUS "***** Building for Python ${PYTHONLIBS_VERSION_STRING} *****")
     string(REPLACE "." "_" OUTPUT_VERSION_STRING ${PYTHONLIBS_VERSION_STRING})
-    swig_add_module(verovio_module_${OUTPUT_VERSION_STRING} python ../bindings/python/verovio.i)
+    swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
     swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${PYTHON_LIBRARIES})
 
     add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
