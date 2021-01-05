@@ -759,6 +759,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (parentChord1) {
         durElement = parentChord1;
     }
+    if (durElement && durElement->m_crossStaff) layer1 = durElement->m_crossLayer;
 
     /************** x positions **************/
 

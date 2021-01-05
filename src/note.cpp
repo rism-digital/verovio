@@ -799,7 +799,10 @@ int Note::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (this->m_crossStaff) {
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
+    }
 
     // Cache the in params to avoid further lookup
     params->m_staff = staff;
