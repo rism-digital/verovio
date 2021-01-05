@@ -35,6 +35,9 @@ class Fb;
 class Gliss;
 class Hairpin;
 class Harm;
+class InstrDef;
+class Label;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
@@ -382,6 +385,10 @@ private:
     /* meter signature */
     int m_meterCount = 4;
     int m_meterUnit = 4;
+    /* part information */
+    Label *m_label = NULL;
+    LabelAbbr *m_labelAbbr = NULL;
+    InstrDef *m_instrdef = NULL;
     /* LastElementID */
     std::string m_ID;
     /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
