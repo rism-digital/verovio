@@ -920,6 +920,7 @@ int Note::CalcDots(FunctorParams *functorParams)
 
     // The shift to the left when a stem flag requires it
     int flagShift = 0;
+    int radius = this->GetDrawingRadius(params->m_doc);
 
     if (chord && (chord->GetDots() > 0)) {
         dots = params->m_chordDots;
@@ -934,12 +935,14 @@ int Note::CalcDots(FunctorParams *functorParams)
                 flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             }
         }
+
+        int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
+        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
     }
-    else if (this->GetDots() > 0) {
+    if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
         dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
-        params->m_chordDrawingX = this->GetDrawingX();
 
         std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
         int loc = this->GetDrawingLoc();
@@ -955,14 +958,10 @@ int Note::CalcDots(FunctorParams *functorParams)
             // HARDCODED
             flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
         }
-    }
-    else {
-        return FUNCTOR_SIBLINGS;
-    }
 
-    int radius = this->GetDrawingRadius(params->m_doc);
-    int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
-    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
+        int xRel = 2 * radius + flagShift;
+        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
+    }
 
     return FUNCTOR_SIBLINGS;
 }
