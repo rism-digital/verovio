@@ -515,11 +515,11 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
-    int slashFactor = (this->GetStemMod() < 6) ? this->GetStemMod() - 4 : 0;
+    int slashFactor = (this->GetStemMod() < 8) ? this->GetStemMod() - 1 : 0;
 
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
-        flag = vrv_cast<Flag *>(this->FindDescendantByType(FLAG));
+        flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
         if (!this->HasStemLen() && this->HasStemMod()) slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
@@ -528,13 +528,15 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Adjust basic stem length to number of slashes
     int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
         + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-    if (abs(baseStem) < ((slashFactor + 4) * tremStep)) {
+    const int minStem = slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3;
+    while (abs(baseStem) < minStem) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - slashFactor * tremStep);
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
         }
         else {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + slashFactor * tremStep);
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
         }
+        --slashFactor;
     }
 
     // SMUFL flags cover some additional stem length from the 32th only
