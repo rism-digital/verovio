@@ -754,12 +754,13 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (note1) {
         durElement = note1;
         layer1 = dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
+        if (note1->m_crossStaff) layer1 = note1->m_crossLayer;
         parentChord1 = note1->IsChordTone();
     }
     if (parentChord1) {
         durElement = parentChord1;
+        if (parentChord1->m_crossStaff) layer1 = parentChord1->m_crossLayer;
     }
-    if (durElement && durElement->m_crossStaff) layer1 = durElement->m_crossLayer;
 
     /************** x positions **************/
 
@@ -847,7 +848,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
-    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(durElement)) != STEMDIRECTION_NONE)) {
+    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(note1)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
