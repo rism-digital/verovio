@@ -82,9 +82,5 @@ if __name__ == "__main__":
             svgString = tk.renderToSVG(1)
             svgString = svgString.replace(
                 "overflow=\"inherit\"", "overflow=\"visible\"")
-            try:
-                ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
-                cairosvg.svg2png(bytestring=svgString,
-                                 scale=2, write_to=pngFile)
-            except:
-                continue
+            ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
+            cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
