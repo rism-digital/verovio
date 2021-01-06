@@ -195,7 +195,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     Object *graphic = NULL;
     char spanningType = SPANNING_START_END;
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
+    // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         // we use the start measure
         measure = interface->GetStartMeasure();
@@ -244,7 +244,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 
     // Overwrite the spanningType for open ended control events
-    // We can identify them becaseu they end on a right barline attribute
+    // We can identify them because they end on a right barline attribute
     if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
         spanningType = SPANNING_START;
     }
