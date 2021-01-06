@@ -1031,7 +1031,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!this->IsChordTone() && !this->IsMensuralDur()) {
         if (!currentStem) {
