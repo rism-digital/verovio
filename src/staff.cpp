@@ -528,8 +528,20 @@ int Staff::CalcStem(FunctorParams *)
     ListOfObjects layers;
     this->FindAllDescendantByComparison(&layers, &isLayer);
 
-    // Not more than one layer - drawing stem dir remains unset
+    if (layers.empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Not more than one layer - drawing stem dir remains unset unless there is cross-staff content
     if (layers.size() < 2) {
+        Layer *layer = vrv_cast<Layer *>(layers.front());
+        assert(layer);
+        if (layer->HasCrossStaffFromBelow()) {
+            layer->SetDrawingStemDir(STEMDIRECTION_up);
+        }
+        else if (layer->HasCrossStaffFromAbove()) {
+            layer->SetDrawingStemDir(STEMDIRECTION_down);
+        }
         return FUNCTOR_CONTINUE;
     }
 

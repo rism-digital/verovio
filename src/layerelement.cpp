@@ -1512,16 +1512,24 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // When we will have allowed @layer in <note>, we will have to do:
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
     AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
+    bool direction = (parentStaff->GetN() < m_crossStaff->GetN()) ? FORWARD : BACKWARD;
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
-        // Just try to pick the first one...
-        m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByType(LAYER));
+        // Just try to pick the first one... (i.e., last one when crossing above)
+        m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByType(LAYER, UNSPECIFIED, direction));
     }
     if (!m_crossLayer) {
         // Nothing we can do
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
             durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
+    }
+
+    if (direction == FORWARD) {
+        m_crossLayer->SetCrossStaffFromAbove(true);
+    }
+    else {
+        m_crossLayer->SetCrossStaffFromBelow(true);
     }
 
     params->m_currentCrossStaff = m_crossStaff;

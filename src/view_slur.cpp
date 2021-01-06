@@ -162,6 +162,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         layer = dynamic_cast<Layer *>(end->GetFirstAncestor(LAYER));
         layerElement = end;
     }
+    if (layerElement->m_crossStaff) layer = layerElement->m_crossLayer;
     assert(layer);
 
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
