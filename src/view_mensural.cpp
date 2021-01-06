@@ -55,6 +55,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     int radius = note->GetDrawingRadius(m_doc);
     int staffY = staff->GetDrawingY();
     int verticalCenter = 0;
+    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     /************** Stem/notehead direction: **************/
 
@@ -69,10 +70,12 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         stemDir = layerStemDir;
     }
     else {
-        if (drawingDur < DUR_1)
+        if (drawingDur < DUR_1) {
             stemDir = STEMDIRECTION_down;
-        else
+        }
+        else {
             stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
     }
 
     /************** Noteheads: **************/
@@ -91,7 +94,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
-        if (((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE))
+        if (((drawingDur > DUR_1) || ((note->GetStemDir() != STEMDIRECTION_NONE) && mensural_black))
             && note->GetStemVisible() != BOOLEAN_false) {
             DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
