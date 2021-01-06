@@ -205,7 +205,7 @@ private:
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     ///@}
 
-     /*
+    /*
      * Add clef changes to all layers of a given measure, staff, and time stamp
      */
     void AddClef(Section *section, Measure *measure, Staff *staff, const std::string &measureNum);
@@ -335,14 +335,14 @@ private:
     ///@{
     std::string GetOrnamentGlyphNumber(int attributes) const;
     ///@}
-    
+
     /*
      * @name Helper method for setting @staff attribute for chords
      */
     ///@{
     void SetChordStaff(Layer *layer);
     ///@}
-    
+
     /*
      * @name Methods for converting MusicXML values to MEI attributes.
      */
