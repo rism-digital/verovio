@@ -469,7 +469,7 @@ public:
  **/
 class AdjustTupletNumOverlapParams : public FunctorParams {
 public:
-    AdjustTupletNumOverlapParams(TupletNum* tupletNum)
+    AdjustTupletNumOverlapParams(TupletNum *tupletNum)
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;

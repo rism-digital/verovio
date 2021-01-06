@@ -70,6 +70,7 @@ if __name__ == "__main__":
 
     totalChanges = 0
     categoryChanges = 0
+    log = []
 
     path_in1 = args.input_dir1
     path_in2 = args.input_dir2
@@ -176,6 +177,7 @@ if __name__ == "__main__":
             span = etree.SubElement(link, 'span', attrib={'class': 'badge'})
             span.text = str(nbChanges)
 
+            log.append("* {}: {}".format(item1, nbChanges))
             categoryChanges += 1
             totalChanges += nbChanges
     
@@ -184,3 +186,10 @@ if __name__ == "__main__":
 
     htmlFileOut = os.path.join(path_out, 'index.html')
     end_webpage(html, body, htmlFileOut)
+
+    if (totalChanges > 0):
+        logFileOut = os.path.join(path_out, 'log.md')
+        with open(logFileOut, 'w') as f:
+            f.write("\n%s\n" % text2.text)
+            for item in log:
+                f.write("%s\n" % item)

@@ -75,6 +75,8 @@ void Layer::Reset()
     ResetStaffDefObjects();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
+    m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
 }
 
 void Layer::CloneReset()
@@ -93,6 +95,8 @@ void Layer::CloneReset()
     m_cautionStaffDefMeterSig = NULL;
 
     m_drawingStemDir = STEMDIRECTION_NONE;
+    m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
 }
 
 void Layer::ResetStaffDefObjects()
@@ -233,6 +237,20 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
         return STEMDIRECTION_NONE;
     }
     else {
+        // If the element is cross-staff, then do not use the layer m_drawingStemDir
+        if (element->m_crossStaff) {
+            // Instead look if the cross-staff is from below or above
+            if (this->m_crossStaffFromBelow) {
+                return STEMDIRECTION_down;
+            }
+            else if (this->m_crossStaffFromAbove) {
+                return STEMDIRECTION_up;
+            }
+            else {
+                // This should actually not happen
+                return STEMDIRECTION_NONE;
+            }
+        }
         return m_drawingStemDir;
     }
 }
@@ -636,6 +654,13 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     params->m_currentMensur = GetCurrentMensur();
     params->m_currentMeterSig = GetCurrentMeterSig();
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::ResetDrawing(FunctorParams *functorParams)
+{
+    this->m_crossStaffFromBelow = false;
+    this->m_crossStaffFromAbove = false;
     return FUNCTOR_CONTINUE;
 }
 
