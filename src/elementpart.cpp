@@ -526,16 +526,18 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     // Adjust basic stem length to number of slashes
-    int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
-        + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-    while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
+    if (slashFactor && !this->HasStemLen()) {
+        const int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
+            + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
+        while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
+            if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+                this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
+            }
+            else {
+                this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
+            }
+            --slashFactor;
         }
-        else {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
-        }
-        --slashFactor;
     }
 
     // SMUFL flags cover some additional stem length from the 32th only
