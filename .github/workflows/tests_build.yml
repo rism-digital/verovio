@@ -61,10 +61,9 @@ jobs:
           mkdir -p ${{ env.OUTPUT_DIR }}
           ls -alh
           ls -alh ${{ env.OUTPUT_DIR }}
-          sudo apt-get install librsvg2-bin openresolv wireguard
+          sudo apt-get install openresolv wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
-          rsvg-convert --version
-          python3 -m pip install diffimg lxml xmldiff   
+          python3 -m pip install diffimg lxml xmldiff cairosvg
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
@@ -81,11 +80,10 @@ jobs:
       - name: Build Python toolkit and run the tests for the dev branch
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings
         run: |
-          cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
+          cmake ../cmake -DNO_HUMDRUM_SUPPORT=ON -DNO_ABC_SUPPORT=ON -DNO_PAE_SUPPORT=ON -DBUILD_AS_PYTHON=ON -B python
           cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
-          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
 
       - name: Checkout the PR
         uses: actions/checkout@v2
@@ -96,11 +94,10 @@ jobs:
       - name: Build Python toolkit and run the tests for the PR
         working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}/bindings
         run: |
-          cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
+          cmake ../cmake -DNO_HUMDRUM_SUPPORT=ON -DNO_ABC_SUPPORT=ON -DNO_PAE_SUPPORT=ON -DBUILD_AS_PYTHON=ON -B python
           cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
-          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
@@ -108,32 +105,51 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
-      - name: "Upload results"
+      - name: Upload results as artefacts
         uses: actions/upload-artifact@v2
         with:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
 
-      - name: Check file existence
+      - name: Check existence of the log.md file
         id: check_files
         uses: andstor/file-existence-action@v1
         with:
           files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
 
-      - id: get-comment-body
-        if: steps.check_files.outputs.files_exists == 'true'
+      - name: Check user permission to add a comment
+        id: check_permission
+        uses: scherermichael-oss/action-has-permission@master
+        with:
+          required-permission: write
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run only if user has NOT sufficient permissions
+        if: "! steps.check_permission.outputs.has-permission"
+        run: |
+          echo "Sorry! Your permissions are insufficient to list the results as a comment."
+          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
+
+      - name: Generate comment content
+        id: get-comment-body
+        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
         run: |
           link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-          body="$link$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
+          body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
           body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}" 
+          body="${body//$'\n'/'\r\n'}"
           echo ::set-output name=body::$body
 
       - name: Add comment with link
-        if: steps.check_files.outputs.files_exists == 'true'
-        uses: actions-ecosystem/action-create-comment@v1
+        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
+        uses: actions/github-script@v3
         with:
-          github_token: ${{ secrets.github_token }}
-          body: |
-            ${{ steps.get-comment-body.outputs.body }}
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "${{ steps.get-comment-body.outputs.body }}"
+            })
