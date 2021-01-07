@@ -1,9 +1,9 @@
 # This script it expected to be run from ./bindings/python
 import argparse
+import cairosvg
 import json
 import os
 import sys
-import xml.etree as etree
 import xml.etree.ElementTree as ET
 
 # Add path for toolkit built in-place
@@ -65,6 +65,7 @@ if __name__ == "__main__":
             meiFile = os.path.join(path1, item1, item2)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
+            pngFile = os.path.join(path2, item1, name + '.png')
 
             # parse the MEI file
             tree = ET.parse(meiFile)
@@ -78,4 +79,8 @@ if __name__ == "__main__":
 
             tk.setOptions(json.dumps(options))
             tk.loadFile(meiFile)
-            tk.renderToSVGFile(svgFile, 1)
+            svgString = tk.renderToSVG(1)
+            svgString = svgString.replace(
+                "overflow=\"inherit\"", "overflow=\"visible\"")
+            ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
+            cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
