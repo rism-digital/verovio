@@ -105,7 +105,7 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
-      - name: "Upload results"
+      - name: Upload results
         uses: actions/upload-artifact@v2
         with:
           name: test-suite-diff
@@ -117,20 +117,25 @@ jobs:
         with:
           files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
 
-      - id: get-comment-body
+      - name: Generate comment content
+        id: get-comment-body
         if: steps.check_files.outputs.files_exists == 'true'
         run: |
           link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-          body="$link$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
+          body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
           body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}" 
+          body="${body//$'\n'/'\r\n'}"
           echo ::set-output name=body::$body
 
       - name: Add comment with link
         if: steps.check_files.outputs.files_exists == 'true'
-        uses: actions-ecosystem/action-create-comment@v1
+        uses: actions/github-script@v3
         with:
-          github_token: ${{ secrets.github_token }}
-          body: |
-            ${{ steps.get-comment-body.outputs.body }}
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "${{ steps.get-comment-body.outputs.body }}"
+            })
