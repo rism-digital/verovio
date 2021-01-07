@@ -62,7 +62,6 @@ jobs:
           ls -alh
           ls -alh ${{ env.OUTPUT_DIR }}
           sudo apt-get install openresolv wireguard
-          sudo apt-get install librsvg2-bin
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
           python3 -m pip install diffimg lxml xmldiff cairosvg
 
@@ -85,7 +84,6 @@ jobs:
           cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
-          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
 
       - name: Checkout the PR
         uses: actions/checkout@v2
