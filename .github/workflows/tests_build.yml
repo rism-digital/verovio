@@ -105,21 +105,35 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
-      - name: Upload results
+      - name: Upload results as artefacts
         uses: actions/upload-artifact@v2
         with:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
 
-      - name: Check file existence
+      - name: Check existence of the log.md file
         id: check_files
         uses: andstor/file-existence-action@v1
         with:
           files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
 
+      - name: Check user permission to add a comment
+        id: check_permission
+        uses: scherermichael-oss/action-has-permission@master
+        with:
+          required-permission: write
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run only if user has NOT sufficient permissions
+        if: "! steps.check_permission.outputs.has-permission"
+        run: |
+          echo "Sorry! Your permissions are insufficient to list the results as a comment."
+          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
+
       - name: Generate comment content
         id: get-comment-body
-        if: steps.check_files.outputs.files_exists == 'true'
+        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
         run: |
           link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
@@ -128,7 +142,7 @@ jobs:
           echo ::set-output name=body::$body
 
       - name: Add comment with link
-        if: steps.check_files.outputs.files_exists == 'true'
+        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
