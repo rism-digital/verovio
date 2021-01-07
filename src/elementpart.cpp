@@ -528,8 +528,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Adjust basic stem length to number of slashes
     int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
         + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-    const int minStem = slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3;
-    while (abs(baseStem) < minStem) {
+    while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
         }
