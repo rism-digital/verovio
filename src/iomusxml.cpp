@@ -1076,7 +1076,17 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     assert(node);
     assert(staffGrp);
 
+    // First get the number of staves in the part
     int nbStaves = 1;
+    pugi::xpath_node staves = node.select_node("attributes[1]/staves");
+    if (staves) {
+        nbStaves = staves.node().text().as_int();
+    }
+    if (nbStaves > 1) {
+        if (m_label) staffGrp->AddChild(m_label);
+        if (m_labelAbbr) staffGrp->AddChild(m_labelAbbr);
+        if (m_instrdef) staffGrp->AddChild(m_instrdef);
+    }
 
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
 
@@ -1090,17 +1100,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         // we do not want to read it again, just change the name
         if (IsElement(*it, "attributes")) it->set_name("mei-read");
 
-        // First get the number of staves in the part
-        pugi::xpath_node staves = it->select_node("staves");
-        if (staves) {
-            nbStaves = staves.node().text().as_int();
-        }
-        if (nbStaves > 1) {
-            if (m_label) staffGrp->AddChild(m_label);
-            if (m_labelAbbr) staffGrp->AddChild(m_labelAbbr);
-            if (m_instrdef) staffGrp->AddChild(m_instrdef);
-        }
-
         std::string xpath;
         // Create as many staffDef
         for (int i = 0; i < nbStaves; ++i) {
@@ -1110,7 +1109,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
-                if (i == 0 && nbStaves == 1) {
+                if (nbStaves == 1) {
                     staffDef->SetUuid(staffGrp->GetUuid());
                     if (m_label) staffDef->AddChild(m_label);
                     if (m_labelAbbr) staffDef->AddChild(m_labelAbbr);
