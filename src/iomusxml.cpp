@@ -729,34 +729,34 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 const std::string groupAbbr
                     = GetContentOfChild(xpathNode.node(), "group-abbreviation[not(@print-object='no')]");
                 if (!groupName.empty()) {
-                    Label *label = new Label();
+                    m_label = new Label();
                     if (xpathNode.node().select_node("group-name-display[not(@print-object='no')]")) {
                         const std::string name = StyleLabel(xpathNode.node().select_node("group-name-display").node());
                         Text *text = new Text();
                         text->SetText(UTF8to16(name));
-                        label->AddChild(text);
+                        m_label->AddChild(text);
                     }
                     else {
                         Text *text = new Text();
                         text->SetText(UTF8to16(groupName));
-                        label->AddChild(text);
-                        staffGrp->AddChild(label);
+                        m_label->AddChild(text);
+                        staffGrp->AddChild(m_label);
                     }
                 }
                 if (!groupAbbr.empty()) {
-                    LabelAbbr *labelAbbr = new LabelAbbr();
+                    m_labelAbbr = new LabelAbbr();
                     if (xpathNode.node().select_node("group-abbreviation-display[not(@print-object='no')]")) {
                         const std::string name
                             = StyleLabel(xpathNode.node().select_node("group-abbreviation-display").node());
                         Text *text = new Text();
                         text->SetText(UTF8to16(name));
-                        labelAbbr->AddChild(text);
+                        m_labelAbbr->AddChild(text);
                     }
                     else {
                         Text *text = new Text();
                         text->SetText(UTF8to16(groupAbbr));
-                        labelAbbr->AddChild(text);
-                        staffGrp->AddChild(labelAbbr);
+                        m_labelAbbr->AddChild(text);
+                        staffGrp->AddChild(m_labelAbbr);
                     }
                 }
                 m_staffGrpStack.back()->AddChild(staffGrp);
