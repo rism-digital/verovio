@@ -699,10 +699,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
-        m_label = NULL;
-        m_labelAbbr = NULL;
-        m_instrdef = NULL;
-
         pugi::xpath_node xpathNode = *it;
         if (IsElement(xpathNode.node(), "part-group")) {
             if (HasAttributeWithValue(xpathNode.node(), "type", "start")) {
@@ -732,7 +728,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
                 const std::string groupAbbr
                     = GetContentOfChild(xpathNode.node(), "group-abbreviation[not(@print-object='no')]");
-                if (!groupName.empty()) {
+                if (!groupName.empty() && !m_label) {
                     m_label = new Label();
                     if (xpathNode.node().select_node("group-name-display[not(@print-object='no')]")) {
                         const std::string name = StyleLabel(xpathNode.node().select_node("group-name-display").node());
@@ -747,7 +743,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                         staffGrp->AddChild(m_label);
                     }
                 }
-                if (!groupAbbr.empty()) {
+                if (!groupAbbr.empty() && !m_labelAbbr) {
                     m_labelAbbr = new LabelAbbr();
                     if (xpathNode.node().select_node("group-abbreviation-display[not(@print-object='no')]")) {
                         const std::string name
@@ -786,7 +782,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
             std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
             pugi::xpath_node midiInstrument = xpathNode.node().select_node("midi-instrument");
-            if (!partName.empty()) {
+            if (!partName.empty() && !m_label) {
                 m_label = new Label();
                 if (xpathNode.node().select_node("part-name-display[not(@print-object='no')]")) {
                     std::string name = StyleLabel(xpathNode.node().select_node("part-name-display").node());
@@ -809,7 +805,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     }
                 }
             }
-            if (!partAbbr.empty()) {
+            if (!partAbbr.empty() && !m_labelAbbr) {
                 m_labelAbbr = new LabelAbbr();
                 if (xpathNode.node().select_node("part-abbreviation-display[not(@print-object='no')]")) {
                     std::string name = StyleLabel(xpathNode.node().select_node("part-abbreviation-display").node());
@@ -832,7 +828,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     }
                 }
             }
-            if (midiInstrument) {
+            if (midiInstrument && !m_instrdef) {
                 m_instrdef = new InstrDef;
                 m_instrdef->SetMidiInstrname(m_instrdef->AttMidiInstrument::StrToMidinames(
                     midiInstrument.node().select_node("midi-name").node().text().as_string()));
@@ -1090,6 +1086,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         if (m_label) staffGrp->AddChild(m_label);
         if (m_labelAbbr) staffGrp->AddChild(m_labelAbbr);
         if (m_instrdef) staffGrp->AddChild(m_instrdef);
+        m_label = NULL;
+        m_labelAbbr = NULL;
+        m_instrdef = NULL;
     }
 
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
@@ -1118,6 +1117,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     if (m_label) staffDef->AddChild(m_label);
                     if (m_labelAbbr) staffDef->AddChild(m_labelAbbr);
                     if (m_instrdef) staffDef->AddChild(m_instrdef);
+                    m_label = NULL;
+                    m_labelAbbr = NULL;
+                    m_instrdef = NULL;
                 }
                 staffGrp->AddChild(staffDef);
                 // set initial octave shift
