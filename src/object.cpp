@@ -1929,6 +1929,30 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // Take into account beam in cross-staff situation
+    if (this->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(this);
+        assert(beam);
+        // Ignore it if it has cross-staff content but is not entirely cross-staff itself
+        if (beam->m_crossStaffContent && !beam->m_crossStaff) return FUNCTOR_CONTINUE;
+    }
+
+    // Take into account stem for notes in cross-staff situation and in beams
+    if (this->Is(STEM)) {
+        LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
+        if (noteOrChord && noteOrChord->m_crossStaff) {
+            if (noteOrChord->IsInBeam()) {
+                Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
+                assert(beam);
+                // Ignore it but only if the beam is not entirely cross-staff itself
+                if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
+            }
+            else if (noteOrChord->IsInBeamSpan()) {
+                return FUNCTOR_CONTINUE;
+            }
+        }
+    }
+
     if (this->Is(FB) || this->Is(FIGURE)) {
         return FUNCTOR_CONTINUE;
     }

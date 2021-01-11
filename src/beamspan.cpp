@@ -200,16 +200,6 @@ int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
 
     m_beamedElements = HasPlist() ? *GetRefs() : GetBeamSpanElementList(layer, staff);
 
-    // Find whether this beamSpan is crossStaff - if there are beamed elements that belong
-    // to differen staffs we can consider this beamSpan as such
-    bool isCrossStaff = false;
-    for (const auto element : m_beamedElements) {
-        if (element->GetFirstAncestor(STAFF) != staff) {
-            isCrossStaff = true;
-            break;
-        }
-    }
-
     // set current beamSpan as referencedElement for all beamed elemenents (for the
     // sake of figuring if corresponding element is in beamSpan)
     for (const auto element : m_beamedElements) {
@@ -218,11 +208,10 @@ int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
 
         layerElem->m_referencedElement = this;
 
-        if (isCrossStaff) {
+        Staff *elementStaff = vrv_cast<Staff *>(layerElem->GetFirstAncestor(STAFF));
+        if (elementStaff->GetN() != staff->GetN()) {
             Layer *elementLayer = vrv_cast<Layer *>(layerElem->GetFirstAncestor(LAYER));
-            Staff *elementStaff = vrv_cast<Staff *>(layerElem->GetFirstAncestor(STAFF));
-            if (!layer || !staff || layerElem->m_crossStaff) continue;
-
+            if (!elementStaff || !elementLayer) continue;
             layerElem->m_crossStaff = elementStaff;
             layerElem->m_crossLayer = elementLayer;
         }
