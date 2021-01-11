@@ -96,8 +96,8 @@ setup(name='verovio',
         "dirty_template": "{tag}.dev{ccount}+git.{sha}.dirty",
         "starting_version": "3.1.0",
         "version_callback": None,
-        "version_file": None,
-        "count_commits_from_version_file": False
+        "version_file": "VERSION",
+        "count_commits_from_version_file": True
       },
       setup_requires=['setuptools-git-versioning'],
       cmdclass={'sdist': sdist, 'build_ext': build_ext},
