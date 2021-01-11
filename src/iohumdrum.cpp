@@ -5066,7 +5066,6 @@ void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig,
 template <class ELEMENT>
 void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok)
 {
-
     Mensur *vrvmensur = getMensur(element, mensurtok);
     if (!vrvmensur) {
         return;
@@ -5078,54 +5077,45 @@ void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &met
     if (metersig == "*met(C)" || metersig == "C") {
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_2);
-        return;
     }
-    if (metersig == "*met(C|)" || metersig == "C|") {
+    else if (metersig == "*met(C|)" || metersig == "C|") {
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_2);
         vrvmensur->SetSlash(1);
-        return;
     }
-    if (metersig == "*met(O)" || metersig == "O") {
+    else if (metersig == "*met(O)" || metersig == "O") {
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_2);
-        return;
     }
-    if (metersig == "*met(O|)" || metersig == "O|") {
+    else if (metersig == "*met(O|)" || metersig == "O|") {
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_2);
         vrvmensur->SetSlash(1);
-        return;
     }
-    if (metersig == "*met(O.)" || metersig == "O.") {
+    else if (metersig == "*met(O.)" || metersig == "O.") {
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_3);
-        return;
     }
-    if (metersig == "*met(O.|)" || metersig == "O.|") {
+    else if (metersig == "*met(O.|)" || metersig == "O.|") {
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_3);
         vrvmensur->SetSlash(1);
-        return;
     }
-    if (metersig == "*met(C.)" || metersig == "C.") {
+    else if (metersig == "*met(C.)" || metersig == "C.") {
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_3);
-        return;
     }
-    if (metersig == "*met(C.|)" || metersig == "C.|") {
+    else if (metersig == "*met(C.|)" || metersig == "C.|") {
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_3);
         vrvmensur->SetSlash(1);
-        return;
     }
-    if (metersig == "*met(C|3/2)" || metersig == "C|3/2") {
+    else if (metersig == "*met(C|3/2)" || metersig == "C|3/2") {
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_2);
         vrvmensur->SetNum(3);
         vrvmensur->SetNumbase(2);
         vrvmensur->SetSlash(1);
-        return;
     }
 
     if (metersig.find('C') != std::string::npos) {
