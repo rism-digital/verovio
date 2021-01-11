@@ -30,7 +30,7 @@ jobs:
       # Build the wheels for Linux, Windows and macOS for Python 3.9
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-18.04, ubuntu-20.04]
-        python-version: [ 3.8, 3.9 ] # [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         architecture: [ x86, x64 ]
         include:
           - os: macos-latest
@@ -268,7 +268,7 @@ jobs:
         working-directory: bindings/python/
         run: |
           mkdir -p ./dist
-          cp artifacts/*-${{ matrix.python-version }}/* dist/
+          cp artifacts/*/* dist/
 
       # TODO: Can be removed when everything is set up
       - name: Verify dist folder
