@@ -90,6 +90,16 @@ verovio_module = Extension('verovio._verovio',
 
 setup(name='verovio',
       version= '3.1.0-dev-2',
+      version_config={
+        "template": "{tag}",
+        "dev_template": "{tag}.dev{ccount}+git.{sha}",
+        "dirty_template": "{tag}.dev{ccount}+git.{sha}.dirty",
+        "starting_version": "3.1.0",
+        "version_callback": None,
+        "version_file": None,
+        "count_commits_from_version_file": False
+      },
+      setup_requires=['setuptools-git-versioning'],
       cmdclass={'sdist': sdist, 'build_ext': build_ext},
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
