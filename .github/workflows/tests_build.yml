@@ -126,7 +126,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Run only if user has NOT sufficient permissions
-        if: "! steps.check_permission.outputs.has-permission"
+        if: steps.check_files.outputs.files_exists == 'true' && "! steps.check_permission.outputs.has-permission"
         run: |
           echo "Sorry! Your permissions are insufficient to list the results as a comment."
           cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
