@@ -89,9 +89,9 @@ verovio_module = Extension('verovio._verovio',
 
 
 setup(name='verovio',
-      version= '3.1.0-dev-2',
       version_config={
-        "template": "{tag}",
+        #"template": "{tag}",
+        "template": "{tag}.dev{ccount}+git.{sha}",
         "dev_template": "{tag}.dev{ccount}+git.{sha}",
         "dirty_template": "{tag}.dev{ccount}+git.{sha}.dirty",
         "starting_version": "3.1.0",
