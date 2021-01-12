@@ -1315,7 +1315,8 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
         extend = false;
     }
 
-    int stemLen = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    const int directionBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    int stemLen = directionBias;
     // For 8th notes, use the shortened stem (if shortened)
     if (this->m_dur == DUR_8) {
         if (stemLenInHalfUnits != standardStemLen) {
@@ -1336,6 +1337,14 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
             case (DUR_1024): stemLen *= (extend) ? 38 : 36; break;
             default: stemLen *= 14;
         }
+    }
+    
+    // handle @stem.mod attribute to properly draw beams with tremolos
+    const int slashFactor = (m_closestNote->GetStemMod() < 8) ? m_closestNote->GetStemMod() - 1 : 0;
+    const int stemLengthInUnits = abs(stemLen / 2);
+    // if stem length is very short and is not enough to fit slashes, we need to adjust it
+    if (stemLengthInUnits - 3 < slashFactor) {
+        stemLen += directionBias * (3 + slashFactor - stemLengthInUnits) * 4;
     }
 
     return stemLen;
