@@ -46,7 +46,7 @@ def get_version():
         print("Running tools/get_version.sh")
         version = subprocess.getoutput("bash -c 'cd tools; ./get_version.sh'")
     if version.endswith(".dev"):
-        init_sha = subprocess.getoutput("git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
+        init_sha = subprocess.getoutput("git log -n 1 --pretty=format:%H -- .pypi-version")
         count = subprocess.getoutput("git rev-list --count HEAD ^{}".format(init_sha))
         version += count
     print(version)
