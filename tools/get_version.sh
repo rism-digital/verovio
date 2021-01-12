@@ -7,7 +7,7 @@ is_dev=$(cat ../include/vrv/vrvdef.h | grep "#define VERSION_DEV" | cut -d\  -f3
 
 dev=""
 if [ $is_dev = "true" ]; then 
-    dev=".dev0"
+    dev=".dev"
 fi
 
 echo "$major.$minor.$revision$dev"
