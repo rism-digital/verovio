@@ -12,6 +12,7 @@ import platform
 import os
 import subprocess
 
+
 def get_commit():
     """Utility function to call tools/get_git_commit.sh on any platform"""
     if os.path.exists("./tools"):
