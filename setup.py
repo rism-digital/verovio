@@ -10,6 +10,7 @@ from setuptools.command.sdist import sdist as _sdist
 from glob import glob
 import platform
 import os
+import subprocess
 
 
 def get_commit():
@@ -37,6 +38,17 @@ class sdist(_sdist):
 # Utility function to read the README file into the long_description.
 with open('README.md', 'r') as fh:
     long_description = fh.read()
+
+def get_version():
+    """Function to get the version from the cpp file and the git sha for dev versions"""
+    version = "0.0.0"
+    if os.path.exists("./tools"):
+        print("Running tools/get_version.sh")
+        version = subprocess.getoutput("bash -c 'cd tools; ./get_version.sh'")
+    if version.endswith(".dev0"):
+        sha = subprocess.getoutput("git rev-list -n 1 HEAD")
+        version += "+{}".format(sha[:8])
+    return version
 
 # extra compile arguments
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
@@ -89,17 +101,7 @@ verovio_module = Extension('verovio._verovio',
 
 
 setup(name='verovio',
-      version_config={
-        #"template": "{tag}",
-        "template": "{tag}.dev{ccount}",
-        "dev_template": "{tag}.dev{ccount}",
-        "dirty_template": "{tag}.dev{ccount}",
-        "starting_version": "3.1.0",
-        "version_callback": None,
-        "version_file": "VERSION",
-        "count_commits_from_version_file": True
-      },
-      setup_requires=['setuptools-git-versioning'],
+      version = get_version(),
       cmdclass={'sdist': sdist, 'build_ext': build_ext},
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
