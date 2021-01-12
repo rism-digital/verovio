@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.1.0] - 2021-01-12
 * Support for "old style" multiple measure rests (@rettinghaus)
 * Support for `note@vel` and `dynamics@val` in MusicXML import (@earboxer)
 * Support for `multiRest@loc` (@rettinghaus)
