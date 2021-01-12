@@ -6,9 +6,7 @@ on:
     branches:
       - develop-pypi
   release:
-    types:
-      - published
-      - created
+    types: [created, published]
 
 # globals
 env:
