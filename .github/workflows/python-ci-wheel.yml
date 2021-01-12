@@ -5,8 +5,7 @@ on:
     # Trigger the workflow on push, but only for the develop-pypi branch
     branches:
       - develop-pypi
-  release:
-    types: [created, published]
+        master
 
 # globals
 env:
@@ -273,19 +272,8 @@ jobs:
         run: ls -R
 
       #===============================================#
-      # Upload to package index
-      - name: Upload to PyPi
-        if: github.event_name == 'release' && github.event.action == 'published'
-        working-directory: bindings/python
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: twine upload dist/*
-
-      #===============================================#
       # Upload to package test index
       - name: Upload to TestPyPi
-        if: github.event_name != 'release' || github.event.action == 'created'
         working-directory: bindings/python
         env:
           TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
@@ -295,7 +283,6 @@ jobs:
       #===============================================#
       # Check test build
       - name: Create install dir
-        if: github.event_name != 'release'
         shell: bash
         run: |
           mkdir - p ${{ env.CHECK_INSTALL_DIR }}
