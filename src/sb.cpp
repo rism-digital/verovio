@@ -57,4 +57,13 @@ int Sb::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Sb::CastOffSystems(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+    if (params->m_smart) {
+        // TODO: Break the layout if this system is almost full.
+    }
+}
+
 } // namespace vrv

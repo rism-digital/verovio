@@ -635,7 +635,8 @@ bool Toolkit::LoadData(const std::string &data)
     // be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
     if (breaks != BREAKS_none) {
-        if (input->HasLayoutInformation() && (breaks == BREAKS_encoded || breaks == BREAKS_line)) {
+        if (input->HasLayoutInformation()
+            && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
                 // LogElapsedTimeStart();
                 m_doc.CastOffEncodingDoc();
@@ -644,6 +645,9 @@ bool Toolkit::LoadData(const std::string &data)
             else if (breaks == BREAKS_line) {
                 m_doc.CastOffLineDoc();
             }
+            else if (breaks == BREAKS_smart) {
+                m_doc.CastOffSmartDoc();
+            }
         }
         else {
             if (breaks == BREAKS_encoded) {
@@ -651,6 +655,9 @@ bool Toolkit::LoadData(const std::string &data)
             }
             else if (breaks == BREAKS_line) {
                 LogWarning("Requesting layout with line breaks but nothing provided in the data");
+            }
+            else if (breaks == BREAKS_smart) {
+                LogWarning("Requesting layout with smart breaks but nothing provided in the data");
             }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();

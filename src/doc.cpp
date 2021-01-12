@@ -831,7 +831,11 @@ void Doc::CastOffLineDoc()
 {
     Doc::CastOffDocBase(true, false);
 }
-void Doc::CastOffDocBase(bool useSb, bool usePb)
+void Doc::CastOffSmartDoc()
+{
+    Doc::CastOffDocBase(2, false);
+}
+void Doc::CastOffDocBase(int useSb, bool usePb)
 {
     Pages *pages = this->GetPages();
     assert(pages);
@@ -853,14 +857,15 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if (useSb && !usePb) {
+    if (useSb == 1 && !usePb) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
         contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
-        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
+        bool smart = (useSb == 2);
+        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this, smart);
         castOffSystemsParams.m_systemWidth
             = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
         castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
