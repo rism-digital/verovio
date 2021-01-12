@@ -41,6 +41,13 @@ with open('README.md', 'r') as fh:
 def get_version():
     """Function to get the version from the cpp file and the git sha for dev versions"""
     version = "0.0.0"
+    # If we have a PKG-INFO (e.g., in a sdist) use that
+    if os.path.exists('PKG-INFO'):
+        with open('PKG-INFO', 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            if line.startswith('Version:'):
+                return line[8:].strip()
     if os.path.exists("./tools"):
         print("Running tools/get_version.sh")
         version = subprocess.getoutput("bash -c 'cd tools; ./get_version.sh'")
