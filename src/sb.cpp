@@ -15,6 +15,7 @@
 
 #include "editorial.h"
 #include "functorparams.h"
+#include "measure.h"
 #include "page.h"
 #include "system.h"
 #include "vrv.h"
@@ -62,8 +63,21 @@ int Sb::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
     if (params->m_smart) {
-        // TODO: Break the layout if this system is almost full.
+        // Get the last measure of the currentSystem
+        Measure *measure
+            = dynamic_cast<Measure *>(params->m_currentSystem->GetChild(params->m_currentSystem->GetChildCount() - 1));
+        if (measure != NULL) {
+            int measureRightX = measure->GetDrawingX() + measure->GetWidth() - params->m_shift;
+            // LogDebug("ratio: %f\n", (float)measureRightX / (float)params->m_systemWidth);
+            if (measureRightX > params->m_systemWidth * .66) {
+                // Use this system break.
+                params->m_currentSystem = new System();
+                params->m_page->AddChild(params->m_currentSystem);
+                params->m_shift += measureRightX;
+            }
+        }
     }
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
