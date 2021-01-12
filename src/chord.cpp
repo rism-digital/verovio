@@ -128,14 +128,16 @@ void Chord::AddChild(Object *child)
         return;
     }
 
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        m_children.insert(m_children.begin(), child);
+        children->insert(children->begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children->push_back(child);
     }
     Modify();
 }
@@ -415,6 +417,52 @@ bool Chord::HasNoteWithDots()
     return false;
 }
 
+void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    int margin = 0;
+    // get positions of other elements
+    std::set<int> otherElementLocations;
+    for (auto element : otherElements) {
+        if (element->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(element);
+            assert(note);
+            otherElementLocations.insert(note->GetDrawingLoc());
+        }
+    }
+    const ArrayOfObjects *notes = GetList(this);
+    assert(notes);
+    // get current chord positions
+    std::set<int> chordElementLocations;
+    for (auto iter : *notes) {
+        Note *note = vrv_cast<Note *>(iter);
+        assert(note);
+        chordElementLocations.insert(note->GetDrawingLoc());
+    }
+    const int expectedElementsInUnison
+        = CountElementsInUnison(chordElementLocations, otherElementLocations, GetDrawingStemDir());
+    const bool isLowerPosition = (STEMDIRECTION_down == GetDrawingStemDir() && (otherElementLocations.size() > 0)
+        && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
+    int actualElementsInUnison = 0;
+    // process each note of the chord separately, storing locations in the set
+    for (auto iter : *notes) {
+        Note *note = vrv_cast<Note *>(iter);
+        assert(note);
+        auto [overlap, isInUnison]
+            = note->CalcNoteHorizontalOverlap(doc, otherElements, true, isLowerPosition, expectedElementsInUnison > 0);
+        if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
+            margin = overlap;
+        }
+        if (isInUnison) ++actualElementsInUnison;
+    }
+
+    if (expectedElementsInUnison && (expectedElementsInUnison == actualElementsInUnison)) {
+        isUnison = true;
+    }
+    else if (margin) {
+        SetDrawingXRel(GetDrawingXRel() + margin);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -497,7 +545,10 @@ int Chord::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (this->m_crossStaff) {
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
+    }
 
     // Cache the in params to avoid further lookup
     params->m_staff = staff;
@@ -642,7 +693,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!currentStem) {
         currentStem = new Stem();

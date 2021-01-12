@@ -138,6 +138,19 @@ int System::GetHeight() const
     return 0;
 }
 
+int System::GetMinimumSystemSpacing(const Doc *doc) const
+{
+    const auto &spacingSystem = doc->GetOptions()->m_spacingSystem;
+    if (!spacingSystem.isSet()) {
+        assert(m_drawingScoreDef);
+        if (m_drawingScoreDef->HasSpacingSystem()) {
+            return m_drawingScoreDef->GetSpacingSystem() * doc->GetDrawingUnit(100);
+        }
+    }
+
+    return spacingSystem.GetValue() * doc->GetDrawingUnit(100);
+}
+
 void System::SetDrawingLabelsWidth(int width)
 {
     if (m_drawingLabelsWidth < width) {

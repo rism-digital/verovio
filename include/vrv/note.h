@@ -53,8 +53,8 @@ class Note : public LayerElement,
              public AttExtSym,
              public AttGraced,
              public AttMidiVelocity,
-             public AttNoteAnlMensural,
              public AttNoteHeads,
+             public AttNoteVisMensural,
              public AttStems,
              public AttStemsCmn,
              public AttTiePresent,
@@ -188,6 +188,13 @@ public:
     bool IsVisible();
 
     /**
+     * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
+     * element if it's in unison with it
+     */
+    std::pair<int, bool> CalcNoteHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
+        bool isChordElement, bool isLowerElement = false, bool unison = true);
+
+    /**
      * MIDI timing information
      */
     ///@{
@@ -205,6 +212,11 @@ public:
     double GetScoreTimeDuration();
     char GetMIDIPitch();
     ///@}
+
+    /**
+     * Helper to adjust overlaping layers for notes
+     */
+    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
 
 public:
     //----------//

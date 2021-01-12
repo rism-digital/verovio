@@ -246,7 +246,7 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
     FontInfo *currentFont = dc->GetFont();
 
     params.m_y -= m_doc->GetTextLineHeight(currentFont, false);
-    params.m_newLine = true;
+    params.m_explicitPosition = true;
 
     dc->EndTextGraphic(lb, this);
 }
@@ -313,18 +313,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
                 rendFont.SetPointSize(fs->GetFontSizeNumeric());
             }
             else if (fs->GetType() == FONTSIZE_term) {
-                int percent = 100;
-                switch (fs->GetTerm()) {
-                    case (FONTSIZETERM_xx_large): percent = 200; break;
-                    case (FONTSIZETERM_x_large): percent = 150; break;
-                    case (FONTSIZETERM_large): percent = 110; break;
-                    case (FONTSIZETERM_larger): percent = 110; break;
-                    case (FONTSIZETERM_small): percent = 80; break;
-                    case (FONTSIZETERM_smaller): percent = 80; break;
-                    case (FONTSIZETERM_x_small): percent = 60; break;
-                    case (FONTSIZETERM_xx_small): percent = 50; break;
-                    default: break;
-                }
+                const int percent = fs->GetPercentForTerm();
                 rendFont.SetPointSize(params.m_pointSize * percent / 100);
             }
             else if (fs->GetType() == FONTSIZE_percent) {
@@ -342,16 +331,21 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         assert(dc->GetFont());
         int MHeight = m_doc->GetTextGlyphHeight('M', dc->GetFont(), false);
         if (rend->GetRend() == TEXTRENDITION_sup) {
-            yShift = m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
+            yShift += m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
             yShift += (MHeight * SUPER_SCRIPT_POSITION);
         }
         else {
-            yShift = MHeight * SUB_SCRIPT_POSITION;
+            yShift += MHeight * SUB_SCRIPT_POSITION;
         }
         params.m_y += yShift;
         params.m_verticalShift = true;
         dc->GetFont()->SetSupSubScript(true);
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() * SUPER_SCRIPT_FACTOR);
+    }
+
+    if ((rend->GetRend() == TEXTRENDITION_box) && (params.m_actualWidth != 0)) {
+        params.m_x = params.m_actualWidth + m_doc->GetDrawingUnit(100);
+        params.m_explicitPosition = true;
     }
 
     DrawTextChildren(dc, rend, params);
@@ -361,6 +355,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         params.m_verticalShift = true;
         dc->GetFont()->SetSupSubScript(false);
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
+    }
+
+    if (rend->GetRend() == TEXTRENDITION_box) {
+        params.m_boxedRend.push_back(rend);
+        params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
+        params.m_explicitPosition = true;
     }
 
     if (customFont) dc->ResetFont();
@@ -377,9 +377,9 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     Resources::SelectTextFont(dc->GetFont()->GetWeight(), dc->GetFont()->GetStyle());
 
-    if (params.m_newLine) {
+    if (params.m_explicitPosition) {
         dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
-        params.m_newLine = false;
+        params.m_explicitPosition = false;
     }
     else if (params.m_verticalShift) {
         dc->MoveTextVerticallyTo(ToDeviceContextY(params.m_y));
@@ -406,6 +406,8 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     else {
         DrawTextString(dc, text->GetText(), params);
     }
+
+    params.m_actualWidth = text->GetContentRight();
 
     dc->EndTextGraphic(text, this);
 }

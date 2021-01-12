@@ -28,6 +28,7 @@ class Octave : public ControlElement,
                public AttExtender,
                public AttLineRend,
                public AttLineRendBase,
+               public AttNNumberLike,
                public AttOctaveDisplacement {
 public:
     /**

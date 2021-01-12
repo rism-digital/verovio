@@ -7,6 +7,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <climits>
 #include <math.h>
@@ -24,6 +25,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
+#include "elementpart.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
@@ -643,6 +645,64 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
     return result;
 }
 
+int LayerElement::CountElementsInUnison(
+    const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
+{
+    if (firstChord.empty() || secondChord.empty()) return 0;
+    // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
+    // of how they are encoded in the MEI file
+    std::set<int> difference;
+    if (firstChord.size() > secondChord.size()) {
+        std::set_difference(firstChord.begin(), firstChord.end(), secondChord.begin(), secondChord.end(),
+            std::inserter(difference, difference.begin()));
+    }
+    else {
+        std::set_difference(secondChord.begin(), secondChord.end(), firstChord.begin(), firstChord.end(),
+            std::inserter(difference, difference.begin()));
+    }
+    // If there is a difference, there are two situations:
+    // 1. Location is between start and end of either chords/set of notes - this means these elements cannot be
+    //    in unison (since there is interfering note there)
+    // 2. Location is lesser/greater than start/end of either - it's ok, overlapping notes can still be in unison
+    if (!difference.empty()) {
+        for (const auto &element : difference) {
+            if (((firstChord.size() <= secondChord.size()) && (element > *firstChord.begin())
+                    && (element < *firstChord.rbegin()))
+                || ((firstChord.size() > secondChord.size()) && (element > *secondChord.begin())
+                    && (element < *secondChord.rbegin()))) {
+                return 0;
+            }
+        }
+    }
+
+    // If there are no `middle` notes, check whether chords can be in unison with regards of stem direction
+    // With DOWN stem direction, highest note of the chord HAS to be in unison. If topmost location of the chord
+    // is higher than topmost location of the opposing chord it means that these elements cannot be in unison.
+    // Same applies to the UP stem direction, just with reversed condition
+    if (stemDirection == STEMDIRECTION_down) {
+        if ((*firstChord.rbegin() > *secondChord.rbegin()) || (*firstChord.begin() > *secondChord.begin())) return 0;
+    }
+    else {
+        if ((*firstChord.rbegin() < *secondChord.rbegin()) || (*firstChord.begin() < *secondChord.begin())) return 0;
+    }
+
+    // Finally, check if notes in unison are at the proper distance to be drawn as unison, as well as get number of
+    // elements in unison
+    std::vector<int> intersection;
+    intersection.resize(firstChord.size() > secondChord.size() ? firstChord.size() : secondChord.size());
+    auto it = std::set_intersection(
+        firstChord.begin(), firstChord.end(), secondChord.begin(), secondChord.end(), intersection.begin());
+    intersection.resize(it - intersection.begin());
+    if (intersection.empty()) return false;
+    for (int i = 0; i < (int)intersection.size() - 1; ++i) {
+        if (std::abs(intersection.at(i) - intersection.at(i + 1)) == 1) {
+            return 0;
+        }
+    }
+
+    return (int)intersection.size();
+}
+
 //----------------------------------------------------------------------------
 // LayerElement functors methods
 //----------------------------------------------------------------------------
@@ -978,15 +1038,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             if (hasMultipleLayer) {
                 Layer *firstLayer = vrv_cast<Layer *>(staffY->FindDescendantByType(LAYER));
                 assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN())
+                if (firstLayer->GetN() == layerY->GetN()) {
                     loc += 2;
-                else
+                }
+                else {
                     loc -= 2;
+                }
             }
-
             // add offset
-            else if (staff->m_drawingLines > 3)
+            else if (staff->m_drawingLines > 3) {
                 loc += 2;
+            }
         }
 
         mRest->SetDrawingLoc(loc);
@@ -1133,6 +1195,42 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    // ignore elements that are not in the beam or are direct children of the beam
+    if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam) && !IsGraceNote()))
+        return FUNCTOR_SIBLINGS;
+    if (Is({ GRACEGRP, TUPLET, TUPLET_NUM, TUPLET_BRACKET })) return FUNCTOR_CONTINUE;
+
+    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    assert(staff);
+
+    // check if top/bottom of the element overlaps with beam coordinates
+    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+    int leftMargin = 0, rightMargin = 0;
+
+    if (params->m_directionBias > 0) {
+        leftMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1;
+        rightMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2;
+    }
+    else {
+        leftMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1;
+        rightMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2;
+    }
+
+    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
+    if (overlapMargin >= params->m_directionBias * params->m_overlapMargin) {
+        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params->m_overlapMargin
+            = (((overlapMargin + staffOffset - 1) / staffOffset + 1) * staffOffset) * params->m_directionBias;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::AdjustLayers(FunctorParams *functorParams)
 {
     AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
@@ -1168,87 +1266,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
         assert(params->m_currentChord);
     }
 
-    // Eventually we also want to have stem for overlapping voices
-    if (this->Is({ NOTE, DOTS })) {
-
-        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
-
-        std::vector<LayerElement *>::iterator iter;
-        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); ++iter) {
-
-            int verticalMargin = 0; // 1 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            int horizontalMargin = 2 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-
-            if (this->Is(NOTE) && (*iter)->Is(NOTE)) {
-                assert(params->m_currentNote);
-                Note *previousNote = vrv_cast<Note *>(*iter);
-                assert(previousNote);
-                // Unisson, look at the duration for the note heads
-                if (params->m_currentNote->IsUnissonWith(previousNote, false)) {
-                    if ((params->m_currentNote->GetDrawingDur() == DUR_2) && (previousNote->GetDrawingDur() == DUR_2))
-                        continue;
-                    else if ((params->m_currentNote->GetDrawingDur() > DUR_2)
-                        && (previousNote->GetDrawingDur() > DUR_2))
-                        continue;
-                    // Reduce the margin to 0 for whole notes unisson
-                    else if ((params->m_currentNote->GetDrawingDur() == DUR_1)
-                        && (previousNote->GetDrawingDur() == DUR_1))
-                        horizontalMargin = 0;
-                }
-                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() > 1) {
-                    continue;
-                }
-                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
-                    horizontalMargin = 0;
-                }
-                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() < 0)
-                    && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())
-                    && !params->m_currentChord) {
-                    if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
-                        horizontalMargin *= -1;
-                    }
-                    else if ((params->m_currentNote->GetDrawingDur() <= DUR_1)
-                        && (previousNote->GetDrawingDur() <= DUR_1)) {
-                        continue;
-                    }
-                    else {
-                        horizontalMargin *= -1;
-                        verticalMargin = horizontalMargin;
-                    }
-                }
-            }
-
-            if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
-                continue;
-            }
-
-            if (!(horizontalMargin < 0) || params->m_currentChord) {
-
-                // Nothing to do if we have no vertical overlap
-                if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
-
-                // Nothing to do either if we have no horizontal overlap
-                if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
-
-                int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
-
-                // Move the appropriate parent to the left
-                if (xRelShift > 0) {
-                    if (params->m_currentChord)
-                        params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
-                    else if (params->m_currentNote)
-                        params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
-                }
-            }
-            else {
-                // Move the appropriate parent to the right
-                int xRelShift = this->HorizontalRightOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
-                params->m_currentNote->SetDrawingXRel(
-                    params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
-            }
-        }
-    }
+    AdjustOverlappingLayers(params->m_doc, params->m_previous, params->m_unison);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1290,6 +1308,32 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams)
+{
+    AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);
+    assert(params);
+
+    if (!Is({ ARTIC, ARTIC_PART, ACCID, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !HasSelfBB()) return FUNCTOR_CONTINUE;
+
+    if (params->m_ignoreCrossStaff && Is({ CHORD, NOTE, REST }) && m_crossStaff) return FUNCTOR_SIBLINGS;
+
+    if (!params->m_tupletNum->HorizontalSelfOverlap(this)
+        && !params->m_tupletNum->VerticalSelfOverlap(this, params->m_verticalMargin)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (params->m_drawingNumPos == STAFFREL_basic_above) {
+        int dist = GetSelfTop();
+        if (params->m_yRel < dist) params->m_yRel = dist;
+    }
+    else {
+        int dist = GetSelfBottom();
+        if (params->m_yRel > dist) params->m_yRel = dist;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int LayerElement::AdjustXPos(FunctorParams *functorParams)
@@ -1468,16 +1512,24 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // When we will have allowed @layer in <note>, we will have to do:
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
     AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
+    bool direction = (parentStaff->GetN() < m_crossStaff->GetN()) ? FORWARD : BACKWARD;
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
-        // Just try to pick the first one...
-        m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByType(LAYER));
+        // Just try to pick the first one... (i.e., last one when crossing above)
+        m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByType(LAYER, UNSPECIFIED, direction));
     }
     if (!m_crossLayer) {
         // Nothing we can do
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
             durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
+    }
+
+    if (direction == FORWARD) {
+        m_crossLayer->SetCrossStaffFromAbove(true);
+    }
+    else {
+        m_crossLayer->SetCrossStaffFromBelow(true);
     }
 
     params->m_currentCrossStaff = m_crossStaff;
@@ -1493,15 +1545,42 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    DurationInterface *durElement = this->GetDurationInterface();
-    if (!durElement) return FUNCTOR_CONTINUE;
-
-    // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
-    // in the the children of one element. We do not consider this now because it seems over the top
-    // We would need to look at the @n attribute and to have a stack to handle this properly
-    if (durElement->HasStaff()) {
-        params->m_currentCrossStaff = NULL;
-        params->m_currentCrossLayer = NULL;
+    DurationInterface *durInterface = this->GetDurationInterface();
+    if (durInterface) {
+        // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
+        // in the the children of one element. We do not consider this now because it seems over the top
+        // We would need to look at the @n attribute and to have a stack to handle this properly
+        if (durInterface->HasStaff()) {
+            params->m_currentCrossStaff = NULL;
+            params->m_currentCrossLayer = NULL;
+        }
+    }
+    else {
+        // For other elements (e.g., beams, tuplets) check if all their children duration element are cross-staff
+        // If yes, make them cross-staff themselves.
+        ListOfObjects durations;
+        InterfaceComparison hasInterface(INTERFACE_DURATION);
+        this->FindAllDescendantByComparison(&durations, &hasInterface);
+        Staff *crossStaff = NULL;
+        Layer *crossLayer = NULL;
+        for (auto object : durations) {
+            LayerElement *durElement = vrv_cast<LayerElement *>(object);
+            assert(durElement);
+            // The duration element is not cross-staff, of the cross-staff is not that same staff (very rare)
+            if (!durElement->m_crossStaff || (crossStaff && (durElement->m_crossStaff != crossStaff))) {
+                crossStaff = NULL;
+                // We can stop here
+                break;
+            }
+            else {
+                crossStaff = durElement->m_crossStaff;
+                crossLayer = durElement->m_crossLayer;
+            }
+        }
+        if (crossStaff) {
+            this->m_crossStaff = crossStaff;
+            this->m_crossLayer = crossLayer;
+        }
     }
 
     return FUNCTOR_CONTINUE;

@@ -47,7 +47,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Cannot parse JSON from std::string " + json_editorAction);
         return false;

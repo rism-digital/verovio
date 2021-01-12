@@ -15,12 +15,14 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "dot.h"
 #include "elementpart.h"
 #include "layer.h"
 #include "ligature.h"
 #include "mensur.h"
 #include "note.h"
 #include "options.h"
+#include "plica.h"
 #include "proport.h"
 #include "rest.h"
 #include "smufl.h"
@@ -53,6 +55,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     int radius = note->GetDrawingRadius(m_doc);
     int staffY = staff->GetDrawingY();
     int verticalCenter = 0;
+    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     /************** Stem/notehead direction: **************/
 
@@ -67,10 +70,12 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         stemDir = layerStemDir;
     }
     else {
-        if (drawingDur < DUR_1)
+        if (drawingDur < DUR_1) {
             stemDir = STEMDIRECTION_down;
-        else
+        }
+        else {
             stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
     }
 
     /************** Noteheads: **************/
@@ -89,7 +94,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
-        if (((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE))
+        if (((drawingDur > DUR_1) || ((note->GetStemDir() != STEMDIRECTION_NONE) && mensural_black))
             && note->GetStemVisible() != BOOLEAN_false) {
             DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
@@ -349,6 +354,12 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         DrawFilledRectangle(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, bottomRight.y);
     }
 
+    if (note->FindDescendantByType(PLICA)) {
+        // Right side is a stem - end the notehead first
+        dc->EndCustomGraphic();
+        return;
+    }
+
     // serifs and / or stem
     DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[1]);
 
@@ -482,6 +493,99 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
 
     return;
+}
+
+void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+
+    Dot *dot = vrv_cast<Dot *>(element);
+    assert(dot);
+
+    Note *note = dot->m_drawingNote;
+    assert(dot->m_drawingNote);
+
+    Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
+    assert(ligature);
+
+    int position = ligature->GetListIndex(note);
+    assert(position != -1);
+    int shape = ligature->m_drawingShapes.at(position);
+    bool isLast = (position == (int)ligature->m_drawingShapes.size() - 1);
+
+    int y = note->GetDrawingY();
+    int x = note->GetDrawingX();
+    if (!isLast && (shape & LIGATURE_OBLIQUE)) {
+        x += note->GetDrawingRadius(m_doc, true);
+        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+    else {
+        x += 3 * note->GetDrawingRadius(m_doc, true);
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+
+    DrawDotsPart(dc, x, y, 1, staff);
+
+    return;
+}
+
+void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+
+    Plica *plica = vrv_cast<Plica *>(element);
+    assert(plica);
+
+    Note *note = vrv_cast<Note *>(plica->GetFirstAncestor(NOTE));
+    assert(note);
+
+    bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+    bool isLonga = (note->GetActualDur() == DUR_LG);
+    bool up = (plica->GetDir() == STEMDIRECTION_basic_up);
+
+    int shape = LIGATURE_DEFAULT;
+    Point topLeft, bottomRight;
+    int sides[4];
+    this->CalcBrevisPoints(note, staff, &topLeft, &bottomRight, sides, shape, isMensuralBlack);
+
+    int stem = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    stem *= (!isMensuralBlack) ? 7 : 5;
+    int shortStem = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    shortStem *= (!isMensuralBlack) ? 3.5 : 2.5;
+
+    dc->StartGraphic(plica, "", plica->GetUuid());
+
+    if (isLonga) {
+        if (up) {
+            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + shortStem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + stem);
+        }
+        else {
+            DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - shortStem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - stem);
+        }
+    }
+    // brevis
+    else {
+        if (up) {
+            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + stem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + shortStem);
+        }
+        else {
+            DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - stem);
+            DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - shortStem);
+        }
+    }
+
+    dc->EndGraphic(plica, this);
 }
 
 void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)

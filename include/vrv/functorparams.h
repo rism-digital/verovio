@@ -54,6 +54,7 @@ class Syl;
 class System;
 class SystemAligner;
 class Transposer;
+class TupletNum;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -146,6 +147,38 @@ public:
     ArrayOfAligmentArpegTuples m_alignmentArpegTuples;
     MeasureAligner *m_measureAligner;
     Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustBeamParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the beam that should be adjusted
+ * member 1: y coordinate of the beam left side
+ * member 2: y coordinate of the beam right side
+ * member 3: overlap margin that beam needs to be displaced by
+ * member 4: the Doc
+ **/
+
+class AdjustBeamParams : public FunctorParams {
+public:
+    AdjustBeamParams(Doc *doc)
+    {
+        m_beam = NULL;
+        m_y1 = 0;
+        m_y2 = 0;
+        m_directionBias = 0;
+        m_overlapMargin = 0;
+        m_doc = doc;
+    }
+
+    Object *m_beam;
+    int m_y1;
+    int m_y2;
+    int m_directionBias;
+    int m_overlapMargin;
     Doc *m_doc;
 };
 
@@ -323,6 +356,7 @@ public:
  * member 5: the current chord (if any)
  * member 6: the doc
  * member 7: a pointer to the functor for passing it to the system aligner
+ * member 8: flag whether element is in unison
  **/
 
 class AdjustLayersParams : public FunctorParams {
@@ -335,6 +369,7 @@ public:
         m_doc = doc;
         m_functor = functor;
         m_staffNs = staffNs;
+        m_unison = false;
     }
     std::vector<int> m_staffNs;
     int m_currentLayerN;
@@ -344,6 +379,7 @@ public:
     Chord *m_currentChord;
     Doc *m_doc;
     Functor *m_functor;
+    bool m_unison;
 };
 
 //----------------------------------------------------------------------------
@@ -418,6 +454,35 @@ public:
     int m_freeSpace;
     int m_staffSize;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustTupletNumOverlapParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: tupletNum relative position for which is being calculatied
+ * member 1: drawing position of tupletNum
+ * member 2: margin for tupletNum vertical overlap
+ * member 3: flag to indicate whether cross-staff elements should be considered
+ * member 4: resulting relative Y for the tupletNum
+ **/
+class AdjustTupletNumOverlapParams : public FunctorParams {
+public:
+    AdjustTupletNumOverlapParams(TupletNum *tupletNum)
+    {
+        m_tupletNum = tupletNum;
+        m_drawingNumPos = STAFFREL_basic_NONE;
+        m_verticalMargin = 0;
+        m_ignoreCrossStaff = false;
+        m_yRel = 0;
+    }
+
+    TupletNum *m_tupletNum;
+    data_STAFFREL_basic m_drawingNumPos;
+    int m_verticalMargin;
+    bool m_ignoreCrossStaff;
+    int m_yRel;
 };
 
 //----------------------------------------------------------------------------
@@ -1426,7 +1491,6 @@ public:
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;
-
 };
 
 //----------------------------------------------------------------------------

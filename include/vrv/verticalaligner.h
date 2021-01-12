@@ -13,12 +13,13 @@
 namespace vrv {
 
 class AdjustFloatingPositionerGrpsParams;
+class AttSpacing;
 class FloatingObject;
 class ScoreDef;
 class StaffAlignment;
 class StaffDef;
+class System;
 class SystemAligner;
-class TimestampAttr;
 
 //----------------------------------------------------------------------------
 // SystemAligner
@@ -72,6 +73,12 @@ public:
     StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
 
     /**
+     * Get pointer to the parent system.
+     * Return NULL if parent is not set.
+     */
+    System *GetSystem();
+
+    /**
      * Find all the positioners pointing to an object;
      */
     void FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object);
@@ -115,8 +122,14 @@ private:
      * A pointer to the left StaffAlignment object kept for the system bottom position
      */
     StaffAlignment *m_bottomAlignment;
-    /** Stores the above spacing type of staves (based on visibility)*/
+    /**
+     * Stores the above spacing type of staves (based on visibility)
+     */
     std::map<int, SpacingType> m_spacingTypes;
+    /**
+     * A pointer to the parent system
+     */
+    System *m_system;
 };
 
 //----------------------------------------------------------------------------
@@ -180,9 +193,21 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter of the system pointer to which the Alignment is belong to.
+     */
+    ///@{
+    System *GetParentSystem() const { return m_system; }
+    void SetParentSystem(System *system);
+
+    /**
      * Returns the staff size (100 if no staff object is refered to)
      */
     int GetStaffSize() const;
+
+    /**
+     * Returns the spacing attribute object of correspond ScoreDef
+     */
+    const AttSpacing *GetAttSpacing() const;
 
     /**
      * @name Calculates the overlow (above or below for the bounding box.
@@ -289,7 +314,11 @@ public:
     virtual int JustifyY(FunctorParams *functorParams);
 
 private:
-    //
+    /**
+     * Returns minimus preset spacing
+     */
+    int GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const;
+
 public:
     //
 private:
@@ -307,6 +336,11 @@ private:
      * This is necessary since we don't always have all the staves.
      */
     Staff *m_staff;
+    /**
+     * Stores a pointer to the system to which the Alignment is belong to
+     * This is necessary to reduce amount of dynamic_casts.
+     */
+    System *m_system;
     /**
      * Stores the position relative to the system.
      */

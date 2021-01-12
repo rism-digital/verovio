@@ -404,6 +404,12 @@ void Page::LayOutVertically()
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
+    // Adjust the position of the beams in regards of layer elements
+    AdjustBeamParams adjustBeamParams(doc);
+    Functor adjustBeams(&Object::AdjustBeams);
+    Functor adjustBeamsEnd(&Object::AdjustBeamsEnd);
+    this->Process(&adjustBeams, &adjustBeamParams, &adjustBeamsEnd);
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsYParams(doc);
     Functor adjustTupletsY(&Object::AdjustTupletsY);
@@ -581,14 +587,13 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(m_children.back());
+    System *last = dynamic_cast<System *>(GetChildren()->back());
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
-    // Not sure what to do with the footer when adjusted page height is requested...
-    // if (this->GetFooter()) {
-    //    height += this->GetFooter()->GetTotalHeight();
-    //}
+    if (this->GetFooter()) {
+        height += this->GetFooter()->GetTotalHeight();
+    }
 
     return height;
 }
@@ -605,7 +610,7 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto &child : m_children) {
+    for (auto &child : *this->GetChildren()) {
         System *system = dynamic_cast<System *>(child);
         if (system) {
             // we include the left margin and the right margin
@@ -731,12 +736,6 @@ int Page::AlignSystems(FunctorParams *functorParams)
         header->SetDrawingYRel(params->m_shift);
         params->m_shift -= header->GetTotalHeight() + bottomMarginPgHead;
     }
-    RunningElement *footer = this->GetFooter();
-    if (footer) {
-        // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight());
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -751,6 +750,18 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
     RunningElement *footer = this->GetFooter();
     if (footer) {
         this->m_drawingJustifiableHeight -= footer->GetTotalHeight();
+
+        // Move it up below the last system
+        if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
+            if (GetChildCount()) {
+                System *last = dynamic_cast<System *>(GetChildren()->back());
+                assert(last);
+                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight());
+            }
+        }
+        else {
+            footer->SetDrawingYRel(footer->GetTotalHeight());
+        }
     }
 
     return FUNCTOR_CONTINUE;

@@ -53,13 +53,15 @@ class OptionGrp;
 
 enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_encoded };
 
-enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded };
+enum option_CONDENSE { CONDENSE_none = 0, CONDENSE_auto, CONDENSE_all, CONDENSE_encoded };
+
+enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
 enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
 
-enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
+enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
 // Option
@@ -96,6 +98,7 @@ public:
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */
     static std::map<int, std::string> s_breaks;
+    static std::map<int, std::string> s_condense;
     static std::map<int, std::string> s_footer;
     static std::map<int, std::string> s_header;
     static std::map<int, std::string> s_measureNumber;
@@ -404,7 +407,7 @@ public:
     virtual void Init(const std::string &defaultValue);
 
     virtual bool SetValue(const std::string &jsonFilePath);
-    //virtual std::string GetStrValue() const;
+    // virtual std::string GetStrValue() const;
 
     int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
@@ -418,7 +421,6 @@ private:
     jsonxx::Object m_values;
     jsonxx::Object m_defaultValues;
 };
-
 
 //----------------------------------------------------------------------------
 // OptionGrp
@@ -492,7 +494,7 @@ public:
     OptionBool m_adjustPageHeight;
     OptionBool m_adjustPageWidth;
     OptionIntMap m_breaks;
-    OptionBool m_condenseEncoded;
+    OptionIntMap m_condense;
     OptionBool m_condenseFirstPage;
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
@@ -532,7 +534,7 @@ public:
      */
     OptionGrp m_generalLayout;
 
-    OptionDbl m_barlineSeparation;
+    OptionDbl m_barLineSeparation;
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
@@ -558,6 +560,7 @@ public:
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
+    OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
     OptionInt m_slurCurveFactor;
@@ -565,7 +568,8 @@ public:
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
-    OptionDbl m_slurThickness;
+    OptionDbl m_slurEndpointThickness;
+    OptionDbl m_slurMidpointThickness;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;
@@ -578,8 +582,10 @@ public:
     OptionDbl m_subBracketThickness;
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
+    OptionDbl m_textEnclosureThickness;
     OptionDbl m_thickBarlineThickness;
-    OptionDbl m_tieThickness;    
+    OptionDbl m_tieEndpointThickness;
+    OptionDbl m_tieMidpointThickness;
     OptionDbl m_tupletBracketThickness;
 
     /**
@@ -642,6 +648,15 @@ public:
     OptionDbl m_rightMarginRightBarLine;
     //
     OptionDbl m_topMarginHarm;
+
+    /**
+     * Deprecated options
+     */
+    OptionGrp m_deprecated;
+
+    OptionBool m_condenseEncoded;
+    OptionDbl m_slurThickness;
+    OptionDbl m_tieThickness;
 
 private:
     /** The array of style parameters */

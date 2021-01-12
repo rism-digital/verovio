@@ -255,9 +255,15 @@ public:
     Object *GetChild(int idx, const ClassId classId);
 
     /**
-     * Return a cont pointer to the children
+     * Return a const pointer to the children
      */
-    const ArrayOfObjects *GetChildren() { return &m_children; }
+    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const { return &m_children; }
+
+    /**
+     * Return a pointer to the children that allows modification.
+     * This method should be all only in AddChild overrides methods
+     */
+    ArrayOfObjects *GetChildrenForModification() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -805,6 +811,16 @@ public:
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Calculate the vertical position adjustment for the beam if it overlaps with layer elements
+     */
+    virtual int AdjustBeams(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Apply position adjustment that has been calculated previously
+     */
+    virtual int AdjustBeamsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the postion position of slurs.
      */
     virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -847,6 +863,11 @@ public:
      * Calculate the y position of tuplet brackets and num
      */
     virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Calculate the y relative position of tupletNum based on overlaps with other elements
+     */
+    virtual int AdjustTupletNumOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.
@@ -956,6 +977,11 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
+
+    /**
+     * Prepare group symbol starting and ending staffDefs for drawing
+     */
+    virtual int PrepareGroupSymbols(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Associate LayerElement with @facs to the appropriate zone
@@ -1202,13 +1228,14 @@ public:
     ArrayOfStrAttr m_unsupported;
 
 protected:
+    //
+private:
     /**
      * A vector of child objects.
      * Unless SetAsReferenceObject is set or with detached and relinquished, the children are own by it.
      */
     ArrayOfObjects m_children;
 
-private:
     /**
      * A pointer to the parent object;
      */

@@ -53,6 +53,11 @@ std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
     = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
           { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
 
+void SetDefaultResourcePath(const std::string &path)
+{
+    Resources::SetPath(path);
+}
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -594,8 +599,11 @@ bool Toolkit::LoadData(const std::string &data)
         return false;
     }
 
+    bool adjustPageHeight = m_options->m_adjustPageHeight.GetValue();
+    int footerOption = m_options->m_footer.GetValue();
+    // With adjusted page height, show the footer if explicitly set (i.e., not with "auto")
     // generate the page header and footer if necessary
-    if (m_options->m_footer.GetValue() == FOOTER_auto) {
+    if ((!adjustPageHeight && (footerOption == FOOTER_auto)) || (footerOption == FOOTER_always)) {
         m_doc.GenerateFooter();
     }
     if (m_options->m_header.GetValue() == HEADER_auto) {
@@ -681,7 +689,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogWarning("Can not parse JSON std::string. Using default options.");
+        LogWarning("Cannot parse JSON std::string. Using default options.");
     }
     else {
         if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
@@ -875,7 +883,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     // Read JSON options
     if (!json.parse(jsonOptions)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         return false;
     }
 
@@ -950,6 +958,20 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                 }
                 opt->SetValueArray(queries);
             }
+            else if (iter->first == "condenseEncoded") {
+                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("condense");
+                assert(opt);
+                if (json.has<jsonxx::Number>("condenseEncoded")) {
+                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
+                        opt->SetValue("encoded");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
             else if (iter->first == "ignoreLayout") {
                 LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
                 Option *opt = NULL;
@@ -1010,6 +1032,26 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     else {
                         opt->SetValue("auto");
                     }
+                }
+            }
+            else if (iter->first == "slurThickness") {
+                LogWarning("Option slurThickness is deprecated; use slurMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("slurThickness")) {
+                    double thickness = json.get<jsonxx::Number>("slurThickness");
+                    opt = m_options->GetItems()->at("slurMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
+                }
+            }
+            else if (iter->first == "tieThickness") {
+                vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("tieThickness")) {
+                    double thickness = json.get<jsonxx::Number>("tieThickness");
+                    opt = m_options->GetItems()->at("tieMidpointThickness");
+                    assert(opt);
+                    opt->SetValueDbl(thickness);
                 }
             }
             else {

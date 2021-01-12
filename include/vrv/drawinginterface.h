@@ -99,6 +99,11 @@ public:
     bool IsRepeatedPattern();
 
     /**
+     * Checks whether difference between highest and lowest notes of the beam is just one step
+     */
+    bool HasOneStepHeight();
+
+    /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoords();
@@ -111,7 +116,7 @@ public:
     bool m_beamHasChord;
     bool m_hasMultipleStemDir;
     bool m_cueSize;
-    bool m_isCrossStaff;
+    bool m_hasCrossStaffContent;
     int m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;

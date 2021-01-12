@@ -25,7 +25,7 @@ namespace vrv {
  * It contains notes.
  */
 
-class Ligature : public LayerElement, public ObjectListInterface, public AttLigatureLog {
+class Ligature : public LayerElement, public ObjectListInterface, public AttLigatureVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

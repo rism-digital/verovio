@@ -175,6 +175,10 @@ namespace humaux {
         // **text spines which will be converted into lyrics.
         bool verse;
 
+        // verse_labels == List of verse labels that need to be added to the
+        // current staff.
+        std::vector<hum::HTp> verse_labels;
+
         // suppress_tuplet_number == keeps track of whether or not beams should
         // display beam tuplet numbers.
         bool suppress_tuplet_number;
@@ -208,6 +212,7 @@ namespace humaux {
         bool ligature_obliqua = false;
 
         // last_clef == keep track of last clef on staff to avoid duplications.
+        // Probably better to convert to hum::HTp so its location can be utilized.
         std::string last_clef;
 
         // acclev == In **mens data, controls the accidental level conversion
@@ -276,12 +281,12 @@ namespace humaux {
 
         // meter_bottom == Used to keep track of bottom value of time signature.
         // This is needed to calculate tstamps (meter.unit).
-        hum::HumNum meter_bottom;
+        hum::HumNum meter_bottom = 4;
 
-        // meter_top == the top number of the time signature (meter.count).
-        int meter_top;
+        // meter_top == The top number of the time signature (meter.count).
+        int meter_top = 4;
 
-        // ties == keep track of ties for each staff/layer/pitch
+        // ties == Keep track of ties for each staff/layer/pitch
         // and allow for cross-layer ties (no cross staff ties, but that
         // could be easy to implement.
         // dimensions:
@@ -289,9 +294,23 @@ namespace humaux {
         // 2: all open ties for the staff
         std::list<humaux::HumdrumTie> ties;
 
-        // m_dynampos == dynamic position relativ to the staff:
-        // +1 = above, -1=below, 0=undefined (deal center between staves later)
+        // m_dynampos == Dynamic position relativ to the staff:
+        // +1 = above, -1=below, 2=centered (deal center between staves later)
         int m_dynampos = 0;
+        int m_dynamstaffadj = 0; // used for grand staff movement of dynamics to lower staff
+        bool m_dynamposdefined = false; // used for undefined positions since 0 used for center
+
+        // m_notehead == Notehead shape for notes on the staff.  This could be
+        // expanded later into separate control by subspine and/or by pitch (staff/line).
+        std::string m_notehead;
+
+        // auto_custos == Whether or not to generate automatic custodes
+        // at line breaks.
+        bool auto_custos = false;
+
+        // suppress_manual_custos == Do not render manually encoded custodes.
+        // at line breaks.
+        bool suppress_manual_custos = false;
     };
 } // namespace humaux
 
@@ -337,6 +356,8 @@ public:
 
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
+
+    char hairpinAccent = '\0'; // For <> accent on a note.
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -394,7 +415,7 @@ protected:
     bool hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
     void convertNote(vrv::Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
-    void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
+    void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken, int staffindex);
     void convertMRest(MRest *rest, hum::HTp token, int subtoken, int staffindex);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
@@ -527,7 +548,7 @@ protected:
         hum::HTp token, int staffindex, int justification, const std::string &color);
     bool setTempoContent(Tempo *tempo, const std::string &text);
     bool setLabelContent(Label *label, const std::string &text);
-    std::string convertRhythmToVerovioText(const std::string &text);
+    std::string convertMusicSymbolNameToSmuflEntity(const std::string &text);
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);
@@ -537,8 +558,10 @@ protected:
     int getPartNumberLabel(hum::HTp spinestart);
     bool isFirstTokenOnStaff(hum::HTp token);
     bool hasAboveParameter(hum::HTp token, const std::string &category);
+    bool hasAboveParameter(hum::HTp token, const std::string &category, int &output);
     bool hasBelowParameter(hum::HTp token, const std::string &category);
     bool hasBelowParameter(hum::HTp token, const std::string &category, int &output);
+    bool hasCenterParameter(hum::HTp token, const std::string &category, int &output);
     void prepareHeaderFooter();
     bool prepareHeader(
         std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
@@ -559,7 +582,6 @@ protected:
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
     void storeExpansionList(Section *section, hum::HTp etok);
-    std::string replaceMusicShapes(const std::string input);
     int getStaffAdjustment(hum::HTp token);
     void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
     void promoteInstrumentNamesToGroup();
@@ -648,6 +670,18 @@ protected:
     int getLowestDiatonicPitch(hum::HTp token, const string &requirement);
     int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
     bool hasMensuralStaff(hum::HLp line);
+    int getNextBarlineIndex(hum::HumdrumFile &infile, int startline);
+    std::string escapeFreeAmpersand(const std::string &value);
+    void addHairpinAccent(hum::HTp token);
+    void handleCustos(
+        std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
+    hum::HTp getAssociatedDynamSpine(hum::HTp stafftok);
+    hum::HTp getPreviousStaffToken(hum::HTp parttok);
+    void checkForVerseLabels(hum::HTp token);
+    std::vector<hum::HTp> getVerseLabels(hum::HTp token, int staff);
+    std::string getVerseLabelText(hum::HTp token);
+    void addPlicaUp(Note *note);
+    void addPlicaDown(Note *note);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -672,6 +706,7 @@ protected:
     template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
+    template <class ELEMENT> void setStaffBetween(ELEMENT element, int staffnum);
     template <class ELEMENT> void setN(ELEMENT element, int nvalue, hum::HTp tok = NULL);
     template <class ELEMENT> void assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex);
     template <class ELEMENT> KeySig *getKeySig(ELEMENT element);
@@ -689,14 +724,13 @@ protected:
     void setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex);
     template <class ELEMENT> void addChildBackMeasureOrSection(ELEMENT element);
     template <class ELEMENT> void addChildMeasureOrSection(ELEMENT element);
-
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
     void popElementStack(std::vector<std::string> &elements, std::vector<void *> &pointers);
-
     template <class ELEMENT>
     void addTextElement(
         ELEMENT *element, const std::string &content, const std::string &fontstyle = "", bool addSpacer = true);
+    template <class ELEMENT> void addVerovioTextElement(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
@@ -710,6 +744,10 @@ protected:
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
     template <class ELEMENT> void addType(ELEMENT element, const std::string &aType);
+    template <class ELEMENT>
+    void insertTwoRhythmsAndTextBetween(
+        ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2);
+    template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -880,6 +918,9 @@ private:
 
     // m_sections == keep track of thru sections and 1st/second endings.
     std::vector<hum::HTp> m_sectionlabels;
+
+    // m_numberlesslabels == The last section label without a number at the end.
+    std::vector<hum::HTp> m_numberlesslabels;
 
     // m_endingnum == keep track of current ending.
     int m_endingnum = 0;

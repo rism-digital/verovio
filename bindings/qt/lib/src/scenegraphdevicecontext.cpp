@@ -386,7 +386,8 @@ void SceneGraphDeviceContext::StartText(int x, int y, vrv::data_HORIZONTALALIGNM
     SetTextPositionAndAlignment(x, y, alignment);
 }
 
-void SceneGraphDeviceContext::DrawText(const std::string &text, const std::wstring, int x, int y)
+void SceneGraphDeviceContext::DrawText(
+    const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
     Q_ASSERT(m_currentTextQuickItem != nullptr);
 

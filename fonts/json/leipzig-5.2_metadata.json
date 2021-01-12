@@ -1,36 +1,36 @@
 {
     "_comment": "Automatically generated Metadata for theLeipzig-5.2 font. Most (but not all) of these metadata come from the SMuFL specifications.",
     "engravingDefaults": {
-        "arrowShaftThickness": "0.16",
-        "barlineSeparation": "0.4",
-        "beamSpacing": "0.20",
-        "beamThickness": "0.55",
-        "bracketThickness": "0.5",
-        "dashedBarlineDashLength": "0.5",
-        "dashedBarlineGapLength": "0.25",
-        "dashedBarlineThickness": "0.16",
-        "hairpinThickness": "0.16",
-        "legerLineExtension": "0.4",
-        "legerLineThickness": "0.16",
-        "lyricLineThickness": "0.16",
-        "octaveLineThickness": "0.16",
-        "pedalLineThickness": "0.16",
-        "repeatBarlineDotSeparation": "0.16",
-        "repeatEndingLineThickness": "0.16",
-        "slurEndpointThickness": "0.1",
-        "slurMidpointThickness": "0.22",
-        "staffLineThickness": "0.08",
-        "stemThickness": "0.076",
-        "subBracketThickness": "0.16",
-        "textEnclosureThickness": "0.16",
-        "thickBarlineThickness": "0.5",
-        "thinBarlineThickness": "0.16",
-        "tieEndpointThickness": "0.1",
-        "tieMidpointThickness": "0.22",
-        "tupletBracketThickness": "0.16"
+        "arrowShaftThickness": 0.16,
+        "barlineSeparation": 0.4,
+        "beamSpacing": 0.2,
+        "beamThickness": 0.55,
+        "bracketThickness": 0.5,
+        "dashedBarlineDashLength": 0.5,
+        "dashedBarlineGapLength": 0.25,
+        "dashedBarlineThickness": 0.16,
+        "hairpinThickness": 0.16,
+        "legerLineExtension": 0.27,
+        "legerLineThickness": 0.16,
+        "lyricLineThickness": 0.16,
+        "octaveLineThickness": 0.16,
+        "pedalLineThickness": 0.16,
+        "repeatBarlineDotSeparation": 0.16,
+        "repeatEndingLineThickness": 0.16,
+        "slurEndpointThickness": 0.1,
+        "slurMidpointThickness": 0.22,
+        "staffLineThickness": 0.08,
+        "stemThickness": 0.076,
+        "subBracketThickness": 0.16,
+        "textEnclosureThickness": 0.16,
+        "thickBarlineThickness": 0.5,
+        "thinBarlineThickness": 0.16,
+        "tieEndpointThickness": 0.1,
+        "tieMidpointThickness": 0.22,
+        "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.44",
+    "fontVersion": "5.2.47",
     "glyphBBoxes": {
         "uniE000": {
             "bBoxNE": [
@@ -1422,6 +1422,56 @@
                 0.0
             ]
         },
+        "uniE4E0": {
+            "bBoxNE": [
+                1.5,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "uniE4E1": {
+            "bBoxNE": [
+                0.5,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "uniE4E2": {
+            "bBoxNE": [
+                0.5,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE4E3": {
+            "bBoxNE": [
+                1.2,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
+        "uniE4E4": {
+            "bBoxNE": [
+                1.2,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "uniE4E5": {
             "bBoxNE": [
                 1.22,
@@ -1984,12 +2034,12 @@
         },
         "uniE569": {
             "bBoxNE": [
-                0.0,
-                0.0
+                1.872,
+                1.276
             ],
             "bBoxSW": [
                 0.0,
-                0.0
+                -0.324
             ]
         },
         "uniE56A": {
@@ -2042,6 +2092,36 @@
                 -0.004
             ]
         },
+        "uniE56F": {
+            "bBoxNE": [
+                2.0,
+                1.16
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.428
+            ]
+        },
+        "uniE587": {
+            "bBoxNE": [
+                3.996,
+                1.488
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE594": {
+            "bBoxNE": [
+                0.12,
+                1.6
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "uniE59D": {
             "bBoxNE": [
                 1.2186,
@@ -2060,6 +2140,256 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "uniE5B0": {
+            "bBoxNE": [
+                3.92,
+                1.088
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE5B1": {
+            "bBoxNE": [
+                4.16,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.64
+            ]
+        },
+        "uniE5B2": {
+            "bBoxNE": [
+                3.396,
+                1.6
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE5B3": {
+            "bBoxNE": [
+                3.42,
+                2.084
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE5B4": {
+            "bBoxNE": [
+                5.996,
+                1.488
+            ],
+            "bBoxSW": [
+                0.004,
+                -0.008
+            ]
+        },
+        "uniE5B5": {
+            "bBoxNE": [
+                4.304,
+                1.092
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.268
+            ]
+        },
+        "uniE5B6": {
+            "bBoxNE": [
+                5.168,
+                2.2036
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.268
+            ]
+        },
+        "uniE5B7": {
+            "bBoxNE": [
+                5.32,
+                1.416
+            ],
+            "bBoxSW": [
+                0.004,
+                -0.36
+            ]
+        },
+        "uniE5B8": {
+            "bBoxNE": [
+                4.304,
+                1.276
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.268
+            ]
+        },
+        "uniE5B9": {
+            "bBoxNE": [
+                5.476,
+                1.488
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.996
+            ]
+        },
+        "uniE5BA": {
+            "bBoxNE": [
+                3.284,
+                2.2036
+            ],
+            "bBoxSW": [
+                -1.476,
+                -0.996
+            ]
+        },
+        "uniE5BB": {
+            "bBoxNE": [
+                4.256,
+                2.2036
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE5BC": {
+            "bBoxNE": [
+                4.908,
+                1.236
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.364
+            ]
+        },
+        "uniE5BD": {
+            "bBoxNE": [
+                3.32,
+                1.236
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.36
+            ]
+        },
+        "uniE5BE": {
+            "bBoxNE": [
+                3.932,
+                1.076
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE5BF": {
+            "bBoxNE": [
+                3.932,
+                1.28
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.32
+            ]
+        },
+        "uniE5C0": {
+            "bBoxNE": [
+                4.908,
+                1.076
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE5C1": {
+            "bBoxNE": [
+                4.02,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.36
+            ]
+        },
+        "uniE5C2": {
+            "bBoxNE": [
+                4.02,
+                1.24
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.36
+            ]
+        },
+        "uniE5C3": {
+            "bBoxNE": [
+                4.996,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.36
+            ]
+        },
+        "uniE5C4": {
+            "bBoxNE": [
+                4.996,
+                1.24
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.36
+            ]
+        },
+        "uniE5C5": {
+            "bBoxNE": [
+                3.284,
+                2.2036
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "uniE5C6": {
+            "bBoxNE": [
+                4.42,
+                1.472
+            ],
+            "bBoxSW": [
+                0.004,
+                -0.008
+            ]
+        },
+        "uniE5C7": {
+            "bBoxNE": [
+                4.42,
+                1.472
+            ],
+            "bBoxSW": [
+                0.004,
+                -0.32
+            ]
+        },
+        "uniE5C8": {
+            "bBoxNE": [
+                3.024,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.972
             ]
         },
         "uniE610": {
@@ -2132,6 +2462,16 @@
                 0.0
             ]
         },
+        "uniE651": {
+            "bBoxNE": [
+                1.28,
+                2.056
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "uniE655": {
             "bBoxNE": [
                 1.724,
@@ -2145,6 +2485,16 @@
         "uniE659": {
             "bBoxNE": [
                 3.876,
+                2.14
+            ],
+            "bBoxSW": [
+                -0.0,
+                -0.056
+            ]
+        },
+        "uniE65A": {
+            "bBoxNE": [
+                1.512,
                 2.14
             ],
             "bBoxSW": [
@@ -3481,6 +3831,21 @@
         "uniE4CE": {
             "codepoint": "0XE4CE"
         },
+        "uniE4E0": {
+            "codepoint": "0XE4E0"
+        },
+        "uniE4E1": {
+            "codepoint": "0XE4E1"
+        },
+        "uniE4E2": {
+            "codepoint": "0XE4E2"
+        },
+        "uniE4E3": {
+            "codepoint": "0XE4E3"
+        },
+        "uniE4E4": {
+            "codepoint": "0XE4E4"
+        },
         "uniE4E5": {
             "codepoint": "0XE4E5"
         },
@@ -3667,11 +4032,95 @@
         "uniE56E": {
             "codepoint": "0XE56E"
         },
+        "uniE56F": {
+            "codepoint": "0XE56F"
+        },
+        "uniE587": {
+            "codepoint": "0XE587"
+        },
+        "uniE594": {
+            "codepoint": "0XE594"
+        },
         "uniE59D": {
             "codepoint": "0XE59D"
         },
         "uniE59E": {
             "codepoint": "0XE59E"
+        },
+        "uniE5B0": {
+            "codepoint": "0XE5B0"
+        },
+        "uniE5B1": {
+            "codepoint": "0XE5B1"
+        },
+        "uniE5B2": {
+            "codepoint": "0XE5B2"
+        },
+        "uniE5B3": {
+            "codepoint": "0XE5B3"
+        },
+        "uniE5B4": {
+            "codepoint": "0XE5B4"
+        },
+        "uniE5B5": {
+            "codepoint": "0XE5B5"
+        },
+        "uniE5B6": {
+            "codepoint": "0XE5B6"
+        },
+        "uniE5B7": {
+            "codepoint": "0XE5B7"
+        },
+        "uniE5B8": {
+            "codepoint": "0XE5B8"
+        },
+        "uniE5B9": {
+            "codepoint": "0XE5B9"
+        },
+        "uniE5BA": {
+            "codepoint": "0XE5BA"
+        },
+        "uniE5BB": {
+            "codepoint": "0XE5BB"
+        },
+        "uniE5BC": {
+            "codepoint": "0XE5BC"
+        },
+        "uniE5BD": {
+            "codepoint": "0XE5BD"
+        },
+        "uniE5BE": {
+            "codepoint": "0XE5BE"
+        },
+        "uniE5BF": {
+            "codepoint": "0XE5BF"
+        },
+        "uniE5C0": {
+            "codepoint": "0XE5C0"
+        },
+        "uniE5C1": {
+            "codepoint": "0XE5C1"
+        },
+        "uniE5C2": {
+            "codepoint": "0XE5C2"
+        },
+        "uniE5C3": {
+            "codepoint": "0XE5C3"
+        },
+        "uniE5C4": {
+            "codepoint": "0XE5C4"
+        },
+        "uniE5C5": {
+            "codepoint": "0XE5C5"
+        },
+        "uniE5C6": {
+            "codepoint": "0XE5C6"
+        },
+        "uniE5C7": {
+            "codepoint": "0XE5C7"
+        },
+        "uniE5C8": {
+            "codepoint": "0XE5C8"
         },
         "uniE610": {
             "codepoint": "0XE610"
@@ -3694,11 +4143,17 @@
         "uniE650": {
             "codepoint": "0XE650"
         },
+        "uniE651": {
+            "codepoint": "0XE651"
+        },
         "uniE655": {
             "codepoint": "0XE655"
         },
         "uniE659": {
             "codepoint": "0XE659"
+        },
+        "uniE65A": {
+            "codepoint": "0XE65A"
         },
         "uniE880": {
             "codepoint": "0XE880"

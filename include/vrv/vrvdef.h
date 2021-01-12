@@ -34,8 +34,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 0
-#define VERSION_REVISION 2
+#define VERSION_MINOR 1
+#define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
 
@@ -85,6 +85,7 @@ enum ClassId {
     DOC,
     FACSIMILE,
     FB,
+    GRPSYM,
     GRACE_ALIGNER,
     INSTRDEF,
     KEYSIG_ATTR,
@@ -206,6 +207,7 @@ enum ClassId {
     NC,
     NOTE,
     NEUME,
+    PLICA,
     PROPORT,
     REST,
     SPACE,

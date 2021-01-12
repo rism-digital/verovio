@@ -278,6 +278,24 @@ int main(int argc, char **argv)
                 key = long_options[option_index].name;
                 opt = params->at(toCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
+                
+                // Handle deprecated options
+                if (key == "condense-encoded") {
+                    vrv::LogWarning("Option --condense-encoded is deprecated; use --condense encoded instead");
+                    options->m_condense.SetValue("encoded");
+                    break;
+                }
+                if (key == "slur-thickness") {
+                    vrv::LogWarning("Option --slur-thickness is deprecated; use --slur-midpoint-thickness instead");
+                    options->m_slurMidpointThickness.SetValue(optarg);
+                    break;
+                }
+                else if (key == "tie-thickness") {
+                    vrv::LogWarning("Option --tie-thickness is deprecated; use --tie-midpoint-thickness instead");
+                    options->m_tieMidpointThickness.SetValue(optarg);
+                    break;
+                }
+
                 if (optBool) {
                     optBool->SetValue(true);
                 }

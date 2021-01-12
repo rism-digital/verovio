@@ -1,6 +1,6 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![Build Status](https://travis-ci.org/rism-ch/verovio.svg?branch=develop)](https://travis-ci.org/rism-ch/verovio)
-[![Build status](https://ci.appveyor.com/api/projects/status/121cxhmtwurxffh0?svg=true)](https://ci.appveyor.com/project/LaurentPugin/verovio-r1t6l)
+[![AppVeyor status](https://ci.appveyor.com/api/projects/status/121cxhmtwurxffh0?svg=true)](https://ci.appveyor.com/project/LaurentPugin/verovio-r1t6l)
+[![GH Actions status](https://github.com/rism-ch/verovio/workflows/Verovio%20CI%20Build/badge.svg)](https://github.com/rism-ch/verovio/actions?query=workflow%3A%22Verovio+CI+Build%22)
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
@@ -41,7 +41,7 @@ Major releases of Verovio and MEI versions:
 From Verovio 2.x.x, the plan is to have even version numbers for Verovio releases using a stable version of MEI, and odd version numbers for releases using a development version of MEI. It means that once MEI 5.0 will be released, Verovio will move to version 4.x.x. Older versions of MEI are still supported by newer versions of Verovio. MEI files are internally upgraded when loaded into Verovio. This applies only to the features supported by Verovio. We will try to maintain this in the future.
 
 Other libraries
---------------
+---------------
 
 The following libraries are embedded in Verovio:
 
@@ -66,7 +66,7 @@ The sample page of music shown below was generated with version 2.4.0-dev-2748fe
 ![Example page](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)
 
 Example resources using verovio
------------------------------------------
+-------------------------------
 
 | name | type  | description |
 | ---- | ----- | ----------- |
@@ -74,19 +74,20 @@ Example resources using verovio
 | [MoVI](https://dme.mozarteum.at/movi/en) | repertory | The digital Mozart digital score VIewer at the [Mozarteum](https://mozarteum.at) |
 | [Tasso in Music Project](https://www.tassomusic.org/work/?id=Trm0047m) | repertory | Musical settings of the poetry of [Torquato Tasso](https://en.wikipedia.org/wiki/Torquato_Tasso)
 | [Measuring Polyphony](https://measuringpolyphony.org/display.html?/assets/mensural/325_MENSURAL.mei) | repertory | Late medieval music in black mensural and modern notations |
+| [Probstücke Digital](http://probstuecke-digital.de) | repertory | open and critical digital edition of Mattheson's test pieces |
 | [370 Bach Chorales](https://chorales.sapp.org) | repertory | Online edition of Bach chorales, including an interactive [typesetter page](https://chorales.sapp.org/typesetter) that allows for creating musical examples for online display or use in papers. |
 | [Humdrum Notation Plugin](https://plugin.humdrum.org) | tool | Javascript interface to verovio for displaying multiple musical examples on a webpage |
 | [Music Sheet Viewer](http://www.partitionnumerique.com/music-sheet-viewer-wordpress-plugin) | tool | WordPress plugin for displaying graphical music from MEI data | 
 
 
 Digital score repositories on Github
--------------------------------------
+------------------------------------
 
 Here is a list of digital score repositories on Github that can be displayed with verovio:
 
 
 | link | encoding | description |
-| ---- | ------ | ----------- | 
+| ---- | -------- | ----------- | 
 |  [MEI complete examples](https://github.com/music-encoding/sample-encodings/tree/master/MEI_4.0/Music/Complete_examples) | MEI | 86 various works encoded in MEI |
 | [Mozart Piano Sonatas](https://github.com/craigsapp/mozart-piano-sonatas) | Humdrum | 17 Piano sonatas by W.A. Mozart from the Alte Mozart-Ausgabe ([in VHV](http://verovio.humdrum.org/?file=mozart/sonatas&k=e)) |
 | [Beethoven Piano Sonatas](https://github.com/craigsapp/beethoven-piano-sonatas) | Humdrum | 32 Piano sonatas by L. van Beethoven, edited by Paul Dukas ([in VHV](http://verovio.humdrum.org/?file=beethoven/sonatas&k=e)) |

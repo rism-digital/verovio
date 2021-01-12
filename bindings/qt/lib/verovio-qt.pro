@@ -1,7 +1,7 @@
 QT -= gui
 QT += quick
 
-CONFIG += c++14
+CONFIG += c++17
 
 TARGET = verovio-qt
 TEMPLATE = lib
@@ -36,6 +36,7 @@ INCLUDEPATH += include
     INCLUDEPATH += ../../../include/vrv
     INCLUDEPATH += ../../../include/pugi
     INCLUDEPATH += ../../../include/utf8
+    INCLUDEPATH += ../../../include/json
     INCLUDEPATH += ../../../libmei
 }
 

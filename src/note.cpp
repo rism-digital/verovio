@@ -24,6 +24,7 @@
 #include "glyph.h"
 #include "layer.h"
 #include "ligature.h"
+#include "plica.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -55,8 +56,8 @@ Note::Note()
     , AttExtSym()
     , AttGraced()
     , AttMidiVelocity()
-    , AttNoteAnlMensural()
     , AttNoteHeads()
+    , AttNoteVisMensural()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -70,8 +71,8 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_NOTEHEADS);
+    RegisterAttClass(ATT_NOTEVISMENSURAL);
     RegisterAttClass(ATT_MIDIVELOCITY);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
@@ -95,8 +96,8 @@ void Note::Reset()
     ResetCue();
     ResetExtSym();
     ResetGraced();
-    ResetNoteAnlMensural();
     ResetNoteHeads();
+    ResetNoteVisMensural();
     ResetMidiVelocity();
     ResetStems();
     ResetStemsCmn();
@@ -141,6 +142,9 @@ bool Note::IsSupportedChild(Object *child)
     else if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
     }
+    else if (child->Is(PLICA)) {
+        assert(dynamic_cast<Plica *>(child));
+    }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
     }
@@ -168,13 +172,15 @@ void Note::AddChild(Object *child)
 
     child->SetParent(this);
 
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        m_children.insert(m_children.begin(), child);
+        children->insert(children->begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children->push_back(child);
     }
     Modify();
 }
@@ -576,14 +582,125 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    const wchar_t flagGlyph
-        = (this->GetDur() >= DURATION_16) ? SMUFL_E242_flag16thUp : flag->GetSmuflCode(GetDrawingStemDir());
+    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    data_DURATION dur = this->GetDur();
+    if (dur < DURATION_16) flagGlyph = flag->GetSmuflCode(GetDrawingStemDir());
     const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
 
     const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
         - (isDotShifted ? doc->GetDrawingUnit(staffSize) : 0);
 
     return dotMargin < 0;
+}
+
+std::pair<int, bool> Note::CalcNoteHorizontalOverlap(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool isLowerElement, bool unison)
+{
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    bool isInUnison = false;
+    int shift = 0;
+
+    for (int i = 0; i < int(otherElements.size()); ++i) {
+        int verticalMargin = 0;
+        int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        bool isUnisonElement = false;
+        if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
+            Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
+            assert(previousNote);
+            isUnisonElement = IsUnissonWith(previousNote, true);
+            // Unisson, look at the duration for the note heads
+            if (unison && IsUnissonWith(previousNote, false)) {
+                int previousDuration = previousNote->GetDrawingDur();
+                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
+                bool isEdgeElement = false;
+                if (isPreviousCoord) {
+                    Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
+                    data_STEMDIRECTION stemDir = GetDrawingStemDir();
+                    previousDuration = parentChord->GetDur();
+                    isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
+                        || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
+                }
+                // Reduce the margin to 0 for whole notes unisson
+                else if ((GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
+                    horizontalMargin = 0;
+                }
+                if (!isPreviousCoord || isEdgeElement || isChordElement) {
+                    if ((GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
+                        isInUnison = true;
+                        continue;
+                    }
+                    else if ((GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
+                        isInUnison = true;
+                        continue;
+                    }
+                }
+                else {
+                    horizontalMargin *= -1;
+                }
+            }
+            else if (previousNote->GetDrawingLoc() - GetDrawingLoc() > 1) {
+                continue;
+            }
+            else if (previousNote->GetDrawingLoc() - GetDrawingLoc() == 1) {
+                horizontalMargin = 0;
+            }
+            else if ((previousNote->GetDrawingLoc() - GetDrawingLoc() < 0)
+                && (previousNote->GetDrawingStemDir() != GetDrawingStemDir()) /* && !isChordElement*/) {
+                if (previousNote->GetDrawingLoc() - GetDrawingLoc() == -1) {
+                    horizontalMargin *= -1;
+                }
+                else if ((GetDrawingDur() <= DUR_1) && (previousNote->GetDrawingDur() <= DUR_1)) {
+                    continue;
+                }
+                else if (previousNote->m_crossStaff || m_crossStaff)
+                    continue;
+                else {
+                    horizontalMargin *= -1;
+                    verticalMargin = horizontalMargin;
+                }
+            }
+        }
+
+        // Nothing to do if we have no vertical overlap
+        if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) continue;
+
+        // Nothing to do either if we have no horizontal overlap
+        if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) continue;
+
+        if (horizontalMargin < 0 || isLowerElement) {
+            shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
+            if (!isUnisonElement) shift -= horizontalMargin;
+        }
+        else if ((horizontalMargin >= 0) || isChordElement) {
+            shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+
+            // Make additional adjustments for cross-staff and unison notes
+            if (m_crossStaff) shift -= horizontalMargin;
+            if (isInUnison) shift *= -1;
+        }
+        else {
+            // Otherwise move the appropriate parent to the right
+            shift -= horizontalMargin
+                - HorizontalRightOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+        }
+    }
+
+    // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
+    // That way accidental will be near note that actually has accidental and not near lowest-layer note
+    if (isChordElement && unison && GetDrawingAccid() && (shift > 0)) shift *= -1;
+
+    return { shift, isInUnison };
+}
+
+void Note::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    if (GetParent()->Is(CHORD)) return;
+
+    auto [margin, isInUnison] = CalcNoteHorizontalOverlap(doc, otherElements, false);
+    isUnison = isInUnison;
+    if (!isInUnison) SetDrawingXRel(GetDrawingXRel() + margin);
 }
 
 //----------------------------------------------------------------------------
@@ -682,7 +799,10 @@ int Note::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (this->m_crossStaff) {
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
+    }
 
     // Cache the in params to avoid further lookup
     params->m_staff = staff;
@@ -800,6 +920,7 @@ int Note::CalcDots(FunctorParams *functorParams)
 
     // The shift to the left when a stem flag requires it
     int flagShift = 0;
+    int radius = this->GetDrawingRadius(params->m_doc);
 
     if (chord && (chord->GetDots() > 0)) {
         dots = params->m_chordDots;
@@ -814,12 +935,14 @@ int Note::CalcDots(FunctorParams *functorParams)
                 flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             }
         }
+
+        int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
+        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
     }
-    else if (this->GetDots() > 0) {
+    if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
         dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
-        params->m_chordDrawingX = this->GetDrawingX();
 
         std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
         int loc = this->GetDrawingLoc();
@@ -835,14 +958,10 @@ int Note::CalcDots(FunctorParams *functorParams)
             // HARDCODED
             flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
         }
-    }
-    else {
-        return FUNCTOR_SIBLINGS;
-    }
 
-    int radius = this->GetDrawingRadius(params->m_doc);
-    int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
-    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
+        int xRel = 2 * radius + flagShift;
+        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
+    }
 
     return FUNCTOR_SIBLINGS;
 }
@@ -912,7 +1031,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!this->IsChordTone() && !this->IsMensuralDur()) {
         if (!currentStem) {

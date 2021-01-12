@@ -168,16 +168,17 @@ void Measure::AddChildBack(Object *child)
     }
 
     child->SetParent(this);
-    if (m_children.empty()) {
-        m_children.push_back(child);
+    ArrayOfObjects *children = this->GetChildrenForModification();
+    if (children->empty()) {
+        children->push_back(child);
     }
-    else if (m_children.back()->Is(STAFF)) {
-        m_children.push_back(child);
+    else if (children->back()->Is(STAFF)) {
+        children->push_back(child);
     }
     else {
-        for (auto it = m_children.begin(); it != m_children.end(); ++it) {
+        for (auto it = children->begin(); it != children->end(); ++it) {
             if (!(*it)->Is(STAFF)) {
-                m_children.insert(it, child);
+                children->insert(it, child);
                 break;
             }
         }
@@ -1106,7 +1107,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
-        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
+        if (iter->second == HARM) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {

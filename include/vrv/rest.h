@@ -15,7 +15,6 @@
 
 namespace vrv {
 
-
 class TransPitch;
 
 enum RestLayer { RL_UNSET = -1, RL_sameLayer, RL_otherLayer };
@@ -126,8 +125,7 @@ public:
     int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
 
 private:
-
-     /**
+    /**
      * Helper function to update rest oloc/ploc based on the input TransPitch
      */
     void UpdateFromTransLoc(const TransPitch &tp);
@@ -163,8 +161,6 @@ public:
     //
 private:
 };
-
-
 
 } // namespace vrv
 

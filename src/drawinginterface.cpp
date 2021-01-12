@@ -81,7 +81,7 @@ void BeamDrawingInterface::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
-    m_isCrossStaff = false;
+    m_hasCrossStaffContent = false;
     m_shortestDur = 0;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
@@ -163,7 +163,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
 
         Staff *staff = current->GetCrossStaff(layer);
         if (staff != currentStaff) {
-            this->m_isCrossStaff = true;
+            this->m_hasCrossStaffContent = true;
         }
         currentStaff = staff;
 
@@ -229,7 +229,9 @@ bool BeamDrawingInterface::IsHorizontal()
         return true;
     }
 
-    if (m_drawingPlace == BEAMPLACE_mixed) return true;
+    if (HasOneStepHeight()) return true;
+
+    // if (m_drawingPlace == BEAMPLACE_mixed) return true;
 
     if (m_drawingPlace == BEAMPLACE_NONE) return true;
 
@@ -347,6 +349,25 @@ bool BeamDrawingInterface::IsRepeatedPattern()
     }
 
     return false;
+}
+
+bool BeamDrawingInterface::HasOneStepHeight()
+{
+    if (m_shortestDur < DUR_32) return false;
+
+    int top = -128;
+    int bottom = 128;
+    for (auto coord : m_beamElementCoords) {
+        if (coord->m_closestNote) {
+            Note *note = vrv_cast<Note *>(coord->m_closestNote);
+            assert(note);
+            int loc = note->GetDrawingLoc();
+            if (loc > top) top = loc;
+            if (loc < bottom) bottom = loc;
+        }
+    }
+
+    return (abs(top - bottom) <= 1);
 }
 
 //----------------------------------------------------------------------------

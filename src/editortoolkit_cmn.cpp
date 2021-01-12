@@ -50,7 +50,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         return false;
     }
 

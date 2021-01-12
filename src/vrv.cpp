@@ -6,12 +6,12 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "vrv.h"
-#include <iostream>
 
 //----------------------------------------------------------------------------
 
 #include <assert.h>
 #include <cmath>
+#include <iostream>
 #include <sstream>
 #include <stdarg.h>
 #include <stdio.h>

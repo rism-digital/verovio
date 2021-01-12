@@ -30,6 +30,8 @@ namespace vrv {
 
 HalfmRpt::HalfmRpt() : LayerElement("mrpt-")
 {
+    RegisterAttClass(ATT_COLOR);
+
     Reset();
 }
 
@@ -38,6 +40,7 @@ HalfmRpt::~HalfmRpt() {}
 void HalfmRpt::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
 }
 
 //----------------------------------------------------------------------------

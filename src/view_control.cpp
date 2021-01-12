@@ -42,6 +42,7 @@
 #include "options.h"
 #include "pedal.h"
 #include "reh.h"
+#include "rend.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -194,7 +195,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     Object *graphic = NULL;
     char spanningType = SPANNING_START_END;
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
+    // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         // we use the start measure
         measure = interface->GetStartMeasure();
@@ -243,7 +244,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 
     // Overwrite the spanningType for open ended control events
-    // We can identify them becaseu they end on a right barline attribute
+    // We can identify them because they end on a right barline attribute
     if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
         spanningType = SPANNING_START;
     }
@@ -508,7 +509,7 @@ void View::DrawHairpin(
         }
     }
 
-    // In any case, a hairpin should not be sorter than 2 units.
+    // In any case, a hairpin should not be shorter than 2 units.
     // If shorter, with groups, this will screw up vertical alignment and push everything down - to be improved by
     // deactivating grp?
     if ((adjustedX2 - adjustedX1) >= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2) {
@@ -518,6 +519,11 @@ void View::DrawHairpin(
 
     // Store the full drawing length
     if (spanningType == SPANNING_START_END) {
+        const auto [leftOverlap, rightOverlap]
+            = hairpin->GetBarlineOverlapAdjustment(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2);
+        x1 += leftOverlap;
+        x2 -= rightOverlap;
+
         hairpin->SetDrawingLength(x2 - x1);
     }
 
@@ -684,7 +690,7 @@ void View::DrawOctave(
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         TextExtend extend;
         dc->GetSmuflTextExtent(str, &extend);
-        int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
+        const int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
         DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
         dc->ResetFont();
 
@@ -704,9 +710,10 @@ void View::DrawOctave(
 
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
         // draw the ending vertical line if not the end of the system
-        if (spanningType != SPANNING_START)
+        if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
             dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
                 ToDeviceContextY(y2 + lineWidth / 2));
+        }
 
         dc->ResetPen();
         dc->ResetBrush();
@@ -747,10 +754,12 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (note1) {
         durElement = note1;
         layer1 = dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
+        if (note1->m_crossStaff) layer1 = note1->m_crossLayer;
         parentChord1 = note1->IsChordTone();
     }
     if (parentChord1) {
         durElement = parentChord1;
+        if (parentChord1->m_crossStaff) layer1 = parentChord1->m_crossLayer;
     }
 
     /************** x positions **************/
@@ -839,7 +848,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
-    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(durElement)) != STEMDIRECTION_NONE)) {
+    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(note1)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
@@ -891,7 +900,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
         height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieThickness.GetValue();
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieMidpointThickness.GetValue();
 
     // control points
     Point c1, c2;
@@ -935,7 +944,14 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "", tie->GetUuid(), false);
-    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize, 0, penStyle);
+    // set pen width and calculate tie thickness coeficient to adjust tie width in according to it
+    const int penWidth
+        = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (m_tieThicknessCoeficient <= 0) {
+        m_tieThicknessCoeficient = BoundingBox::GetBezierThicknessCoeficient(bezier, thickness, 0, penWidth);
+    }
+    DrawThickBezierCurve(
+        dc, bezier, m_tieThicknessCoeficient * thickness, staff->m_drawingStaffSize, penWidth, 0, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1463,7 +1479,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
             continue;
         }
-
+        params.m_boxedRend.clear();
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -1485,6 +1501,8 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
         dc->ResetFont();
         dc->ResetBrush();
+
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(dir, this);
@@ -1535,6 +1553,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             continue;
         }
 
+        params.m_boxedRend.clear();
         params.m_y = dynam->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -1565,6 +1584,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             dc->ResetFont();
             dc->ResetBrush();
         }
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(dynam, this);
@@ -1676,6 +1696,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
             continue;
         }
 
+        params.m_boxedRend.clear();
         params.m_y = fing->GetDrawingY();
 
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
@@ -1691,6 +1712,8 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
         dc->ResetFont();
         dc->ResetBrush();
+
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(fing, this);
@@ -1835,6 +1858,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             continue;
         }
 
+        params.m_boxedRend.clear();
         params.m_y = harm->GetDrawingY();
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
@@ -1854,6 +1878,8 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
             dc->ResetFont();
             dc->ResetBrush();
+
+            DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
         }
     }
 
@@ -2059,6 +2085,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
             continue;
         }
 
+        params.m_boxedRend.clear();
         params.m_y = reh->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -2073,6 +2100,8 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
         dc->ResetFont();
         dc->ResetBrush();
+
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(reh, this);
@@ -2123,6 +2152,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
             continue;
         }
 
+        params.m_boxedRend.clear();
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -2144,6 +2174,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
         dc->ResetFont();
         dc->ResetBrush();
+
+        DrawTextBoxes(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(tempo, this);
@@ -2365,7 +2397,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     Measure *measure = NULL;
     char spanningType = SPANNING_START_END;
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
+    // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         measure = ending->GetMeasure();
         x1 = measure->GetDrawingX();
@@ -2491,6 +2523,22 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->EndResumedGraphic(ending, this);
     else
         dc->EndGraphic(ending, this);
+}
+
+void View::DrawTextBoxes(DeviceContext *dc, const std::vector<TextElement *> &boxedRend, int staffSize)
+{
+    assert(dc);
+    const int lineThickness = m_options->m_textEnclosureThickness.GetValue() * staffSize;
+    const int boxMargin = staffSize / 2;
+
+    for (const auto rend : boxedRend) {
+        const int x1 = rend->GetContentLeft() - boxMargin;
+        const int y1 = rend->GetContentBottom() - boxMargin;
+        const int x2 = rend->GetContentRight() + boxMargin;
+        const int y2 = rend->GetContentTop() + 2 * boxMargin;
+
+        DrawNotFilledRectangle(dc, x1, y1, x2, y2, lineThickness, 0);
+    }
 }
 
 } // namespace vrv

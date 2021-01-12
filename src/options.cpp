@@ -24,8 +24,11 @@ namespace vrv {
 std::map<int, std::string> Option::s_breaks
     = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_line, "line" }, { BREAKS_encoded, "encoded" } };
 
+std::map<int, std::string> Option::s_condense
+    = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
+
 std::map<int, std::string> Option::s_footer
-    = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" } };
+    = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
 std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
@@ -33,14 +36,14 @@ std::map<int, std::string> Option::s_header
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
 
-std::map<int, std::string> Option::s_systemDivider
-    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
+    { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
       "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
       "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15}}";
+      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': 0.2}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -623,9 +626,9 @@ Options::Options()
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
 
-    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
-    m_condenseEncoded.Init(false);
-    this->Register(&m_condenseEncoded, "condenseEncoded", &m_general);
+    m_condense.SetInfo("Condense", "Control condensed score layout");
+    m_condense.Init(CONDENSE_auto, &Option::s_condense);
+    this->Register(&m_condense, "condense", &m_general);
 
     m_condenseFirstPage.SetInfo("Condense first page", "When condensing a score also condense the first page");
     m_condenseFirstPage.Init(false);
@@ -769,7 +772,12 @@ Options::Options()
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
 
-    m_barLineWidth.SetInfo("Bar line width", "The barLine width");
+    m_barLineSeparation.SetInfo(
+        "Barline separation", "The default distance between multiple barlines when locked together");
+    m_barLineSeparation.Init(0.8, 0.5, 2.0);
+    this->Register(&m_barLineSeparation, "barLineSeparation", &m_generalLayout);
+
+    m_barLineWidth.SetInfo("Barline width", "The barLine width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
@@ -873,6 +881,11 @@ Options::Options()
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
 
+    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
+        "The default horizontal distance between the dots and the inner barline of a repeat barline");
+    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
+
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
     m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
@@ -902,18 +915,22 @@ Options::Options()
     m_slurMaxSlope.Init(20, 0, 60);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
-    m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
-    m_slurThickness.Init(0.6, 0.2, 1.2);
-    this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
+    m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
+    m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
+
+    m_slurMidpointThickness.SetInfo("Slur midpoint thickness", "The midpoint slur thickness in MEI units");
+    m_slurMidpointThickness.Init(0.6, 0.2, 1.2);
+    this->Register(&m_slurMidpointThickness, "slurMidpointThickness", &m_generalLayout);
 
     m_spacingBraceGroup.SetInfo(
         "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
-    m_spacingBraceGroup.Init(12, 0, 36);
+    m_spacingBraceGroup.Init(12, 0, 48);
     this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
 
     m_spacingBracketGroup.SetInfo(
         "Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
-    m_spacingBracketGroup.Init(12, 0, 36);
+    m_spacingBracketGroup.Init(12, 0, 48);
     this->Register(&m_spacingBracketGroup, "spacingBracketGroup", &m_generalLayout);
 
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
@@ -929,7 +946,7 @@ Options::Options()
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
 
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
-    m_spacingStaff.Init(12, 0, 36);
+    m_spacingStaff.Init(12, 0, 48);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
 
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
@@ -949,20 +966,28 @@ Options::Options()
     this->Register(&m_subBracketThickness, "subBracketThickness", &m_generalLayout);
 
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
-    m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
+    m_systemDivider.Init(SYSTEMDIVIDER_auto, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
     m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
+    m_textEnclosureThickness.SetInfo("Text box line thickness", "The thickness of the line text enclosing box");
+    m_textEnclosureThickness.Init(0.2, 0.10, 0.80);
+    this->Register(&m_textEnclosureThickness, "textEnclosureThickness", &m_generalLayout);
+
     m_thickBarlineThickness.SetInfo("Thick barline thickness", "The thickness of the thick barline");
     m_thickBarlineThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_thickBarlineThickness, "thickBarlineThickness", &m_generalLayout);
 
-    m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
-    m_tieThickness.Init(0.5, 0.2, 1.0);
-    this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
+    m_tieEndpointThickness.SetInfo("Tie Endpoint thickness", "The Endpoint tie thickness in MEI units");
+    m_tieEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_tieEndpointThickness, "tieEndpointThickness", &m_generalLayout);
+
+    m_tieMidpointThickness.SetInfo("Tie midpoint thickness", "The midpoint tie thickness in MEI units");
+    m_tieMidpointThickness.Init(0.5, 0.2, 1.0);
+    this->Register(&m_tieMidpointThickness, "tieMidpointThickness", &m_generalLayout);
 
     m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
     m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
@@ -1175,6 +1200,23 @@ Options::Options()
     m_topMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
 
+    /********* Deprecated options *********/
+
+    m_deprecated.SetLabel("Deprecated options", "Deprecated");
+    m_grps.push_back(&m_deprecated);
+
+    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
+    m_condenseEncoded.Init(false);
+    this->Register(&m_condenseEncoded, "condenseEncoded", &m_deprecated);
+
+    m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
+    m_slurThickness.Init(0.6, 0.2, 2);
+    this->Register(&m_slurThickness, "slurThickness", &m_deprecated);
+
+    m_tieThickness.SetInfo("Tie  thickness", "The tie thickness in MEI units");
+    m_tieThickness.Init(0.5, 0.2, 1.0);
+    this->Register(&m_tieThickness, "tieThickness", &m_deprecated);
+
     /*
     // Example of a staffRel param
     OptionStaffrel rel;
@@ -1218,21 +1260,27 @@ void Options::Sync()
 {
     if (!m_engravingDefaults.isSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults
-        = { { "staffLineThickness", &m_staffLineWidth }, //
-              { "stemThickness", &m_stemWidth }, //
-              { "legerLineThickness", &m_ledgerLineThickness }, //
-              { "legerLineExtension", &m_ledgerLineExtension }, //
-              { "slurMidpointThickness", &m_slurThickness }, //
-              { "tieMidpointThickness", &m_tieThickness }, //
-              { "thinBarlineThickness", &m_barLineWidth }, //
-              { "thickBarlineThickness", &m_thickBarlineThickness }, //
-              { "bracketThickness", &m_bracketThickness }, //
-              { "subBracketThickness", &m_subBracketThickness }, //
-              { "hairpinThickness", &m_hairpinThickness }, //
-              { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
-              { "lyricLineThickness", &m_lyricLineThickness }, //
-              { "tupletBracketThickness", &m_tupletBracketThickness } };
+    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = {
+        { "staffLineThickness", &m_staffLineWidth }, //
+        { "stemThickness", &m_stemWidth }, //
+        { "legerLineThickness", &m_ledgerLineThickness }, //
+        { "legerLineExtension", &m_ledgerLineExtension }, //
+        { "slurEndpointThickness", &m_slurEndpointThickness }, //
+        { "slurMidpointThickness", &m_slurMidpointThickness }, //
+        { "tieEndpointThickness", &m_tieEndpointThickness }, //
+        { "tieMidpointThickness", &m_tieMidpointThickness }, //
+        { "thinBarlineThickness", &m_barLineWidth }, //
+        { "thickBarlineThickness", &m_thickBarlineThickness }, //
+        { "barlineSeparation", &m_barLineSeparation }, //
+        { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
+        { "bracketThickness", &m_bracketThickness }, //
+        { "subBracketThickness", &m_subBracketThickness }, //
+        { "hairpinThickness", &m_hairpinThickness }, //
+        { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
+        { "lyricLineThickness", &m_lyricLineThickness }, //
+        { "tupletBracketThickness", &m_tupletBracketThickness }, //
+        { "textEnclosureThickness", &m_textEnclosureThickness } //
+    };
 
     for (auto &pair : engravingDefaults) {
         if (pair.second->isSet()) continue;
