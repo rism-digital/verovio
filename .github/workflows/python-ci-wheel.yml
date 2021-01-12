@@ -1,0 +1,306 @@
+name: Python Wheel Build
+
+on:
+  push:
+    # Trigger the workflow on push, but only for the develop-pypi branch
+    branches:
+      - develop-pypi
+  release:
+    types:
+      - published
+      - created
+
+# globals
+env:
+  PACKAGE_NAME: verovio
+  CHECK_INSTALL_DIR: check_install_dir
+  CIBW_BUILD_IDENTIFIER: ''
+
+
+jobs:
+  #===============================================#
+  #         BUILD WHEEL DISTRIBUTION              #
+  #===============================================#
+  build_wheels:
+    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }}-${{ matrix.architecture }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Ensure that a wheel builder finishes even if another fails
+      fail-fast: false
+      # Build the wheels for Linux, Windows and macOS for Python 3.9
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-18.04]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        architecture: [ x86, x64 ]
+        include:
+          - os: macos-latest
+            architecture: x64
+            platform_id: macosx_x86_64
+          - os: windows-latest
+            architecture: x64
+            platform_id: win_amd64
+          - os: windows-latest
+            architecture: x86
+            platform_id: win32
+          - os: ubuntu-18.04
+            architecture: x64
+            platform_id: manylinux_x86_64
+        exclude:
+          - os: macos-latest
+            architecture: x86
+          - os: ubuntu-18.04
+            architecture: x86
+
+    steps:
+      #===============================================#
+      # Set up
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
+
+      #===============================================#
+      # Dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install cibuildwheel==1.7.1 twine
+
+      #===============================================#
+      # Prepare identifier
+      - name: Set CIBW_BUILD_IDENTIFIER
+        shell: bash
+        run: |
+          # Remove dot from python-version for CIBW and prefix with cp
+          id=cp$(echo ${{ matrix.python-version }} | sed -e 's/\.//g')-${{ matrix.platform_id }}
+          echo CIBW_BUILD_IDENTIFIER=$id >> $GITHUB_ENV
+
+      # TODO: Can be removed when everything is set up
+      - name: Check CIBW_BUILD_IDENTIFIER
+        shell: bash
+        run: echo ${{ env.CIBW_BUILD_IDENTIFIER }}
+
+      # TODO: Can be removed when everything is set up
+      - name: Get Build Identifiers provided by cibuildwheel for ${{ matrix.os }}-${{ matrix.architecture }}
+        run: python -m cibuildwheel --print-build-identifiers
+
+      #===============================================#
+      # wheels
+      - name: Build wheels
+        env:
+          CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
+          CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_I686_IMAGE: manylinux2014
+          CIBW_BEFORE_ALL_LINUX: yum install swig -y
+          CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
+          CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
+          CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
+        run: python -m cibuildwheel --output-dir wheelhouse
+
+      #===============================================#
+      # Check build
+
+      # TODO: Can be removed when everything is set up
+      - name: "List result"
+        working-directory: wheelhouse
+        run: ls -R
+
+      - name: Check with Twine
+        working-directory: wheelhouse
+        run: twine check *.whl
+
+      - name: Install from wheel on Unix
+        if: always() && runner.os != 'Windows'
+        working-directory: wheelhouse
+        run: python -m pip install ./*.whl
+
+      # Wildcard use is different with PowerShell
+      # cf. https://stackoverflow.com/a/43900040
+      - name: Install from wheel on Windows
+        working-directory: wheelhouse
+        if: always() && runner.os == 'Windows'
+        run: python -m pip install (get-item .\*.whl).FullName
+
+      - name: Check wheel installation
+        working-directory: wheelhouse
+        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
+
+      #===============================================#
+      # Upload artifacts
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}
+          path: ./wheelhouse/*.whl
+
+
+  #===============================================#
+  #         BUILD SOURCE DISTRIBUTION             #
+  #===============================================#
+  build_sdist:
+    name: Build sdist (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+        python-version: [3.9]
+
+    steps:
+      #===============================================#
+      # Set up
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      #===============================================#
+      # Swig
+      - name: Install swig
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update -q
+          sudo apt install swig
+
+      - name: Verify swig
+        run: swig -version
+
+      #===============================================#
+      # Dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install setuptools wheel twine
+
+      #===============================================#
+      # sdist
+      - name: Build ext
+        run: python setup.py build_ext
+
+      - name: Build source distribution
+        run: python setup.py sdist
+
+      #===============================================#
+      # Check build
+
+      # TODO: Can be removed when everything is set up
+      - name: List result
+        working-directory: dist
+        run: ls -R
+
+      - name: Check with Twine
+        working-directory: dist
+        run: twine check *.tar.gz
+
+      - name: Create install dir
+        shell: bash
+        run: mkdir - p ${{ env.CHECK_INSTALL_DIR }}
+
+      - name: Install from source
+        working-directory: ${{ env.CHECK_INSTALL_DIR }}
+        run: python -m pip install ../dist/*.tar.gz
+
+      - name: Check source installation
+        working-directory: ${{ env.CHECK_INSTALL_DIR }}
+        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
+
+      #===============================================#
+      # Upload artifact
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sdist-${{ runner.os }}-python-${{ matrix.python-version }}
+          path: dist/*.tar.gz
+
+
+  #===============================================#
+  #         UPLOAD TO PACKAGE INDEX               #
+  #===============================================#
+  upload_testpypi:
+    name: Upload to TestPyPi
+    needs: [build_wheels, build_sdist]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+        python-version: [3.9]
+        architecture: [ x64 ]
+
+    steps:
+      #===============================================#
+      # Set up
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
+
+      #===============================================#
+      # Dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install twine
+
+      #===============================================#
+      # Prepare artifacts
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: bindings/python/artifacts/
+
+      # TODO: Can be removed when everything is set up
+      - name: Display structure of downloaded files
+        working-directory: bindings/python/artifacts/
+        run: ls -R
+
+      - name: Copy artifacts to dist folder
+        working-directory: bindings/python/
+        run: |
+          mkdir -p ./dist
+          cp artifacts/*/* dist/
+
+      # TODO: Can be removed when everything is set up
+      - name: Verify dist folder
+        working-directory: bindings/python/dist/
+        run: ls -R
+
+      #===============================================#
+      # Upload to package index
+      - name: Upload to PyPi
+        if: github.event_name == 'release' && github.event.action == 'published'
+        working-directory: bindings/python
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: twine upload dist/*
+
+      #===============================================#
+      # Upload to package test index
+      - name: Upload to TestPyPi
+        if: github.event_name != 'release' || github.event.action == 'created'
+        working-directory: bindings/python
+        env:
+          TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
+        run: twine upload --repository testpypi dist/*
+
+      #===============================================#
+      # Check test build
+      - name: Create install dir
+        if: github.event_name != 'release'
+        shell: bash
+        run: |
+          mkdir - p ${{ env.CHECK_INSTALL_DIR }}
+          cd ${{ env.CHECK_INSTALL_DIR }}
+          python -m pip install --index-url https://test.pypi.org/simple/ --pre ${{ env.PACKAGE_NAME }}
+          python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
