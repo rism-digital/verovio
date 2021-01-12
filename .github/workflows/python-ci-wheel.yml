@@ -2,10 +2,8 @@ name: Python Wheel Build
 
 on:
   push:
-    # Trigger the workflow on push, but only for the develop-pypi branch
-    branches:
-      - develop-pypi
-        master
+    # Trigger the workflow on push, but only for the develop-pypi and master branch
+    branches: [develop-pypi, master]
 
 # globals
 env:
