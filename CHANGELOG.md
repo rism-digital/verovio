@@ -6,7 +6,10 @@
 * Support for `multiRest@loc` (@rettinghaus)
 * Support for `mNum@fontsize` (@rettinghaus)
 * Support for `accidental-mark` in MusicXML import (@rettinghaus)
+* Support for double-stemmed beams (@eNote-GmbH)
 * Improved barline rendition (@rettinghaus)
+* Improved cross-staff notation with multiple layers
+* Python Package Index (PyPI) distribution (@musicEnfanthen and @alastair)
 * Option --footer extended with 'always' value to show footer with --adjust-page-height
 
 ## [3.0.2] - 2020-11-17
