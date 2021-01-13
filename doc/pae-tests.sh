@@ -11,7 +11,7 @@ for i in `\ls $dir`; do
         l=${k##*/}
         echo "<h3>${l//_/ }</h3>" >> pae-tests.html
         echo $k
-        ../tools/verovio -r ../data/ -f pae -o - $k -s 50 --no-layout >> pae-tests.html
+        ../tools/verovio -r ../data/ -f pae -o - $k -s 50 --breaks none >> pae-tests.html
     done
 done
 

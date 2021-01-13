@@ -35,6 +35,9 @@ class Fb;
 class Gliss;
 class Hairpin;
 class Harm;
+class InstrDef;
+class Label;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
@@ -203,6 +206,11 @@ private:
     ///@}
 
     /*
+     * Add clef changes to all layers of a given measure, staff, and time stamp
+     */
+    void AddClef(Section *section, Measure *measure, Staff *staff, const std::string &measureNum);
+
+    /*
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
@@ -325,8 +333,15 @@ private:
      * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
      */
     ///@{
-    ///@}
     std::string GetOrnamentGlyphNumber(int attributes) const;
+    ///@}
+
+    /*
+     * @name Helper method for setting @staff attribute for chords
+     */
+    ///@{
+    void SetChordStaff(Layer *layer);
+    ///@}
 
     /*
      * @name Methods for converting MusicXML values to MEI attributes.
@@ -370,6 +385,10 @@ private:
     /* meter signature */
     int m_meterCount = 4;
     int m_meterUnit = 4;
+    /* part information */
+    Label *m_label = NULL;
+    LabelAbbr *m_labelAbbr = NULL;
+    InstrDef *m_instrdef = NULL;
     /* LastElementID */
     std::string m_ID;
     /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
@@ -378,6 +397,9 @@ private:
     std::map<Layer *, int> m_layerEndTimes;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
+    /* To remember current layer to properly handle layers/staves/cross-staff elements */
+    Layer *m_currentLayer = NULL;
+    bool m_isLayerInitialized = false;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */

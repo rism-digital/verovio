@@ -257,6 +257,11 @@ public:
     ///@}
 
     /**
+     * See Object::AdjustTupletNumOverlap
+     */
+    virtual int AdjustTupletNumOverlap(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);

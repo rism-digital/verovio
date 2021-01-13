@@ -53,6 +53,11 @@ std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
     = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
           { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
 
+void SetDefaultResourcePath(const std::string &path)
+{
+    Resources::SetPath(path);
+}
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -952,6 +957,20 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
                 }
                 opt->SetValueArray(queries);
+            }
+            else if (iter->first == "condenseEncoded") {
+                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("condense");
+                assert(opt);
+                if (json.has<jsonxx::Number>("condenseEncoded")) {
+                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
+                        opt->SetValue("encoded");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
             }
             else if (iter->first == "ignoreLayout") {
                 LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");

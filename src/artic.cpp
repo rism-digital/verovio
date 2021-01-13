@@ -276,6 +276,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     assert(staff);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
+    if (parent && parent->m_crossStaff) layer = parent->m_crossLayer;
 
     stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
 

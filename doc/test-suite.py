@@ -1,12 +1,12 @@
 # This script it expected to be run from ./bindings/python
 import argparse
+import cairosvg
 import json
 import os
 import sys
-import xml.etree as etree
 import xml.etree.ElementTree as ET
 
-# Add path for tookit built in-place
+# Add path for toolkit built in-place
 sys.path.append('.')
 import verovio
 
@@ -32,36 +32,40 @@ if __name__ == "__main__":
     tk = verovio.toolkit(False)
     # version of the toolkit
     print(tk.getVersion())
-    
+
     # keep all the options to be able to reset them for each test
     defaultOptions = json.loads(tk.getOptions(True))
-    
+
     tk.setResourcePath('../../data')
 
-    path1 = args.test_suite_dir
-    path2 = args.output_dir
+    path1 = args.test_suite_dir.replace("\ ", " ")
+    path2 = args.output_dir.replace("\ ", " ")
     dir1 = sorted(os.listdir(path1))
     for item1 in dir1:
-        if not(os.path.isdir(os.path.join(path1, item1))): continue
+        if not(os.path.isdir(os.path.join(path1, item1))):
+            continue
 
         # create the output directory if necessary
         if not(os.path.isdir(os.path.join(path2, item1))):
             os.mkdir(os.path.join(path2, item1))
-        
+
         dir2 = sorted(os.listdir(os.path.join(path1, item1)))
         for item2 in dir2:
             # skip directories
-            if not(os.path.isfile(os.path.join(path1, item1, item2))): continue
+            if not(os.path.isfile(os.path.join(path1, item1, item2))):
+                continue
             # skip hidden files
-            if item2.startswith('.'): continue
+            if item2.startswith('.'):
+                continue
 
             # reset the options
             options = {**defaultOptions, **testOptions}
-            
+
             # filenames (input MEI and output SVG)
             meiFile = os.path.join(path1, item1, item2)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
+            pngFile = os.path.join(path2, item1, name + '.png')
 
             # parse the MEI file
             tree = ET.parse(meiFile)
@@ -75,5 +79,8 @@ if __name__ == "__main__":
 
             tk.setOptions(json.dumps(options))
             tk.loadFile(meiFile)
-            tk.renderToSVGFile(svgFile, 1)
-                    
+            svgString = tk.renderToSVG(1)
+            svgString = svgString.replace(
+                "overflow=\"inherit\"", "overflow=\"visible\"")
+            ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
+            cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)

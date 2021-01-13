@@ -164,6 +164,16 @@ public:
             m_cautionStaffDefClef || m_cautionStaffDefKeySig || m_cautionStaffDefMensur || m_cautionStaffDefMeterSig);
     }
 
+    /**
+     * @name Setter and getter for the cross-staff flags
+     */
+    //@{
+    void SetCrossStaffFromAbove(bool crossStaff) { m_crossStaffFromAbove = crossStaff; }
+    bool HasCrossStaffFromAbove() const { return m_crossStaffFromAbove; }
+    void SetCrossStaffFromBelow(bool crossStaff) { m_crossStaffFromBelow = crossStaff; }
+    bool HasCrossStaffFromBelow() const { return m_crossStaffFromBelow; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -225,7 +235,7 @@ public:
      * See Object::ResetDrawing
      * To be added once Layer implements LinkingInterface
      */
-    // virtual int ResetDrawing(FunctorParams *);
+    virtual int ResetDrawing(FunctorParams *);
 
 private:
     //
@@ -233,9 +243,15 @@ public:
     //
 private:
     /**
-     *
+     * The drawing stem direction of the layer based on the number of layers in the staff
      */
     data_STEMDIRECTION m_drawingStemDir;
+
+    /**
+     * Two flags indicating when a layer is also used from cross-staff content from below or above
+     */
+    bool m_crossStaffFromBelow;
+    bool m_crossStaffFromAbove;
 
     /** */
     Clef *m_staffDefClef;

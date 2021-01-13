@@ -24,7 +24,7 @@ home=`pwd`
 read -p "Do you want to empty $indir1 $indir2 and $outdir ? [Y]" -n 1 -r
 echo    # move to a new line
 if [[ $REPLY =~ ^[Y]$ ]]
-then   
+then
     echo "Emptying directories ..."
     rm $indir1/*/*.png
     rm $indir1/*/*.svg
@@ -44,8 +44,7 @@ if [ ! -z $build_dev ]; then
     cd python
     make -j8
 
-    $PYTHON ../../doc/test-suite.py $testdir $indir1
-    ../../doc/test-suite-to-png.sh $indir1
+    $PYTHON ../../doc/test-suite.py "$testdir" "$indir1"
 
     cd $home
 fi
@@ -55,9 +54,8 @@ cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON
 cd python
 make -j8
 
-$PYTHON ../../doc/test-suite.py $testdir $indir2
-../../doc/test-suite-to-png.sh $indir2
+$PYTHON ../../doc/test-suite.py "$testdir" "$indir2"
 
-$PYTHON ../../doc/test-suite-diff.py $indir2 $indir1 $outdir
+$PYTHON ../../doc/test-suite-diff.py "$indir2" "$indir1" "$outdir"
 
 open $outdir/index.html
