@@ -264,10 +264,10 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     ClassIdComparison matchType(LAYER);
     realStaff->FindAllDescendantByComparison(&layers, &matchType);
     const bool isTopLayer((m_crossStaff && (staff->GetN() < m_crossStaff->GetN()))
-        || (vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN()));
+        || (!m_crossStaff && vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN()));
 
     // find best rest location relative to elements on other layers
-    const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
+    const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer, isTopLayer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
         + GetRestOffsetFromOptions(RL_otherLayer, otherLayerRelativeLocationInfo, isTopLayer);
@@ -282,7 +282,6 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     if (m_crossStaff) {
         if (isTopLayer) {
             otherLayerRelativeLocation += defaultLocation + 2;
-
         }
         else {
             otherLayerRelativeLocation -= defaultLocation + 2;
@@ -294,15 +293,18 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
-    const ListOfObjects &layersList, Layer *currentLayer)
+    const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer)
 {
     if (!currentLayer) return { VRV_UNSET, RA_none };
-    const bool isTopLayer(vrv_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
 
     // Get iterator to another layer. We're going to find coliding elements there
     auto layerIter = std::find_if(layersList.begin(), layersList.end(),
         [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
-    if (layerIter == layersList.end()) return { VRV_UNSET, RA_none };
+    if (layerIter == layersList.end()) {
+        if (!m_crossStaff) return { VRV_UNSET, RA_none };
+        // if we're dealing with cross-staff item, get first/last layer, depending whether rest is on top or bottom
+        layerIter = isTopLayer ? layersList.begin() : std::prev(layersList.end());
+    }
     auto collidingElementsList = vrv_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
 
     std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
