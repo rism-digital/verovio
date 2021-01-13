@@ -20893,7 +20893,6 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     if (hasMensuralStaff(&infile[startline])) {
-        // m_measure = NULL;
         m_measure = new Measure(false);
     }
     else {
@@ -20935,6 +20934,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
             endnum = 0;
         }
     }
+
     else if (currentsection != m_lastsection) {
         newsection = true;
         if (m_lastsection != currentsection) {
@@ -20992,6 +20992,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
             m_sections.back()->AddChild(m_measure);
         }
     }
+
     m_endingnum = endnum;
     m_measures.push_back(m_measure);
 
@@ -23045,10 +23046,17 @@ void HumdrumInput::importVerovioOptions(Doc *doc)
 
 void HumdrumInput::finalizeDocument(Doc *doc)
 {
+
     doc->ConvertScoreDefMarkupDoc();
-    // doc->ExpandExpansions();
+    doc->ExpandExpansions();
     doc->ConvertToPageBasedDoc();
     doc->ConvertMarkupDoc();
+
+    if (m_mens) {
+        doc->SetMensuralMusicOnly(true);
+        doc->m_notationType = NOTATIONTYPE_mensural;
+        doc->ConvertToCastOffMensuralDoc();
+    }
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */
