@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Improved automatic cross staff rest positioning (@eNote-GmbH)
 
 ## [3.1.0] - 2021-01-12
 * Support for "old style" multiple measure rests (@rettinghaus)
