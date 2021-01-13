@@ -288,8 +288,15 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         }
     }
 
-    return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
-                      : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
+    const int maxOtherLayerOffset = 10;
+    return isTopLayer
+        ? std::max(
+            { (otherLayerRelativeLocation > maxOtherLayerOffset ? maxOtherLayerOffset : otherLayerRelativeLocation),
+                currentLayerRelativeLocation, defaultLocation })
+        : std::min(
+            { (otherLayerRelativeLocation < -maxOtherLayerOffset ? -maxOtherLayerOffset : otherLayerRelativeLocation),
+                currentLayerRelativeLocation, defaultLocation });
+
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
