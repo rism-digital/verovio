@@ -282,7 +282,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     if (m_crossStaff) {
         if (isTopLayer) {
             otherLayerRelativeLocation += defaultLocation + 2;
-        }            
+        }
         else {
             otherLayerRelativeLocation -= defaultLocation + 2;
         }
