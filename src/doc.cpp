@@ -827,15 +827,18 @@ void Doc::CastOffDoc()
 {
     Doc::CastOffDocBase(false, false);
 }
+
 void Doc::CastOffLineDoc()
 {
     Doc::CastOffDocBase(true, false);
 }
+
 void Doc::CastOffSmartDoc()
 {
-    Doc::CastOffDocBase(2, false);
+    Doc::CastOffDocBase(false, false, true);
 }
-void Doc::CastOffDocBase(int useSb, bool usePb)
+
+void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 {
     Pages *pages = this->GetPages();
     assert(pages);
@@ -857,14 +860,13 @@ void Doc::CastOffDocBase(int useSb, bool usePb)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if (useSb == 1 && !usePb) {
+    if (useSb && !usePb && !smart) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
         contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
-        bool smart = (useSb == 2);
         CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this, smart);
         castOffSystemsParams.m_systemWidth
             = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;

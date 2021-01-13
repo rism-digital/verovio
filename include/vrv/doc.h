@@ -260,10 +260,11 @@ public:
 
     /**
      * Casts off the entire document, with options for obeying breaks.
-     * @param useSb - 1 to use the sb from the document, 2 to sometimes us the sb from the document.
-     * @param usePg - true to use the pb from the document.
+     * @param useSb - true to use the sb from the document.
+     * @param usePb - true to use the pb from the document.
+     * @param smart - true to sometimes use encoded sb and pb.
      */
-    void CastOffDocBase(int useSb, bool usePb);
+    void CastOffDocBase(bool useSb, bool usePb, bool smart = false);
 
     /**
      * Casts off the running elements (headers and footer)
