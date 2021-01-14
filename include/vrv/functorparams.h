@@ -952,11 +952,12 @@ public:
  * member 5: the current scoreDef width
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
+ * member 8: whether to smartly use encoded system breaks
  **/
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc)
+    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc, bool smart)
     {
         m_contentSystem = contentSystem;
         m_page = page;
@@ -965,6 +966,7 @@ public:
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
         m_doc = doc;
+        m_smart = smart;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -974,6 +976,7 @@ public:
     int m_currentScoreDefWidth;
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
+    bool m_smart;
 };
 
 //----------------------------------------------------------------------------
