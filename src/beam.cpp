@@ -156,12 +156,11 @@ void BeamSegment::CalcBeam(
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
 
-    CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
-
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         CalcMixedBeamPlace(staff);
         CalcPartialFlagPlace();
     }
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
 
     // Set drawing stem positions
     CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
@@ -244,7 +243,7 @@ void BeamSegment::CalcBeam(
                 int yMax, yMin;
                 chord->GetYExtremes(yMax, yMin);
                 if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-                    if (coord->m_beamRelativePlace == BEAMPLACE_above) y2 += (yMin - yMax);
+                    y2 += (coord->m_beamRelativePlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
                 }
                 else {
                     y2 += (beamInterface->m_drawingPlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
@@ -1099,9 +1098,16 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
 
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
-    const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     int relevantNoteLoc = VRV_UNSET;
     for (auto coord : m_beamElementCoordRefs) {
+        data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+        if (place != BEAMPLACE_mixed) {
+            stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+        else {
+            stemDir = (coord->m_beamRelativePlace == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+        const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
         coord->SetClosestNote(stemDir);
         if (!coord->m_closestNote) continue;
         if (relevantNoteLoc == VRV_UNSET) {
