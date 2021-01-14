@@ -288,15 +288,8 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         }
     }
 
-    const int maxOtherLayerOffset = 10;
-    return isTopLayer
-        ? std::max(
-            { (otherLayerRelativeLocation > maxOtherLayerOffset ? maxOtherLayerOffset : otherLayerRelativeLocation),
-                currentLayerRelativeLocation, defaultLocation })
-        : std::min(
-            { (otherLayerRelativeLocation < -maxOtherLayerOffset ? -maxOtherLayerOffset : otherLayerRelativeLocation),
-                currentLayerRelativeLocation, defaultLocation });
-
+    return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
+                      : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
@@ -322,6 +315,11 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
         //  If note on other layer is not on the same x position as rest - ignore its accidental
         if (GetAlignment()->GetTime() != vrv_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = RA_none;
+            // limit how much rest can be offset when there is duration overlap, but no x position overlap
+            if (abs(currentElementInfo.first) > 4) {
+                if (finalElementInfo.first != VRV_UNSET) continue;
+                currentElementInfo.first = isTopLayer ? 4 : -4;
+            }
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
             || (!isTopLayer && (finalElementInfo.first > currentElementInfo.first))) {
