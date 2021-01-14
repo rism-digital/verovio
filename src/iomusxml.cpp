@@ -740,9 +740,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                         Text *text = new Text();
                         text->SetText(UTF8to16(groupName));
                         m_label->AddChild(text);
-                        staffGrp->AddChild(m_label);
-                        m_label = NULL;
                     }
+                    staffGrp->AddChild(m_label);
+                    m_label = NULL;
                 }
                 if (!groupAbbr.empty() && !m_labelAbbr) {
                     m_labelAbbr = new LabelAbbr();
@@ -756,9 +756,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                         Text *text = new Text();
                         text->SetText(UTF8to16(groupAbbr));
                         m_labelAbbr->AddChild(text);
-                        staffGrp->AddChild(m_labelAbbr);
-                        m_labelAbbr = NULL;
                     }
+                    staffGrp->AddChild(m_labelAbbr);
+                    m_labelAbbr = NULL;
                 }
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
