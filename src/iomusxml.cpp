@@ -2316,7 +2316,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Tempo
-    pugi::xpath_node metronome = type.select_node("metronome");
+    pugi::xpath_node metronome = type.child("metronome");
     if (node.select_node("sound[@tempo]") || metronome) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
@@ -2324,16 +2324,15 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
         tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
         if (words.size() != 0) TextRendition(words, tempo);
-        if (metronome)
-            PrintMetronome(metronome.node(), tempo);
-        else {
-            tempo->SetMidiBpm(node.select_node("sound").node().attribute("tempo").as_int());
+        if (metronome) PrintMetronome(metronome.node(), tempo);
+        if (node.select_node("sound[@tempo]")) {
+            tempo->SetMidiBpm(round(node.child("sound").attribute("tempo").as_float()));
         }
         tempo->SetTstamp(timeStamp);
-        pugi::xpath_node staffNode = node.select_node("staff");
+        pugi::xml_node staffNode = node.child("staff");
         if (staffNode) {
             tempo->SetStaff(tempo->AttStaffIdent::StrToXsdPositiveIntegerList(
-                std::to_string(staffNode.node().text().as_int() + staffOffset)));
+                std::to_string(staffNode.text().as_int() + staffOffset)));
         }
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
         m_tempoStack.push_back(tempo);
