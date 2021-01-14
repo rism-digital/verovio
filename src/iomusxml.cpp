@@ -2598,7 +2598,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     else {
         Note *note = new Note();
         element = note;
-        note->SetVisible(ConvertWordToBool(node.append_attribute("print-object").as_string()));
+        note->SetVisible(ConvertWordToBool(node.attribute("print-object").as_string()));
         note->SetColor(node.attribute("color").as_string());
         if (!noteID.empty()) {
             note->SetUuid(noteID);
