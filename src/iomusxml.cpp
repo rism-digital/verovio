@@ -2746,7 +2746,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // set attributes to the note if we are not in a chord
         if (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(CHORD)) {
-            note->SetDur(ConvertTypeToDur(typeStr));
+            if (!typeStr.empty()) note->SetDur(ConvertTypeToDur(typeStr));
             note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
@@ -3602,7 +3602,9 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
         { "32nd", DURATION_32 }, //
         { "64th", DURATION_64 }, //
         { "128th", DURATION_128 }, //
-        { "256th", DURATION_256 } //
+        { "256th", DURATION_256 }, //
+        { "512th", DURATION_512 }, //
+        { "1024th", DURATION_1024 } //
     };
 
     const auto result = Type2Dur.find(value);
@@ -3610,7 +3612,7 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported note-type-value '%s'", value.c_str());
     return DURATION_NONE;
 }
 
