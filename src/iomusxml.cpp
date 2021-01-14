@@ -1968,7 +1968,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     pugi::xpath_node_set words = node.select_nodes("direction-type/words");
     const bool containsWords = !words.empty();
-    bool containsDynamics = !node.select_node("direction-type/dynamics").node().empty();
+    bool containsDynamics = !node.select_node("direction-type/dynamics|direction-type/sound[@dynamics]").node().empty();
 
     // Directive
     int defaultY = 0; // y position attribute, only for directives and dynamics
