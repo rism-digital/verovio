@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
 * Improved automatic cross staff rest positioning (@eNote-GmbH)
 
 ## [3.1.0] - 2021-01-12
