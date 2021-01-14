@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "measure.h"
@@ -69,7 +70,8 @@ int Sb::CastOffSystems(FunctorParams *functorParams)
         if (measure != NULL) {
             int measureRightX = measure->GetDrawingX() + measure->GetWidth() - params->m_shift;
             // LogDebug("ratio: %f\n", (float)measureRightX / (float)params->m_systemWidth);
-            if (measureRightX > params->m_systemWidth * .66) {
+            double smartSbThresh = params->m_doc->GetOptions()->m_breaksSmartSb.GetValue();
+            if (measureRightX > params->m_systemWidth * smartSbThresh) {
                 // Use this system break.
                 params->m_currentSystem = new System();
                 params->m_page->AddChild(params->m_currentSystem);

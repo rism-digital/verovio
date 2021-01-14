@@ -626,6 +626,11 @@ Options::Options()
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
 
+    m_breaksSmartSb.SetInfo("Smart breaks sb usage threshold",
+        "In smart breaks mode, the portion of system width usage at which an encoded sb will be used");
+    m_breaksSmartSb.Init(0.66, 0.0, 1.0);
+    this->Register(&m_breaksSmartSb, "breaksSmartSb", &m_general);
+
     m_condense.SetInfo("Condense", "Control condensed score layout");
     m_condense.Init(CONDENSE_auto, &Option::s_condense);
     this->Register(&m_condense, "condense", &m_general);

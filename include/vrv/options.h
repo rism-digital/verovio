@@ -494,6 +494,7 @@ public:
     OptionBool m_adjustPageHeight;
     OptionBool m_adjustPageWidth;
     OptionIntMap m_breaks;
+    OptionDbl m_breaksSmartSb;
     OptionIntMap m_condense;
     OptionBool m_condenseFirstPage;
     OptionBool m_condenseTempoPages;
