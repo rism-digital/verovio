@@ -1830,23 +1830,24 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(node);
     assert(measure);
 
-    const pugi::xml_node staffNode = node.child("staff");
-    const std::string directionId = node.attribute("id").as_string();
     const std::string placeStr = node.attribute("placement").as_string();
-    const int offset = node.select_node("offset").node().text().as_int();
+    const std::string directionId = node.attribute("id").as_string();
+
+    const pugi::xml_node typeNode = node.child("direction-type");
+    const pugi::xpath_node voice = node.select_node("voice");
+    const int offset = node.child("offset").text().as_int();
+    const pugi::xml_node staffNode = node.child("staff");
+    
     const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
-    const pugi::xpath_node voice = node.select_node("voice");
     if (voice) m_prevLayer = SelectLayer(node, measure);
 
-    const pugi::xml_node type = node.select_node("direction-type").node();
-
     // Bracket
-    pugi::xpath_node bracket = type.select_node("bracket");
+    pugi::xml_node bracket = typeNode.child("bracket");
     if (bracket) {
-        int voiceNumber = bracket.node().attribute("number").as_int();
+        int voiceNumber = bracket.attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
-        if (HasAttributeWithValue(bracket.node(), "type", "stop")) {
+        if (HasAttributeWithValue(bracket, "type", "stop")) {
             if (m_bracketStack.empty()) {
                 // if this is empty, most likely we're dealing with an extender
             }
@@ -1854,7 +1855,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 const int measureDifference
                     = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
                 m_bracketStack.front().first->SetLendsym(
-                    ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
+                    ConvertLineEndSymbol(bracket.attribute("line-end").as_string()));
                 if (measureDifference >= 0) {
                     m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                 }
@@ -1864,12 +1865,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
         else {
             BracketSpan *bracketSpan = new BracketSpan();
             musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
-            bracketSpan->SetColor(bracket.node().attribute("color").as_string());
+            bracketSpan->SetColor(bracket.attribute("color").as_string());
             bracketSpan->SetLform(
-                bracketSpan->AttLineRendBase::StrToLineform(bracket.node().attribute("line-type").as_string()));
+                bracketSpan->AttLineRendBase::StrToLineform(bracket.attribute("line-type").as_string()));
             // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
             bracketSpan->SetFunc("unclear");
-            bracketSpan->SetLstartsym(ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
+            bracketSpan->SetLstartsym(ConvertLineEndSymbol(bracket.attribute("line-end").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
             m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
@@ -1877,14 +1878,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Coda
-    pugi::xpath_node coda = type.select_node("coda");
+    pugi::xml_node coda = typeNode.child("coda");
     if (coda) {
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("coda");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (coda.node().attribute("id")) dir->SetUuid(coda.node().attribute("id").as_string());
+        if (coda.attribute("id")) dir->SetUuid(coda.attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -1898,7 +1899,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
-    pugi::xpath_node dashes = type.select_node("bracket|dashes");
+    pugi::xpath_node dashes = typeNode.select_node("bracket|dashes");
     if (dashes) {
         int dashesNumber = dashes.node().attribute("number").as_int();
         dashesNumber = (dashesNumber < 1) ? 1 : dashesNumber;
@@ -2149,21 +2150,21 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Ottava
-    pugi::xpath_node xmlShift = type.select_node("octave-shift");
+    pugi::xml_node xmlShift = typeNode.child("octave-shift");
     if (xmlShift) {
-        const int staffN = (!staffNode) ? 1 : staffNode.text().as_int() + staffOffset;
-        if (HasAttributeWithValue(xmlShift.node(), "type", "stop")) {
-            m_octDis[staffN] = 0;
+        const int staffNum = (!staffNode) ? 1 : staffNode.text().as_int() + staffOffset;
+        if (HasAttributeWithValue(xmlShift, "type", "stop")) {
+            m_octDis[staffNum] = 0;
             std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
             for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
                 if (iter->second->Is(OCTAVE)) {
                     Octave *octave = dynamic_cast<Octave *>(iter->second);
                     if (octave->HasEndid()) continue;
                     std::vector<int> staffAttr = octave->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffN) != staffAttr.end()) {
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum) != staffAttr.end()) {
                         octave->SetEndid(m_ID);
                     }
-                    else if (xmlShift.node().attribute("number").as_string() == octave->GetN()) {
+                    else if (xmlShift.attribute("number").as_string() == octave->GetN()) {
                         octave->SetEndid(m_ID);
                     }
                     else {
@@ -2174,15 +2175,15 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
         else {
             Octave *octave = new Octave();
-            octave->SetColor(xmlShift.node().attribute("color").as_string());
+            octave->SetColor(xmlShift.attribute("color").as_string());
             octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
-            octave->SetN(xmlShift.node().attribute("number").as_string());
-            const int octDisNum = xmlShift.node().attribute("size") ? xmlShift.node().attribute("size").as_int() : 8;
+            octave->SetN(xmlShift.attribute("number").as_string());
+            const int octDisNum = xmlShift.attribute("size") ? xmlShift.attribute("size").as_int() : 8;
             octave->SetDis(octave->AttOctaveDisplacement::StrToOctaveDis(std::to_string(octDisNum)));
-            m_octDis[staffN] = (octDisNum + 2) / 8;
-            if (HasAttributeWithValue(xmlShift.node(), "type", "up")) {
+            m_octDis[staffNum] = (octDisNum + 2) / 8;
+            if (HasAttributeWithValue(xmlShift, "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
-                m_octDis[staffN] *= -1;
+                m_octDis[staffNum] *= -1;
             }
             else
                 octave->SetDisPlace(STAFFREL_basic_above);
@@ -2192,24 +2193,24 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Pedal
-    pugi::xpath_node xmlPedal = type.select_node("pedal");
+    pugi::xml_node xmlPedal = typeNode.child("pedal");
     if (xmlPedal) {
-        std::string pedalType = xmlPedal.node().attribute("type").as_string();
-        bool pedalLine = xmlPedal.node().attribute("line").as_bool();
+        std::string pedalType = xmlPedal.attribute("type").as_string();
+        bool pedalLine = xmlPedal.attribute("line").as_bool();
         if (pedalType != "continue") {
             Pedal *pedal = new Pedal();
-            pedal->SetColor(xmlPedal.node().attribute("color").as_string());
-            // pedal->SetN(xmlPedal.node().attribute("number").as_string());
+            pedal->SetColor(xmlPedal.attribute("color").as_string());
+            // pedal->SetN(xmlPedal.attribute("number").as_string());
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
-            if (xmlPedal.node().attribute("abbreviated")) {
+            if (xmlPedal.attribute("abbreviated")) {
                 pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
                 pedal->SetExternalsymbols(pedal, "glyph.num", "U+E651");
             }
             if (pedalType == "sostenuto") {
                 pedal->SetFunc("sostenuto");
-                if (xmlPedal.node().attribute("abbreviated")) {
+                if (xmlPedal.attribute("abbreviated")) {
                     pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
                     pedal->SetExternalsymbols(pedal, "glyph.num", "U+E65A");
                 }
@@ -2224,7 +2225,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             pedal->SetTstamp(timeStamp);
             if (pedalType == "stop") pedal->SetTstamp(timeStamp - 0.1);
-            int defaultY = xmlPedal.node().attribute("default-y").as_int();
+            int defaultY = xmlPedal.attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             pedal->SetVgrp(defaultY);
@@ -2234,11 +2235,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Principal voice
-    pugi::xpath_node lead = type.select_node("principal-voice");
+    pugi::xml_node lead = typeNode.child("principal-voice");
     if (lead) {
-        int voiceNumber = lead.node().attribute("number").as_int();
+        int voiceNumber = lead.attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
-        if (HasAttributeWithValue(lead.node(), "type", "stop")) {
+        if (HasAttributeWithValue(lead, "type", "stop")) {
             const int measureDifference
                 = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
             if (measureDifference >= 0) {
@@ -2250,10 +2251,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             // std::string symbol = lead.node().attribute("symbol").as_string();
             BracketSpan *bracketSpan = new BracketSpan();
             musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
-            bracketSpan->SetColor(lead.node().attribute("color").as_string());
+            bracketSpan->SetColor(lead.attribute("color").as_string());
             // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
             bracketSpan->SetFunc("analytical");
-            bracketSpan->SetLstartsym(ConvertLineEndSymbol(lead.node().attribute("symbol").as_string()));
+            bracketSpan->SetLstartsym(ConvertLineEndSymbol(lead.attribute("symbol").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             bracketSpan->SetType("principal-voice");
             m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
@@ -2262,25 +2263,24 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Rehearsal
-    pugi::xpath_node rehearsal = type.select_node("rehearsal");
+    pugi::xml_node rehearsal = typeNode.child("rehearsal");
     if (rehearsal) {
         Reh *reh = new Reh();
         reh->SetPlace(reh->AttPlacement::StrToStaffrel(placeStr.c_str()));
-        std::string halign = rehearsal.node().attribute("halign").as_string();
-        std::string lang = rehearsal.node().attribute("xml:lang").as_string();
+        std::string halign = rehearsal.attribute("halign").as_string();
+        std::string lang = rehearsal.attribute("xml:lang").as_string();
         if (lang.empty()) lang = "it";
-        std::string textStr = GetContent(rehearsal.node());
-        reh->SetColor(rehearsal.node().attribute("color").as_string());
+        std::string textStr = GetContent(rehearsal);
+        reh->SetColor(rehearsal.attribute("color").as_string());
         reh->SetTstamp(timeStamp);
         int staffNum = staffNode.text().as_int() + staffOffset;
         staffNum = (staffNum < 1) ? 1 : staffNum;
         reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
         Rend *rend = new Rend();
-        rend->SetFontweight(
-            rend->AttTypography::StrToFontweight(rehearsal.node().attribute("font-weight").as_string()));
+        rend->SetFontweight(rend->AttTypography::StrToFontweight(rehearsal.attribute("font-weight").as_string()));
         rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
-        rend->SetRend(ConvertEnclosure(rehearsal.node().attribute("enclosure").as_string()));
+        rend->SetRend(ConvertEnclosure(rehearsal.attribute("enclosure").as_string()));
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         rend->AddChild(text);
@@ -2289,14 +2289,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Segno
-    pugi::xpath_node segno = type.select_node("segno");
+    pugi::xml_node segno = typeNode.child("segno");
     if (segno) {
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("segno");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (segno.node().attribute("id")) dir->SetUuid(segno.node().attribute("id").as_string());
+        if (segno.attribute("id")) dir->SetUuid(segno.attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -2310,7 +2310,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Tempo
-    pugi::xpath_node metronome = type.child("metronome");
+    pugi::xpath_node metronome = typeNode.child("metronome");
     if (node.select_node("sound[@tempo]") || metronome) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
@@ -2334,7 +2334,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // other cases
     if (!containsWords && !containsDynamics && !coda && !bracket && !lead && !metronome && !segno && !xmlShift
         && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
-        LogWarning("MusicXML import: Unsupported direction-type '%s'", type.first_child().name());
+        LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
     }
 }
 
