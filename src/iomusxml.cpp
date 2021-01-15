@@ -780,8 +780,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 continue;
             }
             // part-name should be revised, as soon MEI can suppress labels
-            std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
-            std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
+            const std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
+            const std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
             pugi::xpath_node midiInstrument = xpathNode.node().select_node("midi-instrument");
             if (!partName.empty() && !m_label) {
                 m_label = new Label();
@@ -1837,7 +1837,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     const pugi::xpath_node voice = node.select_node("voice");
     const int offset = node.child("offset").text().as_int();
     const pugi::xml_node staffNode = node.child("staff");
-    
+    const pugi::xml_node soundNode = node.child("sound");
+
     const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
     if (voice) m_prevLayer = SelectLayer(node, measure);
@@ -1971,7 +1972,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     // Directive
     int defaultY = 0; // y position attribute, only for directives and dynamics
-    if (containsWords && !containsDynamics && !node.select_node("sound[@tempo]")) {
+    if (containsWords && !containsDynamics && !soundNode.attribute("tempo")) {
         pugi::xpath_node_set words = node.select_nodes("direction-type/words");
         defaultY = words.first().node().attribute("default-y").as_int();
         std::string wordStr = words.first().node().text().as_string();
@@ -1985,7 +1986,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
-            dir->SetType(node.child("sound").first_attribute().name());
+            dir->SetType(soundNode.first_attribute().name());
             if (staffNode) {
                 dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.text().as_int() + staffOffset)));
@@ -2040,8 +2041,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
         }
 
-        if (node.select_node("sound")) {
-            const float dynamics = node.select_node("sound").node().attribute("dynamics").as_float(-1.0);
+        if (soundNode) {
+            const float dynamics = soundNode.attribute("dynamics").as_float(-1.0);
             if (dynamics >= 0.0) {
                 dynam->SetVal(ConvertDynamicsToMidiVal(dynamics));
             }
@@ -2311,7 +2312,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     // Tempo
     pugi::xpath_node metronome = typeNode.child("metronome");
-    if (node.select_node("sound[@tempo]") || metronome) {
+    if (soundNode.attribute("tempo") || metronome) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
             tempo->SetLang(words.first().node().attribute("xml:lang").as_string());
@@ -2319,8 +2320,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
         if (words.size() != 0) TextRendition(words, tempo);
         if (metronome) PrintMetronome(metronome.node(), tempo);
-        if (node.select_node("sound[@tempo]")) {
-            tempo->SetMidiBpm(round(node.child("sound").attribute("tempo").as_float()));
+        if (soundNode.attribute("tempo")) {
+            tempo->SetMidiBpm(round(soundNode.attribute("tempo").as_float()));
         }
         tempo->SetTstamp(timeStamp);
         if (staffNode) {
@@ -2463,10 +2464,10 @@ void MusicXmlInput::ReadMusicXmlNote(
         return;
     }
 
-    pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
+    const pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-    const bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']")) ? true : false;
-    pugi::xml_node grace = node.select_node("grace").node();
+    const bool cue = (node.child("cue") || node.select_node("type[@size='cue']")) ? true : false;
+    pugi::xml_node grace = node.child("grace");
 
     // duration string and dots
     const std::string typeStr = node.child("type").text().as_string();
@@ -2615,8 +2616,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // stem direction - taken into account below for the chord or the note
         data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-        pugi::xpath_node stem = node.select_node("stem");
-        std::string stemText = stem.node().text().as_string();
+        const pugi::xml_node stem = node.child("stem");
+        const std::string stemText = stem.text().as_string();
         if (stemText == "down") {
             stemDir = STEMDIRECTION_down;
         }
@@ -2656,19 +2657,19 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // notehead
-        pugi::xpath_node notehead = node.select_node("notehead");
+        const pugi::xml_node notehead = node.child("notehead");
         if (notehead) {
-            note->SetHeadColor(notehead.node().attribute("color").as_string());
-            note->SetHeadShape(ConvertNotehead(notehead.node().text().as_string()));
-            if (notehead.node().attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
-            auto noteHeadFill = notehead.node().attribute("filled");
+            note->SetHeadColor(notehead.attribute("color").as_string());
+            note->SetHeadShape(ConvertNotehead(notehead.text().as_string()));
+            if (notehead.attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
+            auto noteHeadFill = notehead.attribute("filled");
             if (noteHeadFill) note->SetHeadFill(noteHeadFill.as_bool() ? FILL_solid : FILL_void);
-            if (!std::strncmp(notehead.node().text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
+            if (!std::strncmp(notehead.text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
         }
 
         // look at the next note to see if we are starting or ending a chord
         pugi::xpath_node nextNote = node.select_node("./following-sibling::note");
-        if (nextNote.node().select_node("chord")) nextIsChord = true;
+        if (nextNote.node().child("chord")) nextIsChord = true;
         Chord *chord = NULL;
         if (nextIsChord) {
             // create the chord if we are starting a new chord
@@ -2701,7 +2702,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         // If the current note is part of a chord.
-        if (nextIsChord || node.select_node("chord")) {
+        if (nextIsChord || node.child("chord")) {
             if (chord == NULL && m_elementStackMap.at(layer).size() > 0
                 && m_elementStackMap.at(layer).back()->Is(CHORD)) {
                 chord = dynamic_cast<Chord *>(m_elementStackMap.at(layer).back());
@@ -2739,9 +2740,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetDurPpq(duration);
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
-            if (node.attribute("default-y") && stem.node().attribute("default-y")) {
+            if (node.attribute("default-y") && stem.attribute("default-y")) {
                 float stemLen
-                    = abs(node.attribute("default-y").as_float() - stem.node().attribute("default-y").as_float()) / 5;
+                    = abs(node.attribute("default-y").as_float() - stem.attribute("default-y").as_float()) / 5;
                 note->SetStemLen(stemLen);
             }
             if (stemText == "none") note->SetStemVisible(BOOLEAN_false);
@@ -2943,17 +2944,17 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // dynamics
-    pugi::xpath_node xmlDynam = notations.node().select_node("dynamics");
+    pugi::xml_node xmlDynam = notations.node().child("dynamics");
     if (xmlDynam) {
         Dynam *dynam = new Dynam();
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         dynam->SetStartid(m_ID);
-        if (xmlDynam.node().attribute("id")) dynam->SetUuid(xmlDynam.node().attribute("id").as_string());
+        if (xmlDynam.attribute("id")) dynam->SetUuid(xmlDynam.attribute("id").as_string());
         // place
-        dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.node().attribute("placement").as_string()));
+        dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.attribute("placement").as_string()));
         std::string dynamStr;
-        for (pugi::xml_node xmlDynamPart : xmlDynam.node().children()) {
+        for (pugi::xml_node xmlDynamPart : xmlDynam.children()) {
             if (xmlDynamPart.text()) {
                 dynamStr += xmlDynamPart.text().as_string();
             }
@@ -2967,14 +2968,14 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // fermatas
-    pugi::xpath_node xmlFermata = notations.node().select_node("fermata");
+    pugi::xml_node xmlFermata = notations.node().child("fermata");
     if (xmlFermata) {
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
         fermata->SetStartid(m_ID);
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        if (xmlFermata.node().attribute("id")) fermata->SetUuid(xmlFermata.node().attribute("id").as_string());
-        ShapeFermata(fermata, xmlFermata.node());
+        if (xmlFermata.attribute("id")) fermata->SetUuid(xmlFermata.attribute("id").as_string());
+        ShapeFermata(fermata, xmlFermata);
     }
 
     // fingering
