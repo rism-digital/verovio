@@ -41,7 +41,7 @@ Major releases of Verovio and MEI versions:
 From Verovio 2.x.x, the plan is to have even version numbers for Verovio releases using a stable version of MEI, and odd version numbers for releases using a development version of MEI. It means that once MEI 5.0 will be released, Verovio will move to version 4.x.x. Older versions of MEI are still supported by newer versions of Verovio. MEI files are internally upgraded when loaded into Verovio. This applies only to the features supported by Verovio. We will try to maintain this in the future.
 
 Other libraries
---------------
+---------------
 
 The following libraries are embedded in Verovio:
 
@@ -66,7 +66,7 @@ The sample page of music shown below was generated with version 2.4.0-dev-2748fe
 ![Example page](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)
 
 Example resources using verovio
------------------------------------------
+-------------------------------
 
 | name | type  | description |
 | ---- | ----- | ----------- |
@@ -81,13 +81,13 @@ Example resources using verovio
 
 
 Digital score repositories on Github
--------------------------------------
+------------------------------------
 
 Here is a list of digital score repositories on Github that can be displayed with verovio:
 
 
 | link | encoding | description |
-| ---- | ------ | ----------- | 
+| ---- | -------- | ----------- | 
 |  [MEI complete examples](https://github.com/music-encoding/sample-encodings/tree/master/MEI_4.0/Music/Complete_examples) | MEI | 86 various works encoded in MEI |
 | [Mozart Piano Sonatas](https://github.com/craigsapp/mozart-piano-sonatas) | Humdrum | 17 Piano sonatas by W.A. Mozart from the Alte Mozart-Ausgabe ([in VHV](http://verovio.humdrum.org/?file=mozart/sonatas&k=e)) |
 | [Beethoven Piano Sonatas](https://github.com/craigsapp/beethoven-piano-sonatas) | Humdrum | 32 Piano sonatas by L. van Beethoven, edited by Paul Dukas ([in VHV](http://verovio.humdrum.org/?file=beethoven/sonatas&k=e)) |

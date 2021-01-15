@@ -118,17 +118,17 @@ RestOffsets g_defaultRests{
         { { RA_none,
             { { RLP_restOnTopLayer,
                   { { RNP_noteInSpace,
-                        { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 3 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 },
+                        { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 1 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 },
                             { DUR_64, 5 }, { DUR_128, 5 }, { DUR_LG, 3 }, { DUR_BR, 1 } } },
                       { RNP_noteOnLine,
                           { { DUR_1, 0 }, { DUR_2, 0 }, { DUR_4, 2 }, { DUR_8, 2 }, { DUR_16, 2 }, { DUR_32, 2 },
                               { DUR_64, 4 }, { DUR_128, 4 }, { DUR_LG, 2 }, { DUR_BR, 2 } } } } },
                 { RLP_restOnBottomLayer,
                     { { RNP_noteInSpace,
-                          { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -3 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 },
+                          { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -1 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 },
                               { DUR_64, -3 }, { DUR_128, -5 }, { DUR_LG, -3 }, { DUR_BR, -3 } } },
                         { RNP_noteOnLine,
-                            { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -4 }, { DUR_8, -2 }, { DUR_16, -2 },
+                            { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -2 }, { DUR_8, -2 }, { DUR_16, -2 },
                                 { DUR_32, -4 }, { DUR_64, -4 }, { DUR_128, -6 }, { DUR_LG, -2 },
                                 { DUR_BR, -2 } } } } } } } } }
 };
@@ -258,13 +258,16 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (layerCount != 2) return defaultLocation;
 
+    Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
+
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
-    staff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer(vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
+    realStaff->FindAllDescendantByComparison(&layers, &matchType);
+    const bool isTopLayer((m_crossStaff && (staff->GetN() < m_crossStaff->GetN()))
+        || (!m_crossStaff && vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN()));
 
     // find best rest location relative to elements on other layers
-    const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
+    const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer, isTopLayer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
         + GetRestOffsetFromOptions(RL_otherLayer, otherLayerRelativeLocationInfo, isTopLayer);
@@ -276,21 +279,32 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         currentLayerRelativeLocation
             += GetRestOffsetFromOptions(RL_sameLayer, currentLayerRelativeLocationInfo, isTopLayer);
     }
+    if (m_crossStaff) {
+        if (isTopLayer) {
+            otherLayerRelativeLocation += defaultLocation + 2;
+        }
+        else {
+            otherLayerRelativeLocation -= defaultLocation + 2;
+        }
+    }
 
     return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
                       : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
-    const ListOfObjects &layersList, Layer *currentLayer)
+    const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer)
 {
     if (!currentLayer) return { VRV_UNSET, RA_none };
-    const bool isTopLayer(vrv_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
 
     // Get iterator to another layer. We're going to find coliding elements there
     auto layerIter = std::find_if(layersList.begin(), layersList.end(),
         [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
-    if (layerIter == layersList.end()) return { VRV_UNSET, RA_none };
+    if (layerIter == layersList.end()) {
+        if (!m_crossStaff) return { VRV_UNSET, RA_none };
+        // if we're dealing with cross-staff item, get first/last layer, depending whether rest is on top or bottom
+        layerIter = isTopLayer ? layersList.begin() : std::prev(layersList.end());
+    }
     auto collidingElementsList = vrv_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
 
     std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
@@ -301,6 +315,11 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
         //  If note on other layer is not on the same x position as rest - ignore its accidental
         if (GetAlignment()->GetTime() != vrv_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = RA_none;
+            // limit how much rest can be offset when there is duration overlap, but no x position overlap
+            if (abs(currentElementInfo.first) > 4) {
+                if (finalElementInfo.first != VRV_UNSET) continue;
+                currentElementInfo.first = isTopLayer ? 4 : -4;
+            }
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
             || (!isTopLayer && (finalElementInfo.first > currentElementInfo.first))) {
@@ -413,6 +432,12 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
         }
         return isTopLayer ? *std::max_element(btremElements.begin(), btremElements.end())
                           : *std::min_element(btremElements.begin(), btremElements.end());
+    }
+    if (object->Is(REST)) {
+        if (!m_crossStaff) return { VRV_UNSET, RA_none };
+        Rest *rest = vrv_cast<Rest *>(object);
+        assert(rest);
+        return { rest->GetDrawingLoc(), RA_none };
     }
     return { VRV_UNSET, RA_none };
 }

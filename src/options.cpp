@@ -21,8 +21,8 @@
 
 namespace vrv {
 
-std::map<int, std::string> Option::s_breaks
-    = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_line, "line" }, { BREAKS_encoded, "encoded" } };
+std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
+    { BREAKS_line, "line" }, { BREAKS_smart, "smart" }, { BREAKS_encoded, "encoded" } };
 
 std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
@@ -625,6 +625,11 @@ Options::Options()
     m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
+
+    m_breaksSmartSb.SetInfo("Smart breaks sb usage threshold",
+        "In smart breaks mode, the portion of system width usage at which an encoded sb will be used");
+    m_breaksSmartSb.Init(0.66, 0.0, 1.0);
+    this->Register(&m_breaksSmartSb, "breaksSmartSb", &m_general);
 
     m_condense.SetInfo("Condense", "Control condensed score layout");
     m_condense.Init(CONDENSE_auto, &Option::s_condense);
