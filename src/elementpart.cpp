@@ -515,25 +515,28 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
-    int slashFactor = (this->GetStemMod() < 6) ? this->GetStemMod() - 4 : 0;
+    int slashFactor = (this->GetStemMod() < 8) ? this->GetStemMod() - 1 : 0;
 
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
-        flag = vrv_cast<Flag *>(this->FindDescendantByType(FLAG));
+        flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
         if (!this->HasStemLen() && this->HasStemMod()) slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
     }
 
     // Adjust basic stem length to number of slashes
-    int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
-        + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-    if (abs(baseStem) < ((slashFactor + 4) * tremStep)) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - slashFactor * tremStep);
-        }
-        else {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + slashFactor * tremStep);
+    if (slashFactor && !this->HasStemLen()) {
+        const int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
+            + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
+        while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
+            if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+                this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
+            }
+            else {
+                this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
+            }
+            --slashFactor;
         }
     }
 

@@ -237,6 +237,11 @@ public:
 
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
 
+    /**
+     * Return stem length adjustment in half units, depending on the @stem.mode attribute 
+     */
+    int CalculateStemModAdjustment(int stemLength, int directionBias);
+
     int m_x;
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration

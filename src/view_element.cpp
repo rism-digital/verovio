@@ -578,7 +578,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         if (stemDir == STEMDIRECTION_down) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         DrawSmuflCode(dc, x, y, SMUFL_E22A_buzzRoll, staff->m_drawingStaffSize, false);
     }
-    else {
+    else if (stemMod != STEMMODIFIER_sprech) {
         for (int s = 1; s < stemMod; ++s) {
             DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
             y += step;

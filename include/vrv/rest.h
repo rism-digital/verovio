@@ -134,7 +134,7 @@ private:
      * Get the rest vertical location relative to location of elements placed on other layers
      */
     std::pair<int, RestAccidental> GetLocationRelativeToOtherLayers(
-        const ListOfObjects &layersList, Layer *currentLayer);
+        const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer);
 
     /**
      * Get the rest vertical location relative to location of elements placed on current layers

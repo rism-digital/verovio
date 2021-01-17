@@ -1183,8 +1183,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                         loc++;
                 }
             }
-            else if (hasMultipleLayer) {
-                loc = rest->GetOptimalLayerLocation(staffY, layerY, loc);
+            else if (hasMultipleLayer || m_crossStaff) {
+                Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+                assert(staff);
+                loc = rest->GetOptimalLayerLocation(staff, layer, loc);
             }
         }
         loc = rest->GetRestLocOffset(loc);
@@ -1203,7 +1205,7 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     // ignore elements that are not in the beam or are direct children of the beam
     if (!params->m_beam || (Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam) && !IsGraceNote()))
         return FUNCTOR_SIBLINGS;
-    if (Is({ GRACEGRP, TUPLET, TUPLET_NUM, TUPLET_BRACKET })) return FUNCTOR_CONTINUE;
+    if (Is({ GRACEGRP, TUPLET, TUPLET_NUM, TUPLET_BRACKET, BTREM })) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
