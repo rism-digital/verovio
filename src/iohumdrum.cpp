@@ -19409,23 +19409,6 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertMensuralRhythm(ELEMENT
 
     std::string vstring = token->getVisualDuration(subtoken);
 
-    if (!vstring.empty()) {
-        int dotcount = characterCountInSubtoken(vstring, '.');
-        if (dotcount > 0) {
-            element->SetDots(dotcount);
-        }
-        // dotcount = characterCountInSubtoken(tstring, '.');
-        // if (dotcount > 0) {
-        //    element->SetDotsGes(dotcount);
-        //}
-    }
-    else {
-        int dotcount = characterCountInSubtoken(tstring, ':');
-        if (dotcount > 0) {
-            element->SetDots(dotcount);
-        }
-    }
-
     // Tuplet durations are not handled below yet.
     // dur is in units of quarter notes.
 
