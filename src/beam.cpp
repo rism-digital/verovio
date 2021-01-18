@@ -82,59 +82,6 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void Beam::GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow)
-{
-    assert(element);
-    assert(alignment);
-    
-    // Only flags and stems need to be skipped
-    if (!element->Is({ NOTE, ACCID, STEM })) return;
-
-    // Nothing to do if there is not cross-staff
-    if (!this->m_hasCrossStaffContent || this->m_crossStaff) return;
-    
-    //skipBelow = true;
-    //skipAbove = true;
-    
-    return;
-    
-    data_STAFFREL_basic direction = element->GetCrossStaffRel();
-    
-    LayerElement *noteOrChord = NULL;
-    noteOrChord = (!element->Is(STEM)) ? dynamic_cast<LayerElement *>(element->GetParent()) : element;
-    if (!noteOrChord) return;
-    
-    if (this->m_drawingPlace == BEAMPLACE_above) {
-        if (!noteOrChord->m_crossStaff)  {
-            skipAbove = (direction == STAFFREL_basic_below);
-        }
-        else {
-            skipBelow = (direction == STAFFREL_basic_below);
-        }
-    }
-    
-    
-    //skipBelow = true;
-    //skipAbove = true;
-
-    
-    return;
-
-
-    Staff *staff = alignment->GetStaff();
-    assert(staff);
-
-    Staff *staffAbove = NULL;
-    Staff *staffBelow = NULL;
-    //this->GetCrossStaffExtremes(staffAbove, staffBelow);
-    if (staffAbove && (staffAbove != staff)) {
-        skipAbove = true;
-    }
-    if (staffBelow && (staffBelow != staff)) {
-        skipBelow = true;
-    }
-}
-
 void BeamSegment::CalcBeam(
     Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
 {
@@ -166,7 +113,7 @@ void BeamSegment::CalcBeam(
     // Set drawing stem positions
     CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
-        if (!beamInterface->m_hasCrossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
+        if (!beamInterface->m_crossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
             CalcBeamInit(layer, staff, doc, beamInterface, place);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
@@ -690,7 +637,7 @@ void BeamSegment::CalcBeamPosition(
         }
         // cross-staff or beam@place=mixed
         else {
-            if (beamInterface->m_hasCrossStaffContent) {
+            if (beamInterface->m_crossStaffContent) {
                 data_STEMDIRECTION dir
                     = (coord->m_beamRelativePlace == BEAMPLACE_above) ? STEMDIRECTION_up : STEMDIRECTION_down;
                 coord->SetDrawingStemDir(dir, staff, doc, this, beamInterface);
@@ -934,7 +881,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     else if (beamInterface->m_notesStemDir == STEMDIRECTION_down) {
         beamInterface->m_drawingPlace = BEAMPLACE_below;
     }
-    else if (beamInterface->m_hasCrossStaffContent) {
+    else if (beamInterface->m_crossStaffContent) {
         beamInterface->m_drawingPlace = BEAMPLACE_mixed;
     }
     // Look at the layer direction or, finally, at the note position
@@ -1316,7 +1263,7 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     int stemLen = segment->m_uniformStemLength;
-    if (interface->m_hasCrossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
+    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
         if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
             stemLen *= -1;
         }
@@ -1329,7 +1276,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (interface->m_hasCrossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
+    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
         segment->m_extendedToCenter = false;
     }
     else if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
@@ -1392,7 +1339,7 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
             default: stemLen *= 14;
         }
     }
-    
+
     return stemLen + CalculateStemModAdjustment(stemLen, directionBias);
 }
 
@@ -1416,7 +1363,6 @@ int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBi
 
     return 0;
 }
-
 
 void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
 {

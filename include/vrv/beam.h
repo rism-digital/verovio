@@ -155,13 +155,6 @@ public:
     bool IsFirstInBeam(LayerElement *element);
     bool IsLastInBeam(LayerElement *element);
     ///@}
-                 
-                 
-    /**
-     * Check if the part of a beam needs to be taken into account as overflow above or below in case of cross-staff
-     * beam.
-     */
-    void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
 
     /**
      *
@@ -246,7 +239,7 @@ public:
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
 
     /**
-     * Return stem length adjustment in half units, depending on the @stem.mode attribute 
+     * Return stem length adjustment in half units, depending on the @stem.mode attribute
      */
     int CalculateStemModAdjustment(int stemLength, int directionBias);
 
