@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Dec 29 13:14:55 PST 2020
+// Last Modified: Sun Jan 17 19:09:22 PST 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -10,7 +10,8 @@
 // Description:   Include file for humlib library.
 //
 /*
-Copyright (c) 2015-2020 Craig Stuart Sapp
+https://github.com/craigsapp/humlib
+Copyright (c) 2015-2021 Craig Stuart Sapp
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -1466,7 +1467,9 @@ class HumdrumToken : public std::string, public HumHash {
 
 		bool     isBarline                 (void) const;
 		bool     isCommentLocal            (void) const;
+		bool     isLocalComment            (void) const { return isCommentLocal(); }
 		bool     isCommentGlobal           (void) const;
+		bool     isGlobalComment           (void) const { return isCommentGlobal(); }
 		bool     isComment                 (void) const;
 		bool     isData                    (void) const;
 		bool     isInterpretation          (void) const;
