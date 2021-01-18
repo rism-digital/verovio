@@ -779,7 +779,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             const std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
             const std::string partAbbr
                 = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
-            pugi::xpath_node midiInstrument = xpathNode.node().select_node("midi-instrument");
+            pugi::xml_node midiInstrument = xpathNode.node().child("midi-instrument");
             if (!partName.empty() && !m_label) {
                 m_label = new Label();
                 if (xpathNode.node().select_node("part-name-display[not(@print-object='no')]")) {
@@ -829,15 +829,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             if (midiInstrument && !m_instrdef) {
                 m_instrdef = new InstrDef;
                 m_instrdef->SetMidiInstrname(m_instrdef->AttMidiInstrument::StrToMidinames(
-                    midiInstrument.node().select_node("midi-name").node().text().as_string()));
-                pugi::xpath_node midiChannel = midiInstrument.node().select_node("midi-channel");
-                if (midiChannel) m_instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
-                // pugi::xpath_node midiPan = midiInstrument.node().select_node("pan");
-                // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
-                pugi::xpath_node midiProgram = midiInstrument.node().select_node("midi-program");
-                if (midiProgram) m_instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
-                pugi::xpath_node midiVolume = midiInstrument.node().select_node("volume");
-                if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.node().text().as_int());
+                    midiInstrument.child("midi-name").text().as_string()));
+                pugi::xml_node midiChannel = midiInstrument.child("midi-channel");
+                if (midiChannel) m_instrdef->SetMidiChannel(midiChannel.text().as_int() - 1);
+                // pugi::xml_node midiPan = midiInstrument.child("pan");
+                // if (midiPan) instrdef->SetMidiPan(midiPan.text().as_int());
+                pugi::xml_node midiProgram = midiInstrument.child("midi-program");
+                if (midiProgram) m_instrdef->SetMidiInstrnum(midiProgram.text().as_int() - 1);
+                pugi::xml_node midiVolume = midiInstrument.child("volume");
+                if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.text().as_int());
             }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
@@ -1274,7 +1274,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     else
                         meterSig->SetForm(METERFORM_norm);
                 }
-                if (time.node().select_node("senza-misura")) {
+                if (time.node().child("senza-misura")) {
                     meterSig->SetForm(METERFORM_invis);
                 }
                 if (time.node().select_nodes("beats").size() > 1) {
@@ -1292,9 +1292,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     }
                     meterSig->SetCount(m_meterCount);
                 }
-                pugi::xpath_node beatType = time.node().select_node("beat-type");
-                if (beatType.node().text()) {
-                    m_meterUnit = beatType.node().text().as_int();
+                pugi::xml_node beatType = time.node().child("beat-type");
+                if (beatType.text()) {
+                    m_meterUnit = beatType.text().as_int();
                     meterSig->SetUnit(m_meterUnit);
                 }
             }
@@ -2353,12 +2353,12 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
         for (pugi::xml_node figure : node.children("figure")) {
             std::string textStr;
             if (paren) textStr.append("(");
-            textStr.append(ConvertFigureGlyph(figure.select_node("prefix").node().text().as_string()));
-            textStr.append(figure.select_node("figure-number").node().text().as_string());
-            textStr.append(ConvertFigureGlyph(figure.select_node("suffix").node().text().as_string()));
+            textStr.append(ConvertFigureGlyph(figure.child("prefix").text().as_string()));
+            textStr.append(figure.child("figure-number").text().as_string());
+            textStr.append(ConvertFigureGlyph(figure.child("suffix").text().as_string()));
             if (paren) textStr.append(")");
             F *f = new F();
-            if (figure.select_node("extend[@type='start']")) f->SetExtender(BOOLEAN_true);
+            if (figure.child("extend")) f->SetExtender(BOOLEAN_true);
             Text *text = new Text();
             text->SetText(UTF8to16(textStr));
             f->AddChild(text);
@@ -2366,7 +2366,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
         }
         harm->AddChild(fb);
         harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
-        m_durFb += node.select_node("duration").node().text().as_int();
+        m_durFb += node.child("duration").text().as_int();
         m_controlElements.push_back(std::make_pair(measureNum, harm));
         m_harmStack.push_back(harm);
     }
@@ -2390,28 +2390,28 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
     if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
-    pugi::xpath_node kind = node.select_node("kind");
+    pugi::xml_node kind = node.child("kind");
     if (kind) {
-        if (HasAttributeWithValue(kind.node(), "use-symbols", "yes")) {
-            harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
+        if (HasAttributeWithValue(kind, "use-symbols", "yes")) {
+            harmText = harmText + ConvertKindToSymbol(GetContent(kind));
         }
-        else if (kind.node().attribute("text") && std::strcmp(kind.node().text().as_string(), "none")) {
-            harmText = harmText + kind.node().attribute("text").as_string();
+        else if (kind.attribute("text") && std::strcmp(kind.text().as_string(), "none")) {
+            harmText = harmText + kind.attribute("text").as_string();
         }
         else {
-            harmText = harmText + ConvertKindToText(GetContent(kind.node()));
+            harmText = harmText + ConvertKindToText(GetContent(kind));
         }
     }
-    pugi::xpath_node degree = node.select_node("degree");
+    pugi::xml_node degree = node.child("degree");
     if (degree) {
-        pugi::xpath_node alter = node.select_node("degree/degree-alter");
-        harmText += ConvertAlterToSymbol(GetContent(alter.node())) + GetContentOfChild(node, "degree/degree-value");
+        harmText += ConvertAlterToSymbol(degree.child("degree-alter").text().as_string())
+            + degree.child("degree-value").text().as_string();
     }
-    pugi::xpath_node bass = node.select_node("bass");
+    pugi::xml_node bass = node.child("bass");
     if (bass) {
-        harmText += "/" + GetContentOfChild(node, "bass/bass-step");
-        pugi::xpath_node alter = node.select_node("bass/bass-alter");
-        if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
+        harmText += "/";
+        harmText += bass.child("bass-step").text().as_string()
+            + ConvertAlterToSymbol(bass.child("bass-alter").text().as_string());
     }
     Harm *harm = new Harm();
     Text *text = new Text();
@@ -2419,8 +2419,8 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
     harm->SetPlace(harm->AttPlacement::StrToStaffrel(node.attribute("placement").as_string()));
     harm->SetType(node.attribute("type").as_string());
     harm->AddChild(text);
-    pugi::xpath_node offset = node.select_node("offset");
-    if (offset) durOffset = offset.node().text().as_int();
+    pugi::xml_node offset = node.child("offset");
+    if (offset) durOffset = offset.text().as_int();
     harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     m_controlElements.push_back(std::make_pair(measureNum, harm));
     m_harmStack.push_back(harm);
@@ -2439,7 +2439,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
-    bool isChord = node.select_node("chord");
+    bool isChord = node.child("chord");
 
     // reset figured bass offset
     m_durFb = 0;
@@ -2599,15 +2599,15 @@ void MusicXmlInput::ReadMusicXmlNote(
                 note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
 
         // accidental
-        pugi::xpath_node accidental = node.select_node("accidental");
+        pugi::xml_node accidental = node.child("accidental");
         if (accidental) {
             Accid *accid = new Accid();
-            accid->SetAccid(ConvertAccidentalToAccid(accidental.node().text().as_string()));
-            accid->SetColor(accidental.node().attribute("color").as_string());
-            if (HasAttributeWithValue(accidental.node(), "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
-            if (HasAttributeWithValue(accidental.node(), "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
-            if (HasAttributeWithValue(accidental.node(), "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
-            if (HasAttributeWithValue(accidental.node(), "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
+            accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
+            accid->SetColor(accidental.attribute("color").as_string());
+            if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
+            if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
+            if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
+            if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
             note->AddChild(accid);
         }
 
