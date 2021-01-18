@@ -18703,6 +18703,19 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
+    // mensuration note explicit performance durations (MEI 5):
+    if (mensit) {
+        if (token->find("+") != std::string::npos) {
+            note->SetDurQuality(DURQUALITY_mensural_altera);
+        }
+        if (token->find("i") != std::string::npos) {
+            note->SetDurQuality(DURQUALITY_mensural_imperfecta);
+        }
+        if (token->find("p") != std::string::npos) {
+            note->SetDurQuality(DURQUALITY_mensural_perfecta);
+        }
+    }
+
     // handle ties
     if (!token->isDataType("**mens")) {
         if ((tstring.find("[") != std::string::npos) || (tstring.find("_") != std::string::npos)) {
