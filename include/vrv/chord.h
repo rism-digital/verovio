@@ -107,12 +107,6 @@ public:
     void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
 
     /**
-     * Check if the part of a chord needs to be taken into account as overflow above or below in case of cross-staff
-     * chord.
-     */
-    void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
-
-    /**
      * Return true if the chord has some cross staff notes.
      */
     bool HasCrossStaff();

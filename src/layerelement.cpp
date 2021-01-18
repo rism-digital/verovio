@@ -229,6 +229,96 @@ Staff *LayerElement::GetCrossStaff(Layer *&layer) const
     return NULL;
 }
 
+data_STAFFREL_basic LayerElement::GetCrossStaffRel()
+{
+    if (!m_crossStaff) return STAFFREL_basic_NONE;
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    return (m_crossStaff->GetN() < staff->GetN()) ? STAFFREL_basic_above : STAFFREL_basic_below;
+}
+
+void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlignment *&below)
+{
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    // By default use the alignment of the parent staff
+    above = staff->GetAlignment();
+    below = above;
+
+    // Chord and beam parent (if any)
+    Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD));
+    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
+
+    Layer *crossLayer = NULL;
+    Staff *crossStaff = this->GetCrossStaff(crossLayer);
+
+    // By default for cross-staff element, use the cross-staff alignment
+    if (crossStaff && crossStaff->GetAlignment()) {
+        above = crossStaff->GetAlignment();
+        below = above;
+    }
+    // Stems and flags with cross-staff chords need special treatment
+    if (this->Is({ FLAG, STEM }) && chord && chord->HasCrossStaff()) {
+        Staff *staffAbove = NULL;
+        Staff *staffBelow = NULL;
+        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+        if (staffAbove) {
+            above = staffAbove->GetAlignment();
+        }
+        if (staffBelow) {
+            below = staffBelow->GetAlignment();
+        }
+    }
+    // Stems cross-staff beam need special treament but only if the beam itself is not cross-staff
+    if (this->Is(STEM) && beam && beam->m_crossStaffContent && !beam->m_crossStaff) {
+        data_STAFFREL_basic direction = beam->m_crossStaffRel;
+        if (direction == STAFFREL_basic_above) {
+            above = beam->m_crossStaffContent->GetAlignment();
+            below = beam->m_beamStaff->GetAlignment();
+        }
+        else {
+            above = beam->m_beamStaff->GetAlignment();
+            below = beam->m_crossStaffContent->GetAlignment();
+        }
+    }
+    // Beams in cross-staff situation need special treatment
+    if (this->Is(BEAM)) {
+        beam = vrv_cast<Beam *>(this);
+        assert(beam);
+        // Beam between the staves - ignore both above and below
+        if (beam->m_crossStaffContent && !beam->m_crossStaff) {
+            data_STAFFREL_basic direction = beam->m_crossStaffRel;
+            if (beam->m_drawingPlace == BEAMPLACE_mixed) {
+                above = NULL;
+                below = NULL;
+            }
+            // Beam below - ignore above and find the appropriate below staff
+            else if (beam->m_drawingPlace == BEAMPLACE_below) {
+                above = NULL;
+                if (direction == STAFFREL_basic_above) {
+                    below = beam->m_beamStaff->GetAlignment();
+                }
+                else {
+                    below = beam->m_crossStaffContent->GetAlignment();
+                }
+            }
+            // Beam above - ignore below and find the appropriate above staff
+            else if (beam->m_drawingPlace == BEAMPLACE_above) {
+                below = NULL;
+                if (direction == STAFFREL_basic_below) {
+                    above = beam->m_beamStaff->GetAlignment();
+                }
+                else {
+                    above = beam->m_crossStaffContent->GetAlignment();
+                }
+            }
+        }
+    }
+}
+
 Alignment *LayerElement::GetGraceAlignment() const
 {
     assert(m_graceAlignment);
@@ -1557,7 +1647,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
             params->m_currentCrossLayer = NULL;
         }
     }
-    else {
+    else if (this->Is({ BEAM, BTREM, FTREM, TUPLET })) {
         // For other elements (e.g., beams, tuplets) check if all their children duration element are cross-staff
         // If yes, make them cross-staff themselves.
         ListOfObjects durations;
@@ -1878,6 +1968,8 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_drawingCueSize = false;
+    m_crossStaff = NULL;
+    m_crossLayer = NULL;
 
     // Pass it to the pseudo functor of the interface
     LinkingInterface *interface = this->GetLinkingInterface();
