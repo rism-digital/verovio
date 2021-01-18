@@ -79,6 +79,8 @@ int Sb::CastOffSystems(FunctorParams *functorParams)
             }
         }
     }
+    // Keep the <sb> in the internal MEI, even if we're not using it to break the system.
+    MoveItselfTo(params->m_currentSystem);
     return FUNCTOR_SIBLINGS;
 }
 
