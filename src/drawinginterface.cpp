@@ -82,6 +82,7 @@ void BeamDrawingInterface::Reset()
     m_hasMultipleStemDir = false;
     m_cueSize = false;
     m_hasCrossStaffContent = false;
+    m_crossStaffRel = STAFFREL_basic_NONE;
     m_shortestDur = 0;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
@@ -164,6 +165,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         Staff *staff = current->GetCrossStaff(layer);
         if (staff != currentStaff) {
             this->m_hasCrossStaffContent = true;
+            this->m_crossStaffRel = current->GetCrossStaffRel();
         }
         currentStaff = staff;
 

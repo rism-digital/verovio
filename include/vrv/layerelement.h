@@ -26,6 +26,7 @@ class Layer;
 class Mensur;
 class MeterSig;
 class Staff;
+class StaffAlignment;
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -178,6 +179,10 @@ public:
      * Return NULL if there is no cross-staff in the element or a parent.
      */
     Staff *GetCrossStaff(Layer *&layer) const;
+    data_STAFFREL_basic GetCrossStaffRel();
+    
+                         
+    void GetStaffOverflows(StaffAlignment *current, StaffAlignment *above, StaffAlignment *below);
 
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)

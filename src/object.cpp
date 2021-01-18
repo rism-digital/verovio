@@ -1566,22 +1566,56 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     // Take into account beam in cross-staff situation
     if (this->Is(BEAM)) {
+        return FUNCTOR_CONTINUE;
         Beam *beam = vrv_cast<Beam *>(this);
         assert(beam);
         // Ignore it if it has cross-staff content but is not entirely cross-staff itself
         if (beam->m_hasCrossStaffContent && !beam->m_crossStaff) return FUNCTOR_CONTINUE;
     }
+    
+    /*
+    // Take into account stem for notes in cross-staff situation and in beams
+    if (this->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this);
+        assert(chord);
+       // return FUNCTOR_CONTINUE;
+        if (chord->IsInBeam()) {
+            Beam *beam = vrv_cast<Beam *>(chord->GetFirstAncestor(BEAM));
+            assert(beam);
+            // Ignore it but only if the beam is not entirely cross-staff itself
+            if (beam->m_hasCrossStaffContent && !beam->m_crossStaff && !chord->m_crossStaff) return FUNCTOR_CONTINUE;
+        }
+    }
+    
+    // Take into account stem for notes in cross-staff situation and in beams
+    if (this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+       // return FUNCTOR_CONTINUE;
+        if (note->IsInBeam()) {
+            Beam *beam = vrv_cast<Beam *>(note->GetFirstAncestor(BEAM));
+            assert(beam);
+            // Ignore it but only if the beam is not entirely cross-staff itself
+            if (beam->m_hasCrossStaffContent && !beam->m_crossStaff && !note->m_crossStaff) return FUNCTOR_CONTINUE;
+        }
+    }
+    */
 
+    /*
     // Take into account stem for notes in cross-staff situation and in beams
     if (this->Is(STEM)) {
         LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
         if (noteOrChord && noteOrChord->m_crossStaff && noteOrChord->IsInBeam()) {
+        //if (noteOrChord && noteOrChord->IsInBeam()) {
             Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
             assert(beam);
             // Ignore it but only if the beam is not entirely cross-staff itself
             if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
+            //if (beam->m_hasCrossStaffContent && !beam->m_crossStaff && !noteOrChord->m_crossStaff) return FUNCTOR_CONTINUE;
         }
+        //if (noteOrChord && noteOrChord->m_crossStaff) return FUNCTOR_SIBLINGS;
     }
+    */
 
     if (this->Is(FB) || this->Is(FIGURE)) {
         return FUNCTOR_CONTINUE;
@@ -1604,9 +1638,16 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     bool skipAbove = false;
     bool skipBelow = false;
+
+    /*
+    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
+    if (beam && params->m_staffAlignment) {
+        beam->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
+    }
+
     Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chord && params->m_staffAlignment) {
-        chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
+        //chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
 
     StaffAlignment *alignment = params->m_staffAlignment;
@@ -1631,6 +1672,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         alignment->SetOverflowBelow(overflowBelow);
         alignment->AddBBoxBelow(current);
     }
+    */
 
     return FUNCTOR_CONTINUE;
 }

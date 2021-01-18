@@ -15,6 +15,7 @@
 namespace vrv {
 
 class BeamElementCoord;
+class StaffAlignment;
 
 // the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
@@ -154,6 +155,13 @@ public:
     bool IsFirstInBeam(LayerElement *element);
     bool IsLastInBeam(LayerElement *element);
     ///@}
+                 
+                 
+    /**
+     * Check if the part of a beam needs to be taken into account as overflow above or below in case of cross-staff
+     * beam.
+     */
+    void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
 
     /**
      *

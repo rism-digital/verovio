@@ -229,6 +229,25 @@ Staff *LayerElement::GetCrossStaff(Layer *&layer) const
     return NULL;
 }
 
+data_STAFFREL_basic LayerElement::GetCrossStaffRel()
+{
+    if (!m_crossStaff) return STAFFREL_basic_NONE;
+    
+    Staff* staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    
+    return (m_crossStaff->GetN() < staff->GetN()) ? STAFFREL_basic_above : STAFFREL_basic_below;
+}
+
+void LayerElement::GetStaffOverflows(StaffAlignment *current, StaffAlignment *above, StaffAlignment *below)
+{
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    
+    if (this->Is)
+    
+}
+
 Alignment *LayerElement::GetGraceAlignment() const
 {
     assert(m_graceAlignment);
@@ -1557,7 +1576,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
             params->m_currentCrossLayer = NULL;
         }
     }
-    else {
+    else if (this->Is({BEAM, BTREM, FTREM, TUPLET})) {
         // For other elements (e.g., beams, tuplets) check if all their children duration element are cross-staff
         // If yes, make them cross-staff themselves.
         ListOfObjects durations;
@@ -1878,6 +1897,8 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_drawingCueSize = false;
+    m_crossStaff = NULL;
+    m_crossLayer = NULL;
 
     // Pass it to the pseudo functor of the interface
     LinkingInterface *interface = this->GetLinkingInterface();

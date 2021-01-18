@@ -29,6 +29,7 @@
 #include "space.h"
 #include "staff.h"
 #include "tuplet.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -79,6 +80,59 @@ void BeamSegment::ClearCoordRefs()
 void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords)
 {
     m_beamElementCoordRefs = *beamElementCoords;
+}
+
+void Beam::GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow)
+{
+    assert(element);
+    assert(alignment);
+    
+    // Only flags and stems need to be skipped
+    if (!element->Is({ NOTE, ACCID, STEM })) return;
+
+    // Nothing to do if there is not cross-staff
+    if (!this->m_hasCrossStaffContent || this->m_crossStaff) return;
+    
+    //skipBelow = true;
+    //skipAbove = true;
+    
+    return;
+    
+    data_STAFFREL_basic direction = element->GetCrossStaffRel();
+    
+    LayerElement *noteOrChord = NULL;
+    noteOrChord = (!element->Is(STEM)) ? dynamic_cast<LayerElement *>(element->GetParent()) : element;
+    if (!noteOrChord) return;
+    
+    if (this->m_drawingPlace == BEAMPLACE_above) {
+        if (!noteOrChord->m_crossStaff)  {
+            skipAbove = (direction == STAFFREL_basic_below);
+        }
+        else {
+            skipBelow = (direction == STAFFREL_basic_below);
+        }
+    }
+    
+    
+    //skipBelow = true;
+    //skipAbove = true;
+
+    
+    return;
+
+
+    Staff *staff = alignment->GetStaff();
+    assert(staff);
+
+    Staff *staffAbove = NULL;
+    Staff *staffBelow = NULL;
+    //this->GetCrossStaffExtremes(staffAbove, staffBelow);
+    if (staffAbove && (staffAbove != staff)) {
+        skipAbove = true;
+    }
+    if (staffBelow && (staffBelow != staff)) {
+        skipBelow = true;
+    }
 }
 
 void BeamSegment::CalcBeam(

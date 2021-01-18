@@ -117,6 +117,7 @@ public:
     bool m_hasMultipleStemDir;
     bool m_cueSize;
     bool m_hasCrossStaffContent;
+    data_STAFFREL_basic m_crossStaffRel;
     int m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
