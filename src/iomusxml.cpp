@@ -2663,6 +2663,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (noteHeadFill) note->SetHeadFill(noteHeadFill.as_bool() ? FILL_solid : FILL_void);
             if (!std::strncmp(notehead.text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
         }
+        if (node.child("notehead-text")) LogWarning("MusicXML import: notehead-text is not supported");
 
         // look at the next note to see if we are starting or ending a chord
         pugi::xpath_node nextNote = node.select_node("./following-sibling::note");
