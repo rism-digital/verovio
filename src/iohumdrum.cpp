@@ -5823,8 +5823,23 @@ void HumdrumInput::checkForOmd(int startline, int endline)
 
     if (!value.empty()) {
         Tempo *tempo = new Tempo;
+        hum::HTp token = infile.token(index, 0);
+        hum::HumNum timepos = token->getDurationFromStart();
+        if (timepos > 0) {
+            int midibpm = getMmTempo(token);
+            if (midibpm > 0) {
+                tempo->SetMidiBpm(midibpm);
+            }
+            else {
+                // check for *MM marker before OMD
+                midibpm = getMmTempoForward(token);
+                if (midibpm > 0) {
+                    tempo->SetMidiBpm(midibpm);
+                }
+            }
+        }
         if (index >= 0) {
-            setLocationId(tempo, infile.token(index, 0));
+            setLocationId(tempo, token);
         }
         addChildBackMeasureOrSection(tempo);
         setTempoContent(tempo, value);
@@ -8342,6 +8357,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handleOttavaMark(layerdata[i], note);
             handleLigature(layerdata[i]);
             handleColoration(layerdata[i]);
+            handleTempoChange(layerdata[i]);
             handlePedalMark(layerdata[i]);
             handleStaffStateVariables(layerdata[i]);
             handleStaffDynamStateVariables(layerdata[i]);
@@ -9143,6 +9159,222 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
             }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleTempoChange -- Generate <tempo> from *MM# interpretation as
+//    long as there is no <tempo> text that will use the tempo *MM# as @midi.bpm.
+//    *MM at the start of the music is ignored (placed separately into scoreDef).
+//
+
+void HumdrumInput::handleTempoChange(hum::HTp token)
+{
+    if (!token->isInterpretation()) {
+        return;
+    }
+    hum::HumRegex hre;
+    if (!hre.search(token, "^\\*MM(\\d+\\.?\\d*)")) {
+        return;
+    }
+    hum::HumNum ttime = token->getDurationFromStart();
+    if (ttime == 0) {
+        // ignore starting tempo setting since it is handled
+        // by scoreDef.
+        return;
+    }
+
+    int midibpm = int(hre.getMatchDouble(1) + 0.5);
+    if (midibpm <= 0) {
+        return;
+    }
+
+    bool nearOmd = isNearOmd(token);
+    if (nearOmd) {
+        return;
+    }
+
+    bool hastempo = hasTempoTextAfter(token);
+    if (hastempo) {
+        return;
+    }
+
+    // only insert the tempo if there is no higher staff
+    // that has a tempo marking at the same time
+    bool islast = isLastStaffTempo(token);
+    if (!islast) {
+        return;
+    }
+
+    Tempo *tempo = new Tempo;
+    tempo->SetMidiBpm(midibpm);
+    setLocationId(tempo, token);
+    int staffindex = 0;
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    tempo->SetTstamp(tstamp.getFloat());
+    addChildMeasureOrSection(tempo);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isLastStaffTempo --
+//
+
+bool HumdrumInput::isLastStaffTempo(hum::HTp token)
+{
+    int field = token->getFieldIndex() + 1;
+    int track = token->getTrack();
+    hum::HumdrumLine &line = *(token->getOwner());
+    for (int i = field; i < line.getFieldCount(); i++) {
+        hum::HTp newtok = line.token(i);
+        int newtrack = newtok->getTrack();
+        if (track == newtrack) {
+            continue;
+        }
+        if (!newtok->isStaff()) {
+            continue;
+        }
+        if (newtok->compare(0, 3, "*MM") == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasTempoTextAfter -- Used to check of *MM# tempo change has potential <tempo>
+//    text after it, but before any data.  Will not cross a measure boundary.
+//    Input token is assumed to be a *MM interpertation (MIDI-like tempo change)
+//    Algorithm: Find the first note after the input token and then check for a local
+//    or global LO:TX parameter that applies to that note (for local LO:TX).
+//
+
+bool HumdrumInput::hasTempoTextAfter(hum::HTp token)
+{
+    hum::HumdrumFile &infile = *(token->getOwner()->getOwner());
+    int startline = token->getLineIndex();
+    hum::HTp current = token->getNextToken();
+    if (!current) {
+        return false;
+    }
+
+    // search for local LO:TX:
+    while (current && !current->isData()) {
+        current = current->getNextToken();
+    }
+    if (!current) {
+        // No more data: at the end of the music.
+        return false;
+    }
+    hum::HTp data = current;
+    int dataline = data->getLineIndex();
+    // now work backwards through all null local comments and !LO: parameters searching
+    // for potential tempo text
+    std::vector<hum::HTp> texts;
+    current = data->getPreviousToken();
+    int line = current->getLineIndex();
+    if (!current) {
+        return false;
+    }
+    while (current && (line > startline)) {
+        if (!current->isLocalComment()) {
+            break;
+        }
+        if (current->compare(0, 7, "!LO:TX:") == 0) {
+            texts.push_back(current);
+        }
+        current = current->getPreviousToken();
+        line = current->getLineIndex();
+    }
+    for (int i = 0; i < (int)texts.size(); i++) {
+        bool status = isTempoishText(texts[i]);
+        if (status) {
+            return true;
+        }
+    }
+
+    // now check for global tempo text;
+    texts.clear();
+    for (int i = dataline - 1; i > startline; --i) {
+        hum::HTp gtok = infile.token(i, 0);
+        if (gtok->compare(0, 8, "!!LO:TX:") == 0) {
+            texts.push_back(gtok);
+        }
+    }
+    for (int i = 0; i < (int)texts.size(); i++) {
+        bool status = isTempoishText(texts[i]);
+        if (status) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isTempoishText -- Return true if the text is probably tempo indication.
+//
+
+bool HumdrumInput::isTempoishText(hum::HTp token)
+{
+    hum::HumRegex hre;
+    if (hre.search(token, ":tempo:")) {
+        return true;
+    }
+    if (hre.search(token, ":tempo$")) {
+        return true;
+    }
+    if (!hre.search(token, ":t=([^:]+)")) {
+        return false;
+    }
+    std::string text = hre.getMatch(1);
+    if (hre.search(text, "\\[.*?\\]\\s*=.*\\d\\d")) {
+        return true;
+    }
+
+    return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isNearOmd -- Returns true of the line of the token is adjacent to
+//    An OMD line, with the boundary being a data line (measures are included).
+//
+
+bool HumdrumInput::isNearOmd(hum::HTp token)
+{
+    int tline = token->getLineIndex();
+    hum::HumdrumFile &infile = *(token->getOwner()->getOwner());
+
+    for (int i = tline - 1; tline >= 0; --i) {
+        hum::HTp ltok = infile.token(i, 0);
+        if (ltok->isData()) {
+            break;
+        }
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        if (ltok->compare(0, 6, "!!!OMD") == 0) {
+            return true;
+        }
+    }
+
+    for (int i = tline + 1; tline < infile.getLineCount(); ++tline) {
+        hum::HTp ltok = infile.token(i, 0);
+        if (ltok->isData()) {
+            break;
+        }
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        if (ltok->compare(0, 6, "!!!OMD") == 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //////////////////////////////
@@ -10532,6 +10764,8 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         italic = true;
     }
 
+    bool tempo = hline->isDefined("LO", "TX", "tempo");
+
     double Y = 0.0;
     double Z = 0.0;
     bool showplace = false;
@@ -10574,48 +10808,97 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         placement = "above";
     }
 
-    Dir *dir = new Dir;
-    if (cparam) {
-        setStaffBetween(dir, m_currentstaff);
-    }
-    else {
-        setStaff(dir, m_currentstaff);
-    }
-    setLocationId(dir, token);
-    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    dir->SetTstamp(tstamp.getFloat());
-    if (vgroup > 0) {
-        dir->SetVgrp(vgroup);
-    }
+    if (tempo) {
 
-    if (placement == "above") {
-        setPlace(dir, "above", showplace);
-        addChildBackMeasureOrSection(dir);
-    }
-    else if (placement == "below") {
-        setPlace(dir, "below", showplace);
-        addChildMeasureOrSection(dir);
-    }
-    else if (placement == "between") {
-        setPlace(dir, "between", showplace);
-        addChildMeasureOrSection(dir);
+        Tempo *tempo = new Tempo;
+        int midibpm = getMmTempo(token);
+        if (midibpm > 0) {
+            tempo->SetMidiBpm(midibpm);
+        }
+        if (cparam) {
+            setStaffBetween(tempo, m_currentstaff);
+        }
+        else {
+            setStaff(tempo, m_currentstaff);
+        }
+        setLocationId(tempo, token);
+        hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+        tempo->SetTstamp(tstamp.getFloat());
+        if (placement == "above") {
+            setPlace(tempo, "above", showplace);
+            addChildBackMeasureOrSection(tempo);
+        }
+        else if (placement == "below") {
+            setPlace(tempo, "below", showplace);
+            addChildMeasureOrSection(tempo);
+        }
+        else if (placement == "between") {
+            setPlace(tempo, "between", showplace);
+            addChildMeasureOrSection(tempo);
+        }
+        else {
+            addChildMeasureOrSection(tempo);
+        }
+        if ((!italic) || bold) {
+            Rend *rend = new Rend;
+            tempo->AddChild(rend);
+            addTextElement(rend, text);
+            if (!italic) {
+                rend->SetFontstyle(FONTSTYLE_normal);
+            }
+            if (bold) {
+                rend->SetFontweight(FONTWEIGHT_bold);
+            }
+        }
+        else {
+            addTextElement(tempo, text);
+        }
     }
     else {
-        addChildMeasureOrSection(dir);
-    }
-    if ((!italic) || bold) {
-        Rend *rend = new Rend;
-        dir->AddChild(rend);
-        addTextElement(rend, text);
-        if (!italic) {
-            rend->SetFontstyle(FONTSTYLE_normal);
+
+        Dir *dir = new Dir;
+        if (cparam) {
+            setStaffBetween(dir, m_currentstaff);
         }
-        if (bold) {
-            rend->SetFontweight(FONTWEIGHT_bold);
+        else {
+            setStaff(dir, m_currentstaff);
         }
-    }
-    else {
-        addTextElement(dir, text);
+        setLocationId(dir, token);
+        hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+        dir->SetTstamp(tstamp.getFloat());
+        if (vgroup > 0) {
+            dir->SetVgrp(vgroup);
+        }
+
+        if (placement == "above") {
+            setPlace(dir, "above", showplace);
+            addChildBackMeasureOrSection(dir);
+        }
+        else if (placement == "below") {
+            setPlace(dir, "below", showplace);
+            addChildMeasureOrSection(dir);
+        }
+        else if (placement == "between") {
+            setPlace(dir, "between", showplace);
+            addChildMeasureOrSection(dir);
+        }
+        else {
+            addChildMeasureOrSection(dir);
+        }
+        if ((!italic) || bold) {
+            Rend *rend = new Rend;
+            dir->AddChild(rend);
+            addTextElement(rend, text);
+            if (!italic) {
+                rend->SetFontstyle(FONTSTYLE_normal);
+            }
+            if (bold) {
+                rend->SetFontweight(FONTWEIGHT_bold);
+            }
+        }
+        else {
+            addTextElement(dir, text);
+        }
     }
 }
 
@@ -10816,6 +11099,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
     bool problemQ = false;
     bool verboseQ = false;
+    bool tempoQ = false;
     std::string text;
     std::string key;
     std::string value;
@@ -10823,6 +11107,8 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     std::string verboseType;
     std::string ovalue;
     std::string svalue;
+    Dir *dir = NULL;
+    Tempo *tempo = NULL;
 
     for (int i = 0; i < hps->getCount(); ++i) {
         key = hps->getParameterName(i);
@@ -10893,6 +11179,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
         if (key == "type") {
             typevalue = value;
+        }
+        if (key == "tempo") {
+            tempoQ = true;
         }
         if (key == "vgrp") {
             if ((!value.empty()) && std::isdigit(value[0])) {
@@ -10993,62 +11282,118 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         return;
     }
 
-    Dir *dir = new Dir;
-    if (placement == "between") {
-        setStaffBetween(dir, m_currentstaff);
+    int midibpm = 0.0;
+    if (tempoQ) {
+        midibpm = int(getMmTempo(token, true) + 0.5);
+        if (midibpm == 0) {
+            // this is a redundant tempo message, so ignore (event as text dir).
+            return;
+        }
+    }
+
+    if (tempoQ) {
+
+        tempo = new Tempo;
+        if (midibpm > 0) {
+            tempo->SetMidiBpm(midibpm);
+        }
+        if (placement == "between") {
+            setStaffBetween(tempo, m_currentstaff);
+        }
+        else {
+            setStaff(tempo, m_currentstaff);
+        }
+        hum::HTp dirtok = hps->getToken();
+        if (dirtok != NULL) {
+            setLocationId(tempo, dirtok);
+        }
+        else {
+            cerr << "DIRTOK FOR " << token << " IS EMPTY " << endl;
+        }
+        hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+        if (token->isMens()) {
+            // Attach to note, not with measure timestamp.
+            // Need to handle text on chords (will currently have a problem attaching to chords)
+            std::string startid = getLocationId("note", token);
+            tempo->SetStartid("#" + startid);
+        }
+        else {
+            tempo->SetTstamp(tstamp.getFloat());
+        }
+        if (problemQ) {
+            appendTypeTag(tempo, "problem");
+        }
+        if (sicQ) {
+            appendTypeTag(tempo, "sic");
+        }
+        if (!typevalue.empty()) {
+            appendTypeTag(tempo, typevalue);
+        }
+        addChildMeasureOrSection(tempo);
+        if (placement == "above") {
+            setPlace(tempo, "above", showplace);
+        }
+        else if (placement == "below") {
+            setPlace(tempo, "below", showplace);
+        }
+        else if (placement == "between") {
+            setPlace(tempo, "between", showplace);
+        }
     }
     else {
-        setStaff(dir, m_currentstaff);
-    }
-    hum::HTp dirtok = hps->getToken();
-    if (dirtok != NULL) {
-        setLocationId(dir, dirtok);
-    }
-    else {
-        cerr << "DIRTOK FOR " << token << " IS EMPTY " << endl;
-    }
-    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    if (token->isMens()) {
-        // Attach to note, not with measure timestamp.
-        // Need to handle text on chords (will currently have a problem attaching to chords)
-        std::string startid = getLocationId("note", token);
-        dir->SetStartid("#" + startid);
-    }
-    else {
-        dir->SetTstamp(tstamp.getFloat());
+
+        dir = new Dir;
+        if (placement == "between") {
+            setStaffBetween(dir, m_currentstaff);
+        }
+        else {
+            setStaff(dir, m_currentstaff);
+        }
+        hum::HTp dirtok = hps->getToken();
+        if (dirtok != NULL) {
+            setLocationId(dir, dirtok);
+        }
+        else {
+            cerr << "DIRTOK FOR " << token << " IS EMPTY " << endl;
+        }
+        hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+        if (token->isMens()) {
+            // Attach to note, not with measure timestamp.
+            // Need to handle text on chords (will currently have a problem attaching to chords)
+            std::string startid = getLocationId("note", token);
+            dir->SetStartid("#" + startid);
+        }
+        else {
+            dir->SetTstamp(tstamp.getFloat());
+        }
+        // bool problemQ = false;
+        // bool sicQ = false;
+        if (vgroup > 0) {
+            dir->SetVgrp(vgroup);
+        }
+        if (problemQ) {
+            appendTypeTag(dir, "problem");
+        }
+        if (sicQ) {
+            appendTypeTag(dir, "sic");
+        }
+        if (!typevalue.empty()) {
+            appendTypeTag(dir, typevalue);
+        }
+        addChildMeasureOrSection(dir);
+        if (placement == "above") {
+            setPlace(dir, "above", showplace);
+        }
+        else if (placement == "below") {
+            setPlace(dir, "below", showplace);
+        }
+        else if (placement == "between") {
+            setPlace(dir, "between", showplace);
+        }
     }
 
-    // bool problemQ = false;
-    // bool sicQ = false;
-    if (vgroup > 0) {
-        dir->SetVgrp(vgroup);
-    }
-
-    if (problemQ) {
-        appendTypeTag(dir, "problem");
-    }
-
-    if (sicQ) {
-        appendTypeTag(dir, "sic");
-    }
-
-    if (!typevalue.empty()) {
-        appendTypeTag(dir, typevalue);
-    }
-
-    addChildMeasureOrSection(dir);
-    if (placement == "above") {
-        setPlace(dir, "above", showplace);
-    }
-    else if (placement == "below") {
-        setPlace(dir, "below", showplace);
-    }
-    else if (placement == "between") {
-        setPlace(dir, "between", showplace);
-    }
     bool plain = !(italic || bold);
     bool needrend = plain || bold || justification || color.size();
-
     bool oldneedrend = false;
     bool onlyverovio = false;
     if (hre.search(text, "^(\\[.*?\\])+$")) {
@@ -11058,7 +11403,6 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (needrend) {
-
         Rend *rend = new Rend;
         if (!color.empty()) {
             rend->SetColor(color);
@@ -11069,7 +11413,12 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         else if (sicQ) {
             rend->SetColor("limegreen");
         }
-        dir->AddChild(rend);
+        if (tempoQ && tempo) {
+            tempo->AddChild(rend);
+        }
+        else if (dir) {
+            dir->AddChild(rend);
+        }
         addTextElement(rend, text);
         if (!italic) {
             rend->SetFontstyle(FONTSTYLE_normal);
@@ -11082,37 +11431,131 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
     }
     else {
-        addTextElement(dir, text);
 
-        if (onlyverovio && oldneedrend) {
-            int count = dir->GetChildCount();
-            for (int j = 0; j < count; j++) {
-                Object *obj = dir->GetChild(j);
-                if (obj->GetClassName() != "Rend") {
-                    continue;
+        if (tempoQ && tempo) {
+            addTextElement(tempo, text);
+            if (onlyverovio && oldneedrend) {
+                int count = tempo->GetChildCount();
+                for (int j = 0; j < count; j++) {
+                    Object *obj = tempo->GetChild(j);
+                    if (obj->GetClassName() != "Rend") {
+                        continue;
+                    }
+                    Rend *item = (Rend *)obj;
+                    if (!color.empty()) {
+                        item->SetColor(color);
+                    }
+                    else if (problemQ) {
+                        item->SetColor("red");
+                    }
+                    else if (sicQ) {
+                        item->SetColor("limegreen");
+                    }
+                    if (!italic) {
+                        item->SetFontstyle(FONTSTYLE_normal);
+                    }
+                    if (bold) {
+                        item->SetFontweight(FONTWEIGHT_bold);
+                    }
+                    if (justification == 1) {
+                        item->SetHalign(HORIZONTALALIGNMENT_right);
+                    }
                 }
-                Rend *item = (Rend *)obj;
-                if (!color.empty()) {
-                    item->SetColor(color);
-                }
-                else if (problemQ) {
-                    item->SetColor("red");
-                }
-                else if (sicQ) {
-                    item->SetColor("limegreen");
-                }
-                if (!italic) {
-                    item->SetFontstyle(FONTSTYLE_normal);
-                }
-                if (bold) {
-                    item->SetFontweight(FONTWEIGHT_bold);
-                }
-                if (justification == 1) {
-                    item->SetHalign(HORIZONTALALIGNMENT_right);
+            }
+        }
+        else if (dir) {
+
+            addTextElement(dir, text);
+            if (onlyverovio && oldneedrend) {
+                int count = dir->GetChildCount();
+                for (int j = 0; j < count; j++) {
+                    Object *obj = dir->GetChild(j);
+                    if (obj->GetClassName() != "Rend") {
+                        continue;
+                    }
+                    Rend *item = (Rend *)obj;
+                    if (!color.empty()) {
+                        item->SetColor(color);
+                    }
+                    else if (problemQ) {
+                        item->SetColor("red");
+                    }
+                    else if (sicQ) {
+                        item->SetColor("limegreen");
+                    }
+                    if (!italic) {
+                        item->SetFontstyle(FONTSTYLE_normal);
+                    }
+                    if (bold) {
+                        item->SetFontweight(FONTWEIGHT_bold);
+                    }
+                    if (justification == 1) {
+                        item->SetHalign(HORIZONTALALIGNMENT_right);
+                    }
                 }
             }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMmTempo -- return any *MM# tempo value before or at the input token,
+//     but before any data.
+//     Returns 0.0 if no tempo is found.
+//
+
+double HumdrumInput::getMmTempo(hum::HTp token, bool checklast)
+{
+    hum::HumRegex hre;
+    hum::HTp current = token;
+    if (current && current->isData()) {
+        current = current->getPreviousToken();
+    }
+    while (current && !current->isData()) {
+        if (current->isInterpretation()) {
+            if (hre.search(current, "^\\*MM(\\d+\\.?\\d*)")) {
+                bool islast = isLastStaffTempo(current);
+                if (!islast) {
+                    return 0.0;
+                }
+                double tempo = hre.getMatchDouble(1);
+                return tempo;
+            }
+        }
+        current = current->getPreviousToken();
+    }
+    return 0.0;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMmTempoForward -- return any *MM# tempo value before or at the input token,
+//     but before any data.
+//     Returns 0.0 if no tempo is found.
+//
+
+double HumdrumInput::getMmTempoForward(hum::HTp token)
+{
+    hum::HumRegex hre;
+    hum::HTp current = token;
+    if (current && current->isData()) {
+        current = current->getNextToken();
+    }
+    while (current->getSpineInfo() == "") {
+        int line = token->getLineIndex() + 1;
+        current = token->getOwner()->getOwner()->token(line, 0);
+    }
+    while (current && !current->isData()) {
+        if (current->isInterpretation()) {
+            if (hre.search(current, "^\\*MM(\\d+\\.?\\d*)")) {
+                double tempo = hre.getMatchDouble(1);
+                return tempo;
+            }
+        }
+        current = current->getNextToken();
+    }
+    return 0.0;
 }
 
 //////////////////////////////
@@ -11123,6 +11566,10 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     hum::HTp token, int staffindex, int justification, const std::string &color)
 {
     Tempo *tempo = new Tempo;
+    int midibpm = getMmTempo(token);
+    if (midibpm > 0) {
+        tempo->SetMidiBpm(midibpm);
+    }
     if (placement == "center") {
         setStaffBetween(tempo, m_currentstaff);
     }

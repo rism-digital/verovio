@@ -695,6 +695,13 @@ protected:
         const string &tstring, hum::HumNum factor);
     void setNoteMeiDur(Note *note, int meidur);
     void storeExpansionListsInChoice(Section *section, std::vector<hum::HTp> &expansions);
+    double getMmTempo(hum::HTp token, bool checklast = false);
+    double getMmTempoForward(hum::HTp token);
+    bool isNearOmd(hum::HTp token);
+    void handleTempoChange(hum::HTp token);
+    bool hasTempoTextAfter(hum::HTp token);
+    bool isTempoishText(hum::HTp token);
+    bool isLastStaffTempo(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
