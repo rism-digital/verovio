@@ -18206,13 +18206,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
-    if (tstring.find("P") != std::string::npos) {
-        appendTypeTag(note, "appoggiatura-start");
-    }
-    if (tstring.find("p") != std::string::npos) {
-        appendTypeTag(note, "appoggiatura-stop");
-    }
-
     // Add the pitch information
     int base40 = hum::Convert::kernToBase40(tstring);
     base40 += m_transpose[staffindex];
@@ -18713,6 +18706,15 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
         if (token->find("p") != std::string::npos) {
             note->SetDurQuality(DURQUALITY_mensural_perfecta);
+        }
+    }
+
+    if (!mensit) {
+        if (tstring.find("P") != std::string::npos) {
+            appendTypeTag(note, "appoggiatura-start");
+        }
+        if (tstring.find("p") != std::string::npos) {
+            appendTypeTag(note, "appoggiatura-stop");
         }
     }
 
