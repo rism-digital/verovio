@@ -559,7 +559,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         tempo->SetMmDots(dotCount);
     }
 
-    pugi::xml_node beatunit = metronome.child("beat-unit");
+    const pugi::xml_node beatunit = metronome.child("beat-unit");
     if (beatunit) {
         std::wstring verovioText;
         const std::string content = beatunit.text().as_string();
@@ -579,7 +579,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     }
 
     rawText = "";
-    pugi::xml_node perminute = metronome.child("per-minute");
+    const pugi::xml_node perminute = metronome.child("per-minute");
     if (perminute) {
         const std::string mm = perminute.text().as_string();
         double mmval = 0.0;
@@ -588,9 +588,8 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         if (std::regex_search(mm, matches, std::regex("(\\d+\\.?\\d*)"))) {
             mmval = std::stod(matches[1]);
         }
-        if ((!isnan(mmval)) && (mmval > 0.5)) {
-            int mmint = int(mmval + 0.5);
-            tempo->SetMm(mmint);
+        if (!isnan(mmval)) {
+            tempo->SetMm(mmval);
         }
         if (!mm.empty()) {
             std::stringstream sstream;
