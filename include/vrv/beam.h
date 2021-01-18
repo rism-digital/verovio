@@ -108,6 +108,8 @@ private:
     bool CalcBeamSlope(
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
 
+    void CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step);
+
     void CalcBeamPosition(Doc *doc, Staff *staff, Layer *layer, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
     void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
@@ -131,6 +133,9 @@ private:
 
     // Helper to check wheter beam fits within certain bounds
     bool DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset);
+
+    // Helper to find number of additional beams. Return { additional beams below main beam, additional beams above }
+    std::pair<int, int> GetAdditionalBeamCount(BeamDrawingInterface *beamInterface);
 
     // Helper to check mixed beam positioning compared to other elements (ledger lines, staff) and adjust it accordingly
     bool NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
