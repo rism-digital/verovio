@@ -777,7 +777,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
             // part-name should be revised, as soon MEI can suppress labels
             const std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
-            const std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
+            const std::string partAbbr
+                = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
             pugi::xpath_node midiInstrument = xpathNode.node().select_node("midi-instrument");
             if (!partName.empty() && !m_label) {
                 m_label = new Label();
@@ -3442,6 +3443,10 @@ void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pu
 void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer)
 {
     if (!beamStart || (node.select_node("notations/ornaments/tremolo[@type='start']"))) return;
+    if (m_elementStackMap.at(layer).size() > 0 && m_elementStackMap.at(layer).back()->Is(BEAM)) {
+        LogDebug("MusicXML import: Adding a beam to a beam");
+        if (!node.child("grace")) return;
+    }
 
     Beam *beam = new Beam();
     if (beamStart.attribute("id")) beam->SetUuid(beamStart.attribute("id").as_string());
