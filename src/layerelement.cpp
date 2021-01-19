@@ -260,8 +260,8 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
         above = crossStaff->GetAlignment();
         below = above;
     }
-    // Stems and flags with cross-staff chords need special treatment
-    if (this->Is({ FLAG, STEM }) && chord && chord->HasCrossStaff()) {
+    // Dots, flags and stems with cross-staff chords need special treatment
+    if (this->Is({ DOTS, FLAG, STEM }) && chord && chord->HasCrossStaff()) {
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);
