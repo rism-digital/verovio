@@ -76,42 +76,35 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     curve->GetPoints(points);
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
-    Point p1 = points[0];
-    Point rotatedC1 = BoundingBox::CalcPositionAfterRotation(points[1], -slurAngle, p1);
-    Point rotatedC2 = BoundingBox::CalcPositionAfterRotation(points[2], -slurAngle, p1);
-    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(points[3], -slurAngle, p1);
+    BezierCurve bezier(points[0], points[1], points[2], points[3]);
+    bezier.Rotate(-slurAngle, points[0]);
+    bezier.SetControlPointOffset(doc, staff->m_drawingStaffSize);
 
-    GetSpannedPointPositions(doc, spannedElements, p1, slurAngle, curveDir, staff->m_drawingStaffSize);
+    GetSpannedPointPositions(doc, spannedElements, bezier.p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
     bool adjusted = false;
     if (!spannedElements->empty()) {
 
         // Adjust the curvatur (control points are move)
-        int adjustedHeight = AdjustSlurCurve(doc, spannedElements, p1, rotatedP2, rotatedC1, rotatedC2, curveDir,
-            slurAngle, staff->m_drawingStaffSize, true);
+        int adjustedHeight
+            = AdjustSlurCurve(doc, spannedElements, bezier, curveDir, slurAngle, staff->m_drawingStaffSize, true);
 
+        // The slur is being adjusted
         adjusted = true;
-
-        rotatedC1 = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, p1);
-        rotatedC2 = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, p1);
-        rotatedP2 = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, p1);
+        bezier.Rotate(slurAngle, bezier.p1);
 
         // The adjustedHeight value is 0 if everything fits within the slur
         // If not we need to move its position
         if (adjustedHeight != 0) {
-            // The slur is being adjusted
-            adjusted = true;
             // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-            AdjustSlurPosition(
-                doc, curve, spannedElements, p1, rotatedP2, rotatedC1, rotatedC2, curveDir, slurAngle, false);
+            AdjustSlurPosition(doc, curve, spannedElements, bezier, curveDir, slurAngle, false);
             // Re-calculate the control points with the new height
-            GetControlPoints(
-                doc, p1, rotatedP2, rotatedC1, rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
+            GetControlPoints(bezier, curveDir, adjustedHeight);
 
-            points[0] = p1;
-            points[1] = rotatedC1;
-            points[2] = rotatedC2;
-            points[3] = rotatedP2;
+            points[0] = bezier.p1;
+            points[1] = bezier.c1;
+            points[2] = bezier.c2;
+            points[3] = bezier.p2;
             curve->UpdateCurveParams(points, slurAngle, curve->GetThickness(), curveDir);
         }
 
@@ -119,21 +112,19 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         if (!spannedElements->empty()) {
 
             // First re-calcuate the spanning point positions
-            GetSpannedPointPositions(doc, spannedElements, p1, slurAngle, curveDir, staff->m_drawingStaffSize);
+            GetSpannedPointPositions(doc, spannedElements, bezier.p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
             // Move it and force both sides to move
-            AdjustSlurPosition(
-                doc, curve, spannedElements, p1, rotatedP2, rotatedC1, rotatedC2, curveDir, slurAngle, true);
-            GetControlPoints(
-                doc, p1, rotatedP2, rotatedC1, rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
+            AdjustSlurPosition(doc, curve, spannedElements, bezier, curveDir, slurAngle, true);
+            GetControlPoints(bezier, curveDir, adjustedHeight);
         }
     }
 
     if (adjusted) {
-        points[0] = p1;
-        points[1] = rotatedC1; // BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
-        points[2] = rotatedC2; // BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
-        points[3] = rotatedP2; // BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+        points[0] = bezier.p1;
+        points[1] = bezier.c1; // BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
+        points[2] = bezier.c2; // BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+        points[3] = bezier.p2; // BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
         curve->UpdateCurveParams(points, slurAngle, curve->GetThickness(), curveDir);
         // Since we are going to redraw-it reset its bounding box
         curve->BoundingBox::ResetBoundingBox();
@@ -142,17 +133,17 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     return adjusted;
 }
 
-int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
-    Point &c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio)
+int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve,
+    curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio)
 {
     Point bezier[4];
-    bezier[0] = p1;
-    bezier[1] = c1;
-    bezier[2] = c2;
-    bezier[3] = p2;
+    bezier[0] = bezierCurve.p1;
+    bezier[1] = bezierCurve.c1;
+    bezier[2] = bezierCurve.c2;
+    bezier[3] = bezierCurve.p2;
 
-    int dist = abs(p2.x - p1.x);
-    int currentHeight = abs(c1.y - p1.y);
+    int dist = abs(bezierCurve.p2.x - bezierCurve.p1.x);
+    int currentHeight = abs(bezierCurve.c1.y - bezierCurve.p1.y);
     int maxHeight = 0;
 
     // 0.2 for avoiding / by 0 (below)
@@ -268,19 +259,13 @@ int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedEl
 }
 
 void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
-    const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
-    curvature_CURVEDIR curveDir, float &angle, bool forceBothSides)
+    const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve, curvature_CURVEDIR curveDir,
+    float &angle, bool forceBothSides)
 {
-    Point bezier[4];
-    bezier[0] = p1;
-    bezier[1] = c1;
-    bezier[2] = c2;
-    bezier[3] = p2;
-
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
 
-    int dist = abs(p2.x - p1.x);
+    int dist = abs(bezierCurve.p2.x - bezierCurve.p1.x);
     float posXRatio = 1.0;
 
     int margin = 1 * doc->GetDrawingUnit(100) / 2;
@@ -303,16 +288,16 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
             continue;
         }
 
-        int xLeft = std::max(p1.x, spannedElement->m_boundingBox->GetSelfLeft());
-        int xRight = std::min(p2.x, spannedElement->m_boundingBox->GetSelfRight());
+        int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
+        int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
         int xMiddle = xLeft + ((xRight - xLeft) / 2);
-        int posX = xMiddle - p1.x;
+        int posX = xMiddle - bezierCurve.p1.x;
 
         // Weight the desired height according to the x position on the other side
         posXRatio = 1.0;
         bool leftPoint = true;
         if (posX > dist / 2) {
-            posX = p2.x - xMiddle;
+            posX = bezierCurve.p2.x - xMiddle;
             leftPoint = false;
         }
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
@@ -334,15 +319,15 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
     //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);
 
     if (curveDir == curvature_CURVEDIR_above) {
-        p1.y += maxShiftLeft;
-        p2.y += maxShiftRight;
+        bezierCurve.p1.y += maxShiftLeft;
+        bezierCurve.p2.y += maxShiftRight;
     }
     else {
-        p1.y -= maxShiftLeft;
-        p2.y -= maxShiftRight;
+        bezierCurve.p1.y -= maxShiftLeft;
+        bezierCurve.p2.y -= maxShiftRight;
     }
 
-    angle = GetAdjustedSlurAngle(doc, p1, p2, curveDir, true);
+    angle = GetAdjustedSlurAngle(doc, bezierCurve.p1, bezierCurve.p2, curveDir, true);
     //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
@@ -377,34 +362,28 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVE
     return slurAngle;
 }
 
-void Slur::GetControlPoints(
-    Doc *doc, Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, int height, int staffSize)
+void Slur::GetControlPoints(BezierCurve &bezier, curvature_CURVEDIR curveDir, int height)
 {
-    float slurAngle = atan2(p2.y - p1.y, p2.x - p1.x);
+    float slurAngle = atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x);
     if (slurAngle != 0.0) {
-        p2 = BoundingBox::CalcPositionAfterRotation(p2, -slurAngle, p1);
+        bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
         // It should not be the case but we do need to avoid recursive calls whatever the effect in the resutls
-        if (p2.y != p1.y) p2.y = p1.y;
-        GetControlPoints(doc, p1, p2, c1, c2, curveDir, height, staffSize);
-        p2 = BoundingBox::CalcPositionAfterRotation(p2, slurAngle, p1);
-        c1 = BoundingBox::CalcPositionAfterRotation(c1, slurAngle, p1);
-        c2 = BoundingBox::CalcPositionAfterRotation(c2, slurAngle, p1);
+        if (bezier.p2.y != bezier.p1.y) bezier.p2.y = bezier.p1.y;
+        GetControlPoints(bezier, curveDir, height);
+        bezier.Rotate(slurAngle, bezier.p1);
         return;
     }
 
-    // Set the x position of the control points
-    int cPos = std::min(
-        (p2.x - p1.x) / doc->GetOptions()->m_slurControlPoints.GetValue(), doc->GetDrawingStaffSize(staffSize));
-    c1.x = p1.x + cPos;
-    c2.x = p2.x - cPos;
+    bezier.c1.x = bezier.p1.x + bezier.m_controlPointOffset;
+    bezier.c2.x = bezier.p2.x - bezier.m_controlPointOffset;
 
     if (curveDir == curvature_CURVEDIR_above) {
-        c1.y = p1.y + height;
-        c2.y = p2.y + height;
+        bezier.c1.y = bezier.p1.y + height;
+        bezier.c2.y = bezier.p2.y + height;
     }
     else {
-        c1.y = p1.y - height;
-        c2.y = p2.y - height;
+        bezier.c1.y = bezier.p1.y - height;
+        bezier.c2.y = bezier.p2.y - height;
     }
 }
 

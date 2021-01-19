@@ -525,14 +525,16 @@ float View::CalcInitialSlur(
     FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
 {
     // For readability makes them p1 and p2
-    Point p1 = points[0];
-    Point p2 = points[3];
+    BezierCurve bezier;
+    bezier.p1 = points[0];
+    bezier.p2 = points[3];
+    bezier.SetControlPointOffset(m_doc, staff->m_drawingStaffSize);
 
     /************** height **************/
 
     // the 'height' of the bezier
     int height;
-    int dist = abs(p2.x - p1.x);
+    int dist = abs(bezier.p2.x - bezier.p1.x);
     height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
         dist / m_options->m_slurHeightFactor.GetValue());
     height = std::min(
@@ -546,17 +548,19 @@ float View::CalcInitialSlur(
     System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
     assert(system);
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
-    findSpannedLayerElementsParams.m_minPos = p1.x;
-    findSpannedLayerElementsParams.m_maxPos = p2.x;
+    findSpannedLayerElementsParams.m_minPos = bezier.p1.x;
+    findSpannedLayerElementsParams.m_maxPos = bezier.p2.x;
     findSpannedLayerElementsParams.m_classIds
         = { ACCID, ARTIC, CHORD, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
-    AttNIntegerComparison matchStaff(STAFF, staff->GetN());
-    AttNIntegerComparison matchLayer(LAYER, layerN);
-    filters.push_back(&matchStaff);
-    filters.push_back(&matchLayer);
+    //if (!slur->GetStart()->m_crossStaff && !slur->GetEnd()->m_crossStaff) {
+        AttNIntegerComparison matchStaff(STAFF, staff->GetN());
+        AttNIntegerComparison matchLayer(LAYER, layerN);
+        filters.push_back(&matchStaff);
+        filters.push_back(&matchLayer);
+    //}
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
@@ -567,17 +571,18 @@ float View::CalcInitialSlur(
         Point pRotated;
         Point pLeft;
         pLeft.x = element->GetSelfLeft();
-        // if ((pLeft.x > p1->x) && (pLeft.x < p2->x)) {
+        // if ((pLeft.x > p1->x) && (pLeft.x < bezier.p2->x)) {
         //    pLeft.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
         //    spannedElements->push_back(spannedElement);
         //}
         Point pRight;
         pRight.x = element->GetSelfRight();
-        // if ((pRight.x > p1->x) && (pRight.x < p2->x)) {
+        // if ((pRight.x > p1->x) && (pRight.x < bezier.p2->x)) {
         //    pRight.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
         //    spannedElements->push_back(spannedElement);
         //}
-        if (((pLeft.x > p1.x) && (pLeft.x < p2.x)) || ((pRight.x > p1.x) && (pRight.x < p2.x))) {
+        if (((pLeft.x > bezier.p1.x) && (pLeft.x < bezier.p2.x))
+            || ((pRight.x > bezier.p1.x) && (pRight.x < bezier.p2.x))) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement;
             spannedElement->m_boundingBox = element;
             curve->AddSpannedElement(spannedElement);
@@ -593,18 +598,19 @@ float View::CalcInitialSlur(
     /************** angle **************/
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spannedElements->size() > 0));
-    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(p2, -slurAngle, p1);
+    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, bezier.p1, bezier.p2, curveDir, (spannedElements->size() > 0));
+    bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
 
     /************** control points **************/
 
     Point rotatedC1, rotatedC2;
-    slur->GetControlPoints(m_doc, p1, rotatedP2, rotatedC1, rotatedC2, curveDir, height, staff->m_drawingStaffSize);
+    slur->GetControlPoints(bezier, curveDir, height);
+    bezier.Rotate(slurAngle, bezier.p1);
 
-    points[0] = p1;
-    points[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, p1);
-    points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, p1);
-    points[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, p1);
+    points[0] = bezier.p1;
+    points[1] = bezier.c1;
+    points[2] = bezier.c2;
+    points[3] = bezier.p2;
 
     return slurAngle;
 }

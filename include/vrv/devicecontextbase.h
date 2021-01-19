@@ -187,6 +187,30 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// BezierCurve
+// ---------------------------------------------------------------------------
+
+/**
+ * Simple class for representing bezier cCurve
+ */
+
+class Doc;
+class BezierCurve {
+public:
+    Point p1, p2; // start & end points
+    Point c1, c2; // control points
+    int m_controlPointOffset = 0;
+
+    BezierCurve() {}
+    BezierCurve(Point &p1, Point &c1, Point &c2, Point &p2) : p1(p1), c1(c1), c2(c2), p2(p2) {}
+
+    void Rotate(float angle, const Point &rotationPoint);
+    void SetControlPointOffset(Doc* doc, int staffSize);
+
+    // no copy ctor or assignment operator - the defaults are ok
+};
+
+// ---------------------------------------------------------------------------
 // TextExtend
 // ---------------------------------------------------------------------------
 
