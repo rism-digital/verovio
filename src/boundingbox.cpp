@@ -681,6 +681,8 @@ void BoundingBox::Swap(int &v1, int &v2)
 
 Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point center)
 {
+    if (point == center) return point;
+
     float s = sin(alpha);
     float c = cos(alpha);
 

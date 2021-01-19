@@ -11,6 +11,8 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <boundingbox.h>
+#include <doc.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -19,6 +21,20 @@
 #include "vrv.h"
 
 namespace vrv {
+
+void BezierCurve::Rotate(float angle, const Point &rotationPoint)
+{
+    p1 = BoundingBox::CalcPositionAfterRotation(p1, angle, rotationPoint);
+    p2 = BoundingBox::CalcPositionAfterRotation(p2, angle, rotationPoint);
+    c1 = BoundingBox::CalcPositionAfterRotation(c1, angle, rotationPoint);
+    c2 = BoundingBox::CalcPositionAfterRotation(c2, angle, rotationPoint);
+}
+
+void BezierCurve::SetControlPointOffset(Doc* doc, int staffSize) 
+{
+    m_controlPointOffset = std::min((p2.x - p1.x) / doc->GetOptions()->m_slurControlPoints.GetValue(),
+        doc->GetDrawingStaffSize(staffSize));
+}
 
 //----------------------------------------------------------------------------
 // DeviceContext
