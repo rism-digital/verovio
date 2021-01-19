@@ -3797,7 +3797,7 @@ AttMmTempo::~AttMmTempo()
 
 void AttMmTempo::ResetMmTempo()
 {
-    m_mm = 0;
+    m_mm = 0.0;
     m_mmUnit = DURATION_NONE;
     m_mmDots = 0;
 }
@@ -3806,7 +3806,7 @@ bool AttMmTempo::ReadMmTempo(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("mm")) {
-        this->SetMm(StrToInt(element.attribute("mm").value()));
+        this->SetMm(StrToDbl(element.attribute("mm").value()));
         element.remove_attribute("mm");
         hasAttribute = true;
     }
@@ -3827,7 +3827,7 @@ bool AttMmTempo::WriteMmTempo(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMm()) {
-        element.append_attribute("mm") = IntToStr(this->GetMm()).c_str();
+        element.append_attribute("mm") = DblToStr(this->GetMm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMmUnit()) {
@@ -3843,7 +3843,7 @@ bool AttMmTempo::WriteMmTempo(pugi::xml_node element)
 
 bool AttMmTempo::HasMm() const
 {
-    return (m_mm != 0);
+    return (m_mm != 0.0);
 }
 
 bool AttMmTempo::HasMmUnit() const
@@ -8673,7 +8673,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMmTempo *att = dynamic_cast<AttMmTempo *>(element);
         assert(att);
         if (attrType == "mm") {
-            att->SetMm(att->StrToInt(attrValue));
+            att->SetMm(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "mm.unit") {
@@ -10097,7 +10097,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMmTempo *att = dynamic_cast<const AttMmTempo *>(element);
         assert(att);
         if (att->HasMm()) {
-            attributes->push_back(std::make_pair("mm", att->IntToStr(att->GetMm())));
+            attributes->push_back(std::make_pair("mm", att->DblToStr(att->GetMm())));
         }
         if (att->HasMmUnit()) {
             attributes->push_back(std::make_pair("mm.unit", att->DurationToStr(att->GetMmUnit())));

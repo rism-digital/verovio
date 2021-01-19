@@ -237,21 +237,15 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
         return STEMDIRECTION_NONE;
     }
     else {
-        // If the element is cross-staff, then do not use the layer m_drawingStemDir
-        if (element->m_crossStaff) {
-            // Instead look if the cross-staff is from below or above
-            if (this->m_crossStaffFromBelow) {
-                return STEMDIRECTION_down;
-            }
-            else if (this->m_crossStaffFromAbove) {
-                return STEMDIRECTION_up;
-            }
-            else {
-                // This should actually not happen
-                return STEMDIRECTION_NONE;
-            }
+        if (this->m_crossStaffFromBelow) {
+            return (element->m_crossStaff) ? STEMDIRECTION_down : STEMDIRECTION_up;
         }
-        return m_drawingStemDir;
+        else if (this->m_crossStaffFromAbove) {
+            return (element->m_crossStaff) ? STEMDIRECTION_up : STEMDIRECTION_down;
+        }
+        else {
+            return m_drawingStemDir;
+        }
     }
 }
 

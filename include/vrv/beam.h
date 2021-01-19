@@ -15,6 +15,7 @@
 namespace vrv {
 
 class BeamElementCoord;
+class StaffAlignment;
 
 // the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
@@ -238,7 +239,7 @@ public:
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
 
     /**
-     * Return stem length adjustment in half units, depending on the @stem.mode attribute 
+     * Return stem length adjustment in half units, depending on the @stem.mode attribute
      */
     int CalculateStemModAdjustment(int stemLength, int directionBias);
 

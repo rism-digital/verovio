@@ -214,8 +214,10 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffD
             notFirstInGroup = notFirstInGroup || (firstVisible && firstVisible != staffChild);
             if (notFirstInGroup) {
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
-                if (staffGrp && staffGrp->HasSymbol()) {
-                    switch (staffGrp->GetSymbol()) {
+                if (staffGrp && staffGrp->GetFirst(GRPSYM)) {
+                    GrpSym *grpSym = vrv_cast<GrpSym *>(staffGrp->GetFirst(GRPSYM));
+                    assert(grpSym);
+                    switch (grpSym->GetSymbol()) {
                         case staffGroupingSym_SYMBOL_brace: spacingType = SpacingType::Brace; break;
                         case staffGroupingSym_SYMBOL_bracket:
                         case staffGroupingSym_SYMBOL_bracketsq: spacingType = SpacingType::Bracket; break;
