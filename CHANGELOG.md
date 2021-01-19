@@ -1,7 +1,6 @@
 # Changelog
 
 ## [unreleased]
-* Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
 * Improved automatic cross staff rest positioning (@eNote-GmbH)
 * Embedding of Leland font from MuseScore
 
