@@ -179,10 +179,10 @@ bool LayerElement::IsInLigature() const
     return (this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
 }
 
-bool LayerElement::IsInFTrem()
+FTrem *LayerElement::IsInFTrem()
 {
-    if (!this->Is({ CHORD, NOTE })) return false;
-    return (this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
+    if (!this->Is({ CHORD, NOTE })) return NULL;
+    return dynamic_cast<FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
 }
 
 Beam *LayerElement::IsInBeam()
@@ -260,8 +260,8 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
         above = crossStaff->GetAlignment();
         below = above;
     }
-    // Stems and flags with cross-staff chords need special treatment
-    if (this->Is({ FLAG, STEM }) && chord && chord->HasCrossStaff()) {
+    // Dots, flags and stems with cross-staff chords need special treatment
+    if (this->Is({ DOTS, FLAG, STEM }) && chord && chord->HasCrossStaff()) {
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);

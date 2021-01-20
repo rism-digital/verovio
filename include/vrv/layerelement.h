@@ -22,6 +22,7 @@ namespace vrv {
 class Alignment;
 class Beam;
 class BeamElementCoord;
+class FTrem;
 class Layer;
 class Mensur;
 class MeterSig;
@@ -110,8 +111,8 @@ public:
     bool GetDrawingCueSize();
     /** Return true if the element is a note within a ligature */
     bool IsInLigature() const;
-    /** Return true if the element is a note or a chord within a fTrem */
-    bool IsInFTrem();
+    /** Return the FTrem parten if the element is a note or a chord within a fTrem */
+    FTrem *IsInFTrem();
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.

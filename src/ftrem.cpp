@@ -32,7 +32,7 @@ namespace vrv {
 // FTrem
 //----------------------------------------------------------------------------
 
-FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
+FTrem::FTrem() : LayerElement("ftrem-"), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {
     RegisterAttClass(ATT_FTREMVIS);
     RegisterAttClass(ATT_TREMMEASURED);

@@ -3,6 +3,8 @@
 ## [unreleased]
 * Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
 * Improved automatic cross staff rest positioning (@eNote-GmbH)
+* Improved cross-staff spacing
+* Improved slurs
 * Embedding of Leland font from MuseScore
 
 ## [3.1.0] - 2021-01-12
