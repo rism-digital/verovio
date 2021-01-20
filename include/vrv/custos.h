@@ -47,7 +47,7 @@ public:
     virtual bool HasToBeAligned() const { return true; }
     
     /**
-     * Add an accid) to a custos.
+     * Add an accid to a custos.
      */
     virtual bool IsSupportedChild(Object *object);
 
