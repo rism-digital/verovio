@@ -363,7 +363,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             if (isGraceToNoteSlur) {
                 if (endNote) {
                     y2 = endNote->GetDrawingY();
-                    x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                    // Shorten the slur but only if the stem is going down
+                    if (endStemDir == STEMDIRECTION_down) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                     isShortSlur = true;
                 }
                 else {
