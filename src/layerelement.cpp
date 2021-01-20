@@ -179,10 +179,10 @@ bool LayerElement::IsInLigature() const
     return (this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
 }
 
-bool LayerElement::IsInFTrem()
+FTrem *LayerElement::IsInFTrem()
 {
-    if (!this->Is({ CHORD, NOTE })) return false;
-    return (this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
+    if (!this->Is({ CHORD, NOTE })) return NULL;
+    return dynamic_cast<FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
 }
 
 Beam *LayerElement::IsInBeam()

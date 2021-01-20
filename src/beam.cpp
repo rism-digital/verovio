@@ -1019,8 +1019,7 @@ void BeamSegment::CalcSetValues()
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam()
-    : LayerElement("beam-"), ObjectListInterface(), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
+Beam::Beam() : LayerElement("beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
@@ -1151,42 +1150,6 @@ void Beam::FilterList(ArrayOfObjects *childList)
     */
 
     InitCoords(childList, beamStaff, this->GetPlace());
-}
-
-int Beam::GetPosition(LayerElement *element)
-{
-    this->GetList(this);
-    int position = this->GetListIndex(element);
-    // Check if this is a note in the chord
-    if ((position == -1) && (element->Is(NOTE))) {
-        Note *note = vrv_cast<Note *>(element);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) position = this->GetListIndex(chord);
-    }
-    return position;
-}
-
-bool Beam::IsFirstInBeam(LayerElement *element)
-{
-    this->GetList(this);
-    int position = this->GetPosition(element);
-    // This method should be called only if the note is part of a beam
-    assert(position != -1);
-    // this is the first one
-    if (position == 0) return true;
-    return false;
-}
-
-bool Beam::IsLastInBeam(LayerElement *element)
-{
-    int size = (int)this->GetList(this)->size();
-    int position = this->GetPosition(element);
-    // This method should be called only if the note is part of a beam
-    assert(position != -1);
-    // this is the last one
-    if (position == (size - 1)) return true;
-    return false;
 }
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()

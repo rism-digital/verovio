@@ -19,6 +19,7 @@
 #include "comparison.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -94,6 +95,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType)
 {
     Beam *parentBeam = NULL;
+    FTrem *parentFTrem = NULL;
     Chord *startParentChord = NULL;
     Chord *endParentChord = NULL;
     Note *startNote = NULL;
@@ -279,7 +281,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
                 y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             }
             // same but in beam - adjust the x too
-            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
+            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))) {
                 y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
                 x1 += startRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -304,7 +307,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
                 y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             }
             // same but in beam
-            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
+            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))) {
                 y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
                 x1 -= startRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -339,7 +343,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
                 y2 = end->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             }
             // same but in beam - adjust the x too
-            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
+            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
                 y2 = end->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
                 x2 += endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -358,7 +363,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             if (isGraceToNoteSlur) {
                 if (endNote) {
                     y2 = endNote->GetDrawingY();
-                    x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                    // Shorten the slur but only if the stem is going down
+                    if (endStemDir == STEMDIRECTION_down) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                     isShortSlur = true;
                 }
                 else {
@@ -374,7 +380,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
                 y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             }
             // same but in beam
-            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
+            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
                 y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
                 //
                 x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);

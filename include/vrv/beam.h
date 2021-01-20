@@ -120,7 +120,6 @@ public:
 //----------------------------------------------------------------------------
 
 class Beam : public LayerElement,
-             public ObjectListInterface,
              public BeamDrawingInterface,
              public AttColor,
              public AttBeamedWith,
@@ -146,15 +145,6 @@ public:
      * Only Note or Rest elements will be actually added to the beam.
      */
     virtual bool IsSupportedChild(Object *object);
-
-    /**
-     * Return information about the position in the beam.
-     * (no const since the cached list is updated)
-     */
-    ///@{
-    bool IsFirstInBeam(LayerElement *element);
-    bool IsLastInBeam(LayerElement *element);
-    ///@}
 
     /**
      *
@@ -191,12 +181,6 @@ protected:
      * This also initializes the m_beamElementCoords vector
      */
     virtual void FilterList(ArrayOfObjects *childList);
-
-    /**
-     * Return the position of the element in the beam.
-     * For notes, lookup the position of the parent chord.
-     */
-    int GetPosition(LayerElement *element);
 
 private:
     //

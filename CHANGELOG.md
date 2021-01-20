@@ -2,6 +2,8 @@
 
 ## [unreleased]
 * Improved automatic cross staff rest positioning (@eNote-GmbH)
+* Improved cross-staff spacing
+* Improved slurs
 * Embedding of Leland font from MuseScore
 
 ## [3.1.0] - 2021-01-12
