@@ -132,7 +132,7 @@ private:
     void CalcSetValues();
 
     // Helper to check wheter beam fits within certain bounds
-    bool DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset);
+    bool DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff = false);
 
     // Helper to find number of additional beams. Return { additional beams below main beam, additional beams above }
     std::pair<int, int> GetAdditionalBeamCount(BeamDrawingInterface *beamInterface);
