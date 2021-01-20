@@ -1538,6 +1538,24 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     return timeofElement;
 }
 
+int Toolkit::GetScoreTimeForElement(const std::string &xmlId)
+{
+    Object *element = m_doc.FindDescendantByUuid(xmlId);
+
+    if (!element) {
+        LogWarning("Element '%s' not found", xmlId.c_str());
+        return 0;
+    }
+
+    int scoreTimeofElement = 0;
+    if (element->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(element);
+        assert(note);
+        scoreTimeofElement = note->GetScoreTimeOnset();
+    }
+    return scoreTimeofElement;
+}
+
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindDescendantByUuid(xmlId);

@@ -243,6 +243,12 @@ public:
     std::string GetMIDIValuesForElement(const std::string &xmlId);
 
     /**
+     * Return the score time at which the element is the ID (xml:id) is notated.
+     * Returns 0 if no element is found.
+     */
+    int GetScoreTimeForElement(const std::string &xmlId);
+
+    /**
      * @name Set and get the scale
      */
     ///@{
