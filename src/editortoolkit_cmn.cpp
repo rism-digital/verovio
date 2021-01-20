@@ -587,7 +587,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             this->m_chainedId = rest->GetUuid();
             return true;
         }
-        if (beam->IsFirstInBeam(note)) {
+        if (beam->IsFirstIn(beam, note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             Object *parent = beam->GetParent();
@@ -597,7 +597,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             this->m_chainedId = rest->GetUuid();
             return true;
         }
-        else if (beam->IsLastInBeam(note)) {
+        else if (beam->IsLastIn(beam, note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             Object *parent = beam->GetParent();

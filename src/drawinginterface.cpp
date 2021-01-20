@@ -65,7 +65,7 @@ void DrawingListInterface::ResetDrawingList()
 // BeamDrawingInterface
 //----------------------------------------------------------------------------
 
-BeamDrawingInterface::BeamDrawingInterface()
+BeamDrawingInterface::BeamDrawingInterface() : ObjectListInterface()
 {
     Reset();
 }
@@ -371,6 +371,42 @@ bool BeamDrawingInterface::HasOneStepHeight()
     }
 
     return (abs(top - bottom) <= 1);
+}
+
+bool BeamDrawingInterface::IsFirstIn(Object *object, LayerElement *element)
+{
+    this->GetList(object);
+    int position = this->GetPosition(object, element);
+    // This method should be called only if the note is part of a fTrem
+    assert(position != -1);
+    // this is the first one
+    if (position == 0) return true;
+    return false;
+}
+
+bool BeamDrawingInterface::IsLastIn(Object *object, LayerElement *element)
+{
+    int size = (int)this->GetList(object)->size();
+    int position = this->GetPosition(object, element);
+    // This method should be called only if the note is part of a beam
+    assert(position != -1);
+    // this is the last one
+    if (position == (size - 1)) return true;
+    return false;
+}
+
+int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
+{
+    this->GetList(object);
+    int position = this->GetListIndex(element);
+    // Check if this is a note in the chord
+    if ((position == -1) && (element->Is(NOTE))) {
+        Note *note = vrv_cast<Note *>(element);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) position = this->GetListIndex(chord);
+    }
+    return position;
 }
 
 //----------------------------------------------------------------------------
