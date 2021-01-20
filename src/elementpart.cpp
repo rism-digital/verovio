@@ -470,6 +470,14 @@ int Stem::CalcStem(FunctorParams *functorParams)
     int stemShift = params->m_doc->GetDrawingStemWidth(staffSize) / 2;
     bool drawingCueSize = this->GetDrawingCueSize();
 
+    // For notes longer than half notes the stem is always 0
+    if (params->m_dur < DUR_2) {
+        this->SetDrawingXRel(0);
+        this->SetDrawingYRel(0);
+        this->SetDrawingStemLen(0);
+        return FUNCTOR_CONTINUE;
+    }
+
     /************ Set the position, the length and adjust to the note head ************/
 
     int baseStem = 0;
