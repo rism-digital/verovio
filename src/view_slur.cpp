@@ -441,12 +441,12 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     /************** y position **************/
 
     if (drawingCurveDir == curvature_CURVEDIR_above) {
-        y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y1 += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
-        y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y1 -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     Point points[4];
