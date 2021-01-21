@@ -313,6 +313,15 @@ public:
      */
     const ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
 
+    /**
+     * @name Getter, setter and checker for the crossStaff
+     */
+    ///@{
+    void SetCrossStaff(Staff *crossStaff) { m_crossStaff = crossStaff; }
+    Staff *GetCrossStaff() const { return m_crossStaff; }
+    bool IsCrossStaff() const { return m_crossStaff != NULL; }
+    ///@}
+
 private:
     //
 public:
@@ -327,6 +336,7 @@ private:
     float m_angle;
     int m_thickness;
     curvature_CURVEDIR m_dir;
+    Staff* m_crossStaff;
     ///@}
 
     ArrayOfCurveSpannedElements m_spannedElements;

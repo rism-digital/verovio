@@ -442,6 +442,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_angle = 0.0;
     m_thickness = 0;
     m_dir = curvature_CURVEDIR_NONE;
+    m_crossStaff = NULL;
     m_cachedMinMaxY = VRV_UNSET;
     ClearSpannedElements();
 }

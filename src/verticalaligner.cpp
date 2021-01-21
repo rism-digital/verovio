@@ -626,6 +626,16 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
                 Slur *slur = vrv_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
                 slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
+                if (curve->IsCrossStaff()) {
+                    if (!skipAbove && (curvature_CURVEDIR_above == curve->GetDir())
+                        && (GetStaff()->GetN() > curve->GetCrossStaff()->GetN())) {
+                        skipAbove = true;
+                    }
+                    else if (!skipBelow && (curvature_CURVEDIR_below == curve->GetDir())
+                        && (GetStaff()->GetN() < curve->GetCrossStaff()->GetN())) {
+                        skipBelow = true;
+                    }
+                }
             }
             else if ((*iter)->GetObject()->Is(TIE)) {
                 Tie *tie = vrv_cast<Tie *>((*iter)->GetObject());
