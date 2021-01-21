@@ -40,7 +40,7 @@ if [ ! -z $build_dev ]; then
     cd $devdir
     git pull
     cd bindings
-    cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON
+    cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON -DVRV_DYNAMIC_CAST=ON
     cd python
     make -j8
 
@@ -50,7 +50,7 @@ if [ ! -z $build_dev ]; then
 fi
 
 cd ../bindings
-cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON
+cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON -DVRV_DYNAMIC_CAST=ON
 cd python
 make -j8
 

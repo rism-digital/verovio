@@ -8,6 +8,7 @@ if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
+option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        OFF)
 option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
@@ -93,6 +94,10 @@ execute_process(
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
 )
+
+if(VRV_DYNAMIC_CAST)
+    add_definitions(-DVRV_DYNAMIC_CAST)
+endif()
 
 if(NO_DARMS_SUPPORT)
     add_definitions(-DNO_DARMS_SUPPORT)
