@@ -40,6 +40,17 @@ void Custos::Reset()
     ResetColor();
 }
 
+bool Custos::IsSupportedChild(Object *child)
+{
+    if (child->Is(ACCID)) {
+        assert(dynamic_cast<Accid *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

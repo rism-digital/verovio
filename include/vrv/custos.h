@@ -8,6 +8,7 @@
 #ifndef __VRV_CUSTOS_H__
 #define __VRV_CUSTOS_H__
 
+#include "accid.h"
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "layerelement.h"
@@ -44,6 +45,11 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+    
+    /**
+     * Add an accid to a custos.
+     */
+    virtual bool IsSupportedChild(Object *object);
 
     //----------//
     // Functors //
