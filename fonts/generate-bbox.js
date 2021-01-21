@@ -24,7 +24,7 @@ if (metadata.search(".json") !== -1) {
 // Or parse file and create symbol-code mapping if cgf file has been provided
 else if (metadata.search(".g2n") !== -1)
 {
-	glyphMap = new Map();
+	glyphMap = {};
 	content = fs.read(metadata);
 	lines = content.split("\n");
 	for(i in lines) {
