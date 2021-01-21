@@ -199,13 +199,41 @@ class BezierCurve {
 public:
     Point p1, p2; // start & end points
     Point c1, c2; // control points
-    int m_controlPointOffset = 0;
+
+    // no copy ctor or assignment operator - the defaults are ok
 
     BezierCurve() {}
     BezierCurve(Point &p1, Point &c1, Point &c2, Point &p2) : p1(p1), c1(c1), c2(c2), p2(p2) {}
 
+    // Helper to rotate all points within bezier curve around @rotationPoint by @angle
     void Rotate(float angle, const Point &rotationPoint);
-    void SetControlPointOffset(Doc* doc, int staffSize);
+
+    /**
+     * @name Getter/setter for control point offset (as well as method to calculate it from options)
+     */
+    ///@{
+    void CalculateControlPointOffset(Doc* doc, int staffSize);
+    void SetControlPointOffset(int controlPointOffset) { m_controlPointOffset = controlPointOffset; };
+    int GetControlPointOffset() const { return m_controlPointOffset; }
+    ///@}
+
+    /**
+     * @name Getter/setter for the height of control points (left and right)
+     */
+    ///@{
+    void SetControlHeight(int height) { m_leftControlHeight = m_rightControlHeight = height; }
+    void SetLeftControlHeight(int height) { m_leftControlHeight = height; }
+    void SetRightControlHeight(int height) { m_rightControlHeight = height; }
+    int GetLeftControlHeight() const { return m_leftControlHeight; }
+    int GetRightControlHeight() const { return m_rightControlHeight; }
+    ///@}
+
+private:
+    // Control point X-axis offset for both start/end points
+    // In future, when more complex shapes are required, this should probably be changed to left/right offsets
+    int m_controlPointOffset = 0;
+    int m_leftControlHeight = 0;
+    int m_rightControlHeight = 0;
 
     // no copy ctor or assignment operator - the defaults are ok
 };

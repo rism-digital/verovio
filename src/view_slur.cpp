@@ -528,7 +528,7 @@ float View::CalcInitialSlur(
     BezierCurve bezier;
     bezier.p1 = points[0];
     bezier.p2 = points[3];
-    bezier.SetControlPointOffset(m_doc, staff->m_drawingStaffSize);
+    bezier.CalculateControlPointOffset(m_doc, staff->m_drawingStaffSize);
 
     /************** height **************/
 
@@ -556,17 +556,17 @@ float View::CalcInitialSlur(
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
     //if (!slur->GetStart()->m_crossStaff && !slur->GetEnd()->m_crossStaff) {
-        AttNIntegerComparison matchStaff(STAFF, staff->GetN());
-        AttNIntegerComparison matchLayer(LAYER, layerN);
-        filters.push_back(&matchStaff);
-        filters.push_back(&matchLayer);
+    AttNIntegerComparison matchStaff(STAFF, staff->GetN());
+    AttNIntegerComparison matchLayer(LAYER, layerN);
+    filters.push_back(&matchStaff);
+    filters.push_back(&matchLayer);
     //}
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
 
     curve->ClearSpannedElements();
-    for (auto &element : findSpannedLayerElementsParams.m_elements) {
+    for (auto element : findSpannedLayerElementsParams.m_elements) {
 
         Point pRotated;
         Point pLeft;
@@ -587,6 +587,10 @@ float View::CalcInitialSlur(
             spannedElement->m_boundingBox = element;
             curve->AddSpannedElement(spannedElement);
         }
+
+        if (!curve->IsCrossStaff() && element->m_crossStaff) {
+            curve->SetCrossStaff(element->m_crossStaff);
+        }
     }
 
     for (auto &positioner : findSpannedLayerElementsParams.m_ties) {
@@ -598,13 +602,15 @@ float View::CalcInitialSlur(
     /************** angle **************/
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, bezier.p1, bezier.p2, curveDir, (spannedElements->size() > 0));
+    const bool withPoints = ((spannedElements->size() > 0) && (!curve->IsCrossStaff()));
+    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, bezier.p1, bezier.p2, curveDir, withPoints);
     bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
 
     /************** control points **************/
 
     Point rotatedC1, rotatedC2;
-    slur->GetControlPoints(bezier, curveDir, height);
+    bezier.SetControlHeight(height);
+    slur->GetControlPoints(bezier, curveDir);
     bezier.Rotate(slurAngle, bezier.p1);
 
     points[0] = bezier.p1;

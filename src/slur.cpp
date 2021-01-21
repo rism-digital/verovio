@@ -78,7 +78,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
     bezier.Rotate(-slurAngle, points[0]);
-    bezier.SetControlPointOffset(doc, staff->m_drawingStaffSize);
+    bezier.CalculateControlPointOffset(doc, staff->m_drawingStaffSize);
 
     GetSpannedPointPositions(doc, spannedElements, bezier.p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
@@ -95,11 +95,14 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 
         // The adjustedHeight value is 0 if everything fits within the slur
         // If not we need to move its position
+        bool ignoreAngle = false;
         if (adjustedHeight != 0) {
+            bezier.SetControlHeight(adjustedHeight);
             // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-            AdjustSlurPosition(doc, curve, spannedElements, bezier, curveDir, slurAngle, false);
+            bool nonAngled = AdjustSlurPosition(doc, curve, bezier, slurAngle, false);
+            ignoreAngle = nonAngled && curve->IsCrossStaff();
             // Re-calculate the control points with the new height
-            GetControlPoints(bezier, curveDir, adjustedHeight);
+            GetControlPoints(bezier, curveDir, ignoreAngle);
 
             points[0] = bezier.p1;
             points[1] = bezier.c1;
@@ -115,8 +118,8 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
             GetSpannedPointPositions(doc, spannedElements, bezier.p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
             // Move it and force both sides to move
-            AdjustSlurPosition(doc, curve, spannedElements, bezier, curveDir, slurAngle, true);
-            GetControlPoints(bezier, curveDir, adjustedHeight);
+            AdjustSlurPosition(doc, curve, bezier, slurAngle, true);
+            GetControlPoints(bezier, curveDir, ignoreAngle);
         }
     }
 
@@ -258,9 +261,44 @@ int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedEl
     return 0;
 }
 
-void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
-    const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve, curvature_CURVEDIR curveDir,
-    float &angle, bool forceBothSides)
+bool Slur::AdjustSlurPosition(
+    Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides)
+{
+    const int margin = 1 * doc->GetDrawingUnit(100) / 2;
+    auto [maxShiftLeft, maxShiftRight] = CalculateAdjustedSlurShift(curve, bezierCurve, margin, forceBothSides);
+    if (!maxShiftLeft && !maxShiftRight) return false;
+
+    // If curve is cross staff and shifts are larger than current height of the control points - adjust control point height to make sure that slur bends around the overlapping elements
+    if (curve->IsCrossStaff()
+        && ((maxShiftLeft > bezierCurve.GetLeftControlHeight())
+            || (maxShiftRight > bezierCurve.GetRightControlHeight()))) {
+        //angle = 0.0;
+        //if ((maxShiftLeft > bezierCurve.GetLeftControlHeight()) || (maxShiftRight > bezierCurve.GetRightControlHeight())) {
+            bezierCurve.SetControlPointOffset(bezierCurve.GetControlPointOffset() / 2);
+            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + maxShiftRight * 1.25);
+            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + maxShiftLeft * 1.25);
+            return true;
+        //}
+        //else {
+        //    bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
+        //    bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
+        //   return false;
+        //}
+    }
+    // otherwise it is normal slur - just move position of the start/end points up or down and recalculate angle
+    else {
+        bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
+        bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
+
+        angle = GetAdjustedSlurAngle(doc, bezierCurve.p1, bezierCurve.p2, curve->GetDir(), !curve->IsCrossStaff());
+        //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
+        return false;
+    }
+}
+
+
+std::pair<int, int> Slur::CalculateAdjustedSlurShift(
+    FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int margin, bool forceBothSides)
 {
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
@@ -268,9 +306,11 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
     int dist = abs(bezierCurve.p2.x - bezierCurve.p1.x);
     float posXRatio = 1.0;
 
-    int margin = 1 * doc->GetDrawingUnit(100) / 2;
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    // Actually nothing to do
+    if (spannedElements->empty()) return { 0, 0 };
 
-    for (auto &spannedElement : *spannedElements) {
+    for (auto spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -312,23 +352,9 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
         }
     }
 
-    // Actually nothing to do
-    if (spannedElements->empty()) return;
-
+    return { maxShiftLeft, maxShiftRight };
     // Unrotated the slur
-    //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);
-
-    if (curveDir == curvature_CURVEDIR_above) {
-        bezierCurve.p1.y += maxShiftLeft;
-        bezierCurve.p2.y += maxShiftRight;
-    }
-    else {
-        bezierCurve.p1.y -= maxShiftLeft;
-        bezierCurve.p2.y -= maxShiftRight;
-    }
-
-    angle = GetAdjustedSlurAngle(doc, bezierCurve.p1, bezierCurve.p2, curveDir, true);
-    //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
+    //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1)
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints)
@@ -362,28 +388,28 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVE
     return slurAngle;
 }
 
-void Slur::GetControlPoints(BezierCurve &bezier, curvature_CURVEDIR curveDir, int height)
+void Slur::GetControlPoints(BezierCurve &bezier, curvature_CURVEDIR curveDir, bool ignoreAngle)
 {
     float slurAngle = atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x);
-    if (slurAngle != 0.0) {
+    if ((slurAngle != 0.0) && !ignoreAngle) {
         bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
         // It should not be the case but we do need to avoid recursive calls whatever the effect in the resutls
         if (bezier.p2.y != bezier.p1.y) bezier.p2.y = bezier.p1.y;
-        GetControlPoints(bezier, curveDir, height);
+        GetControlPoints(bezier, curveDir);
         bezier.Rotate(slurAngle, bezier.p1);
         return;
     }
 
-    bezier.c1.x = bezier.p1.x + bezier.m_controlPointOffset;
-    bezier.c2.x = bezier.p2.x - bezier.m_controlPointOffset;
+    bezier.c1.x = bezier.p1.x + bezier.GetControlPointOffset();
+    bezier.c2.x = bezier.p2.x - bezier.GetControlPointOffset();
 
     if (curveDir == curvature_CURVEDIR_above) {
-        bezier.c1.y = bezier.p1.y + height;
-        bezier.c2.y = bezier.p2.y + height;
+        bezier.c1.y = bezier.p1.y + bezier.GetLeftControlHeight();
+        bezier.c2.y = bezier.p2.y + bezier.GetRightControlHeight();
     }
     else {
-        bezier.c1.y = bezier.p1.y - height;
-        bezier.c2.y = bezier.p2.y - height;
+        bezier.c1.y = bezier.p1.y - bezier.GetLeftControlHeight();
+        bezier.c2.y = bezier.p2.y - bezier.GetRightControlHeight();
     }
 }
 

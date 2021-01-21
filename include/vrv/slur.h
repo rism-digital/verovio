@@ -60,12 +60,20 @@ public:
 
     int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve,
         curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
-    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
-        const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve, curvature_CURVEDIR curveDir,
-        float &angle, bool forceBothSides);
+
+    /**
+     * Adjust slur position based on overlapping objects within its spanning elements
+     */
+    bool Slur::AdjustSlurPosition(
+        Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides);
+    /**
+     * Calculate slur left/right maximum shifts required for slur not to overlap with other objects
+     */
+    std::pair<int, int> CalculateAdjustedSlurShift(
+        FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int margin, bool forceBothSides);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
-    void GetControlPoints(BezierCurve &curve, curvature_CURVEDIR curveDir, int height);
+    void GetControlPoints(BezierCurve &curve, curvature_CURVEDIR curveDir, bool ignoreAngle = false);
     void GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
         curvature_CURVEDIR curveDir, int staffSize);
 
