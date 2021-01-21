@@ -181,7 +181,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         if (system->HasMixedDrawingStemDir(start, end)) {
             slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
         }
-        // If we have a strat to end situation, check if the slur is cross-staff and store it.
+        // If we have a start to end situation, check if the slur is cross-staff and store it.
         if (start->m_crossStaff != end->m_crossStaff) {
             slur->IsCrossStaff(true);
         }
@@ -191,8 +191,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             assert(startStaff);
             Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
             assert(endStaff);
-            if (startStaff->GetN() != endStaff->GetN())
-                slur->IsCrossStaff(true);
+            if (startStaff->GetN() != endStaff->GetN()) slur->IsCrossStaff(true);
         }
     }
 

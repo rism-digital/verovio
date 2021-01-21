@@ -422,10 +422,10 @@ void Page::LayOutVertically()
 
     // If slurs were adjusted we need to redraw to adjust the bounding boxes
     if (adjustSlursParams.m_adjusted) {
-        // There is a problem here with cross-staff slurs: if there have been ajusted, the
+        // There is a problem here with cross-staff slurs: if they have been ajusted, the
         // Slur::m_isCrossStaff flag will trigger View::DrawSlurInitial to be called again.
         // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
-        // but in between this can cause wrong collisions dection. To be improved
+        // but in between, we can have wrong collisions detections. To be improved
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
