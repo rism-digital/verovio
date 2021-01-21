@@ -99,8 +99,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         if (adjustedHeight != 0) {
             bezier.SetControlHeight(adjustedHeight);
             // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-            bool nonAngled = AdjustSlurPosition(doc, curve, bezier, slurAngle, false);
-            ignoreAngle = nonAngled && curve->IsCrossStaff();
+            ignoreAngle = AdjustSlurPosition(doc, curve, bezier, slurAngle, false);
             // Re-calculate the control points with the new height
             GetControlPoints(bezier, curveDir, ignoreAngle);
 
@@ -272,18 +271,12 @@ bool Slur::AdjustSlurPosition(
     if (curve->IsCrossStaff()
         && ((maxShiftLeft > bezierCurve.GetLeftControlHeight())
             || (maxShiftRight > bezierCurve.GetRightControlHeight()))) {
-        //angle = 0.0;
-        //if ((maxShiftLeft > bezierCurve.GetLeftControlHeight()) || (maxShiftRight > bezierCurve.GetRightControlHeight())) {
-            bezierCurve.SetControlPointOffset(bezierCurve.GetControlPointOffset() / 2);
-            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + maxShiftRight * 1.25);
-            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + maxShiftLeft * 1.25);
-            return true;
-        //}
-        //else {
-        //    bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
-        //    bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
-        //   return false;
-        //}
+        angle = 0.0;
+        bezierCurve.SetControlPointOffset(bezierCurve.GetControlPointOffset() / 2);
+        // Use right shift for left control height and vice versa to keep slur more balanced
+        bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftRight);
+        bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftLeft);
+        return true;
     }
     // otherwise it is normal slur - just move position of the start/end points up or down and recalculate angle
     else {
