@@ -21,6 +21,7 @@ class DeviceContext;
 class Ending;
 class Measure;
 class ScoreDef;
+class Slur;
 class Staff;
 
 //----------------------------------------------------------------------------
@@ -112,6 +113,11 @@ public:
      * The start and end element are expected to be on the same staff and same layer.
      */
     bool HasMixedDrawingStemDir(LayerElement *start, LayerElement *end);
+
+    /**
+     * Get preferred curve direction based on the starting and ending point of the slur
+     */
+    curvature_CURVEDIR GetPreferredCurveDirection(LayerElement *start, LayerElement *end, Slur *slur);
 
     /**
      * @name Setter and getter of the drawing visible flag

@@ -179,7 +179,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
         // situations
         if (system->HasMixedDrawingStemDir(start, end)) {
-            slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
+            auto curveDir = system->GetPreferredCurveDirection(start, end, slur);
+            slur->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE? curveDir : curvature_CURVEDIR_above);
         }
         // If we have a start to end situation, check if the slur is cross-staff and store it.
         if (start->m_crossStaff != end->m_crossStaff) {
@@ -555,12 +556,10 @@ float View::CalcInitialSlur(
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
-    //if (!slur->GetStart()->m_crossStaff && !slur->GetEnd()->m_crossStaff) {
     AttNIntegerComparison matchStaff(STAFF, staff->GetN());
     AttNIntegerComparison matchLayer(LAYER, layerN);
     filters.push_back(&matchStaff);
     filters.push_back(&matchLayer);
-    //}
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);

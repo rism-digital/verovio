@@ -27,6 +27,7 @@
 #include "pages.h"
 #include "pedal.h"
 #include "section.h"
+#include "slur.h"
 #include "staff.h"
 #include "syl.h"
 #include "trill.h"
@@ -259,6 +260,44 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     }
 
     return false;
+}
+
+curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, LayerElement *end, Slur* slur) 
+{
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
+    findSpannedLayerElementsParams.m_minPos = start->GetDrawingX();
+    findSpannedLayerElementsParams.m_maxPos = end->GetDrawingX();
+    findSpannedLayerElementsParams.m_classIds = { CHORD, NOTE };
+
+    Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
+    assert(layerStart);
+
+    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
+    Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL);
+
+    curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
+    for (auto element : findSpannedLayerElementsParams.m_elements) {
+        Layer *layer = vrv_cast<Layer *>((element)->GetFirstAncestor(LAYER));
+        assert(layer);
+        if (layer == layerStart) continue;
+
+        if (curvature_CURVEDIR_NONE == preferredDirection) {
+            if (layer->GetN() > layerStart->GetN()) {
+                preferredDirection = curvature_CURVEDIR_above;
+            }
+            else {
+                preferredDirection = curvature_CURVEDIR_below;
+            }
+        }
+        // if there are layers both above and below - discard previous location and return - we'll use default direction
+        else if (((curvature_CURVEDIR_above == preferredDirection) && (layer->GetN() < layerStart->GetN()))
+            || ((curvature_CURVEDIR_below == preferredDirection) && (layer->GetN() > layerStart->GetN()))) {
+            preferredDirection = curvature_CURVEDIR_NONE;
+            break;
+        }
+    }
+
+    return preferredDirection;
 }
 
 void System::AddToDrawingListIfNeccessary(Object *object)
