@@ -2596,6 +2596,15 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for custos
+    else if (filterParent->Is(CUSTOS)) {
+        if (element == "accid") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for fTrem
     else if (filterParent->Is(FTREM)) {
         if (element == "chord") {
@@ -4848,7 +4857,7 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
-    return true;
+    return ReadLayerChildren(vrvCustos, custos, vrvCustos);
 }
 
 bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)

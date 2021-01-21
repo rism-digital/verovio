@@ -768,11 +768,6 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
             break;
     }
 
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
-
     int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
@@ -786,36 +781,13 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    int clefY = y - (staffSize * (staffLineNumber - clefLine));
-    int pitchOffset;
-    int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
-    int rotateOffset;
     if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = x - staff->GetDrawingX();
-        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
-    }
-    else {
-        rotateOffset = 0;
+        y -= int(xDiff * tan(deg * M_PI / 180.0));
     }
 
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_c) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_f) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_G) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_g) * (staffSize / 2);
-    }
-    else {
-        // This shouldn't happen
-        pitchOffset = 0;
-    }
-
-    int actualY = clefY + pitchOffset + octaveOffset - rotateOffset;
-
-    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -823,9 +795,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
         fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(ToDeviceContextY(actualY));
+        fi->GetZone()->SetUly(ToDeviceContextY(y));
         fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(actualY - noteHeight));
+        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
     }
 
     dc->EndGraphic(element, this);
