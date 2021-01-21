@@ -103,7 +103,7 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * @name Setter and getter for tie attribute and other pointers
+     * @name Setter and getter for accid attribute and other pointers
      */
     ///@{
     Accid *GetDrawingAccid();

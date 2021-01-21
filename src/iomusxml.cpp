@@ -3661,7 +3661,7 @@ data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
         { "diamond", HEADSHAPE_diamond }, //
         { "square", HEADSHAPE_square }, //
         { "cross", HEADSHAPE_plus }, //
-        { "x", HEADSHAPE_slash }, //
+        { "x", HEADSHAPE_x }, //
         { "circle-x", HEADSHAPE_slash }, //
         { "inverted triangle", HEADSHAPE_slash }, //
         { "arrow down", HEADSHAPE_slash }, //
