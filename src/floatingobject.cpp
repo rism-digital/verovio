@@ -206,7 +206,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         Mordent *mordent = vrv_cast<Mordent *>(object);
         assert(mordent);
         // mordent above by default;
-        m_place = (mordent->GetPlace() != STAFFREL_NONE) ? mordent->GetPlace() : STAFFREL_above;
+        m_place = (mordent->GetPlace() != STAFFREL_NONE) ? mordent->GetPlace() : mordent->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(OCTAVE)) {
         Octave *octave = vrv_cast<Octave *>(object);
@@ -235,14 +235,15 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     else if (object->Is(TRILL)) {
         Trill *trill = vrv_cast<Trill *>(object);
         assert(trill);
+        trill->GetStart();
         // trill above by default;
-        m_place = (trill->GetPlace() != STAFFREL_NONE) ? trill->GetPlace() : STAFFREL_above;
+        m_place = (trill->GetPlace() != STAFFREL_NONE) ? trill->GetPlace() : trill->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(TURN)) {
         Turn *turn = vrv_cast<Turn *>(object);
         assert(turn);
         // turn above by default;
-        m_place = (turn->GetPlace() != STAFFREL_NONE) ? turn->GetPlace() : STAFFREL_above;
+        m_place = (turn->GetPlace() != STAFFREL_NONE) ? turn->GetPlace() : turn->GetLayerPlace(STAFFREL_above);
     }
     else {
         m_place = STAFFREL_NONE;
