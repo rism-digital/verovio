@@ -46,12 +46,15 @@ enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, 
 //----------------------------------------------------------------------------
 
 // Can be changed between static and dynamic for debug purposes
-
-// To be used for all cases where type is cheched through Object::m_type
-#define vrv_cast static_cast
-
-// To be used for all FunctorParams casts withi Functors
-#define vrv_params_cast static_cast
+#ifdef VRV_DYNAMIC_CAST
+    // To be used for all cases where type is cheched through Object::m_type
+    #define vrv_cast dynamic_cast
+    // To be used for all FunctorParams casts within Functors
+    #define vrv_params_cast dynamic_cast
+#else
+    #define vrv_cast static_cast
+    #define vrv_params_cast static_cast
+#endif
 
 //----------------------------------------------------------------------------
 // Default midi values

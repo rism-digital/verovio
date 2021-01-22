@@ -3658,6 +3658,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 					_DEBUG,
+					VRV_DYNAMIC_CAST,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;

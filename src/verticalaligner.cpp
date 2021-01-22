@@ -839,7 +839,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     std::vector<FloatingCurvePositioner *> positioners;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({ PHRASE, SLUR, TIE })) continue;
+        if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
         Slur *slur = vrv_cast<Slur *>(positioner->GetObject());
         assert(slur);
 
@@ -854,6 +854,9 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
         if (adjusted) {
             params->m_adjusted = true;
+        }
+        if (slur->IsCrossStaff()) {
+            params->m_crossStaffSlurs = true;
         }
     }
 
