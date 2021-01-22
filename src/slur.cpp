@@ -267,15 +267,22 @@ bool Slur::AdjustSlurPosition(
     auto [maxShiftLeft, maxShiftRight] = CalculateAdjustedSlurShift(curve, bezierCurve, margin, forceBothSides);
     if (!maxShiftLeft && !maxShiftRight) return false;
 
-    // If curve is cross staff and shifts are larger than current height of the control points - adjust control point height to make sure that slur bends around the overlapping elements
+    // If curve is cross staff and shifts are larger than current height of the control points - adjust control point
+    // height to make sure that slur bends around the overlapping elements
     if (curve->IsCrossStaff()
         && ((maxShiftLeft > bezierCurve.GetLeftControlHeight())
             || (maxShiftRight > bezierCurve.GetRightControlHeight()))) {
         angle = 0.0;
         bezierCurve.SetControlPointOffset(bezierCurve.GetControlPointOffset() / 2);
-        // Use right shift for left control height and vice versa to keep slur more balanced
-        bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftRight);
-        bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftLeft);
+        bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftLeft);
+        bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftRight);
+        const int shiftDifference = std::abs(maxShiftLeft - maxShiftRight);
+        if (maxShiftLeft > maxShiftRight) {
+            bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+        }
+        else {
+            bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+        }
         return true;
     }
     // otherwise it is normal slur - just move position of the start/end points up or down and recalculate angle
