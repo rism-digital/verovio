@@ -68,7 +68,30 @@ void Artic::SplitMultival(Object *parent)
 {
     assert(parent == this->GetParent());
 
-    LogDebug("Splitting artic");
+    std::vector<data_ARTICULATION> articList = this->GetArtic();
+    if (articList.empty()) return;
+
+    int idx = this->GetIdx() + 1;
+    std::vector<data_ARTICULATION>::iterator iter;
+    for (iter = articList.begin() + 1; iter != articList.end(); ++iter) {
+        Artic *artic = new Artic();
+        artic->SetArtic({ *iter });
+        artic->AttColor::operator=(*this);
+        artic->AttPlacement::operator=(*this);
+        artic->SetParent(parent);
+        parent->InsertChild(artic, idx);
+        idx++;
+    }
+
+    // The original element only keep the first value
+    this->SetArtic({ articList.at(0) });
+
+    // Multiple valued attributes cannot be preserved as such
+    if (this->IsAttribute()) {
+        this->IsAttribute(false);
+        LogMessage("Mutlivalued attribute @artic on '%s' permanently converted to <artic> elements",
+            parent->GetUuid().c_str());
+    }
 }
 
 void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)

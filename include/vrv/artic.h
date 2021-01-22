@@ -39,6 +39,10 @@ public:
      */
     virtual bool IsSupportedChild(Object *object);
 
+    /**
+     * Split the multi-valued artic attributes into distinct artic elements.
+     * Applied by ConvertMarkupArtic functor.
+     */
     void SplitMultival(Object *parent);
 
     /**
