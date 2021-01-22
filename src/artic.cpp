@@ -64,6 +64,13 @@ bool Artic::IsSupportedChild(Object *child)
     return true;
 }
 
+void Artic::SplitMultival(Object *parent)
+{
+    assert(parent == this->GetParent());
+
+    LogDebug("Splitting artic");
+}
+
 void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)
 {
     assert(insideSlur);
@@ -245,6 +252,16 @@ void ArticPart::AddSlurPositioner(FloatingCurvePositioner *positioner, bool star
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    if (this->GetArtic().size() > 1) params->m_articsToConvert.push_back(this);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Artic::CalcArtic(FunctorParams *functorParams)
 {

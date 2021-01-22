@@ -763,6 +763,19 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Note::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &artic : params->m_articsToConvert) {
+        artic->SplitMultival(this);
+    }
+    params->m_articsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Note::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);

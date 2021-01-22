@@ -551,7 +551,13 @@ enum {
 // Analytical markup bitfields
 //----------------------------------------------------------------------------
 
-enum { MARKUP_DEFAULT = 0, MARKUP_ANALYTICAL_TIE = 1, MARKUP_ANALYTICAL_FERMATA = 2, MARKUP_GRACE_ATTRIBUTE = 4 };
+enum {
+    MARKUP_DEFAULT = 0,
+    MARKUP_ANALYTICAL_TIE = 1,
+    MARKUP_ANALYTICAL_FERMATA = 2,
+    MARKUP_GRACE_ATTRIBUTE = 4,
+    MARKUP_ARTIC_MULTIVAL = 8
+};
 
 //----------------------------------------------------------------------------
 // Bounding box access

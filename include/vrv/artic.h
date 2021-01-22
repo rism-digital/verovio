@@ -39,6 +39,8 @@ public:
      */
     virtual bool IsSupportedChild(Object *object);
 
+    void SplitMultival(Object *parent);
+
     /**
      * Split the articulation content into an array with the values to be displayed inside the staff / slur
      * and the values to be displayed outside.
@@ -74,6 +76,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertMarkupArtic
+     */
+    virtual int ConvertMarkupArtic(FunctorParams *functorParams);
 
     /**
      * See Object::CalcArtic

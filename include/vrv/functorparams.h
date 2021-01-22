@@ -18,9 +18,10 @@ class MidiFile;
 
 namespace vrv {
 
-class ClassIdComparison;
+class Artic;
 class BoundaryStartInterface;
 class Chord;
+class ClassIdComparison;
 class Clef;
 class Doc;
 class Dot;
@@ -1005,6 +1006,20 @@ public:
     Chord *m_currentChord;
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
+// ConvertMarkupArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector<Artic *>* that needs to be converted
+ **/
+
+class ConvertMarkupArticParams : public FunctorParams {
+public:
+    ConvertMarkupArticParams() {}
+    std::vector<Artic *> m_articsToConvert;
 };
 
 //----------------------------------------------------------------------------

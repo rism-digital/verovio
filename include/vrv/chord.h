@@ -159,6 +159,11 @@ public:
     virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
 
     /**
+     * See Object::ConvertMarkupArtic
+     */
+    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
     ///@{
