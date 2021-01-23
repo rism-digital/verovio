@@ -5248,11 +5248,9 @@ void HumdrumInput::setTimeSig(
     bool mensuration = false;
     if (metersig.find("C") != std::string::npos) {
         mensuration = true;
-        ;
     }
     if (metersig.find("O") != std::string::npos) {
         mensuration = true;
-        ;
     }
 
     int top = -1000;
@@ -5264,19 +5262,20 @@ void HumdrumInput::setTimeSig(
     }
     else if (sscanf(timesig.c_str(), "*M%d/%d", &top, &bot) == 2) {
         if (bot == 0) {
-            if (!mensuration) {
-                // Can't add if there is a mensuration; otherwise,
-                // a time signature will be shown.
-                vrvmeter->SetCount(top * 2);
+            if (mensuration) {
+                // hide time signature
+                vrvmeter->SetForm(METERFORM_invis);
             }
+            vrvmeter->SetCount(top * 2);
             vrvmeter->SetUnit(1);
         }
         else {
-            if (!mensuration) {
+            if (mensuration) {
                 // Can't add if there is a mensuration; otherwise,
                 // a time signature will be shown.
-                vrvmeter->SetCount(top);
+                vrvmeter->SetForm(METERFORM_invis);
             }
+            vrvmeter->SetCount(top);
             vrvmeter->SetUnit(bot);
         }
     }
@@ -14915,6 +14914,8 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             // this will also print a time signature.
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetForm(METERFORM_invis);
+            vrvmetersig->SetCount(count);
             vrvmetersig->SetUnit(unit);
         }
         if (metersigtok) {
