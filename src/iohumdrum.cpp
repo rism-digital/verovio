@@ -10104,7 +10104,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         Artic *artic = new Artic;
         appendElement(element, artic);
         artic->SetArtic(articsbelow);
-        setPlace(artic, "below", showposabove.at(0));
+        setPlace(artic, "below", showposbelow.at(0));
         artic->SetUuid(getLocationId(element, token, 0) + "-below");
     }
 
