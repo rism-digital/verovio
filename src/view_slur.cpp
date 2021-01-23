@@ -490,13 +490,12 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         for (auto &object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
-            ArticPart *outsidePart = artic->GetOutsidePart();
-            if (outsidePart) {
-                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
-                    outsidePart->AddSlurPositioner(curve, true);
+            if (artic->IsOutsideArtic()) {
+                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    artic->AddSlurPositioner(curve, true);
                 }
-                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
-                    outsidePart->AddSlurPositioner(curve, true);
+                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    artic->AddSlurPositioner(curve, true);
                 }
             }
         }
@@ -508,13 +507,12 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         for (auto &object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
-            ArticPart *outsidePart = artic->GetOutsidePart();
-            if (outsidePart) {
-                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
-                    outsidePart->AddSlurPositioner(curve, false);
+            if (artic->IsOutsideArtic()) {
+                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    artic->AddSlurPositioner(curve, false);
                 }
-                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
-                    outsidePart->AddSlurPositioner(curve, false);
+                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    artic->AddSlurPositioner(curve, false);
                 }
             }
         }
@@ -551,7 +549,7 @@ float View::CalcInitialSlur(
     findSpannedLayerElementsParams.m_minPos = p1.x;
     findSpannedLayerElementsParams.m_maxPos = p2.x;
     findSpannedLayerElementsParams.m_classIds
-        = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
+        = { ACCID, ARTIC, CHORD, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)

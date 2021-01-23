@@ -94,9 +94,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(ARTIC)) {
         DrawArtic(dc, element, layer, staff, measure);
     }
-    else if (element->Is(ARTIC_PART)) {
-        DrawArticPart(dc, element, layer, staff, measure);
-    }
     else if (element->Is(BARLINE)) {
         DrawBarLine(dc, element, layer, staff, measure);
     }
@@ -299,6 +296,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this);
 }
 
+/*
 void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -309,8 +307,10 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     ArticPart *articPart = vrv_cast<ArticPart *>(element);
     assert(articPart);
+*/
 
-    /************** draw the artic **************/
+/************** draw the artic **************/
+/*
 
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
@@ -379,6 +379,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->EndGraphic(element, this);
 }
+*/
 
 void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {

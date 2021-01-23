@@ -434,7 +434,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         if (beam) {
             // Check for possible articulations
             ListOfObjects artics;
-            ClassIdsComparison comparison({ ARTIC, ARTIC_PART });
+            ClassIdsComparison comparison({ ARTIC });
             this->FindAllDescendantByComparison(&artics, &comparison);
 
             int articPadding = 0;
@@ -470,7 +470,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             // Check for overlap with content
             // Possible issue with beam above the tuplet - not sure this will be noticable
             ListOfObjects descendants;
-            ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
+            ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 
             // Possible fix for beam above tuplet

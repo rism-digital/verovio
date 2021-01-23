@@ -53,15 +53,19 @@ void Artic::Reset()
     ResetPlacement();
 }
 
-bool Artic::IsSupportedChild(Object *child)
+bool Artic::IsInsideArtic()
 {
-    if (child->Is(ARTIC_PART)) {
-        assert(dynamic_cast<ArticPart *>(child));
-    }
-    else {
-        return false;
-    }
-    return true;
+    auto end = Artic::s_outStaffArtic.end();
+    auto i = std::find(Artic::s_outStaffArtic.begin(), end, this->GetArticFirst());
+    return (i == end);
+}
+
+data_ARTICULATION Artic::GetArticFirst()
+{
+    std::vector<data_ARTICULATION> articList = this->GetArtic();
+    if (articList.empty()) return ARTICULATION_NONE;
+
+    return articList.front();
 }
 
 void Artic::SplitMultival(Object *parent)
@@ -113,6 +117,7 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     }
 }
 
+/*
 ArticPart *Artic::GetInsidePart()
 {
     ArticPartTypeComparison articPartComparison(ARTIC_PART_INSIDE);
@@ -124,6 +129,7 @@ ArticPart *Artic::GetOutsidePart()
     ArticPartTypeComparison articPartComparison(ARTIC_PART_OUTSIDE);
     return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
 }
+*/
 
 wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
 {
@@ -211,39 +217,13 @@ bool Artic::IsCentered(data_ARTICULATION artic)
     return false;
 }
 
-//----------------------------------------------------------------------------
-// ArticPart
-//----------------------------------------------------------------------------
-
-ArticPart::ArticPart(ArticPartType type, Artic *artic)
-    : LayerElement("artic-part-"), AttArticulation(), AttColor(), AttPlacement()
+bool Artic::AlwaysAbove()
 {
-    assert(artic);
+    auto end = Artic::s_aboveStaffArtic.end();
+    auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, this->GetArticFirst());
+    return (i != end);
 
-    RegisterAttClass(ATT_ARTICULATION);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_PLACEMENT);
-
-    m_type = type;
-
-    Reset();
-
-    // preserve the color from the parent artic
-    this->SetColor(artic->GetColor());
-}
-
-ArticPart::~ArticPart() {}
-
-void ArticPart::Reset()
-{
-    LayerElement::Reset();
-    ResetArticulation();
-    ResetColor();
-    ResetPlacement();
-}
-
-bool ArticPart::AlwaysAbove()
-{
+    /*
     std::vector<data_ARTICULATION>::iterator iter;
     auto end = Artic::s_aboveStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
@@ -256,9 +236,10 @@ bool ArticPart::AlwaysAbove()
         }
     }
     return false;
+    */
 }
 
-void ArticPart::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
+void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 {
     if (start) {
         if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
@@ -348,17 +329,13 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     /************** set it to both the inside and outside part **************/
 
-    ArticPart *insidePart = this->GetInsidePart();
-    ArticPart *outsidePart = this->GetOutsidePart();
-
-    if (insidePart) {
-        insidePart->SetPlace(place);
+    if (this->IsInsideArtic()) {
+        this->SetPlace(place);
     }
-
-    if (outsidePart) {
+    else {
         // If allowAbove is true it will place the above if the content requires so (even if place below if given)
-        if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
-        outsidePart->SetPlace(place);
+        if (place == STAFFREL_below && allowAbove && this->AlwaysAbove()) place = STAFFREL_above;
+        this->SetPlace(place);
     }
 
     /************** calculate the y position **************/
@@ -392,42 +369,42 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     // Does not work properly with chords, needs rethinking - It might be better to make artic or articPart relative to
     // notes
     // The problem is that in MEI artic are children of chord element and not of the notes
-    if (insidePart) {
-        if (insidePart->GetPlace() == STAFFREL_above) {
-            insidePart->SetDrawingYRel(yInAbove);
+    if (this->IsInsideArtic()) {
+        if (this->GetPlace() == STAFFREL_above) {
+            this->SetDrawingYRel(yInAbove);
             if (parent->m_crossStaff) {
-                insidePart->m_crossStaff = staffAbove;
-                insidePart->m_crossLayer = crossLayer;
+                this->m_crossStaff = staffAbove;
+                this->m_crossLayer = crossLayer;
             }
         }
         else {
-            insidePart->SetDrawingYRel(yInBelow);
+            ThisOrSameasAsLink()->SetDrawingYRel(yInBelow);
             if (parent->m_crossStaff) {
-                insidePart->m_crossStaff = staffBelow;
-                insidePart->m_crossLayer = crossLayer;
+                this->m_crossStaff = staffBelow;
+                this->m_crossLayer = crossLayer;
             }
         }
     }
-
-    if (outsidePart) {
-        if (outsidePart->GetPlace() == STAFFREL_above) {
-            outsidePart->SetDrawingYRel(yOutAbove);
+    else {
+        if (this->GetPlace() == STAFFREL_above) {
+            this->SetDrawingYRel(yOutAbove);
             if (parent->m_crossStaff) {
-                outsidePart->m_crossStaff = staffAbove;
-                outsidePart->m_crossLayer = crossLayer;
+                this->m_crossStaff = staffAbove;
+                this->m_crossLayer = crossLayer;
             }
         }
         else {
-            outsidePart->SetDrawingYRel(yOutBelow);
+            this->SetDrawingYRel(yOutBelow);
             if (parent->m_crossStaff) {
-                outsidePart->m_crossStaff = staffBelow;
-                outsidePart->m_crossLayer = crossLayer;
+                this->m_crossStaff = staffBelow;
+                this->m_crossLayer = crossLayer;
             }
         }
     }
 
     // If we have both an inside and outside part we need to move the outside part away when they are both on the same
     // side
+    /*
     if (insidePart && outsidePart) {
 
         int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
@@ -448,48 +425,12 @@ int Artic::CalcArtic(FunctorParams *functorParams)
             }
         }
     }
+    */
 
     return FUNCTOR_SIBLINGS;
 }
 
-int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    std::vector<data_ARTICULATION> insideSlur;
-    std::vector<data_ARTICULATION> outsideSlur;
-
-    this->SplitArtic(&insideSlur, &outsideSlur);
-
-    if (insideSlur.size() > 0) {
-        ArticPart *articPart = new ArticPart(ARTIC_PART_INSIDE, this);
-        articPart->SetArtic(insideSlur);
-        this->AddChild(articPart);
-    }
-    if (outsideSlur.size() > 0) {
-        ArticPart *articPart = new ArticPart(ARTIC_PART_OUTSIDE, this);
-        articPart->SetArtic(outsideSlur);
-        this->AddChild(articPart);
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Artic::ResetDrawing(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-
-    // Remove all ArticPart children
-    ClearChildren();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
+int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_startSlurPositioners.clear();
     m_endSlurPositioners.clear();
@@ -497,7 +438,7 @@ int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
+int Artic::AdjustArticWithSlurs(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);

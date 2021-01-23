@@ -180,7 +180,6 @@ enum ClassId {
     LAYER_ELEMENT,
     ACCID,
     ARTIC,
-    ARTIC_PART,
     BARLINE,
     BARLINE_ATTR_LEFT,
     BARLINE_ATTR_RIGHT,
