@@ -1116,6 +1116,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
+            if (loc % 2 != 0) --loc;
+            if (staff->m_drawingLines > 1) loc += 2;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
@@ -1128,10 +1130,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 else {
                     loc -= 2;
                 }
-            }
-            // add offset
-            else if (staff->m_drawingLines > 3) {
-                loc += 2;
             }
         }
 
@@ -1154,6 +1152,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
+            if ((rest->GetDur() < DUR_4) && (loc % 2 != 0)) --loc;
+            // Adjust special cases
+            if ((rest->GetDur() == DUR_1) && (staff->m_drawingLines > 1)) loc += 2;
+            if ((rest->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
 
             Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
             // Limitation: GetLayerCount does not take into account editorial markup
@@ -1273,7 +1275,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 loc = rest->GetOptimalLayerLocation(staff, layer, loc);
             }
         }
-        loc = rest->GetRestLocOffset(loc);
         rest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
