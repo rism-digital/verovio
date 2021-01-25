@@ -422,6 +422,10 @@ void Page::LayOutVertically()
 
     // If slurs were adjusted we need to redraw to adjust the bounding boxes
     if (adjustSlursParams.m_adjusted) {
+        // There is a problem here with cross-staff slurs: if they have been ajusted, the
+        // Slur::m_isCrossStaff flag will trigger View::DrawSlurInitial to be called again.
+        // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
+        // but in between, we can have wrong collisions detections. To be improved
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
@@ -458,6 +462,14 @@ void Page::LayOutVertically()
     Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);
     this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
+
+    // Redraw are re-adjust the position of the slurs when we have cross-staff ones
+    if (adjustSlursParams.m_crossStaffSlurs) {
+        LogMessage("XStaff slurs");
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+        this->Process(&adjustSlurs, &adjustSlursParams);
+    }
 
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();

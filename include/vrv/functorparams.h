@@ -387,8 +387,10 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 1: the doc
- * member 2: a pointer to the functor for passing it to the system aligner
+ * member 0: a flag indicating that at least one slur had to be adjusted
+ * member 1: a flag indicating that there is at least one cross-staff slur
+ * member 2: the doc
+ * member 3: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustSlursParams : public FunctorParams {
@@ -396,10 +398,12 @@ public:
     AdjustSlursParams(Doc *doc, Functor *functor)
     {
         m_adjusted = false;
+        m_crossStaffSlurs = false;
         m_doc = doc;
         m_functor = functor;
     }
     bool m_adjusted;
+    bool m_crossStaffSlurs;
     Doc *m_doc;
     Functor *m_functor;
 };
