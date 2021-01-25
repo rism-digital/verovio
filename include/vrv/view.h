@@ -559,16 +559,6 @@ private:
     void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
         Staff *staff, Measure *measure);
 
-    /**
-     * Used for calculating clustered information/dot position
-     */
-    bool IsOnStaffLine(int y, Staff *staff);
-
-    /**
-     * Find the nearest unit position in the direction indicated by place.
-     */
-    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
-
 public:
     /** Document */
     Doc *m_doc;

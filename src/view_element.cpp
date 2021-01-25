@@ -1687,7 +1687,7 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
 {
     int i;
 
-    if (IsOnStaffLine(y, staff)) {
+    if (staff->IsOnStaffLine(y, m_doc)) {
         y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     for (i = 0; i < dots; ++i) {
@@ -1804,29 +1804,6 @@ int View::GetSylYRel(int verseN, Staff *staff)
             + (alignment->GetVerseCount() - verseN) * (height + descender + margin) + (descender);
     }
     return y;
-}
-
-bool View::IsOnStaffLine(int y, Staff *staff)
-{
-    // int y1 = y - staff->GetDrawingY();
-    // int y2 = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    // LogDebug("IsOnStaff %d %d", y1, y2);
-
-    return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
-}
-
-int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place)
-{
-    int yPos = y - staff->GetDrawingY();
-    int distance = yPos % m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (place == STAFFREL_above) {
-        if (distance > 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - distance;
-        return y - distance + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        if (distance < 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + distance;
-        return y - distance - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
 }
 
 } // namespace vrv
