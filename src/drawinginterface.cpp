@@ -290,10 +290,10 @@ bool BeamDrawingInterface::IsHorizontal()
     // Detect concave shapes
     for (i = 1; i < itemCount - 1; ++i) {
         if (m_drawingPlace == BEAMPLACE_above) {
-            if ((items.at(i) > first) && (items.at(i) > last)) return true;
+            if ((items.at(i) >= first) && (items.at(i) >= last)) return true;
         }
         else {
-            if ((items.at(i) < first) && (items.at(i) < last)) return true;
+            if ((items.at(i) <= first) && (items.at(i) <= last)) return true;
         }
     }
 
