@@ -263,7 +263,7 @@ int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedEl
 bool Slur::AdjustSlurPosition(
     Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides)
 {
-    const int margin = 1 * doc->GetDrawingUnit(100) / 2;
+    const int margin = doc->GetDrawingUnit(100);
     auto [maxShiftLeft, maxShiftRight] = CalculateAdjustedSlurShift(curve, bezierCurve, margin, forceBothSides);
     if (!maxShiftLeft && !maxShiftRight) return false;
 
