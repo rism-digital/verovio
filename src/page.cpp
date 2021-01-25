@@ -387,7 +387,7 @@ void Page::LayOutVertically()
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Adjust the position of outside articulations
-    FunctorDocParams calcArticParams(doc);
+    CalcArticParams calcArticParams(doc);
     Functor calcArtic(&Object::CalcArtic);
     this->Process(&calcArtic, &calcArticParams);
 

@@ -505,10 +505,10 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
 enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
 
 //----------------------------------------------------------------------------
-// Artic part types
+// Artic types
 //----------------------------------------------------------------------------
 
-enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
+enum ArticType { ARTIC_INSIDE = 0, ARTIC_OUTSIDE };
 
 //----------------------------------------------------------------------------
 // Visibility optimization

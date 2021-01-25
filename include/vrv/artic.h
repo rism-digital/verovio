@@ -46,6 +46,8 @@ public:
      */
     void SplitMultival(Object *parent);
 
+    void GetAllArtics(bool direction, std::vector<Artic *> &artics);
+
     /**
      * Split the articulation content into an array with the values to be displayed inside the staff / slur
      * and the values to be displayed outside.
@@ -85,6 +87,8 @@ public:
 
     void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
+    data_STAFFREL GetDrawingPlace() const { return m_drawingPlace; }
+
     //----------//
     // Functors //
     //----------//
@@ -109,6 +113,11 @@ public:
      */
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 public:
@@ -125,8 +134,8 @@ public:
     static std::vector<data_ARTICULATION> s_aboveStaffArtic;
 
 private:
-    /** the type of artic part */
-    ArticPartType m_type;
+    //
+    data_STAFFREL m_drawingPlace;
 };
 
 } // namespace vrv

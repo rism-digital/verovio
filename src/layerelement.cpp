@@ -408,51 +408,39 @@ int LayerElement::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
+int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type)
 {
     // It would not crash otherwise but there is not reason to call it
     assert(this->Is({ NOTE, CHORD }));
 
-    return this->GetDrawingY();
-
-    /*
-    ArticPart *firstArticPart = NULL;
-    ArticPart *lastArticPart = NULL;
-
     // We limit support to two artic elements, get them by searching in both directions
     Artic *firstArtic = dynamic_cast<Artic *>(this->FindDescendantByType(ARTIC));
-    Artic *lastArtic = dynamic_cast<Artic *>(this->FindDescendantByType(ARTIC, MAX_ACCID_DEPTH, BACKWARD));
+    Artic *lastArtic = dynamic_cast<Artic *>(this->FindDescendantByType(ARTIC, UNLIMITED_DEPTH, BACKWARD));
     // If they are the same (we have only one artic child), then ignore the second one
     if (firstArtic == lastArtic) lastArtic = NULL;
     // Look for the outside part first if necessary
-    if (type == ARTIC_PART_OUTSIDE) {
-        if (firstArtic) firstArticPart = firstArtic->GetOutsidePart();
-        if (lastArtic) lastArticPart = lastArtic->GetOutsidePart();
-        // Ignore them if on the opposite side of what we are looking for
-        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
-        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
+    if (type == ARTIC_OUTSIDE) {
+        if (firstArtic && (firstArtic->GetDrawingPlace() != place)) firstArtic = NULL;
+        if (lastArtic && (lastArtic->GetDrawingPlace() != place)) lastArtic = NULL;
     }
     // Looking at the inside if nothing is given outside
-    if (firstArtic && !firstArticPart) {
-        firstArticPart = firstArtic->GetInsidePart();
-        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
+    if (firstArtic && firstArtic->IsInsideArtic()) {
+        if (firstArtic->GetDrawingPlace() != place) firstArtic = NULL;
     }
-    if (lastArtic && !lastArticPart) {
-        lastArticPart = lastArtic->GetInsidePart();
-        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
+    if (lastArtic && lastArtic->IsInsideArtic()) {
+        if (lastArtic->GetDrawingPlace() != place) lastArtic = NULL;
     }
 
     if (place == STAFFREL_above) {
-        int firstY = !firstArticPart ? VRV_UNSET : firstArticPart->GetSelfTop();
-        int lastY = !lastArticPart ? VRV_UNSET : lastArticPart->GetSelfTop();
+        int firstY = !firstArtic ? VRV_UNSET : firstArtic->GetSelfTop();
+        int lastY = !lastArtic ? VRV_UNSET : lastArtic->GetSelfTop();
         return std::max(firstY, lastY);
     }
     else {
-        int firstY = !firstArticPart ? -VRV_UNSET : firstArticPart->GetSelfBottom();
-        int lastY = !lastArticPart ? -VRV_UNSET : lastArticPart->GetSelfBottom();
+        int firstY = !firstArtic ? -VRV_UNSET : firstArtic->GetSelfBottom();
+        int lastY = !lastArtic ? -VRV_UNSET : lastArtic->GetSelfBottom();
         return std::min(firstY, lastY);
     }
-    */
 }
 
 void LayerElement::SetDrawingXRel(int drawingXRel)
@@ -479,7 +467,7 @@ void LayerElement::CenterDrawingX()
     SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
 }
 
-int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
+int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
@@ -512,7 +500,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
     return this->GetDrawingY();
 }
 
-int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
+int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {

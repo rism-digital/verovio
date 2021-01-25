@@ -51,6 +51,8 @@ void Artic::Reset()
     ResetArticulation();
     ResetColor();
     ResetPlacement();
+
+    m_drawingPlace = STAFFREL_NONE;
 }
 
 bool Artic::IsInsideArtic()
@@ -98,6 +100,27 @@ void Artic::SplitMultival(Object *parent)
     }
 }
 
+void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
+{
+    Object *parentNoteOrChord = this->GetFirstAncestor(CHORD);
+
+    if (!parentNoteOrChord) parentNoteOrChord = this->GetFirstAncestor(NOTE);
+
+    if (!parentNoteOrChord) return;
+
+    Object *first = (direction == FORWARD) ? this : parentNoteOrChord->GetFirst();
+    Object *last = (direction == BACKWARD) ? this : parentNoteOrChord->GetLast();
+    ClassIdComparison matchType(ARTIC);
+    ListOfObjects children;
+    parentNoteOrChord->FindAllDescendantBetween(&children, &matchType, first, last);
+    for (auto &child : children) {
+        if (child == this) continue;
+        Artic *artic = vrv_cast<Artic *>(child);
+        assert(artic);
+        if (artic->GetDrawingPlace() == this->GetDrawingPlace()) artics.push_back(artic);
+    }
+}
+
 void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)
 {
     assert(insideSlur);
@@ -120,13 +143,13 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
 /*
 ArticPart *Artic::GetInsidePart()
 {
-    ArticPartTypeComparison articPartComparison(ARTIC_PART_INSIDE);
+    ArticPartTypeComparison articPartComparison(ARTIC_INSIDE);
     return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
 }
 
 ArticPart *Artic::GetOutsidePart()
 {
-    ArticPartTypeComparison articPartComparison(ARTIC_PART_OUTSIDE);
+    ArticPartTypeComparison articPartComparison(ARTIC_OUTSIDE);
     return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
 }
 */
@@ -269,173 +292,149 @@ int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
 
 int Artic::CalcArtic(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
     assert(params);
 
-    /************** Get the parent and the stem direction **************/
+    int yIn, yOut, yRel;
 
-    LayerElement *parent = NULL;
-    Note *parentNote = NULL;
-    Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, 2));
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-    data_STAFFREL place = STAFFREL_NONE;
+    if (!params->m_parent) return FUNCTOR_CONTINUE;
 
-    if (!parentChord) {
-        parentNote = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE));
-        parent = parentNote;
-    }
-    else {
-        parent = parentChord;
-    }
-
-    if (!parentChord && !parentNote) {
-        // no parent chord or note, nothing we can do...
-        return FUNCTOR_CONTINUE;
-    }
+    /************** placement **************/
 
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    if (parent && parent->m_crossStaff) layer = parent->m_crossLayer;
 
-    stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
-
-    /************** placement **************/
+    if (params->m_parent->m_crossStaff) {
+        staff = params->m_parent->m_crossStaff;
+        layer = params->m_parent->m_crossLayer;
+    }
 
     bool allowAbove = true;
     data_STEMDIRECTION layerStemDir;
 
     // for now we ignore within @place
     if (this->GetPlace() != STAFFREL_NONE) {
-        place = this->GetPlace();
+        m_drawingPlace = this->GetPlace();
         // If we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
-    else if ((layerStemDir = layer->GetDrawingStemDir(parent)) != STEMDIRECTION_NONE) {
-        place = (layerStemDir == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
+    else if ((layerStemDir = layer->GetDrawingStemDir(params->m_parent)) != STEMDIRECTION_NONE) {
+        m_drawingPlace = (layerStemDir == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
         // If we have more than one layer do not allow to be changed to above
         allowAbove = false;
     }
-    else if (stemDir == STEMDIRECTION_up)
-        place = STAFFREL_below;
-    else
-        place = STAFFREL_above;
+    else if (params->m_stemDir == STEMDIRECTION_up) {
+        m_drawingPlace = STAFFREL_below;
+    }
+    else {
+        m_drawingPlace = STAFFREL_above;
+    }
 
     /************** adjust the xRel position **************/
 
-    int xShift = parent->GetDrawingRadius(params->m_doc);
+    int xShift = params->m_parent->GetDrawingRadius(params->m_doc);
     this->SetDrawingXRel(xShift);
 
     /************** set it to both the inside and outside part **************/
 
-    if (this->IsInsideArtic()) {
-        this->SetPlace(place);
-    }
-    else {
+    if (this->IsOutsideArtic()) {
         // If allowAbove is true it will place the above if the content requires so (even if place below if given)
-        if (place == STAFFREL_below && allowAbove && this->AlwaysAbove()) place = STAFFREL_above;
-        this->SetPlace(place);
+        if (m_drawingPlace == STAFFREL_below && allowAbove && this->AlwaysAbove()) m_drawingPlace = STAFFREL_above;
     }
 
     /************** calculate the y position **************/
 
-    Staff *staffAbove = NULL;
-    Staff *staffBelow = NULL;
-    Layer *crossLayer = NULL;
-
-    // Cross-staff handling of articulation will need to be re-thought. We can look at assiging a cross-staff to the
-    // appropriate ArticPart
-    // (see below) - For chords, we need to distinguish cross-staff chords and cross-staff chord notes
-    if (parent->m_crossStaff && parent->m_crossLayer) {
-        staff = parent->m_crossStaff;
-        staffAbove = staff;
-        staffBelow = staff;
-        crossLayer = parent->m_crossLayer;
+    if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
+        this->m_crossStaff = params->m_staffAbove;
+        this->m_crossLayer = params->m_layerAbove;
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
     }
-    else if (parentChord) {
-        parentChord->GetCrossStaffExtremes(staffAbove, staffBelow);
+    else if (this->GetDrawingPlace() == STAFFREL_below && params->m_crossStaffBelow) {
+        this->m_crossStaff = params->m_staffBelow;
+        this->m_crossLayer = params->m_layerBelow;
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
     }
 
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
-    int yInAbove = std::max(
-        parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
-    int yInBelow
-        = std::min(parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
-    int yOutAbove = std::max(yInAbove, 0);
-    int yOutBelow = std::min(yInBelow, staffYBottom);
-
-    // Does not work properly with chords, needs rethinking - It might be better to make artic or articPart relative to
-    // notes
-    // The problem is that in MEI artic are children of chord element and not of the notes
-    if (this->IsInsideArtic()) {
-        if (this->GetPlace() == STAFFREL_above) {
-            this->SetDrawingYRel(yInAbove);
-            if (parent->m_crossStaff) {
-                this->m_crossStaff = staffAbove;
-                this->m_crossLayer = crossLayer;
-            }
-        }
-        else {
-            ThisOrSameasAsLink()->SetDrawingYRel(yInBelow);
-            if (parent->m_crossStaff) {
-                this->m_crossStaff = staffBelow;
-                this->m_crossLayer = crossLayer;
-            }
-        }
+    if (this->GetDrawingPlace() == STAFFREL_above) {
+        yIn = std::max(
+            params->m_parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
+            staffYBottom);
+        yOut = std::max(yIn, 0);
     }
     else {
-        if (this->GetPlace() == STAFFREL_above) {
-            this->SetDrawingYRel(yOutAbove);
-            if (parent->m_crossStaff) {
-                this->m_crossStaff = staffAbove;
-                this->m_crossLayer = crossLayer;
+        yIn = std::min(
+            params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
+            0);
+        yOut = std::min(yIn, staffYBottom);
+    }
+
+    yRel = this->IsInsideArtic() ? yIn : yOut;
+    this->SetDrawingYRel(yRel);
+
+    Artic *previous = NULL;
+    if (this->GetDrawingPlace() == STAFFREL_above && !params->m_articAbove.empty()) {
+        previous = params->m_articAbove.back();
+    }
+    if (this->GetDrawingPlace() == STAFFREL_below && !params->m_articBelow.empty()) {
+        previous = params->m_articBelow.back();
+    }
+
+    if (previous) {
+        if (this->GetDrawingPlace() == STAFFREL_above) {
+            int inTop = previous->GetContentTop();
+            int outBottom = this->GetContentBottom();
+            if (inTop > outBottom) {
+                this->SetDrawingYRel(this->GetDrawingYRel() + inTop - outBottom);
             }
         }
         else {
-            this->SetDrawingYRel(yOutBelow);
-            if (parent->m_crossStaff) {
-                this->m_crossStaff = staffBelow;
-                this->m_crossLayer = crossLayer;
+            int inBottom = previous->GetContentBottom();
+            int outTop = this->GetContentTop();
+            if (inBottom < outTop) {
+                this->SetDrawingYRel(this->GetDrawingYRel() - outTop + inBottom);
             }
         }
     }
 
-    // If we have both an inside and outside part we need to move the outside part away when they are both on the same
-    // side
-    /*
-    if (insidePart && outsidePart) {
+    int spacing = 2 * params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int y = this->GetDrawingY();
+    int yShift = 0;
+    int direction = (this->GetDrawingPlace() == STAFFREL_above) ? 1 : -1;
 
-        int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
-            * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
-        if (insidePart->GetPlace() == outsidePart->GetPlace()) {
-            if (insidePart->GetPlace() == STAFFREL_above) {
-                int inTop = insidePart->GetContentTop();
-                int outBottom = outsidePart->GetContentBottom();
-                if (inTop > outBottom)
-                    outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + inTop - outBottom + margin);
-            }
-            else {
-                int inBottom = insidePart->GetContentBottom();
-                int outTop = outsidePart->GetContentTop();
-                if (inBottom < outTop)
-                    outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + outTop - inBottom + margin);
-            }
+    if (this->IsInsideArtic()) {
+        // If we are above the top of the  staff, just pile them up
+        if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) yShift += spacing;
+        // If we are below the bottom, just pile the down
+        else if ((this->GetDrawingPlace() == STAFFREL_below)
+            && (y < staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
+            yShift -= spacing;
+        // Otherwise make it fit the staff space
+        else {
+            yShift = staff->GetNearestInterStaffPosition(y, params->m_doc, this->GetDrawingPlace()) - y;
+            if (staff->IsOnStaffLine(y + yShift, params->m_doc))
+                yShift += params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * direction;
         }
     }
-    */
+    // Artic part outside just need to be piled up or down
+    else {
+        yShift += spacing * direction;
+    }
+    this->SetDrawingYRel(this->GetDrawingYRel() + yShift);
+
+    if (this->GetDrawingPlace() == STAFFREL_above) {
+        params->m_articAbove.push_back(this);
+    }
+    else {
+        params->m_articBelow.push_back(this);
+    }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    m_startSlurPositioners.clear();
-    m_endSlurPositioners.clear();
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Artic::AdjustArticWithSlurs(FunctorParams *functorParams)
@@ -465,6 +464,24 @@ int Artic::AdjustArticWithSlurs(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    m_startSlurPositioners.clear();
+    m_endSlurPositioners.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Artic::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    m_drawingPlace = STAFFREL_NONE;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

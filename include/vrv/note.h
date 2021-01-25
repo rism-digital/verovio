@@ -234,6 +234,11 @@ public:
     virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
 
     /**
+     * See Object::CalcArtic
+     */
+    virtual int CalcArtic(FunctorParams *functorParams);
+
+    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);

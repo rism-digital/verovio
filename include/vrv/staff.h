@@ -125,8 +125,7 @@ public:
     void AddLedgerLineAbove(int count, int left, int right, bool cueSize);
     void AddLedgerLineBelow(int count, int left, int right, bool cueSize);
     ///@}
-    
-    
+
     /**
      * Used for calculating clustered information/dot position.
      * The *Doc is the parent doc but passed as param in order to avoid look-up

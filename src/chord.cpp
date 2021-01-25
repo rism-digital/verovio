@@ -290,7 +290,7 @@ int Chord::GetXMax()
     return x;
 }
 
-void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
+void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow, Layer **layerAbove, Layer **layerBelow)
 {
     staffAbove = NULL;
     staffBelow = NULL;
@@ -303,6 +303,7 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
     assert(bottomNote);
     if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
         staffBelow = bottomNote->m_crossStaff;
+        if (layerBelow) (*layerBelow) = bottomNote->m_crossLayer;
     }
 
     // The last note is the top
@@ -310,6 +311,7 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
     assert(topNote);
     if (topNote->m_crossStaff && topNote->m_crossLayer) {
         staffAbove = topNote->m_crossStaff;
+        if (layerAbove) (*layerAbove) = topNote->m_crossLayer;
     }
 }
 
@@ -503,6 +505,54 @@ int Chord::ConvertMarkupArticEnd(FunctorParams *functorParams)
         artic->SplitMultival(this);
     }
     params->m_articsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::CalcArtic(FunctorParams *functorParams)
+{
+    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
+    assert(params);
+
+    params->m_parent = this;
+    params->m_articAbove.clear();
+    params->m_articBelow.clear();
+    params->m_stemDir = this->GetDrawingStemDir();
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    params->m_staffAbove = staff;
+    params->m_staffBelow = staff;
+    params->m_layerAbove = layer;
+    params->m_layerBelow = layer;
+    params->m_crossStaffAbove = false;
+    params->m_crossStaffBelow = false;
+
+    if (this->m_crossStaff) {
+        params->m_staffAbove = this->m_crossStaff;
+        params->m_staffBelow = this->m_crossStaff;
+        params->m_layerAbove = this->m_crossLayer;
+        params->m_layerBelow = this->m_crossLayer;
+        params->m_crossStaffAbove = true;
+        params->m_crossStaffBelow = true;
+    }
+    else {
+        this->GetCrossStaffExtremes(
+            params->m_staffAbove, params->m_staffBelow, &params->m_layerAbove, &params->m_layerBelow);
+        if (params->m_staffAbove) {
+            params->m_crossStaffAbove = true;
+            params->m_staffBelow = staff;
+            params->m_layerBelow = layer;
+        }
+        else if (params->m_staffBelow) {
+            params->m_crossStaffBelow = true;
+            params->m_staffAbove = staff;
+            params->m_layerAbove = layer;
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }
