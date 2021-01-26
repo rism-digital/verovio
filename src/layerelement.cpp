@@ -469,23 +469,27 @@ void LayerElement::CenterDrawingX()
 
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
-    if (this->Is({ NOTE, CHORD })) {
-        if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
-            if (articY != VRV_UNSET) return articY;
-        }
+    if (this->Is({ NOTE, CHORD }) && withArtic) {
+        int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
+        if (articY != VRV_UNSET) return articY;
+    }
+
+    Note *note = NULL;
+    if (this->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this);
+        assert(chord);
+        note = chord->GetTopNote();
+    }
+    else if (this->Is(NOTE)) {
+        note = vrv_cast<Note *>(this);
+        assert(note);
+    }
+
+    if (note) {
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
-            if (this->Is(CHORD)) {
-                int yChordMax = 0, yChordMin = 0;
-                Chord *chord = vrv_cast<Chord *>(this);
-                assert(chord);
-                chord->GetYExtremes(yChordMax, yChordMin);
-                return yChordMax + doc->GetDrawingUnit(staffSize);
-            }
-            else
-                return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
+            return note->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         }
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
@@ -495,7 +499,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticTy
         }
         else {
             // This does not take into account the glyph actual size.
-            return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
+            return note->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         }
     }
     return this->GetDrawingY();
@@ -503,30 +507,34 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticTy
 
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
-    if (this->Is({ NOTE, CHORD })) {
-        if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
-            if (articY != -VRV_UNSET) return articY;
-        }
+    if (this->Is({ NOTE, CHORD }) && withArtic) {
+        int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
+        if (articY != -VRV_UNSET) return articY;
+    }
+
+    Note *note = NULL;
+    if (this->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this);
+        assert(chord);
+        note = chord->GetBottomNote();
+    }
+    else if (this->Is(NOTE)) {
+        note = vrv_cast<Note *>(this);
+        assert(note);
+    }
+
+    if (note) {
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
-            if (this->Is(CHORD)) {
-                int yChordMax = 0, yChordMin = 0;
-                Chord *chord = vrv_cast<Chord *>(this);
-                assert(chord);
-                chord->GetYExtremes(yChordMax, yChordMin);
-                return yChordMin - doc->GetDrawingUnit(staffSize);
-            }
-            else
-                return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
+            return note->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         }
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
             // This does not take into account the glyph actual size.
-            return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
+            return note->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         }
         else {
             return stemmedDrawingInterface->GetDrawingStemEnd(this).y;
