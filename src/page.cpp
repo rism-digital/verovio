@@ -290,6 +290,11 @@ void Page::LayOutHorizontally()
     Functor calcDots(&Object::CalcDots);
     this->Process(&calcDots, &calcDotsParams);
 
+    // Adjust the position of outside articulations
+    CalcArticParams calcArticParams(doc);
+    Functor calcArtic(&Object::CalcArtic);
+    this->Process(&calcArtic, &calcArticParams);
+
     // Render it for filling the bounding box
     View view;
     view.SetDoc(doc);
@@ -297,6 +302,11 @@ void Page::LayOutHorizontally()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    // Adjust the position of outside articulations
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
 
     // Adjust the x position of the LayerElement where multiple layer collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
@@ -386,11 +396,6 @@ void Page::LayOutVertically()
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
-    // Adjust the position of outside articulations
-    CalcArticParams calcArticParams(doc);
-    Functor calcArtic(&Object::CalcArtic);
-    this->Process(&calcArtic, &calcArticParams);
-
     // Render it for filling the bounding box
     View view;
     BBoxDeviceContext bBoxDC(&view, 0, 0);
@@ -398,11 +403,6 @@ void Page::LayOutVertically()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
-
-    // Adjust the position of outside articulations
-    AdjustArticParams adjustArticParams(doc);
-    Functor adjustArtic(&Object::AdjustArtic);
-    this->Process(&adjustArtic, &adjustArticParams);
 
     // Adjust the position of outside articulations with slurs end and start positions
     FunctorDocParams adjustArticWithSlursParams(doc);

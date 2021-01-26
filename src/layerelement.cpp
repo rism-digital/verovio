@@ -413,34 +413,24 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticTy
     // It would not crash otherwise but there is not reason to call it
     assert(this->Is({ NOTE, CHORD }));
 
-    // We limit support to two artic elements, get them by searching in both directions
-    Artic *firstArtic = dynamic_cast<Artic *>(this->FindDescendantByType(ARTIC));
-    Artic *lastArtic = dynamic_cast<Artic *>(this->FindDescendantByType(ARTIC, UNLIMITED_DEPTH, BACKWARD));
-    // If they are the same (we have only one artic child), then ignore the second one
-    if (firstArtic == lastArtic) lastArtic = NULL;
-    // Look for the outside part first if necessary
-    if (type == ARTIC_OUTSIDE) {
-        if (firstArtic && (firstArtic->GetDrawingPlace() != place)) firstArtic = NULL;
-        if (lastArtic && (lastArtic->GetDrawingPlace() != place)) lastArtic = NULL;
-    }
-    // Looking at the inside if nothing is given outside
-    if (firstArtic && firstArtic->IsInsideArtic()) {
-        if (firstArtic->GetDrawingPlace() != place) firstArtic = NULL;
-    }
-    if (lastArtic && lastArtic->IsInsideArtic()) {
-        if (lastArtic->GetDrawingPlace() != place) lastArtic = NULL;
+    ClassIdComparison isArtic(ARTIC);
+    ListOfObjects artics;
+    // Process backward because we want the farest away artic
+    this->FindAllDescendantByComparison(&artics, &isArtic, UNLIMITED_DEPTH, BACKWARD);
+
+    Artic *artic = NULL;
+    for (auto &child : artics) {
+        artic = vrv_cast<Artic *>(child);
+        assert(artic);
+        if (artic->GetDrawingPlace() == place) break;
     }
 
-    if (place == STAFFREL_above) {
-        int firstY = !firstArtic ? VRV_UNSET : firstArtic->GetSelfTop();
-        int lastY = !lastArtic ? VRV_UNSET : lastArtic->GetSelfTop();
-        return std::max(firstY, lastY);
+    int y = (place == STAFFREL_above) ? VRV_UNSET : -VRV_UNSET;
+    if (artic) {
+        y = (place == STAFFREL_above) ? artic->GetSelfTop() : artic->GetSelfBottom();
     }
-    else {
-        int firstY = !firstArtic ? -VRV_UNSET : firstArtic->GetSelfBottom();
-        int lastY = !lastArtic ? -VRV_UNSET : lastArtic->GetSelfBottom();
-        return std::min(firstY, lastY);
-    }
+
+    return y;
 }
 
 void LayerElement::SetDrawingXRel(int drawingXRel)

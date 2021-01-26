@@ -330,20 +330,20 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         m_drawingPlace = STAFFREL_above;
     }
 
-    /************** adjust the xRel position **************/
-
-    int xShift = params->m_parent->GetDrawingRadius(params->m_doc);
-    this->SetDrawingXRel(xShift);
-
-    /************** set it to both the inside and outside part **************/
-
+    // Not sure what this is anymore...
     if (this->IsOutsideArtic()) {
         // If allowAbove is true it will place the above if the content requires so (even if place below if given)
         if (m_drawingPlace == STAFFREL_below && allowAbove && this->AlwaysAbove()) m_drawingPlace = STAFFREL_above;
     }
 
-    /************** calculate the y position **************/
+    /************** adjust the xRel position **************/
 
+    int xShift = params->m_parent->GetDrawingRadius(params->m_doc);
+    this->SetDrawingXRel(xShift);
+
+    /************** set cross-staff / layer **************/
+
+    // Exception for artic because they are relative to the staff - we set m_crossStaff and m_crossLayer
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
         this->m_crossStaff = params->m_staffAbove;
         this->m_crossLayer = params->m_layerAbove;
@@ -368,6 +368,8 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     if (!params->m_parent) return FUNCTOR_CONTINUE;
 
     int yIn, yOut, yRel;
+
+    // Get the parent or cross-staff / layer
 
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
@@ -397,31 +399,26 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     yRel = this->IsInsideArtic() ? yIn : yOut;
     this->SetDrawingYRel(yRel);
 
+    // Adjust according to the position of a previous artic
     Artic *previous = NULL;
     if (this->GetDrawingPlace() == STAFFREL_above && !params->m_articAbove.empty()) {
         previous = params->m_articAbove.back();
+        int inTop = previous->GetContentTop();
+        int outBottom = this->GetContentBottom();
+        if (inTop > outBottom) {
+            this->SetDrawingYRel(this->GetDrawingYRel() + inTop - outBottom);
+        }
     }
     if (this->GetDrawingPlace() == STAFFREL_below && !params->m_articBelow.empty()) {
         previous = params->m_articBelow.back();
-    }
-
-    if (previous) {
-        if (this->GetDrawingPlace() == STAFFREL_above) {
-            int inTop = previous->GetContentTop();
-            int outBottom = this->GetContentBottom();
-            if (inTop > outBottom) {
-                this->SetDrawingYRel(this->GetDrawingYRel() + inTop - outBottom);
-            }
-        }
-        else {
-            int inBottom = previous->GetContentBottom();
-            int outTop = this->GetContentTop();
-            if (inBottom < outTop) {
-                this->SetDrawingYRel(this->GetDrawingYRel() - outTop + inBottom);
-            }
+        int inBottom = previous->GetContentBottom();
+        int outTop = this->GetContentTop();
+        if (inBottom < outTop) {
+            this->SetDrawingYRel(this->GetDrawingYRel() - outTop + inBottom);
         }
     }
 
+    // Add spacing
     int spacing = 1.5 * params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y = this->GetDrawingY();
     int yShift = 0;
@@ -429,11 +426,14 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     if (this->IsInsideArtic()) {
         // If we are above the top of the  staff, just pile them up
-        if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) yShift += spacing;
+        if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) {
+            yShift += spacing;
+        }
         // If we are below the bottom, just pile the down
         else if ((this->GetDrawingPlace() == STAFFREL_below)
-            && (y < staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
+            && (y < staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
             yShift -= spacing;
+        }
         // Otherwise make it fit the staff space
         else {
             yShift = staff->GetNearestInterStaffPosition(y, params->m_doc, this->GetDrawingPlace()) - y;
@@ -447,6 +447,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     }
     this->SetDrawingYRel(this->GetDrawingYRel() + yShift);
 
+    // Add it to the list of previous artics - actually keeping only the last one could be sufficient?
     if (this->GetDrawingPlace() == STAFFREL_above) {
         params->m_articAbove.push_back(this);
     }
