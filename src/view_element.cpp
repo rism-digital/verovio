@@ -1191,11 +1191,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     const int num = std::min(multiRest->GetNum(), 999);
 
     // Position centered in staff
-    y1 = staff->GetDrawingY();
-    y2 = y1 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
+    y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
     if (multiRest->HasLoc()) {
         y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
     }
+    y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if (((num > 4) && !multiRest->HasBlock()) || (num > 15) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
@@ -1205,8 +1205,6 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             width = (width > fixedWidth) ? fixedWidth : width;
         }
         if (width > m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 4) {
-            y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-
             // xCentered is the central point, claculate x and x2
             x1 = xCentered - width / 2;
             x2 = xCentered + width / 2;
@@ -1225,13 +1223,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
                 dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
 
             dc->ReactivateGraphic();
-
         }
     }
     else {
         // Position centered in staff
-        y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 += (staff->m_drawingLines%2 != 0) ? m_doc->GetDrawingUnit(staff->m_drawingStaffSize) : 0;
 
         const int lgWidth = m_doc->GetGlyphWidth(SMUFL_E4E1_restLonga, staff->m_drawingStaffSize, false);
         const int brWidth = m_doc->GetGlyphWidth(SMUFL_E4E2_restDoubleWhole, staff->m_drawingStaffSize, false);
