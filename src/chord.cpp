@@ -515,8 +515,6 @@ int Chord::CalcArtic(FunctorParams *functorParams)
     assert(params);
 
     params->m_parent = this;
-    params->m_articAbove.clear();
-    params->m_articBelow.clear();
     params->m_stemDir = this->GetDrawingStemDir();
 
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
@@ -553,6 +551,18 @@ int Chord::CalcArtic(FunctorParams *functorParams)
             params->m_layerAbove = layer;
         }
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::AdjustArtic(FunctorParams *functorParams)
+{
+    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
+    assert(params);
+
+    params->m_parent = this;
+    params->m_articAbove.clear();
+    params->m_articBelow.clear();
 
     return FUNCTOR_CONTINUE;
 }

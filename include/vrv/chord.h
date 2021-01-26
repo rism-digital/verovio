@@ -160,6 +160,11 @@ public:
     virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustArtic
+     */
+    virtual int AdjustArtic(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertMarkupArtic
      */
     virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);

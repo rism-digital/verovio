@@ -784,8 +784,6 @@ int Note::CalcArtic(FunctorParams *functorParams)
     if (this->IsChordTone()) return FUNCTOR_CONTINUE;
 
     params->m_parent = this;
-    params->m_articAbove.clear();
-    params->m_articBelow.clear();
     params->m_stemDir = this->GetDrawingStemDir();
 
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
@@ -808,6 +806,20 @@ int Note::CalcArtic(FunctorParams *functorParams)
         params->m_crossStaffAbove = true;
         params->m_crossStaffBelow = true;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::AdjustArtic(FunctorParams *functorParams)
+{
+    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
+    assert(params);
+
+    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
+
+    params->m_parent = this;
+    params->m_articAbove.clear();
+    params->m_articBelow.clear();
 
     return FUNCTOR_CONTINUE;
 }

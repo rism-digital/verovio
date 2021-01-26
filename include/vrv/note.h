@@ -224,6 +224,11 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustArtic
+     */
+    virtual int AdjustArtic(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
     virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);

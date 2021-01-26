@@ -399,6 +399,11 @@ void Page::LayOutVertically()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Adjust the position of outside articulations
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
+
     // Adjust the position of outside articulations with slurs end and start positions
     FunctorDocParams adjustArticWithSlursParams(doc);
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);

@@ -184,6 +184,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class AdjustArticParams : public FunctorParams {
+public:
+    AdjustArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+    }
+    std::list<Artic *> m_articAbove;
+    std::list<Artic *> m_articBelow;
+    LayerElement *m_parent;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
 
@@ -752,8 +774,6 @@ public:
         m_crossStaffAbove = false;
         m_crossStaffBelow = false;
     }
-    std::list<Artic *> m_articAbove;
-    std::list<Artic *> m_articBelow;
     LayerElement *m_parent;
     data_STEMDIRECTION m_stemDir;
     Staff *m_staffAbove;

@@ -104,6 +104,11 @@ public:
     virtual int CalcArtic(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustArtic
+     */
+    virtual int AdjustArtic(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustArticWithSlurs
      */
     virtual int AdjustArticWithSlurs(FunctorParams *functorParams);

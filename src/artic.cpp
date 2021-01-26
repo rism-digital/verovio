@@ -295,8 +295,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
     assert(params);
 
-    int yIn, yOut, yRel;
-
     if (!params->m_parent) return FUNCTOR_CONTINUE;
 
     /************** placement **************/
@@ -359,6 +357,28 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         layer = this->m_crossLayer;
     }
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Artic::AdjustArtic(FunctorParams *functorParams)
+{
+    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_parent) return FUNCTOR_CONTINUE;
+
+    int yIn, yOut, yRel;
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    if (this->m_crossStaff && this->m_crossLayer) {
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
+    }
+
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
@@ -402,7 +422,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         }
     }
 
-    int spacing = 2 * params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int spacing = 1.5 * params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y = this->GetDrawingY();
     int yShift = 0;
     int direction = (this->GetDrawingPlace() == STAFFREL_above) ? 1 : -1;
@@ -468,6 +488,9 @@ int Artic::AdjustArticWithSlurs(FunctorParams *functorParams)
 
 int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetVerticalAlignment(functorParams);
+
     m_startSlurPositioners.clear();
     m_endSlurPositioners.clear();
 
