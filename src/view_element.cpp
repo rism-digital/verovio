@@ -1191,7 +1191,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     const int num = std::min(multiRest->GetNum(), 999);
 
     // Position centered in staff
-    y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
+    y1 = staff->GetDrawingY();
+    y2 = y1 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
     if (multiRest->HasLoc()) {
         y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
     }
@@ -1203,27 +1204,29 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             const int fixedWidth = multiRest->AttWidth::GetWidth() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             width = (width > fixedWidth) ? fixedWidth : width;
         }
+        if (width > m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 4) {
+            y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-        // a is the central point, claculate x and x2
-        x1 = xCentered - width / 2;
-        x2 = xCentered + width / 2;
+            // xCentered is the central point, claculate x and x2
+            x1 = xCentered - width / 2;
+            x2 = xCentered + width / 2;
 
-        y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            // bounding box is not relevant for the multi-rest rectangle
+            dc->DeactivateGraphicX();
 
-        // bounding box is not relevant for the multi-rest rectangle
-        dc->DeactivateGraphicX();
+            // Draw the base rect
+            DrawFilledRectangle(dc, x1, y1, x2, y2);
 
-        // Draw the base rect
-        DrawFilledRectangle(dc, x1, y1, x2, y2);
+            // Draw two lines at beginning and end
+            int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            DrawFilledRectangle(
+                dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
+            DrawFilledRectangle(
+                dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
 
-        // Draw two lines at beginning and end
-        int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        DrawFilledRectangle(
-            dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
-        DrawFilledRectangle(
-            dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
+            dc->ReactivateGraphic();
 
-        dc->ReactivateGraphic();
+        }
     }
     else {
         // Position centered in staff
