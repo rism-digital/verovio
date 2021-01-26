@@ -2852,8 +2852,15 @@ void MusicXmlInput::ReadMusicXmlNote(
                 Artic *artic = new Artic();
                 artics.push_back(ConvertArticulations(articulation.name()));
                 if (!std::strcmp(articulation.name(), "detached-legato")) {
+                    // we need to split up this one
                     artics.clear();
                     artics.push_back(ARTICULATION_stacc);
+                    artic->SetArtic(artics);
+                    artic->SetColor(articulation.attribute("color").as_string());
+                    artic->SetPlace(artic->AttPlacement::StrToStaffrel(articulation.attribute("placement").as_string()));
+                    element->AddChild(artic);
+                    artics.clear();
+                    artic = new Artic();
                     artics.push_back(ARTICULATION_ten);
                 }
                 if (artics.back() == ARTICULATION_NONE) {
