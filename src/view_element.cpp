@@ -771,7 +771,16 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
+        // Recalculate y from pitch to prevent visual/meaning mismatch
+        Clef *clef = layer->GetClef(element);
         y = ToLogicalY(staff->GetDrawingY());
+        PitchInterface pi;
+        pi.SetPname(PITCHNAME_c);
+        pi.SetOct(3);
+        // Convert from lines & spaces from bottom to from top
+        int C3OffsetFromTop = ((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset();
+        int custosOffsetFromTop = C3OffsetFromTop + pi.PitchDifferenceTo(custos);
+        y -= custosOffsetFromTop * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
         x = element->GetDrawingX();
