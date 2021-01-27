@@ -2853,8 +2853,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                 artics.push_back(ConvertArticulations(articulation.name()));
                 if (!std::strcmp(articulation.name(), "detached-legato")) {
                     // we need to split up this one
-                    artics.clear();
-                    artics.push_back(ARTICULATION_stacc);
                     artic->SetArtic(artics);
                     artic->SetColor(articulation.attribute("color").as_string());
                     artic->SetPlace(artic->AttPlacement::StrToStaffrel(articulation.attribute("placement").as_string()));
@@ -3509,7 +3507,7 @@ data_ARTICULATION MusicXmlInput::ConvertArticulations(const std::string &value)
     static const std::map<std::string, data_ARTICULATION> Articulations2Id{
         // articulations
         { "accent", ARTICULATION_acc }, //
-        { "detached-legato", ARTICULATION_NONE }, //
+        { "detached-legato", ARTICULATION_stacc }, //
         { "doit", ARTICULATION_doit }, //
         { "falloff", ARTICULATION_fall }, //
         { "plop", ARTICULATION_plop }, //
