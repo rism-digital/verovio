@@ -80,11 +80,6 @@ public:
      */
     wchar_t GetRestGlyph() const;
 
-    /**
-     * Get the vertical offset for each glyph.
-     */
-    int GetRestLocOffset(int loc);
-
     //----------//
     // Functors //
     //----------//

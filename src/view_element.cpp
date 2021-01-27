@@ -1108,6 +1108,24 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     DrawSmuflCode(dc, x, y, rest, staff->m_drawingStaffSize, drawingCueSize);
 
+    // single legder line for whole rest glyphs
+    if ((measure->m_measureAligner.GetMaxTime() < (DUR_MAX * 2))
+        && (y > staff->GetDrawingY()
+            || y < staff->GetDrawingY()
+                    - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
+        const int width = m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, drawingCueSize);
+        int ledgerLineThickness
+            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int ledgerLineExtension
+            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (drawingCueSize) {
+            ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
+            ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
+        }
+
+        DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+    }
+
     dc->EndGraphic(element, this);
 }
 
@@ -1180,8 +1198,6 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     multiRest->CenterDrawingX();
 
-    int x1, x2, y1, y2;
-
     dc->StartGraphic(element, "", element->GetUuid());
 
     const int measureWidth = measure->GetInnerWidth();
@@ -1191,10 +1207,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     const int num = std::min(multiRest->GetNum(), 999);
 
     // Position centered in staff
-    y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
+    int y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
     if (multiRest->HasLoc()) {
         y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
     }
+    int y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if (((num > 4) && !multiRest->HasBlock()) || (num > 15) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
@@ -1203,32 +1220,32 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             const int fixedWidth = multiRest->AttWidth::GetWidth() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             width = (width > fixedWidth) ? fixedWidth : width;
         }
+        if (width > m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 4) {
+            // xCentered is the central point, calculate x1 and x2
+            const int x1 = xCentered - width / 2;
+            const int x2 = xCentered + width / 2;
 
-        // a is the central point, claculate x and x2
-        x1 = xCentered - width / 2;
-        x2 = xCentered + width / 2;
+            // bounding box is not relevant for the multi-rest rectangle
+            dc->DeactivateGraphicX();
 
-        y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            // Draw the base rect
+            DrawFilledRectangle(dc, x1, y1, x2, y2);
 
-        // bounding box is not relevant for the multi-rest rectangle
-        dc->DeactivateGraphicX();
+            // Draw two lines at beginning and end
+            int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            DrawFilledRectangle(
+                dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
+            DrawFilledRectangle(
+                dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
 
-        // Draw the base rect
-        DrawFilledRectangle(dc, x1, y1, x2, y2);
-
-        // Draw two lines at beginning and end
-        int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        DrawFilledRectangle(
-            dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
-        DrawFilledRectangle(
-            dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
-
-        dc->ReactivateGraphic();
+            dc->ReactivateGraphic();
+        }
     }
     else {
-        // Position centered in staff
-        y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        if (staff->m_drawingLines % 2 != 0) {
+            y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
 
         const int lgWidth = m_doc->GetGlyphWidth(SMUFL_E4E1_restLonga, staff->m_drawingStaffSize, false);
         const int brWidth = m_doc->GetGlyphWidth(SMUFL_E4E2_restDoubleWhole, staff->m_drawingStaffSize, false);
@@ -1238,7 +1255,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         width += ((num % 4) / 2) * (brWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         width = (num % 2) ? width + sbWidth : width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        x1 = xCentered - width / 2;
+        int x1 = xCentered - width / 2;
 
         int count = num;
         while ((count / 4)) {
