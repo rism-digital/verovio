@@ -89,3 +89,6 @@ Debug/
 Release/
 *.vcxproj*
 *.sln
+
+# Fonts
+fonts/tmp/
