@@ -193,9 +193,37 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
 bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 {
+    assert(start);
+    assert(end);
+
+    // It is too inefficient to look for chord and notes over the entire system
+    // We need first to get a list of measures
+    Object *measureStart = start->GetFirstAncestor(MEASURE);
+    assert(measureStart);
+    Object *measureEnd = end->GetFirstAncestor(MEASURE);
+    assert(measureEnd);
+    ListOfObjects measures;
+
+    // start and end are in the same measure, this is the only one we need
+    if (measureStart == measureEnd) {
+        measures.push_back(measureStart);
+    }
+    // otherwise look for a measures in between
+    else {
+        ClassIdComparison isMeasure(MEASURE);
+        Functor findAllBetween(&Object::FindAllBetween);
+        FindAllBetweenParams findAllBetweenParams(&isMeasure, &measures, measureStart, measureEnd);
+        this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, 1);
+    }
+
+    // Now we can look for chords and note
     ClassIdsComparison matchType({ CHORD, NOTE });
     ListOfObjects children;
-    this->FindAllDescendantBetween(&children, &matchType, start, end);
+    for (auto &measure : measures) {
+        Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
+        Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
+        measure->FindAllDescendantBetween(&children, &matchType, curStart, curEnd, false);
+    }
 
     Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
