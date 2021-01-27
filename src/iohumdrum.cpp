@@ -12345,7 +12345,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         else if (hre.search(letters, "^m?(f|p)$")) {
             dynamic = letters;
         }
-        else if (hre.search(letters, "^s?f+p+$")) {
+        else if (hre.search(letters, "^s?f+z?p+$")) {
             dynamic = letters;
         }
         if (!dynamic.empty()) {
