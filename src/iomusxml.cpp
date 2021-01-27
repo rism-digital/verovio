@@ -2855,7 +2855,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                     // we need to split up this one
                     artic->SetArtic(artics);
                     artic->SetColor(articulation.attribute("color").as_string());
-                    artic->SetPlace(artic->AttPlacement::StrToStaffrel(articulation.attribute("placement").as_string()));
+                    artic->SetPlace(
+                        artic->AttPlacement::StrToStaffrel(articulation.attribute("placement").as_string()));
                     element->AddChild(artic);
                     artics.clear();
                     artic = new Artic();
