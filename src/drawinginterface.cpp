@@ -21,6 +21,19 @@
 
 namespace vrv {
 
+enum class NoteDirection {
+    none,
+    upward,
+    downward
+};
+
+// helper for determining note direction
+NoteDirection GetNoteDirection(int leftNoteX, int rightNoteX)
+{
+    if (leftNoteX == rightNoteX) return NoteDirection::none;
+    return (leftNoteX < rightNoteX) ? NoteDirection::upward : NoteDirection::downward;
+}
+
 //----------------------------------------------------------------------------
 // DrawingListInterface
 //----------------------------------------------------------------------------
@@ -268,14 +281,16 @@ bool BeamDrawingInterface::IsHorizontal()
     int elementCount = (int)m_beamElementCoords.size();
 
     std::vector<int> items;
+    std::vector<data_BEAMPLACE> directions;
     items.reserve(m_beamElementCoords.size());
+    directions.reserve(m_beamElementCoords.size());
 
-    int i;
-    for (i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoords.at(i);
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
         items.push_back(coord->m_closestNote->GetDrawingY());
+        directions.push_back(coord->m_beamRelativePlace);
     }
     int itemCount = (int)items.size();
 
@@ -288,12 +303,58 @@ bool BeamDrawingInterface::IsHorizontal()
     if (first == last) return true;
 
     // Detect concave shapes
-    for (i = 1; i < itemCount - 1; ++i) {
+    for (int i = 1; i < itemCount - 1; ++i) {
         if (m_drawingPlace == BEAMPLACE_above) {
             if ((items.at(i) >= first) && (items.at(i) >= last)) return true;
         }
-        else {
+        else if (m_drawingPlace == BEAMPLACE_below) {
             if ((items.at(i) <= first) && (items.at(i) <= last)) return true;
+        }
+    }
+    if (m_drawingPlace == BEAMPLACE_mixed) {
+        if ((itemCount == 3) && (directions.front() == directions.back())) return true;
+        int directionChanges = 0;
+        data_BEAMPLACE previous = directions.front();
+        std::for_each(directions.begin(), directions.end(), [&previous, &directionChanges](data_BEAMPLACE current) {
+            if (current != previous) {
+                ++directionChanges;
+                previous = current;
+            }
+        });
+        // if we have a mix of cross-staff elements, going from one staff to another repeatedly, we need to check note
+        // directions. Otherwise we can use direction of the outside pitches for beam
+        if (directionChanges > 1) {
+            int previousTop = VRV_UNSET;
+            int previousBottom = VRV_UNSET;
+            NoteDirection outsidePitchDirection = GetNoteDirection(first, last);
+            std::map<NoteDirection, int> beamDirections{ { NoteDirection::none, 0 }, { NoteDirection::upward, 0 },
+                { NoteDirection::downward, 0 } };
+            for (int i = 0; i < itemCount; ++i) {
+                if (directions[i] == BEAMPLACE_above) {
+                    if (previousTop == VRV_UNSET) {
+                        previousTop = items[i];
+                    }
+                    else {
+                        ++beamDirections[GetNoteDirection(previousTop, items[i])];
+                    }
+                }
+                else if (directions[i] == BEAMPLACE_below) {
+                    if (previousBottom == VRV_UNSET) {
+                        previousBottom = items[i];
+                    }
+                    else {
+                        ++beamDirections[GetNoteDirection(previousBottom, items[i])];
+                    }
+                }
+            }
+            // if direction of beam outside pitches corresponds to majority of the note directions within the beam, beam
+            // can be drawn in that direction. Otherwise horizontal beam should be used
+            bool result = std::all_of(beamDirections.begin(), beamDirections.end(),
+                [&beamDirections, &outsidePitchDirection](const auto &pair) {
+                    return (pair.first == outsidePitchDirection) ? true
+                                                                 : pair.second <= beamDirections[outsidePitchDirection];
+                });
+            if (!result) return true;
         }
     }
 
