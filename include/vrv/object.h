@@ -634,6 +634,15 @@ public:
     ///@}
 
     /**
+     * Convert markup of artic@artic multi value into distinct artic elements.
+     * See Doc::ConvertMarkupAnalyticalDoc
+     */
+    ///@{
+    virtual int ConvertMarkupArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
      * See Doc::ConvertScoreDefMarkupDoc
      */
@@ -824,6 +833,11 @@ public:
      * Adjust the postion position of slurs.
      */
     virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the articulations.
+     */
+    virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position the outside articulations with slur.
