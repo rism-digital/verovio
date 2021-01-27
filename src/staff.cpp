@@ -285,7 +285,7 @@ int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
     int yPos = y - this->GetDrawingY();
     int distance = yPos % doc->GetDrawingUnit(this->m_drawingStaffSize);
     if (place == STAFFREL_above) {
-        // if (distance > 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) - distance;
+        if (distance > 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) - distance;
         return y - distance + doc->GetDrawingUnit(this->m_drawingStaffSize);
     }
     else {
