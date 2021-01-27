@@ -638,7 +638,9 @@ bool HumdrumInput::convertHumdrum()
 
     extractNullInformation(m_nulls, infile);
 
-    prepareTimeSigDur();
+    int top = -1;
+    int bot = -1;
+    prepareTimeSigDur(top, bot);
     setupMeiDocument();
 
     // Create a list of the parts and which spine represents them.
@@ -729,7 +731,7 @@ bool HumdrumInput::convertHumdrum()
     prepareSections();
 
     prepareHeaderFooter();
-    prepareStaffGroups();
+    prepareStaffGroups(top, bot);
 
     // m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
@@ -2037,7 +2039,7 @@ void HumdrumInput::prepareVerses()
 //      the first spine in the file is considered.
 //
 
-void HumdrumInput::prepareTimeSigDur()
+void HumdrumInput::prepareTimeSigDur(int &top, int &bot)
 {
     std::vector<hum::HumNum> &sigdurs = m_timesigdurs;
     hum::HumdrumFile &infile = m_infiles[0];
@@ -2066,8 +2068,6 @@ void HumdrumInput::prepareTimeSigDur()
     }
 
     hum::HumNum curdur = -1;
-    int top;
-    int bot;
     int bot2;
     int line;
 
@@ -2129,12 +2129,12 @@ void HumdrumInput::calculateReverseKernIndex()
 //    group by brackets/bar groupings
 //
 
-void HumdrumInput::prepareStaffGroups()
+void HumdrumInput::prepareStaffGroups(int top, int bot)
 {
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     if (staffstarts.size() > 0) {
-        addMidiTempo(m_doc->m_mdivScoreDef, staffstarts[0]);
+        addMidiTempo(m_doc->m_mdivScoreDef, staffstarts[0], top, bot);
     }
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
@@ -4128,8 +4128,14 @@ string HumdrumInput::getSystemDecoration(const std::string &tag)
 // HumdrumInput::addMidiTempo --
 //
 
-void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart)
+void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top, int bot)
 {
+    if (top <= 0) {
+        top = 4;
+    }
+    if (bot <= 0) {
+        bot = 4;
+    }
     bool foundtempo = false;
     while (kernpart != NULL) {
         if (kernpart->isData()) {
@@ -4153,7 +4159,31 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart)
         kernpart = kernpart->getNextToken();
     }
     if (!foundtempo) {
-        addDefaultTempo(m_scoreDef);
+        hum::HumdrumFile &infile = *(kernpart->getOwner()->getOwner());
+        hum::HumRegex hre;
+        hum::HTp omd = NULL;
+        for (int i = 0; i < infile.getLineCount(); i++) {
+            if (infile[i].isData()) {
+                break;
+            }
+            hum::HTp token = infile[i].token(0);
+            if (hre.search(token, "!!!OMD")) {
+                omd = token;
+                break;
+            }
+        }
+        if (omd) {
+            int guess = hum::Convert::tempoNameToMm(*omd, bot, top);
+            if (guess > 0) {
+                m_scoreDef.SetMidiBpm(guess);
+            }
+            else {
+                addDefaultTempo(m_scoreDef);
+            }
+        }
+        else {
+            addDefaultTempo(m_scoreDef);
+        }
     }
 }
 

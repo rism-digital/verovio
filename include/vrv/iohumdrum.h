@@ -401,7 +401,7 @@ protected:
     void calculateLayout();
     void setSystemMeasureStyle(int startline, int endline);
     std::vector<int> getStaffLayerCounts();
-    void prepareStaffGroups();
+    void prepareStaffGroups(int top, int bot);
     void setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok = NULL, hum::HTp striatok = NULL);
     void setDynamicTransposition(int staffindex, StaffDef *staff, const std::string &itranspose);
     void setTransposition(StaffDef *staffDef, const std::string &transpose);
@@ -410,7 +410,7 @@ protected:
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
-    void prepareTimeSigDur();
+    void prepareTimeSigDur(int &top, int &bot);
     void printMeasureTokens();
     int characterCount(const std::string &text, char symbol);
     int characterCount(hum::HTp token, char symbol);
@@ -514,7 +514,7 @@ protected:
         std::vector<hum::HTp> &layerdata, int startindex);
     void setTupletLocationId(vrv::Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int startindex);
-    void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
+    void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart, int top, int bot);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);
     void setNextLeftBarStyle(data_BARRENDITION style);
