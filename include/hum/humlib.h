@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 17 19:09:22 PST 2021
+// Last Modified: Wed Jan 27 02:09:08 PST 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1957,6 +1957,7 @@ class HumdrumFileBase : public HumHash {
 		                                        int subtokenindex,
 		                                        const std::string& separator = " ");
 		int           getMaxTrack              (void) const;
+		int           getMaxTracks             (void) const { return getMaxTrack(); }
 		int           getTrackCount            (void) const
 		                                                { return getMaxTrack(); }
 		int           getSpineCount            (void) const
@@ -3733,6 +3734,9 @@ class Convert {
 		static std::string  durationFloatToRecip (double duration,
 		                                     HumNum scale = HumNum(1,4));
 		static HumNum timeSigToDurationInQuarter(HTp token);
+
+		// Tempo processing, defined in Convert-tempo.cpp
+		static int tempoNameToMm (const std::string& name, int bot = 4, int top = 4);
 
 		// Pitch processing, defined in Convert-pitch.cpp
 		static std::string  base40ToKern    (int b40);
@@ -5755,6 +5759,13 @@ class Tool_composite : public HumTool {
 		void        processFile        (HumdrumFile& infile);
 		void        initialize         (void);
 		HumNum      getLineDuration    (HumdrumFile& infile, int index, vector<bool>& isNull);
+		void        setupGrouping      (vector<vector<string>>& grouping, HumdrumFile& infile);
+		void        printGroupingInfo  (vector<vector<string>>& gouping);
+		string      getGroup           (vector<vector<string>>& current, int spine, int subspine);
+		bool        hasGroup           (vector<vector<string>>& grouping, HumdrumFile& infile, int line,
+		                                const string& group);
+		int         getGroupNoteType   (vector<vector<string>>& grouping, HumdrumFile& infile,
+		                                int line, const string& group);
 
 	private:
 		string      m_pitch = "e";
