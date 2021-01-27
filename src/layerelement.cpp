@@ -423,6 +423,8 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticTy
         artic = vrv_cast<Artic *>(child);
         assert(artic);
         if (artic->GetDrawingPlace() == place) break;
+        // otherwise reset it because we test on the pointer below
+        artic = NULL;
     }
 
     int y = (place == STAFFREL_above) ? VRV_UNSET : -VRV_UNSET;
