@@ -1108,6 +1108,24 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     DrawSmuflCode(dc, x, y, rest, staff->m_drawingStaffSize, drawingCueSize);
 
+    // single legder line for whole rest glyphs
+    if ((measure->m_measureAligner.GetMaxTime() < (DUR_MAX * 2))
+        && (y > staff->GetDrawingY()
+            || y < staff->GetDrawingY()
+                    - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
+        const int width = m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, drawingCueSize);
+        int ledgerLineThickness
+            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int ledgerLineExtension
+            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (drawingCueSize) {
+            ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
+            ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
+        }
+
+        DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+    }
+
     dc->EndGraphic(element, this);
 }
 
