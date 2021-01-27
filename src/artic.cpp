@@ -303,6 +303,8 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     assert(staff);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
+    
+    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
 
     if (params->m_parent->m_crossStaff) {
         staff = params->m_parent->m_crossStaff;
@@ -342,19 +344,25 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     this->SetDrawingXRel(xShift);
 
     /************** set cross-staff / layer **************/
-
+    
     // Exception for artic because they are relative to the staff - we set m_crossStaff and m_crossLayer
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
         this->m_crossStaff = params->m_staffAbove;
         this->m_crossLayer = params->m_layerAbove;
-        staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
+        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the parent where the beam is
+        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_below) {
+            this->m_crossStaff = NULL;
+            this->m_crossLayer = NULL;
+        }
     }
     else if (this->GetDrawingPlace() == STAFFREL_below && params->m_crossStaffBelow) {
         this->m_crossStaff = params->m_staffBelow;
         this->m_crossLayer = params->m_layerBelow;
-        staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
+        // Exception - opposite as above
+        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_above) {
+            this->m_crossStaff = NULL;
+            this->m_crossLayer = NULL;
+        }
     }
 
     return FUNCTOR_CONTINUE;
