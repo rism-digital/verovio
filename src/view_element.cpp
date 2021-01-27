@@ -290,10 +290,6 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************** draw the artic **************/
 
     int x = artic->GetDrawingX();
-    // HARDCODED value, we double the default margin for now - should go in styling
-    int yShift = 2 * m_doc->GetTopMargin(artic->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int direction = (artic->GetDrawingPlace() == STAFFREL_above) ? 1 : -1;
-
     int y = artic->GetDrawingY();
 
     int xCorr;
@@ -330,9 +326,6 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if (Artic::VerticalCorr(code, artic->GetDrawingPlace())) baselineCorr = glyphHeight;
 
     DrawSmuflCode(dc, x - xCorr, y - baselineCorr, code, staff->m_drawingStaffSize, drawingCueSize);
-
-    // Adjusting the y position for the next artic
-    y += glyphHeight * direction;
 
     dc->EndGraphic(element, this);
 }
