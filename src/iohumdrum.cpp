@@ -4318,6 +4318,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         else if (part->compare(0, 7, "*scale:") == 0) {
             staffscale = part;
         }
+        else if (part->compare(0, 6, "*size:") == 0) {
+            staffscale = part;
+        }
         else if (part->compare(0, 4, "*Trd") == 0) {
             transpose = *part;
         }
