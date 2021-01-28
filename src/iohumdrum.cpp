@@ -4250,6 +4250,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HTp icode = NULL;
     std::string transpose;
     std::string itranspose;
+    hum::HTp staffscale = NULL;
     std::string timesig;
     hum::HTp timetok = NULL;
     std::string metersig;
@@ -4313,6 +4314,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (hre.search(part, "^\\*[a-gA-G][#-]*:([a-z]{3})?$")) {
             keytok = part;
+        }
+        else if (part->compare(0, 7, "*scale:") == 0) {
+            staffscale = part;
         }
         else if (part->compare(0, 4, "*Trd") == 0) {
             transpose = *part;
@@ -4482,6 +4486,18 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
                 ss.at(partnumber - 1).m_dynampos = 0;
                 ss.at(partnumber - 1).m_dynamstaffadj = 0;
                 ss.at(partnumber - 1).m_dynamposdefined = true;
+            }
+        }
+    }
+
+    if (staffscale != NULL) {
+        auto loc = staffscale->find(":");
+        if (loc != std::string::npos) {
+            std::string value = staffscale->substr(loc + 1);
+            if (!value.empty()) {
+                if (value.back() == '%') {
+                    m_staffdef.back()->SetScale(m_staffdef.back()->AttScalable::StrToPercent(value));
+                }
             }
         }
     }
