@@ -14,9 +14,11 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "layer.h"
 #include "rend.h"
 #include "system.h"
 #include "text.h"
+#include "timeinterface.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -60,6 +62,34 @@ data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment()
     if (!rend || !rend->HasHalign()) return HORIZONTALALIGNMENT_NONE;
 
     return rend->GetHalign();
+}
+
+data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue)
+{
+    // Do this only for the following elements
+    if (!this->Is({ TRILL, MORDENT, TURN })) return defaultValue;
+
+    TimePointInterface *interface = this->GetTimePointInterface();
+    assert(interface);
+
+    LayerElement *start = interface->GetStart();
+    if (!start || start->Is(TIMESTAMP_ATTR)) return defaultValue;
+
+    Layer *layer = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
+    // We are only looking that the element cross-staff. We could use LayerElement::GetCrossStaff(Layer  *&)
+    if (start->m_crossLayer) layer = start->m_crossLayer;
+    assert(layer);
+
+    data_STAFFREL value = defaultValue;
+
+    data_STEMDIRECTION stemDir = layer->GetDrawingStemDir(start);
+    switch (stemDir) {
+        case (STEMDIRECTION_up): value = STAFFREL_above; break;
+        case (STEMDIRECTION_down): value = STAFFREL_below; break;
+        default: break;
+    }
+
+    return value;
 }
 
 //----------------------------------------------------------------------------

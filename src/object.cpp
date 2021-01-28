@@ -1564,18 +1564,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // Ignore beam in cross-staff situation
-    if (this->Is(BEAM)) {
-        Beam *beam = dynamic_cast<Beam *>(this);
-        if (beam && beam->m_isCrossStaff) return FUNCTOR_CONTINUE;
-    }
-
-    // Ignore stem for notes in cross-staff situation and in beams
-    if (this->Is(STEM)) {
-        Note *note = dynamic_cast<Note *>(this->GetParent());
-        if (note && note->m_crossStaff && note->IsInBeam()) return FUNCTOR_CONTINUE;
-    }
-
     if (this->Is(FB) || this->Is(FIGURE)) {
         return FUNCTOR_CONTINUE;
     }
@@ -1595,34 +1583,28 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     LayerElement *current = vrv_cast<LayerElement *>(this);
     assert(current);
 
-    bool skipAbove = false;
-    bool skipBelow = false;
-    Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
-    if (chord && params->m_staffAlignment) {
-        chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
+    StaffAlignment *above = NULL;
+    StaffAlignment *below = NULL;
+    current->GetOverflowStaffAlignments(above, below);
+
+    if (above) {
+        int overflowAbove = above->CalcOverflowAbove(current);
+        int staffSize = above->GetStaffSize();
+        if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+            // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            above->SetOverflowAbove(overflowAbove);
+            above->AddBBoxAbove(current);
+        }
     }
 
-    StaffAlignment *alignment = params->m_staffAlignment;
-    Layer *crossLayer = NULL;
-    Staff *crossStaff = current->GetCrossStaff(crossLayer);
-    if (crossStaff && crossStaff->GetAlignment()) {
-        alignment = crossStaff->GetAlignment();
-    }
-
-    int staffSize = alignment->GetStaffSize();
-
-    int overflowAbove = alignment->CalcOverflowAbove(current);
-    if (!skipAbove && (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
-        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
-        alignment->SetOverflowAbove(overflowAbove);
-        alignment->AddBBoxAbove(current);
-    }
-
-    int overflowBelow = alignment->CalcOverflowBelow(current);
-    if (!skipBelow && (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
-        // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-        alignment->SetOverflowBelow(overflowBelow);
-        alignment->AddBBoxBelow(current);
+    if (below) {
+        int overflowBelow = below->CalcOverflowBelow(current);
+        int staffSize = below->GetStaffSize();
+        if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+            // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            below->SetOverflowBelow(overflowBelow);
+            below->AddBBoxBelow(current);
+        }
     }
 
     return FUNCTOR_CONTINUE;

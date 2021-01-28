@@ -26,6 +26,7 @@ enum FileFormat {
     AUTO,
     MEI,
     HUMDRUM,
+    HUMMEI,
     PAE,
     ABC,
     DARMS,
@@ -37,6 +38,8 @@ enum FileFormat {
     MIDI,
     TIMEMAP
 };
+
+void SetDefaultResourcePath(const std::string &path);
 
 //----------------------------------------------------------------------------
 // Toolkit

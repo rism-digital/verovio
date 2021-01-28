@@ -61,6 +61,7 @@ void Slur::Reset()
     ResetCurveRend();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
+    m_isCrossStaff = false;
 }
 
 bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
@@ -438,6 +439,7 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     ControlElement::ResetDrawing(functorParams);
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
+    m_isCrossStaff = false;
 
     return FUNCTOR_CONTINUE;
 }

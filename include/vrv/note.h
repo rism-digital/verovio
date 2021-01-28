@@ -103,7 +103,7 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * @name Setter and getter for tie attribute and other pointers
+     * @name Setter and getter for accid attribute and other pointers
      */
     ///@{
     Accid *GetDrawingAccid();
@@ -224,9 +224,24 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustArtic
+     */
+    virtual int AdjustArtic(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
     virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
+
+    /**
+     * See Object::ConvertMarkupArtic
+     */
+    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcArtic
+     */
+    virtual int CalcArtic(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem

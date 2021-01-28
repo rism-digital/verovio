@@ -1370,9 +1370,9 @@
             <glyph glyph-code="E5BC" smufl-name="ornamentPrecompPortDeVoixMordent"/>
             <glyph glyph-code="E5BD" smufl-name="ornamentPrecompTrillWithMordent"/>
             <glyph glyph-code="E5BE" smufl-name="ornamentPrecompCadence"/>
-            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn "/>
+            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn"/>
             <glyph glyph-code="E5C0" smufl-name="ornamentPrecompDoubleCadenceLowerPrefix"/>
-            <glyph glyph-code="E5C1" smufl-name="ornamentPrecompCadenceUpperPrefix "/>
+            <glyph glyph-code="E5C1" smufl-name="ornamentPrecompCadenceUpperPrefix"/>
             <glyph glyph-code="E5C2" smufl-name="ornamentPrecompCadenceUpperPrefixTurn"/>
             <glyph glyph-code="E5C3" smufl-name="ornamentPrecompDoubleCadenceUpperPrefix"/>
             <glyph glyph-code="E5C4" smufl-name="ornamentPrecompDoubleCadenceUpperPrefixTurn"/>

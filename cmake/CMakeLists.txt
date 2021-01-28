@@ -8,6 +8,7 @@ if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
+option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        OFF)
 option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
@@ -90,8 +91,13 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
 )
+
+if(VRV_DYNAMIC_CAST)
+    add_definitions(-DVRV_DYNAMIC_CAST)
+endif()
 
 if(NO_DARMS_SUPPORT)
     add_definitions(-DNO_DARMS_SUPPORT)
@@ -179,7 +185,7 @@ elseif (BUILD_AS_PYTHON)
     #set(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
     #set(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
     #include_directories(${PYTHON_INCLUDE_DIR})
-    #swig_add_module(verovio_module_custom python ../bindings/python/verovio.i)
+    #swig_add_library(verovio_module_custom LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
     #swig_link_libraries(verovio_module_custom verovio ${PYTHON_LIBRARY})
 
     ### For building for found version of Python (comment when specific version is set)
@@ -187,7 +193,7 @@ elseif (BUILD_AS_PYTHON)
     include_directories(${PYTHON_INCLUDE_PATH})
     message(STATUS "***** Building for Python ${PYTHONLIBS_VERSION_STRING} *****")
     string(REPLACE "." "_" OUTPUT_VERSION_STRING ${PYTHONLIBS_VERSION_STRING})
-    swig_add_module(verovio_module_${OUTPUT_VERSION_STRING} python ../bindings/python/verovio.i)
+    swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
     swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${PYTHON_LIBRARIES})
 
     add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})

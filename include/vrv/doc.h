@@ -224,6 +224,11 @@ public:
     void SetCurrentScoreDefDoc(bool force = false);
 
     /**
+     * Check whether we need to optimize score based on the condense option
+     */
+    bool IsOptimizationNeeded();
+
+    /**
      * Optimize the scoreDef once the document is cast-off.
      */
     void OptimizeScoreDefDoc();
@@ -242,6 +247,12 @@ public:
     void CastOffDoc();
 
     /**
+     * Casts off the entire document, only using the document's system breaks
+     * if they would be close to the end in the normal document.
+     */
+    void CastOffSmartDoc();
+
+    /**
      * Casts off the entire document, using the document's line breaks,
      * but adding its own page breaks.
      */
@@ -250,9 +261,10 @@ public:
     /**
      * Casts off the entire document, with options for obeying breaks.
      * @param useSb - true to use the sb from the document.
-     * @param usePg - true to use the pb from the document.
+     * @param usePb - true to use the pb from the document.
+     * @param smart - true to sometimes use encoded sb and pb.
      */
-    void CastOffDocBase(bool useSb, bool usePb);
+    void CastOffDocBase(bool useSb, bool usePb, bool smart = false);
 
     /**
      * Casts off the running elements (headers and footer)

@@ -380,7 +380,11 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
-    //
+    /**
+     * Addjusts flag placement and stem length if they are crossing notehead or ledger lines
+     */
+    void AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
+
 public:
     //
 private:

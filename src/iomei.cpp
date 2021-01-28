@@ -52,6 +52,7 @@
 #include "functorparams.h"
 #include "gliss.h"
 #include "gracegrp.h"
+#include "grpsym.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
 #include "harm.h"
@@ -91,6 +92,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "phrase.h"
+#include "plica.h"
 #include "proport.h"
 #include "rdg.h"
 #include "ref.h"
@@ -316,6 +318,10 @@ bool MEIOutput::WriteObject(Object *object)
     }
 
     // ScoreDef related
+    else if (object->Is(GRPSYM)) {
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("grpSym");
+        WriteGrpSym(m_currentNode, dynamic_cast<GrpSym *>(object));
+    }
     else if (object->Is(INSTRDEF)) {
         m_currentNode = m_currentNode.append_child("instrDef");
         WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
@@ -574,6 +580,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(NOTE)) {
         m_currentNode = m_currentNode.append_child("note");
         WriteNote(m_currentNode, dynamic_cast<Note *>(object));
+    }
+    else if (object->Is(PLICA)) {
+        m_currentNode = m_currentNode.append_child("plica");
+        WritePlica(m_currentNode, dynamic_cast<Plica *>(object));
     }
     else if (object->Is(PROPORT)) {
         m_currentNode = m_currentNode.append_child("proport");
@@ -1029,6 +1039,24 @@ void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *
     runningElement->WriteTyped(currentNode);
 }
 
+void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
+{
+    assert(grpSym);
+
+    // Only write att.symbol if representing an attribute
+    if (grpSym->IsAttribute()) {
+        grpSym->WriteStaffGroupingSym(currentNode);
+        return;
+    }
+
+    WriteXmlId(currentNode, grpSym);
+    grpSym->WriteColor(currentNode);
+    grpSym->WriteGrpSymLog(currentNode);
+    grpSym->WriteStaffGroupingSym(currentNode);
+    grpSym->WriteStartId(currentNode);
+    grpSym->WriteStartEndId(currentNode);
+}
+
 void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
 {
     assert(pgFoot);
@@ -1209,6 +1237,8 @@ void MEIOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTimeSpanningInterface(currentNode, dynam);
     dynam->WriteExtender(currentNode);
     dynam->WriteLineRendBase(currentNode);
+    dynam->WriteMidiValue(currentNode);
+    dynam->WriteMidiValue2(currentNode);
     dynam->WriteVerticalGroup(currentNode);
 }
 
@@ -1321,6 +1351,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     // pedal->WriteVerticalGroup(currentNode);
+    pedal->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WritePhrase(pugi::xml_node currentNode, Phrase *phrase)
@@ -1486,6 +1517,7 @@ void MEIOutput::WriteBarLine(pugi::xml_node currentNode, BarLine *barLine)
     WriteLayerElement(currentNode, barLine);
     barLine->WriteBarLineLog(currentNode);
     barLine->WriteColor(currentNode);
+    barLine->WriteNNumberLike(currentNode);
     barLine->WriteVisibility(currentNode);
 }
 
@@ -1751,9 +1783,11 @@ void MEIOutput::WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest)
     assert(multiRest);
 
     WriteLayerElement(currentNode, multiRest);
+    WritePositionInterface(currentNode, multiRest);
     multiRest->WriteColor(currentNode);
     multiRest->WriteMultiRestVis(currentNode);
     multiRest->WriteNumbered(currentNode);
+    multiRest->WriteWidth(currentNode);
 }
 
 void MEIOutput::WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
@@ -1819,6 +1853,14 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     rest->WriteColor(currentNode);
     rest->WriteCue(currentNode);
     rest->WriteRestVisMensural(currentNode);
+}
+
+void MEIOutput::WritePlica(pugi::xml_node currentNode, Plica *plica)
+{
+    assert(plica);
+
+    WriteLayerElement(currentNode, plica);
+    plica->WritePlicaVis(currentNode);
 }
 
 void MEIOutput::WriteProport(pugi::xml_node currentNode, Proport *proport)
@@ -2555,6 +2597,15 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for custos
+    else if (filterParent->Is(CUSTOS)) {
+        if (element == "accid") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for fTrem
     else if (filterParent->Is(FTREM)) {
         if (element == "chord") {
@@ -2634,7 +2685,10 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for ligature
     else if (filterParent->Is(LIGATURE)) {
-        if (element == "note") {
+        if (element == "dot") {
+            return true;
+        }
+        else if (element == "note") {
             return true;
         }
         else {
@@ -2647,6 +2701,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "artic") {
+            return true;
+        }
+        else if (element == "plica") {
             return true;
         }
         else if (element == "syl") {
@@ -3536,6 +3593,9 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "clef") {
             success = ReadClef(parent, current);
         }
+        else if (std::string(current.name()) == "grpSym") {
+            success = ReadGrpSym(parent, current);
+        }
         else if (std::string(current.name()) == "keySig") {
             success = ReadKeySig(parent, current);
         }
@@ -3586,7 +3646,14 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
 
     vrvStaffGrp->ReadBasic(staffGrp);
     vrvStaffGrp->ReadLabelled(staffGrp);
-    vrvStaffGrp->ReadStaffGroupingSym(staffGrp);
+    AttStaffGroupingSym groupingSym;
+    groupingSym.ReadStaffGroupingSym(staffGrp);
+    if (groupingSym.HasSymbol()) {
+        GrpSym *vrvGrpSym = new GrpSym();
+        vrvGrpSym->IsAttribute(true);
+        vrvGrpSym->SetSymbol(groupingSym.GetSymbol());
+        vrvStaffGrp->AddChild(vrvGrpSym);
+    }
     vrvStaffGrp->ReadStaffGrpVis(staffGrp);
     vrvStaffGrp->ReadTyped(staffGrp);
 
@@ -3608,6 +3675,9 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
+        else if (std::string(current.name()) == "grpSym") {
+            success = ReadGrpSym(parent, current);
+        }
         else if (std::string(current.name()) == "instrDef") {
             success = ReadInstrDef(parent, current);
         }
@@ -3640,6 +3710,30 @@ bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object
     object->ReadHorizontalAlign(element);
     object->ReadTyped(element);
 
+    return true;
+}
+
+bool MEIInput::ReadGrpSym(Object *parent, pugi::xml_node grpSym)
+{
+    GrpSym *vrvGrpSym = new GrpSym();
+    SetMeiUuid(grpSym, vrvGrpSym);
+
+    vrvGrpSym->ReadColor(grpSym);
+    vrvGrpSym->ReadGrpSymLog(grpSym);
+    vrvGrpSym->ReadStaffGroupingSym(grpSym);
+    vrvGrpSym->ReadStartId(grpSym);
+    vrvGrpSym->ReadStartEndId(grpSym);
+
+    if (parent->Is(SCOREDEF)) {
+        if (!vrvGrpSym->HasLevel() || !vrvGrpSym->HasStartid() || !vrvGrpSym->HasEndid()) {
+            LogWarning("<%s>' nested under <scoreDef> must have @level, @startId and @endId attributes", grpSym.name());
+            delete vrvGrpSym;
+            return true;
+        }
+    }
+
+    parent->AddChild(vrvGrpSym);
+    ReadUnsupportedAttr(grpSym, vrvGrpSym);
     return true;
 }
 
@@ -4068,6 +4162,8 @@ bool MEIInput::ReadDynam(Object *parent, pugi::xml_node dynam)
     ReadTimeSpanningInterface(dynam, vrvDynam);
     vrvDynam->ReadExtender(dynam);
     vrvDynam->ReadLineRendBase(dynam);
+    vrvDynam->ReadMidiValue(dynam);
+    vrvDynam->ReadMidiValue2(dynam);
     vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
@@ -4564,6 +4660,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "multiRpt") {
             success = ReadMultiRpt(parent, xmlElement);
         }
+        else if (elementName == "plica") {
+            success = ReadPlica(parent, xmlElement);
+        }
         else if (elementName == "proport") {
             success = ReadProport(parent, xmlElement);
         }
@@ -4635,6 +4734,10 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
     vrvArtic->ReadColor(artic);
     vrvArtic->ReadPlacement(artic);
 
+    if (vrvArtic->GetArtic().size() > 1) {
+        m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
+    }
+
     parent->AddChild(vrvArtic);
     ReadUnsupportedAttr(artic, vrvArtic);
     return true;
@@ -4647,6 +4750,7 @@ bool MEIInput::ReadBarLine(Object *parent, pugi::xml_node barLine)
 
     vrvBarLine->ReadBarLineLog(barLine);
     vrvBarLine->ReadColor(barLine);
+    vrvBarLine->ReadNNumberLike(barLine);
     vrvBarLine->ReadVisibility(barLine);
 
     parent->AddChild(vrvBarLine);
@@ -4758,7 +4862,7 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
-    return true;
+    return ReadLayerChildren(vrvCustos, custos, vrvCustos);
 }
 
 bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
@@ -4961,9 +5065,11 @@ bool MEIInput::ReadMultiRest(Object *parent, pugi::xml_node multiRest)
     MultiRest *vrvMultiRest = new MultiRest();
     ReadLayerElement(multiRest, vrvMultiRest);
 
+    ReadPositionInterface(multiRest, vrvMultiRest);
     vrvMultiRest->ReadColor(multiRest);
     vrvMultiRest->ReadMultiRestVis(multiRest);
     vrvMultiRest->ReadNumbered(multiRest);
+    vrvMultiRest->ReadWidth(multiRest);
 
     parent->AddChild(vrvMultiRest);
     ReadUnsupportedAttr(multiRest, vrvMultiRest);
@@ -5038,6 +5144,9 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         Artic *vrvArtic = new Artic();
         vrvArtic->IsAttribute(true);
         vrvArtic->SetArtic(artic.GetArtic());
+        if (artic.GetArtic().size() > 1) {
+            m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
+        }
         vrvNote->AddChild(vrvArtic);
     }
 
@@ -5076,6 +5185,18 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
     parent->AddChild(vrvRest);
     ReadUnsupportedAttr(rest, vrvRest);
     return ReadLayerChildren(vrvRest, rest, vrvRest);
+}
+
+bool MEIInput::ReadPlica(Object *parent, pugi::xml_node plica)
+{
+    Plica *vrvPlica = new Plica();
+    ReadLayerElement(plica, vrvPlica);
+
+    vrvPlica->ReadPlicaVis(plica);
+
+    parent->AddChild(vrvPlica);
+    ReadUnsupportedAttr(plica, vrvPlica);
+    return true;
 }
 
 bool MEIInput::ReadProport(Object *parent, pugi::xml_node proport)

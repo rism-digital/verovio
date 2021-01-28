@@ -6,9 +6,14 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "custos.h"
-#include "doc.h"
 
 //----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "doc.h"
 
 namespace vrv {
 
@@ -33,6 +38,17 @@ void Custos::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
+}
+
+bool Custos::IsSupportedChild(Object *child)
+{
+    if (child->Is(ACCID)) {
+        assert(dynamic_cast<Accid *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------

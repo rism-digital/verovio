@@ -53,6 +53,11 @@ std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
     = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
           { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
 
+void SetDefaultResourcePath(const std::string &path)
+{
+    Resources::SetPath(path);
+}
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -219,14 +224,14 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         std::cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << std::endl;
         return UNKNOWN;
     }
+    size_t searchLimit = 600;
+    std::string initial = data.substr(0, searchLimit);
     if (data[0] == '<') {
-        size_t searchLimit = 600;
         // <mei> == root node for standard organization of MEI data
         // <pages> == root node for pages organization of MEI data
         // <score-partwise> == root node for part-wise organization of MusicXML data
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
-        std::string initial = data.substr(0, searchLimit);
 
         if (initial.find("<mei ") != std::string::npos) {
             return MEI;
@@ -277,9 +282,15 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
     }
+    if (initial.find("\n!!") != std::string::npos) {
+        return HUMDRUM;
+    }
+    if (initial.find("\n**") != std::string::npos) {
+        return HUMDRUM;
+    }
 
     // Assume that the input is MEI if other input types were not detected.
-    // This means that DARMS cannot be auto detected.
+    // This means that DARMS cannot be auto-detected.
     return MEI;
 }
 
@@ -422,6 +433,31 @@ bool Toolkit::LoadData(const std::string &data)
     else if (inputFormat == HUMDRUM) {
         // LogMessage("Importing Humdrum data");
 
+        // HumdrumInput *input = new HumdrumInput(&m_doc);
+        input = new HumdrumInput(&m_doc);
+        if (GetOutputTo() == HUMDRUM) {
+            input->SetOutputFormat("humdrum");
+        }
+
+        if (!input->Import(data)) {
+            LogError("Error importing Humdrum data (1)");
+            delete input;
+            return false;
+        }
+        SetHumdrumBuffer(((HumdrumInput *)input)->GetHumdrumString().c_str());
+        if (GetOutputTo() == HUMDRUM) {
+            // Humdrum data will be output (post-filtering data),
+            // So not continuing converting to SVG.
+            return true;
+        }
+
+        // Read embedded options from input Humdrum file:
+        ((HumdrumInput *)input)->parseEmbeddedOptions(&m_doc);
+    }
+    else if (inputFormat == HUMMEI) {
+        // convert first to MEI and then load MEI data via MEIInput.  This
+        // allows using XPath processing.
+        // LogMessage("Importing Humdrum data via MEI");
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc);
@@ -446,7 +482,7 @@ bool Toolkit::LoadData(const std::string &data)
         newData = meioutput.GetOutput();
 
         // Read embedded options from input Humdrum file:
-        tempinput->parseEmbeddedOptions(m_doc);
+        tempinput->parseEmbeddedOptions(&m_doc);
         delete tempinput;
 
         input = new MEIInput(&m_doc);
@@ -588,14 +624,19 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // load the file
-    if (!input->Import(newData.size() ? newData : data)) {
-        LogError("Error importing data");
-        delete input;
-        return false;
+    if (inputFormat != HUMDRUM) {
+        if (!input->Import(newData.size() ? newData : data)) {
+            LogError("Error importing data");
+            delete input;
+            return false;
+        }
     }
 
+    bool adjustPageHeight = m_options->m_adjustPageHeight.GetValue();
+    int footerOption = m_options->m_footer.GetValue();
+    // With adjusted page height, show the footer if explicitly set (i.e., not with "auto")
     // generate the page header and footer if necessary
-    if (m_options->m_footer.GetValue() == FOOTER_auto) {
+    if ((!adjustPageHeight && (footerOption == FOOTER_auto)) || (footerOption == FOOTER_always)) {
         m_doc.GenerateFooter();
     }
     if (m_options->m_header.GetValue() == HEADER_auto) {
@@ -623,11 +664,12 @@ bool Toolkit::LoadData(const std::string &data)
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
     int breaks = m_options->m_breaks.GetValue();
-    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI to
-    // be converted
+    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI
+    // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
     if (breaks != BREAKS_none) {
-        if (input->HasLayoutInformation() && (breaks == BREAKS_encoded || breaks == BREAKS_line)) {
+        if (input->HasLayoutInformation()
+            && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
                 // LogElapsedTimeStart();
                 m_doc.CastOffEncodingDoc();
@@ -636,6 +678,9 @@ bool Toolkit::LoadData(const std::string &data)
             else if (breaks == BREAKS_line) {
                 m_doc.CastOffLineDoc();
             }
+            else if (breaks == BREAKS_smart) {
+                m_doc.CastOffSmartDoc();
+            }
         }
         else {
             if (breaks == BREAKS_encoded) {
@@ -643,6 +688,9 @@ bool Toolkit::LoadData(const std::string &data)
             }
             else if (breaks == BREAKS_line) {
                 LogWarning("Requesting layout with line breaks but nothing provided in the data");
+            }
+            else if (breaks == BREAKS_smart) {
+                LogWarning("Requesting layout with smart breaks but nothing provided in the data");
             }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();
@@ -950,6 +998,20 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                 }
                 opt->SetValueArray(queries);
             }
+            else if (iter->first == "condenseEncoded") {
+                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("condense");
+                assert(opt);
+                if (json.has<jsonxx::Number>("condenseEncoded")) {
+                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
+                        opt->SetValue("encoded");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
             else if (iter->first == "ignoreLayout") {
                 LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
                 Option *opt = NULL;
@@ -1203,6 +1265,9 @@ void Toolkit::RedoLayout()
     m_doc.UnCastOffDoc();
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
+    }
+    else if (m_options->m_breaks.GetValue() == BREAKS_smart) {
+        m_doc.CastOffSmartDoc();
     }
     else {
         m_doc.CastOffDoc();

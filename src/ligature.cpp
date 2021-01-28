@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "dot.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "note.h"
@@ -51,8 +52,11 @@ void Ligature::ClearClusters() {}
 
 bool Ligature::IsSupportedChild(Object *child)
 {
-    if (child->Is(NOTE)) {
-        assert(dynamic_cast<LayerElement *>(child));
+    if (child->Is(DOT)) {
+        assert(dynamic_cast<Dot *>(child));
+    }
+    else if (child->Is(NOTE)) {
+        assert(dynamic_cast<Note *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

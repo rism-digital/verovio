@@ -1,9 +1,27 @@
 # Changelog
 
 ## [unreleased]
+* Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
+* Improved automatic cross staff rest positioning (@eNote-GmbH)
+* Improved cross-staff spacing
+* Improved slurs
+* Improved positioning of ornaments with multiple layers
+* Embedding of Leland font from MuseScore
+
+## [3.1.0] - 2021-01-12
+* Support for "old style" multiple measure rests (@rettinghaus)
+* Support for `note@vel` and `dynamics@val` in MusicXML import (@earboxer)
+* Support for `multiRest@loc` (@rettinghaus)
 * Support for `mNum@fontsize` (@rettinghaus)
 * Support for `accidental-mark` in MusicXML import (@rettinghaus)
+* Support for double-stemmed beams (@eNote-GmbH)
 * Improved barline rendition (@rettinghaus)
+* Improved cross-staff notation with multiple layers
+* Python Package Index (PyPI) distribution (@musicEnfanthen and @alastair)
+* Option --footer extended with 'always' value to show footer with --adjust-page-height
+
+## [3.0.2] - 2020-11-17
+* Add missing default footer file
 
 ## [3.0.1] - 2020-10-22
 * Fix bug with mensural notation notes
@@ -64,7 +82,7 @@
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ### Changed
-* Single file buundle for WASM build
+* Single file bundle for WASM build
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15

@@ -24,6 +24,7 @@
 #include "glyph.h"
 #include "layer.h"
 #include "ligature.h"
+#include "plica.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -140,6 +141,9 @@ bool Note::IsSupportedChild(Object *child)
     }
     else if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
+    }
+    else if (child->Is(PLICA)) {
+        assert(dynamic_cast<Plica *>(child));
     }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
@@ -759,6 +763,67 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Note::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &artic : params->m_articsToConvert) {
+        artic->SplitMultival(this);
+    }
+    params->m_articsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::CalcArtic(FunctorParams *functorParams)
+{
+    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
+    assert(params);
+
+    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
+
+    params->m_parent = this;
+    params->m_stemDir = this->GetDrawingStemDir();
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    params->m_staffAbove = staff;
+    params->m_staffBelow = staff;
+    params->m_layerAbove = layer;
+    params->m_layerBelow = layer;
+    params->m_crossStaffAbove = false;
+    params->m_crossStaffBelow = false;
+
+    if (this->m_crossStaff) {
+        params->m_staffAbove = this->m_crossStaff;
+        params->m_staffBelow = this->m_crossStaff;
+        params->m_layerAbove = this->m_crossLayer;
+        params->m_layerBelow = this->m_crossLayer;
+        params->m_crossStaffAbove = true;
+        params->m_crossStaffBelow = true;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::AdjustArtic(FunctorParams *functorParams)
+{
+    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
+    assert(params);
+
+    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
+
+    params->m_parent = this;
+    params->m_articAbove.clear();
+    params->m_articBelow.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Note::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
@@ -795,7 +860,10 @@ int Note::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (this->m_crossStaff) {
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
+    }
 
     // Cache the in params to avoid further lookup
     params->m_staff = staff;
@@ -913,6 +981,7 @@ int Note::CalcDots(FunctorParams *functorParams)
 
     // The shift to the left when a stem flag requires it
     int flagShift = 0;
+    int radius = this->GetDrawingRadius(params->m_doc);
 
     if (chord && (chord->GetDots() > 0)) {
         dots = params->m_chordDots;
@@ -927,12 +996,14 @@ int Note::CalcDots(FunctorParams *functorParams)
                 flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             }
         }
+
+        int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
+        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
     }
-    else if (this->GetDots() > 0) {
+    if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
         dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
-        params->m_chordDrawingX = this->GetDrawingX();
 
         std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
         int loc = this->GetDrawingLoc();
@@ -948,14 +1019,10 @@ int Note::CalcDots(FunctorParams *functorParams)
             // HARDCODED
             flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
         }
-    }
-    else {
-        return FUNCTOR_SIBLINGS;
-    }
 
-    int radius = this->GetDrawingRadius(params->m_doc);
-    int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
-    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
+        int xRel = 2 * radius + flagShift;
+        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
+    }
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1025,7 +1092,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!this->IsChordTone() && !this->IsMensuralDur()) {
         if (!currentStem) {

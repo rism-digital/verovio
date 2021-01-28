@@ -18,9 +18,10 @@ class MidiFile;
 
 namespace vrv {
 
-class ClassIdComparison;
+class Artic;
 class BoundaryStartInterface;
 class Chord;
+class ClassIdComparison;
 class Clef;
 class Doc;
 class Dot;
@@ -54,6 +55,7 @@ class Syl;
 class System;
 class SystemAligner;
 class Transposer;
+class TupletNum;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -178,6 +180,28 @@ public:
     int m_y2;
     int m_directionBias;
     int m_overlapMargin;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class AdjustArticParams : public FunctorParams {
+public:
+    AdjustArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+    }
+    std::list<Artic *> m_articAbove;
+    std::list<Artic *> m_articBelow;
+    LayerElement *m_parent;
     Doc *m_doc;
 };
 
@@ -386,8 +410,10 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 1: the doc
- * member 2: a pointer to the functor for passing it to the system aligner
+ * member 0: a flag indicating that at least one slur had to be adjusted
+ * member 1: a flag indicating that there is at least one cross-staff slur
+ * member 2: the doc
+ * member 3: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustSlursParams : public FunctorParams {
@@ -395,10 +421,12 @@ public:
     AdjustSlursParams(Doc *doc, Functor *functor)
     {
         m_adjusted = false;
+        m_crossStaffSlurs = false;
         m_doc = doc;
         m_functor = functor;
     }
     bool m_adjusted;
+    bool m_crossStaffSlurs;
     Doc *m_doc;
     Functor *m_functor;
 };
@@ -453,6 +481,35 @@ public:
     int m_freeSpace;
     int m_staffSize;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustTupletNumOverlapParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: tupletNum relative position for which is being calculatied
+ * member 1: drawing position of tupletNum
+ * member 2: margin for tupletNum vertical overlap
+ * member 3: flag to indicate whether cross-staff elements should be considered
+ * member 4: resulting relative Y for the tupletNum
+ **/
+class AdjustTupletNumOverlapParams : public FunctorParams {
+public:
+    AdjustTupletNumOverlapParams(TupletNum *tupletNum)
+    {
+        m_tupletNum = tupletNum;
+        m_drawingNumPos = STAFFREL_basic_NONE;
+        m_verticalMargin = 0;
+        m_ignoreCrossStaff = false;
+        m_yRel = 0;
+    }
+
+    TupletNum *m_tupletNum;
+    data_STAFFREL_basic m_drawingNumPos;
+    int m_verticalMargin;
+    bool m_ignoreCrossStaff;
+    int m_yRel;
 };
 
 //----------------------------------------------------------------------------
@@ -699,7 +756,34 @@ public:
 // CalcArticParams
 //----------------------------------------------------------------------------
 
-// Use FunctorDocParams
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class CalcArticParams : public FunctorParams {
+public:
+    CalcArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+        m_staffAbove = NULL;
+        m_staffBelow = NULL;
+        m_layerAbove = NULL;
+        m_layerBelow = NULL;
+        m_crossStaffAbove = false;
+        m_crossStaffBelow = false;
+    }
+    LayerElement *m_parent;
+    data_STEMDIRECTION m_stemDir;
+    Staff *m_staffAbove;
+    Staff *m_staffBelow;
+    Layer *m_layerAbove;
+    Layer *m_layerBelow;
+    bool m_crossStaffAbove;
+    bool m_crossStaffBelow;
+    Doc *m_doc;
+};
 
 //----------------------------------------------------------------------------
 // CalcChordNoteHeads
@@ -922,11 +1006,12 @@ public:
  * member 5: the current scoreDef width
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
+ * member 8: whether to smartly use encoded system breaks
  **/
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc)
+    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc, bool smart)
     {
         m_contentSystem = contentSystem;
         m_page = page;
@@ -935,6 +1020,7 @@ public:
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
         m_doc = doc;
+        m_smart = smart;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -944,6 +1030,7 @@ public:
     int m_currentScoreDefWidth;
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
+    bool m_smart;
 };
 
 //----------------------------------------------------------------------------
@@ -968,6 +1055,20 @@ public:
     Chord *m_currentChord;
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
+// ConvertMarkupArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector<Artic *>* that needs to be converted
+ **/
+
+class ConvertMarkupArticParams : public FunctorParams {
+public:
+    ConvertMarkupArticParams() {}
+    std::vector<Artic *> m_articsToConvert;
 };
 
 //----------------------------------------------------------------------------

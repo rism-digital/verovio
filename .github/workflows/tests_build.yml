@@ -1,7 +1,7 @@
 name: Test Suite Evaluation
 
 on:
-  pull_request_target:
+  pull_request:
     branches: develop
   # TODO: run this task only on PR in production; use push event for testing
   #push:
@@ -61,15 +61,9 @@ jobs:
           mkdir -p ${{ env.OUTPUT_DIR }}
           ls -alh
           ls -alh ${{ env.OUTPUT_DIR }}
-          sudo apt-get install librsvg2-bin openresolv wireguard
+          sudo apt-get install openresolv wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
-          rsvg-convert --version
-          python3 -m pip install diffimg lxml xmldiff
-
-      - name: Set up Wireguard VPN
-        working-directory: ${{ github.workspace }}
-        run: |
-          sudo wg-quick up ./wg0.conf     
+          python3 -m pip install diffimg lxml xmldiff cairosvg
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
@@ -86,11 +80,10 @@ jobs:
       - name: Build Python toolkit and run the tests for the dev branch
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings
         run: |
-          cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
+          cmake ../cmake -DNO_HUMDRUM_SUPPORT=ON -DNO_ABC_SUPPORT=ON -DNO_PAE_SUPPORT=ON -DBUILD_AS_PYTHON=ON -DVRV_DYNAMIC_CAST=ON -B python
           cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
-          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
 
       - name: Checkout the PR
         uses: actions/checkout@v2
@@ -101,37 +94,55 @@ jobs:
       - name: Build Python toolkit and run the tests for the PR
         working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}/bindings
         run: |
-          cmake ../cmake -DBUILD_AS_PYTHON=ON -B python
+          cmake ../cmake -DNO_HUMDRUM_SUPPORT=ON -DNO_ABC_SUPPORT=ON -DNO_PAE_SUPPORT=ON -DBUILD_AS_PYTHON=ON  -DVRV_DYNAMIC_CAST=ON -B python
           cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
-          ../../doc/test-suite-to-png.sh ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
         run: |
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
- 
-      # Deploy to remote server. Uses the REF_NAME_SLUG to ensure that it maps to any existing directories on the deployment server.
-      - name: Deploy with rsync
-        uses: burnett01/rsync-deployments@4.1
-        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
-        with:
-          switches: -avzr --exclude="uploads" --exclude="fileadmin"
-          path: ${{ github.event.pull_request.number }}
-          remote_path: ${{ secrets.TEST_SUITE_DEPLOY_PATH }}
-          remote_host: ${{ secrets.TEST_SUITE_DEPLOY_SERVER }}
-          remote_user: ${{ secrets.TEST_SUITE_DEPLOY_USER }}
-          remote_key: ${{ secrets.TEST_SUITE_DEPLOY_key }}
 
-      - name: Disconnect VPN
-        working-directory: ${{ github.workspace }}
+      - name: Upload results as artefacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-suite-diff
+          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+
+      - name: Check existence of the log.md file
+        id: check_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
+
+      - name: Check user permission to add a comment
+        id: check_permission
+        uses: scherermichael-oss/action-has-permission@master
+        with:
+          required-permission: write
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run only if user has NOT sufficient permissions
+        if: steps.check_files.outputs.files_exists == 'true' && !steps.check_permission.outputs.has-permission
         run: |
-          sudo wg-quick down ./wg0.conf
+          echo "Sorry! Your permissions are insufficient to list the results as a comment."
+          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
+
+      - name: Generate comment content
+        id: get-comment-body
+        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
+        run: |
+          link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'\r\n'}"
+          echo ::set-output name=body::$body
 
       - name: Add comment with link
-        if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
+        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -140,5 +151,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Test suite regression test available at https://test-suite.verovio.org/${{ env.OUTPUT_DIR }}'
+              body: "${{ steps.get-comment-body.outputs.body }}"
             })

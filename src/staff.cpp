@@ -271,6 +271,29 @@ void Staff::SetFromFacsimile(Doc *doc)
     this->AdjustDrawingStaffSize();
 }
 
+bool Staff::IsOnStaffLine(int y, Doc *doc)
+{
+    assert(doc);
+
+    return ((y - this->GetDrawingY()) % (2 * doc->GetDrawingUnit(this->m_drawingStaffSize)) == 0);
+}
+
+int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
+{
+    assert(doc);
+
+    int yPos = y - this->GetDrawingY();
+    int distance = yPos % doc->GetDrawingUnit(this->m_drawingStaffSize);
+    if (place == STAFFREL_above) {
+        if (distance > 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) - distance;
+        return y - distance + doc->GetDrawingUnit(this->m_drawingStaffSize);
+    }
+    else {
+        if (distance < 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) + distance;
+        return y - distance - doc->GetDrawingUnit(this->m_drawingStaffSize);
+    }
+}
+
 //----------------------------------------------------------------------------
 // LedgerLine
 //----------------------------------------------------------------------------
@@ -528,8 +551,20 @@ int Staff::CalcStem(FunctorParams *)
     ListOfObjects layers;
     this->FindAllDescendantByComparison(&layers, &isLayer);
 
-    // Not more than one layer - drawing stem dir remains unset
+    if (layers.empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Not more than one layer - drawing stem dir remains unset unless there is cross-staff content
     if (layers.size() < 2) {
+        Layer *layer = vrv_cast<Layer *>(layers.front());
+        assert(layer);
+        if (layer->HasCrossStaffFromBelow()) {
+            layer->SetDrawingStemDir(STEMDIRECTION_up);
+        }
+        else if (layer->HasCrossStaffFromAbove()) {
+            layer->SetDrawingStemDir(STEMDIRECTION_down);
+        }
         return FUNCTOR_CONTINUE;
     }
 

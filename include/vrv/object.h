@@ -634,6 +634,15 @@ public:
     ///@}
 
     /**
+     * Convert markup of artic@artic multi value into distinct artic elements.
+     * See Doc::ConvertMarkupAnalyticalDoc
+     */
+    ///@{
+    virtual int ConvertMarkupArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
      * See Doc::ConvertScoreDefMarkupDoc
      */
@@ -826,6 +835,11 @@ public:
     virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the position the articulations.
+     */
+    virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position the outside articulations with slur.
      */
     virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -863,6 +877,11 @@ public:
      * Calculate the y position of tuplet brackets and num
      */
     virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Calculate the y relative position of tupletNum based on overlaps with other elements
+     */
+    virtual int AdjustTupletNumOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.
@@ -972,6 +991,11 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
+
+    /**
+     * Prepare group symbol starting and ending staffDefs for drawing
+     */
+    virtual int PrepareGroupSymbols(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Associate LayerElement with @facs to the appropriate zone

@@ -75,6 +75,8 @@ void Layer::Reset()
     ResetStaffDefObjects();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
+    m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
 }
 
 void Layer::CloneReset()
@@ -93,6 +95,8 @@ void Layer::CloneReset()
     m_cautionStaffDefMeterSig = NULL;
 
     m_drawingStemDir = STEMDIRECTION_NONE;
+    m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
 }
 
 void Layer::ResetStaffDefObjects()
@@ -233,7 +237,15 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
         return STEMDIRECTION_NONE;
     }
     else {
-        return m_drawingStemDir;
+        if (this->m_crossStaffFromBelow) {
+            return (element->m_crossStaff) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+        else if (this->m_crossStaffFromAbove) {
+            return (element->m_crossStaff) ? STEMDIRECTION_up : STEMDIRECTION_down;
+        }
+        else {
+            return m_drawingStemDir;
+        }
     }
 }
 
@@ -636,6 +648,13 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     params->m_currentMensur = GetCurrentMensur();
     params->m_currentMeterSig = GetCurrentMeterSig();
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::ResetDrawing(FunctorParams *functorParams)
+{
+    this->m_crossStaffFromBelow = false;
+    this->m_crossStaffFromAbove = false;
     return FUNCTOR_CONTINUE;
 }
 

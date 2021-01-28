@@ -159,7 +159,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ BRACKETSPAN, HAIRPIN, PHRASE, OCTAVE, SLUR, TIE })) return;
+            if (element->Is({ BRACKETSPAN, HAIRPIN, OCTAVE })) return;
         }
     }
 
@@ -195,7 +195,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     Object *graphic = NULL;
     char spanningType = SPANNING_START_END;
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
+    // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         // we use the start measure
         measure = interface->GetStartMeasure();
@@ -244,7 +244,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 
     // Overwrite the spanningType for open ended control events
-    // We can identify them becaseu they end on a right barline attribute
+    // We can identify them because they end on a right barline attribute
     if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
         spanningType = SPANNING_START;
     }
@@ -509,7 +509,7 @@ void View::DrawHairpin(
         }
     }
 
-    // In any case, a hairpin should not be sorter than 2 units.
+    // In any case, a hairpin should not be shorter than 2 units.
     // If shorter, with groups, this will screw up vertical alignment and push everything down - to be improved by
     // deactivating grp?
     if ((adjustedX2 - adjustedX1) >= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2) {
@@ -519,6 +519,11 @@ void View::DrawHairpin(
 
     // Store the full drawing length
     if (spanningType == SPANNING_START_END) {
+        const auto [leftOverlap, rightOverlap]
+            = hairpin->GetBarlineOverlapAdjustment(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2);
+        x1 += leftOverlap;
+        x2 -= rightOverlap;
+
         hairpin->SetDrawingLength(x2 - x1);
     }
 
@@ -749,10 +754,12 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (note1) {
         durElement = note1;
         layer1 = dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
+        if (note1->m_crossStaff) layer1 = note1->m_crossLayer;
         parentChord1 = note1->IsChordTone();
     }
     if (parentChord1) {
         durElement = parentChord1;
+        if (parentChord1->m_crossStaff) layer1 = parentChord1->m_crossLayer;
     }
 
     /************** x positions **************/
@@ -841,7 +848,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
-    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(durElement)) != STEMDIRECTION_NONE)) {
+    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(note1)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
@@ -2390,7 +2397,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     Measure *measure = NULL;
     char spanningType = SPANNING_START_END;
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
+    // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         measure = ending->GetMeasure();
         x1 = measure->GetDrawingX();

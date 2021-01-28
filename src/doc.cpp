@@ -179,7 +179,7 @@ bool Doc::GenerateDocumentScoreDef()
 
 bool Doc::GenerateFooter()
 {
-    if (m_mdivScoreDef.FindDescendantByType(PGFOOT) || m_options->m_adjustPageHeight.GetValue()) {
+    if (m_mdivScoreDef.FindDescendantByType(PGFOOT)) {
         return false;
     }
 
@@ -251,7 +251,7 @@ void Doc::CalculateMidiTimemap()
 {
     m_MIDITimemapTempo = 0.0;
 
-    // This happens if the document was never cast off (no-layout option in the toolkit)
+    // This happens if the document was never cast off (layout none option in the toolkit)
     if (!m_drawingPage && GetPageCount() == 1) {
         Page *page = this->SetDrawingPage(0);
         if (!page) {
@@ -762,6 +762,12 @@ void Doc::PrepareDrawing()
         }
     }
 
+    /************ Resolve group symbols ************/
+    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attirbutes that determine
+    // their positioning
+    Functor prepareGroupSymbols(&Object::PrepareGroupSymbols);
+    m_mdivScoreDef.Process(&prepareGroupSymbols, NULL);
+
     // LogElapsedTimeEnd ("Preparing drawing");
 
     m_drawingPreparationDone = true;
@@ -792,6 +798,22 @@ void Doc::SetCurrentScoreDefDoc(bool force)
     m_currentScoreDefDone = true;
 }
 
+bool Doc::IsOptimizationNeeded()
+{
+    if (m_options->m_condense.GetValue() == CONDENSE_none) return false;
+    // optimize scores only if encoded
+    bool optimize = (m_mdivScoreDef.HasOptimize() && m_mdivScoreDef.GetOptimize() == BOOLEAN_true);
+    // if nothing specified, do not if there is only one grpSym
+    if ((m_options->m_condense.GetValue() == CONDENSE_auto) && !m_mdivScoreDef.HasOptimize()) {
+        ListOfObjects symbols;
+        ClassIdComparison matchClassId(GRPSYM);
+        m_mdivScoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
+        optimize = (symbols.size() > 1);
+    }
+
+    return optimize;
+}
+
 void Doc::OptimizeScoreDefDoc()
 {
     Functor optimizeScoreDef(&Object::OptimizeScoreDef);
@@ -805,11 +827,18 @@ void Doc::CastOffDoc()
 {
     Doc::CastOffDocBase(false, false);
 }
+
 void Doc::CastOffLineDoc()
 {
     Doc::CastOffDocBase(true, false);
 }
-void Doc::CastOffDocBase(bool useSb, bool usePb)
+
+void Doc::CastOffSmartDoc()
+{
+    Doc::CastOffDocBase(false, false, true);
+}
+
+void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 {
     Pages *pages = this->GetPages();
     assert(pages);
@@ -817,20 +846,6 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     if (pages->GetChildCount() != 1) {
         LogDebug("Document is already cast off");
         return;
-    }
-
-    // By default, optimize scores
-    bool optimize = (m_mdivScoreDef.GetOptimize() != BOOLEAN_false);
-    // However, if nothing specified, do not if there is only one staffGrp
-    if (m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE) {
-        int grpSymNum = 0;
-        for (auto current : *m_mdivScoreDef.GetChildren()) {
-            if (current->Is(STAFFGRP)) {
-                StaffGrp *staffGrp = vrv_cast<StaffGrp *>(current);
-                grpSymNum += (staffGrp->HasSymbol()) ? 1 : 0;
-            }
-        }
-        if (grpSymNum < 2) optimize = false;
     }
 
     this->SetCurrentScoreDefDoc();
@@ -845,14 +860,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if (useSb && !usePb) {
+    if (useSb && !usePb && !smart) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
         contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
-        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
+        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this, smart);
         castOffSystemsParams.m_systemWidth
             = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
         castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
@@ -865,6 +880,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     }
     delete contentSystem;
 
+    bool optimize = IsOptimizationNeeded();
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDefDoc(true);
     if (optimize) {
@@ -994,7 +1010,7 @@ void Doc::CastOffEncodingDoc()
     this->ResetDrawingPage();
     this->SetCurrentScoreDefDoc(true);
 
-    if (this->m_options->m_condenseEncoded.GetValue()) {
+    if (IsOptimizationNeeded()) {
         this->OptimizeScoreDefDoc();
     }
 }
@@ -1163,13 +1179,21 @@ void Doc::ConvertMarkupDoc(bool permanent)
 {
     if (m_markup == MARKUP_DEFAULT) return;
 
-    LogMessage("Converting analytical markup...");
+    LogMessage("Converting markup...");
 
     if (m_markup & MARKUP_GRACE_ATTRIBUTE) {
     }
 
-    if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
+    if (m_markup & MARKUP_ARTIC_MULTIVAL) {
+        LogMessage("Converting artic markup...");
+        ConvertMarkupArticParams convertMarkupArticParams;
+        Functor convertMarkupArtic(&Object::ConvertMarkupArtic);
+        Functor convertMarkupArticEnd(&Object::ConvertMarkupArticEnd);
+        this->Process(&convertMarkupArtic, &convertMarkupArticParams, &convertMarkupArticEnd);
+    }
 
+    if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
+        LogMessage("Converting analytical markup...");
         /************ Prepare processing by staff/layer/verse ************/
 
         // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -1614,6 +1638,8 @@ double Doc::GetRightMargin(const ClassId classId) const
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
+    if (classId == ARTIC) return m_options->m_bottomMarginArtic.GetValue();
+    // For these we also need to look at the scoreDef
     double margin = m_options->m_defaultBottomMargin.GetValue();
     if (classId == DYNAM) {
         margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
@@ -1627,6 +1653,8 @@ double Doc::GetBottomMargin(const ClassId classId) const
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
+    if (classId == ARTIC) return m_options->m_topMarginArtic.GetValue();
+    // For these we also need to look at the scoreDef
     double margin = m_options->m_defaultTopMargin.GetValue();
     if (classId == DYNAM) {
         margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;

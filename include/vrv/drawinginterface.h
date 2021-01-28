@@ -76,8 +76,9 @@ private:
 /**
  * This class is an interface for MEI beam elements (beam, beamSpan).
  * It stores stem drawing values.
+ * It is also an ObjectListInterface.
  */
-class BeamDrawingInterface {
+class BeamDrawingInterface : public ObjectListInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -86,6 +87,16 @@ public:
     BeamDrawingInterface();
     virtual ~BeamDrawingInterface();
     virtual void Reset();
+    ///@}
+
+    /**
+     * Return information about the position in the beam.
+     * (no const since the cached list is updated)
+     * Object * is a pointer to the object implementing the interface (e.g, Beam, FTrem)
+     */
+    ///@{
+    bool IsFirstIn(Object *object, LayerElement *element);
+    bool IsLastIn(Object *object, LayerElement *element);
     ///@}
 
     /**
@@ -109,14 +120,20 @@ public:
     void ClearCoords();
 
 protected:
-    //
+    /**
+     * Return the position of the element in the beam.
+     * For notes, lookup the position of the parent chord.
+     */
+    int GetPosition(Object *object, LayerElement *element);
+
 public:
     // values to be set before calling CalcBeam
     bool m_changingDur;
     bool m_beamHasChord;
     bool m_hasMultipleStemDir;
     bool m_cueSize;
-    bool m_isCrossStaff;
+    Staff *m_crossStaffContent;
+    data_STAFFREL_basic m_crossStaffRel;
     int m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
