@@ -303,7 +303,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     assert(staff);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    
+
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
 
     if (params->m_parent->m_crossStaff) {
@@ -344,12 +344,13 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     this->SetDrawingXRel(xShift);
 
     /************** set cross-staff / layer **************/
-    
+
     // Exception for artic because they are relative to the staff - we set m_crossStaff and m_crossLayer
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
         this->m_crossStaff = params->m_staffAbove;
         this->m_crossLayer = params->m_layerAbove;
-        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the parent where the beam is
+        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the
+        // parent where the beam is
         if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_below) {
             this->m_crossStaff = NULL;
             this->m_crossLayer = NULL;
@@ -427,7 +428,9 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     }
 
     // Add spacing
-    int spacing = 1.5 * params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int spacingTop = params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int spacingBottom
+        = params->m_doc->GetBottomMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y = this->GetDrawingY();
     int yShift = 0;
     int direction = (this->GetDrawingPlace() == STAFFREL_above) ? 1 : -1;
@@ -435,12 +438,12 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     if (this->IsInsideArtic()) {
         // If we are above the top of the  staff, just pile them up
         if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) {
-            yShift += spacing;
+            yShift += spacingBottom;
         }
         // If we are below the bottom, just pile the down
         else if ((this->GetDrawingPlace() == STAFFREL_below)
             && (y < staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
-            yShift -= spacing;
+            yShift -= spacingTop;
         }
         // Otherwise make it fit the staff space
         else {
@@ -451,6 +454,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     }
     // Artic part outside just need to be piled up or down
     else {
+        int spacing = (direction > 0) ? spacingBottom : spacingTop;
         yShift += spacing * direction;
     }
     this->SetDrawingYRel(this->GetDrawingYRel() + yShift);
