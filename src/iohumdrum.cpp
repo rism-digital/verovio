@@ -15150,7 +15150,8 @@ Clef *HumdrumInput::insertClefElement(
     m_clef_buffer.push_back(std::make_tuple(sameas, clefpos, clef));
     if (sameas) {
         // make 100% transparent red in case sameas method changes:
-        clef->SetColor("#ff000000");
+        // See issue https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/546
+        // clef->SetColor("#ff000000");
         // appendTypeTag(clef, "sameas");
     }
 
