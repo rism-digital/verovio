@@ -38,6 +38,7 @@ Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlace
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
@@ -50,6 +51,7 @@ void Artic::Reset()
     LayerElement::Reset();
     ResetArticulation();
     ResetColor();
+    ResetExtSym();
     ResetPlacement();
 
     m_drawingPlace = STAFFREL_NONE;

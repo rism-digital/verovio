@@ -8,6 +8,7 @@
 #ifndef __VRV_ARTIC_H__
 #define __VRV_ARTIC_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 
@@ -17,7 +18,7 @@ namespace vrv {
 // Artic
 //----------------------------------------------------------------------------
 
-class Artic : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
+class Artic : public LayerElement, public AttArticulation, public AttColor, public AttExtSym, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
