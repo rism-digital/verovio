@@ -5124,79 +5124,55 @@ void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &met
         setLocationId(vrvmensur, mensurtok);
     }
     if (metersig == "*met(C)" || metersig == "C") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_2);
     }
     else if (metersig == "*met(C3)" || metersig == "C3") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_3);
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_2);
     }
     else if (metersig == "*met(C|)" || metersig == "C|") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_2);
         vrvmensur->SetSlash(1);
     }
     else if (metersig == "*met(O)" || metersig == "O") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_2);
     }
     else if (metersig == "*met(O3)" || metersig == "O3") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_3);
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_2);
     }
     else if (metersig == "*met(O|)" || metersig == "O|") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_2);
         vrvmensur->SetSlash(1);
     }
     else if (metersig == "*met(O|3)" || metersig == "O|3") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_3);
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_2);
         vrvmensur->SetSlash(1);
     }
     else if (metersig == "*met(O.)" || metersig == "O.") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_3);
     }
     else if (metersig == "*met(O.|)" || metersig == "O.|") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_3);
         vrvmensur->SetProlatio(PROLATIO_3);
         vrvmensur->SetSlash(1);
     }
     else if (metersig == "*met(C.)" || metersig == "C.") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_3);
     }
     else if (metersig == "*met(C.|)" || metersig == "C.|") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_3);
         vrvmensur->SetSlash(1);
     }
     else if (metersig == "*met(C|3/2)" || metersig == "C|3/2") {
-        vrvmensur->SetModusmaior(MODUSMAIOR_2);
-        vrvmensur->SetModusminor(MODUSMINOR_2);
         vrvmensur->SetTempus(TEMPUS_2);
         vrvmensur->SetProlatio(PROLATIO_2);
         vrvmensur->SetNum(3);
@@ -5242,30 +5218,53 @@ void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &met
     // X = how many breves in one long
     // Y = how many semibreves in one breve
     // Z = how many minims in one semibreve
-    if (hre.search(mensurtok, "_(\\d)(\\d)(\\d)(\\d)")) {
-        int modusmaior = hre.getMatchInt(1);
-        int modusminor = hre.getMatchInt(2);
-        int tempus = hre.getMatchInt(3);
-        int prolatio = hre.getMatchInt(4);
+    if (hre.search(mensurtok, "_(\\d?)(\\d?)(\\d?)(\\d?)")) {
+        std::string num1 = hre.getMatch(1);
+        std::string num2 = hre.getMatch(2);
+        std::string num3 = hre.getMatch(3);
+        std::string num4 = hre.getMatch(4);
+
+        int modusmaior = 0;
+        int modusminor = 0;
+        int tempus = 0;
+        int prolatio = 0;
+
+        if (!num1.empty()) {
+            modusmaior = stoi(num1);
+        }
+        if (!num2.empty()) {
+            modusminor = stoi(num2);
+        }
+        if (!num3.empty()) {
+            tempus = stoi(num3);
+        }
+        if (!num4.empty()) {
+            prolatio = stoi(num4);
+        }
+
         switch (prolatio) {
             case 2: vrvmensur->SetProlatio(PROLATIO_2); break;
             case 3: vrvmensur->SetProlatio(PROLATIO_3); break;
-            default: cerr << "Warning: unknown prolation in " << mensurtok << endl;
+            case 0: break;
+            default: cerr << "Warning: unknown prolation " << prolatio << " in " << mensurtok << endl;
         }
         switch (tempus) {
             case 2: vrvmensur->SetTempus(TEMPUS_2); break;
             case 3: vrvmensur->SetTempus(TEMPUS_3); break;
-            default: cerr << "Warning: unknown tempus in " << mensurtok << endl;
+            case 0: break;
+            default: cerr << "Warning: unknown tempus " << tempus << " in " << mensurtok << endl;
         }
         switch (modusminor) {
             case 2: vrvmensur->SetModusminor(MODUSMINOR_2); break;
             case 3: vrvmensur->SetModusminor(MODUSMINOR_3); break;
-            default: cerr << "Warning: unknown tempus in " << mensurtok << endl;
+            case 0: break;
+            default: cerr << "Warning: unknown modus minor " << modusminor << " in " << mensurtok << endl;
         }
         switch (modusmaior) {
             case 2: vrvmensur->SetModusmaior(MODUSMAIOR_2); break;
             case 3: vrvmensur->SetModusmaior(MODUSMAIOR_3); break;
-            default: cerr << "Warning: unknown tempus in " << mensurtok << endl;
+            case 0: break;
+            default: cerr << "Warning: unknown modus maior " << modusmaior << " in " << mensurtok << endl;
         }
     }
 }
