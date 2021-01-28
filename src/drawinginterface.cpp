@@ -302,70 +302,25 @@ bool BeamDrawingInterface::IsHorizontal()
     // First note and last note have the same postion
     if (first == last) return true;
 
-    // Detect concave shapes
-    for (int i = 1; i < itemCount - 1; ++i) {
-        if (m_drawingPlace == BEAMPLACE_above) {
-            if ((items.at(i) >= first) && (items.at(i) >= last)) return true;
-        }
-        else if (m_drawingPlace == BEAMPLACE_below) {
-            if ((items.at(i) <= first) && (items.at(i) <= last)) return true;
-        }
-    }
-    if (m_drawingPlace == BEAMPLACE_mixed) {
-        if ((itemCount == 3) && (directions.front() == directions.back())) return true;
-        int directionChanges = 0;
-        data_BEAMPLACE previous = directions.front();
-        std::for_each(directions.begin(), directions.end(), [&previous, &directionChanges](data_BEAMPLACE current) {
-            if (current != previous) {
-                ++directionChanges;
-                previous = current;
-            }
-        });
-        // if we have a mix of cross-staff elements, going from one staff to another repeatedly, we need to check note
-        // directions. Otherwise we can use direction of the outside pitches for beam
-        if (directionChanges > 1) {
-            int previousTop = VRV_UNSET;
-            int previousBottom = VRV_UNSET;
-            NoteDirection outsidePitchDirection = GetNoteDirection(first, last);
-            std::map<NoteDirection, int> beamDirections{ { NoteDirection::none, 0 }, { NoteDirection::upward, 0 },
-                { NoteDirection::downward, 0 } };
-            for (int i = 0; i < itemCount; ++i) {
-                if (directions[i] == BEAMPLACE_above) {
-                    if (previousTop == VRV_UNSET) {
-                        previousTop = items[i];
-                    }
-                    else {
-                        ++beamDirections[GetNoteDirection(previousTop, items[i])];
-                    }
-                }
-                else if (directions[i] == BEAMPLACE_below) {
-                    if (previousBottom == VRV_UNSET) {
-                        previousBottom = items[i];
-                    }
-                    else {
-                        ++beamDirections[GetNoteDirection(previousBottom, items[i])];
-                    }
-                }
-            }
-            // if direction of beam outside pitches corresponds to majority of the note directions within the beam, beam
-            // can be drawn in that direction. Otherwise horizontal beam should be used
-            bool result = std::all_of(beamDirections.begin(), beamDirections.end(),
-                [&beamDirections, &outsidePitchDirection](const auto &pair) {
-                    return (pair.first == outsidePitchDirection) ? true
-                                                                 : pair.second <= beamDirections[outsidePitchDirection];
-                });
-            if (!result) return true;
-        }
-    }
+    // If drawing place is mixed and is should be drawn horizontal based on mixed rules
+    if ((m_drawingPlace == BEAMPLACE_mixed) && (IsHorizontal(items, directions))) return true;
 
     // Detect beam with two pitches only and as step at the beginning or at the end
     const bool firstStep = (first != items.at(1));
     const bool lastStep = (last != items.at(items.size() - 2));
     if ((items.size() > 2) && (firstStep || lastStep)) {
+        // Detect concave shapes
+        for (int i = 1; i < itemCount - 1; ++i) {
+            if (m_drawingPlace == BEAMPLACE_above) {
+                if ((items.at(i) >= first) && (items.at(i) >= last)) return true;
+            }
+            else if (m_drawingPlace == BEAMPLACE_below) {
+                if ((items.at(i) <= first) && (items.at(i) <= last)) return true;
+            }
+        }
         std::vector<int> pitches;
         std::unique_copy(items.begin(), items.end(), std::back_inserter(pitches));
         if (pitches.size() == 2) {
-            // if (firstStep)
             if (m_drawingPlace == BEAMPLACE_above) {
                 // Single note at the beginning as lower first
                 if (firstStep && (std::is_sorted(items.begin(), items.end()))) return true;
@@ -382,6 +337,57 @@ bool BeamDrawingInterface::IsHorizontal()
     }
 
     return false;
+}
+
+bool BeamDrawingInterface::IsHorizontal(const std::vector<int>& items, const std::vector<data_BEAMPLACE>& directions) const
+{
+    // items and directions should be of the same size, otherwise something is not wrong
+    if (items.size() != directions.size()) return false;
+    if ((items.size() == 3) && (directions.front() == directions.back())) return true;
+
+    // calculate how many times stem direction is changed withing the beam
+    int directionChanges = 0;
+    data_BEAMPLACE previous = directions.front();
+    std::for_each(directions.begin(), directions.end(), [&previous, &directionChanges](data_BEAMPLACE current) {
+        if (current != previous) {
+            ++directionChanges;
+            previous = current;
+        }
+    });
+    // if we have a mix of cross-staff elements, going from one staff to another repeatedly, we need to check note
+    // directions. Otherwise we can use direction of the outside pitches for beam
+    if (directionChanges <= 1) return false;
+
+    int previousTop = VRV_UNSET;
+    int previousBottom = VRV_UNSET;
+    NoteDirection outsidePitchDirection = GetNoteDirection(items.front(), items.back());
+    std::map<NoteDirection, int> beamDirections{ { NoteDirection::none, 0 }, { NoteDirection::upward, 0 },
+        { NoteDirection::downward, 0 } };
+    for (int i = 0; i < items.size(); ++i) {
+        if (directions[i] == BEAMPLACE_above) {
+            if (previousTop == VRV_UNSET) {
+                previousTop = items[i];
+            }
+            else {
+                ++beamDirections[GetNoteDirection(previousTop, items[i])];
+            }
+        }
+        else if (directions[i] == BEAMPLACE_below) {
+            if (previousBottom == VRV_UNSET) {
+                previousBottom = items[i];
+            }
+            else {
+                ++beamDirections[GetNoteDirection(previousBottom, items[i])];
+            }
+        }
+    }
+    // if direction of beam outside pitches corresponds to majority of the note directions within the beam, beam
+    // can be drawn in that direction. Otherwise horizontal beam should be used
+    bool result = std::any_of(
+        beamDirections.begin(), beamDirections.end(), [&beamDirections, &outsidePitchDirection](const auto &pair) {
+            return (pair.first == outsidePitchDirection) ? false : pair.second > beamDirections[outsidePitchDirection];
+        });
+    return result;
 }
 
 bool BeamDrawingInterface::IsRepeatedPattern()
