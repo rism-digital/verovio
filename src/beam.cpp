@@ -760,6 +760,12 @@ bool BeamSegment::CalcBeamSlope(
         }
     }
     else if (place == BEAMPLACE_mixed) {
+        if (step <= unit) {
+            step = 0;
+        }            
+        else if (step > unit * 2) {
+            step = unit * 2;
+        } 
         CalcMixedBeamStem(beamInterface, step);
     }
 
@@ -792,15 +798,15 @@ void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int ste
         return;
     }
 
-    int highestPoint = m_firstNoteOrChord->m_yBeam;
-    int lowestPoint = m_lastNoteOrChord->m_yBeam;
+    int highestPoint = VRV_UNSET;
+    int lowestPoint = VRV_UNSET;
     if (m_nbNotesOrChords > 2) {
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-            if ((coord->m_beamRelativePlace == BEAMPLACE_above) && (coord->m_yBeam > highestPoint)) {
-                highestPoint = coord->m_yBeam;
+            if (coord->m_beamRelativePlace == BEAMPLACE_above) {
+                if ((highestPoint == VRV_UNSET) || (coord->m_yBeam > highestPoint)) highestPoint = coord->m_yBeam;
             };
-            if ((coord->m_beamRelativePlace == BEAMPLACE_below) && (coord->m_yBeam < lowestPoint)) {
-                lowestPoint = coord->m_yBeam;
+            if (coord->m_beamRelativePlace == BEAMPLACE_below) {
+                if ((lowestPoint == VRV_UNSET) || (coord->m_yBeam < lowestPoint)) lowestPoint = coord->m_yBeam;
             };
         });
     }
@@ -865,34 +871,7 @@ void BeamSegment::CalcBeamPosition(
         }
     }
     else {
-
-        // Find the longest stem length
-        int maxLength = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? VRV_UNSET : -VRV_UNSET;
-
-        for (auto coord : m_beamElementCoordRefs) {
-            if (!coord->m_stem) continue;
-
-            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-                if (maxLength < coord->m_yBeam) maxLength = coord->m_yBeam;
-            }
-            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
-                if (maxLength > coord->m_yBeam) maxLength = coord->m_yBeam;
-            }
-            else if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-                if (coord->m_beamRelativePlace == BEAMPLACE_above) {
-                    if (maxLength < coord->m_yBeam) maxLength = coord->m_yBeam;
-                }
-                else if (coord->m_beamRelativePlace == BEAMPLACE_below) {
-                    if (maxLength > coord->m_yBeam) maxLength = coord->m_yBeam;
-                }
-            }
-        }
-
-        if (-VRV_UNSET != abs(maxLength)) {
-            m_beamElementCoordRefs.at(0)->m_yBeam = maxLength;
-        }
-
-        this->CalcAdjustPosition(staff, doc, beamInterface);
+        CalcHorizontalBeam(beamInterface);
     }
 
     if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
@@ -1202,6 +1181,34 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
             }
         }
     }
+}
+
+void BeamSegment::CalcHorizontalBeam(BeamDrawingInterface* beamInterface) {
+    
+    if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
+        CalcMixedBeamStem(beamInterface, 0);
+    }
+    else {
+        int maxLength = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? VRV_UNSET : -VRV_UNSET;
+
+        // Find the longest stem length
+        for (auto coord : m_beamElementCoordRefs) {
+            if (!coord->m_stem) continue;
+
+            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+                if (maxLength < coord->m_yBeam) maxLength = coord->m_yBeam;
+            }
+            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+                if (maxLength > coord->m_yBeam) maxLength = coord->m_yBeam;
+            }
+        }
+
+        if (-VRV_UNSET != abs(maxLength)) {
+            m_beamElementCoordRefs.at(0)->m_yBeam = maxLength;
+        }
+    }
+
+    CalcSetValues();
 }
 
 void BeamSegment::CalcMixedBeamPlace(Staff *staff)
