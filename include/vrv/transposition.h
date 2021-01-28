@@ -59,13 +59,18 @@ public:
     TransPitch &operator--();
     TransPitch operator--(int);
 
-    static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
     data_ACCIDENTAL_GESTURAL GetAccidG() const;
     data_ACCIDENTAL_WRITTEN GetAccidW() const;
     data_PITCHNAME GetPitchName() const;
     std::wstring GetPitchString() const;
     bool IsValid(int maxAccid);
     void SetPitch(int aPname, int anAccid, int anOct);
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
 };
 
 std::ostream &operator<<(std::ostream &out, const TransPitch &pitch);
@@ -171,6 +176,10 @@ public:
     int GetGPitchClass() { return m_diatonicMapping[4]; }
     int GetAPitchClass() { return m_diatonicMapping[5]; }
     int GetBPitchClass() { return m_diatonicMapping[6]; }
+
+    //----------------//
+    // Static methods //
+    //----------------//
 
     // Input string validity helper functions.
     static bool IsValidIntervalName(const std::string &name);

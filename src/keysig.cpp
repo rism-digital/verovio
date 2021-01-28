@@ -218,8 +218,19 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     return symbolStr;
 }
 
+int KeySig::GetFifthsInt()
+{
+    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
+        return -1 * this->GetSig().first;
+    }
+    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
+        return this->GetSig().first;
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
-// Static methods
+// Static methods for KeySig
 //----------------------------------------------------------------------------
 
 data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int pos)
@@ -288,16 +299,6 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
     return octave;
 }
 
-int KeySig::GetFifthsInt()
-{
-    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
-        return -1 * this->GetSig().first;
-    }
-    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
-        return this->GetSig().first;
-    }
-    return 0;
-}
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

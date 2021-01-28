@@ -125,6 +125,10 @@ private:
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
 
+    //----------------//
+    // Static members //
+    //----------------//
+
     /**
      * A vector for storing object / ids mapping.
      * When a group is created based on an object address, it is stack on the vector.

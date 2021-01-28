@@ -52,6 +52,10 @@ public:
      */
     int GetClefLocOffset() const;
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
     /**
      * Return a clef id based on the various parameters
      */

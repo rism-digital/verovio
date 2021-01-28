@@ -93,6 +93,10 @@ public:
 private:
     //
 public:
+    //----------------//
+    // Static members //
+    //----------------//
+
     /**
      * String keys come from the contours of neume groupings as defined in MEI4
      */

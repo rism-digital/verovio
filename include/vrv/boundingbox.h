@@ -159,6 +159,10 @@ public:
      */
     int Intersects(FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
     /**
      * Swap values.
      * This is useful for example when switching to the device context world.

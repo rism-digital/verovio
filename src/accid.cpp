@@ -141,6 +141,10 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     return false;
 }
 
+//----------------------------------------------------------------------------
+// Static methods for Accid
+//----------------------------------------------------------------------------
+
 wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 {
     int symc = SMUFL_E261_accidentalNatural;

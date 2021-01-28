@@ -67,6 +67,10 @@ public:
 
     bool AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
     /**
      * @name Method used for drawing accidentals on ornaments
      */

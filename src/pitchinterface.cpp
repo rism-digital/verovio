@@ -58,18 +58,6 @@ bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterf
     */
 }
 
-void PitchInterface::AdjustPname(int &pname, int &oct)
-{
-    if (pname < PITCHNAME_c) {
-        if (oct > 0) oct--;
-        pname = PITCHNAME_b;
-    }
-    else if (pname > PITCHNAME_b) {
-        if (oct < 7) oct++;
-        pname = PITCHNAME_c;
-    }
-}
-
 void PitchInterface::AdjustPitchByOffset(int pitchOffset)
 {
     int pname = this->GetPname() + pitchOffset;
@@ -133,8 +121,20 @@ void PitchInterface::AdjustPitchForNewClef(Clef *oldClef, Clef *newClef)
 }
 
 //----------------------------------------------------------------------------
-// Static methods
+// Static methods for PitchInterface
 //----------------------------------------------------------------------------
+
+void PitchInterface::AdjustPname(int &pname, int &oct)
+{
+    if (pname < PITCHNAME_c) {
+        if (oct > 0) oct--;
+        pname = PITCHNAME_b;
+    }
+    else if (pname > PITCHNAME_b) {
+        if (oct < 7) oct++;
+        pname = PITCHNAME_c;
+    }
+}
 
 int PitchInterface::CalcLoc(
     LayerElement *layerElement, Layer *layer, LayerElement *crossStaffElement, bool topChordNote)

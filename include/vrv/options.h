@@ -94,6 +94,10 @@ public:
     bool isSet() const { return m_isSet; }
 
 public:
+    //----------------//
+    // Static members //
+    //----------------//
+
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */

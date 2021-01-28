@@ -61,6 +61,10 @@ private:
     unsigned int m_clef_offset;
     bool m_antique_notation; // support square notation
 
+    //----------------//
+    // Static members //
+    //----------------//
+
     static pitchmap PitchMap[];
 };
 

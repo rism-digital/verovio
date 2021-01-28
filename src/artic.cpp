@@ -140,19 +140,30 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     }
 }
 
-/*
-ArticPart *Artic::GetInsidePart()
+bool Artic::AlwaysAbove()
 {
-    ArticPartTypeComparison articPartComparison(ARTIC_INSIDE);
-    return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
+    auto end = Artic::s_aboveStaffArtic.end();
+    auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, this->GetArticFirst());
+    return (i != end);
 }
 
-ArticPart *Artic::GetOutsidePart()
+void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 {
-    ArticPartTypeComparison articPartComparison(ARTIC_OUTSIDE);
-    return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
+    if (start) {
+        if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
+            == m_startSlurPositioners.end())
+            m_startSlurPositioners.push_back(positioner);
+    }
+    else {
+        if (std::find(m_endSlurPositioners.begin(), m_endSlurPositioners.end(), positioner)
+            == m_endSlurPositioners.end())
+            m_endSlurPositioners.push_back(positioner);
+    }
 }
-*/
+
+//----------------------------------------------------------------------------
+// Static methods for Artic
+//----------------------------------------------------------------------------
 
 wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
 {
@@ -238,42 +249,6 @@ bool Artic::IsCentered(data_ARTICULATION artic)
     if (artic == ARTICULATION_stacc) return true;
     if (artic == ARTICULATION_ten) return true;
     return false;
-}
-
-bool Artic::AlwaysAbove()
-{
-    auto end = Artic::s_aboveStaffArtic.end();
-    auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, this->GetArticFirst());
-    return (i != end);
-
-    /*
-    std::vector<data_ARTICULATION>::iterator iter;
-    auto end = Artic::s_aboveStaffArtic.end();
-    std::vector<data_ARTICULATION> articList = this->GetArtic();
-
-    for (iter = articList.begin(); iter != articList.end(); ++iter) {
-        // return false if one has always to be rendered above the staff
-        auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, *iter);
-        if (i != end) {
-            return true;
-        }
-    }
-    return false;
-    */
-}
-
-void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
-{
-    if (start) {
-        if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
-            == m_startSlurPositioners.end())
-            m_startSlurPositioners.push_back(positioner);
-    }
-    else {
-        if (std::find(m_endSlurPositioners.begin(), m_endSlurPositioners.end(), positioner)
-            == m_endSlurPositioners.end())
-            m_endSlurPositioners.push_back(positioner);
-    }
 }
 
 //----------------------------------------------------------------------------
