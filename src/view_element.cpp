@@ -301,7 +301,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     data_ARTICULATION articValue = artic->GetArticFirst();
 
-    wchar_t code = Artic::GetSmuflCode(articValue, artic->GetDrawingPlace());
+    wchar_t code = artic->GetArticGlyph(articValue, artic->GetDrawingPlace());
 
     // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
     if (code == 0) {
@@ -319,6 +319,10 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Center the glyh if necessary
     if (Artic::IsCentered(articValue)) {
         y += (artic->GetDrawingPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
+    }
+    // @glyph.num are (usually?) aligned for placement above and needs to be shifted when below
+    else if (artic->HasGlyphNum() && artic->GetDrawingPlace() == STAFFREL_below) {
+        y -= glyphHeight;
     }
 
     // Adjust the baseline for glyph above the baseline in SMuFL
@@ -876,7 +880,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    wchar_t code = flag->GetSmuflCode(stem->GetDrawingStemDir());
+    wchar_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
 
     dc->EndGraphic(element, this);
@@ -1414,7 +1418,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             || y < staff->GetDrawingY()
                     - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
         dc->DeactivateGraphicX();
-        
+
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
         int ledgerLineThickness
             = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1425,7 +1429,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
         }
         DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
-        
+
         dc->ReactivateGraphic();
     }
 

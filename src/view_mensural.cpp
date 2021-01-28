@@ -88,7 +88,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     // Semibrevis and shorter
     else {
-        wchar_t code = note->GetMensuralSmuflNoteHead();
+        wchar_t code = note->GetMensuralNoteheadGlyph();
         dc->StartCustomGraphic("notehead");
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();

@@ -70,7 +70,7 @@ void Flag::Reset()
     m_drawingNbFlags = 0;
 }
 
-wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
+wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir)
 {
     if (stemDir == STEMDIRECTION_up) {
         switch (m_drawingNbFlags) {
@@ -102,7 +102,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
 
 Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
 {
-    code = this->GetSmuflCode(STEMDIRECTION_up);
+    code = this->GetFlagGlyph(STEMDIRECTION_up);
 
     int h = doc->GetGlyphHeight(code, staffSize, graceSize);
     return Point(0, h + doc->GetGlyphDescender(code, staffSize, graceSize));
@@ -110,7 +110,7 @@ Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
 
 Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
 {
-    code = this->GetSmuflCode(STEMDIRECTION_down);
+    code = this->GetFlagGlyph(STEMDIRECTION_down);
 
     return Point(0, doc->GetGlyphDescender(code, staffSize, graceSize));
 }
@@ -315,7 +315,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
         Flag *currentFlag = NULL;
         currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
         if (currentFlag) {
-            wchar_t flagGlyph = currentFlag->GetSmuflCode(STEMDIRECTION_down);
+            wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
             const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
             horizontalMargin += flagWidth;
         }
@@ -337,7 +337,7 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
 
     const data_STEMDIRECTION stemDirection = GetDrawingStemDir();
     // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
-    const wchar_t flagGlyph = (duration >= DURATION_16) ? SMUFL_E242_flag16thUp : flag->GetSmuflCode(stemDirection);
+    const wchar_t flagGlyph = (duration >= DURATION_16) ? SMUFL_E242_flag16thUp : flag->GetFlagGlyph(stemDirection);
     const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
     const int relevantGlyphHeight = (stemDirection == STEMDIRECTION_up) ? glyphHeight / 2 : glyphHeight;
 

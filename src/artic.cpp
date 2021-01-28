@@ -38,6 +38,7 @@ Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlace
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
@@ -50,6 +51,7 @@ void Artic::Reset()
     LayerElement::Reset();
     ResetArticulation();
     ResetColor();
+    ResetExtSym();
     ResetPlacement();
 
     m_drawingPlace = STAFFREL_NONE;
@@ -161,12 +163,14 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
     }
 }
 
-//----------------------------------------------------------------------------
-// Static methods for Artic
-//----------------------------------------------------------------------------
-
-wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
+wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
 {
+    // If there is glyph.num, prioritize it, otherwise check other attributes
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
     if (place == STAFFREL_above) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A0_articAccentAbove;
@@ -203,7 +207,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // case ARTICULATION_tap;
             // case ARTICULATION_lhpizz;
             // case ARTICULATION_dot;
-            // case ARTICULATION_stroke;
+            case ARTICULATION_stroke: return SMUFL_E4AA_articStaccatissimoStrokeAbove;
             default: return 0;
         }
     }
@@ -225,12 +229,17 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // Removed in MEI 4.0
             // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
+            case ARTICULATION_stroke: return SMUFL_E4AB_articStaccatissimoStrokeBelow;
             default: return 0;
         }
     }
     else
         return 0;
 }
+
+//----------------------------------------------------------------------------
+// Static methods for Artic
+//----------------------------------------------------------------------------
 
 bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
 {
