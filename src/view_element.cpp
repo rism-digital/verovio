@@ -1413,6 +1413,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         && (y > (int)staff->GetDrawingY()
             || y < staff->GetDrawingY()
                     - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
+        dc->DeactivateGraphicX();
+        
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
         int ledgerLineThickness
             = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1422,8 +1424,9 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
         }
-
         DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+        
+        dc->ReactivateGraphic();
     }
 
     /************ Draw children (dots) ************/
