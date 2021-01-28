@@ -550,7 +550,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         assert(note);
         dur = note->GetDrawingDur();
         if (note->IsMensuralDur() && !isInLigature) {
-            code = note->GetMensuralSmuflNoteHead();
+            code = note->GetMensuralNoteheadGlyph();
         }
         else {
             code = note->GetNoteheadGlyph(dur);

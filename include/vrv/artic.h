@@ -72,14 +72,14 @@ public:
 
     data_STAFFREL GetDrawingPlace() const { return m_drawingPlace; }
 
+    /**
+     * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
+     */
+    wchar_t GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place);
+
     //----------------//
     // Static methods //
     //----------------//
-
-    /**
-     * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
-     */
-    static wchar_t GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place);
 
     /**
      * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.

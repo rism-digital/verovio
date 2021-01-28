@@ -267,7 +267,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
     if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
-        code = this->GetMensuralSmuflNoteHead();
+        code = this->GetMensuralNoteheadGlyph();
         p.y = doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
@@ -298,7 +298,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     // See comment above
     if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
-        code = this->GetMensuralSmuflNoteHead();
+        code = this->GetMensuralNoteheadGlyph();
         p.y = -doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
@@ -352,7 +352,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff)
     return baseStem;
 }
 
-wchar_t Note::GetMensuralSmuflNoteHead()
+wchar_t Note::GetMensuralNoteheadGlyph()
 {
     assert(this->IsMensuralDur());
 
@@ -584,7 +584,7 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
     wchar_t flagGlyph = SMUFL_E242_flag16thUp;
     data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetSmuflCode(GetDrawingStemDir());
+    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(GetDrawingStemDir());
     const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
 
     const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2

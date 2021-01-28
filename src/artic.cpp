@@ -161,11 +161,7 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
     }
 }
 
-//----------------------------------------------------------------------------
-// Static methods for Artic
-//----------------------------------------------------------------------------
-
-wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
+wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
 {
     if (place == STAFFREL_above) {
         switch (artic) {
@@ -231,6 +227,10 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
     else
         return 0;
 }
+
+//----------------------------------------------------------------------------
+// Static methods for Artic
+//----------------------------------------------------------------------------
 
 bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
 {
