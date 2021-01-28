@@ -180,7 +180,6 @@ enum ClassId {
     LAYER_ELEMENT,
     ACCID,
     ARTIC,
-    ARTIC_PART,
     BARLINE,
     BARLINE_ATTR_LEFT,
     BARLINE_ATTR_RIGHT,
@@ -506,10 +505,10 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
 enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
 
 //----------------------------------------------------------------------------
-// Artic part types
+// Artic types
 //----------------------------------------------------------------------------
 
-enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
+enum ArticType { ARTIC_INSIDE = 0, ARTIC_OUTSIDE };
 
 //----------------------------------------------------------------------------
 // Visibility optimization
@@ -551,7 +550,13 @@ enum {
 // Analytical markup bitfields
 //----------------------------------------------------------------------------
 
-enum { MARKUP_DEFAULT = 0, MARKUP_ANALYTICAL_TIE = 1, MARKUP_ANALYTICAL_FERMATA = 2, MARKUP_GRACE_ATTRIBUTE = 4 };
+enum {
+    MARKUP_DEFAULT = 0,
+    MARKUP_ANALYTICAL_TIE = 1,
+    MARKUP_ANALYTICAL_FERMATA = 2,
+    MARKUP_GRACE_ATTRIBUTE = 4,
+    MARKUP_ARTIC_MULTIVAL = 8
+};
 
 //----------------------------------------------------------------------------
 // Bounding box access

@@ -229,16 +229,6 @@ wchar_t Rest::GetRestGlyph() const
     return symc;
 }
 
-int Rest::GetRestLocOffset(int loc)
-{
-    switch (this->GetActualDur()) {
-        case DUR_1: loc += 2; break;
-        default: loc += 0; break;
-    }
-
-    return loc;
-}
-
 void Rest::UpdateFromTransLoc(const TransPitch &tp)
 {
     if (HasOloc() && HasPloc()) {
