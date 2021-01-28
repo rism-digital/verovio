@@ -165,6 +165,12 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 
 wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
 {
+    // If there is glyph.num, prioritize it, otherwise check other attributes
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
     if (place == STAFFREL_above) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A0_articAccentAbove;
@@ -201,7 +207,7 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place
             // case ARTICULATION_tap;
             // case ARTICULATION_lhpizz;
             // case ARTICULATION_dot;
-            // case ARTICULATION_stroke;
+            case ARTICULATION_stroke: return SMUFL_E4AA_articStaccatissimoStrokeAbove;
             default: return 0;
         }
     }
@@ -223,6 +229,7 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place
             // Removed in MEI 4.0
             // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
+            case ARTICULATION_stroke: return SMUFL_E4AB_articStaccatissimoStrokeBelow;
             default: return 0;
         }
     }
