@@ -104,7 +104,8 @@ public:
     /**
      * Return the cross staff above or below (if  any).
      */
-    void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
+    void GetCrossStaffExtremes(
+        Staff *&staffAbove, Staff *&staffBelow, Layer **layerAbove = NULL, Layer **layerBelow = NULL);
 
     /**
      * Return true if the chord has some cross staff notes.
@@ -159,12 +160,27 @@ public:
     virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustArtic
+     */
+    virtual int AdjustArtic(FunctorParams *functorParams);
+
+    /**
+     * See Object::ConvertMarkupArtic
+     */
+    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
     ///@{
     virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
     virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::CalcArtic
+     */
+    virtual int CalcArtic(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem

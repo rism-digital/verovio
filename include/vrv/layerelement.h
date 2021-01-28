@@ -157,12 +157,11 @@ public:
      * Returns the drawing top and bottom taking into accound stem, etc.
      * We pass the doc as parameter in order to have access to the current drawing parameters.
      * withArtic specifies if the articulation sign needs to be taken into account or not.
-     * articPartType indicates if the inside or outside artic part has to be taken into account (inside is taken
+     * articType indicates if the inside or outside artic part has to be taken into account (inside is taken
      * into account in any case)
      */
-    int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
-    int GetDrawingBottom(
-        Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
+    int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticType articType = ARTIC_INSIDE);
+    int GetDrawingBottom(Doc *doc, int staffSize, bool withArtic = true, ArticType articType = ARTIC_INSIDE);
 
     /**
      * Return the drawing radius for notes and chords
@@ -370,7 +369,7 @@ public:
     virtual int GetRelativeLayerElement(FunctorParams *functorParams);
 
 private:
-    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

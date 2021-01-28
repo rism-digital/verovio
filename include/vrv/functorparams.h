@@ -18,9 +18,10 @@ class MidiFile;
 
 namespace vrv {
 
-class ClassIdComparison;
+class Artic;
 class BoundaryStartInterface;
 class Chord;
+class ClassIdComparison;
 class Clef;
 class Doc;
 class Dot;
@@ -179,6 +180,28 @@ public:
     int m_y2;
     int m_directionBias;
     int m_overlapMargin;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class AdjustArticParams : public FunctorParams {
+public:
+    AdjustArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+    }
+    std::list<Artic *> m_articAbove;
+    std::list<Artic *> m_articBelow;
+    LayerElement *m_parent;
     Doc *m_doc;
 };
 
@@ -733,7 +756,34 @@ public:
 // CalcArticParams
 //----------------------------------------------------------------------------
 
-// Use FunctorDocParams
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class CalcArticParams : public FunctorParams {
+public:
+    CalcArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+        m_staffAbove = NULL;
+        m_staffBelow = NULL;
+        m_layerAbove = NULL;
+        m_layerBelow = NULL;
+        m_crossStaffAbove = false;
+        m_crossStaffBelow = false;
+    }
+    LayerElement *m_parent;
+    data_STEMDIRECTION m_stemDir;
+    Staff *m_staffAbove;
+    Staff *m_staffBelow;
+    Layer *m_layerAbove;
+    Layer *m_layerBelow;
+    bool m_crossStaffAbove;
+    bool m_crossStaffBelow;
+    Doc *m_doc;
+};
 
 //----------------------------------------------------------------------------
 // CalcChordNoteHeads
@@ -1002,6 +1052,20 @@ public:
     Chord *m_currentChord;
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
+// ConvertMarkupArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector<Artic *>* that needs to be converted
+ **/
+
+class ConvertMarkupArticParams : public FunctorParams {
+public:
+    ConvertMarkupArticParams() {}
+    std::vector<Artic *> m_articsToConvert;
 };
 
 //----------------------------------------------------------------------------

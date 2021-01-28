@@ -1222,9 +1222,11 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         keySig->AddChild(keyAccid);
                     }
                 }
-                if (key.node().select_node("mode")) {
-                    keySig->SetMode(
-                        keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
+                if (key.node().child("mode")) {
+                    const std::string xmlMode = key.node().child("mode").text().as_string();
+                    if (std::strncmp(xmlMode.c_str(), "none", 4)) {
+                        keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
+                    }
                 }
             }
             // add it if necessary
@@ -2846,50 +2848,29 @@ void MusicXmlInput::ReadMusicXmlNote(
         // articulation
         std::vector<data_ARTICULATION> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
-            if (notations.node().select_node("articulations/*[not(@placement)]")) {
+            for (pugi::xml_node articulation : articulations.children()) {
                 Artic *artic = new Artic();
-                for (pugi::xml_node articulation : articulations.children()) {
-                    artics.push_back(ConvertArticulations(articulation.name()));
-                    if (!std::strcmp(articulation.name(), "detached-legato")) {
-                        artics.push_back(ARTICULATION_stacc);
-                        artics.push_back(ARTICULATION_ten);
-                    }
+                artics.push_back(ConvertArticulations(articulation.name()));
+                if (!std::strcmp(articulation.name(), "detached-legato")) {
+                    // we need to split up this one
+                    artic->SetArtic(artics);
+                    artic->SetColor(articulation.attribute("color").as_string());
+                    artic->SetPlace(
+                        artic->AttPlacement::StrToStaffrel(articulation.attribute("placement").as_string()));
+                    element->AddChild(artic);
+                    artics.clear();
+                    artic = new Artic();
+                    artics.push_back(ARTICULATION_ten);
+                }
+                if (artics.back() == ARTICULATION_NONE) {
+                    delete artic;
+                    continue;
                 }
                 artic->SetArtic(artics);
+                artic->SetColor(articulation.attribute("color").as_string());
+                artic->SetPlace(artic->AttPlacement::StrToStaffrel(articulation.attribute("placement").as_string()));
                 element->AddChild(artic);
                 artics.clear();
-            }
-            else {
-                std::vector<data_ARTICULATION> articsAbove;
-                std::vector<data_ARTICULATION> articsBelow;
-                for (pugi::xml_node articulation : articulations.children()) {
-                    if (HasAttributeWithValue(articulation, "placement", "above")) {
-                        articsAbove.push_back(ConvertArticulations(articulation.name()));
-                        if (!std::strcmp(articulation.name(), "detached-legato")) {
-                            articsAbove.push_back(ARTICULATION_stacc);
-                            articsAbove.push_back(ARTICULATION_ten);
-                        }
-                    }
-                    else {
-                        articsBelow.push_back(ConvertArticulations(articulation.name()));
-                        if (!std::strcmp(articulation.name(), "detached-legato")) {
-                            articsBelow.push_back(ARTICULATION_stacc);
-                            articsBelow.push_back(ARTICULATION_ten);
-                        }
-                    }
-                }
-                if (!articsAbove.empty()) {
-                    Artic *artic = new Artic();
-                    artic->SetArtic(articsAbove);
-                    artic->SetPlace(STAFFREL_above);
-                    element->AddChild(artic);
-                }
-                if (!articsBelow.empty()) {
-                    Artic *artic = new Artic();
-                    artic->SetArtic(articsBelow);
-                    artic->SetPlace(STAFFREL_below);
-                    element->AddChild(artic);
-                }
             }
         }
 
@@ -2901,14 +2882,21 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // set @tab.string and @tab.fret
             }
             else {
-                Artic *artic = new Artic();
                 for (pugi::xml_node articulation : technical.children()) {
+                    Artic *artic = new Artic();
                     artics.push_back(ConvertArticulations(articulation.name()));
+                    if (artics.back() == ARTICULATION_NONE) {
+                        delete artic;
+                        continue;
+                    }
+                    artic->SetArtic(artics);
+                    artic->SetColor(articulation.attribute("color").as_string());
+                    artic->SetPlace(
+                        artic->AttPlacement::StrToStaffrel(articulation.attribute("placement").as_string()));
+                    artic->SetType("technical");
+                    element->AddChild(artic);
+                    artics.clear();
                 }
-                artic->SetArtic(artics);
-                artic->SetType("technical");
-                element->AddChild(artic);
-                artics.clear();
             }
         }
 
@@ -3520,7 +3508,7 @@ data_ARTICULATION MusicXmlInput::ConvertArticulations(const std::string &value)
     static const std::map<std::string, data_ARTICULATION> Articulations2Id{
         // articulations
         { "accent", ARTICULATION_acc }, //
-        { "detached-legato", ARTICULATION_NONE }, //
+        { "detached-legato", ARTICULATION_stacc }, //
         { "doit", ARTICULATION_doit }, //
         { "falloff", ARTICULATION_fall }, //
         { "plop", ARTICULATION_plop }, //

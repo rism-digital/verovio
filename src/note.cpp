@@ -763,6 +763,67 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Note::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &artic : params->m_articsToConvert) {
+        artic->SplitMultival(this);
+    }
+    params->m_articsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::CalcArtic(FunctorParams *functorParams)
+{
+    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
+    assert(params);
+
+    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
+
+    params->m_parent = this;
+    params->m_stemDir = this->GetDrawingStemDir();
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    params->m_staffAbove = staff;
+    params->m_staffBelow = staff;
+    params->m_layerAbove = layer;
+    params->m_layerBelow = layer;
+    params->m_crossStaffAbove = false;
+    params->m_crossStaffBelow = false;
+
+    if (this->m_crossStaff) {
+        params->m_staffAbove = this->m_crossStaff;
+        params->m_staffBelow = this->m_crossStaff;
+        params->m_layerAbove = this->m_crossLayer;
+        params->m_layerBelow = this->m_crossLayer;
+        params->m_crossStaffAbove = true;
+        params->m_crossStaffBelow = true;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::AdjustArtic(FunctorParams *functorParams)
+{
+    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
+    assert(params);
+
+    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
+
+    params->m_parent = this;
+    params->m_articAbove.clear();
+    params->m_articBelow.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Note::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);

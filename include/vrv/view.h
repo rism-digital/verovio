@@ -283,7 +283,6 @@ protected:
     ///@{
     void DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -559,16 +558,6 @@ private:
      */
     void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
         Staff *staff, Measure *measure);
-
-    /**
-     * Used for calculating clustered information/dot position
-     */
-    bool IsOnStaffLine(int y, Staff *staff);
-
-    /**
-     * Find the nearest unit position in the direction indicated by place.
-     */
-    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
 
 public:
     /** Document */

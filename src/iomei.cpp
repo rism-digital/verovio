@@ -4733,6 +4733,10 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
     vrvArtic->ReadColor(artic);
     vrvArtic->ReadPlacement(artic);
 
+    if (vrvArtic->GetArtic().size() > 1) {
+        m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
+    }
+
     parent->AddChild(vrvArtic);
     ReadUnsupportedAttr(artic, vrvArtic);
     return true;
@@ -5139,6 +5143,9 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         Artic *vrvArtic = new Artic();
         vrvArtic->IsAttribute(true);
         vrvArtic->SetArtic(artic.GetArtic());
+        if (artic.GetArtic().size() > 1) {
+            m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
+        }
         vrvNote->AddChild(vrvArtic);
     }
 
