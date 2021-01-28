@@ -228,6 +228,7 @@ enum {
     SMUFL_E56D_ornamentMordentInverted = 0xE56D,
     SMUFL_E56E_ornamentTremblement = 0xE56E,
     SMUFL_E56F_ornamentHaydn = 0xE56F,
+    SMUFL_E583_ornamentVerticalLine = 0xE583,
     SMUFL_E587_ornamentSchleifer = 0xE587,
     SMUFL_E59D_ornamentZigZagLineNoRightEnd = 0xE59D,
     SMUFL_E59E_ornamentZigZagLineWithRightEnd = 0xE59E,
@@ -246,9 +247,9 @@ enum {
     SMUFL_E5BC_ornamentPrecompPortDeVoixMordent = 0xE5BC,
     SMUFL_E5BD_ornamentPrecompTrillWithMordent = 0xE5BD,
     SMUFL_E5BE_ornamentPrecompCadence = 0xE5BE,
-    SMUFL_E5BF_ornamentPrecompCadenceWithTurn  = 0xE5BF,
+    SMUFL_E5BF_ornamentPrecompCadenceWithTurn = 0xE5BF,
     SMUFL_E5C0_ornamentPrecompDoubleCadenceLowerPrefix = 0xE5C0,
-    SMUFL_E5C1_ornamentPrecompCadenceUpperPrefix  = 0xE5C1,
+    SMUFL_E5C1_ornamentPrecompCadenceUpperPrefix = 0xE5C1,
     SMUFL_E5C2_ornamentPrecompCadenceUpperPrefixTurn = 0xE5C2,
     SMUFL_E5C3_ornamentPrecompDoubleCadenceUpperPrefix = 0xE5C3,
     SMUFL_E5C4_ornamentPrecompDoubleCadenceUpperPrefixTurn = 0xE5C4,
@@ -363,7 +364,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 338
+#define SMUFL_COUNT 339
 
 } // namespace vrv
 
