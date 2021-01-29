@@ -2,6 +2,7 @@
 
 ## [unreleased]
 * Support for `artic@glyph.num`
+* Support for arabic accidentals
 * Improved automatic cross staff rest positioning (@eNote-GmbH)
 * Improved cross-staff spacing
 * Improved slurs

@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.48",
+    "fontVersion": "5.2.49",
     "glyphBBoxes": {
         "uniE000": {
             "bBoxNE": [
@@ -1010,6 +1010,86 @@
             "bBoxSW": [
                 0.0,
                 -1.492
+            ]
+        },
+        "uniE440": {
+            "bBoxNE": [
+                0.988,
+                1.876
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "uniE441": {
+            "bBoxNE": [
+                0.792,
+                1.876
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "uniE442": {
+            "bBoxNE": [
+                0.988,
+                1.876
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "uniE443": {
+            "bBoxNE": [
+                0.792,
+                1.876
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "uniE444": {
+            "bBoxNE": [
+                0.424,
+                1.312
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
+            ]
+        },
+        "uniE445": {
+            "bBoxNE": [
+                0.788,
+                1.42
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
+            ]
+        },
+        "uniE446": {
+            "bBoxNE": [
+                0.84,
+                1.312
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
+            ]
+        },
+        "uniE447": {
+            "bBoxNE": [
+                0.956,
+                1.42
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
             ]
         },
         "uniE4A0": {
@@ -3718,6 +3798,30 @@
         "uniE283": {
             "codepoint": "0XE283"
         },
+        "uniE440": {
+            "codepoint": "0XE440"
+        },
+        "uniE441": {
+            "codepoint": "0XE441"
+        },
+        "uniE442": {
+            "codepoint": "0XE442"
+        },
+        "uniE443": {
+            "codepoint": "0XE443"
+        },
+        "uniE444": {
+            "codepoint": "0XE444"
+        },
+        "uniE445": {
+            "codepoint": "0XE445"
+        },
+        "uniE446": {
+            "codepoint": "0XE446"
+        },
+        "uniE447": {
+            "codepoint": "0XE447"
+        },
         "uniE4A0": {
             "codepoint": "0XE4A0"
         },
@@ -4875,6 +4979,118 @@
             "cutOutSW": [
                 0.156,
                 -0.948
+            ]
+        },
+        "uniE440": {
+            "cutOutNE": [
+                0.316,
+                1.484
+            ],
+            "cutOutSE": [
+                0.628,
+                -0.344
+            ]
+        },
+        "uniE441": {
+            "cutOutNE": [
+                0.096,
+                0.564
+            ],
+            "cutOutSE": [
+                0.432,
+                -0.344
+            ]
+        },
+        "uniE442": {
+            "cutOutNE": [
+                0.312,
+                1.32
+            ],
+            "cutOutSE": [
+                0.628,
+                -0.344
+            ]
+        },
+        "uniE443": {
+            "cutOutNW": [
+                0.7,
+                0.584
+            ],
+            "cutOutSW": [
+                0.368,
+                -0.332
+            ]
+        },
+        "uniE444": {
+            "cutOutNE": [
+                0.252,
+                0.72
+            ],
+            "cutOutNW": [
+                0.16,
+                0.652
+            ],
+            "cutOutSE": [
+                0.256,
+                -0.748
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.812
+            ]
+        },
+        "uniE445": {
+            "cutOutNE": [
+                0.624,
+                0.844
+            ],
+            "cutOutNW": [
+                0.16,
+                0.644
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.82
+            ]
+        },
+        "uniE446": {
+            "cutOutNE": [
+                0.452,
+                0.72
+            ],
+            "cutOutNW": [
+                0.36,
+                0.652
+            ],
+            "cutOutSE": [
+                0.456,
+                -0.748
+            ],
+            "cutOutSW": [
+                0.36,
+                -0.812
+            ]
+        },
+        "uniE447": {
+            "cutOutNE": [
+                0.712,
+                0.844
+            ],
+            "cutOutNW": [
+                0.248,
+                0.644
+            ],
+            "cutOutSE": [
+                0.712,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.248,
+                -0.82
             ]
         }
     }
