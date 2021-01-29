@@ -560,7 +560,9 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
         GetStaffDefMensur()->AlignHorizontally(params);
     }
     if (this->GetStaffDefMeterSig()) {
-        GetStaffDefMeterSig()->AlignHorizontally(params);
+        if (GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
+            GetStaffDefMeterSig()->AlignHorizontally(params);
+        }
     }
 
     params->m_scoreDefRole = SCOREDEF_NONE;
