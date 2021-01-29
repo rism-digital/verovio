@@ -20,7 +20,7 @@ echo "Generating metadata for $fontname font"
 
 # generate SVG and G2N files for the text font
 fontforge "$scriptdir"/generate_plain_font_metadata.py "$1"
-find . -type f -name "$fontfile*.svg" -not -path "./tmp/*" -print0 | while IFS= read -r -d '' fname;
+find . -type f -name "$fontname*.svg" -not -path "./tmp/*" -print0 | while IFS= read -r -d '' fname;
 do
 	font="${fname%.*}"
 	# generate bounding boxes SVG for the text font
