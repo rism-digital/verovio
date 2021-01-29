@@ -273,7 +273,7 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
         }
     }
     // Stems cross-staff beam need special treament but only if the beam itself is not cross-staff
-    if (this->Is({ARTIC, STEM}) && beam && beam->m_crossStaffContent && !beam->m_crossStaff) {
+    if (this->Is({ ARTIC, STEM }) && beam && beam->m_crossStaffContent && !beam->m_crossStaff) {
         data_STAFFREL_basic direction = beam->m_crossStaffRel;
         if (direction == STAFFREL_basic_above) {
             above = beam->m_crossStaffContent->GetAlignment();
@@ -550,7 +550,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         assert(note);
         dur = note->GetDrawingDur();
         if (note->IsMensuralDur() && !isInLigature) {
-            code = note->GetMensuralSmuflNoteHead();
+            code = note->GetMensuralNoteheadGlyph();
         }
         else {
             code = note->GetNoteheadGlyph(dur);

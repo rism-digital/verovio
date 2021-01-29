@@ -225,7 +225,6 @@ public:
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
-    static void SeedUuid(unsigned int seed = 0);
 
     /**
      * Methods for setting / getting comments
@@ -535,6 +534,14 @@ public:
      */
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
         ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    static void SeedUuid(unsigned int seed = 0);
+
+    static bool sortByUlx(Object *a, Object *b);
 
     //----------//
     // Functors //
@@ -1219,8 +1226,6 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
-    static bool sortByUlx(Object *a, Object *b);
-
 protected:
     //
 private:
@@ -1316,6 +1321,10 @@ private:
      * A flag indicating if the Object is a copy created by an expanded expansion element.
      */
     bool m_isExpansion;
+
+    //----------------//
+    // Static members //
+    //----------------//
 
     /**
      * A static counter for uuid generation.

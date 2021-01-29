@@ -1313,7 +1313,7 @@
             <!--<glyph glyph-code="E580" smufl-name="ornamentObliqueLineHorizAfterNote"/>-->
             <!--<glyph glyph-code="E581" smufl-name="ornamentComma"/>-->
             <!--<glyph glyph-code="E582" smufl-name="ornamentShake3"/>-->
-            <!--<glyph glyph-code="E583" smufl-name="ornamentVerticalLine"/>-->
+            <glyph glyph-code="E583" smufl-name="ornamentVerticalLine"/>
             <!--<glyph glyph-code="E584" smufl-name="ornamentShakeMuffat1"/>-->
             <!--<glyph glyph-code="E585" smufl-name="glissandoUp"/>-->
             <!--<glyph glyph-code="E586" smufl-name="glissandoDown"/>-->

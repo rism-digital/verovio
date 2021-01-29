@@ -72,6 +72,10 @@ int Clef::GetClefLocOffset() const
     return offset;
 }
 
+//----------------------------------------------------------------------------
+// Static methods for Clef
+//----------------------------------------------------------------------------
+
 int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place)
 {
     return place << 24 | octaveDis << 16 | line << 8 | shape;

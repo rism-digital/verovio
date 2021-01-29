@@ -732,11 +732,6 @@ private:
     bool IsAllowed(std::string element, Object *filterParent);
 
     /**
-     * A static array for storing the implemented editorial elements
-     */
-    static std::vector<std::string> s_editorialElementNames;
-
-    /**
      * The selected <mdiv>.
      * If not specified by --mdiv-x-path query, then it is the first <mdiv> in the body
      */
@@ -752,6 +747,15 @@ private:
      * The comment to be attached to the next Object
      */
     std::string m_comment;
+
+    //----------------//
+    // Static members //
+    //----------------//
+
+    /**
+     * A static array for storing the implemented editorial elements
+     */
+    static std::vector<std::string> s_editorialElementNames;
 };
 
 } // namespace vrv

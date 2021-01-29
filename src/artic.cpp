@@ -38,6 +38,7 @@ Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlace
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
@@ -50,6 +51,7 @@ void Artic::Reset()
     LayerElement::Reset();
     ResetArticulation();
     ResetColor();
+    ResetExtSym();
     ResetPlacement();
 
     m_drawingPlace = STAFFREL_NONE;
@@ -140,22 +142,35 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     }
 }
 
-/*
-ArticPart *Artic::GetInsidePart()
+bool Artic::AlwaysAbove()
 {
-    ArticPartTypeComparison articPartComparison(ARTIC_INSIDE);
-    return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
+    auto end = Artic::s_aboveStaffArtic.end();
+    auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, this->GetArticFirst());
+    return (i != end);
 }
 
-ArticPart *Artic::GetOutsidePart()
+void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 {
-    ArticPartTypeComparison articPartComparison(ARTIC_OUTSIDE);
-    return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
+    if (start) {
+        if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
+            == m_startSlurPositioners.end())
+            m_startSlurPositioners.push_back(positioner);
+    }
+    else {
+        if (std::find(m_endSlurPositioners.begin(), m_endSlurPositioners.end(), positioner)
+            == m_endSlurPositioners.end())
+            m_endSlurPositioners.push_back(positioner);
+    }
 }
-*/
 
-wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
+wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
 {
+    // If there is glyph.num, prioritize it, otherwise check other attributes
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
     if (place == STAFFREL_above) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A0_articAccentAbove;
@@ -192,7 +207,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // case ARTICULATION_tap;
             // case ARTICULATION_lhpizz;
             // case ARTICULATION_dot;
-            // case ARTICULATION_stroke;
+            case ARTICULATION_stroke: return SMUFL_E4AA_articStaccatissimoStrokeAbove;
             default: return 0;
         }
     }
@@ -214,12 +229,17 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // Removed in MEI 4.0
             // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
+            case ARTICULATION_stroke: return SMUFL_E4AB_articStaccatissimoStrokeBelow;
             default: return 0;
         }
     }
     else
         return 0;
 }
+
+//----------------------------------------------------------------------------
+// Static methods for Artic
+//----------------------------------------------------------------------------
 
 bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
 {
@@ -238,42 +258,6 @@ bool Artic::IsCentered(data_ARTICULATION artic)
     if (artic == ARTICULATION_stacc) return true;
     if (artic == ARTICULATION_ten) return true;
     return false;
-}
-
-bool Artic::AlwaysAbove()
-{
-    auto end = Artic::s_aboveStaffArtic.end();
-    auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, this->GetArticFirst());
-    return (i != end);
-
-    /*
-    std::vector<data_ARTICULATION>::iterator iter;
-    auto end = Artic::s_aboveStaffArtic.end();
-    std::vector<data_ARTICULATION> articList = this->GetArtic();
-
-    for (iter = articList.begin(); iter != articList.end(); ++iter) {
-        // return false if one has always to be rendered above the staff
-        auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, *iter);
-        if (i != end) {
-            return true;
-        }
-    }
-    return false;
-    */
-}
-
-void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
-{
-    if (start) {
-        if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
-            == m_startSlurPositioners.end())
-            m_startSlurPositioners.push_back(positioner);
-    }
-    else {
-        if (std::find(m_endSlurPositioners.begin(), m_endSlurPositioners.end(), positioner)
-            == m_endSlurPositioners.end())
-            m_endSlurPositioners.push_back(positioner);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -303,7 +287,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     assert(staff);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    
+
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
 
     if (params->m_parent->m_crossStaff) {
@@ -344,12 +328,13 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     this->SetDrawingXRel(xShift);
 
     /************** set cross-staff / layer **************/
-    
+
     // Exception for artic because they are relative to the staff - we set m_crossStaff and m_crossLayer
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
         this->m_crossStaff = params->m_staffAbove;
         this->m_crossLayer = params->m_layerAbove;
-        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the parent where the beam is
+        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the
+        // parent where the beam is
         if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_below) {
             this->m_crossStaff = NULL;
             this->m_crossLayer = NULL;
@@ -427,7 +412,9 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     }
 
     // Add spacing
-    int spacing = 1.5 * params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int spacingTop = params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int spacingBottom
+        = params->m_doc->GetBottomMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y = this->GetDrawingY();
     int yShift = 0;
     int direction = (this->GetDrawingPlace() == STAFFREL_above) ? 1 : -1;
@@ -435,12 +422,12 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     if (this->IsInsideArtic()) {
         // If we are above the top of the  staff, just pile them up
         if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) {
-            yShift += spacing;
+            yShift += spacingBottom;
         }
         // If we are below the bottom, just pile the down
         else if ((this->GetDrawingPlace() == STAFFREL_below)
             && (y < staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
-            yShift -= spacing;
+            yShift -= spacingTop;
         }
         // Otherwise make it fit the staff space
         else {
@@ -451,6 +438,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     }
     // Artic part outside just need to be piled up or down
     else {
+        int spacing = (direction > 0) ? spacingBottom : spacingTop;
         yShift += spacing * direction;
     }
     this->SetDrawingYRel(this->GetDrawingYRel() + yShift);

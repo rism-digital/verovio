@@ -133,6 +133,11 @@ public:
     using StyleAttributes = std::pair<data_FONTWEIGHT, data_FONTSTYLE>;
     using GlyphMap = std::map<wchar_t, Glyph>;
     using GlyphTextMap = std::map<StyleAttributes, GlyphMap>;
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
     /**
      * @name Setters and getters for static environment variables
      */
@@ -160,6 +165,10 @@ private:
     static bool LoadFont(const std::string &fontName);
 
 private:
+    //----------------//
+    // Static members //
+    //----------------//
+
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static std::string s_path;
     /** The loaded SMuFL font */

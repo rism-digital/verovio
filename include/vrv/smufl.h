@@ -228,6 +228,7 @@ enum {
     SMUFL_E56D_ornamentMordentInverted = 0xE56D,
     SMUFL_E56E_ornamentTremblement = 0xE56E,
     SMUFL_E56F_ornamentHaydn = 0xE56F,
+    SMUFL_E583_ornamentVerticalLine = 0xE583,
     SMUFL_E587_ornamentSchleifer = 0xE587,
     SMUFL_E59D_ornamentZigZagLineNoRightEnd = 0xE59D,
     SMUFL_E59E_ornamentZigZagLineWithRightEnd = 0xE59E,
@@ -363,7 +364,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 338
+#define SMUFL_COUNT 339
 
 } // namespace vrv
 

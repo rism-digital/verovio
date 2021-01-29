@@ -1058,6 +1058,10 @@ Options::Options()
 
     /// custom bottom
 
+    m_bottomMarginArtic.SetInfo("Bottom margin artic", "The margin for artic in MEI units");
+    m_bottomMarginArtic.Init(0.75, 0.0, 10.0);
+    this->Register(&m_bottomMarginArtic, "bottomMarginArtic", &m_elementMargins);
+
     m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
     m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
@@ -1199,6 +1203,10 @@ Options::Options()
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
 
     /// custom top
+
+    m_topMarginArtic.SetInfo("Top margin artic", "The margin for artic in MEI units");
+    m_topMarginArtic.Init(0.75, 0.0, 10.0);
+    this->Register(&m_topMarginArtic, "topMarginArtic", &m_elementMargins);
 
     m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
     m_topMarginHarm.Init(1.0, 0.0, 10.0);

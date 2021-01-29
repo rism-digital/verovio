@@ -8,6 +8,7 @@
 #ifndef __VRV_ARTIC_H__
 #define __VRV_ARTIC_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 
@@ -17,7 +18,7 @@ namespace vrv {
 // Artic
 //----------------------------------------------------------------------------
 
-class Artic : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
+class Artic : public LayerElement, public AttArticulation, public AttColor, public AttExtSym, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -56,23 +57,6 @@ public:
     void SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur);
 
     /**
-     * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
-     */
-    static wchar_t GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place);
-
-    /**
-     * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.
-     * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
-     * See bow indications for an example where is is always above
-     */
-    static bool VerticalCorr(wchar_t code, const data_STAFFREL &place);
-
-    /**
-     * Static method that returns true if the data_ARTICULATION has to be centered between staff lines
-     */
-    static bool IsCentered(data_ARTICULATION artic);
-
-    /**
      * Return the inside and outside part of an artic if any (NULL otherwiser)
      */
     ///@{
@@ -88,6 +72,27 @@ public:
     void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
     data_STAFFREL GetDrawingPlace() const { return m_drawingPlace; }
+
+    /**
+     * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
+     */
+    wchar_t GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place);
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.
+     * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
+     * See bow indications for an example where is is always above
+     */
+    static bool VerticalCorr(wchar_t code, const data_STAFFREL &place);
+
+    /**
+     * Static method that returns true if the data_ARTICULATION has to be centered between staff lines
+     */
+    static bool IsCentered(data_ARTICULATION artic);
 
     //----------//
     // Functors //

@@ -604,6 +604,10 @@ protected:
     ScoreDef m_drawingScoreDef;
 
 private:
+    //----------------//
+    // Static members //
+    //----------------//
+
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
     static int s_drawingLigX[2], s_drawingLigY[2];

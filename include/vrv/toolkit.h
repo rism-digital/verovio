@@ -26,6 +26,7 @@ enum FileFormat {
     AUTO,
     MEI,
     HUMDRUM,
+    HUMMEI,
     PAE,
     ABC,
     DARMS,
@@ -308,8 +309,6 @@ private:
     FileFormat m_inputFrom;
     FileFormat m_outputTo;
 
-    static char *m_humdrumBuffer;
-
     Options *m_options;
 
     /**
@@ -318,6 +317,12 @@ private:
     char *m_cString;
 
     EditorToolkit *m_editorToolkit;
+
+    //----------------//
+    // Static members //
+    //----------------//
+
+    static char *m_humdrumBuffer;
 };
 
 } // namespace vrv

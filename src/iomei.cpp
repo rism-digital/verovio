@@ -1351,6 +1351,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     // pedal->WriteVerticalGroup(currentNode);
+    pedal->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WritePhrase(pugi::xml_node currentNode, Phrase *phrase)
@@ -1506,6 +1507,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     WriteLayerElement(currentNode, artic);
     artic->WriteArticulation(currentNode);
     artic->WriteColor(currentNode);
+    artic->WriteExtSym(currentNode);
     artic->WritePlacement(currentNode);
 }
 
@@ -4731,6 +4733,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
 
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadColor(artic);
+    vrvArtic->ReadExtSym(artic);
     vrvArtic->ReadPlacement(artic);
 
     if (vrvArtic->GetArtic().size() > 1) {
