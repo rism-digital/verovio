@@ -167,6 +167,7 @@ void ScoreDef::Reset()
     m_drawLabels = false;
     m_drawingWidth = 0;
     m_setAsDrawing = false;
+    m_cacheCastOffWidth = VRV_UNSET;
 }
 
 bool ScoreDef::IsSupportedChild(Object *child)
@@ -417,7 +418,10 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
     // the initial one - for this to be corrected, we would need two parameters, one for the current initial
     // scoreDef and one for the current that will be the initial one at the next system
     // Also, the abbr label (width) changes would not be taken into account
-    params->m_currentScoreDefWidth = this->GetDrawingWidth() + params->m_contentSystem->GetDrawingAbbrLabelsWidth();
+    if (m_cacheCastOffWidth == VRV_UNSET) {
+        m_cacheCastOffWidth = this->GetDrawingWidth() + params->m_contentSystem->GetDrawingAbbrLabelsWidth();
+    }
+    params->m_currentScoreDefWidth = m_cacheCastOffWidth;
 
     return FUNCTOR_SIBLINGS;
 }

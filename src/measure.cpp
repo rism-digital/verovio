@@ -119,6 +119,10 @@ void Measure::Reset()
     m_xAbs = VRV_UNSET;
     m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
+    
+    m_cachedCastOffOverflow = VRV_UNSET;
+    m_cachedCastOffDrawingXRel = VRV_UNSET;
+    m_cachedCastOffWidth = VRV_UNSET;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -918,9 +922,17 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
-
-    // Check if the measure has some overlfowing control elements
-    int overflow = this->GetDrawingOverflow();
+    
+    if (m_cachedCastOffWidth == VRV_UNSET) {
+        // Check if the measure has some overlfowing control elements
+        m_cachedCastOffOverflow = this->GetDrawingOverflow();
+        m_cachedCastOffWidth = this->GetWidth();
+        m_cachedCastOffDrawingXRel = this->m_drawingXRel;
+        
+    }
+    int overflow = this->m_cachedCastOffOverflow;
+    int width = this->m_cachedCastOffWidth;
+    int drawingXRel = this->m_cachedCastOffDrawingXRel;
 
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
@@ -933,16 +945,16 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+        else if (drawingXRel + width + params->m_currentScoreDefWidth - params->m_shift
             > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = this->m_drawingXRel;
+            params->m_shift = drawingXRel;
             for (Object *oneOfPendingObjects : params->m_pendingObjects) {
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
-                    params->m_shift = firstPendingMesure->m_drawingXRel;
+                    params->m_shift = firstPendingMesure->m_cachedCastOffDrawingXRel;
                     // it has to be first measure
                     break;
                 }

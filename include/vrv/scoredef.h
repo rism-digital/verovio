@@ -218,6 +218,8 @@ private:
     //
 public:
     bool m_setAsDrawing;
+                     
+    int m_cacheCastOffWidth;
     //
 private:
     /** Flags for indicating whether labels need to be drawn or not */

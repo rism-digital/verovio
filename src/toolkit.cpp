@@ -694,6 +694,11 @@ bool Toolkit::LoadData(const std::string &data)
             }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();
+            
+            //m_options->m_pageWidth.SetValue(1000);
+            
+            //m_doc.UnCastOffDoc();
+            //m_doc.CastOffDoc();
             // LogElapsedTimeEnd("layout");
         }
     }

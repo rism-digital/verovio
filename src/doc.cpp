@@ -849,10 +849,16 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     }
 
     this->SetCurrentScoreDefDoc();
-
+    
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
-    contentPage->LayOutHorizontally();
+
+    Measure *firstMeasure = vrv_cast<Measure *>(contentPage->FindDescendantByType(MEASURE));
+    if (!firstMeasure || firstMeasure->m_cachedCastOffWidth == VRV_UNSET) {
+        LogMessage("Doing Horizontal Layout");
+        contentPage->LayOutHorizontally();
+        LogMessage("Horizontal Layout Done");
+    }
 
     System *contentSystem = vrv_cast<System *>(contentPage->DetachChild(0));
     assert(contentSystem);
@@ -869,10 +875,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     else {
         CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this, smart);
         castOffSystemsParams.m_systemWidth
-            = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
-        castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
+        = this->m_drawingPageContentWidth;// - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+        castOffSystemsParams.m_shift = 0; //-contentSystem->GetDrawingLabelsWidth();
         castOffSystemsParams.m_currentScoreDefWidth
-            = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
+        = 0; //contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
 
         Functor castOffSystems(&Object::CastOffSystems);
         Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
