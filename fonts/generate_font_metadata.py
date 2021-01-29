@@ -53,9 +53,9 @@ fontFileName = ''
 fontDir = ''
 outDir = 'json/'
 if nargs != 2:
-    fontFileName = 'November2.sfd'
+    fontFileName = 'Leipzig.sfd'
     path = fontFileName
-    #print ( "Oops... Font file name missing!" )
+    #print ( "Font file name missing" )
     #sys.exit (1)
 
 if fontFileName == '':
@@ -64,20 +64,23 @@ if fontFileName == '':
 try:
     font = fontforge.open(path)
 except EnvironmentError:
-    print("Aargh... Error opening font file %s!" % fontFileName)
+    print("Can't open font file %sßß" % fontFileName)
     sys.exit(1)
 
 fontName = os.path.splitext(os.path.basename(fontFileName))[0]
 
-log = open(outDir + fontName.lower() + '.log', 'w+')
-print ("\n# # # %s: checking data & generating metadata... # # #" % (
-    fontFileName), file=log)
 # generating OpenType font:
-#font.generate( outDir+fontName+'.otf', '', ('glyph-map-file', 'opentype') )
-fontVersion = font.version
-metadata = {'fontName': fontName, 'fontVersion': fontVersion}
+print("Generating OpenType font")
+font.generate( font.fontname+'.otf', '', 'opentype' )
+metadata = {'fontName': font.fontname, 'fontVersion': font.version}
 
-jsonComment = 'Automatically generated Metadata for the' + fontName + \
+# extracting font log
+print("Extracting font log")
+fontlog = open('FONTLOG.txt', 'w+')
+n=fontlog.write(font.fontlog)
+fontlog.close()
+
+jsonComment = 'Automatically generated Metadata for the ' + font.fontname + \
     ' font. Most (but not all) of these metadata come from the SMuFL specifications.'
 metadata["_comment"] = jsonComment
 # customize these values if necessary:
@@ -112,64 +115,21 @@ engravingDefaults = {
 
 metadata["engravingDefaults"] = engravingDefaults
 
-lilypondData = '%{\n'
-lilypondData += '  TODO: LilyPond data header\n%}\n\n'
-lilypondData += '#(define ' + fontName.lower() + ' \'(\n'
-lilypondGlyphs = list()
+with open('glyphnames.json') as smuflGlyphnamesFile:
+    smuflGlyphnames = json.load(smuflGlyphnamesFile)
 
-print ("  Generating unicode metadata...", file=log)
-print ("  Generating LilyPond metadata...", file=log)
-
-with open(fontFileName) as f:
-    lines = f.readlines()
-glyphs = dict()
-line_iter = iter(lines)
-for anyLine in line_iter:
-    line1 = anyLine.split()
-    if len(line1) > 0 and line1[0] == 'StartChar:':
-        glyphName = line1[1]
-        line2 = line_iter.__next__().split()
-        line3 = line_iter.__next__().split()
-        value = int(line2[2])
-        if value != '-1' and value > 31:
-            mainCodepoint = "%#06X" % value
-            initialCodepoint = mainCodepoint
-            found = False
-            if (value >= 0xE000 and value < 0xE400) or (value >= 0xF400 and value < 0xF800):
-                found = True
-            if line3[0] == 'AltUni2:':
-                alternates = list()
-                for item in line3:
-                    if item != 'AltUni2:':
-                        alternate = item.split('.')
-                        value = "%#06X" % int(alternate[0], 16)
-                        if not found and int(initialCodepoint, 16) <= 0xff and int(value, 16) >= 0xE000 and int(value, 16) < 0xF800:
-                            if int(value, 16) < 0xF000 or int(value, 16) > 0xF0FF:
-                                found = True
-                            temp = mainCodepoint
-                            mainCodepoint = value
-                            value = temp
-                        alternates.append(value)
-                glyphs[glyphName] = {
-                    'codepoint': mainCodepoint, 'alternateCodepoints': alternates}
-            else:
-                glyphs[glyphName] = {'codepoint': mainCodepoint}
-            lilypondGlyphs.append(
-                '   ("' + glyphName + '" . #x' + "%04X" % int(mainCodepoint, 16) + ')')
-metadata["glyphs"] = glyphs
-
-lilypondGlyphs.sort()
-lilypondData += '\n'.join(lilypondGlyphs) + '\n))\n'
-
-print ("  Generating bounding box metadata...", file=log)
-print ("  Checking font...", file=log)
-print("", file=log)
 glyphBBoxes = dict()
 glyphsWithAnchors = dict()
 count = 0
 undefCount = 0
 for glyph in font:
     g = font[glyph]
+
+    if "uni" in glyph:
+        for smuflGlyphname in smuflGlyphnames.items():
+            if glyph.split("uni")[1] in list(smuflGlyphname[1].values())[0]:
+                g.glyphname = smuflGlyphname[0]
+
     if g.unicode != -1 and g.unicode > 31:
         count += 1
         validateGlyph(g)
@@ -189,16 +149,11 @@ for glyph in font:
 metadata["glyphBBoxes"] = glyphBBoxes
 metadata["glyphsWithAnchors"] = glyphsWithAnchors
 font.close()
+
 print("\n%d defined glyphs processed (there are %d undefined glyphs)" % (
-    count, undefCount - 31), file=log)
-log.close()
-log = open(outDir + fontName.lower() + '.log', 'r')
-print(log.read())
+    count, undefCount - 31))
 
 output = json.dumps(metadata, sort_keys=True, indent=4, separators=(',', ': '))
 jsonFileName = outDir + fontName.lower() + "_metadata.json"
-lilypondDataFileName = outDir + fontName.lower() + "_data.ly"
 with open(jsonFileName, "w") as outfile:
     outfile.write(output)
-with open(lilypondDataFileName, "w") as outfile:
-    outfile.write(lilypondData)
