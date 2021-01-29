@@ -49,7 +49,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
 
-    if (dc->Is(BBOX_DEVICE_CONTEXT) && (curve->GetDir() == curvature_CURVEDIR_NONE || slur->IsCrossStaff())) {
+    if (dc->Is(BBOX_DEVICE_CONTEXT) && (curve->GetDir() == curvature_CURVEDIR_NONE || curve->IsCrossStaff())) {
         this->DrawSlurInitial(curve, slur, x1, x2, staff, spanningType);
     }
 
@@ -181,18 +181,6 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         if (system->HasMixedDrawingStemDir(start, end)) {
             auto curveDir = system->GetPreferredCurveDirection(start, end, slur);
             slur->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE? curveDir : curvature_CURVEDIR_above);
-        }
-        // If we have a start to end situation, check if the slur is cross-staff and store it.
-        if (start->m_crossStaff != end->m_crossStaff) {
-            slur->IsCrossStaff(true);
-        }
-        // Check if the two elements are in different staves (but themselves not cross-staff)
-        else {
-            Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
-            assert(startStaff);
-            Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
-            assert(endStaff);
-            if (startStaff->GetN() != endStaff->GetN()) slur->IsCrossStaff(true);
         }
     }
 
