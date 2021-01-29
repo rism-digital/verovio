@@ -9962,7 +9962,7 @@ void HumdrumInput::addPlicaUp(Note *note)
 //    ARTICULATION_tap,
 //    ARTICULATION_lhpizz,
 //    ARTICULATION_dot,
-//    ARTICULATION_stroke,
+//    ARTICULATION_stroke
 //};
 //
 
@@ -9995,6 +9995,10 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             ch = '`';
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
             ++i;
+        }
+        if (m_signifiers.verticalStroke == ch) {
+            // use 7 slot in array for vertical strokes
+            ch = 7;
         }
         articloc.at(ch) = i + 1;
 
@@ -10056,6 +10060,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         positions.push_back(articpos[6]);
         gestural.push_back(articges['6']);
         showingpositions.push_back(showpos['6']);
+    }
+    if (articloc[7]) {
+        artics.push_back(ARTICULATION_stroke);
+        positions.push_back(articpos[7]);
+        gestural.push_back(articges[7]);
+        showingpositions.push_back(showpos[7]);
     }
     if (articloc['^']) {
         artics.push_back(ARTICULATION_acc);
@@ -22819,6 +22829,12 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // !!!RDF**kern: i = hairpin accent
         if (value.find("hairpin accent", equals) != std::string::npos) {
             m_signifiers.hairpinAccent = signifier;
+        }
+
+        // vertical strokes:
+        // !!!RDF**kern: | = vertical stroke
+        if (value.find("vertical stroke", equals) != std::string::npos) {
+            m_signifiers.verticalStroke = signifier;
         }
 
         // terminal longs

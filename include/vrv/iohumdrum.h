@@ -362,6 +362,7 @@ public:
     std::vector<std::string> textcolor;
 
     char hairpinAccent = '\0'; // For <> accent on a note.
+    char verticalStroke = '\0'; // For horizontal stroke ornament
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
