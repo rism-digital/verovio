@@ -1,8 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support for `clef@visible` (@rettinghaus)
 * Support for `artic@glyph.num`
 * Support for arabic accidentals
+* Improved default rest positioning
 * Improved automatic cross staff rest positioning (@eNote-GmbH)
 * Improved cross-staff spacing
 * Improved slurs
