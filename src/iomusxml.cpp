@@ -1182,7 +1182,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // add it if necessary
             if (clef) {
-                // Make it an attribute for now
                 staffDef->AddChild(clef);
             }
 
@@ -1227,6 +1226,10 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     if (std::strncmp(xmlMode.c_str(), "none", 4)) {
                         keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
                     }
+                }
+                if (key.node().attribute("id")) {
+                    if (!keySig) keySig = new KeySig();
+                    keySig->SetUuid(key.node().attribute("id").as_string());
                 }
             }
             // add it if necessary
@@ -1302,7 +1305,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // add it if necessary
             if (meterSig) {
-                // Make it an attribute for now
                 staffDef->AddChild(meterSig);
             }
 
@@ -1650,9 +1652,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             if (!keySig) keySig = new KeySig();
             keySig->SetUuid(key.node().attribute("id").as_string());
         }
+        if (keySig) keySig->SetVisible(ConvertWordToBool(key.node().attribute("print-object").as_string()));
         // Add it if necessary
         if (keySig) {
-            // Make it an attribute for now
             scoreDef->AddChild(keySig);
         }
 
@@ -1692,8 +1694,6 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             }
             // add it if necessary
             if (meterSig) {
-                // Make it an attribute for now
-                meterSig->IsAttribute(true);
                 scoreDef->AddChild(meterSig);
             }
         }
