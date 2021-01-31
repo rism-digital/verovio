@@ -20389,6 +20389,16 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 //      SS = turn, centered between two notes
 //      $$ = inverted turn, centered between two notes
 //
+//  Layout parameters:
+//      LO:TURN:facc[=true] = flip upper and lower accidentals
+//      LO:TURN:uacc=[acc]  = upper [visible] accidental (or lower visual one if flip is active)
+//      LO:TURN:lacc=[acc]  = lower [visible] accidental (or upper visual one if flip is active)
+// 			[ul]acc = "none" = force the accidental not to show
+// 			[ul]acc = "true" = force the accidental not to show ("LO:TURN:[ul]acc" hide an accidental)
+//
+// Deal with cases where the accidental should be hidden but different from sounding accidental.  This
+// can be done when MEI allows @accidlower.ges and @accidupper.ges.
+//
 // Assuming not in chord for now.
 //
 
@@ -20488,10 +20498,84 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         tokindex = 0;
     }
 
-    // check for upper and lower accidental on turn
+    // Check for automatic upper and lower accidental on turn:
     std::string loweraccid = token->getValue("auto", to_string(tokindex), "turnLowerAccidental");
     std::string upperaccid = token->getValue("auto", to_string(tokindex), "turnUpperAccidental");
-    // check to see if they need to be flipped
+    if (!loweraccid.empty()) {
+        if (loweraccid == "1") {
+            loweraccid = "#";
+        }
+        if (loweraccid == "-1") {
+            loweraccid = "-";
+        }
+        if (loweraccid == "0") {
+            loweraccid = "n";
+        }
+        if (loweraccid == "3") {
+            loweraccid = "#x";
+        }
+        if (loweraccid == "-3") {
+            loweraccid = "---";
+        }
+        if (loweraccid == "2") {
+            loweraccid = "x";
+        }
+        else if (loweraccid == "-2") {
+            loweraccid = "--";
+        }
+    }
+    if (!upperaccid.empty()) {
+        if (upperaccid == "1") {
+            upperaccid = "#";
+        }
+        if (upperaccid == "-1") {
+            upperaccid = "-";
+        }
+        if (upperaccid == "0") {
+            upperaccid = "n";
+        }
+        if (upperaccid == "3") {
+            upperaccid = "#x";
+        }
+        if (upperaccid == "-3") {
+            upperaccid = "---";
+        }
+        if (upperaccid == "2") {
+            upperaccid = "x";
+        }
+        else if (upperaccid == "-2") {
+            upperaccid = "--";
+        }
+    }
+
+    // Check for LO:TURN forced visual accidentals:
+    std::string lacctext = token->getLayoutParameter("TURN", "lacc");
+    std::string uacctext = token->getLayoutParameter("TURN", "uacc");
+
+    if (!lacctext.empty()) {
+        if (lacctext == "none") {
+            loweraccid = "none";
+        }
+        if (lacctext == "true") {
+            loweraccid = "none";
+        }
+        else {
+            loweraccid = lacctext;
+        }
+    }
+    if (!uacctext.empty()) {
+        if (uacctext == "false") {
+            upperaccid = "none";
+        }
+        if (uacctext == "true") {
+            upperaccid = "none";
+        }
+        else {
+            upperaccid = uacctext;
+        }
+    }
+
+    // Check to see if accidentals need to be flipped:
     std::string text = token->getLayoutParameter("TURN", "facc");
     if (text == "true") {
         std::string tval = loweraccid;
@@ -20499,30 +20583,89 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         upperaccid = tval;
     }
 
-    bool hasloweraccid = loweraccid.empty() ? false : true;
-    int loweraccidval = 0;
-    if (hasloweraccid) {
-        loweraccidval = stoi(loweraccid);
-        switch (loweraccidval) {
-            case -1: turn->SetAccidlower(ACCIDENTAL_WRITTEN_f); break;
-            case 0: turn->SetAccidlower(ACCIDENTAL_WRITTEN_n); break;
-            case +1: turn->SetAccidlower(ACCIDENTAL_WRITTEN_s); break;
-            case -2: turn->SetAccidlower(ACCIDENTAL_WRITTEN_ff); break;
-            case +2: turn->SetAccidlower(ACCIDENTAL_WRITTEN_x); break;
-        }
+    if (!loweraccid.empty()) {
+        setWrittenAccidentalLower(turn, loweraccid);
     }
+    if (!upperaccid.empty()) {
+        setWrittenAccidentalUpper(turn, upperaccid);
+    }
+}
 
-    bool hasupperaccid = upperaccid.empty() ? false : true;
-    int upperaccidval = 0;
-    if (hasupperaccid) {
-        upperaccidval = stoi(upperaccid);
-        switch (upperaccidval) {
-            case -1: turn->SetAccidupper(ACCIDENTAL_WRITTEN_f); break;
-            case 0: turn->SetAccidupper(ACCIDENTAL_WRITTEN_n); break;
-            case +1: turn->SetAccidupper(ACCIDENTAL_WRITTEN_s); break;
-            case -2: turn->SetAccidupper(ACCIDENTAL_WRITTEN_ff); break;
-            case +2: turn->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
-        }
+//////////////////////////////
+//
+// HumdrumInput::setWrittenAccidentalUpper -- An empty input string will be ignored, use "none" to force
+//     no upper accidental.
+//
+
+template <class ELEMENT> void HumdrumInput::setWrittenAccidentalUpper(ELEMENT element, const string &value)
+{
+    if (value == "none") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_NONE);
+    }
+    else if (value == "#") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_s);
+    }
+    else if (value == "-") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_f);
+    }
+    else if (value == "n") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_n);
+    }
+    else if (value == "n-") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_nf);
+    }
+    else if (value == "n#") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_ns);
+    }
+    else if (value == "--") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_ff);
+    }
+    else if (value == "##") {
+        element->SetAccidupper(ACCIDENTAL_WRITTEN_x);
+    }
+    else {
+        // other accidentals are possible to add here; otherwise,
+        // the invalid accidental will be ignored (not replaced
+        // with an empty accidental, for example).
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setWrittenAccidentalLower -- An empty input string will be ignored, use "none" to force
+//     no upper accidental.
+//
+
+template <class ELEMENT> void HumdrumInput::setWrittenAccidentalLower(ELEMENT element, const string &value)
+{
+    if (value == "none") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_NONE);
+    }
+    else if (value == "#") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_s);
+    }
+    else if (value == "-") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_f);
+    }
+    else if (value == "n") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_n);
+    }
+    else if (value == "n-") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_nf);
+    }
+    else if (value == "n#") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_ns);
+    }
+    else if (value == "--") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_ff);
+    }
+    else if (value == "##") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_x);
+    }
+    else {
+        // other accidentals are possible to add here; otherwise,
+        // the invalid accidental will be ignored (not replaced
+        // with an empty accidental, for example).
     }
 }
 
@@ -20808,6 +20951,7 @@ void HumdrumInput::addTrill(hum::HTp token)
             }
         }
     }
+
     if (foundQ) {
         if (value == "none") {
             trill->SetAccidupper(ACCIDENTAL_WRITTEN_NONE);

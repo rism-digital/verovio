@@ -770,6 +770,8 @@ protected:
     template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
     template <class ELEMENT> void addFermata(ELEMENT *rest, const std::string &tstring);
     template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
+    template <class ELEMENT> void setWrittenAccidentalUpper(ELEMENT element, const string &value);
+    template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const string &value);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
