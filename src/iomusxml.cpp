@@ -769,7 +769,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             const std::string partId = xpathNode.node().attribute("id").as_string();
             std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
             pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
-            if (!partFirstMeasure.node().select_node("attributes")) {
+            if (!partFirstMeasure.node().child("attributes")) {
                 LogWarning("MusicXML import: Could not find the 'attributes' element in the first "
                            "measure of part '%s'",
                     partId.c_str());
@@ -1096,6 +1096,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "direction")
             && !IsElement(*it, "print") && !IsElement(*it, "sound")) {
             break;
+        }
+        if (!IsElement(*it, "attributes")) {
+            continue;
         }
 
         // we do not want to read it again, just change the name
