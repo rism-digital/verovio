@@ -542,7 +542,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string rawText;
     bool paren = false;
-    if (HasAttributeWithValue(metronome, "parentheses", "yes")) {
+    if (metronome.attribute("parentheses").as_bool()) {
         rawText = "(";
         paren = true;
     }
@@ -583,9 +583,9 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         const std::string mm = perminute.text().as_string();
         // Use the first floating-point number on the line to set @mm:
         std::string matches("0123456789");
-        size_t offset = mm.find_first_of(matches);
-        float mmval = std::stof(mm.substr(offset));
-        if (!isnan(mmval)) {
+        std::size_t offset = mm.find_first_of(matches);
+        if (offset < mm.length()) {
+            const float mmval = std::stof(mm.substr(offset));
             tempo->SetMm(mmval);
         }
         if (!mm.empty()) {
