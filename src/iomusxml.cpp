@@ -1097,12 +1097,14 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             && !IsElement(*it, "print") && !IsElement(*it, "sound")) {
             break;
         }
-        if (!IsElement(*it, "attributes")) {
-            continue;
-        }
 
         // we do not want to read it again, just change the name
-        if (IsElement(*it, "attributes")) it->set_name("mei-read");
+        if (IsElement(*it, "attributes")) {
+            it->set_name("mei-read");
+        }
+        else {
+            continue;
+        }
 
         std::string xpath;
         // Create as many staffDef
