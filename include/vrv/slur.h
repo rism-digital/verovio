@@ -64,7 +64,7 @@ public:
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
      */
-    bool Slur::AdjustSlurPosition(
+    bool AdjustSlurPosition(
         Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides);
     /**
      * Calculate slur left/right maximum shifts required for slur not to overlap with other objects

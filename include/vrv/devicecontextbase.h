@@ -197,8 +197,9 @@ public:
 class Doc;
 class BezierCurve {
 public:
-    Point p1, p2; // start & end points
+    Point p1; // start point
     Point c1, c2; // control points
+    Point p2; // end point
 
     // no copy ctor or assignment operator - the defaults are ok
 
