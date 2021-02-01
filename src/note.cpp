@@ -1173,19 +1173,6 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::PreparePointersByLayer(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::PreparePointersByLayer(functorParams);
-
-    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
-    assert(params);
-
-    params->m_currentNote = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Note::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too

@@ -504,8 +504,9 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
     Dot *dot = vrv_cast<Dot *>(element);
     assert(dot);
 
-    Note *note = dot->m_drawingNote;
-    assert(dot->m_drawingNote);
+    assert(dot->m_drawingPreviousElement && dot->m_drawingPreviousElement->Is(NOTE));
+    Note *note = vrv_cast<Note *>(dot->m_drawingPreviousElement);
+    assert(note);
 
     Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
