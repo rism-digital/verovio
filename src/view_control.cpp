@@ -1466,8 +1466,14 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     int lineCount = dir->GetNumberOfLines(dir);
 
+    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
+    Alignment *pos
+        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
     // If we have not timestamp
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
+    if (!dir->HasStartid() && (dir->GetTstamp() <= 1) && pos) {
+        params.m_x = measure->GetDrawingX() + pos->GetXRel();
+    }
 
     data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
     // dir are left aligned by default (with both @tstamp and @startid)
