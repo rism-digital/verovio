@@ -1041,14 +1041,14 @@
         </wyschnegradskyAccidentals72Edo>
         <arelEzgiUzdilekAeuAccidentals>
             <description>Arel-Ezgi-Uzdilek (AEU) accidentals</description>
-            <!--<glyph glyph-code="E440" smufl-name="accidentalBuyukMucennebFlat"/>-->
-            <!--<glyph glyph-code="E441" smufl-name="accidentalKucukMucennebFlat"/>-->
-            <!--<glyph glyph-code="E442" smufl-name="accidentalBakiyeFlat"/>-->
-            <!--<glyph glyph-code="E443" smufl-name="accidentalKomaFlat"/>-->
-            <!--<glyph glyph-code="E444" smufl-name="accidentalKomaSharp"/>-->
-            <!--<glyph glyph-code="E445" smufl-name="accidentalBakiyeSharp"/>-->
-            <!--<glyph glyph-code="E446" smufl-name="accidentalKucukMucennebSharp"/>-->
-            <!--<glyph glyph-code="E447" smufl-name="accidentalBuyukMucennebSharp"/>-->
+            <glyph glyph-code="E440" smufl-name="accidentalBuyukMucennebFlat"/>
+            <glyph glyph-code="E441" smufl-name="accidentalKucukMucennebFlat"/>
+            <glyph glyph-code="E442" smufl-name="accidentalBakiyeFlat"/>
+            <glyph glyph-code="E443" smufl-name="accidentalKomaFlat"/>
+            <glyph glyph-code="E444" smufl-name="accidentalKomaSharp"/>
+            <glyph glyph-code="E445" smufl-name="accidentalBakiyeSharp"/>
+            <glyph glyph-code="E446" smufl-name="accidentalKucukMucennebSharp"/>
+            <glyph glyph-code="E447" smufl-name="accidentalBuyukMucennebSharp"/>
             <range_end>U+E44F</range_end>
             <range_start>U+E440</range_start>
         </arelEzgiUzdilekAeuAccidentals>
@@ -1370,7 +1370,7 @@
             <glyph glyph-code="E5BC" smufl-name="ornamentPrecompPortDeVoixMordent"/>
             <glyph glyph-code="E5BD" smufl-name="ornamentPrecompTrillWithMordent"/>
             <glyph glyph-code="E5BE" smufl-name="ornamentPrecompCadence"/>
-            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn"/>
+a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn"/>
             <glyph glyph-code="E5C0" smufl-name="ornamentPrecompDoubleCadenceLowerPrefix"/>
             <glyph glyph-code="E5C1" smufl-name="ornamentPrecompCadenceUpperPrefix"/>
             <glyph glyph-code="E5C2" smufl-name="ornamentPrecompCadenceUpperPrefixTurn"/>

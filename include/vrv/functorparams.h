@@ -1777,10 +1777,10 @@ class PreparePointersByLayerParams : public FunctorParams {
 public:
     PreparePointersByLayerParams()
     {
-        m_currentNote = NULL;
+        m_currentElement = NULL;
         m_lastDot = NULL;
     }
-    Note *m_currentNote;
+    LayerElement *m_currentElement;
     Dot *m_lastDot;
 };
 

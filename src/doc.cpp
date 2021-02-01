@@ -1248,7 +1248,7 @@ void Doc::TransposeDoc()
         // Find the starting key tonic of the data to use in calculating the tranposition interval:
         // Set transposition by key tonic.
         // Detect the current key from the keysignature.
-        KeySig *keysig = dynamic_cast<KeySig *>(this->m_mdivScoreDef.FindDescendantByType(KEYSIG, 3));
+        KeySig *keysig = dynamic_cast<KeySig *>(this->m_mdivScoreDef.FindDescendantByType(KEYSIG));
         // If there is no keysignature, assume it is C.
         TransPitch currentKey = TransPitch(0, 0, 0);
         if (keysig && keysig->HasPname()) {
