@@ -572,6 +572,13 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
+
+    // hidden clef
+    if (clef->GetVisible() == BOOLEAN_false) {
+        clef->SetEmptyBB();
+        return;
+    }
+
     int x, y;
     if (m_doc->GetType() == Facs && clef->HasFacs()) {
         y = ToLogicalY(staff->GetDrawingY());
