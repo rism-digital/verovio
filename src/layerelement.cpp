@@ -936,8 +936,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is(DOT)) {
         Dot *dot = vrv_cast<Dot *>(this);
         assert(dot);
-        if (dot->m_drawingNote) {
-            m_alignment = dot->m_drawingNote->GetAlignment();
+        if (dot->m_drawingPreviousElement) {
+            m_alignment = dot->m_drawingPreviousElement->GetAlignment();
         }
         else {
             // Create an alignment only if the dot has no resolved preceeding note
@@ -1680,13 +1680,17 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (params->m_lastDot) {
+    // Skip ligatures because we want it attached to the first note in it
+    if (params->m_lastDot && !this->Is(LIGATURE)) {
         params->m_lastDot->m_drawingNextElement = this;
         params->m_lastDot = NULL;
     }
     if (this->Is(BARLINE)) {
         // Do not attach a note when a barline is passed
-        params->m_currentNote = NULL;
+        params->m_currentElement = NULL;
+    }
+    else if (this->Is({ NOTE, REST })) {
+        params->m_currentElement = this;
     }
 
     return FUNCTOR_CONTINUE;
