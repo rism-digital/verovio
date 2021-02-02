@@ -18,6 +18,8 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
+#include "dir.h"
+#include "dynam.h"
 #include "hairpin.h"
 #include "layer.h"
 #include "measure.h"
@@ -42,7 +44,7 @@ namespace vrv {
 
 std::string EditorToolkitCMN::EditInfo()
 {
-    return m_chainedId;
+    return m_editInfo.json();
 }
 
 bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
@@ -206,7 +208,7 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
     m_chainedId = "";
     for (int i = 0; i < (int)actions.size(); i++) {
         status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
-        m_editInfo = m_chainedId;
+        m_editInfo.import("uuid", m_chainedId);
     }
     return status;
 }
@@ -310,7 +312,8 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     interface->SetEndid("#" + endid);
 
     this->m_chainedId = element->GetUuid();
-
+    m_editInfo.import("uuid", element->GetUuid());
+    
     return true;
 }
 
@@ -333,16 +336,15 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         return false;
     }
 
-    /*
     Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
-    if (elementType == "dynam") {
-        element = new Slur();
+    if (elementType == "dir") {
+        element = new Dir();
     }
-    else if (elementType == "hairpin") {
-        element = new Hairpin();
+    else if (elementType == "dynam") {
+        element = new Dynam();
     }
     else {
         LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
@@ -353,12 +355,11 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
-    interface->SetStartid(startid);
-    interface->SetEndid(endid);
+    interface->SetStartid("#" + startid);
 
     this->m_chainedId = element->GetUuid();
-    */
-
+    m_editInfo.import("uuid", element->GetUuid());
+    
     return true;
 }
 

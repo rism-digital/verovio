@@ -107,7 +107,7 @@ verovio.toolkit.prototype.edit = function ( editorAction )
 
 verovio.toolkit.prototype.editInfo = function ()
 {
-    return verovio.vrvToolkit.editInfo( this.ptr );
+    return JSON.parse( verovio.vrvToolkit.editInfo( this.ptr ) );
 };
 
 verovio.toolkit.prototype.getAvailableOptions = function ()
