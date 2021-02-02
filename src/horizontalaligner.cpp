@@ -460,6 +460,19 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
+std::pair<int, bool> Alignment::GetAccidAdjustedPosition(Doc* doc, int staffN)
+{
+    if (!HasAlignmentReference(staffN)) return { 0, false };
+
+    AlignmentReference *reference = GetAlignmentReference(staffN);
+    if (!reference) return { 0, false };
+
+    Accid *accid = reference->GetFrontAccid();
+    if (!accid) return { 0, false };
+
+    return { accid->GetDrawingX(), true };
+}
+
 bool Alignment::IsSupportedChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
@@ -682,6 +695,13 @@ void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int s
     for (auto child : *this->GetChildren()) {
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids);
     }
+}
+
+Accid *AlignmentReference::GetFrontAccid() const
+{
+    if (m_accidSpace.empty()) return NULL;
+
+    return m_accidSpace.front();
 }
 
 //----------------------------------------------------------------------------
