@@ -13,8 +13,8 @@ then
 fi
 
 scriptdir=$(dirname "$0")
-fontfile="${1%.*}"
-fontname=$(basename $fontfile)
+fontfile="$1"
+fontname="$(basename "${fontfile%.*}")"
 
 echo "Generating metadata for $fontname font"
 
