@@ -683,7 +683,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
             cueSize = true;
             // HARDCODED
-            x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
+            // x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
         }
     }
 

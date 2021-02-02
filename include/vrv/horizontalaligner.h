@@ -130,7 +130,9 @@ public:
      * Returns (-)VRV_UNSET in nothing for the staff specified.
      * Uses Object::GetAlignmentLeftRight
      */
-    void GetLeftRight(int staffN, int &minLeft, int &maxRight);
+    void GetLeftRight(
+        const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
 
     /**
      * Returns the GraceAligner for the Alignment.
@@ -177,6 +179,11 @@ public:
      * Return true if the alignment contains at least one reference with staffN
      */
     bool HasAlignmentReference(int staffN);
+
+    /**
+     * Return true if the alignment contains only references to timestamp attributes.
+     */
+    bool HasTimestampOnly();
 
     //----------//
     // Functors //

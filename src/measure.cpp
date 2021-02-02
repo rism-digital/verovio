@@ -700,6 +700,16 @@ int Measure::AdjustArpegEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::AdjustClefChanges(FunctorParams *functorParams)
+{
+    AdjustClefsParams *params = vrv_params_cast<AdjustClefsParams *>(functorParams);
+    assert(params);
+
+    params->m_aligner = &m_measureAligner;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::AdjustLayers(FunctorParams *functorParams)
 {
     AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
@@ -714,7 +724,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
-        ns.push_back(-1);
+        ns.push_back(BARLINE_REFERENCES);
         ns.push_back(*iter);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);

@@ -731,6 +731,11 @@ public:
     ///@}
 
     /**
+     * Adjust the spacing for clef changes.
+     */
+    virtual int AdjustClefChanges(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position the outside articulations.
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }

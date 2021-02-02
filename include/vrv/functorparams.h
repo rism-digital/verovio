@@ -184,6 +184,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustClefsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the measureAligner
+ * member 1: the Doc
+ **/
+
+class AdjustClefsParams : public FunctorParams {
+public:
+    AdjustClefsParams(Doc *doc)
+    {
+        m_aligner = NULL;
+        m_doc = doc;
+    }
+    MeasureAligner *m_aligner;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustArticParams
 //----------------------------------------------------------------------------
 
@@ -1440,6 +1460,7 @@ public:
     }
     int m_minLeft;
     int m_maxRight;
+    std::vector<ClassId> m_excludeClasses;
     Functor *m_functor;
 };
 
@@ -1946,12 +1967,15 @@ public:
         m_previousTime = 0.0;
         m_previousXRel = 0;
         m_longestActualDur = 0;
+        m_lastNonTimestamp = NULL;
         m_doc = doc;
         m_functor = functor;
     }
     double m_previousTime;
     int m_previousXRel;
     int m_longestActualDur;
+    Alignment *m_lastNonTimestamp;
+    std::list<Alignment *> m_timestamps;
     Doc *m_doc;
     Functor *m_functor;
 };
