@@ -1541,20 +1541,20 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindDescendantByUuid(xmlId);
+    jsonxx::Object o;
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
-        return 0;
+        return o.json();
     }
 
-    double scoreTimeOnset = 0.0;
-    double scoreTimeOffset = 0.0;
-    double scoreTimeDuration = 0.0;
-    double scoreTimeTiedDuration = 0.0;
-    double realTimeOnsetMilliseconds = 0.0;
-    double realTimeOffsetMilliseconds = 0.0;
+    jsonxx::Array scoreTimeOnset;
+    jsonxx::Array scoreTimeOffset;
+    jsonxx::Array scoreTimeDuration;
+    jsonxx::Array scoreTimeTiedDuration;
+    jsonxx::Array realTimeOnsetMilliseconds;
+    jsonxx::Array realTimeOffsetMilliseconds;
 
-    jsonxx::Object o;
     if (element->Is(NOTE)) {
         if (!m_doc.HasMidiTimemap()) {
             // generate MIDI timemap before progressing
@@ -1562,28 +1562,30 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
         }
         if (!m_doc.HasMidiTimemap()) {
             LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
-            return 0;
+            return o.json();
         }
         Note *note = vrv_cast<Note *>(element);
         assert(note);
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
-        // For now ignore repeats and access always the first
-        realTimeOnsetMilliseconds = measure->GetRealTimeOffsetMilliseconds(1);
-        realTimeOffsetMilliseconds = realTimeOnsetMilliseconds + note->GetRealTimeOffsetMilliseconds();
-        realTimeOnsetMilliseconds += note->GetRealTimeOnsetMilliseconds();
 
-        scoreTimeOnset = note->GetScoreTimeOnset();
-        scoreTimeOffset = note->GetScoreTimeOffset();
-        scoreTimeDuration = note->GetScoreTimeDuration();
-        scoreTimeTiedDuration = note->GetScoreTimeTiedDuration();
+        // For now ignore repeats and access always the first
+        double offset = measure->GetRealTimeOffsetMilliseconds(1);
+        realTimeOffsetMilliseconds << offset + note->GetRealTimeOffsetMilliseconds();
+        realTimeOnsetMilliseconds << offset + note->GetRealTimeOnsetMilliseconds();
+
+        scoreTimeOnset << note->GetScoreTimeOnset();
+        scoreTimeOffset << note->GetScoreTimeOffset();
+        scoreTimeDuration << note->GetScoreTimeDuration();
+        scoreTimeTiedDuration << note->GetScoreTimeTiedDuration();
+
+        o << "scoreTimeOnset" << scoreTimeOnset;
+        o << "scoreTimeOffset" << scoreTimeOffset;
+        o << "scoreTimeDuration" << scoreTimeDuration;
+        o << "scoreTimeTiedDuration" << scoreTimeTiedDuration;
+        o << "realTimeOnsetMilliseconds" << realTimeOnsetMilliseconds;
+        o << "realTimeOffsetMilliseconds" << realTimeOffsetMilliseconds;
     }
-    o << "scoreTimeOnset" << scoreTimeOnset;
-    o << "scoreTimeOffset" << scoreTimeOffset;
-    o << "scoreTimeDuration" << scoreTimeDuration;
-    o << "scoreTimeTiedDuration" << scoreTimeTiedDuration;
-    o << "realTimeOnsetMilliseconds" << realTimeOnsetMilliseconds;
-    o << "realTimeOffsetMilliseconds" << realTimeOffsetMilliseconds;
     return o.json();
 }
 
