@@ -27,6 +27,7 @@
 #include "rest.h"
 #include "slur.h"
 #include "staff.h"
+#include "tie.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -290,6 +291,9 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     if (elementType == "slur") {
         element = new Slur();
     }
+    else if (elementType == "tie") {
+        element = new Tie();
+    }
     else if (elementType == "hairpin") {
         element = new Hairpin();
     }
@@ -302,8 +306,8 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
-    interface->SetStartid(startid);
-    interface->SetEndid(endid);
+    interface->SetStartid("#" + startid);
+    interface->SetEndid("#" + endid);
 
     this->m_chainedId = element->GetUuid();
 
