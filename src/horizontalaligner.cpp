@@ -265,7 +265,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
         }
 
         int minLeft;
-        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight);
+        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight, {CLEF});
 
         if (maxRight != VRV_UNSET) break;
     }
@@ -477,7 +477,7 @@ bool Alignment::HasTimestampOnly()
     // If no child, then not timestamp
     if (!this->GetChildCount()) return false;
     // Look for everything that is not a timestamp
-    ReverseClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR});
+    ReverseClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR });
     return (this->FindDescendantByComparison(&notTimestamp, 2) == NULL);
 }
 
@@ -548,10 +548,27 @@ bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
     return (std::find(types.begin(), types.end(), m_type) != types.end());
 }
 
-void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
+void Alignment::GetLeftRight(const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
 {
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
     GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
+
+    minLeft = -VRV_UNSET;
+    maxRight = VRV_UNSET;
+
+    for (auto staffN : staffNs) {
+        int staffMinLeft, staffMaxRight;
+        this->GetLeftRight(staffN, staffMinLeft, staffMaxRight);
+        if (staffMinLeft < minLeft) minLeft = staffMinLeft;
+        if (staffMaxRight > maxRight) maxRight = staffMaxRight;
+    }
+}
+
+void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
+{
+    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
+    GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
+    getAlignmentLeftRightParams.m_excludeClasses = m_excludes;
 
     if (staffN != VRV_UNSET) {
         ArrayOfComparisons filters;
@@ -559,8 +576,9 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
         filters.push_back(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
-    else
+    else {
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams);
+    }
 
     minLeft = getAlignmentLeftRightParams.m_minLeft;
     maxRight = getAlignmentLeftRightParams.m_maxRight;
@@ -1014,10 +1032,10 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
     }
-    
+
     if (this->HasTimestampOnly()) {
         params->m_timestamps.push_back(this);
-        //return FUNCTOR_CONTINUE;
+        // return FUNCTOR_CONTINUE;
     }
 
     if (intervalTime > 0.0) {
@@ -1035,7 +1053,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
-    
+
     for (auto &alignment : params->m_timestamps) {
         LogMessage("%f", alignment->GetTime());
     }

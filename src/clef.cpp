@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
 #include "scoredefinterface.h"
@@ -131,6 +132,89 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         params->m_overlapMargin = (overlapMargin / staffOffset + (leftMargin == rightMargin ? 1 : 2)) * staffOffset
             * params->m_directionBias;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Clef::AdjustClefChanges(FunctorParams *functorParams)
+{
+    AdjustClefsParams *params = vrv_params_cast<AdjustClefsParams *>(functorParams);
+    assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    assert(this->GetAlignment());
+    if (this->GetAlignment()->GetType() != ALIGNMENT_CLEF) return FUNCTOR_CONTINUE;
+
+    assert(params->m_aligner);
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    // Create ad comparison object for each type / @n
+    std::vector<int> ns;
+    // -1 for barline attributes that need to be taken into account each time
+    ns.push_back(BARLINE_REFERENCES);
+    ns.push_back(staff->GetN());
+    AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
+    
+    /*
+    GraceAligner *graceAligner = NULL;
+    Alignment *pa = vrv_cast<Alignment *>(params->m_aligner->GetPrevious(this->GetAlignment()));
+    if (pa && pa->GetType() == ALIGNMENT_GRACENOTE) {
+        int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
+        if (pa->HasGraceAligner(graceAlignerId)) {
+            graceAligner = pa->GetGraceAligner(graceAlignerId);
+        }
+    }
+    */
+
+    // Look for the previous reference on this staff (or a barline)
+    Object *previous = params->m_aligner->FindPreviousChild(&matchStaff, this->GetAlignment());
+    // Look for the next reference - here we start with the next alignment, because otherwise it is find the reference to itself
+    Object *next = params->m_aligner->FindNextChild(&matchStaff, params->m_aligner->GetNext(this->GetAlignment()));
+
+    // This should never happen because we always have at least barline alignments - even empty
+    if (!previous || !next) {
+        LogDebug("No aligment reference found before and after the clef change");
+        return FUNCTOR_CONTINUE;
+    }
+
+    // We looked for the first alignment reference - we actually need the parent alignment
+    Alignment *previousAlignment = vrv_cast<Alignment *>(previous->GetParent());
+    assert(previousAlignment);
+    Alignment *nextAligment = vrv_cast<Alignment *>(next->GetParent());
+    assert(nextAligment);
+
+    // LayerElement::AdjustXPos can have spread the alignment apparts.
+    // We want them to point at the same position. Otherwise, when adjusting proportionally
+    // (below) this will yield displacements.
+    this->GetAlignment()->SetXRel(nextAligment->GetXRel());
+
+    int previousLeft, previousRight;
+    previousAlignment->GetLeftRight(ns, previousLeft, previousRight);
+    // This typically happens with invisible barlines. Just take the position of the alignment
+    if (previousRight == VRV_UNSET) previousRight = previousAlignment->GetXRel();
+    
+    int nextLeft, nextRight;
+    nextAligment->GetLeftRight(ns, nextLeft, nextRight);
+    // This typically happens with invisible barlines. Just take the position of the alignment
+    if (nextLeft == -VRV_UNSET) nextLeft = nextAligment->GetXRel();
+
+    int selfRight = this->GetContentRight() + params->m_doc->GetRightMargin(CLEF) * staff->m_drawingStaffSize;
+    // First move it to the left if necessary
+    if (selfRight > nextLeft) {
+        this->SetDrawingXRel(this->GetDrawingXRel() - selfRight + nextLeft);
+        this->SetColor("blue");
+    }
+    // The looks if it overlap on the right and make room if necessary
+    int selfLeft = this->GetContentLeft() - params->m_doc->GetLeftMargin(CLEF) * staff->m_drawingStaffSize;
+    if (selfLeft < previousRight) {
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
+            previousAlignment, this->GetAlignment(), previousRight - selfLeft) };
+        params->m_aligner->AdjustProportionally(boundaries);
+        this->SetColor("pink");
     }
 
     return FUNCTOR_CONTINUE;

@@ -71,6 +71,11 @@ public:
      */
     virtual int AdjustBeams(FunctorParams *functorParams);
 
+    /**
+     * See Object::AdjustClefChanges
+     */
+    virtual int AdjustClefChanges(FunctorParams *functorParams);
+
 private:
 public:
     //
