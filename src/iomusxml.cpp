@@ -542,7 +542,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string rawText;
     bool paren = false;
-    if (HasAttributeWithValue(metronome, "parentheses", "yes")) {
+    if (metronome.attribute("parentheses").as_bool()) {
         rawText = "(";
         paren = true;
     }
@@ -583,9 +583,9 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         const std::string mm = perminute.text().as_string();
         // Use the first floating-point number on the line to set @mm:
         std::string matches("0123456789");
-        size_t offset = mm.find_first_of(matches);
-        float mmval = std::stof(mm.substr(offset));
-        if (!isnan(mmval)) {
+        std::size_t offset = mm.find_first_of(matches);
+        if (offset < mm.length()) {
+            const float mmval = std::stof(mm.substr(offset));
             tempo->SetMm(mmval);
         }
         if (!mm.empty()) {
@@ -769,7 +769,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             const std::string partId = xpathNode.node().attribute("id").as_string();
             std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
             pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
-            if (!partFirstMeasure.node().select_node("attributes")) {
+            if (!partFirstMeasure.node().child("attributes")) {
                 LogWarning("MusicXML import: Could not find the 'attributes' element in the first "
                            "measure of part '%s'",
                     partId.c_str());
@@ -1037,14 +1037,24 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     }
 
     // Convert rights into availability
-    pugi::xml_node availability = pubStmt.append_child("availability");
+    pugi::xpath_node_set rightsSet = root.select_nodes("/score-partwise/identification/rights");
+    if (!rightsSet.empty()) {
+        pugi::xml_node availability = pubStmt.append_child("availability");
+        for (pugi::xpath_node_set::const_iterator it = rightsSet.begin(); it != rightsSet.end(); ++it) {
+            pugi::xpath_node rights = *it;
+            availability.append_child("distributor")
+                .append_child(pugi::node_pcdata)
+                .set_value(rights.node().text().as_string());
+        }
+    }
 
-    pugi::xpath_node_set rightses = root.select_nodes("/score-partwise/identification/rights");
-    for (pugi::xpath_node_set::const_iterator it = rightses.begin(); it != rightses.end(); ++it) {
-        pugi::xpath_node rights = *it;
-        availability.append_child("distributor")
-            .append_child(pugi::node_pcdata)
-            .set_value(rights.node().text().as_string());
+    pugi::xpath_node_set dateSet = root.select_nodes("/score-partwise/identification/encoding/encoding-date");
+    for (pugi::xpath_node_set::const_iterator it = dateSet.begin(); it != dateSet.end(); ++it) {
+        pugi::xpath_node encodingDate = *it;
+        pugi::xml_node date = pubStmt.append_child("date");
+        date.text().set(encodingDate.node().text().as_string());
+        date.append_attribute("isodate").set_value(encodingDate.node().text().as_string());
+        date.append_attribute("type").set_value(encodingDate.node().name());
     }
 
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
@@ -1099,7 +1109,12 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         }
 
         // we do not want to read it again, just change the name
-        if (IsElement(*it, "attributes")) it->set_name("mei-read");
+        if (IsElement(*it, "attributes")) {
+            it->set_name("mei-read");
+        }
+        else {
+            continue;
+        }
 
         std::string xpath;
         // Create as many staffDef
