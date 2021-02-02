@@ -130,7 +130,8 @@ public:
      * Returns (-)VRV_UNSET in nothing for the staff specified.
      * Uses Object::GetAlignmentLeftRight
      */
-    void GetLeftRight(const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
+    void GetLeftRight(
+        const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
     void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
 
     /**

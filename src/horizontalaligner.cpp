@@ -265,7 +265,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
         }
 
         int minLeft;
-        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight, {CLEF});
+        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight, { CLEF });
 
         if (maxRight != VRV_UNSET) break;
     }
@@ -376,8 +376,9 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
         // The alignment is its parent
         leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
     }
-    else
+    else {
         leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+    }
     // Return if nothing found
     if (!leftAlignment) return -VRV_UNSET;
 
@@ -548,7 +549,8 @@ bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
     return (std::find(types.begin(), types.end(), m_type) != types.end());
 }
 
-void Alignment::GetLeftRight(const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
+void Alignment::GetLeftRight(
+    const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
 {
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
     GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
@@ -1033,10 +1035,10 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalTime = 0.0;
     }
 
-    if (this->HasTimestampOnly()) {
-        params->m_timestamps.push_back(this);
-        // return FUNCTOR_CONTINUE;
-    }
+    // if (this->HasTimestampOnly()) {
+    //    params->m_timestamps.push_back(this);
+    // return FUNCTOR_CONTINUE;
+    //}
 
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
@@ -1054,11 +1056,13 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
 
+    /*
     for (auto &alignment : params->m_timestamps) {
         LogMessage("%f", alignment->GetTime());
     }
     params->m_timestamps.clear();
     params->m_lastNonTimestamp = this;
+    */
 
     return FUNCTOR_CONTINUE;
 }

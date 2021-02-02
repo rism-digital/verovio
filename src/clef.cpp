@@ -158,55 +158,73 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     ns.push_back(BARLINE_REFERENCES);
     ns.push_back(staff->GetN());
     AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-    
-    /*
+
+    // Look if we have a grace aligner just after the clef.
+    // Limitation: clef changes are always aligned before grace notes, even if appearing after in the encoding
+    // To overcome this limitation we will need to rethink alignment, or (better) use <graceGrp> and have the
+    // <clef> within it at the right place. Then the Clef should use the grace aligner and note the measure aligner
     GraceAligner *graceAligner = NULL;
-    Alignment *pa = vrv_cast<Alignment *>(params->m_aligner->GetPrevious(this->GetAlignment()));
-    if (pa && pa->GetType() == ALIGNMENT_GRACENOTE) {
+    Alignment *nextAlignment = vrv_cast<Alignment *>(params->m_aligner->GetNext(this->GetAlignment()));
+    if (nextAlignment && nextAlignment->GetType() == ALIGNMENT_GRACENOTE) {
+        // If we have one, then check if we have one for our staff (or all staves with --grace-rhythm-align
         int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
-        if (pa->HasGraceAligner(graceAlignerId)) {
-            graceAligner = pa->GetGraceAligner(graceAlignerId);
+        if (nextAlignment->HasGraceAligner(graceAlignerId)) {
+            graceAligner = nextAlignment->GetGraceAligner(graceAlignerId);
         }
     }
-    */
 
-    // Look for the previous reference on this staff (or a barline)
-    Object *previous = params->m_aligner->FindPreviousChild(&matchStaff, this->GetAlignment());
-    // Look for the next reference - here we start with the next alignment, because otherwise it is find the reference to itself
-    Object *next = params->m_aligner->FindNextChild(&matchStaff, params->m_aligner->GetNext(this->GetAlignment()));
-
-    // This should never happen because we always have at least barline alignments - even empty
-    if (!previous || !next) {
-        LogDebug("No aligment reference found before and after the clef change");
-        return FUNCTOR_CONTINUE;
+    // Not grace aligner, look for the next alignment with something on that staff
+    if (!graceAligner) {
+        nextAlignment = NULL;
+        // Look for the next reference - here we start with the next alignment, because otherwise it is find the
+        // reference to itself
+        Object *next = params->m_aligner->FindNextChild(&matchStaff, params->m_aligner->GetNext(this->GetAlignment()));
+        if (next) {
+            nextAlignment = vrv_cast<Alignment *>(next->GetParent());
+            assert(nextAlignment);
+        }
     }
 
-    // We looked for the first alignment reference - we actually need the parent alignment
-    Alignment *previousAlignment = vrv_cast<Alignment *>(previous->GetParent());
-    assert(previousAlignment);
-    Alignment *nextAligment = vrv_cast<Alignment *>(next->GetParent());
-    assert(nextAligment);
+    Alignment *previousAlignment = NULL;
+    // Look for the previous reference on this staff (or a barline)
+    Object *previous = params->m_aligner->FindPreviousChild(&matchStaff, this->GetAlignment());
+    if (previous) {
+        // We looked for the first alignment reference - we actually need the parent alignment
+        previousAlignment = vrv_cast<Alignment *>(previous->GetParent());
+        assert(previousAlignment);
+    }
+
+    // This should never happen because we always have at least barline alignments - even empty
+    if (!previousAlignment || !nextAlignment) {
+        LogDebug("No aligment found before and after the clef change");
+        return FUNCTOR_CONTINUE;
+    }
 
     // LayerElement::AdjustXPos can have spread the alignment apparts.
     // We want them to point at the same position. Otherwise, when adjusting proportionally
     // (below) this will yield displacements.
-    this->GetAlignment()->SetXRel(nextAligment->GetXRel());
+    this->GetAlignment()->SetXRel(nextAlignment->GetXRel());
 
     int previousLeft, previousRight;
     previousAlignment->GetLeftRight(ns, previousLeft, previousRight);
     // This typically happens with invisible barlines. Just take the position of the alignment
     if (previousRight == VRV_UNSET) previousRight = previousAlignment->GetXRel();
-    
+
+    // Get the right position of the grace group or the next element
     int nextLeft, nextRight;
-    nextAligment->GetLeftRight(ns, nextLeft, nextRight);
-    // This typically happens with invisible barlines. Just take the position of the alignment
-    if (nextLeft == -VRV_UNSET) nextLeft = nextAligment->GetXRel();
+    if (graceAligner) {
+        nextLeft = graceAligner->GetGraceGroupLeft(staff->GetN());
+    }
+    else {
+        nextAlignment->GetLeftRight(ns, nextLeft, nextRight);
+    }
+    // This typically happens with invisible barlines or with --grace-rhythm-align and not grace on that staff
+    if (nextLeft == -VRV_UNSET) nextLeft = nextAlignment->GetXRel();
 
     int selfRight = this->GetContentRight() + params->m_doc->GetRightMargin(CLEF) * staff->m_drawingStaffSize;
     // First move it to the left if necessary
     if (selfRight > nextLeft) {
         this->SetDrawingXRel(this->GetDrawingXRel() - selfRight + nextLeft);
-        this->SetColor("blue");
     }
     // The looks if it overlap on the right and make room if necessary
     int selfLeft = this->GetContentLeft() - params->m_doc->GetLeftMargin(CLEF) * staff->m_drawingStaffSize;
@@ -214,7 +232,6 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
         ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
             previousAlignment, this->GetAlignment(), previousRight - selfLeft) };
         params->m_aligner->AdjustProportionally(boundaries);
-        this->SetColor("pink");
     }
 
     return FUNCTOR_CONTINUE;

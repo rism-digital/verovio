@@ -1565,7 +1565,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
-    
+
     if (this->Is(params->m_excludeClasses)) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();
