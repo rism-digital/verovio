@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jan 27 02:09:08 PST 2021
+// Last Modified: Sun Jan 31 21:47:47 PST 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -31136,13 +31136,11 @@ bool HumdrumToken::isTempo(void) {
 //
 
 bool HumdrumToken::isMensurationSymbol(void) {
-	if (this->compare(0, 5, "*met(") != 0) {
-		return false;
+	if (this->compare(0, 5, "*met(") == 0) {
+		return true;
 	}
-	if ((*this)[this->size()-1] != ')') {
-		return false;
-	}
-	return true;
+	// extended mensuration symbol allows for an underscore and up to four digits after it.
+	return false;
 }
 
 

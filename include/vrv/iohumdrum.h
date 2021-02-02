@@ -287,6 +287,12 @@ namespace humaux {
         // meter_top == The top number of the time signature (meter.count).
         int meter_top = 4;
 
+        // Active **mens rhythmic level divisions:
+        int maximodus = 0; // how many longs in a maxima
+        int modus = 0; // how many breves in a long
+        int tempus = 0; // how many semibreves in a breve
+        int prolatio = 0; // how many minims in a semibreve
+
         // ties == Keep track of ties for each staff/layer/pitch
         // and allow for cross-layer ties (no cross staff ties, but that
         // could be easy to implement.
@@ -347,7 +353,7 @@ public:
     std::string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
     std::string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
 
-    // coloring of notes
+    // Coloring of notes/rests in **kern:
     // !!!RDF**kern: i = marked note, color="#553325"
     // !!!RDF**kern: i = matched note, color=red
     // !!!RDF**kern: i = color="blue"
@@ -358,6 +364,14 @@ public:
     std::vector<std::string> mcolor;
     std::vector<std::string> markdir;
 
+    // Coloring of **mens notes (not for coloration).
+    // default color is hotpink, since red is used for
+    // colored notes in black notation.
+    std::vector<char> mens_mark;
+    std::vector<std::string> mens_mcolor;
+    std::vector<std::string> mens_markdir;
+
+    // Coloring of **text:
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
 
@@ -703,6 +717,8 @@ protected:
     bool hasTempoTextAfter(hum::HTp token);
     bool isTempoishText(hum::HTp token);
     bool isLastStaffTempo(hum::HTp token);
+    void addMensuralQuality(Note *note, hum::HTp token);
+    bool checkForMens(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
