@@ -1480,7 +1480,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         ListOfObjects children;
         parent->FindAllDescendantByComparison(&children, &comp);
         if (!children.empty()) {
-            params.m_x = children.front()->GetDrawingX() - dir->GetStart()->GetDrawingRadius(m_doc);
+            params.m_x = children.front()->GetDrawingX();
         }
     }
 
@@ -1493,6 +1493,12 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
             continue;
+        }
+        if (!dir->HasStartid() && !pos) {
+            Alignment *dirAlignment = dir->GetStart()->GetAlignment();
+            params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+            auto [xPos, result] = dirAlignment->GetAccidAdjustedPosition(m_doc, (*staffIter)->GetN());
+            if (result) params.m_x = xPos;
         }
         params.m_boxedRend.clear();
         params.m_y = dir->GetDrawingY();
