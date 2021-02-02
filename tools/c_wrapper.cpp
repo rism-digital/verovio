@@ -131,6 +131,13 @@ double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId)
     return tk->GetTimeForElement(xmlId);
 }
 
+const char *vrvToolkit_getTimesForElement(Toolkit *tk, const char *xmlId)
+{
+    tk->ResetLogBuffer();
+    tk->SetCString(tk->GetTimesForElement(xmlId));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_getVersion(Toolkit *tk)
 {
     tk->SetCString(tk->GetVersion());

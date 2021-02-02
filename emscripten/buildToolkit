@@ -175,6 +175,7 @@ $exports .= "'_vrvToolkit_getOptions',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
 $exports .= "'_vrvToolkit_getTimeForElement',";
+$exports .= "'_vrvToolkit_getTimesForElement',";
 $exports .= "'_vrvToolkit_getVersion',";
 $exports .= "'_vrvToolkit_loadData',";
 $exports .= "'_vrvToolkit_redoLayout',";

@@ -51,6 +51,9 @@ verovio.vrvToolkit.getPageWithElement = Module.cwrap( 'vrvToolkit_getPageWithEle
 // double getTimeForElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getTimeForElement = Module.cwrap( 'vrvToolkit_getTimeForElement', 'number', ['number', 'string'] );
 
+// string getTimesForElement(Toolkit *ic, const char *xmlId)
+verovio.vrvToolkit.getTimesForElement = Module.cwrap( 'vrvToolkit_getTimesForElement', 'string', ['number', 'string'] );
+
 // char *getMIDIValuesForElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getMIDIValuesForElement = Module.cwrap( 'vrvToolkit_getMIDIValuesForElement', 'string', ['number', 'string'] );
 
@@ -186,6 +189,11 @@ verovio.toolkit.prototype.getPageWithElement = function ( xmlId )
 verovio.toolkit.prototype.getTimeForElement = function ( xmlId )
 {
     return verovio.vrvToolkit.getTimeForElement( this.ptr, xmlId );
+};
+
+verovio.toolkit.prototype.getTimesForElement = function ( xmlId )
+{
+    return JSON.parse( verovio.vrvToolkit.getTimesForElement( this.ptr, xmlId ) );
 };
 
 verovio.toolkit.prototype.getVersion = function ()
