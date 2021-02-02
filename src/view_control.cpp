@@ -1474,6 +1474,15 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     if (!dir->HasStartid() && (dir->GetTstamp() <= 1) && pos) {
         params.m_x = measure->GetDrawingX() + pos->GetXRel();
     }
+    else if (dir->HasStartid()) {
+        LayerElement *parent = dir->GetStart();
+        ClassIdComparison comp(ACCID);
+        ListOfObjects children;
+        parent->FindAllDescendantByComparison(&children, &comp);
+        if (!children.empty()) {
+            params.m_x = children.front()->GetDrawingX() - dir->GetStart()->GetDrawingRadius(m_doc);
+        }
+    }
 
     data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
     // dir are left aligned by default (with both @tstamp and @startid)
