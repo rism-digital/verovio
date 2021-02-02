@@ -472,6 +472,15 @@ bool Alignment::HasAlignmentReference(int staffN)
     return (this->FindDescendantByComparison(&matchStaff, 1) != NULL);
 }
 
+bool Alignment::HasTimestampOnly()
+{
+    // If no child, then not timestamp
+    if (!this->GetChildCount()) return false;
+    // Look for everything that is not a timestamp
+    ReverseClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR});
+    return (this->FindDescendantByComparison(&notTimestamp, 2) == NULL);
+}
+
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
@@ -751,6 +760,7 @@ int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
     // Reset the previous time position and x_rel to 0;
     params->m_previousTime = 0.0;
     params->m_previousXRel = 0;
+    params->m_lastNonTimestamp = NULL;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1004,6 +1014,11 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
     }
+    
+    if (this->HasTimestampOnly()) {
+        params->m_timestamps.push_back(this);
+        //return FUNCTOR_CONTINUE;
+    }
 
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
@@ -1020,6 +1035,12 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
+    
+    for (auto &alignment : params->m_timestamps) {
+        LogMessage("%f", alignment->GetTime());
+    }
+    params->m_timestamps.clear();
+    params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }

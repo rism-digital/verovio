@@ -1946,12 +1946,16 @@ public:
         m_previousTime = 0.0;
         m_previousXRel = 0;
         m_longestActualDur = 0;
+        m_lastNonTimestamp = NULL;
         m_doc = doc;
         m_functor = functor;
+        
     }
     double m_previousTime;
     int m_previousXRel;
     int m_longestActualDur;
+    Alignment *m_lastNonTimestamp;
+    std::list<Alignment *> m_timestamps;
     Doc *m_doc;
     Functor *m_functor;
 };
