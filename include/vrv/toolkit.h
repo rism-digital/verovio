@@ -244,6 +244,14 @@ public:
     std::string GetMIDIValuesForElement(const std::string &xmlId);
 
     /**
+     * Return a JSON object string with the following key values for a given note:
+     * scoreTimeOnset, scoreTimeOffset, scoreTimeTiedDuration,
+     * realTimeOnsetMilliseconds, realTimeOffsetMilliseconds, realTimeTiedDurationMilliseconds.
+     * Returns 0 if no element is found.
+     */
+    std::string GetTimesForElement(const std::string &xmlId);
+
+    /**
      * @name Set and get the scale
      */
     ///@{

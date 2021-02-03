@@ -1574,6 +1574,57 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     return timeofElement;
 }
 
+std::string Toolkit::GetTimesForElement(const std::string &xmlId)
+{
+    Object *element = m_doc.FindDescendantByUuid(xmlId);
+    jsonxx::Object o;
+
+    if (!element) {
+        LogWarning("Element '%s' not found", xmlId.c_str());
+        return o.json();
+    }
+
+    jsonxx::Array scoreTimeOnset;
+    jsonxx::Array scoreTimeOffset;
+    jsonxx::Array scoreTimeDuration;
+    jsonxx::Array scoreTimeTiedDuration;
+    jsonxx::Array realTimeOnsetMilliseconds;
+    jsonxx::Array realTimeOffsetMilliseconds;
+
+    if (element->Is(NOTE)) {
+        if (!m_doc.HasMidiTimemap()) {
+            // generate MIDI timemap before progressing
+            m_doc.CalculateMidiTimemap();
+        }
+        if (!m_doc.HasMidiTimemap()) {
+            LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+            return o.json();
+        }
+        Note *note = vrv_cast<Note *>(element);
+        assert(note);
+        Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
+        assert(measure);
+
+        // For now ignore repeats and access always the first
+        double offset = measure->GetRealTimeOffsetMilliseconds(1);
+        realTimeOffsetMilliseconds << offset + note->GetRealTimeOffsetMilliseconds();
+        realTimeOnsetMilliseconds << offset + note->GetRealTimeOnsetMilliseconds();
+
+        scoreTimeOnset << note->GetScoreTimeOnset();
+        scoreTimeOffset << note->GetScoreTimeOffset();
+        scoreTimeDuration << note->GetScoreTimeDuration();
+        scoreTimeTiedDuration << note->GetScoreTimeTiedDuration();
+
+        o << "scoreTimeOnset" << scoreTimeOnset;
+        o << "scoreTimeOffset" << scoreTimeOffset;
+        o << "scoreTimeDuration" << scoreTimeDuration;
+        o << "scoreTimeTiedDuration" << scoreTimeTiedDuration;
+        o << "realTimeOnsetMilliseconds" << realTimeOnsetMilliseconds;
+        o << "realTimeOffsetMilliseconds" << realTimeOffsetMilliseconds;
+    }
+    return o.json();
+}
+
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindDescendantByUuid(xmlId);
