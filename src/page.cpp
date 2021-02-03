@@ -334,6 +334,12 @@ void Page::LayOutHorizontally()
         doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
+    // Adjust the spacing of clef changes since they are skipped in AdjustXPos
+    // Look at each clef change and  move them to the left and add space if necessary
+    Functor adjustClefChanges(&Object::AdjustClefChanges);
+    AdjustClefsParams adjustClefChangesParams(doc);
+    this->Process(&adjustClefChanges, &adjustClefChangesParams);
+
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     PrepareProcessingListsParams prepareProcessingListsParams;

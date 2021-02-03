@@ -1444,6 +1444,10 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    if (this->GetAlignment()->GetType() == ALIGNMENT_CLEF) {
+        return FUNCTOR_CONTINUE;
+    }
+
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
@@ -1457,8 +1461,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     else {
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
-        selfLeft = this->GetSelfLeft()
-            - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+        selfLeft = this->GetSelfLeft();
+        selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
     }
 
     int offset = selfLeft - params->m_minPos;

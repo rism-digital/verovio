@@ -265,7 +265,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
         }
 
         int minLeft;
-        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight);
+        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight, { CLEF });
 
         if (maxRight != VRV_UNSET) break;
     }
@@ -376,8 +376,9 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
         // The alignment is its parent
         leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
     }
-    else
+    else {
         leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+    }
     // Return if nothing found
     if (!leftAlignment) return -VRV_UNSET;
 
@@ -472,6 +473,15 @@ bool Alignment::HasAlignmentReference(int staffN)
     return (this->FindDescendantByComparison(&matchStaff, 1) != NULL);
 }
 
+bool Alignment::HasTimestampOnly()
+{
+    // If no child, then not timestamp
+    if (!this->GetChildCount()) return false;
+    // Look for everything that is not a timestamp
+    ReverseClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR });
+    return (this->FindDescendantByComparison(&notTimestamp, 2) == NULL);
+}
+
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
@@ -539,10 +549,28 @@ bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
     return (std::find(types.begin(), types.end(), m_type) != types.end());
 }
 
-void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
+void Alignment::GetLeftRight(
+    const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
 {
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
     GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
+
+    minLeft = -VRV_UNSET;
+    maxRight = VRV_UNSET;
+
+    for (auto staffN : staffNs) {
+        int staffMinLeft, staffMaxRight;
+        this->GetLeftRight(staffN, staffMinLeft, staffMaxRight);
+        if (staffMinLeft < minLeft) minLeft = staffMinLeft;
+        if (staffMaxRight > maxRight) maxRight = staffMaxRight;
+    }
+}
+
+void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
+{
+    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
+    GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
+    getAlignmentLeftRightParams.m_excludeClasses = m_excludes;
 
     if (staffN != VRV_UNSET) {
         ArrayOfComparisons filters;
@@ -550,8 +578,9 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
         filters.push_back(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
-    else
+    else {
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams);
+    }
 
     minLeft = getAlignmentLeftRightParams.m_minLeft;
     maxRight = getAlignmentLeftRightParams.m_maxRight;
@@ -751,6 +780,7 @@ int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
     // Reset the previous time position and x_rel to 0;
     params->m_previousTime = 0.0;
     params->m_previousXRel = 0;
+    params->m_lastNonTimestamp = NULL;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1005,6 +1035,11 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalTime = 0.0;
     }
 
+    // if (this->HasTimestampOnly()) {
+    //    params->m_timestamps.push_back(this);
+    // return FUNCTOR_CONTINUE;
+    //}
+
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
@@ -1020,6 +1055,14 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
+
+    /*
+    for (auto &alignment : params->m_timestamps) {
+        LogMessage("%f", alignment->GetTime());
+    }
+    params->m_timestamps.clear();
+    params->m_lastNonTimestamp = this;
+    */
 
     return FUNCTOR_CONTINUE;
 }

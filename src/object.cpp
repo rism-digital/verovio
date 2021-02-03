@@ -1566,6 +1566,8 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
+    if (this->Is(params->m_excludeClasses)) return FUNCTOR_CONTINUE;
+
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
 
