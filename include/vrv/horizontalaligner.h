@@ -185,6 +185,11 @@ public:
      */
     bool HasTimestampOnly();
 
+    /* Return true and X position of the first accidental from the accid space of alignment reference for specific staff
+     * (found by staffN parameter). Return false and 0 otherwise.
+     */
+    std::pair<int, bool> GetAccidAdjustedPosition(Doc *doc, int staffN);
+
     //----------//
     // Functors //
     //----------//
@@ -312,6 +317,11 @@ public:
      * Return true if the reference has elements from multiple layers.
      */
     bool HasMultipleLayer() const { return (m_layerCount > 1); }
+
+    /**
+     * Return first accidental from the accid space of the alignment reference
+     */
+    Accid *GetFrontAccid() const;
 
     //----------//
     // Functors //

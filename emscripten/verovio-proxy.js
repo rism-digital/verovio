@@ -51,7 +51,7 @@ verovio.vrvToolkit.getPageWithElement = Module.cwrap( 'vrvToolkit_getPageWithEle
 // double getTimeForElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getTimeForElement = Module.cwrap( 'vrvToolkit_getTimeForElement', 'number', ['number', 'string'] );
 
-// string getTimesForElement(Toolkit *ic, const char *xmlId)
+// char *getTimesForElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getTimesForElement = Module.cwrap( 'vrvToolkit_getTimesForElement', 'string', ['number', 'string'] );
 
 // char *getMIDIValuesForElement(Toolkit *ic, const char *xmlId)
