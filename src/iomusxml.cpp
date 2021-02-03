@@ -180,9 +180,9 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                 }
                 // if afterBarline is false at beginning of measure, move before barline
                 if (!iter->m_afterBarline && m_durTotal == 0) {
-                    AttNNumberLikeComparison comparisonMeasure(MEASURE, measureNum);
-                    Object *currentMeasure = section->FindDescendantByComparison(&comparisonMeasure);
-                    Object *previousMeasure = section->GetPrevious(currentMeasure, MEASURE);
+                    const std::string previousMeasureNum = std::to_string(std::stoi(measure->GetN()) - 1);
+                    AttNNumberLikeComparison comparisonMeasure(MEASURE, previousMeasureNum);
+                    Object *previousMeasure = section->FindDescendantByComparison(&comparisonMeasure);
                     if (!previousMeasure) {
                         AddLayerElement(layer, iter->m_clef);
                         iter->isFirst = false;
