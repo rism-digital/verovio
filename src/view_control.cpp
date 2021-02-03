@@ -2147,7 +2147,12 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         ListOfObjects children;
         parent->FindAllDescendantByComparison(&children, &comp);
         if (!children.empty()) {
-            params.m_x = children.front()->GetDrawingX();
+            auto iter = std::min_element(children.begin(), children.end(),
+                [](Object *left, Object *right) { return left->GetDrawingX() < right->GetDrawingX(); });
+
+            Accid *accid = vrv_cast<Accid *>(*iter);
+            params.m_x
+                = (*iter)->GetDrawingX() - m_doc->GetGlyphWidth(accid->GetAccidGlyph(accid->GetAccid()), 100, false);
         }
     }
 
@@ -2165,7 +2170,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         if (!tempo->HasStartid() && !pos) {
             Alignment *dirAlignment = tempo->GetStart()->GetAlignment();
             params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-            auto [xPos, result] = dirAlignment->GetAccidAdjustedPosition(m_doc, (*staffIter)->GetN());
+            auto [xPos, result]
+                = dirAlignment->GetAccidAdjustedPosition(m_doc, (*staffIter)->GetN(), (*staffIter)->m_drawingStaffSize);
             if (result) params.m_x = xPos;
         }
         params.m_boxedRend.clear();
