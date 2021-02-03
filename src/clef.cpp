@@ -160,9 +160,9 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
 
     // Look if we have a grace aligner just after the clef.
-    // Limitation: clef changes are always aligned before grace notes, even if appearing after in the encoding
+    // Limitation: clef changes are always aligned before grace notes, even if appearing after in the encoding.
     // To overcome this limitation we will need to rethink alignment, or (better) use <graceGrp> and have the
-    // <clef> within it at the right place. Then the Clef should use the grace aligner and note the measure aligner
+    // <clef> within it at the right place. Then the Clef should use the grace aligner and not the measure aligner.
     GraceAligner *graceAligner = NULL;
     Alignment *nextAlignment = vrv_cast<Alignment *>(params->m_aligner->GetNext(this->GetAlignment()));
     if (nextAlignment && nextAlignment->GetType() == ALIGNMENT_GRACENOTE) {
@@ -173,11 +173,11 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
         }
     }
 
-    // Not grace aligner, look for the next alignment with something on that staff
+    // No grace aligner, look for the next alignment with something on that staff
     if (!graceAligner) {
         nextAlignment = NULL;
-        // Look for the next reference - here we start with the next alignment, because otherwise it is find the
-        // reference to itself
+        // Look for the next reference - here we start with the next alignment, because otherwise it will find the
+        // reference to the Clef in its own children
         Object *next = params->m_aligner->FindNextChild(&matchStaff, params->m_aligner->GetNext(this->GetAlignment()));
         if (next) {
             nextAlignment = vrv_cast<Alignment *>(next->GetParent());
@@ -200,9 +200,9 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // LayerElement::AdjustXPos can have spread the alignment apparts.
-    // We want them to point at the same position. Otherwise, when adjusting proportionally
-    // (below) this will yield displacements.
+    // LayerElement::AdjustXPos can have spread the alignment apart.
+    // We want them to point to the same position. Otherwise, adjusting proportionally
+    // (below) will yield displacements.
     this->GetAlignment()->SetXRel(nextAlignment->GetXRel());
 
     int previousLeft, previousRight;
@@ -210,7 +210,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     // This typically happens with invisible barlines. Just take the position of the alignment
     if (previousRight == VRV_UNSET) previousRight = previousAlignment->GetXRel();
 
-    // Get the right position of the grace group or the next element
+    // Get the right position of the grace group or of the next element
     int nextLeft, nextRight;
     if (graceAligner) {
         nextLeft = graceAligner->GetGraceGroupLeft(staff->GetN());
@@ -218,7 +218,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     else {
         nextAlignment->GetLeftRight(ns, nextLeft, nextRight);
     }
-    // This typically happens with invisible barlines or with --grace-rhythm-align and not grace on that staff
+    // This typically happens with invisible barlines or with --grace-rhythm-align but no grace on that staff
     if (nextLeft == -VRV_UNSET) nextLeft = nextAlignment->GetXRel();
 
     int selfRight = this->GetContentRight() + params->m_doc->GetRightMargin(CLEF) * staff->m_drawingStaffSize;
@@ -226,7 +226,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     if (selfRight > nextLeft) {
         this->SetDrawingXRel(this->GetDrawingXRel() - selfRight + nextLeft);
     }
-    // The looks if it overlap on the right and make room if necessary
+    // Then look if it overlaps on the right and make room if necessary
     int selfLeft = this->GetContentLeft() - params->m_doc->GetLeftMargin(CLEF) * staff->m_drawingStaffSize;
     if (selfLeft < previousRight) {
         ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
