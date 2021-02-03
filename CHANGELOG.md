@@ -11,6 +11,7 @@
 * Improved positioning of ornaments with multiple layers
 * Improved articulations in normal and cross-staff contexts
 * Improved spacing of clef changes
+* Improved timestamp events alignments by avoiding extra-space to be added
 * Embedding of Leland font from MuseScore
 * Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
 * Options `--top-margin-artic and --bottom-margin-artic for articulation margins
