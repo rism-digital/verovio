@@ -181,7 +181,6 @@ public:
     bool HasAlignmentReference(int staffN);
 
     /**
-
      * Return true if the alignment contains only references to timestamp attributes.
      */
     bool HasTimestampOnly();
