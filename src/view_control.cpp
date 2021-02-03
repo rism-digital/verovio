@@ -2161,7 +2161,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter)) {
             continue;
         }
-        
+
         if (!tempo->HasStartid() && !pos) {
             Alignment *dirAlignment = tempo->GetStart()->GetAlignment();
             params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();

@@ -461,7 +461,7 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-std::pair<int, bool> Alignment::GetAccidAdjustedPosition(Doc* doc, int staffN)
+std::pair<int, bool> Alignment::GetAccidAdjustedPosition(Doc *doc, int staffN)
 {
     if (!HasAlignmentReference(staffN)) return { 0, false };
 
