@@ -150,7 +150,7 @@ void Tuplet::FilterList(ArrayOfObjects *childList)
     }
 }
 
-void Tuplet::CalcDrawingBracketAndNumPos()
+void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
 {
     m_drawingBracketPos = STAFFREL_basic_NONE;
 
@@ -204,6 +204,11 @@ void Tuplet::CalcDrawingBracketAndNumPos()
     }
     // true means up
     m_drawingBracketPos = ups > downs ? STAFFREL_basic_above : STAFFREL_basic_below;
+
+    if (tupletNumHead) {
+        m_drawingBracketPos
+            = (m_drawingBracketPos == STAFFREL_basic_below) ? STAFFREL_basic_above : STAFFREL_basic_below;
+    }
 
     // also use it for the num unless it is already set
     if (m_drawingNumPos == STAFFREL_basic_NONE) {

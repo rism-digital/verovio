@@ -998,6 +998,10 @@ Options::Options()
     m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_tupletBracketThickness, "tupletBracketThickness", &m_generalLayout);
 
+    m_tupletNumHead.SetInfo("Tuplet number on head", "Placement of tuplet number on the side of the note head");
+    m_tupletNumHead.Init(false);
+    this->Register(&m_tupletNumHead, "tupletNumHead", &m_generalLayout);
+
     /********* selectors *********/
 
     m_selectors.SetLabel("Element selectors and processing", "3-selectors");

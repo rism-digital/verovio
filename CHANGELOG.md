@@ -1,7 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support for `clef@visible` (@rettinghaus)
 * Support for `artic@glyph.num`
+* Support for arabic accidentals
+* Improved default rest positioning
 * Improved automatic cross staff rest positioning (@eNote-GmbH)
 * Improved cross-staff spacing
 * Improved slurs
@@ -9,7 +12,8 @@
 * Improved articulations in normal and cross-staff contexts
 * Embedding of Leland font from MuseScore
 * Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
-* Options --top-margin-artic and --bottom-margin-artic for articulation margins
+* Options `--top-margin-artic and --bottom-margin-artic for articulation margins
+* Option --tuplet-num-head for placing tuplet numbers on the side of the notehead
 
 ## [3.1.0] - 2021-01-12
 * Support for "old style" multiple measure rests (@rettinghaus)

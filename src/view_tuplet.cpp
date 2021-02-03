@@ -62,7 +62,7 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // We do it here because we have no dedicated functor to do it (which would be an overkill)
     if (tuplet->GetDrawingBracketPos() == STAFFREL_basic_NONE) {
-        tuplet->CalcDrawingBracketAndNumPos();
+        tuplet->CalcDrawingBracketAndNumPos(m_doc->GetOptions()->m_tupletNumHead.GetValue());
     }
 
     dc->StartGraphic(element, "", element->GetUuid());

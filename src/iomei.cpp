@@ -1577,6 +1577,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
         cleffingLog.WriteCleffingLog(currentNode);
         AttCleffingVis cleffingVis;
         cleffingVis.SetClefColor(clef->GetColor());
+        cleffingVis.SetClefVisible(clef->GetVisible());
         cleffingVis.WriteCleffingVis(currentNode);
         return;
     }
@@ -1587,6 +1588,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteColor(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
+    clef->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
@@ -3469,6 +3471,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvClef->SetDis(cleffingLog.GetClefDis());
         vrvClef->SetDisPlace(cleffingLog.GetClefDisPlace());
         vrvClef->SetColor(cleffingVis.GetClefColor());
+        vrvClef->SetVisible(cleffingVis.GetClefVisible());
         object->AddChild(vrvClef);
     }
 
@@ -4845,6 +4848,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadColor(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
+    vrvClef->ReadVisibility(clef);
 
     parent->AddChild(vrvClef);
     ReadUnsupportedAttr(clef, vrvClef);

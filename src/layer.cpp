@@ -551,16 +551,22 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
         params->m_scoreDefRole = SCOREDEF_INTERMEDIATE;
 
     if (this->GetStaffDefClef()) {
-        GetStaffDefClef()->AlignHorizontally(params);
+        if (GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
+            GetStaffDefClef()->AlignHorizontally(params);
+        }
     }
     if (this->GetStaffDefKeySig()) {
-        GetStaffDefKeySig()->AlignHorizontally(params);
+        if (GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
+            GetStaffDefKeySig()->AlignHorizontally(params);
+        }
     }
     if (this->GetStaffDefMensur()) {
         GetStaffDefMensur()->AlignHorizontally(params);
     }
     if (this->GetStaffDefMeterSig()) {
-        GetStaffDefMeterSig()->AlignHorizontally(params);
+        if (GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
+            GetStaffDefMeterSig()->AlignHorizontally(params);
+        }
     }
 
     params->m_scoreDefRole = SCOREDEF_NONE;
