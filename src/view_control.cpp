@@ -1466,23 +1466,8 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     int lineCount = dir->GetNumberOfLines(dir);
 
-    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
-    Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
     // If we have not timestamp
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
-    if (!dir->HasStartid() && (dir->GetTstamp() <= 1) && pos) {
-        params.m_x = measure->GetDrawingX() + pos->GetXRel();
-    }
-    else if (dir->HasStartid()) {
-        LayerElement *parent = dir->GetStart();
-        ClassIdComparison comp(ACCID);
-        ListOfObjects children;
-        parent->FindAllDescendantByComparison(&children, &comp);
-        if (!children.empty()) {
-            params.m_x = children.front()->GetDrawingX();
-        }
-    }
 
     data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
     // dir are left aligned by default (with both @tstamp and @startid)
@@ -1494,12 +1479,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
             continue;
         }
-        if (!dir->HasStartid() && !pos) {
-            Alignment *dirAlignment = dir->GetStart()->GetAlignment();
-            params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-            auto [xPos, result] = dirAlignment->GetAccidAdjustedPosition(m_doc, (*staffIter)->GetN());
-            if (result) params.m_x = xPos;
-        }
+
         params.m_boxedRend.clear();
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
@@ -2161,6 +2141,15 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         else
             params.m_x -= 2 * tempo->GetStart()->GetDrawingRadius(m_doc);
     }
+    else if (tempo->HasStartid()) {
+        LayerElement *parent = tempo->GetStart();
+        ClassIdComparison comp(ACCID);
+        ListOfObjects children;
+        parent->FindAllDescendantByComparison(&children, &comp);
+        if (!children.empty()) {
+            params.m_x = children.front()->GetDrawingX();
+        }
+    }
 
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
     // Tempo are left aligned by default;
@@ -2172,7 +2161,13 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter)) {
             continue;
         }
-
+        
+        if (!tempo->HasStartid() && !pos) {
+            Alignment *dirAlignment = tempo->GetStart()->GetAlignment();
+            params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+            auto [xPos, result] = dirAlignment->GetAccidAdjustedPosition(m_doc, (*staffIter)->GetN());
+            if (result) params.m_x = xPos;
+        }
         params.m_boxedRend.clear();
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
