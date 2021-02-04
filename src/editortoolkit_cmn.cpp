@@ -313,7 +313,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
 
     this->m_chainedId = element->GetUuid();
     m_editInfo.import("uuid", element->GetUuid());
-    
+
     return true;
 }
 
@@ -359,7 +359,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
 
     this->m_chainedId = element->GetUuid();
     m_editInfo.import("uuid", element->GetUuid());
-    
+
     return true;
 }
 
