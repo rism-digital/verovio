@@ -116,6 +116,8 @@ void MeasureAligner::Reset()
     AddAlignment(m_rightBarLineAlignment);
     m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
+
+    m_initialTstampDur = -DUR_MAX;
 }
 
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
@@ -169,6 +171,13 @@ double MeasureAligner::GetMaxTime() const
     assert(m_rightBarLineAlignment);
 
     return m_rightAlignment->GetTime();
+}
+
+void MeasureAligner::SetInitialTstamp(int meterUnit)
+{
+    if (meterUnit != 0) {
+        m_initialTstampDur = DUR_MAX / meterUnit * -1;
+    }
 }
 
 void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments)
@@ -799,8 +808,9 @@ int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
     params->m_previousTime = 0.0;
-    params->m_previousXRel = 0;
-    params->m_lastNonTimestamp = NULL;
+    params->m_previousXRel = params->m_doc->GetDrawingUnit(100);
+    params->m_lastNonTimestamp = m_leftBarLineAlignment;
+    params->m_measureAligner = this;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1055,10 +1065,11 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalTime = 0.0;
     }
 
-    // if (this->HasTimestampOnly()) {
-    //    params->m_timestamps.push_back(this);
-    // return FUNCTOR_CONTINUE;
-    //}
+    // Do not move aligner that are only time-stamps at this stage but add it to the pending list
+    if (this->HasTimestampOnly()) {
+        params->m_timestamps.push_back(this);
+        return FUNCTOR_CONTINUE;
+    }
 
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
@@ -1076,13 +1087,31 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
 
-    /*
-    for (auto &alignment : params->m_timestamps) {
-        LogMessage("%f", alignment->GetTime());
+    // This is an alignment which is not timestamp only. If we have a list of pendings timetamp
+    // alignments, then we now need to move them appropriately
+    if (!params->m_timestamps.empty() && params->m_lastNonTimestamp) {
+        int startXRel = params->m_lastNonTimestamp->GetXRel();
+        double startTime = params->m_lastNonTimestamp->GetTime();
+        double endTime = this->GetTime();
+        // We have timestamp alignments between the left barline and the first beat. We need
+        // to use the MeasureAligner::m_initialTstampDur to calculate the time (percentage) position
+        if (params->m_lastNonTimestamp->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
+            startTime = params->m_measureAligner->GetInitialTstampDur();
+        }
+        // The duration since the last alignment and the current one
+        double duration = endTime - startTime;
+        int space = m_xRel - params->m_lastNonTimestamp->GetXRel();
+        // For each timestamp alignment, move them proporitionally to the space we currently have
+        for (auto &alignment : params->m_timestamps) {
+            // Avoid division by zero (nothing to move with the alignment anyway
+            if (duration == 0.0) break;
+            double percent = (alignment->GetTime() - startTime) / duration;
+            alignment->SetXRel(startXRel + space * percent);
+        }
+        params->m_timestamps.clear();
     }
-    params->m_timestamps.clear();
+
     params->m_lastNonTimestamp = this;
-    */
 
     return FUNCTOR_CONTINUE;
 }
