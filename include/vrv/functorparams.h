@@ -503,6 +503,28 @@ public:
     Doc *m_doc;
 };
 
+
+//----------------------------------------------------------------------------
+// AdjustTempoParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the systemAligner
+ * member 1: the doc
+ **/
+
+class AdjustTempoParams : public FunctorParams {
+public:
+    AdjustTempoParams(Doc *doc)
+    {
+        m_systemAligner = NULL;
+        m_doc = doc;
+    }
+
+    SystemAligner *m_systemAligner;
+    Doc *m_doc;
+};
+
 //----------------------------------------------------------------------------
 // AdjustTupletNumOverlapParams
 //----------------------------------------------------------------------------

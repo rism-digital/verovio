@@ -764,6 +764,11 @@ public:
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the x position of accidental.
+     */
+    virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * @name Adjust the x position of a right barline in order to make sure the is no text content
      * overlflowing in the right margin
      */
