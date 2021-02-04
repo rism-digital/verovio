@@ -67,11 +67,11 @@ bool Tempo::IsSupportedChild(Object *child)
     return true;
 }
 
-int Tempo::GetDrawingXRelativeToStaff(int staffN) 
+int Tempo::GetDrawingXRelativeToStaff(int staffN)
 {
     int m_relativeX = 0;
-    if (m_drawingXRel.find(staffN) != m_drawingXRel.end()) {
-        m_relativeX = m_drawingXRel.at(staffN);
+    if (m_drawingXRels.find(staffN) != m_drawingXRels.end()) {
+        m_relativeX = m_drawingXRels.at(staffN);
     }
 
     return GetStart()->GetDrawingX() + m_relativeX;
@@ -106,9 +106,19 @@ int Tempo::AdjustTempo(FunctorParams *functorParams)
             Alignment *align = GetStart()->GetAlignment();
             align->GetLeftRight(staffN, left, right);
         }
-        
-        m_drawingXRel[staffN] = left - start;
+
+        m_drawingXRels[staffN] = left - start;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Tempo::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    ControlElement::ResetDrawing(functorParams);
+
+    m_drawingXRels.clear();
 
     return FUNCTOR_CONTINUE;
 }

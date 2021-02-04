@@ -73,12 +73,17 @@ public:
      */
     virtual int AdjustTempo(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 public:
     //
 private:
-    std::map<int, int> m_drawingXRel;
+    std::map<int, int> m_drawingXRels;
 };
 
 } // namespace vrv
