@@ -220,7 +220,7 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                         break;
                     }
                 }
-                if (addSameas) {
+                if (!objects.empty() && addSameas) {
                     Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
                     sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
                     AddLayerElement(layer, sameasClef);
