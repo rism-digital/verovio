@@ -359,6 +359,11 @@ void Page::LayOutHorizontally()
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
 
+    // Adjust the tempo
+    Functor adjustTempo(&Object::AdjustTempo);
+    AdjustTempoParams adjustTempoParams(doc);
+    this->Process(&adjustTempo, &adjustTempoParams);
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsXParams(doc);
     Functor adjustTupletsX(&Object::AdjustTupletsX);

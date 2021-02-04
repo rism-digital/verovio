@@ -559,6 +559,16 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::AdjustTempo(FunctorParams *functorParams)
+{
+    AdjustTempoParams *params = vrv_params_cast<AdjustTempoParams *>(functorParams);
+    assert(params);
+
+    params->m_systemAligner = &m_systemAligner;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);

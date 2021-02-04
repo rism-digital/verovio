@@ -13,8 +13,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "controlelement.h"
 #include "editorial.h"
+#include "functorparams.h"
+#include "measure.h"
+#include "staff.h"
+#include "system.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -60,6 +65,52 @@ bool Tempo::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+int Tempo::GetDrawingXRelativeToStaff(int staffN) 
+{
+    int m_relativeX = 0;
+    if (m_drawingXRel.find(staffN) != m_drawingXRel.end()) {
+        m_relativeX = m_drawingXRel.at(staffN);
+    }
+
+    return GetStart()->GetDrawingX() + m_relativeX;
+}
+
+int Tempo::AdjustTempo(FunctorParams *functorParams)
+{
+    AdjustTempoParams *params = vrv_params_cast<AdjustTempoParams *>(functorParams);
+    assert(params);
+
+    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
+    ArrayOfFloatingPositioners positioners;
+    params->m_systemAligner->FindAllPositionerPointingTo(&positioners, this);
+
+    if (positioners.empty()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Measure *measure = vrv_cast<Measure *>(GetFirstAncestor(MEASURE));
+    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
+    Alignment *pos
+        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
+
+    for (auto positioner : positioners) {
+        int left, right;
+        int start = GetStart()->GetDrawingX();
+        const int staffN = positioner->GetAlignment()->GetStaff()->GetN();
+        if (!HasStartid() && (GetTstamp() <= 1) && pos) {
+            left = measure->GetDrawingX() + pos->GetXRel();
+        }
+        else {
+            Alignment *align = GetStart()->GetAlignment();
+            align->GetLeftRight(staffN, left, right);
+        }
+        
+        m_drawingXRel[staffN] = left - start;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

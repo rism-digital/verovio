@@ -58,15 +58,27 @@ public:
      */
     virtual bool IsSupportedChild(Object *object);
 
+    /**
+     * @name Get the X drawing position
+     */
+    ///@{
+    int GetDrawingXRelativeToStaff(int staffN);
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::AdjustTempoX
+     */
+    virtual int AdjustTempo(FunctorParams *functorParams);
 
 private:
     //
 public:
     //
 private:
+    std::map<int, int> m_drawingXRel;
 };
 
 } // namespace vrv

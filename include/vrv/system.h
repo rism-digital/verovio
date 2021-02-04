@@ -189,6 +189,11 @@ public:
     ///@}
 
     /**
+     * See Object::AdjustTempo
+     */
+    virtual int AdjustTempo(FunctorParams *functorParams);
+
+    /**
      * See Object::AlignVertically
      */
     ///@{

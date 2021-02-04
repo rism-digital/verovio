@@ -461,24 +461,6 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-std::pair<int, bool> Alignment::GetAccidAdjustedPosition(Doc *doc, int staffN, int staffSize)
-{
-    if (!HasAlignmentReference(staffN)) return { 0, false };
-
-    AlignmentReference *reference = GetAlignmentReference(staffN);
-    if (!reference) return { 0, false };
-
-    const std::vector<Accid *> *alignmentAccidentals = reference->GetAccidSpace();
-    if (alignmentAccidentals->empty()) return { 0, false };
-
-    auto iter = std::min_element(alignmentAccidentals->cbegin(), alignmentAccidentals->cend(),
-        [](const Accid *left, const Accid *right) { return left->GetDrawingX() < right->GetDrawingX(); });
-    Accid *accid = vrv_cast<Accid *>(*iter);
-    const int accidGlyphWidth = doc->GetGlyphWidth(accid->GetAccidGlyph(accid->GetAccid()), staffSize, false);
-
-    return { (*iter)->GetDrawingX() - accidGlyphWidth / 2, true };
-}
-
 bool Alignment::IsSupportedChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
