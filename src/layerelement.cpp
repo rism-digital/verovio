@@ -1448,6 +1448,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    int offset = 0;
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
@@ -1463,9 +1464,19 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft();
         selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+        
+        int overlap = 0;
+        for (auto &boundingBox : params->m_boundingBoxes) {
+            bool hasOverlap = this->HorizontalContentOverlap(boundingBox);
+            if (hasOverlap) {
+                int overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc));
+                LogMessage("%s overlaps of %d", this->GetClassName().c_str(), overlap);
+            }
+        }
+        offset -= overlap;
     }
 
-    int offset = selfLeft - params->m_minPos;
+    offset = std::min(offset, selfLeft - params->m_minPos);
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         // Also move the cumultated x shift and the minimum position for the next alignment accordingly
@@ -1473,12 +1484,12 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingMinPos += (-offset);
     }
 
-    int selfRight;
+    int selfRight = this->GetAlignment()->GetXRel();
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         selfRight = this->GetAlignment()->GetXRel()
             + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
     }
-    else {
+    else if (this->Is({CLEF, KEYSIG, MENSUR, METERSIG})) {
         selfRight = this->GetSelfRight()
             + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
     }
