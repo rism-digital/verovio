@@ -11,12 +11,12 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <boundingbox.h>
-#include <doc.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
+#include "boundingbox.h"
+#include "doc.h"
 #include "glyph.h"
 #include "vrv.h"
 
