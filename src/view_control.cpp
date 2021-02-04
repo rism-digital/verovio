@@ -2151,8 +2151,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
                 [](Object *left, Object *right) { return left->GetDrawingX() < right->GetDrawingX(); });
 
             Accid *accid = vrv_cast<Accid *>(*iter);
-            params.m_x
-                = (*iter)->GetDrawingX() - m_doc->GetGlyphWidth(accid->GetAccidGlyph(accid->GetAccid()), 100, false);
+            params.m_x = (*iter)->GetDrawingX()
+                - m_doc->GetGlyphWidth(accid->GetAccidGlyph(accid->GetAccid()), 100, false) / 2;
         }
     }
 

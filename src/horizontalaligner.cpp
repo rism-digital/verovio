@@ -476,7 +476,7 @@ std::pair<int, bool> Alignment::GetAccidAdjustedPosition(Doc *doc, int staffN, i
     Accid *accid = vrv_cast<Accid *>(*iter);
     const int accidGlyphWidth = doc->GetGlyphWidth(accid->GetAccidGlyph(accid->GetAccid()), staffSize, false);
 
-    return { (*iter)->GetDrawingX() - accidGlyphWidth, true };
+    return { (*iter)->GetDrawingX() - accidGlyphWidth / 2, true };
 }
 
 bool Alignment::IsSupportedChild(Object *child)
