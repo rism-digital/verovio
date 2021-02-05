@@ -206,8 +206,13 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
             }
             else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
                 bool addSameas = true;
-                ListOfObjects objects;
+                ListOfObjects objects, measureObjects;
                 ClassIdComparison matchClassId(CLEF);
+                measure->FindAllDescendantByComparison(&measureObjects, &matchClassId);
+                auto it = std::find_if(measureObjects.begin(), measureObjects.end(),
+                    [&iter](Object *obj) { return obj->GetUuid() == iter->m_clef->GetUuid(); });
+                if (it == measureObjects.end()) continue;
+
                 layer->FindAllDescendantByComparison(&objects, &matchClassId);
                 for (auto o : objects) {
                     Clef *clef = dynamic_cast<Clef *>(o);
@@ -220,7 +225,7 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                         break;
                     }
                 }
-                if (!objects.empty() && addSameas) {
+                if (addSameas) {
                     Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
                     sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
                     AddLayerElement(layer, sameasClef);
