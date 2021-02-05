@@ -53,12 +53,12 @@ void GrpSym::Reset()
 
 void GrpSym::SetStartDef(StaffDef *start)
 {
-    if (start && !m_startDef) m_startDef = start;
+    if (start) m_startDef = start;
 }
 
 void GrpSym::SetEndDef(StaffDef *end)
 {
-    if (end && !m_endDef) m_endDef = end;
+    if (end) m_endDef = end;
 }
 
 int GrpSym::GetDrawingX() const
@@ -126,6 +126,14 @@ int GrpSym::PrepareGroupSymbols(FunctorParams *)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int GrpSym::OptimizeScoreDefEnd(FunctorParams *functorParams)
+{
+    // OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    // assert(params);
+
+    return this->PrepareGroupSymbols(functorParams);
 }
 
 } // namespace vrv

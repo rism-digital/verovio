@@ -162,7 +162,7 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 
 void StaffGrp::SetGroupSymbol(GrpSym *grpSym)
 {
-    if (!m_groupSymbol && grpSym) {
+    if (grpSym) {
         m_groupSymbol = grpSym;
     }
 }

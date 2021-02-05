@@ -69,6 +69,11 @@ public:
      */
     virtual int PrepareGroupSymbols(FunctorParams *functorParams);
 
+    /**
+     * See Object::OptimizeScoreDef
+     */
+    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+
 private:
     //
 public:
