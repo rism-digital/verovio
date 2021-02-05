@@ -1479,6 +1479,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
             continue;
         }
+
         params.m_boxedRend.clear();
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
@@ -2128,19 +2129,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     int lineCount = tempo->GetNumberOfLines(tempo);
 
     TextDrawingParams params;
-
-    // see if we have a meter signature for this measure
-    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
-    Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
-    params.m_x = tempo->GetStart()->GetDrawingX();
-    if (!tempo->HasStartid()) {
-        if ((tempo->GetTstamp() <= 1) && pos)
-            params.m_x = measure->GetDrawingX() + pos->GetXRel();
-        else
-            params.m_x -= 2 * tempo->GetStart()->GetDrawingRadius(m_doc);
-    }
-
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
     // Tempo are left aligned by default;
     if (alignment == 0) alignment = HORIZONTALALIGNMENT_left;
@@ -2152,6 +2140,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
             continue;
         }
 
+        params.m_x = tempo->GetDrawingXRelativeToStaff((*staffIter)->GetN());
         params.m_boxedRend.clear();
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
