@@ -1478,12 +1478,13 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY() - stem->GetDrawingStemLen());
 
-    if (stem->HasStemMod()) {
+    if (stem->HasStemMod() && (stem->GetDrawingStemLen())) {
         if (stem->GetStemMod() == STEMMODIFIER_sprech) {
             int yShift = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
             Note *note = vrv_cast<Note *>(stem->GetParent());
             if (!note) {
                 Chord *chord = vrv_cast<Chord *>(stem->GetParent());
+                assert(chord);
                 if (stem->GetDrawingStemLen() < 0) {
                     note = chord->GetTopNote();
                 }
