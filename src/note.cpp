@@ -1102,7 +1102,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         currentStem->AttGraced::operator=(*this);
         currentStem->AttStems::operator=(*this);
         currentStem->AttStemsCmn::operator=(*this);
-        if (this->GetActualDur() < DUR_2) {
+        if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
             currentStem->IsVirtual(true);
         }
     }

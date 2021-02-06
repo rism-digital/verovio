@@ -1327,9 +1327,12 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
                 Staff *bottomStaff = previousSystemMeasure->GetBottomVisibleStaff();
                 // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
                 // substract offset of the system divider symbol itself (added to y2 and y4)
-                previousSystemBottomMarginY = bottomStaff->GetDrawingY()
-                    - (bottomStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
-                    - m_doc->GetDrawingUnit(100) * 5;
+                if (bottomStaff) {
+                    previousSystemBottomMarginY = bottomStaff->GetDrawingY()
+                        - (bottomStaff->m_drawingLines - 1)
+                            * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
+                        - m_doc->GetDrawingUnit(100) * 5;
+                }
             }
         }
     }
