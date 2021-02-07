@@ -20892,11 +20892,15 @@ template <class ELEMENT> void HumdrumInput::setWrittenAccidentalLower(ELEMENT el
     else if (value == "##") {
         element->SetAccidlower(ACCIDENTAL_WRITTEN_x);
     }
-    else {
-        // other accidentals are possible to add here; otherwise,
-        // the invalid accidental will be ignored (not replaced
-        // with an empty accidental, for example).
-    }
+    else if (value == "x") {
+        element->SetAccidlower(ACCIDENTAL_WRITTEN_x);
+}
+else
+{
+    // other accidentals are possible to add here; otherwise,
+    // the invalid accidental will be ignored (not replaced
+    // with an empty accidental, for example).
+}
 }
 
 //////////////////////////////
