@@ -10094,6 +10094,8 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     vector<int> articpos(256, 0);
     vector<bool> showpos(256, 0);
     vector<int> articges(256, 0); // is it a gestural articulation?
+    bool textTenuto = false;
+    bool textTenutoBelow = false;
     char ch;
     char posch;
     char pos2ch;
@@ -10117,6 +10119,16 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
             ++i;
         }
+        else if ((ch == '~') && (posch == '~')) {
+            // textual tenuto
+            textTenuto = true;
+            ++i;
+            posch = i < tsize - 1 ? token->at(i + 1) : 0;
+            if (m_signifiers.below && (posch == m_signifiers.below)) {
+                textTenutoBelow = true;
+            }
+            continue;
+        }
         if (m_signifiers.verticalStroke == ch) {
             // use 7 slot in array for vertical strokes
             ch = 7;
@@ -10130,10 +10142,10 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             if ((posch == 'y') && (pos2ch != 'y')) {
                 articges[ch] = 1;
             }
-            else if ((posch == m_signifiers.above) && (pos2ch == 'y') && (pos3ch != 'y')) {
+            else if (m_signifiers.above && (posch == m_signifiers.above) && (pos2ch == 'y') && (pos3ch != 'y')) {
                 articges[ch] = 1;
             }
-            else if ((posch == m_signifiers.below) && (pos2ch == 'y') && (pos3ch != 'y')) {
+            else if (m_signifiers.below && (posch == m_signifiers.below) && (pos2ch == 'y') && (pos3ch != 'y')) {
                 articges[ch] = 1;
             }
         }
@@ -10149,6 +10161,21 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         else {
             articpos.at(ch) = 0;
         }
+    }
+
+    if (textTenuto) {
+        std::string text = "ten.";
+        std::string placement = "above";
+        if (textTenutoBelow) {
+            placement = "below";
+        }
+        bool bold = false;
+        bool italic = true;
+        int justification = 0;
+        std::string color = "black";
+        int vgroup = 0;
+        int staffindex = m_rkern[token->getTrack()];
+        addDirection(text, placement, bold, italic, token, staffindex, justification, color, vgroup);
     }
 
     // second position is the staff position (-1=below, 0=undefined, 1=above)
