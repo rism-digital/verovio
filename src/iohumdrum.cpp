@@ -10172,7 +10172,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         bool bold = false;
         bool italic = true;
         int justification = 0;
-        std::string color = "black";
+        std::string color = "";
         int vgroup = 0;
         int staffindex = m_rkern[token->getTrack()];
         addDirection(text, placement, bold, italic, token, staffindex, justification, color, vgroup);
