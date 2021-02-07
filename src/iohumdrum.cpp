@@ -21058,6 +21058,22 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     else if (token->find("ww") != std::string::npos) {
         mordent->SetLong(BOOLEAN_true);
     }
+
+    // Set an explicit visual accidental for the mordent.
+    // Maybe in the future allow for lacc and uacc to place the accidental.
+    // Also deal with a mordent in a chord later.
+    std::string acctext = token->getLayoutParameter("MOR", "acc");
+    if ((!acctext.empty()) && acctext != "true") {
+        if (acctext == "false") {
+            acctext = "none";
+        }
+        if (lowerQ) {
+            setWrittenAccidentalLower(mordent, acctext);
+        }
+        else {
+            setWrittenAccidentalUpper(mordent, acctext);
+        }
+    }
 }
 
 //////////////////////////////
