@@ -10217,80 +10217,29 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         return;
     }
 
-    Artic *artic = NULL;
-    if (artics.size() == 1) {
-        // single articulation, so no problem
-        if (gestural.at(0)) {
-            // When enabled in artic, set gestrual articulation.
-            // For now do not store gestural articulation in MEI:
-            // artic->SetArticGes(artics);
-            return;
+    vector<Artic *> articlist;
+    for (int i = 0; i < (int)artics.size(); i++) {
+        Artic *artic = new Artic;
+        articlist.push_back(artic);
+        element->AddChild(artic);
+        if (artics.size() > 1) {
+            // reorder ID numbers by sequence in token later
+            setLocationId(artic, token, i + 1);
         }
         else {
-            artic = new Artic;
-            appendElement(element, artic);
-            artic->SetArtic(artics);
+            setLocationId(artic, token);
         }
-        if (positions.at(0) > 0) {
-            setPlace(artic, "above", showingpositions.at(0));
+        std::vector<data_ARTICULATION> oneartic;
+        oneartic.clear();
+        oneartic.push_back(artics.at(i));
+        artic->SetArtic(oneartic);
+        if (positions.at(i) > 0) {
+            setPlace(artic, "above", positions.at(i));
         }
-        else if (positions.at(0) < 0) {
-            setPlace(artic, "below", showingpositions.at(0));
+        else if (positions.at(i) < 0) {
+            setPlace(artic, "below", positions.at(i));
         }
-        setLocationId(artic, token);
-        return;
-    }
-
-    if (artic == NULL) {
-        artic = new Artic;
-        appendElement(element, artic);
-    }
-
-    // Handle gestural articulations below when there are multiple articulations.
-
-    // more than one articulation, so categorize them by placement.
-
-    std::vector<data_ARTICULATION> articsabove;
-    std::vector<data_ARTICULATION> articsbelow;
-    std::vector<data_ARTICULATION> articsdefault; // no placment parameter
-    std::vector<bool> showposabove;
-    std::vector<bool> showposbelow;
-
-    for (int i = 0; i < (int)artics.size(); ++i) {
-        if (positions[i] > 0) {
-            articsabove.push_back(artics[i]);
-            showposabove.push_back(showingpositions.at(i));
-        }
-        else if (positions[i] < 0) {
-            articsbelow.push_back(artics[i]);
-            showposbelow.push_back(showingpositions.at(i));
-        }
-        else {
-            articsdefault.push_back(artics[i]);
-        }
-    }
-
-    if (!articsabove.empty()) {
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(articsabove);
-        setPlace(artic, "above", showposabove.at(0));
-        artic->SetUuid(getLocationId(element, token, 0) + "-above");
-    }
-
-    if (!articsbelow.empty()) {
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(articsbelow);
-        setPlace(artic, "below", showposbelow.at(0));
-        artic->SetUuid(getLocationId(element, token, 0) + "-below");
-    }
-
-    if (!articsdefault.empty()) {
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(articsdefault);
-        setLocationId(artic, token);
+        // add gestural articulation info
     }
 }
 
