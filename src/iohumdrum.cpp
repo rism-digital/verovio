@@ -4920,7 +4920,7 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
 
     std::string name8 = name;
     // Substitute b and "-flat" for Unicode flat symbol:
-    std::regex exp1("\\b([A-G])b\\b");
+    std::regex exp1("\\b([ABDEFG])b\\b");
     std::regex exp2("\\b([A-Ga-g])-flat\\b");
     name8 = std::regex_replace(name8, exp1, "$1\xe2\x99\xad");
     name8 = std::regex_replace(name8, exp2, "$1\xe2\x99\xad");
