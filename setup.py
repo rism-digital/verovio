@@ -133,5 +133,10 @@ setup(name='verovio',
           'verovio.data.Leipzig': os.listdir('./data/Leipzig'),
           'verovio.data.Petaluma': os.listdir('./data/Petaluma'),
           'verovio.data.text': os.listdir('./data/text'),
-      }
+      },
+      python_requires='>=3.6',
+      project_urls={
+          'Bug Reports': 'https://github.com/rism-ch/verovio/issues',
+          'Source': 'https://github.com/rism-ch/verovio',
+      },
 )
