@@ -495,7 +495,7 @@ int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int Layer::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     ResetStaffDefObjects();
 

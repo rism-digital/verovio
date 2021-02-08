@@ -70,7 +70,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
 
     // Set the current score def to the page one
-    // The page one has previously been set by Object::SetCurrentScoreDef
+    // The page one has previously been set by Object::ScoreDefSetCurrent
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
     if (m_options->m_shrinkToFit.GetValue()) {
@@ -309,7 +309,7 @@ void View::DrawStaffGrp(
 
     // draw the system start bar line
     if (topStaffGrp
-        && ((((firstDef != lastDef) || staffGrp->HasSymbol())
+        && ((((firstDef != lastDef) || staffGrp->GetFirst(GRPSYM))
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
         // int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);

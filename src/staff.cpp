@@ -358,16 +358,16 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int Staff::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     m_drawingStaffDef = NULL;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::OptimizeScoreDef(FunctorParams *functorParams)
+int Staff::ScoreDefOptimize(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     assert(params->m_currentScoreDef);
@@ -375,7 +375,7 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
 
     if (!staffDef) {
         LogDebug(
-            "Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::OptimizeScoreDef", this->GetN());
+            "Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::ScoreDefOptimize", this->GetN());
         return FUNCTOR_SIBLINGS;
     }
 

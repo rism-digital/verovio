@@ -1,4 +1,6 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![PyPI](https://img.shields.io/pypi/v/verovio)](https://pypi.org/project/verovio/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/verovio)](https://pypi.org/project/verovio/)
 [![AppVeyor status](https://ci.appveyor.com/api/projects/status/121cxhmtwurxffh0?svg=true)](https://ci.appveyor.com/project/LaurentPugin/verovio-r1t6l)
 [![GH Actions status](https://github.com/rism-ch/verovio/workflows/Verovio%20CI%20Build/badge.svg)](https://github.com/rism-ch/verovio/actions?query=workflow%3A%22Verovio+CI+Build%22)
 
