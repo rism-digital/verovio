@@ -12,6 +12,7 @@ import platform
 import os
 import subprocess
 
+
 def get_commit():
     """Utility function to call tools/get_git_commit.sh on any platform"""
     if os.path.exists("./tools"):
@@ -20,23 +21,29 @@ def get_commit():
     else:
         print("Can't change to tools directory")
 
+
 class build_ext(_build_ext):
     """Override build_ext and sdist commands to generate the git version header file"""
+
     def run(self):
         # generate the git commit include file
         get_commit()
         _build_ext.run(self)
 
+
 class sdist(_sdist):
     """Override build_sdist and sdist commands to generate the git version header file"""
+
     def run(self):
         # generate the git commit include file
         get_commit()
         _sdist.run(self)
 
+
 # Utility function to read the README file into the long_description.
 with open('README.md', 'r') as fh:
     long_description = fh.read()
+
 
 def get_version():
     """Function to get the version from the cpp file and the git sha for dev versions"""
@@ -52,11 +59,14 @@ def get_version():
         print("Running tools/get_version.sh")
         version = subprocess.getoutput("bash -c 'cd tools; ./get_version.sh'")
     if version.endswith(".dev"):
-        init_sha = subprocess.getoutput("git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
-        count = subprocess.getoutput("git rev-list --count HEAD \"^{}\"".format(init_sha))
+        init_sha = subprocess.getoutput(
+            "git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
+        count = subprocess.getoutput(
+            "git rev-list --count HEAD \"^{}\"".format(init_sha))
         version += count
     print(version)
     return version
+
 
 # extra compile arguments
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
@@ -69,30 +79,30 @@ else:
 
 verovio_module = Extension('verovio._verovio',
                            sources=glob('./src/*.cpp') + glob('./src/hum/*.cpp') +
-                                   [
-                                       './src/json/jsonxx.cc',
-                                       './src/pugi/pugixml.cpp',
-                                       './src/midi/Binasc.cpp',
-                                       './src/midi/MidiEvent.cpp',
-                                       './src/midi/MidiEventList.cpp',
-                                       './src/midi/MidiFile.cpp',
-                                       './src/midi/MidiMessage.cpp',
-                                       './libmei/attconverter.cpp',
-                                       './libmei/atts_analytical.cpp',
-                                       './libmei/atts_cmn.cpp',
-                                       './libmei/atts_cmnornaments.cpp',
-                                       './libmei/atts_critapp.cpp',
-                                       './libmei/atts_gestural.cpp',
-                                       './libmei/atts_externalsymbols.cpp',
-                                       './libmei/atts_facsimile.cpp',
-                                       './libmei/atts_mei.cpp',
-                                       './libmei/atts_mensural.cpp',
-                                       './libmei/atts_midi.cpp',
-                                       './libmei/atts_neumes.cpp',
-                                       './libmei/atts_pagebased.cpp',
-                                       './libmei/atts_shared.cpp',
-                                       './libmei/atts_visual.cpp',
-                                       './bindings/python/verovio.i'],
+                           [
+                               './src/json/jsonxx.cc',
+                               './src/pugi/pugixml.cpp',
+                               './src/midi/Binasc.cpp',
+                               './src/midi/MidiEvent.cpp',
+                               './src/midi/MidiEventList.cpp',
+                               './src/midi/MidiFile.cpp',
+                               './src/midi/MidiMessage.cpp',
+                               './libmei/attconverter.cpp',
+                               './libmei/atts_analytical.cpp',
+                               './libmei/atts_cmn.cpp',
+                               './libmei/atts_cmnornaments.cpp',
+                               './libmei/atts_critapp.cpp',
+                               './libmei/atts_gestural.cpp',
+                               './libmei/atts_externalsymbols.cpp',
+                               './libmei/atts_facsimile.cpp',
+                               './libmei/atts_mei.cpp',
+                               './libmei/atts_mensural.cpp',
+                               './libmei/atts_midi.cpp',
+                               './libmei/atts_neumes.cpp',
+                               './libmei/atts_pagebased.cpp',
+                               './libmei/atts_shared.cpp',
+                               './libmei/atts_visual.cpp',
+                               './bindings/python/verovio.i'],
                            swig_opts=['-c++', '-outdir', './bindings/python'],
                            include_dirs=['/usr/local/include',
                                          './include',
@@ -109,12 +119,22 @@ verovio_module = Extension('verovio._verovio',
 
 
 setup(name='verovio',
-      version = get_version(),
+      version=get_version(),
       cmdclass={'sdist': sdist, 'build_ext': build_ext},
       url="https://www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       long_description=long_description,
       long_description_content_type="text/markdown",
+      license='LGPLv3',
+      classifiers=[
+          'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
+
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
+      ],
       ext_modules=[verovio_module],
       packages=['verovio',
                 'verovio.data',
@@ -133,5 +153,10 @@ setup(name='verovio',
           'verovio.data.Leipzig': os.listdir('./data/Leipzig'),
           'verovio.data.Petaluma': os.listdir('./data/Petaluma'),
           'verovio.data.text': os.listdir('./data/text'),
-      }
+      },
+      python_requires='>=3.6',
+      project_urls={
+          'Bug Reports': 'https://github.com/rism-ch/verovio/issues',
+          'Source': 'https://github.com/rism-ch/verovio',
+      },
 )
