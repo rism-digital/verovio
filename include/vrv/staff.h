@@ -148,14 +148,14 @@ public:
     virtual int ConvertToCastOffMensural(FunctorParams *params);
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
-    virtual int OptimizeScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefOptimize(FunctorParams *functorParams);
 
     /**
      * See Object::ResetVerticalAlignment

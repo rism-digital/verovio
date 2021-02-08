@@ -84,9 +84,9 @@ public:
     //----------//
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
-    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+    virtual int ScoreDefOptimizeEnd(FunctorParams *functorParams);
 
 protected:
     /**

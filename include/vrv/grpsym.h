@@ -65,9 +65,9 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareGroupSymbols
+     * See Object::ScoreDefSetGrpSym
      */
-    virtual int PrepareGroupSymbols(FunctorParams *functorParams);
+    virtual int ScoreDefSetGrpSym(FunctorParams *functorParams);
 
 private:
     //
