@@ -481,7 +481,6 @@ void Page::LayOutVertically()
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlursParams.m_crossStaffSlurs) {
-        LogMessage("XStaff slurs");
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(&adjustSlurs, &adjustSlursParams);
