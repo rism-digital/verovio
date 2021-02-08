@@ -748,17 +748,14 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         return;
     }
 
-    LayerElement *durElement = NULL;
     Chord *parentChord1 = NULL;
     Layer *layer1 = NULL;
     if (note1) {
-        durElement = note1;
         layer1 = dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
         if (note1->m_crossStaff) layer1 = note1->m_crossLayer;
         parentChord1 = note1->IsChordTone();
     }
     if (parentChord1) {
-        durElement = parentChord1;
         if (parentChord1->m_crossStaff) layer1 = parentChord1->m_crossLayer;
     }
 

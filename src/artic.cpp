@@ -283,15 +283,12 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     /************** placement **************/
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
 
-    if (params->m_parent->m_crossStaff) {
-        staff = params->m_parent->m_crossStaff;
+    if (params->m_parent->m_crossLayer) {
         layer = params->m_parent->m_crossLayer;
     }
 
@@ -366,12 +363,9 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
 
-    if (this->m_crossStaff && this->m_crossLayer) {
+    if (this->m_crossStaff) {
         staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
     }
 
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
