@@ -225,7 +225,6 @@ public:
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
-    static void SeedUuid(unsigned int seed = 0);
 
     /**
      * Methods for setting / getting comments
@@ -536,6 +535,14 @@ public:
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
         ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    static void SeedUuid(unsigned int seed = 0);
+
+    static bool sortByUlx(Object *a, Object *b);
+
     //----------//
     // Functors //
     //----------//
@@ -634,6 +641,15 @@ public:
     ///@}
 
     /**
+     * Convert markup of artic@artic multi value into distinct artic elements.
+     * See Doc::ConvertMarkupAnalyticalDoc
+     */
+    ///@{
+    virtual int ConvertMarkupArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
      * See Doc::ConvertScoreDefMarkupDoc
      */
@@ -715,6 +731,11 @@ public:
     ///@}
 
     /**
+     * Adjust the spacing for clef changes.
+     */
+    virtual int AdjustClefChanges(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position the outside articulations.
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -741,6 +762,11 @@ public:
      * Adjust the x position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the x position of accidental.
+     */
+    virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * @name Adjust the x position of a right barline in order to make sure the is no text content
@@ -824,6 +850,11 @@ public:
      * Adjust the postion position of slurs.
      */
     virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the articulations.
+     */
+    virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position the outside articulations with slur.
@@ -929,15 +960,15 @@ public:
      * It also includes a scoreDef for each measure where a change occured before.
      * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
-    virtual int SetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
 
     /**
      * Optimize the scoreDef for each system.
      * For automatic breaks, looks for staves with only mRests.
      */
     ///@{
-    virtual int OptimizeScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int OptimizeScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimizeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -948,7 +979,7 @@ public:
     /**
      * Unset the initial scoreDef of each system and measure
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefUnsetCurrent(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
@@ -981,7 +1012,7 @@ public:
     /**
      * Prepare group symbol starting and ending staffDefs for drawing
      */
-    virtual int PrepareGroupSymbols(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Associate LayerElement with @facs to the appropriate zone
@@ -1205,8 +1236,6 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
-    static bool sortByUlx(Object *a, Object *b);
-
 protected:
     //
 private:
@@ -1302,6 +1331,10 @@ private:
      * A flag indicating if the Object is a copy created by an expanded expansion element.
      */
     bool m_isExpansion;
+
+    //----------------//
+    // Static members //
+    //----------------//
 
     /**
      * A static counter for uuid generation.

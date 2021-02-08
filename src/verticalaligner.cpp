@@ -214,8 +214,10 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffD
             notFirstInGroup = notFirstInGroup || (firstVisible && firstVisible != staffChild);
             if (notFirstInGroup) {
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
-                if (staffGrp && staffGrp->HasSymbol()) {
-                    switch (staffGrp->GetSymbol()) {
+                if (staffGrp && staffGrp->GetFirst(GRPSYM)) {
+                    GrpSym *grpSym = vrv_cast<GrpSym *>(staffGrp->GetFirst(GRPSYM));
+                    assert(grpSym);
+                    switch (grpSym->GetSymbol()) {
                         case staffGroupingSym_SYMBOL_brace: spacingType = SpacingType::Brace; break;
                         case staffGroupingSym_SYMBOL_bracket:
                         case staffGroupingSym_SYMBOL_bracketsq: spacingType = SpacingType::Bracket; break;
@@ -837,7 +839,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     std::vector<FloatingCurvePositioner *> positioners;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({ PHRASE, SLUR, TIE })) continue;
+        if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
         Slur *slur = vrv_cast<Slur *>(positioner->GetObject());
         assert(slur);
 
@@ -852,6 +854,9 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
         if (adjusted) {
             params->m_adjusted = true;
+        }
+        if (slur->IsCrossStaff()) {
+            params->m_crossStaffSlurs = true;
         }
     }
 

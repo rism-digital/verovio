@@ -29,6 +29,7 @@
 #include "space.h"
 #include "staff.h"
 #include "tuplet.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -112,7 +113,7 @@ void BeamSegment::CalcBeam(
     // Set drawing stem positions
     CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
-        if (!beamInterface->m_hasCrossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
+        if (!beamInterface->m_crossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
             CalcBeamInit(layer, staff, doc, beamInterface, place);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
@@ -636,7 +637,7 @@ void BeamSegment::CalcBeamPosition(
         }
         // cross-staff or beam@place=mixed
         else {
-            if (beamInterface->m_hasCrossStaffContent) {
+            if (beamInterface->m_crossStaffContent) {
                 data_STEMDIRECTION dir
                     = (coord->m_beamRelativePlace == BEAMPLACE_above) ? STEMDIRECTION_up : STEMDIRECTION_down;
                 coord->SetDrawingStemDir(dir, staff, doc, this, beamInterface);
@@ -880,7 +881,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     else if (beamInterface->m_notesStemDir == STEMDIRECTION_down) {
         beamInterface->m_drawingPlace = BEAMPLACE_below;
     }
-    else if (beamInterface->m_hasCrossStaffContent) {
+    else if (beamInterface->m_crossStaffContent) {
         beamInterface->m_drawingPlace = BEAMPLACE_mixed;
     }
     // Look at the layer direction or, finally, at the note position
@@ -1017,8 +1018,7 @@ void BeamSegment::CalcSetValues()
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam()
-    : LayerElement("beam-"), ObjectListInterface(), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
+Beam::Beam() : LayerElement("beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
@@ -1151,42 +1151,6 @@ void Beam::FilterList(ArrayOfObjects *childList)
     InitCoords(childList, beamStaff, this->GetPlace());
 }
 
-int Beam::GetPosition(LayerElement *element)
-{
-    this->GetList(this);
-    int position = this->GetListIndex(element);
-    // Check if this is a note in the chord
-    if ((position == -1) && (element->Is(NOTE))) {
-        Note *note = vrv_cast<Note *>(element);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) position = this->GetListIndex(chord);
-    }
-    return position;
-}
-
-bool Beam::IsFirstInBeam(LayerElement *element)
-{
-    this->GetList(this);
-    int position = this->GetPosition(element);
-    // This method should be called only if the note is part of a beam
-    assert(position != -1);
-    // this is the first one
-    if (position == 0) return true;
-    return false;
-}
-
-bool Beam::IsLastInBeam(LayerElement *element)
-{
-    int size = (int)this->GetList(this)->size();
-    int position = this->GetPosition(element);
-    // This method should be called only if the note is part of a beam
-    assert(position != -1);
-    // this is the last one
-    if (position == (size - 1)) return true;
-    return false;
-}
-
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 {
     this->GetList(this);
@@ -1262,7 +1226,7 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     int stemLen = segment->m_uniformStemLength;
-    if (interface->m_hasCrossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
+    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
         if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
             stemLen *= -1;
         }
@@ -1275,7 +1239,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (interface->m_hasCrossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
+    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
         segment->m_extendedToCenter = false;
     }
     else if (((stemDir == STEMDIRECTION_up) && (this->m_yBeam <= segment->m_verticalCenter))
@@ -1315,7 +1279,8 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
         extend = false;
     }
 
-    int stemLen = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    const int directionBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    int stemLen = directionBias;
     // For 8th notes, use the shortened stem (if shortened)
     if (this->m_dur == DUR_8) {
         if (stemLenInHalfUnits != standardStemLen) {
@@ -1338,7 +1303,28 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
         }
     }
 
-    return stemLen;
+    return stemLen + CalculateStemModAdjustment(stemLen, directionBias);
+}
+
+int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBias)
+{
+    // handle @stem.mod attribute to properly draw beams with tremolos
+    int slashFactor = 0;
+    if (m_element->Is(NOTE)) {
+        if (m_closestNote->GetStemMod() < STEMMODIFIER_sprech) slashFactor = m_closestNote->GetStemMod() - 1;
+    }
+    else if (m_element->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(m_element);
+        assert(chord);
+        if (chord->GetStemMod() < STEMMODIFIER_sprech) slashFactor = chord->GetStemMod() - 1;
+    }
+    const int stemLengthInUnits = abs(stemLength / 2);
+    // if stem length is very short and is not enough to fit slashes, we need to adjust it
+    if (stemLengthInUnits - 3 < slashFactor) {
+        return (directionBias * (3 + slashFactor - stemLengthInUnits) * 4);
+    }
+
+    return 0;
 }
 
 void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)

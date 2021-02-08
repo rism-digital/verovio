@@ -50,14 +50,16 @@ Version 5.2.44 - adding anchor points to noteheads
 Version 5.2.45 - adding precomposed ornaments
 Version 5.2.46 - adding single P and S for piano pedal
 Version 5.2.47 - adding glyphs for longer rests
+Version 5.2.48 - adding baroque ornament
+Version 5.2.49 - adding arabic accidentals
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20201107 at Fri Dec 18 13:33:54 2020
- By Klaus Rettinghaus
+Created by FontForge 20201107 at Fri Jan 29 11:43:52 2021
+ By Laurent Pugin
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.47
+Version 5.2.49
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
@@ -1325,5 +1327,27 @@ d="M0 10v230c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-230c0 -8 -2 -10 -10 -10h-105c-
 d="M0 -240v480c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10z" />
     <glyph glyph-name="uniE4E0" unicode="&#xe4e0;" horiz-adv-x="375" 
 d="M250 -240v480c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10zM0 -240v480c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10z" />
+    <glyph glyph-name="uniE583" unicode="&#xe583;" 
+d="M0 0v330h26v-330h-26z" />
+    <glyph glyph-name="uniE440" unicode="&#xe440;" horiz-adv-x="247" 
+d="M139 106c-32 0 -48 -10 -70 -29v-194c31 31 54 59 71 84c21 32 32 59 32 84c0 9 1 16 1 20c0 14 -3 21 -11 30l-8 3zM69 110c32 16 54 27 93 27c26 0 35 -3 54 -13c13 -7 24 -20 27 -38l4 -25c0 -28 -16 -57 -45 -89c-23 -25 -39 -44 -65 -68l-88 -79v344.533
+l-49 -27.5333v36l49 27.5333l-1.42109e-14 41.9999l-49 -27.5332v36l49 27.5332v185.467h20v-174.229l147 85.2285v-36l-147 -85.2285v-42.0001l147 85.2286v-36l-147 -85.2286v-70.7714z" />
+    <glyph glyph-name="uniE441" unicode="&#xe441;" horiz-adv-x="200" 
+d="M20 110c32 16 54 27 93 27c26 0 35 -3 54 -13c13 -7 24 -20 27 -38l4 -25c0 -28 -16 -57 -45 -89c-23 -25 -39 -44 -65 -68l-88 -79v644h20v-359zM90 106c-32 0 -48 -10 -70 -29v-194c31 31 54 59 71 84c21 32 32 59 32 84c0 9 1 16 1 20c0 14 -3 21 -11 30l-8 3z" />
+    <glyph glyph-name="uniE442" unicode="&#xe442;" horiz-adv-x="247" 
+d="M139 106c-32 0 -48 -10 -70 -29v-194c31 31 54 59 71 84c21 32 32 59 32 84c0 9 1 16 1 20c0 14 -3 21 -11 30l-8 3zM69 110c32 16 54 27 93 27c26 0 35 -3 54 -13c13 -7 24 -20 27 -38l4 -25c0 -28 -16 -57 -45 -89c-23 -25 -39 -44 -65 -68l-88 -79v363.467
+l-49 -28.4667v36l49 28.4667v244.533h20v-232.914l147 87.9143v-36l-147 -87.9143v-90.0857z" />
+    <glyph glyph-name="uniE443" unicode="&#xe443;" horiz-adv-x="198" 
+d="M178 110v359h20v-644l-88 79c-26 24 -42 43 -65 68c-29 32 -45 61 -45 89l4 25c3 18 14 31 27 38c19 10 28 13 54 13c39 0 61 -11 93 -27zM108 106l-15 -2l-8 -3c-8 -9 -11 -16 -11 -30c0 -4 1 -11 1 -20c0 -25 11 -52 32 -84c17 -25 40 -53 71 -84v194
+c-22 19 -38 29 -70 29z" />
+    <glyph glyph-name="uniE444" unicode="&#xe444;" horiz-adv-x="106" 
+d="M106 179v-91l-44 -14v-165l44 12v-91l-46 -14v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163z" />
+    <glyph glyph-name="uniE446" unicode="&#xe446;" horiz-adv-x="210" 
+d="M156 179v-91l-44 -14v-51.2667l98 31.2667v-56l-98 -31.2667v-57.7333l44 12v-91l-46 -14v-155h-17v149l-43 -13v90l43 14v59.6714l-93 -29.6714v56l93 29.6714v51.3286l-43 -14v92l43 13v169h17v-163z" />
+    <glyph glyph-name="uniE445" unicode="&#xe445;" horiz-adv-x="197" 
+d="M136 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-76 -22v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163zM60 73v-167l76 22v168z" />
+    <glyph glyph-name="uniE447" unicode="&#xe447;" horiz-adv-x="239" 
+d="M158 186v169h17v-164l44 14v-91l-44 -14v-52.5481l64 19.5481v-56l-64 -19.5481v-56.4519l44 12v-91l-44 -13v-155h-17v150l-76 -22v-155h-17v149l-43 -13v90l43 14v56.8536l-65 -19.8536v56l65 19.8536v54.1464l-43 -14v92l43 13v169h17v-163zM82 -36.954v-57.046l76 22
+v58.2594zM82 19.046l76 23.2134v53.7406l-76 -23v-53.954z" />
   </font>
 </defs></svg>

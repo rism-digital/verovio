@@ -15,6 +15,7 @@
 namespace vrv {
 
 class BeamElementCoord;
+class StaffAlignment;
 
 // the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
@@ -119,7 +120,6 @@ public:
 //----------------------------------------------------------------------------
 
 class Beam : public LayerElement,
-             public ObjectListInterface,
              public BeamDrawingInterface,
              public AttColor,
              public AttBeamedWith,
@@ -145,15 +145,6 @@ public:
      * Only Note or Rest elements will be actually added to the beam.
      */
     virtual bool IsSupportedChild(Object *object);
-
-    /**
-     * Return information about the position in the beam.
-     * (no const since the cached list is updated)
-     */
-    ///@{
-    bool IsFirstInBeam(LayerElement *element);
-    bool IsLastInBeam(LayerElement *element);
-    ///@}
 
     /**
      *
@@ -190,12 +181,6 @@ protected:
      * This also initializes the m_beamElementCoords vector
      */
     virtual void FilterList(ArrayOfObjects *childList);
-
-    /**
-     * Return the position of the element in the beam.
-     * For notes, lookup the position of the parent chord.
-     */
-    int GetPosition(LayerElement *element);
 
 private:
     //
@@ -236,6 +221,11 @@ public:
     void SetClosestNote(data_STEMDIRECTION stemDir);
 
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+
+    /**
+     * Return stem length adjustment in half units, depending on the @stem.mode attribute
+     */
+    int CalculateStemModAdjustment(int stemLength, int directionBias);
 
     int m_x;
     int m_yBeam; // y value of stem top position

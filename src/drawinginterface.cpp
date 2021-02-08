@@ -65,7 +65,7 @@ void DrawingListInterface::ResetDrawingList()
 // BeamDrawingInterface
 //----------------------------------------------------------------------------
 
-BeamDrawingInterface::BeamDrawingInterface()
+BeamDrawingInterface::BeamDrawingInterface() : ObjectListInterface()
 {
     Reset();
 }
@@ -81,7 +81,8 @@ void BeamDrawingInterface::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
-    m_hasCrossStaffContent = false;
+    m_crossStaffContent = NULL;
+    m_crossStaffRel = STAFFREL_basic_NONE;
     m_shortestDur = 0;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
@@ -105,6 +106,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
 {
     assert(staff);
 
+    BeamDrawingInterface::Reset();
     ClearCoords();
 
     if (childList->empty()) {
@@ -136,7 +138,6 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
 
     data_STEMDIRECTION currentStemDir;
     Layer *layer = NULL;
-    Staff *currentStaff = NULL;
 
     int elementCount = 0;
 
@@ -162,10 +163,10 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         }
 
         Staff *staff = current->GetCrossStaff(layer);
-        if (staff != currentStaff) {
-            this->m_hasCrossStaffContent = true;
+        if (staff && (staff != m_beamStaff)) {
+            this->m_crossStaffContent = staff;
+            this->m_crossStaffRel = current->GetCrossStaffRel();
         }
-        currentStaff = staff;
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
@@ -368,6 +369,42 @@ bool BeamDrawingInterface::HasOneStepHeight()
     }
 
     return (abs(top - bottom) <= 1);
+}
+
+bool BeamDrawingInterface::IsFirstIn(Object *object, LayerElement *element)
+{
+    this->GetList(object);
+    int position = this->GetPosition(object, element);
+    // This method should be called only if the note is part of a fTrem
+    assert(position != -1);
+    // this is the first one
+    if (position == 0) return true;
+    return false;
+}
+
+bool BeamDrawingInterface::IsLastIn(Object *object, LayerElement *element)
+{
+    int size = (int)this->GetList(object)->size();
+    int position = this->GetPosition(object, element);
+    // This method should be called only if the note is part of a beam
+    assert(position != -1);
+    // this is the last one
+    if (position == (size - 1)) return true;
+    return false;
+}
+
+int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
+{
+    this->GetList(object);
+    int position = this->GetListIndex(element);
+    // Check if this is a note in the chord
+    if ((position == -1) && (element->Is(NOTE))) {
+        Note *note = vrv_cast<Note *>(element);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) position = this->GetListIndex(chord);
+    }
+    return position;
 }
 
 //----------------------------------------------------------------------------

@@ -184,7 +184,7 @@ bool System::SetCurrentFloatingPositioner(
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
@@ -193,9 +193,37 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
 bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 {
+    assert(start);
+    assert(end);
+
+    // It is too inefficient to look for chord and notes over the entire system
+    // We need first to get a list of measures
+    Object *measureStart = start->GetFirstAncestor(MEASURE);
+    assert(measureStart);
+    Object *measureEnd = end->GetFirstAncestor(MEASURE);
+    assert(measureEnd);
+    ListOfObjects measures;
+
+    // start and end are in the same measure, this is the only one we need
+    if (measureStart == measureEnd) {
+        measures.push_back(measureStart);
+    }
+    // otherwise look for a measures in between
+    else {
+        ClassIdComparison isMeasure(MEASURE);
+        Functor findAllBetween(&Object::FindAllBetween);
+        FindAllBetweenParams findAllBetweenParams(&isMeasure, &measures, measureStart, measureEnd);
+        this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, 1);
+    }
+
+    // Now we can look for chords and note
     ClassIdsComparison matchType({ CHORD, NOTE });
     ListOfObjects children;
-    this->FindAllDescendantBetween(&children, &matchType, start, end);
+    for (auto &measure : measures) {
+        Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
+        Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
+        measure->FindAllDescendantBetween(&children, &matchType, curStart, curEnd, false);
+    }
 
     Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
@@ -276,7 +304,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 // System functor methods
 //----------------------------------------------------------------------------
 
-int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -288,9 +316,9 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::OptimizeScoreDef(FunctorParams *functorParams)
+int System::ScoreDefOptimize(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     this->IsDrawingOptimized(true);
@@ -308,15 +336,25 @@ int System::OptimizeScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
+int System::ScoreDefOptimizeEnd(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
     m_systemAligner.SetSpacing(params->m_currentScoreDef);
 
     return FUNCTOR_CONTINUE;
+}
+
+int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
+{
+    ScoreDefSetGrpSymParams *params = vrv_params_cast<ScoreDefSetGrpSymParams *>(functorParams);
+    assert(params);
+
+    if (m_drawingScoreDef) m_drawingScoreDef->Process(params->m_functor, functorParams);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
@@ -527,6 +565,16 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
     // Ajust the postion of the alignment according to what we have collected for this harm grp
     params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
     params->m_overlapingSyl.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AdjustTempo(FunctorParams *functorParams)
+{
+    AdjustTempoParams *params = vrv_params_cast<AdjustTempoParams *>(functorParams);
+    assert(params);
+
+    params->m_systemAligner = &m_systemAligner;
 
     return FUNCTOR_CONTINUE;
 }

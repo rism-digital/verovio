@@ -257,7 +257,7 @@ void Doc::CalculateMidiTimemap()
         if (!page) {
             return;
         }
-        this->SetCurrentScoreDefDoc();
+        this->ScoreDefSetCurrentDoc();
         page->LayOutHorizontally();
     }
 
@@ -762,43 +762,40 @@ void Doc::PrepareDrawing()
         }
     }
 
-    /************ Resolve group symbols ************/
-    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attirbutes that determine
-    // their positioning
-    Functor prepareGroupSymbols(&Object::PrepareGroupSymbols);
-    m_mdivScoreDef.Process(&prepareGroupSymbols, NULL);
+    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
+    m_mdivScoreDef.Process(&scoreDefSetGrpSym, NULL);
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
     m_drawingPreparationDone = true;
 }
 
-void Doc::SetCurrentScoreDefDoc(bool force)
+void Doc::ScoreDefSetCurrentDoc(bool force)
 {
     if (m_currentScoreDefDone && !force) {
         return;
     }
 
     if (m_currentScoreDefDone) {
-        Functor unsetCurrentScoreDef(&Object::UnsetCurrentScoreDef);
-        UnsetCurrentScoreDefParams unsetCurrentScoreDefParams(&unsetCurrentScoreDef);
-        this->Process(&unsetCurrentScoreDef, &unsetCurrentScoreDefParams);
+        Functor scoreDefUnsetCurrent(&Object::ScoreDefUnsetCurrent);
+        ScoreDefUnsetCurrentParams scoreDefUnsetCurrentParams(&scoreDefUnsetCurrent);
+        this->Process(&scoreDefUnsetCurrent, &scoreDefUnsetCurrentParams);
     }
 
     ScoreDef upcomingScoreDef = m_mdivScoreDef;
-    SetCurrentScoreDefParams setCurrentScoreDefParams(this, &upcomingScoreDef);
-    Functor setCurrentScoreDef(&Object::SetCurrentScoreDef);
+    ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &upcomingScoreDef);
+    Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);
 
     // First process the current scoreDef in order to fill the staffDef with
     // the appropriate drawing values
-    upcomingScoreDef.Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
+    upcomingScoreDef.Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
 
-    this->Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
+    this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
 
     m_currentScoreDefDone = true;
 }
 
-bool Doc::IsOptimizationNeeded()
+bool Doc::ScoreDefNeedsOptimization()
 {
     if (m_options->m_condense.GetValue() == CONDENSE_none) return false;
     // optimize scores only if encoded
@@ -814,24 +811,41 @@ bool Doc::IsOptimizationNeeded()
     return optimize;
 }
 
-void Doc::OptimizeScoreDefDoc()
+void Doc::ScoreDefOptimizeDoc()
 {
-    Functor optimizeScoreDef(&Object::OptimizeScoreDef);
-    Functor optimizeScoreDefEnd(&Object::OptimizeScoreDefEnd);
-    OptimizeScoreDefParams optimizeScoreDefParams(this, &optimizeScoreDef, &optimizeScoreDefEnd);
+    Functor scoreDefOptimize(&Object::ScoreDefOptimize);
+    Functor scoreDefOptimizeEnd(&Object::ScoreDefOptimizeEnd);
+    ScoreDefOptimizeParams scoreDefOptimizeParams(this, &scoreDefOptimize, &scoreDefOptimizeEnd);
 
-    this->Process(&optimizeScoreDef, &optimizeScoreDefParams, &optimizeScoreDefEnd);
+    this->Process(&scoreDefOptimize, &scoreDefOptimizeParams, &scoreDefOptimizeEnd);
+}
+
+void Doc::ScoreDefSetGrpSymDoc()
+{
+    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attirbutes that determine
+    // their positioning
+    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
+    // m_mdivScoreDef.Process(&scoreDefSetGrpSym, NULL);
+    ScoreDefSetGrpSymParams scoreDefSetGrpSymParams(&scoreDefSetGrpSym);
+    this->Process(&scoreDefSetGrpSym, &scoreDefSetGrpSymParams);
 }
 
 void Doc::CastOffDoc()
 {
     Doc::CastOffDocBase(false, false);
 }
+
 void Doc::CastOffLineDoc()
 {
     Doc::CastOffDocBase(true, false);
 }
-void Doc::CastOffDocBase(bool useSb, bool usePb)
+
+void Doc::CastOffSmartDoc()
+{
+    Doc::CastOffDocBase(false, false, true);
+}
+
+void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 {
     Pages *pages = this->GetPages();
     assert(pages);
@@ -841,7 +855,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
         return;
     }
 
-    this->SetCurrentScoreDefDoc();
+    this->ScoreDefSetCurrentDoc();
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
@@ -853,14 +867,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if (useSb && !usePb) {
+    if (useSb && !usePb && !smart) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
         contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
-        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
+        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this, smart);
         castOffSystemsParams.m_systemWidth
             = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
         castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
@@ -873,12 +887,13 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     }
     delete contentSystem;
 
-    bool optimize = IsOptimizationNeeded();
+    bool optimize = ScoreDefNeedsOptimization();
     // Reset the scoreDef at the beginning of each system
-    this->SetCurrentScoreDefDoc(true);
+    this->ScoreDefSetCurrentDoc(true);
     if (optimize) {
-        this->OptimizeScoreDefDoc();
+        this->ScoreDefOptimizeDoc();
     }
+    this->ScoreDefSetGrpSymDoc();
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
@@ -900,10 +915,11 @@ void Doc::CastOffDocBase(bool useSb, bool usePb)
     contentPage->Process(&castOffPages, &castOffPagesParams);
     delete contentPage;
 
-    this->SetCurrentScoreDefDoc(true);
+    this->ScoreDefSetCurrentDoc(true);
     if (optimize) {
-        this->OptimizeScoreDefDoc();
+        this->ScoreDefOptimizeDoc();
     }
+    this->ScoreDefSetGrpSymDoc();
 }
 
 void Doc::CastOffRunningElements(CastOffPagesParams *params)
@@ -965,12 +981,12 @@ void Doc::UnCastOffDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDefDoc(true);
+    this->ScoreDefSetCurrentDoc(true);
 }
 
 void Doc::CastOffEncodingDoc()
 {
-    this->SetCurrentScoreDefDoc();
+    this->ScoreDefSetCurrentDoc();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1001,11 +1017,12 @@ void Doc::CastOffEncodingDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDefDoc(true);
+    this->ScoreDefSetCurrentDoc(true);
 
-    if (IsOptimizationNeeded()) {
-        this->OptimizeScoreDefDoc();
+    if (ScoreDefNeedsOptimization()) {
+        this->ScoreDefOptimizeDoc();
     }
+    this->ScoreDefSetGrpSymDoc();
 }
 
 void Doc::ConvertToPageBasedDoc()
@@ -1052,7 +1069,7 @@ void Doc::ConvertToCastOffMensuralDoc()
         m_isMensuralMusicOnly = false;
     }
 
-    this->SetCurrentScoreDefDoc();
+    this->ScoreDefSetCurrentDoc();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1095,7 +1112,7 @@ void Doc::ConvertToCastOffMensuralDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDefDoc(true);
+    this->ScoreDefSetCurrentDoc(true);
 }
 
 void Doc::ConvertToUnCastOffMensuralDoc()
@@ -1156,7 +1173,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDefDoc(true);
+    this->ScoreDefSetCurrentDoc(true);
 }
 
 void Doc::ConvertScoreDefMarkupDoc(bool permanent)
@@ -1172,13 +1189,21 @@ void Doc::ConvertMarkupDoc(bool permanent)
 {
     if (m_markup == MARKUP_DEFAULT) return;
 
-    LogMessage("Converting analytical markup...");
+    LogMessage("Converting markup...");
 
     if (m_markup & MARKUP_GRACE_ATTRIBUTE) {
     }
 
-    if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
+    if (m_markup & MARKUP_ARTIC_MULTIVAL) {
+        LogMessage("Converting artic markup...");
+        ConvertMarkupArticParams convertMarkupArticParams;
+        Functor convertMarkupArtic(&Object::ConvertMarkupArtic);
+        Functor convertMarkupArticEnd(&Object::ConvertMarkupArticEnd);
+        this->Process(&convertMarkupArtic, &convertMarkupArticParams, &convertMarkupArticEnd);
+    }
 
+    if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
+        LogMessage("Converting analytical markup...");
         /************ Prepare processing by staff/layer/verse ************/
 
         // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -1240,7 +1265,7 @@ void Doc::TransposeDoc()
         // Find the starting key tonic of the data to use in calculating the tranposition interval:
         // Set transposition by key tonic.
         // Detect the current key from the keysignature.
-        KeySig *keysig = dynamic_cast<KeySig *>(this->m_mdivScoreDef.FindDescendantByType(KEYSIG, 3));
+        KeySig *keysig = dynamic_cast<KeySig *>(this->m_mdivScoreDef.FindDescendantByType(KEYSIG));
         // If there is no keysignature, assume it is C.
         TransPitch currentKey = TransPitch(0, 0, 0);
         if (keysig && keysig->HasPname()) {
@@ -1623,6 +1648,8 @@ double Doc::GetRightMargin(const ClassId classId) const
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
+    if (classId == ARTIC) return m_options->m_bottomMarginArtic.GetValue();
+    // For these we also need to look at the scoreDef
     double margin = m_options->m_defaultBottomMargin.GetValue();
     if (classId == DYNAM) {
         margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
@@ -1636,6 +1663,8 @@ double Doc::GetBottomMargin(const ClassId classId) const
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
+    if (classId == ARTIC) return m_options->m_topMarginArtic.GetValue();
+    // For these we also need to look at the scoreDef
     double margin = m_options->m_defaultTopMargin.GetValue();
     if (classId == DYNAM) {
         margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;

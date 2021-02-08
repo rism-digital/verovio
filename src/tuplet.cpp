@@ -150,7 +150,7 @@ void Tuplet::FilterList(ArrayOfObjects *childList)
     }
 }
 
-void Tuplet::CalcDrawingBracketAndNumPos()
+void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
 {
     m_drawingBracketPos = STAFFREL_basic_NONE;
 
@@ -204,6 +204,11 @@ void Tuplet::CalcDrawingBracketAndNumPos()
     }
     // true means up
     m_drawingBracketPos = ups > downs ? STAFFREL_basic_above : STAFFREL_basic_below;
+
+    if (tupletNumHead) {
+        m_drawingBracketPos
+            = (m_drawingBracketPos == STAFFREL_basic_below) ? STAFFREL_basic_above : STAFFREL_basic_below;
+    }
 
     // also use it for the num unless it is already set
     if (m_drawingNumPos == STAFFREL_basic_NONE) {
@@ -434,7 +439,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         if (beam) {
             // Check for possible articulations
             ListOfObjects artics;
-            ClassIdsComparison comparison({ ARTIC, ARTIC_PART });
+            ClassIdsComparison comparison({ ARTIC });
             this->FindAllDescendantByComparison(&artics, &comparison);
 
             int articPadding = 0;
@@ -470,7 +475,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             // Check for overlap with content
             // Possible issue with beam above the tuplet - not sure this will be noticable
             ListOfObjects descendants;
-            ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
+            ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 
             // Possible fix for beam above tuplet

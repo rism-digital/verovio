@@ -89,6 +89,18 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// ReverseClassIdsComparison
+//----------------------------------------------------------------------------
+
+class ReverseClassIdsComparison : public ClassIdsComparison {
+
+public:
+    ReverseClassIdsComparison(const std::vector<ClassId> &classIds) : ClassIdsComparison(classIds) {}
+
+    virtual bool operator()(Object *object) { return !ClassIdsComparison::operator()(object); }
+};
+
+//----------------------------------------------------------------------------
 // InterfaceComparison
 //----------------------------------------------------------------------------
 
@@ -330,32 +342,6 @@ public:
 private:
     int m_extremeDur;
     DurExtreme m_extremeType;
-};
-
-//----------------------------------------------------------------------------
-// ArticPartTypeComparison
-//----------------------------------------------------------------------------
-
-/**
- * This class evaluates if the object is an Alignment of a certain type
- */
-class ArticPartTypeComparison : public ClassIdComparison {
-
-public:
-    ArticPartTypeComparison(const ArticPartType type) : ClassIdComparison(ARTIC_PART) { m_type = type; }
-
-    void SetType(ArticPartType type) { m_type = type; }
-
-    virtual bool operator()(Object *object)
-    {
-        if (!MatchesType(object)) return false;
-        ArticPart *articPart = vrv_cast<ArticPart *>(object);
-        assert(articPart);
-        return (articPart->GetType() == m_type);
-    }
-
-private:
-    ArticPartType m_type;
 };
 
 //----------------------------------------------------------------------------

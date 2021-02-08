@@ -141,6 +141,10 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     return false;
 }
 
+//----------------------------------------------------------------------------
+// Static methods for Accid
+//----------------------------------------------------------------------------
+
 wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 {
     int symc = SMUFL_E261_accidentalNatural;
@@ -167,6 +171,14 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
         case ACCIDENTAL_WRITTEN_3qf: symc = SMUFL_E281_accidentalThreeQuarterTonesFlatZimmermann; break;
         case ACCIDENTAL_WRITTEN_1qs: symc = SMUFL_E282_accidentalQuarterToneSharpStein; break;
         case ACCIDENTAL_WRITTEN_3qs: symc = SMUFL_E283_accidentalThreeQuarterTonesSharpStein; break;
+        case ACCIDENTAL_WRITTEN_bms: symc = SMUFL_E447_accidentalBuyukMucennebSharp; break;
+        case ACCIDENTAL_WRITTEN_kms: symc = SMUFL_E446_accidentalKucukMucennebSharp; break;
+        case ACCIDENTAL_WRITTEN_bs: symc = SMUFL_E445_accidentalBakiyeSharp; break;
+        case ACCIDENTAL_WRITTEN_ks: symc = SMUFL_E444_accidentalKomaSharp; break;
+        case ACCIDENTAL_WRITTEN_kf: symc = SMUFL_E443_accidentalKomaFlat; break;
+        case ACCIDENTAL_WRITTEN_bf: symc = SMUFL_E442_accidentalBakiyeFlat; break;
+        case ACCIDENTAL_WRITTEN_kmf: symc = SMUFL_E441_accidentalKucukMucennebFlat; break;
+        case ACCIDENTAL_WRITTEN_bmf: symc = SMUFL_E440_accidentalBuyukMucennebFlat; break;
         default: break;
     }
     return symc;

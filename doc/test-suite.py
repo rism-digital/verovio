@@ -63,6 +63,7 @@ if __name__ == "__main__":
 
             # filenames (input MEI and output SVG)
             meiFile = os.path.join(path1, item1, item2)
+            print(meiFile)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Nov 15 23:12:30 PST 2020
+// Last Modified: Wed Jan 27 02:09:08 PST 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10,7 +10,8 @@
 // Description:   Source file for humlib library.
 //
 /*
-Copyright (c) 2015-2020 Craig Stuart Sapp
+https://github.com/craigsapp/humlib
+Copyright (c) 2015-2021 Craig Stuart Sapp
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -951,7 +952,7 @@ bool Convert::isPowerOfTwo(int value) {
 
 //////////////////////////////
 //
-// Tool_transpose::pearsonCorrelation --
+// Convert::pearsonCorrelation --
 //
 
 double Convert::pearsonCorrelation(const vector<double>& x, const vector<double>& y) {
@@ -4757,6 +4758,93 @@ void Convert::removeDollarsFromString(string& buffer, int maximum) {
 		buf2 = to_string(value2);
 		hre.replaceDestructive(buffer, buf2, "[%$]\\d+");
 	}
+}
+
+
+
+
+
+
+//////////////////////////////
+//
+// Convert::tempoNameToMm -- Guess what the MM tempo should be given
+//    a tempo name.  Returns 0 if no guess is made.
+// 
+// Also add cases where there is a tempo marking, such as [quarter] = 132 
+// in the input text.
+//
+
+int Convert::tempoNameToMm (const string& name, int bot, int top) {
+	HumRegex hre;
+	int output = -1;
+
+	if      (hre.search(name, "larghissimo"      , "i")) { output = 24;  }
+	else if (hre.search(name, "adagissimo"       , "i")) { output = 35;  }
+	else if (hre.search(name, "all.*molto"       , "i")) { output = 146; }
+	else if (hre.search(name, "all.*vivace"      , "i")) { output = 144; }
+	else if (hre.search(name, "all.*moderato"    , "i")) { output = 116; }
+	else if (hre.search(name, "all.*fuoco"       , "i")) { output = 138; }
+	else if (hre.search(name, "all.*presto"      , "i")) { output = 160; }
+	else if (hre.search(name, "grave"            , "i")) { output = 40;  }
+	else if (hre.search(name, "largo"            , "i")) { output = 45;  }
+	else if (hre.search(name, "lento?"           , "i")) { output = 50;  }
+	else if (hre.search(name, "larghetto"        , "i")) { output = 63;  }
+	else if (hre.search(name, "adagio"           , "i")) { output = 70;  }
+	else if (hre.search(name, "adagietto"        , "i")) { output = 74;  }
+	else if (hre.search(name, "andantino"        , "i")) { output = 90;  }
+	else if (hre.search(name, "marcia moderato"  , "i")) { output = 85;  }
+	else if (hre.search(name, "andante moderato" , "i")) { output = 92;  }
+	else if (hre.search(name, "allegretto"       , "i")) { output = 116; }
+	else if (hre.search(name, "rasch"            , "i")) { output = 128; }
+	else if (hre.search(name, "vivo"             , "i")) { output = 152; }
+	else if (hre.search(name, "vif"              , "i")) { output = 152; }
+	else if (hre.search(name, "vivace"           , "i")) { output = 164; }
+	else if (hre.search(name, "schnell"          , "i")) { output = 164; }
+	else if (hre.search(name, "vivacissimo"      , "i")) { output = 172; }
+	else if (hre.search(name, "allegrissimo"     , "i")) { output = 176; }
+	else if (hre.search(name, "moderato"         , "i")) { output = 108; }
+	else if (hre.search(name, "andante"          , "i")) { output = 88;  }
+	else if (hre.search(name, "presto"           , "i")) { output = 180; }
+	else if (hre.search(name, "allegro"          , "i")) { output = 128; }
+	else if (hre.search(name, "prestissimo"      , "i")) { output = 208; }
+	else if (hre.search(name, "bewegt"           , "i")) { output = 144; }
+	else if (hre.search(name, "all(?!a)"         , "i")) { output = 128; }
+
+	if (output <= 0) {
+		return output;
+	}
+
+	if (hre.search(name, "ma non troppo", "i") || hre.search(name, "non tanto")) {
+		if (output > 100) {
+			output = int(output * 0.93 + 0.5);
+		} else {
+			output = int(output / 0.93 + 0.5);
+		}
+	}
+
+	if (bot == 2) {
+		output = int(output * 1.75 + 0.5);
+	} else if (bot == 1) {
+		output = int (output * 3.0 + 0.5);
+	} else if ((bot == 8) && (top % 3 == 0)) {
+		output = int(output * 1.5 + 0.5);
+	} else if (bot == 8) {
+		output = int(output * 0.75 + 0.5);
+	} else if ((bot == 16) && (top % 3 == 0)) {
+		output = int(output * 1.5 / 2.0 + 0.5);
+	} else if (bot == 16) {
+		output = int(output / 2.0 + 0.5);
+	} else if ((bot == 32) && (top % 3 == 0)) {
+		output = int(output * 1.5 / 4.0 + 0.5);
+	} else if (bot == 32) {
+		output = int(output / 4.0 + 0.5);
+	}
+
+	if ((bot == 2) && (top % 3 == 0)) {
+		output = int(output * 1.5 + 0.5);
+	}
+
+	return output;
 }
 
 
@@ -27825,107 +27913,8 @@ string HumdrumLine::getReferenceValue(void) const {
 
 //////////////////////////////
 //
-// HumdrumLine::getUniversalReferenceKey -- Return reference key if a
+// HumdrumLine::getUniversalReferenceValue -- Return reference value if a
 //     universal reference record.  Otherwise returns an empty string.
-//
-
-string HumdrumLine::getUniversalReferenceKey(void) const {
-	if (this->size() < 6) {
-		return "";
-	}
-	if (this->substr(0, 4) != "!!!!") {
-		return "";
-	}
-	if ((*this)[4] == '!') {
-		return "";
-	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
-		return "";
-	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
-		return "";
-	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
-		return "";
-	}
-	return this->substr(4, colloc - 4);
-}
-
-
-
-//////////////////////////////
-//
-// HumdrumLine::getGlobalReferenceKey -- Return reference key if a
-//     universal reference record.  Otherwise returns an empty string.
-//
-
-string HumdrumLine::getGlobalReferenceKey(void) const {
-	if (this->size() < 6) {
-		return "";
-	}
-	if (this->substr(0, 3) != "!!!") {
-		return "";
-	}
-	if ((*this)[4] == '!') {
-		return "";
-	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
-		return "";
-	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
-		return "";
-	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
-		return "";
-	}
-	return this->substr(3, colloc - 3);
-}
-
-
-
-//////////////////////////////
-//
-// HumdrumLine::getGlobalReferenceValue -- Return reference value if a reference
-//     record.  Otherwise returns an empty string.
-//
-
-string HumdrumLine::getGlobalReferenceValue(void) const {
-	if (this->size() < 5) {
-		return "";
-	}
-	if (this->substr(0, 3) != "!!!") {
-		return "";
-	}
-	if ((*this)[3] == '!') {
-		return "";
-	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
-		return "";
-	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
-		return "";
-	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
-		return "";
-	}
-	return Convert::trimWhiteSpace(this->substr(colloc+1));
-}
-
-
-
-//////////////////////////////
-//
-// HumdrumLine::getUniversalReferenceValue -- Return reference value if a reference
-//     record.  Otherwise returns an empty string.
 //
 
 string HumdrumLine::getUniversalReferenceValue(void) const {
@@ -27938,19 +27927,166 @@ string HumdrumLine::getUniversalReferenceValue(void) const {
 	if ((*this)[4] == '!') {
 		return "";
 	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
+
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
 		return "";
 	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
+	int index = (int)colloc + 1;
+	for (int i=index; i<(int)this->size(); i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)this->size()) {
 		return "";
 	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
+	string output = this->substr(index);
+	for (int i=(int)output.size() - 1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+			continue;
+		}
+		break;
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getGlobalReferenceValue -- Return reference value if a
+//     global reference record.  Otherwise returns an empty string.
+//
+
+string HumdrumLine::getGlobalReferenceValue(void) const {
+	if (this->size() < 6) {
 		return "";
 	}
-	return Convert::trimWhiteSpace(this->substr(colloc+1));
+	if (this->substr(0, 3) != "!!!") {
+		return "";
+	}
+	if ((*this)[4] == '!') {
+		return "";
+	}
+
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
+		return "";
+	}
+	int index = (int)colloc + 1;
+	for (int i=index; i<(int)this->size(); i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)this->size()) {
+		return "";
+	}
+	string output = this->substr(index);
+	for (int i=(int)output.size() - 1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+			continue;
+		}
+		break;
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getGlobalReferenceKey -- Return reference key if a reference
+//     record.  Otherwise returns an empty string.
+//
+
+string HumdrumLine::getGlobalReferenceKey(void) const {
+
+	if (this->size() < 5) {
+		return "";
+	}
+	if (this->substr(0, 3) != "!!!") {
+		return "";
+	}
+	if ((*this)[3] == '!') {
+		return "";
+	}
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
+		return "";
+	}
+	int index = 3;
+	for (int i=index; i<(int)colloc; i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)colloc) {
+		return "";
+	}
+	int length = colloc - index;
+	string output = this->substr(index, length);
+	for (int i=(int)output.size()-1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+		}
+	}
+	return output;
+
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getUniversalReferenceKey -- Return reference key if a reference
+//     record.  Otherwise returns an empty string.
+//
+
+string HumdrumLine::getUniversalReferenceKey(void) const {
+
+	if (this->size() < 6) {
+		return "";
+	}
+	if (this->substr(0, 4) != "!!!!") {
+		return "";
+	}
+	if ((*this)[4] == '!') {
+		return "";
+	}
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
+		return "";
+	}
+	int index = 4;
+	for (int i=index; i<(int)colloc; i++) {
+		if (isspace(this->at(i))) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	if (index >= (int)colloc) {
+		return "";
+	}
+	int length = colloc - index;
+	string output = this->substr(index, length);
+	for (int i=(int)output.size()-1; i>=0; i--) {
+		if (isspace(output.at(i))) {
+			output.resize((int)output.size() - 1);
+		}
+	}
+	return output;
+
 }
 
 
@@ -29057,8 +29193,10 @@ ostream& HumdrumLine::printXml(ostream& out, int level, const string& indent) {
 		out << "/>\n";
 
 		out << Convert::repeatString(indent, level) << "<frameType>";
-		if (isReference()) {
+		if (isGlobalReference()) {
 			out << "reference";
+		} else if (isUniversalReference()) {
+			out << "ureference";
 		} else if (isBlank()) {
 			out << "empty";
 		} else {
@@ -30811,7 +30949,7 @@ bool HumdrumToken::isGrace(void) {
 
 //////////////////////////////
 //
-// HumdrumToken::isClef -- True if a **kern clef.
+// HumdrumToken::isClef -- True if a clef.
 //
 
 bool HumdrumToken::isClef(void) {
@@ -30831,11 +30969,85 @@ bool HumdrumToken::isClef(void) {
 
 //////////////////////////////
 //
-// HumdrumToken::isKeySignature -- True if a **kern key signature.
+// HumdrumToken::isModernClef -- True if a modern clef.
+//
+
+bool HumdrumToken::isModernClef(void) {
+	if (!(isDataType("**kern") || isDataType("**mens"))) {
+			return false;
+	}
+	if (!isInterpretation()) {
+		return false;
+	} else if (this->compare(0, 6, "*mclef") == 0) {
+		return true;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isOriginalClef -- True if an original clef.
+//
+
+bool HumdrumToken::isOriginalClef(void) {
+	if (!(isDataType("**kern") || isDataType("**mens"))) {
+			return false;
+	}
+	if (!isInterpretation()) {
+		return false;
+	} else if (this->compare(0, 6, "*oclef") == 0) {
+		return true;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isKeySignature -- True if a key signature.
 //
 
 bool HumdrumToken::isKeySignature(void) {
 	if (this->compare(0, 3, "*k[") != 0) {
+		return false;
+	}
+	if (this->back() != ']') {
+		return false;
+	}
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isOriginalKeySignature -- True if an original key signature.
+//
+
+bool HumdrumToken::isOriginalKeySignature(void) {
+	if (this->compare(0, 4, "*ok[") != 0) {
+		return false;
+	}
+	if (this->back() != ']') {
+		return false;
+	}
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isModernKeySignature -- True if a modern key signature.
+//
+
+bool HumdrumToken::isModernKeySignature(void) {
+	if (this->compare(0, 4, "*mk[") != 0) {
 		return false;
 	}
 	if (this->back() != ']') {
@@ -30925,6 +31137,23 @@ bool HumdrumToken::isTempo(void) {
 
 bool HumdrumToken::isMensurationSymbol(void) {
 	if (this->compare(0, 5, "*met(") != 0) {
+		return false;
+	}
+	if ((*this)[this->size()-1] != ')') {
+		return false;
+	}
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isOriginalMensurationSymbol -- True if a **kern mensuration Symbol.
+//
+
+bool HumdrumToken::isOriginalMensurationSymbol(void) {
+	if (this->compare(0, 6, "*omet(") != 0) {
 		return false;
 	}
 	if ((*this)[this->size()-1] != ')') {
@@ -48018,13 +48247,17 @@ PixelColor& PixelColor::setHue(float value) {
 		Blue  = 255;
 		Green = (unsigned char)limit(255 - floatToChar(6.0 * (fraction - 3.0/6.0)), 0,255);
 	} else if (fraction < 5.0/6.0) {
-		Red   = 0;
-		Green = (unsigned char)limit(floatToChar(6.0 * (fraction - 4.0/6.0)), 0,255);
+		Red   = (unsigned char)limit(floatToChar(6.0 * (fraction - 4.0/6.0)), 0,255);
+		Green = 0;
 		Blue  = 255;
-	} else {
+	} else if (fraction <= 6.0/6.0) {
 		Red   = 255;
 		Green = 0;
 		Blue  = (unsigned char)limit(255 - floatToChar(6.0 * (fraction - 5.0/6.0)), 0,255);
+	} else {
+		Red   = 0;
+		Green = 0;
+		Blue  = 0;
 	}
 
 	return *this;
@@ -55065,6 +55298,8 @@ void Tool_colortriads::processFile(HumdrumFile& infile) {
 
 Tool_composite::Tool_composite(void) {
 	define("pitch=s:e",    "pitch to display for composite rhythm");
+	define("debug=b",      "print debugging information");
+	define("group=b",      "group into separate composite steams by group labels");
 	define("a|append=b",   "append data to end of line");
 	define("p|prepend=b",  "prepend data to end of line");
 	define("b|beam=b",     "apply automatic beaming");
@@ -55140,14 +55375,32 @@ void Tool_composite::initialize(void) {
 
 void Tool_composite::processFile(HumdrumFile& infile) {
 	Tool_extract extract;
+	bool groupQ = getBoolean("group");
 	bool appendQ = getBoolean("append");
 	bool prependQ = getBoolean("prepend");
 	bool graceQ = !getBoolean("no-grace");
+	bool debugQ = getBoolean("debug");
+	vector<vector<string>> grouping;
+	if (groupQ) {
+		setupGrouping(grouping, infile);
+		if (debugQ) {
+			printGroupingInfo(grouping);
+			return;
+		}
+	}
 
-	if (appendQ) {
-		extract.setModified("s", "1-$,0");
+	if (!appendQ) {
+		if (groupQ) {
+			extract.setModified("s", "0,0,1-$");
+		} else {
+			extract.setModified("s", "0,1-$");
+		}
 	} else {
-		extract.setModified("s", "0,1-$");
+		if (groupQ) {
+			extract.setModified("s", "1-$,0,0");
+		} else {
+			extract.setModified("s", "1-$,0");
+		}
 	}
 
 	vector<HumNum> durations(infile.getLineCount());
@@ -55192,34 +55445,93 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 
 	HumRegex hre;
 
+	bool wroteA = false;
+	bool wroteB = false;
+	stringstream sstream;
+	sstream << infile;
+	HumdrumFile originalfile;
+	originalfile.readString(sstream.str());
 	extract.run(infile);
 	infile.readString(extract.getAllText());
-	HTp token;
+	HTp token = NULL;
+	HTp token2 = NULL;
 	for (int i=0; i<infile.getLineCount(); i++) {
+		token = NULL;
+		token2 = NULL;
 		if (infile[i].isInterpretation()) {
-			if (appendQ) {
-				token = infile.token(i, infile[i].getFieldCount() - 1);
+			if (prependQ) {
+				if (groupQ) {
+					token = infile.token(i, 0);
+					token2 = infile.token(i, 1);
+				} else {
+					token = infile.token(i, 0);
+					token2 = NULL;
+				}
 			} else {
-				token = infile.token(i, 0);
+				if (groupQ) {
+					token = infile.token(i, infile[i].getFieldCount() - 2);
+					token2 = infile.token(i, infile[i].getFieldCount() - 1);
+				} else {
+					token = infile.token(i, infile[i].getFieldCount() - 1);
+					token2 = NULL;
+				}
 			}
-			if (token->compare("**blank") == 0) {
-				token->setText("**kern");
-				continue;
+			if (groupQ) {
+				if (token && token->compare("**blank") == 0) {
+					token->setText("**kern");
+				}
+				if (token2 && token2->compare("**blank") == 0) {
+					token2->setText("**kern");
+				}
+				// continue;
+			} else {
+				if (token && token->compare("**blank") == 0) {
+					token->setText("**kern");
+				}
+				// continue;
 			}
 			// copy time signature and tempos
 			for (int j=1; j<infile[i].getFieldCount(); j++) {
 				HTp stok = infile.token(i, j);
 				if (stok->isTempo()) {
 					token->setText(*stok);
+					if (token2) {
+						token->setText(*stok);
+					}
 				} else if (stok->isTimeSignature()) {
 					token->setText(*stok);
+					if (token2) {
+						token->setText(*stok);
+					}
 				} else if (stok->isMensurationSymbol()) {
 					token->setText(*stok);
+					if (token2) {
+						token->setText(*stok);
+					}
 				} else if (stok->isKeySignature()) {
 					token->setText(*stok);
+					if (token2) {
+						token->setText(*stok);
+					}
 				} else if (stok->isKeyDesignation()) {
 					token->setText(*stok);
+					if (token2) {
+						token->setText(*stok);
+					}
+				} else if (*stok == "*") {
+					if (groupQ) {
+						if (!wroteA) {
+							token->setText("*grp:A");
+							wroteA = true;
+						}
+						if (!wroteB) {
+							token2->setText("*grp:B");
+							wroteB = true;
+						}
+
+					}
 				}
+
 			}
 		}
 		if (!infile[i].isData()) {
@@ -55258,68 +55570,220 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 					full += q;
 					full += pstring;
 					full += beam;
-					HTp targettok = infile.token(i, 0);
-					if (appendQ) {
-						targettok = infile.token(i, infile[i].getFieldCount() - 1);
+					HTp targettok = NULL;
+					HTp targettok2 = NULL;
+					if (groupQ) {
+						if (prependQ) {
+							targettok = infile.token(i, 0);
+							targettok2 = infile.token(i, 1);
+						} else {
+							targettok = infile.token(i, infile[i].getFieldCount()-2);
+							targettok2 = infile.token(i, infile[i].getFieldCount()-1);
+						}
+					} else {
+						if (prependQ) {
+							targettok = infile.token(i, 0);
+							targettok2 = NULL;
+						} else {
+							targettok = infile.token(i, infile[i].getFieldCount()-1);
+							targettok2 = NULL;
+						}
 					}
-					targettok->setText(full);
+
+					if (groupQ) {
+						string group = grouping.at(i).at(j);
+						if (group == "A") {
+							targettok->setText(full);
+						} else if (group == "B") {
+							targettok2->setText(full);
+						}
+					} else {
+						targettok->setText(full);
+					}
 					break;
 				}
 			}
 			continue;
 		}
+
 		HumNum duration = getLineDuration(infile, i, isNull);
 		string recip;
+		string recip2;
 		if (isNull[i]) {
 			recip = ".";
+			recip2 = ".";
 		} else {
 			recip = Convert::durationToRecip(duration);
+			recip2 = recip;
 		}
 
-		if (appendQ) {
-			token = infile.token(i, infile[i].getFieldCount() - 1);
-		} else {
-			token = infile.token(i, 0);
-		}
-		if (isRest[i]) {
-			if (!isNull[i]) {
-				recip += "r";
+		if (groupQ) {
+
+			bool grpa = hasGroup(grouping, originalfile, i, "A");
+			bool grpb = hasGroup(grouping, originalfile, i, "B");
+			// int atype = getGroupNoteType(grouping, originalfile, i, "A");
+			// int btype = getGroupNoteType(grouping, originalfile, i, "A");
+cerr << "GRPA " << grpa << " GRPB " << grpb << " LINE " << originalfile[i] << endl;
+
+			HTp token2 = NULL;
+			if (prependQ) {
+				token = infile.token(i, 0);
+				token2 = infile.token(i, 1);
+			} else {
+				token = infile.token(i, infile[i].getFieldCount()-2);
+				token2 = infile.token(i, infile[i].getFieldCount()-1);
 			}
+			if (isRest[i]) {
+				if (!isNull[i]) {
+					if (grpa) {
+						recip += "r";
+					}
+					if (grpb) {
+						recip2 += "r";
+					}
+				}
+			} else {
+				if (grpa) {
+					recip += pstring;
+				} else {
+					recip += "r";
+				}
+				if (grpb) {
+					recip2 += pstring;
+				} else {
+					recip2 += "r";
+				}
+			}
+			token->setText(recip);
+			token2->setText(recip2);
+
 		} else {
-			recip += pstring;
+
+			if (prependQ) {
+				token = infile.token(i, 0);
+			} else {
+				token = infile.token(i, infile[i].getFieldCount()-1);
+			}
+			if (isRest[i]) {
+				if (!isNull[i]) {
+					recip += "r";
+				}
+			} else {
+				recip += pstring;
+			}
+			token->setText(recip);
+
 		}
-		token->setText(recip);
 	}
 
-	if (!(appendQ || prependQ)) {
-		Tool_extract extract2;
-		extract2.setModified("s", "1");
-		extract2.run(infile);
-		infile.readString(extract2.getAllText());
+	if (groupQ) {
+		if (!(appendQ || prependQ)) {
+			Tool_extract extract2;
+			extract2.setModified("s", "1-2");
+			extract2.run(infile);
+			infile.readString(extract2.getAllText());
+		}
+	} else {
+		if (!(appendQ || prependQ)) {
+			Tool_extract extract2;
+			extract2.setModified("s", "1");
+			extract2.run(infile);
+			infile.readString(extract2.getAllText());
+		}
 	}
 
 	if (getBoolean("beam")) {
 		Tool_autobeam autobeam;
-		if (appendQ) {
-			int trackcount =  infile.getTrackCount();
-			string tstring = to_string(trackcount);
-			autobeam.setModified("t", tstring);
+		if (groupQ) {
+			if (prependQ) {
+				autobeam.setModified("t", "1,2");
+			} else {
+				int trackcount =  infile.getTrackCount();
+				string tstring = to_string(trackcount-1);
+				tstring += ",";
+				tstring += to_string(trackcount);
+				autobeam.setModified("t", tstring);
+			}
 		} else {
-			autobeam.setModified("t", "1");
+			if (prependQ) {
+				autobeam.setModified("t", "1");
+			} else {
+				int trackcount =  infile.getTrackCount();
+				string tstring = to_string(trackcount);
+				autobeam.setModified("t", tstring);
+			}
 		}
 		// need to analyze structure for some reason:
 		infile.analyzeStrands();
 		autobeam.run(infile);
 	}
 
-
 }
 
 
 //////////////////////////////
 //
+// Tool_composite::getGroupNoteType --
+//
+// -2 = No group of that type exists
+// -1 = Note sustained
+//  0 = No group tokens exists
+//  1 = Note or rest attack
+//
+
+int Tool_composite::getGroupNoteType(vector<vector<string>>& grouping, HumdrumFile& infile,
+		int line, const string& group) {
+	// bool hasNull = false;
+	// bool hasRest = false;
+	// bool hasAttack = false;
+	// bool hasSustain = false;
+	for (int i=0; i<(int)grouping[line].size(); i++) {
+		// HTp token = infile.token(line, i);
+		string tgroup = grouping[line][i];
+		if (tgroup != group) {
+			continue;
+		}
+	}
+
+	// ggg do more work here
+	return 0;
+}
+
+//////////////////////////////
+//
+// Tool_composite::hasGroup --
+//
+
+bool Tool_composite::hasGroup(vector<vector<string>>& grouping, HumdrumFile& infile, int line,
+		const string& group) {
+	if (!infile[line].isData()) {
+		return false;
+	}
+	for (int i=0; i<(int)grouping[line].size(); i++) {
+		HTp token = infile.token(line, i);
+		if (!token->isKern()) {
+			continue;
+		}
+		if (token->isNull()) {
+			continue;
+		}
+		if (!token->isNoteAttack()) {
+			continue;
+		}
+		string testgroup = grouping[line][i];
+		if (testgroup == group) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_composite::getLineDuration -- Return the duration of the line, but return
-//    0 if the line only contains nulls.  Also add the duration of any subsequent 
+//    0 if the line only contains nulls.  Also add the duration of any subsequent
 //    lines that are null lines before any data content lines.
 
 HumNum Tool_composite::getLineDuration(HumdrumFile& infile, int index, vector<bool>& isNull) {
@@ -55341,6 +55805,107 @@ HumNum Tool_composite::getLineDuration(HumdrumFile& infile, int index, vector<bo
 		}
 	}
 	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::setupGrouping --
+//
+
+void Tool_composite::setupGrouping(vector<vector<string>>& grouping, HumdrumFile& infile) {
+	grouping.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		grouping[i].resize(infile[i].getFieldCount());
+	}
+
+	int maxtrack = infile.getMaxTrack();
+	vector<vector<string>> current;
+	current.resize(maxtrack);
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		int lasttrack = 1;
+		int subtrack = 1;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			if (track != lasttrack) {
+				subtrack = 1;
+			} else {
+				subtrack++;
+			}
+			if (subtrack > (int)current.at(track-1).size()) {
+				current.at(track-1).resize(subtrack);
+			}
+			if (*token == "*grp:A") {
+  				current.at(track-1).at(subtrack-1) = "A";
+			}
+			if (*token == "*grp:B") {
+  				current.at(track-1).at(subtrack-1) = "B";
+			}
+			if (*token == "*grp:") {
+				// clear a group:
+  				current.at(track-1).at(subtrack-1) = "";
+			}
+         string group = getGroup(current, track-1, subtrack-1);
+			grouping.at(i).at(j) = group;
+		}
+
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::getGroup --
+//
+
+string Tool_composite::getGroup(vector<vector<string>>& current, int spine, int subspine) {
+	if (spine >= (int)current.size()) {
+		return "";
+	}
+	if (subspine >= (int)current.at(spine).size()) {
+		return "";
+	}
+	string output = current[spine][subspine];
+	if (!output.empty()) {
+		return output;
+	}
+	// Grouping is empty for the subspine, so walk backwards through the
+	// subspine array to find any non-empty grouping, which will be assumed
+	// to apply to the current subspine.
+	for (int i=subspine-1; i>=0; --i) {
+		if (!current[spine][i].empty()) {
+			return current[spine][i];
+		}
+	}
+
+	return "";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::printGroupingInfo -- for debugging of group assignments.
+//
+
+void Tool_composite::printGroupingInfo(vector<vector<string>>& grouping) {
+	for (int i=0; i<(int)grouping.size(); i++) {
+		if (!grouping.empty()) {
+			cerr << grouping[i][0];
+			for (int j=1; j<(int)grouping[i].size(); j++) {
+				cerr << "\t" << grouping[i][j];
+
+			}
+		}
+		cerr << endl;
+	}
 }
 
 
@@ -61884,6 +62449,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(melisma, infile, commands[i].second, status);
 		} else if (commands[i].first == "metlev") {
 			RUNTOOL(metlev, infile, commands[i].second, status);
+		} else if (commands[i].first == "modori") {
+			RUNTOOL(modori, infile, commands[i].second, status);
 		} else if (commands[i].first == "msearch") {
 			RUNTOOL(msearch, infile, commands[i].second, status);
 		} else if (commands[i].first == "phrase") {
@@ -71258,6 +71825,521 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 			}
 		}
 	}
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_modori::Tool_modori -- Set the recognized options for the tool.
+//
+
+Tool_modori::Tool_modori(void) {
+	define("m|modern=b",    "prepare score for modern style");
+	define("o|original=b", "prepare score for original style");
+	define("d|info=b", "display key/clef/mensuration information");
+	define("K|no-key|no-keys=b", "Do not change key signatures");
+	define("C|no-clef|no-clefs=b", "Do not change clefs");
+	define("M|no-mensuration|no-mensurations=b", "Do not change mensurations");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_modori::run -- Do the main work of the tool.
+//
+
+bool Tool_modori::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_modori::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_modori::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_modori::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_modori::initialize(void) {
+	m_infoQ = getBoolean("info");
+	m_modernQ = getBoolean("modern");
+	m_originalQ = getBoolean("original");
+	if (m_modernQ && m_originalQ) {
+		// if both options are used, ignore -m:
+		m_modernQ = false;
+	}
+	m_nokeyQ         = getBoolean("no-key");
+	m_noclefQ        = getBoolean("no-clef");
+	m_nomensurationQ = getBoolean("no-mensuration");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::processFile --
+//
+
+void Tool_modori::processFile(HumdrumFile& infile) {
+	m_keys.clear();
+	m_clefs.clear();
+	m_mensurations.clear();
+
+	int maxtrack = infile.getMaxTrack();
+	m_keys.resize(maxtrack+1);
+	m_clefs.resize(maxtrack+1);
+	m_mensurations.resize(maxtrack+1);
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HumNum timeval = infile[i].getDurationFromStart();
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (*token == "*") {
+				continue;
+			}
+			int track = token->getTrack();
+			if (token->isKeySignature()) {
+				m_keys[track][timeval].push_back(token);
+			} else if (token->isOriginalKeySignature()) {
+				m_keys[track][timeval].push_back(token);
+			} else if (token->isModernKeySignature()) {
+				m_keys[track][timeval].push_back(token);
+			} else if (token->isClef()) {
+				m_clefs[track][timeval].push_back(token);
+			} else if (token->isOriginalClef()) {
+				m_clefs[track][timeval].push_back(token);
+			} else if (token->isModernClef()) {
+				m_clefs[track][timeval].push_back(token);
+			} else if (token->isMensuration()) {
+				m_mensurations[track][timeval].push_back(token);
+			} else if (token->isOriginalMensuration()) {
+				m_mensurations[track][timeval].push_back(token);
+			}
+		}
+	}
+
+	if (m_infoQ) {
+		if (m_modernQ || m_originalQ) {
+			m_humdrum_text << infile;
+		}
+		printInfo();
+	}
+
+	if (!(m_modernQ || m_originalQ)) {
+		// nothing to do
+		return;
+	}
+	
+	switchModernOriginal(infile);
+}
+
+
+//////////////////////////////
+//
+// Tool_modori::switchModernOriginal --
+//
+
+void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
+
+	set<int> changed;
+
+	if (!m_nokeyQ) {
+		for (int t=1; t<(int)m_keys.size(); ++t) {
+			for (auto it = m_keys.at(t).begin(); it != m_keys.at(t).end(); ++it) {
+				if (it->second.size() != 2) {
+					continue;
+				}
+				bool status = swapKeyStyle(it->second.at(0), it->second.at(1));
+				if (status) {
+					int line = it->second.at(0)->getLineIndex();
+					changed.insert(line);
+					line = it->second.at(1)->getLineIndex();
+					changed.insert(line);
+				}
+			}
+		}
+	}
+
+	if (!m_noclefQ) {
+		for (int t=1; t<(int)m_clefs.size(); ++t) {
+			for (auto it = m_clefs.at(t).begin(); it != m_clefs.at(t).end(); ++it) {
+				if (it->second.size() != 2) {
+					continue;
+				}
+				bool status = swapClefStyle(it->second.at(0), it->second.at(1));
+				if (status) {
+					int line = it->second.at(0)->getLineIndex();
+					changed.insert(line);
+					line = it->second.at(1)->getLineIndex();
+					changed.insert(line);
+				}
+			}
+		}
+	}
+
+	// mensurations are only used for "original" display.  It is possible
+	// to use a modern metric signature (common time or cut time) but these
+	// are not currently allowed.  Only one *met at a given time position
+	// is allowed.
+
+	if (!m_nomensurationQ) {
+		for (int t=1; t<(int)m_mensurations.size(); ++t) {
+			for (auto it = m_mensurations.at(t).begin(); it != m_mensurations.at(t).end(); ++it) {
+				if (it->second.size() != 1) {
+					continue;
+				}
+				bool status = flipMensurationStyle(it->second.at(0));
+				if (status) {
+					int line = it->second.at(0)->getLineIndex();
+					changed.insert(line);
+				}
+			}
+		}
+	}
+
+	for (auto it = changed.begin(); it != changed.end(); ++it) {
+		int line = *it;
+		infile[line].createLineFromTokens();
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::flipMensurationStyle -- Returns true if swapped.
+//
+
+bool Tool_modori::flipMensurationStyle(HTp token) {
+	bool output = false;
+	HumRegex hre;
+	string text;
+	if (token->isMensuration()) {
+		// switch to invisible mensuration
+		text = "*omet";
+		text += token->substr(4);
+		token->setText(text);
+		output = true;
+	} else if (token->isOriginalMensuration()) {
+		// switch to visible mensuration
+		text = "*met";
+		text += token->substr(5);
+		token->setText(text);
+		output = true;
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::swapKeyStyle -- Returns true if swapped.
+//
+
+bool Tool_modori::swapKeyStyle(HTp one, HTp two) {
+	bool mtype1 = false;
+	bool mtype2 = false;
+	bool otype1 = false;
+	bool otype2 = false;
+	bool ktype1 = false;
+	bool ktype2 = false;
+	bool output = false;
+
+	if (one->isKeySignature()) {
+		ktype1 = true;
+	} else if (one->isModernKeySignature()) {
+		mtype1 = true;
+	} else if (one->isOriginalKeySignature()) {
+		otype1 = true;
+	}
+
+	if (two->isKeySignature()) {
+		ktype2 = true;
+	} else if (two->isModernKeySignature()) {
+		mtype2 = true;
+	} else if (two->isOriginalKeySignature()) {
+		otype2 = true;
+	}
+
+	if (m_modernQ) {
+		// Show the modern key signature.  If one key is *mk and the
+		// other is *k then change *mk to *k and *k to *ok respectively.
+		if (ktype1 && mtype2) {
+			convertKeySignatureToOriginal(one);
+			convertKeySignatureToRegular(two);
+			output = true;
+		} else if (mtype1 && ktype2) {
+			convertKeySignatureToRegular(one);
+			convertKeySignatureToOriginal(two);
+			output = true;
+		}
+	} else if (m_originalQ) {
+		// Show the original key.  If one key is *ok and the
+		// other is *k then change *ok to *k and *k to *mk respectively.
+		if (ktype1 && otype2) {
+			convertKeySignatureToModern(one);
+			convertKeySignatureToRegular(two);
+			output = true;
+		} else if (otype1 && ktype2) {
+			convertKeySignatureToRegular(one);
+			convertKeySignatureToModern(two);
+			output = true;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::swapClefStyle -- Returns true if swapped.
+//
+
+bool Tool_modori::swapClefStyle(HTp one, HTp two) {
+	bool mtype1 = false;
+	bool mtype2 = false;
+	bool otype1 = false;
+	bool otype2 = false;
+	bool ktype1 = false;
+	bool ktype2 = false;
+	bool output = false;
+
+	if (one->isClef()) {
+		ktype1 = true;
+	} else if (one->isModernClef()) {
+		mtype1 = true;
+	} else if (one->isOriginalClef()) {
+		otype1 = true;
+	}
+
+	if (two->isClef()) {
+		ktype2 = true;
+	} else if (two->isModernClef()) {
+		mtype2 = true;
+	} else if (two->isOriginalClef()) {
+		otype2 = true;
+	}
+
+	if (m_modernQ) {
+		// Show the modern key signature.  If one key is *mk and the
+		// other is *k then change *mk to *k and *k to *ok respectively.
+		if (ktype1 && mtype2) {
+			convertClefToOriginal(one);
+			convertClefToRegular(two);
+			output = true;
+		} else if (mtype1 && ktype2) {
+			convertClefToRegular(one);
+			convertClefToOriginal(two);
+			output = true;
+		}
+	} else if (m_originalQ) {
+		// Show the original key.  If one key is *ok and the
+		// other is *k then change *ok to *k and *k to *mk respectively.
+		if (ktype1 && otype2) {
+			convertClefToModern(one);
+			convertClefToRegular(two);
+			output = true;
+		} else if (otype1 && ktype2) {
+			convertClefToRegular(one);
+			convertClefToModern(two);
+			output = true;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertKeySignatureToModern --
+//
+
+void Tool_modori::convertKeySignatureToModern(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?k(.*)")) {
+		string text = "*mk";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertKeySignatureToOriginal --
+//
+
+void Tool_modori::convertKeySignatureToOriginal(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?k(.*)")) {
+		string text = "*ok";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertKeySignatureToRegular --
+//
+
+void Tool_modori::convertKeySignatureToRegular(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?k(.*)")) {
+		string text = "*k";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertClefToModern --
+//
+
+void Tool_modori::convertClefToModern(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?clef(.*)")) {
+		string text = "*mclef";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertClefToOriginal --
+//
+
+void Tool_modori::convertClefToOriginal(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?clef(.*)")) {
+		string text = "*oclef";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertClefToRegular --
+//
+
+void Tool_modori::convertClefToRegular(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?clef(.*)")) {
+		string text = "*clef";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+////////////////////
+//
+// Tool_modori::printInfo --
+//
+
+void Tool_modori::printInfo(void) {
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	m_humdrum_text << "!! KEYS:" << endl;
+
+	for (int t=1; t<(int)m_keys.size(); ++t) {
+		for (auto it = m_keys.at(t).begin(); it != m_keys.at(t).end(); ++it) {
+			m_humdrum_text << "!!    " << it->first;
+			for (int j=0; j<(int)it->second.size(); ++j) {
+				m_humdrum_text << '\t' << it->second.at(j);
+		}
+			m_humdrum_text << endl;
+		}
+	}
+
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	m_humdrum_text << "!! CLEFS:" << endl;
+
+	for (int t=1; t<(int)m_keys.size(); ++t) {
+		for (auto it = m_clefs.at(t).begin(); it != m_clefs.at(t).end(); ++it) {
+			m_humdrum_text << "!!    " << it->first;
+			for (int j=0; j<(int)it->second.size(); ++j) {
+				m_humdrum_text << '\t' << it->second.at(j);
+			}
+			m_humdrum_text << endl;
+		}
+	}
+
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	m_humdrum_text << "!! MENSURATIONS:" << endl;
+
+	for (int t=1; t<(int)m_mensurations.size(); ++t) {
+		for (auto it = m_mensurations.at(t).begin(); it != m_mensurations.at(t).end(); ++it) {
+			m_humdrum_text << "!!    " << it->first;
+			for (int j=0; j<(int)it->second.size(); j++) {
+				m_humdrum_text << '\t' << it->second.at(j);
+			}
+			m_humdrum_text << endl;
+		}
+	}
+
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+
 }
 
 
@@ -85333,6 +86415,7 @@ Tool_semitones::Tool_semitones(void) {
 	define("mark=s:@", "mark character");
 	define("m|midi=b", "show MIDI note number for pitches");
 	define("n|count=b", "output count of intervals being marked");
+	define("p|pc=b", "output pitch classes from C=0 instead of MIDI notes for -m option");
 	define("r|same|repeat|repeated=b", "highlight notes that are repeated ");
 	define("s|step=b", "highlight notes that have step-wise motion");
 	define("u|up=b", "highlight notes that that have a positive semitone interval");
@@ -85405,6 +86488,7 @@ void Tool_semitones::initialize(void) {
 	m_noinputQ    = getBoolean("no-input");
 	m_nomarkQ     = getBoolean("no-marks");
 	m_notiesQ     = getBoolean("no-ties");
+	m_pcQ         = getBoolean("pc");
 	m_repeatQ     = getBoolean("repeat");
 	m_norestsQ    = getBoolean("no-rests");
 	m_secondQ     = getBoolean("second");
@@ -85436,7 +86520,7 @@ void Tool_semitones::processFile(HumdrumFile& infile) {
 	for (int i=0; i<infile.getLineCount(); i++) {
 		analyzeLine(infile, i);
 	}
-	if (m_markCount > 0) {
+	if ((m_markCount > 0) && !m_nomarkQ) {
 		m_humdrum_text << "!!!RDF**kern: ";
 		m_humdrum_text << m_marker;
 		m_humdrum_text << " = marked note";
@@ -85615,7 +86699,11 @@ int Tool_semitones::processKernSpines(HumdrumFile& infile, int line, int start, 
 					if (m_cdataQ) {
 						printTokens("**cdata", toksize);
 					} else if (m_midiQ) {
-						printTokens("**mnn", toksize);
+						if (m_pcQ) {
+							printTokens("**mpc", toksize);
+						} else {
+							printTokens("**mnn", toksize);
+						}
 					} else {
 						printTokens("**tti", toksize);
 					}
@@ -85833,6 +86921,9 @@ string Tool_semitones::getTwelveToneIntervalString(HTp token) {
 
 	if (m_midiQ) {
 		string output;
+		if (m_pcQ) {
+			value = value % 12;
+		}
 		output = to_string(value);
 		return output;
 	}

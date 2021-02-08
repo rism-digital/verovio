@@ -126,6 +126,18 @@ public:
     void AddLedgerLineBelow(int count, int left, int right, bool cueSize);
     ///@}
 
+    /**
+     * Used for calculating clustered information/dot position.
+     * The *Doc is the parent doc but passed as param in order to avoid look-up
+     */
+    bool IsOnStaffLine(int y, Doc *doc);
+
+    /**
+     * Find the nearest unit position in the direction indicated by place.
+     * The *Doc is the parent doc but passed as param in order to avoid look-up
+     */
+    int GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place);
+
     //----------//
     // Functors //
     //----------//
@@ -136,14 +148,14 @@ public:
     virtual int ConvertToCastOffMensural(FunctorParams *params);
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
-    virtual int OptimizeScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefOptimize(FunctorParams *functorParams);
 
     /**
      * See Object::ResetVerticalAlignment

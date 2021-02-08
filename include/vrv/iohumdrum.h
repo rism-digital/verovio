@@ -29,6 +29,7 @@
 #include "options.h"
 #include "pedal.h"
 #include "reh.h"
+#include "rend.h"
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
@@ -311,6 +312,9 @@ namespace humaux {
         // suppress_manual_custos == Do not render manually encoded custodes.
         // at line breaks.
         bool suppress_manual_custos = false;
+
+        // toggle for black/white mensural notation.  0=white, 1=black
+        int mensuration_type = 0;
     };
 } // namespace humaux
 
@@ -374,7 +378,8 @@ public:
 
     virtual bool Import(const std::string &humdrum);
 
-    void parseEmbeddedOptions(vrv::Doc &doc);
+    void parseEmbeddedOptions(vrv::Doc *doc);
+    void finalizeDocument(vrv::Doc *doc);
 
 #ifndef NO_HUMDRUM_SUPPORT
 
@@ -396,7 +401,7 @@ protected:
     void calculateLayout();
     void setSystemMeasureStyle(int startline, int endline);
     std::vector<int> getStaffLayerCounts();
-    void prepareStaffGroups();
+    void prepareStaffGroups(int top, int bot);
     void setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok = NULL, hum::HTp striatok = NULL);
     void setDynamicTransposition(int staffindex, StaffDef *staff, const std::string &itranspose);
     void setTransposition(StaffDef *staffDef, const std::string &transpose);
@@ -405,7 +410,7 @@ protected:
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
-    void prepareTimeSigDur();
+    void prepareTimeSigDur(int &top, int &bot);
     void printMeasureTokens();
     int characterCount(const std::string &text, char symbol);
     int characterCount(hum::HTp token, char symbol);
@@ -509,7 +514,7 @@ protected:
         std::vector<hum::HTp> &layerdata, int startindex);
     void setTupletLocationId(vrv::Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int startindex);
-    void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
+    void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart, int top, int bot);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);
     void setNextLeftBarStyle(data_BARRENDITION style);
@@ -543,7 +548,7 @@ protected:
     hum::HTp getHighestSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
-        int staffindex, int justification = 0, const std::string &color = "");
+        int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1);
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
         hum::HTp token, int staffindex, int justification, const std::string &color);
     bool setTempoContent(Tempo *tempo, const std::string &text);
@@ -581,13 +586,13 @@ protected:
     void initializeSpineColor(hum::HumdrumFile &infile);
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
-    void storeExpansionList(Section *section, hum::HTp etok);
     int getStaffAdjustment(hum::HTp token);
     void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
     void promoteInstrumentNamesToGroup();
     void promoteInstrumentsForStaffGroup(StaffGrp *group);
     void promoteInstrumentAbbreviationsToGroup();
     void promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group);
+    void setGroupSymbol(StaffGrp *sg, staffGroupingSym_SYMBOL symbol);
     std::string getInstrumentName(StaffDef *sd);
     std::string getInstrumentAbbreviation(StaffDef *sd);
     std::string getInstrumentClass(hum::HTp start);
@@ -682,6 +687,21 @@ protected:
     std::string getVerseLabelText(hum::HTp token);
     void addPlicaUp(Note *note);
     void addPlicaDown(Note *note);
+    void setLayoutSlurDirection(Slur *slur, hum::HTp token);
+    void setFontStyle(Rend *rend, const string &fontstyle);
+    void importVerovioOptions(Doc *doc);
+    void adjustChordNoteDurations(Chord *chord, std::vector<Note *> &notes, std::vector<string> &tstrings);
+    void adjustChordNoteDuration(Note *note, hum::HumNum hdur, int dur, int dots, hum::HumNum chorddur,
+        const string &tstring, hum::HumNum factor);
+    void setNoteMeiDur(Note *note, int meidur);
+    void storeExpansionListsInChoice(Section *section, std::vector<hum::HTp> &expansions);
+    double getMmTempo(hum::HTp token, bool checklast = false);
+    double getMmTempoForward(hum::HTp token);
+    bool isNearOmd(hum::HTp token);
+    void handleTempoChange(hum::HTp token);
+    bool hasTempoTextAfter(hum::HTp token);
+    bool isTempoishText(hum::HTp token);
+    bool isLastStaffTempo(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -733,7 +753,7 @@ protected:
     template <class ELEMENT> void addVerovioTextElement(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
-    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
+    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place, bool showplace);
     template <class ELEMENT>
     void setMeterSymbol(
         ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL, hum::HTp metertok = NULL);
@@ -743,11 +763,12 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
-    template <class ELEMENT> void addType(ELEMENT element, const std::string &aType);
     template <class ELEMENT>
     void insertTwoRhythmsAndTextBetween(
         ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2);
     template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
+    template <class ELEMENT> void addFermata(ELEMENT *rest, const std::string &tstring);
+    template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -1015,6 +1036,10 @@ private:
 
     // m_scordatura_transposition == used to transpose scordatura notes;
     std::vector<hum::HumTransposer *> m_scordatura_transposition;
+
+    // m_humtype == input option boolean to include extra @type information that will
+    // be converted into @class in SVG conversion.
+    int m_humtype = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

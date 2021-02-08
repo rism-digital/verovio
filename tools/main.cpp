@@ -108,7 +108,7 @@ void display_usage()
     std::cout << " -                     Use \"-\" as input file for reading from the standard input" << std::endl;
     std::cout << " -h, --help            Display this message" << std::endl;
     std::cout << " -a, --all-pages       Output all pages" << std::endl;
-    std::cout << " -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)" << std::endl;
+    std::cout << " -f, --format <s>      Select input format: abc, darms, humdrum, mei, pae, xml (MusicXML) (default is mei)" << std::endl;
     std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
     std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
     std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;

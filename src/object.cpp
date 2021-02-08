@@ -597,17 +597,6 @@ void Object::ResetUuid()
     GenerateUuid();
 }
 
-void Object::SeedUuid(unsigned int seed)
-{
-    // Init random number generator for uuids
-    if (seed == 0) {
-        std::srand((unsigned int)std::time(0));
-    }
-    else {
-        std::srand(seed);
-    }
-}
-
 void Object::SetParent(Object *parent)
 {
     assert(!m_parent);
@@ -902,6 +891,81 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
     FindChildByComparisonParams params(comp, start);
     this->Process(&findPreviousChildByComparison, &params);
     return params.m_element;
+}
+
+//----------------------------------------------------------------------------
+// Static methods for Object
+//----------------------------------------------------------------------------
+
+void Object::SeedUuid(unsigned int seed)
+{
+    // Init random number generator for uuids
+    if (seed == 0) {
+        std::srand((unsigned int)std::time(0));
+    }
+    else {
+        std::srand(seed);
+    }
+}
+
+bool Object::sortByUlx(Object *a, Object *b)
+{
+    FacsimileInterface *fa = NULL, *fb = NULL;
+    InterfaceComparison comp(INTERFACE_FACSIMILE);
+    if (a->GetFacsimileInterface() && a->GetFacsimileInterface()->HasFacs())
+        fa = a->GetFacsimileInterface();
+    else {
+        ListOfObjects children;
+        a->FindAllDescendantByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            if ((*it)->Is(SYL)) continue;
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+                fa = temp;
+            }
+        }
+    }
+    if (b->GetFacsimileInterface() && b->GetFacsimileInterface()->HasFacs())
+        fb = b->GetFacsimileInterface();
+    else {
+        ListOfObjects children;
+        b->FindAllDescendantByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            if ((*it)->Is(SYL)) continue;
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+                fb = temp;
+            }
+        }
+    }
+
+    // Preserve ordering of neume components in ligature
+    if (a->Is(NC) && b->Is(NC)) {
+        Nc *nca = dynamic_cast<Nc *>(a);
+        Nc *ncb = dynamic_cast<Nc *>(b);
+        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+            Object *parent = a->GetParent();
+            assert(parent);
+            if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
+                // Return nc with higher pitch
+                return nca->PitchDifferenceTo(ncb) > 0; // If object a has the higher pitch
+            }
+        }
+    }
+
+    if (fa == NULL || fb == NULL) {
+        if (fa == NULL) {
+            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
+        }
+        if (fb == NULL) {
+            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
+        }
+        return false;
+    }
+
+    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
 //----------------------------------------------------------------------------
@@ -1352,9 +1416,9 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetCurrentScoreDef(FunctorParams *functorParams)
+int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
 {
-    SetCurrentScoreDefParams *params = vrv_params_cast<SetCurrentScoreDefParams *>(functorParams);
+    ScoreDefSetCurrentParams *params = vrv_params_cast<ScoreDefSetCurrentParams *>(functorParams);
     assert(params);
 
     assert(params->m_upcomingScoreDef);
@@ -1502,6 +1566,8 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
+    if (this->Is(params->m_excludeClasses)) return FUNCTOR_CONTINUE;
+
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
 
@@ -1564,25 +1630,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // Take into account beam in cross-staff situation
-    if (this->Is(BEAM)) {
-        Beam *beam = vrv_cast<Beam *>(this);
-        assert(beam);
-        // Ignore it if it has cross-staff content but is not entirely cross-staff itself
-        if (beam->m_hasCrossStaffContent && !beam->m_crossStaff) return FUNCTOR_CONTINUE;
-    }
-
-    // Take into account stem for notes in cross-staff situation and in beams
-    if (this->Is(STEM)) {
-        LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
-        if (noteOrChord && noteOrChord->m_crossStaff && noteOrChord->IsInBeam()) {
-            Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
-            assert(beam);
-            // Ignore it but only if the beam is not entirely cross-staff itself
-            if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
-        }
-    }
-
     if (this->Is(FB) || this->Is(FIGURE)) {
         return FUNCTOR_CONTINUE;
     }
@@ -1602,34 +1649,28 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     LayerElement *current = vrv_cast<LayerElement *>(this);
     assert(current);
 
-    bool skipAbove = false;
-    bool skipBelow = false;
-    Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
-    if (chord && params->m_staffAlignment) {
-        chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
+    StaffAlignment *above = NULL;
+    StaffAlignment *below = NULL;
+    current->GetOverflowStaffAlignments(above, below);
+
+    if (above) {
+        int overflowAbove = above->CalcOverflowAbove(current);
+        int staffSize = above->GetStaffSize();
+        if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+            // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            above->SetOverflowAbove(overflowAbove);
+            above->AddBBoxAbove(current);
+        }
     }
 
-    StaffAlignment *alignment = params->m_staffAlignment;
-    Layer *crossLayer = NULL;
-    Staff *crossStaff = current->GetCrossStaff(crossLayer);
-    if (crossStaff && crossStaff->GetAlignment()) {
-        alignment = crossStaff->GetAlignment();
-    }
-
-    int staffSize = alignment->GetStaffSize();
-
-    int overflowAbove = alignment->CalcOverflowAbove(current);
-    if (!skipAbove && (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
-        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
-        alignment->SetOverflowAbove(overflowAbove);
-        alignment->AddBBoxAbove(current);
-    }
-
-    int overflowBelow = alignment->CalcOverflowBelow(current);
-    if (!skipBelow && (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
-        // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-        alignment->SetOverflowBelow(overflowBelow);
-        alignment->AddBBoxBelow(current);
+    if (below) {
+        int overflowBelow = below->CalcOverflowBelow(current);
+        int staffSize = below->GetStaffSize();
+        if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+            // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            below->SetOverflowBelow(overflowBelow);
+            below->AddBBoxBelow(current);
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -1681,66 +1722,6 @@ int Object::SaveEnd(FunctorParams *functorParams)
         return FUNCTOR_STOP;
     }
     return FUNCTOR_CONTINUE;
-}
-
-bool Object::sortByUlx(Object *a, Object *b)
-{
-    FacsimileInterface *fa = NULL, *fb = NULL;
-    InterfaceComparison comp(INTERFACE_FACSIMILE);
-    if (a->GetFacsimileInterface() && a->GetFacsimileInterface()->HasFacs())
-        fa = a->GetFacsimileInterface();
-    else {
-        ListOfObjects children;
-        a->FindAllDescendantByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
-            assert(temp);
-            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
-                fa = temp;
-            }
-        }
-    }
-    if (b->GetFacsimileInterface() && b->GetFacsimileInterface()->HasFacs())
-        fb = b->GetFacsimileInterface();
-    else {
-        ListOfObjects children;
-        b->FindAllDescendantByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
-            assert(temp);
-            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
-                fb = temp;
-            }
-        }
-    }
-
-    // Preserve ordering of neume components in ligature
-    if (a->Is(NC) && b->Is(NC)) {
-        Nc *nca = dynamic_cast<Nc *>(a);
-        Nc *ncb = dynamic_cast<Nc *>(b);
-        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
-            Object *parent = a->GetParent();
-            assert(parent);
-            if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
-                // Return nc with higher pitch
-                return nca->PitchDifferenceTo(ncb) > 0; // If object a has the higher pitch
-            }
-        }
-    }
-
-    if (fa == NULL || fb == NULL) {
-        if (fa == NULL) {
-            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
-        }
-        if (fb == NULL) {
-            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
-        }
-        return false;
-    }
-
-    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
 int Object::ReorderByXPos(FunctorParams *functorParams)

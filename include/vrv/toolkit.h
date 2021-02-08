@@ -26,6 +26,7 @@ enum FileFormat {
     AUTO,
     MEI,
     HUMDRUM,
+    HUMMEI,
     PAE,
     ABC,
     DARMS,
@@ -243,6 +244,14 @@ public:
     std::string GetMIDIValuesForElement(const std::string &xmlId);
 
     /**
+     * Return a JSON object string with the following key values for a given note:
+     * scoreTimeOnset, scoreTimeOffset, scoreTimeTiedDuration,
+     * realTimeOnsetMilliseconds, realTimeOffsetMilliseconds, realTimeTiedDurationMilliseconds.
+     * Returns 0 if no element is found.
+     */
+    std::string GetTimesForElement(const std::string &xmlId);
+
+    /**
      * @name Set and get the scale
      */
     ///@{
@@ -308,8 +317,6 @@ private:
     FileFormat m_inputFrom;
     FileFormat m_outputTo;
 
-    static char *m_humdrumBuffer;
-
     Options *m_options;
 
     /**
@@ -318,6 +325,12 @@ private:
     char *m_cString;
 
     EditorToolkit *m_editorToolkit;
+
+    //----------------//
+    // Static members //
+    //----------------//
+
+    static char *m_humdrumBuffer;
 };
 
 } // namespace vrv

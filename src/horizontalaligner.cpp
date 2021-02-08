@@ -116,6 +116,8 @@ void MeasureAligner::Reset()
     AddAlignment(m_rightBarLineAlignment);
     m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
+
+    m_initialTstampDur = -DUR_MAX;
 }
 
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
@@ -169,6 +171,13 @@ double MeasureAligner::GetMaxTime() const
     assert(m_rightBarLineAlignment);
 
     return m_rightAlignment->GetTime();
+}
+
+void MeasureAligner::SetInitialTstamp(int meterUnit)
+{
+    if (meterUnit != 0) {
+        m_initialTstampDur = DUR_MAX / meterUnit * -1;
+    }
 }
 
 void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments)
@@ -265,7 +274,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
         }
 
         int minLeft;
-        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight);
+        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight, { CLEF });
 
         if (maxRight != VRV_UNSET) break;
     }
@@ -376,8 +385,9 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
         // The alignment is its parent
         leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
     }
-    else
+    else {
         leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+    }
     // Return if nothing found
     if (!leftAlignment) return -VRV_UNSET;
 
@@ -472,6 +482,15 @@ bool Alignment::HasAlignmentReference(int staffN)
     return (this->FindDescendantByComparison(&matchStaff, 1) != NULL);
 }
 
+bool Alignment::HasTimestampOnly()
+{
+    // If no child, then not timestamp
+    if (!this->GetChildCount()) return false;
+    // Look for everything that is not a timestamp
+    ReverseClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR });
+    return (this->FindDescendantByComparison(&notTimestamp, 2) == NULL);
+}
+
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
@@ -539,10 +558,28 @@ bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
     return (std::find(types.begin(), types.end(), m_type) != types.end());
 }
 
-void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
+void Alignment::GetLeftRight(
+    const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
 {
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
     GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
+
+    minLeft = -VRV_UNSET;
+    maxRight = VRV_UNSET;
+
+    for (auto staffN : staffNs) {
+        int staffMinLeft, staffMaxRight;
+        this->GetLeftRight(staffN, staffMinLeft, staffMaxRight);
+        if (staffMinLeft < minLeft) minLeft = staffMinLeft;
+        if (staffMaxRight > maxRight) maxRight = staffMaxRight;
+    }
+}
+
+void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
+{
+    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
+    GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
+    getAlignmentLeftRightParams.m_excludeClasses = m_excludes;
 
     if (staffN != VRV_UNSET) {
         ArrayOfComparisons filters;
@@ -550,8 +587,9 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
         filters.push_back(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
-    else
+    else {
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams);
+    }
 
     minLeft = getAlignmentLeftRightParams.m_minLeft;
     maxRight = getAlignmentLeftRightParams.m_maxRight;
@@ -750,7 +788,9 @@ int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
     params->m_previousTime = 0.0;
-    params->m_previousXRel = 0;
+    params->m_previousXRel = params->m_doc->GetDrawingUnit(100);
+    params->m_lastNonTimestamp = m_leftBarLineAlignment;
+    params->m_measureAligner = this;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1005,6 +1045,12 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalTime = 0.0;
     }
 
+    // Do not move aligner that are only time-stamps at this stage but add it to the pending list
+    if (this->HasTimestampOnly()) {
+        params->m_timestamps.push_back(this);
+        return FUNCTOR_CONTINUE;
+    }
+
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
@@ -1020,6 +1066,32 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
+
+    // This is an alignment which is not timestamp only. If we have a list of pendings timetamp
+    // alignments, then we now need to move them appropriately
+    if (!params->m_timestamps.empty() && params->m_lastNonTimestamp) {
+        int startXRel = params->m_lastNonTimestamp->GetXRel();
+        double startTime = params->m_lastNonTimestamp->GetTime();
+        double endTime = this->GetTime();
+        // We have timestamp alignments between the left barline and the first beat. We need
+        // to use the MeasureAligner::m_initialTstampDur to calculate the time (percentage) position
+        if (params->m_lastNonTimestamp->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
+            startTime = params->m_measureAligner->GetInitialTstampDur();
+        }
+        // The duration since the last alignment and the current one
+        double duration = endTime - startTime;
+        int space = m_xRel - params->m_lastNonTimestamp->GetXRel();
+        // For each timestamp alignment, move them proporitionally to the space we currently have
+        for (auto &alignment : params->m_timestamps) {
+            // Avoid division by zero (nothing to move with the alignment anyway
+            if (duration == 0.0) break;
+            double percent = (alignment->GetTime() - startTime) / duration;
+            alignment->SetXRel(startXRel + space * percent);
+        }
+        params->m_timestamps.clear();
+    }
+
+    params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1151,7 +1223,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int AlignmentReference::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int AlignmentReference::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     Alignment *alignment = vrv_cast<Alignment *>(this->GetParent());
     assert(alignment);

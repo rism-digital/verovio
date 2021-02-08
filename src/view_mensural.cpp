@@ -49,20 +49,19 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = vrv_cast<Note *>(element);
     assert(note);
 
-    int yNote = element->GetDrawingY();
-    int xNote = element->GetDrawingX();
-    int drawingDur = note->GetDrawingDur();
-    int radius = note->GetDrawingRadius(m_doc);
-    int staffY = staff->GetDrawingY();
-    int verticalCenter = 0;
-    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    const int yNote = element->GetDrawingY();
+    const int xNote = element->GetDrawingX();
+    const int drawingDur = note->GetDrawingDur();
+    const int radius = note->GetDrawingRadius(m_doc);
+    const int staffY = staff->GetDrawingY();
+    const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     /************** Stem/notehead direction: **************/
 
     data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+    int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
     if (note->HasStemDir()) {
         stemDir = note->GetStemDir();
     }
@@ -89,7 +88,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     // Semibrevis and shorter
     else {
-        wchar_t code = note->GetMensuralSmuflNoteHead();
+        wchar_t code = note->GetMensuralNoteheadGlyph();
         dc->StartCustomGraphic("notehead");
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
@@ -118,10 +117,10 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
     Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
 
-    bool drawingCueSize = rest->GetDrawingCueSize();
-    int drawingDur = rest->GetActualDur();
-    int x = element->GetDrawingX();
-    int y = element->GetDrawingY();
+    const bool drawingCueSize = rest->GetDrawingCueSize();
+    const int drawingDur = rest->GetActualDur();
+    const int x = element->GetDrawingX();
+    const int y = element->GetDrawingY();
 
     switch (drawingDur) {
         case DUR_MX: charCode = SMUFL_E9F0_mensuralRestMaxima; break;
@@ -505,8 +504,9 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
     Dot *dot = vrv_cast<Dot *>(element);
     assert(dot);
 
-    Note *note = dot->m_drawingNote;
-    assert(dot->m_drawingNote);
+    assert(dot->m_drawingPreviousElement && dot->m_drawingPreviousElement->Is(NOTE));
+    Note *note = vrv_cast<Note *>(dot->m_drawingPreviousElement);
+    assert(note);
 
     Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
@@ -673,7 +673,7 @@ void View::CalcBrevisPoints(
 
     // Calculate size of the rectangle
     topLeft->x = note->GetDrawingX();
-    int width = 2 * note->GetDrawingRadius(m_doc, true);
+    const int width = 2 * note->GetDrawingRadius(m_doc, true);
     bottomRight->x = topLeft->x + width;
 
     double heightFactor = (isMensuralBlack) ? 0.8 : 1.0;
@@ -713,7 +713,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     assert(note2);
     assert(staff);
 
-    int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
     Point *topLeft = &points[0];
     Point *bottomLeft = &points[1];

@@ -1351,6 +1351,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     // pedal->WriteVerticalGroup(currentNode);
+    pedal->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WritePhrase(pugi::xml_node currentNode, Phrase *phrase)
@@ -1506,6 +1507,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     WriteLayerElement(currentNode, artic);
     artic->WriteArticulation(currentNode);
     artic->WriteColor(currentNode);
+    artic->WriteExtSym(currentNode);
     artic->WritePlacement(currentNode);
 }
 
@@ -1576,6 +1578,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
         cleffingLog.WriteCleffingLog(currentNode);
         AttCleffingVis cleffingVis;
         cleffingVis.SetClefColor(clef->GetColor());
+        cleffingVis.SetClefVisible(clef->GetVisible());
         cleffingVis.WriteCleffingVis(currentNode);
         return;
     }
@@ -1586,6 +1589,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteColor(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
+    clef->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
@@ -2596,6 +2600,15 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for custos
+    else if (filterParent->Is(CUSTOS)) {
+        if (element == "accid") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for fTrem
     else if (filterParent->Is(FTREM)) {
         if (element == "chord") {
@@ -3459,6 +3472,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvClef->SetDis(cleffingLog.GetClefDis());
         vrvClef->SetDisPlace(cleffingLog.GetClefDisPlace());
         vrvClef->SetColor(cleffingVis.GetClefColor());
+        vrvClef->SetVisible(cleffingVis.GetClefVisible());
         object->AddChild(vrvClef);
     }
 
@@ -4722,7 +4736,12 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
 
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadColor(artic);
+    vrvArtic->ReadExtSym(artic);
     vrvArtic->ReadPlacement(artic);
+
+    if (vrvArtic->GetArtic().size() > 1) {
+        m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
+    }
 
     parent->AddChild(vrvArtic);
     ReadUnsupportedAttr(artic, vrvArtic);
@@ -4830,6 +4849,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadColor(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
+    vrvClef->ReadVisibility(clef);
 
     parent->AddChild(vrvClef);
     ReadUnsupportedAttr(clef, vrvClef);
@@ -4848,7 +4868,7 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
-    return true;
+    return ReadLayerChildren(vrvCustos, custos, vrvCustos);
 }
 
 bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
@@ -5130,6 +5150,9 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         Artic *vrvArtic = new Artic();
         vrvArtic->IsAttribute(true);
         vrvArtic->SetArtic(artic.GetArtic());
+        if (artic.GetArtic().size() > 1) {
+            m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
+        }
         vrvNote->AddChild(vrvArtic);
     }
 

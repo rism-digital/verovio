@@ -22,10 +22,12 @@ namespace vrv {
 class Alignment;
 class Beam;
 class BeamElementCoord;
+class FTrem;
 class Layer;
 class Mensur;
 class MeterSig;
 class Staff;
+class StaffAlignment;
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -109,8 +111,8 @@ public:
     bool GetDrawingCueSize();
     /** Return true if the element is a note within a ligature */
     bool IsInLigature() const;
-    /** Return true if the element is a note or a chord within a fTrem */
-    bool IsInFTrem();
+    /** Return the FTrem parten if the element is a note or a chord within a fTrem */
+    FTrem *IsInFTrem();
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -155,12 +157,11 @@ public:
      * Returns the drawing top and bottom taking into accound stem, etc.
      * We pass the doc as parameter in order to have access to the current drawing parameters.
      * withArtic specifies if the articulation sign needs to be taken into account or not.
-     * articPartType indicates if the inside or outside artic part has to be taken into account (inside is taken
+     * articType indicates if the inside or outside artic part has to be taken into account (inside is taken
      * into account in any case)
      */
-    int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
-    int GetDrawingBottom(
-        Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
+    int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticType articType = ARTIC_INSIDE);
+    int GetDrawingBottom(Doc *doc, int staffSize, bool withArtic = true, ArticType articType = ARTIC_INSIDE);
 
     /**
      * Return the drawing radius for notes and chords
@@ -178,6 +179,18 @@ public:
      * Return NULL if there is no cross-staff in the element or a parent.
      */
     Staff *GetCrossStaff(Layer *&layer) const;
+
+    /**
+     * Retrieve the direction of a cross-staff situation
+     */
+    data_STAFFREL_basic GetCrossStaffRel();
+
+    /**
+     * Get the StaffAlignment for which overflows need to be calculated against.
+     * Set to NULL when the overflow needs to be ignored (e.g., for something between the staves in
+     * cross-staff situations.)
+     */
+    void GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlignment *&below);
 
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
@@ -356,7 +369,7 @@ public:
     virtual int GetRelativeLayerElement(FunctorParams *functorParams);
 
 private:
-    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

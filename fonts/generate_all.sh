@@ -44,4 +44,8 @@ echo "Generating Petaluma files ..."
 saxon Petaluma.svg extract-glyphs.xsl > tmp/Petaluma-bounding-boxes.svg
 phantomjs generate-bbox.js tmp/Petaluma-bounding-boxes.svg ../data/Petaluma.xml json/petaluma_metadata.json
 
+echo "Generating Leland files ..."
+saxon Leland.svg extract-glyphs.xsl > tmp/Leland-bounding-boxes.svg
+phantomjs generate-bbox.js tmp/Leland-bounding-boxes.svg ../data/Leland.xml json/leland_metadata.json
+
 echo "Done!"

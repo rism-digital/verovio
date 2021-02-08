@@ -290,6 +290,11 @@ void Page::LayOutHorizontally()
     Functor calcDots(&Object::CalcDots);
     this->Process(&calcDots, &calcDotsParams);
 
+    // Adjust the position of outside articulations
+    CalcArticParams calcArticParams(doc);
+    Functor calcArtic(&Object::CalcArtic);
+    this->Process(&calcArtic, &calcArticParams);
+
     // Render it for filling the bounding box
     View view;
     view.SetDoc(doc);
@@ -297,6 +302,11 @@ void Page::LayOutHorizontally()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    // Adjust the position of outside articulations
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
 
     // Adjust the x position of the LayerElement where multiple layer collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
@@ -324,6 +334,12 @@ void Page::LayOutHorizontally()
         doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
+    // Adjust the spacing of clef changes since they are skipped in AdjustXPos
+    // Look at each clef change and  move them to the left and add space if necessary
+    Functor adjustClefChanges(&Object::AdjustClefChanges);
+    AdjustClefsParams adjustClefChangesParams(doc);
+    this->Process(&adjustClefChanges, &adjustClefChangesParams);
+
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     PrepareProcessingListsParams prepareProcessingListsParams;
@@ -342,6 +358,11 @@ void Page::LayOutHorizontally()
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+
+    // Adjust the tempo
+    Functor adjustTempo(&Object::AdjustTempo);
+    AdjustTempoParams adjustTempoParams(doc);
+    this->Process(&adjustTempo, &adjustTempoParams);
 
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsXParams(doc);
@@ -386,11 +407,6 @@ void Page::LayOutVertically()
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
-    // Adjust the position of outside articulations
-    FunctorDocParams calcArticParams(doc);
-    Functor calcArtic(&Object::CalcArtic);
-    this->Process(&calcArtic, &calcArticParams);
-
     // Render it for filling the bounding box
     View view;
     BBoxDeviceContext bBoxDC(&view, 0, 0);
@@ -422,6 +438,10 @@ void Page::LayOutVertically()
 
     // If slurs were adjusted we need to redraw to adjust the bounding boxes
     if (adjustSlursParams.m_adjusted) {
+        // There is a problem here with cross-staff slurs: if they have been ajusted, the
+        // Slur::m_isCrossStaff flag will trigger View::DrawSlurInitial to be called again.
+        // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
+        // but in between, we can have wrong collisions detections. To be improved
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
@@ -458,6 +478,13 @@ void Page::LayOutVertically()
     Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);
     this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
+
+    // Redraw are re-adjust the position of the slurs when we have cross-staff ones
+    if (adjustSlursParams.m_crossStaffSlurs) {
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+        this->Process(&adjustSlurs, &adjustSlursParams);
+    }
 
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();

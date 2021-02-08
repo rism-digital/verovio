@@ -267,7 +267,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
     if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
-        code = this->GetMensuralSmuflNoteHead();
+        code = this->GetMensuralNoteheadGlyph();
         p.y = doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
@@ -298,7 +298,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     // See comment above
     if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
-        code = this->GetMensuralSmuflNoteHead();
+        code = this->GetMensuralNoteheadGlyph();
         p.y = -doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
@@ -352,7 +352,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff)
     return baseStem;
 }
 
-wchar_t Note::GetMensuralSmuflNoteHead()
+wchar_t Note::GetMensuralNoteheadGlyph()
 {
     assert(this->IsMensuralDur());
 
@@ -584,7 +584,7 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
     wchar_t flagGlyph = SMUFL_E242_flag16thUp;
     data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetSmuflCode(GetDrawingStemDir());
+    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(GetDrawingStemDir());
     const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
 
     const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
@@ -759,6 +759,67 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
         Fermata *fermata = new Fermata();
         fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &artic : params->m_articsToConvert) {
+        artic->SplitMultival(this);
+    }
+    params->m_articsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::CalcArtic(FunctorParams *functorParams)
+{
+    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
+    assert(params);
+
+    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
+
+    params->m_parent = this;
+    params->m_stemDir = this->GetDrawingStemDir();
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    params->m_staffAbove = staff;
+    params->m_staffBelow = staff;
+    params->m_layerAbove = layer;
+    params->m_layerBelow = layer;
+    params->m_crossStaffAbove = false;
+    params->m_crossStaffBelow = false;
+
+    if (this->m_crossStaff) {
+        params->m_staffAbove = this->m_crossStaff;
+        params->m_staffBelow = this->m_crossStaff;
+        params->m_layerAbove = this->m_crossLayer;
+        params->m_layerBelow = this->m_crossLayer;
+        params->m_crossStaffAbove = true;
+        params->m_crossStaffBelow = true;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::AdjustArtic(FunctorParams *functorParams)
+{
+    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
+    assert(params);
+
+    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
+
+    params->m_parent = this;
+    params->m_articAbove.clear();
+    params->m_articBelow.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -1041,7 +1102,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         currentStem->AttGraced::operator=(*this);
         currentStem->AttStems::operator=(*this);
         currentStem->AttStemsCmn::operator=(*this);
-        if (this->GetActualDur() < DUR_2) {
+        if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
             currentStem->IsVirtual(true);
         }
     }
@@ -1108,19 +1169,6 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
 
     params->m_lastButOneNote = params->m_lastNote;
     params->m_lastNote = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::PreparePointersByLayer(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::PreparePointersByLayer(functorParams);
-
-    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
-    assert(params);
-
-    params->m_currentNote = this;
 
     return FUNCTOR_CONTINUE;
 }

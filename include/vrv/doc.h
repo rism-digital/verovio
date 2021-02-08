@@ -221,17 +221,22 @@ public:
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-    void SetCurrentScoreDefDoc(bool force = false);
+    void ScoreDefSetCurrentDoc(bool force = false);
 
     /**
      * Check whether we need to optimize score based on the condense option
      */
-    bool IsOptimizationNeeded();
+    bool ScoreDefNeedsOptimization();
 
     /**
      * Optimize the scoreDef once the document is cast-off.
      */
-    void OptimizeScoreDefDoc();
+    void ScoreDefOptimizeDoc();
+
+    /**
+     * Set the GrpSym start / end for each System once ScoreDef is set and (if necessary) optimized
+     */
+    void ScoreDefSetGrpSymDoc();
 
     /**
      * Prepare the document for drawing.
@@ -247,6 +252,12 @@ public:
     void CastOffDoc();
 
     /**
+     * Casts off the entire document, only using the document's system breaks
+     * if they would be close to the end in the normal document.
+     */
+    void CastOffSmartDoc();
+
+    /**
      * Casts off the entire document, using the document's line breaks,
      * but adding its own page breaks.
      */
@@ -255,9 +266,10 @@ public:
     /**
      * Casts off the entire document, with options for obeying breaks.
      * @param useSb - true to use the sb from the document.
-     * @param usePg - true to use the pb from the document.
+     * @param usePb - true to use the pb from the document.
+     * @param smart - true to sometimes use encoded sb and pb.
      */
-    void CastOffDocBase(bool useSb, bool usePb);
+    void CastOffDocBase(bool useSb, bool usePb, bool smart = false);
 
     /**
      * Casts off the running elements (headers and footer)
@@ -502,7 +514,7 @@ private:
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.
-     * If yes, SetCurrentScoreDef will not parse the document (again) unless
+     * If yes, ScoreDefSetCurrent will not parse the document (again) unless
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;
