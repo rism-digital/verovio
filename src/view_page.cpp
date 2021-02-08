@@ -70,7 +70,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
 
     // Set the current score def to the page one
-    // The page one has previously been set by Object::SetCurrentScoreDef
+    // The page one has previously been set by Object::ScoreDefSetCurrent
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
     if (m_options->m_shrinkToFit.GetValue()) {

@@ -184,7 +184,7 @@ bool System::SetCurrentFloatingPositioner(
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
@@ -304,7 +304,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 // System functor methods
 //----------------------------------------------------------------------------
 
-int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -316,9 +316,9 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::OptimizeScoreDef(FunctorParams *functorParams)
+int System::ScoreDefOptimize(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     this->IsDrawingOptimized(true);
@@ -336,15 +336,27 @@ int System::OptimizeScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
+int System::ScoreDefOptimizeEnd(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
     m_systemAligner.SetSpacing(params->m_currentScoreDef);
 
     return FUNCTOR_CONTINUE;
+}
+
+int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
+{
+    ScoreDefSetGrpSymParams *params = vrv_params_cast<ScoreDefSetGrpSymParams *>(functorParams);
+    assert(params);
+
+    assert(m_drawingScoreDef);
+
+    m_drawingScoreDef->Process(params->m_functor, functorParams);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)

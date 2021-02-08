@@ -1223,7 +1223,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int AlignmentReference::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int AlignmentReference::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     Alignment *alignment = vrv_cast<Alignment *>(this->GetParent());
     assert(alignment);

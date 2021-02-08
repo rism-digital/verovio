@@ -1416,9 +1416,9 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetCurrentScoreDef(FunctorParams *functorParams)
+int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
 {
-    SetCurrentScoreDefParams *params = vrv_params_cast<SetCurrentScoreDefParams *>(functorParams);
+    ScoreDefSetCurrentParams *params = vrv_params_cast<ScoreDefSetCurrentParams *>(functorParams);
     assert(params);
 
     assert(params->m_upcomingScoreDef);

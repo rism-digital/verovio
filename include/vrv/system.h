@@ -132,17 +132,22 @@ public:
     //----------//
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
     ///@{
-    virtual int OptimizeScoreDef(FunctorParams *functorParams);
-    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+    virtual int ScoreDefOptimize(FunctorParams *functorParams);
+    virtual int ScoreDefOptimizeEnd(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::ScoreDefSetGrpSym
+     */
+    virtual int ScoreDefSetGrpSym(FunctorParams *functorParams);
 
     /**
      * See Object::ResetHorizontalAlignment

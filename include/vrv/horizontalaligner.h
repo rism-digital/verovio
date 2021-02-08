@@ -333,9 +333,9 @@ public:
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
 private:
     //

@@ -65,14 +65,9 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareGroupSymbols
+     * See Object::ScoreDefSetGrpSym
      */
-    virtual int PrepareGroupSymbols(FunctorParams *functorParams);
-
-    /**
-     * See Object::OptimizeScoreDef
-     */
-    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+    virtual int ScoreDefSetGrpSym(FunctorParams *functorParams);
 
 private:
     //

@@ -317,7 +317,7 @@ int Measure::GetDrawingOverflow()
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
@@ -577,9 +577,9 @@ int Measure::SaveEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
 }
 
-int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int Measure::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
-    UnsetCurrentScoreDefParams *params = vrv_params_cast<UnsetCurrentScoreDefParams *>(functorParams);
+    ScoreDefUnsetCurrentParams *params = vrv_params_cast<ScoreDefUnsetCurrentParams *>(functorParams);
     assert(params);
 
     if (m_drawingScoreDef) {
@@ -593,9 +593,9 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::OptimizeScoreDef(FunctorParams *functorParams)
+int Measure::ScoreDefOptimize(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     if (!params->m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
