@@ -309,7 +309,7 @@ void View::DrawStaffGrp(
 
     // draw the system start bar line
     if (topStaffGrp
-        && ((((firstDef != lastDef) || staffGrp->HasSymbol())
+        && ((((firstDef != lastDef) || staffGrp->GetFirst(GRPSYM))
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
         // int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
