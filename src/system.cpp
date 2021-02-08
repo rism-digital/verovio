@@ -352,9 +352,7 @@ int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
     ScoreDefSetGrpSymParams *params = vrv_params_cast<ScoreDefSetGrpSymParams *>(functorParams);
     assert(params);
 
-    assert(m_drawingScoreDef);
-
-    m_drawingScoreDef->Process(params->m_functor, functorParams);
+    if (m_drawingScoreDef) m_drawingScoreDef->Process(params->m_functor, functorParams);
 
     return FUNCTOR_SIBLINGS;
 }
