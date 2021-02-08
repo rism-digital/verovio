@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
 * Support for `artic@glyph.num`
 * Support for arabic accidentals
