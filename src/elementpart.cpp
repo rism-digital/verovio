@@ -531,7 +531,9 @@ int Stem::CalcStem(FunctorParams *functorParams)
         flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
-        if (!this->HasStemLen() && this->HasStemMod()) slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
+            slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        }
     }
 
     // Adjust basic stem length to number of slashes
