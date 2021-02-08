@@ -761,6 +761,9 @@ void Doc::PrepareDrawing()
             syl->CreateDefaultZone(this);
         }
     }
+    
+    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
+    m_mdivScoreDef.Process(&scoreDefSetGrpSym, NULL);
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
