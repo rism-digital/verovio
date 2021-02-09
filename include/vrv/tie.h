@@ -13,6 +13,10 @@
 
 namespace vrv {
 
+class Chord;
+class Layer;
+class Note;
+
 //----------------------------------------------------------------------------
 // Tie
 //----------------------------------------------------------------------------
@@ -47,6 +51,8 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
+    bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
+
     //----------//
     // Functors //
     //----------//
@@ -65,6 +71,15 @@ public:
 
 private:
     //
+    data_STEMDIRECTION CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, int spanningType,
+        bool isOuterChordNote, Point &startPoint, Point &endPoint);
+
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        Layer *layer, Note *note, Chord *startParentChord, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
+
+    void UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement, int thickness,
+        int height, curvature_CURVEDIR drawingCurveDir);
+
 public:
     //
 private:
