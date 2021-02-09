@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 31 21:47:47 PST 2021
+// Last Modified: Sat Feb  6 16:40:38 PST 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -48359,6 +48359,278 @@ ostream& operator<<(ostream& out, PixelColor apixel) {
 
 /////////////////////////////////
 //
+// Tool_autoaccid::Tool_autoaccid -- Set the recognized options for the tool.
+//
+
+Tool_autoaccid::Tool_autoaccid(void) {
+	define("x|visual=b", "mark visual accidentals only");
+	define("y|suppressed=b", "mark hidden accidentals only");
+	define("r|remove=b", "remove accidental qualifications");
+	define("c|keep-cautionary|keep-courtesy|cautionary|caution|courtesy=b", "keep cautionary accidentals when removing markers");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_autoaccid::run -- Do the main work of the tool.
+//
+
+bool Tool_autoaccid::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_autoaccid::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_autoaccid::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_autoaccid::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autoaccid::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_autoaccid::initialize(void) {
+	m_visualQ   = getBoolean("visual");
+	m_hiddenQ   = getBoolean("suppressed");
+	m_removeQ   = getBoolean("remove");
+	m_cautionQ  = getBoolean("keep-cautionary");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autoaccid::processFile --
+//
+
+void Tool_autoaccid::processFile(HumdrumFile& infile) {
+	initialize();
+	if (m_removeQ) {
+		removeAccidentalQualifications(infile);
+	} else {
+		infile.analyzeKernAccidentals();
+		addAccidentalQualifications(infile);
+	}
+	infile.createLinesFromTokens();
+}
+
+
+//////////////////////////////
+//
+// Tool_autoaccid::addAccidentalQualifications --
+//
+//
+
+void Tool_autoaccid::addAccidentalQualifications(HumdrumFile& infile) {
+	int scount = infile.getStrandCount();
+	HumRegex hre;
+	for (int i=0; i<scount; i++) {
+		HTp sbegin = infile.getStrandBegin(i);
+		if (!sbegin->isKern()) {
+			continue;
+		}
+		HTp send   = infile.getStrandEnd(i);
+		HTp current = sbegin;
+		while (current && (current != send)) {
+			if (!current->isData()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isNull()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isRest()) {
+				current = current->getNextToken();
+				continue;
+			}
+			addAccidentalInfo(current);
+			current = current->getNextToken();
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autoaccid::addAccidentalInfo --
+//
+// Analysis have several parameters:
+//      visualAccidental = true :: need to add an X after the accidental
+//      visualAccidental = false :: need to add an y after the accidental
+// also:
+//      cautionaryAccidental = "true" :: 
+//      obligatoryAccidental = "true" :: 
+//
+
+void Tool_autoaccid::addAccidentalInfo(HTp token) {
+	vector<string> subtokens;
+	subtokens = token->getSubtokens();
+	if (subtokens.size() == 1) {
+		bool visual = token->getValueBool("auto", "0", "visualAccidental");
+		subtokens[0] = setVisualState(subtokens[0], visual);
+	} else {
+		for (int i=0; i<(int)subtokens.size(); i++) {
+			bool visual = token->getValueBool("auto", to_string(i+1), "visualAccidental");
+			subtokens[i] = setVisualState(subtokens[i], visual);
+		}
+	}
+	string text;
+	for (int i=0; i<(int)subtokens.size(); i++) {
+		text += subtokens[i];
+		if (i < (int)subtokens.size() - 1) {
+			text += ' ';
+		}
+	}
+	token->setText(text);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autoaccid::setVisualState -- 
+//
+
+string Tool_autoaccid::setVisualState(const string& input, bool state) {
+	HumRegex hre;
+	if (hre.search(input, "[-#n][Xy]")) {
+		// do not remark accidental
+		return input;
+	}
+	bool hasNatural = hre.search(input, "n");
+	bool hasFlat    = hre.search(input, "-");
+	bool hasSharp   = hre.search(input, "#");
+	bool accidental = hasNatural || hasFlat || hasSharp;
+	string output;
+	if (m_visualQ) {
+		if (state) {
+			if (!accidental) {
+				// need to show a natural accidental (and add the natural sign)
+				output = hre.replaceCopy(input, "$1nX", "([A-Ga-g]+)");
+			} else {
+				// force accidental to display
+				output = hre.replaceCopy(input, "$1X", "([-#n]+)");
+			}
+		} else {
+			// do nothing
+		}
+	} else if (m_hiddenQ) {
+		if (!state) {
+			if (accidental) {
+				// force accidental to be hidden
+				output = hre.replaceCopy(input, "$1y", "([-#n]+)");
+			} else {
+				output = input;
+			}
+		}
+	} else {
+		// force display/hide state for accidental
+		if (state) {
+			if (!accidental) {
+				// need to show a natural accidental (and add the natural sign)
+				output = hre.replaceCopy(input, "$1nX", "([A-Ga-g]+)");
+			} else {
+				// force accidental to display
+				output = hre.replaceCopy(input, "$1X", "([-#n]+)");
+			}
+		} else {
+			if (accidental) {
+				// force accidental to be hidden
+				output = hre.replaceCopy(input, "$1y", "([-#n]+)");
+			} else {
+				output = input;
+			}
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autoaccid::removeAccidentalQualifications --
+//
+//
+
+void Tool_autoaccid::removeAccidentalQualifications(HumdrumFile& infile) {
+	int scount = infile.getStrandCount();
+	HumRegex hre;
+	for (int i=0; i<scount; i++) {
+		HTp sbegin = infile.getStrandStart(i);
+		if (!sbegin->isKern()) {
+			continue;
+		}
+		HTp send   = infile.getStrandEnd(i);
+		HTp current = sbegin;
+		while (current && (current != send)) {
+			if (!current->isData()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isNull()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isRest()) {
+				current = current->getNextToken();
+				continue;
+			}
+			string text = current->getText();
+			if (m_visualQ) {
+				hre.replaceDestructive(text, "$1", "([-#n]+)X(?!X)", "g");
+			} else if (m_hiddenQ) {
+				hre.replaceDestructive(text, "$1", "([-#n]+)y(?!y)", "g");
+			} else {
+				hre.replaceDestructive(text, "$1", "([-#n]+)X(?!X)", "g");
+				hre.replaceDestructive(text, "$1", "([-#n]+)y(?!y)", "g");
+			}
+		}
+		current = current->getNextToken();
+	}
+}
+
+
+
+
+
+
+/////////////////////////////////
+//
 // Tool_autobeam::Tool_autobeam -- Set the recognized options for the tool.
 //
 
@@ -55295,13 +55567,14 @@ void Tool_colortriads::processFile(HumdrumFile& infile) {
 //
 
 Tool_composite::Tool_composite(void) {
-	define("pitch=s:e",    "pitch to display for composite rhythm");
+	define("pitch=s:eR",   "pitch to display for composite rhythm");
 	define("debug=b",      "print debugging information");
-	define("group=b",      "group into separate composite steams by group labels");
+	define("g|group=b",    "separate composite steams by group labels (*grp:A and *grp:B)");
 	define("a|append=b",   "append data to end of line");
 	define("p|prepend=b",  "prepend data to end of line");
 	define("b|beam=b",     "apply automatic beaming");
 	define("G|no-grace=b", "do not include grace notes");
+	define("poly=b",       "set options for polyrhythm project");
 }
 
 
@@ -55373,16 +55646,24 @@ void Tool_composite::initialize(void) {
 
 void Tool_composite::processFile(HumdrumFile& infile) {
 	Tool_extract extract;
-	bool groupQ = getBoolean("group");
-	bool appendQ = getBoolean("append");
-	bool prependQ = getBoolean("prepend");
-	bool graceQ = !getBoolean("no-grace");
-	bool debugQ = getBoolean("debug");
-	vector<vector<string>> grouping;
+	bool groupQ = getBoolean("group");     // split composite rhythm into separate streams
+	bool appendQ = getBoolean("append");   // append composite analysis to input data.
+	bool prependQ = getBoolean("prepend"); // prepend composite analysis to input data.
+	bool graceQ = !getBoolean("no-grace"); // show grace notes in composite rhythm.
+	bool debugQ = getBoolean("debug");     // print debugging information.
+
+	if (getBoolean("poly")) {
+		groupQ = true;
+		if (!appendQ) {
+			prependQ = true;
+		}
+	}
+
 	if (groupQ) {
-		setupGrouping(grouping, infile);
-		if (debugQ) {
-			printGroupingInfo(grouping);
+		assignGroups(infile);
+		analyzeLineGroups(infile);
+		if ((1) || debugQ) {
+			printGroupAssignments(infile);
 			return;
 		}
 	}
@@ -55589,7 +55870,7 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 					}
 
 					if (groupQ) {
-						string group = grouping.at(i).at(j);
+						string group = infile.token(i, j)->getValue("auto", "group");
 						if (group == "A") {
 							targettok->setText(full);
 						} else if (group == "B") {
@@ -55616,9 +55897,9 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 		}
 
 		if (groupQ) {
-
-			bool grpa = hasGroup(grouping, originalfile, i, "A");
-			bool grpb = hasGroup(grouping, originalfile, i, "B");
+/*
+			//bool grpa = hasGroup(originalfile, i, "A");
+			//bool grpb = hasGroup(originalfile, i, "B");
 			// int atype = getGroupNoteType(grouping, originalfile, i, "A");
 			// int btype = getGroupNoteType(grouping, originalfile, i, "A");
 cerr << "GRPA " << grpa << " GRPB " << grpb << " LINE " << originalfile[i] << endl;
@@ -55710,11 +55991,146 @@ cerr << "GRPA " << grpa << " GRPB " << grpb << " LINE " << originalfile[i] << en
 				string tstring = to_string(trackcount);
 				autobeam.setModified("t", tstring);
 			}
+*/
 		}
+
 		// need to analyze structure for some reason:
-		infile.analyzeStrands();
-		autobeam.run(infile);
+//		infile.analyzeStrands();
+//		autobeam.run(infile);
+
 	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::analyzeLineGroups -- Look at each line for Group A and B and determine if
+//    And one of five activity types are possible for the line:
+//        group:A:type = "note"   if there is at least one note attack in group A on the line.
+//        group:A:type = "ncont"  if there is no attack but at least one note sustain in group A.
+//        group:A:type = "rest"   if there is no note attack or sustain but there is a rest start.
+//        group:A:type = "rcont"  if there is a rest continuing in group A on the line.
+//        group:A:type = "empty"  if there is no activity for group A on the line.
+//
+
+void Tool_composite::analyzeLineGroups(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (!infile[i].data()) {
+			continue;
+		}
+		analyzeLineGroup(infile, i, "A");
+		analyzeLineGroup(infile, i, "B");
+	}
+}
+
+void Tool_composite::analyzeLineGroup(HumdrumFile& infile, int line, const string& target) {
+	vector<HTp> tokens;  // list of tokens on line with given target group
+	bool graceline = false;
+	if (infile[line].getDuration() == 0) {
+		graceline = true;
+	}
+	for (int i=0; i<infile[line].getFieldCount(); i++) {
+		HTp token = infile.token(line, i);
+		if (!token->isKern()) {
+			continue;
+		}
+		string group = token->getValue("auto", "group");
+		if (group != target) {
+			continue;
+		}
+		tokens.push_back(token);
+	}
+	if (tokens.empty()) {
+		infile[line].setValue("group", target, "type", "empty");
+		return;
+	}
+
+	// See if there is a note-attack for the group:
+	// [Deal with chords having different tie states later.]
+	bool hasAttack = false;
+	for (int i=0; i<(int)tokens.size(); i++) {
+		if (tokens[i]->isNull()) {
+			continue;
+		}
+		if (tokens[i]->find("_") != string::npos) {
+			continue;
+		}
+		if (tokens[i]->find("]") != string::npos) {
+			continue;
+		}
+		if (tokens[i]->find("r") != string::npos) {
+			continue;
+		}
+		hasAttack = true;
+		break;
+	}
+	if (hasAttack) {
+		infile[line].setValue("group", target, "type", "note");
+		return;
+	}
+
+	// See if there is a note sustain for the group:
+	bool hasSustain = false;
+	HTp resolved = NULL;
+	for (int i=0; i<(int)tokens.size(); i++) {
+		if (tokens[i]->find("r") != string::npos) {
+			continue;
+		}
+		if (tokens[i]->find("_") != string::npos) {
+			hasSustain = true;
+			break;
+		}
+		if (tokens[i]->find("]") != string::npos) {
+			hasSustain = true;
+			break;
+		}
+		if (tokens[i]->isNull()) {
+			resolved =  tokens[i]->resolveNull();
+		} else {
+			resolved = tokens[i];
+		}
+		if (!resolved) {
+			continue;
+		}
+		if (resolved->isRest()) {
+			continue;
+		}
+		hasSustain = true;
+		break;
+	}
+	if (hasSustain) {
+		if (graceline) {
+			// Ignore sustains (or rests) on grace lines.
+			infile[line].setValue("group", target, "type", "empty");
+			return;
+		} else {
+			infile[line].setValue("group", target, "type", "ncont");
+			return;
+		}
+	}
+			
+	// See if there is the start of a rest on the line
+	bool hasRest = false;
+	for (int i=0; i<(int)tokens.size(); i++) {
+		if (tokens[i]->find("r") != string::npos) {
+			hasRest = true;
+			break;
+		}
+	}
+	if (hasRest) {
+		if (graceline) {
+			// Ignore rests on grace lines
+			
+		} else {
+		}
+	}
+
+
+
 
 }
 
@@ -55752,12 +56168,12 @@ int Tool_composite::getGroupNoteType(vector<vector<string>>& grouping, HumdrumFi
 // Tool_composite::hasGroup --
 //
 
-bool Tool_composite::hasGroup(vector<vector<string>>& grouping, HumdrumFile& infile, int line,
-		const string& group) {
+bool Tool_composite::hasGroup(HumdrumFile& infile, int line, const string& group) {
 	if (!infile[line].isData()) {
 		return false;
 	}
-	for (int i=0; i<(int)grouping[line].size(); i++) {
+/*
+	for (int i=0; i<infile[line].getFieldCount(); i++) {
 		HTp token = infile.token(line, i);
 		if (!token->isKern()) {
 			continue;
@@ -55773,6 +56189,7 @@ bool Tool_composite::hasGroup(vector<vector<string>>& grouping, HumdrumFile& inf
 			return true;
 		}
 	}
+*/
 	return false;
 }
 
@@ -55809,14 +56226,13 @@ HumNum Tool_composite::getLineDuration(HumdrumFile& infile, int index, vector<bo
 
 //////////////////////////////
 //
-// Tool_composite::setupGrouping --
+// Tool_composite::assignGroups -- Add a parameter auto:grouping = "A" or "B" depending on the 
+//    group.  This can be generalized later to more letters, or arbitrary strings perhaps.
+//    This comes from an interpretation such as *grp:A or *grp:B in the data.  If *grp: is found
+//    without a letter, than that group will be null group.
 //
 
-void Tool_composite::setupGrouping(vector<vector<string>>& grouping, HumdrumFile& infile) {
-	grouping.resize(infile.getLineCount());
-	for (int i=0; i<infile.getLineCount(); i++) {
-		grouping[i].resize(infile[i].getFieldCount());
-	}
+void Tool_composite::assignGroups(HumdrumFile& infile) {
 
 	int maxtrack = infile.getMaxTrack();
 	vector<vector<string>> current;
@@ -55850,9 +56266,8 @@ void Tool_composite::setupGrouping(vector<vector<string>>& grouping, HumdrumFile
   				current.at(track-1).at(subtrack-1) = "";
 			}
          string group = getGroup(current, track-1, subtrack-1);
-			grouping.at(i).at(j) = group;
+			token->setValue("auto", "group", group);
 		}
-
 	}
 }
 
@@ -55890,16 +56305,24 @@ string Tool_composite::getGroup(vector<vector<string>>& current, int spine, int 
 
 //////////////////////////////
 //
-// Tool_composite::printGroupingInfo -- for debugging of group assignments.
+// Tool_composite::printGroupAssignments -- for debugging of group assignments.
 //
 
-void Tool_composite::printGroupingInfo(vector<vector<string>>& grouping) {
-	for (int i=0; i<(int)grouping.size(); i++) {
-		if (!grouping.empty()) {
-			cerr << grouping[i][0];
-			for (int j=1; j<(int)grouping[i].size(); j++) {
-				cerr << "\t" << grouping[i][j];
-
+void Tool_composite::printGroupAssignments(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			cerr << infile[i] << endl;
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			string value = token->getValue("auto", "group");
+			cerr << token;
+			if (!value.empty()) {
+				cerr << "{" << value << "}";
+			}
+			if (j < infile[i].getFieldCount() - 1) {
+				cerr << "\t";
 			}
 		}
 		cerr << endl;
@@ -62410,7 +62833,9 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 	vector<pair<string, string> > commands;
 	getCommandList(commands, infile);
 	for (int i=0; i<(int)commands.size(); i++) {
-		if (commands[i].first == "autobeam") {
+		if (commands[i].first == "autoaccid") {
+			RUNTOOL(autoaccid, infile, commands[i].second, status);
+		} else if (commands[i].first == "autobeam") {
 			RUNTOOL(autobeam, infile, commands[i].second, status);
 		} else if (commands[i].first == "autostem") {
 			RUNTOOL(autostem, infile, commands[i].second, status);
@@ -62753,6 +63178,298 @@ void Tool_filter::getUniversalCommandList(vector<pair<string, string> >& command
 
 void Tool_filter::initialize(HumdrumFile& infile) {
 	m_debugQ = getBoolean("debug");
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_fixps::Tool_fixps -- Set the recognized options for the tool.
+//
+
+Tool_fixps::Tool_fixps(void) {
+	// define ("n|only-remove-empty-transpositions=b", "Only remove empty transpositions");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_fixps::run -- Primary interfaces to the tool.
+//
+
+bool Tool_fixps::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_fixps::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_fixps::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+//
+// In-place processing of file:
+//
+
+bool Tool_fixps::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fixps::processFile --
+//
+
+void Tool_fixps::processFile(HumdrumFile& infile) {
+	removeDuplicateDynamics(infile);
+	markEmptyVoices(infile);
+	vector<vector<HTp>> newlist;
+	removeEmpties(newlist, infile);
+	outputNewSpining(newlist, infile);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fixps::outputNewSpining --
+//
+
+void Tool_fixps::outputNewSpining(vector<vector<HTp>>& newlist, HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		if ((i > 0) && (!newlist[i].empty()) && newlist[i][0]->isCommentLocal()) {
+			if (!newlist[i-1].empty() && newlist[i-1][0]->isCommentLocal()) {
+				if (newlist[i].size() == newlist[i-1].size()) {
+					bool same = true;
+					for (int j=0; j<(int)newlist[i].size(); j++) {
+						if (*(newlist[i][j]) != *(newlist[i-1][j])) {
+cerr << "GOT HERE " << i << " " << j << endl;
+cerr << infile[i-1] << endl;
+cerr << infile[i] << endl;
+cerr << endl;
+							same = false;
+							break;
+						}
+					}
+					if (same) {
+						continue;
+					}
+				}
+			}
+		}
+		if (!infile[i].isManipulator()) {
+			m_humdrum_text << newlist[i].at(0);
+			for (int j=1; j<(int)newlist[i].size(); j++) {
+				m_humdrum_text << "\t";
+				m_humdrum_text << newlist[i].at(j);
+			}
+			m_humdrum_text << endl;
+			continue;
+		}
+		if ((i > 0) && !infile[i-1].isManipulator()) {
+			printNewManipulator(infile, newlist, i);
+		}
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_fixps::printNewManipulator --
+//
+
+void Tool_fixps::printNewManipulator(HumdrumFile& infile, vector<vector<HTp>>& newlist, int line) {
+	HTp token = infile.token(line, 0);
+	if (*token == "*-") {
+		m_humdrum_text << infile[line] << endl;
+		return;
+	}
+	if (token->compare(0, 2, "**") == 0) {
+		m_humdrum_text << infile[line] << endl;
+		return;
+	}
+	m_humdrum_text << "++++++++++++++++++++" << endl;
+}
+
+//////////////////////////////
+//
+// Tool_fixps::removeDuplicateDynamics --
+//
+
+void Tool_fixps::removeDuplicateDynamics(HumdrumFile& infile) {
+	int scount = infile.getStrandCount();
+	for (int i=0; i<scount; i++) {
+		HTp sstart = infile.getStrandBegin(i);
+		if (!sstart->isDataType("**dynam")) {
+			continue;
+		}
+		HTp send   = infile.getStrandEnd(i);
+		HTp current = sstart;
+		while (current && (current != send)) {
+			vector<string> subtoks = current->getSubtokens();
+			if (subtoks.size() % 2 == 1) {
+				current = current->getNextToken();
+				continue;
+			}
+			bool equal = true;
+			int half = (int)subtoks.size() / 2;
+			for (int j=0; j<half; j++) {
+				if (subtoks[i] != subtoks[i+half]) {
+					equal = false;
+				}
+			}
+			if (equal) {
+				string newtext = subtoks[0];
+				for (int j=1; j<half; j++) {
+					newtext += " ";
+					newtext += subtoks[j];
+				}
+				current->setText(newtext);
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fixps::removeEmpties --
+//
+
+void Tool_fixps::removeEmpties(vector<vector<HTp>>& newlist, HumdrumFile& infile) {
+	newlist.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (infile[i].isManipulator()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			string value = token->getValue("delete");
+			if (value == "true") {
+				continue;
+			}
+			newlist[i].push_back(token);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fixps::markEmptyVoices --
+//
+
+void Tool_fixps::markEmptyVoices(HumdrumFile& infile) {
+	HLp barline = NULL;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (infile[i].isManipulator()) {
+			continue;
+		}
+		if (infile[i].isInterpretation()) {
+			if (infile.token(i, 0)->compare(0, 2, "**")) {
+				barline = &infile[i];
+			}
+			continue;
+		}
+		if (infile[i].isBarline()) {
+			barline = &infile[i];
+		}
+		if (!infile[i].isData()) {
+			continue;
+		}
+		if (!barline) {
+			continue;
+		}
+		// check on the data line if:
+		// * it is in the first subspine
+		// * it is an invisible rest
+		// * it takes the full duration of the measure
+		// If so, then mark the tokens for deletion in that layer.
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			// int track = token->getTrack();
+			int subtrack = token->getSubtrack();
+			if (subtrack != 1) {
+				continue;
+			}
+			if (token->find("yy") == string::npos) {
+				continue;
+			}
+			if (!token->isRest()) {
+				continue;
+			}
+			HumNum duration = token->getDuration();
+			HumNum bardur = token->getDurationToBarline();
+			HTp current = token;
+			while (current) {
+			   subtrack = current->getSubtrack();
+				if (subtrack != 1) {
+					break;
+				}
+				current->setValue("delete", "true");
+				if (current->isBarline()) {
+					break;
+				}
+				current = current->getNextToken();
+			}
+			current = token;
+			current = current->getPreviousToken();
+			while (current) {
+				if (current->isManipulator()) {
+					break;
+				}
+				if (current->isBarline()) {
+					break;
+				}
+				subtrack = current->getSubtrack();
+				if (subtrack != 1) {
+					break;
+				}
+				current->setValue("delete", "true");
+				current = current->getPreviousToken();
+			}
+		}
+	}
+
 }
 
 

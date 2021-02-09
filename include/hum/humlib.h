@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 31 21:47:47 PST 2021
+// Last Modified: Sat Feb  6 16:40:38 PST 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5276,6 +5276,33 @@ class HumdrumFileSet {
 
 
 
+class Tool_autoaccid : public HumTool {
+	public:
+		         Tool_autoaccid    (void);
+		        ~Tool_autoaccid    () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void    processFile        (HumdrumFile& infile);
+		void    initialize         (void);
+		void    addAccidentalInfo  (HTp token);
+		void    removeAccidentalQualifications(HumdrumFile& infile);
+		void    addAccidentalQualifications(HumdrumFile& infile);
+		string  setVisualState     (const string& input, bool state);
+
+	private:
+		bool    m_visualQ;
+		bool    m_hiddenQ;
+		bool    m_removeQ;
+		bool    m_cautionQ;
+
+};
+
+
 
 class Tool_autobeam : public HumTool {
 	public:
@@ -5747,28 +5774,30 @@ class Tool_colortriads : public HumTool {
 
 class Tool_composite : public HumTool {
 	public:
-		       	   Tool_composite      (void);
-		       	  ~Tool_composite      () {};
+		       	   Tool_composite        (void);
+		       	  ~Tool_composite        () {};
 
-		bool        run                (HumdrumFileSet& infiles);
-		bool        run                (HumdrumFile& infile);
-		bool        run                (const string& indata, ostream& out);
-		bool        run                (HumdrumFile& infile, ostream& out);
+		bool        run                  (HumdrumFileSet& infiles);
+		bool        run                  (HumdrumFile& infile);
+		bool        run                  (const string& indata, ostream& out);
+		bool        run                  (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void        processFile        (HumdrumFile& infile);
-		void        initialize         (void);
-		HumNum      getLineDuration    (HumdrumFile& infile, int index, vector<bool>& isNull);
-		void        setupGrouping      (vector<vector<string>>& grouping, HumdrumFile& infile);
-		void        printGroupingInfo  (vector<vector<string>>& gouping);
-		string      getGroup           (vector<vector<string>>& current, int spine, int subspine);
-		bool        hasGroup           (vector<vector<string>>& grouping, HumdrumFile& infile, int line,
-		                                const string& group);
-		int         getGroupNoteType   (vector<vector<string>>& grouping, HumdrumFile& infile,
-		                                int line, const string& group);
+		void        processFile          (HumdrumFile& infile);
+		void        initialize           (void);
+		HumNum      getLineDuration      (HumdrumFile& infile, int index, vector<bool>& isNull);
+		void        assignGroups         (HumdrumFile& infile);
+		void        analyzeLineGroups    (HumdrumFile& infile);
+		void        analyzeLineGroup     (HumdrumFile& infile, int line, const string& target);
+		void        printGroupAssignments(HumdrumFile& infile);
+		string      getGroup             (vector<vector<string>>& current, int spine, int subspine);
+		bool        hasGroup             (HumdrumFile& infile, int line,
+		                                  const string& group);
+		int         getGroupNoteType     (vector<vector<string>>& grouping, HumdrumFile& infile,
+		                                  int line, const string& group);
 
 	private:
-		string      m_pitch = "e";
+		string      m_pitch = "eR";
 
 };
 
@@ -6164,6 +6193,30 @@ class Tool_filter : public HumTool {
 	private:
 		string   m_variant;        // used with -v option.
 		bool     m_debugQ = false; // used with --debug option
+
+};
+
+
+class Tool_fixps : public HumTool {
+	public:
+		         Tool_fixps         (void);
+		        ~Tool_fixps         () {};
+
+		bool     run                (HumdrumFileSet& infiles);
+		bool     run                (HumdrumFile& infile);
+		bool     run                (const string& indata, ostream& out);
+		bool     run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize         (HumdrumFile& infile);
+		void     processFile        (HumdrumFile& infile);
+		void     markEmptyVoices    (HumdrumFile& infile);
+		void     removeEmpties      (vector<vector<HTp>>& newlist, HumdrumFile& infile);
+		void     removeDuplicateDynamics(HumdrumFile& infile);
+		void     outputNewSpining   (vector<vector<HTp>>& newlist, HumdrumFile& infile);
+		void     printNewManipulator(HumdrumFile& infile, vector<vector<HTp>>& newlist, int line);
+
+	private:
 
 };
 
