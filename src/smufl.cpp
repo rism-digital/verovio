@@ -22,7 +22,7 @@ namespace vrv {
 // A map for the SMUFL names and the glyphs available in Verovio
 //----------------------------------------------------------------------------
 
-const std::map<std::string, int> Resources::s_smuflNames = {
+const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "brace", SMUFL_E000_brace },
     { "bracketTop", SMUFL_E003_bracketTop },
     { "bracketBottom", SMUFL_E004_bracketBottom },

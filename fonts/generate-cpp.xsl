@@ -8,7 +8,7 @@
         <xsl:value-of select="$input-text"/>
         
         <!-- root of the bounding box svg file -->
-        <xsl:text>const std::map&lt;std::string, int&gt; Resources::s_smuflNames = {</xsl:text>
+        <xsl:text>const std::map&lt;std::string, wchar_t&gt; Resources::s_smuflNames = {</xsl:text>
         <xsl:text>&#10;</xsl:text>
         <xsl:apply-templates select="//glyph">
         </xsl:apply-templates>
