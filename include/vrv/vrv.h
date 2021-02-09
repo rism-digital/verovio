@@ -155,6 +155,8 @@ public:
     static Glyph *GetGlyph(wchar_t smuflCode);
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
     static Glyph *GetGlyph(const std::string &smuflName);
+    /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
+    static wchar_t GetGlyphCode(const std::string &smuflName);
     /** Set current text style*/
     static void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle);
     /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
