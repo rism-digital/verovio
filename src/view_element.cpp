@@ -320,8 +320,8 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if (Artic::IsCentered(articValue)) {
         y += (artic->GetDrawingPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
     }
-    // @glyph.num are (usually?) aligned for placement above and needs to be shifted when below
-    else if (artic->HasGlyphNum() && artic->GetDrawingPlace() == STAFFREL_below) {
+    // @glyph.num/name are (usually?) aligned for placement above and needs to be shifted when below
+    else if ((artic->HasGlyphNum() || artic->HasGlyphName()) && artic->GetDrawingPlace() == STAFFREL_below) {
         y -= glyphHeight;
     }
 
