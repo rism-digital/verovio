@@ -175,6 +175,7 @@ private:
     static GlyphTextMap s_textFont;
     static StyleAttributes s_currentStyle;
     static const StyleAttributes k_defaultStyle;
+    static const std::map<std::string, int> s_smuflNames;
 };
 
 //----------------------------------------------------------------------------
