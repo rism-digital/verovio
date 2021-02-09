@@ -1,6 +1,9 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@glyph.name`
+
+## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
 * Support for `artic@glyph.num`
 * Support for arabic accidentals
@@ -10,9 +13,13 @@
 * Improved slurs
 * Improved positioning of ornaments with multiple layers
 * Improved articulations in normal and cross-staff contexts
+* Improved spacing of clef changes
+* Improved timestamp events alignments by avoiding extra-space to be added
+* Improved horizontal alignment of tempo indications (@eNote-GmbH)
 * Embedding of Leland font from MuseScore
+* Method Toolkit::GetTimesForElement for accessing score times (@wergo)
 * Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
-* Options `--top-margin-artic and --bottom-margin-artic for articulation margins
+* Options --top-margin-artic and --bottom-margin-artic for articulation margins
 * Option --tuplet-num-head for placing tuplet numbers on the side of the notehead
 
 ## [3.1.0] - 2021-01-12

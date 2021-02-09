@@ -53,12 +53,12 @@ void GrpSym::Reset()
 
 void GrpSym::SetStartDef(StaffDef *start)
 {
-    if (start && !m_startDef) m_startDef = start;
+    if (start) m_startDef = start;
 }
 
 void GrpSym::SetEndDef(StaffDef *end)
 {
-    if (end && !m_endDef) m_endDef = end;
+    if (end) m_endDef = end;
 }
 
 int GrpSym::GetDrawingX() const
@@ -77,7 +77,7 @@ int GrpSym::GetDrawingY() const
 // GrpSym functor methods
 //----------------------------------------------------------------------------
 
-int GrpSym::PrepareGroupSymbols(FunctorParams *)
+int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
 {
     // For the grpSym that is encoded in the scope of the staffGrp just get first and last staffDefs and set then as
     // starting and ending points

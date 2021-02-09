@@ -162,7 +162,7 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 
 void StaffGrp::SetGroupSymbol(GrpSym *grpSym)
 {
-    if (!m_groupSymbol && grpSym) {
+    if (grpSym) {
         m_groupSymbol = grpSym;
     }
 }
@@ -171,9 +171,9 @@ void StaffGrp::SetGroupSymbol(GrpSym *grpSym)
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
 
-int StaffGrp::OptimizeScoreDefEnd(FunctorParams *)
+int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
 {
-    // OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    // ScoreDefOptimize *params = vrv_params_cast<ScoreDefOptimize *>(functorParams);
     // assert(params);
 
     this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);

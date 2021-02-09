@@ -67,6 +67,11 @@ wchar_t Trill::GetTrillGlyph() const
         wchar_t code = GetGlyphNum();
         if (NULL != Resources::GetGlyph(code)) return code;
     }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
 
     // return default glyph for trill
     return SMUFL_E566_ornamentTrill;
