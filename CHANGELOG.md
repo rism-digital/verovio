@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@glyph.name`
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
