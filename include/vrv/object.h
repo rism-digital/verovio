@@ -764,6 +764,11 @@ public:
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the x position of accidental.
+     */
+    virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * @name Adjust the x position of a right barline in order to make sure the is no text content
      * overlflowing in the right margin
      */
@@ -955,15 +960,15 @@ public:
      * It also includes a scoreDef for each measure where a change occured before.
      * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
-    virtual int SetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
 
     /**
      * Optimize the scoreDef for each system.
      * For automatic breaks, looks for staves with only mRests.
      */
     ///@{
-    virtual int OptimizeScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int OptimizeScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimizeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -974,7 +979,7 @@ public:
     /**
      * Unset the initial scoreDef of each system and measure
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefUnsetCurrent(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
@@ -1007,7 +1012,7 @@ public:
     /**
      * Prepare group symbol starting and ending staffDefs for drawing
      */
-    virtual int PrepareGroupSymbols(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Associate LayerElement with @facs to the appropriate zone

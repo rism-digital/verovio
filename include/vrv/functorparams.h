@@ -504,6 +504,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustTempoParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the systemAligner
+ * member 1: the doc
+ **/
+
+class AdjustTempoParams : public FunctorParams {
+public:
+    AdjustTempoParams(Doc *doc)
+    {
+        m_systemAligner = NULL;
+        m_doc = doc;
+    }
+
+    SystemAligner *m_systemAligner;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustTupletNumOverlapParams
 //----------------------------------------------------------------------------
 
@@ -1617,40 +1638,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// OptimizeScoreDefParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current scoreDef
- * member 1: the current staffDef
- * member 2: the flag indicating if we are optimizing encoded layout
- * member 3: the doc
- **/
-
-class OptimizeScoreDefParams : public FunctorParams {
-public:
-    OptimizeScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
-    {
-        m_currentScoreDef = NULL;
-        m_encoded = false;
-        m_firstScoreDef = true;
-        m_hasFermata = false;
-        m_hasTempo = false;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-    }
-    ScoreDef *m_currentScoreDef;
-    bool m_encoded;
-    bool m_firstScoreDef;
-    bool m_hasFermata;
-    bool m_hasTempo;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-};
-
-//----------------------------------------------------------------------------
 // PrepareBoundariesParams
 //----------------------------------------------------------------------------
 
@@ -1956,8 +1943,11 @@ public:
  * member 0: the previous time position
  * member 1: the previous x rel position
  * member 2: duration of the longest note
- * member 3: the doc
- * member 4: the functor to be redirected to Aligner
+ * member 3: the last alignment that was not timestamp-only
+ * member 4: the list of timestamp-only alignment that needs to be adjusted
+ * member 5: the MeasureAligner
+ * member 6: the Doc
+ * member 7: the functor to be redirected to Aligner
  **/
 
 class SetAlignmentXPosParams : public FunctorParams {
@@ -1968,6 +1958,7 @@ public:
         m_previousXRel = 0;
         m_longestActualDur = 0;
         m_lastNonTimestamp = NULL;
+        m_measureAligner = NULL;
         m_doc = doc;
         m_functor = functor;
     }
@@ -1976,6 +1967,7 @@ public:
     int m_longestActualDur;
     Alignment *m_lastNonTimestamp;
     std::list<Alignment *> m_timestamps;
+    MeasureAligner *m_measureAligner;
     Doc *m_doc;
     Functor *m_functor;
 };
@@ -2001,7 +1993,41 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// SetCurrentScoreDefParams
+// ScoreDefOptimizeParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ * member 2: the flag indicating if we are optimizing encoded layout
+ * member 3: the doc
+ **/
+
+class ScoreDefOptimizeParams : public FunctorParams {
+public:
+    ScoreDefOptimizeParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_encoded = false;
+        m_firstScoreDef = true;
+        m_hasFermata = false;
+        m_hasTempo = false;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDef *m_currentScoreDef;
+    bool m_encoded;
+    bool m_firstScoreDef;
+    bool m_hasFermata;
+    bool m_hasTempo;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
+// ScoreDefSetCurrentParams
 //----------------------------------------------------------------------------
 
 /**
@@ -2014,9 +2040,9 @@ public:
  * member 6: the doc
  **/
 
-class SetCurrentScoreDefParams : public FunctorParams {
+class ScoreDefSetCurrentParams : public FunctorParams {
 public:
-    SetCurrentScoreDefParams(Doc *doc, ScoreDef *upcomingScoreDef)
+    ScoreDefSetCurrentParams(Doc *doc, ScoreDef *upcomingScoreDef)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
@@ -2033,6 +2059,34 @@ public:
     System *m_currentSystem;
     bool m_drawLabels;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// ScoreDefSetGrpSymParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor to be redirected to the System::m_currentScoreDef
+ **/
+
+class ScoreDefSetGrpSymParams : public FunctorParams {
+public:
+    ScoreDefSetGrpSymParams(Functor *functor) { m_functor = functor; }
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// ScoreDefUnsetCurrentParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor to be redirected to Aligner
+ **/
+
+class ScoreDefUnsetCurrentParams : public FunctorParams {
+public:
+    ScoreDefUnsetCurrentParams(Functor *functor) { m_functor = functor; }
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -2128,20 +2182,6 @@ public:
 class ReorderByXPosParams : public FunctorParams {
 public:
     int modifications = 0;
-};
-
-//----------------------------------------------------------------------------
-// UnsetCurrentScoreDefParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the functor to be redirected to Aligner
- **/
-
-class UnsetCurrentScoreDefParams : public FunctorParams {
-public:
-    UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
-    Functor *m_functor;
 };
 
 } // namespace vrv

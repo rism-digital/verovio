@@ -70,7 +70,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
 
     // Set the current score def to the page one
-    // The page one has previously been set by Object::SetCurrentScoreDef
+    // The page one has previously been set by Object::ScoreDefSetCurrent
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
     if (m_options->m_shrinkToFit.GetValue()) {
@@ -309,7 +309,7 @@ void View::DrawStaffGrp(
 
     // draw the system start bar line
     if (topStaffGrp
-        && ((((firstDef != lastDef) || staffGrp->HasSymbol())
+        && ((((firstDef != lastDef) || staffGrp->GetFirst(GRPSYM))
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
         // int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
@@ -1327,9 +1327,12 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
                 Staff *bottomStaff = previousSystemMeasure->GetBottomVisibleStaff();
                 // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
                 // substract offset of the system divider symbol itself (added to y2 and y4)
-                previousSystemBottomMarginY = bottomStaff->GetDrawingY()
-                    - (bottomStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
-                    - m_doc->GetDrawingUnit(100) * 5;
+                if (bottomStaff) {
+                    previousSystemBottomMarginY = bottomStaff->GetDrawingY()
+                        - (bottomStaff->m_drawingLines - 1)
+                            * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
+                        - m_doc->GetDrawingUnit(100) * 5;
+                }
             }
         }
     }

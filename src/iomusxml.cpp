@@ -473,6 +473,12 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
         }
         return dynamStr;
     }
+    if (IsElement(node, "coda")) {
+        return "\xF0\x9D\x84\x8C";
+    }
+    if (IsElement(node, "segno")) {
+        return "\xF0\x9D\x84\x8B";
+    }
     return std::string();
 }
 
@@ -1785,15 +1791,18 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
     }
 
     // parse endings (prima volta, seconda volta...)
-    pugi::xpath_node ending = node.select_node("ending");
+    pugi::xml_node ending = node.child("ending");
     if (ending) {
-        std::string endingNumber = ending.node().attribute("number").as_string();
-        std::string endingType = ending.node().attribute("type").as_string();
-        std::string endingText = ending.node().text().as_string();
+        std::string endingNumber = ending.attribute("number").as_string();
+        std::string endingType = ending.attribute("type").as_string();
+        std::string endingText = ending.text().as_string();
         // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
         // endingText.c_str());
         if (endingType == "start") {
-            if (m_endingStack.empty() || NotInEndingStack(measure->GetN())) {
+            // check for corresponding stop points
+            std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
+            pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
+            if (endingEnd && (m_endingStack.empty() || NotInEndingStack(measure->GetN()))) {
                 musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
                 std::vector<Measure *> measureList;
                 measureList.push_back(measure);
@@ -1893,14 +1902,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Coda
-    pugi::xml_node coda = typeNode.child("coda");
-    if (coda) {
+    pugi::xml_node xmlCoda = typeNode.child("coda");
+    if (xmlCoda) {
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("coda");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (coda.attribute("id")) dir->SetUuid(coda.attribute("id").as_string());
+        if (xmlCoda.attribute("id")) dir->SetUuid(xmlCoda.attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -1987,7 +1996,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Directive
     int defaultY = 0; // y position attribute, only for directives and dynamics
     if (containsWords && !containsDynamics && !soundNode.attribute("tempo")) {
-        pugi::xpath_node_set words = node.select_nodes("direction-type/words");
+        pugi::xpath_node_set words = node.select_nodes("direction-type/*[self::words or self::coda or self::segno]");
         defaultY = words.first().node().attribute("default-y").as_int();
         std::string wordStr = words.first().node().text().as_string();
         if (wordStr.rfind("cresc", 0) == 0 || wordStr.rfind("dim", 0) == 0 || wordStr.rfind("decresc", 0) == 0) {
@@ -2304,14 +2313,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Segno
-    pugi::xml_node segno = typeNode.child("segno");
-    if (segno) {
+    pugi::xml_node xmlSegno = typeNode.child("segno");
+    if (xmlSegno) {
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
         dir->SetType("segno");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (segno.attribute("id")) dir->SetUuid(segno.attribute("id").as_string());
+        if (xmlSegno.attribute("id")) dir->SetUuid(xmlSegno.attribute("id").as_string());
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
         rend->SetFontstyle(FONTSTYLE_normal);
@@ -2347,7 +2356,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (!containsWords && !containsDynamics && !coda && !bracket && !lead && !metronome && !segno && !xmlShift
+    if (!containsWords && !containsDynamics && !xmlCoda && !bracket && !lead && !metronome && !xmlSegno && !xmlShift
         && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
     }

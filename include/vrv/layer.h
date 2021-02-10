@@ -189,9 +189,9 @@ public:
     virtual int ConvertToUnCastOffMensural(FunctorParams *params);
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
      * See Object::ResetHorizontalAlignment

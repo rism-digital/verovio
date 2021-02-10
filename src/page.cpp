@@ -359,6 +359,11 @@ void Page::LayOutHorizontally()
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
 
+    // Adjust the tempo
+    Functor adjustTempo(&Object::AdjustTempo);
+    AdjustTempoParams adjustTempoParams(doc);
+    this->Process(&adjustTempo, &adjustTempoParams);
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsXParams(doc);
     Functor adjustTupletsX(&Object::AdjustTupletsX);
@@ -476,7 +481,6 @@ void Page::LayOutVertically()
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlursParams.m_crossStaffSlurs) {
-        LogMessage("XStaff slurs");
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(&adjustSlurs, &adjustSlursParams);
