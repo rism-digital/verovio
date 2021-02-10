@@ -314,7 +314,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         Flag *currentFlag = NULL;
         currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
-        if (currentFlag) {
+        if (currentFlag && currentFlag->m_drawingNbFlags) {
             wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
             const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
             horizontalMargin += flagWidth;
