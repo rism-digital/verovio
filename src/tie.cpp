@@ -292,25 +292,31 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
     int height, curvature_CURVEDIR drawingCurveDir)
 {
     ListOfObjects objects;
-    ClassIdsComparison cmp({ DOT, DOTS /*, FLAG */ });
+    ClassIdsComparison cmp({ DOT, DOTS, FLAG });
     durElement->FindAllDescendantByComparison(&objects, &cmp);
 
     for (auto object : objects) {
-        bool discard = false;
-        int intersection = curve->CalcAdjustment(object, discard);
-        if (intersection == 0) continue;
-        if (std::abs(intersection) > height) intersection = intersection / std::abs(intersection) * height;
-        /*if (object->Is(DOTS) && intersection) {
-            int elementHeight = std::abs(object->GetTopBy(SELF) - object->GetBottomBy(SELF));
-            intersection = elementHeight - (intersection + height);
-        }*/        
+        // if we have possible overlap with dots, we need to move tie up/down to avoid it. This happens only for the
+        // outter ties, so there should be no issue of inner tie moving up and colliding with other elements
+        if (object->Is(DOTS)) {
+            bool discard = false;
+            int intersection = curve->CalcAdjustment(object, discard);
+            if (intersection == 0) continue;
+            if (std::abs(intersection) > height) intersection = intersection / std::abs(intersection) * height;
 
-        for (int i = 0; i < 4; ++i) {
-            if (drawingCurveDir == curvature_CURVEDIR_above) {
+            intersection *= (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
+            for (int i = 0; i < 4; ++i) {
                 bezier[i].y += intersection;
             }
-            else if (drawingCurveDir == curvature_CURVEDIR_below) {
-                bezier[i].y -= intersection;
+        }
+        // In case there is overlap with flag, we need to move starting point to the side, to avoid it
+        else if (object->Is(FLAG)) {
+            bool discard = false;
+            int intersection = curve->CalcAdjustment(object, discard, 0);
+            if (intersection != 0) {
+                bezier[0].x += height;
+                bezier[1].x += height / 2;
+                bezier[2].x = bezier[3].x - height / 2;
             }
         }
 

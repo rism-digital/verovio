@@ -70,13 +70,16 @@ public:
     virtual int FindSpannedLayerElements(FunctorParams *functorParams);
 
 private:
-    //
+    // Calculate initial position X position and return stem direction of the startNote
     data_STEMDIRECTION CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, int spanningType,
         bool isOuterChordNote, Point &startPoint, Point &endPoint);
 
+    // Helper function to get preferred curve direction based on the number of conditions (like note direction, position
+    // on the staff, etc.)
     curvature_CURVEDIR GetPreferredCurveDirection(
         Layer *layer, Note *note, Chord *startParentChord, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
 
+    // Update tie positioning based on the overlaps with posible layerElements such as dots/flags
     void UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement, int thickness,
         int height, curvature_CURVEDIR drawingCurveDir);
 
