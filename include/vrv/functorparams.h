@@ -588,12 +588,13 @@ public:
  * member 1: the upcoming minimum position (i.e., the min pos for the next element)
  * member 2: the cumulated shift on the previous aligners
  * member 3: the @n of the staff currently processed (used for grace note alignment)
- * member 4: the list of staffN in the top-level scoreDef
- * member 5: the bounding box in the previous aligner
- * member 6: the upcoming bounding boxes (to be used in the next aligner)
- * member 7: the Doc
- * member 8: the Functor for redirection to the MeasureAligner
- * member 9: the end Functor for redirection
+ * member 4: the size of the staff being processed
+ * member 5: the list of staffN in the top-level scoreDef
+ * member 6: the bounding box in the previous aligner
+ * member 7: the upcoming bounding boxes (to be used in the next aligner)
+ * member 8: the Doc
+ * member 9: the Functor for redirection to the MeasureAligner
+ * member 10: the end Functor for redirection
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -605,6 +606,7 @@ public:
         m_cumulatedXShift = 0;
         m_staffN = 0;
         m_staffNs = staffNs;
+        m_staffSize = 100;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -613,6 +615,7 @@ public:
     int m_upcomingMinPos;
     int m_cumulatedXShift;
     int m_staffN;
+    int m_staffSize;
     std::vector<int> m_staffNs;
     std::vector<BoundingBox *> m_boundingBoxes;
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
