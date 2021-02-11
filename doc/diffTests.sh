@@ -13,6 +13,8 @@ indir2="/Users/laurent/tmp/test-output-pr"
 outdir="/Users/laurent/tmp/test-output-diff"
 # The path to the directory containing the develop branch - used only for rebuilding
 devdir="/Users/laurent/projects/verovio_lpugin"
+# The path to the file containing the shortlist - file can be empty but must be there
+shortlist="/Users/laurent/tmp/shortlist.txt"
 
 # The version of python we want to use (we can be more specific here, e.g., python3.8)
 PYTHON=python3.9
@@ -54,7 +56,7 @@ cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON -DVRV_DYNA
 cd python
 make -j8
 
-$PYTHON ../../doc/test-suite.py "$testdir" "$indir2"
+$PYTHON ../../doc/test-suite.py "$testdir" "$indir2" --shortlist "$shortlist"
 
 $PYTHON ../../doc/test-suite-diff.py "$indir2" "$indir1" "$outdir"
 
