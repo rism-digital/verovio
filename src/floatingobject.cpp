@@ -493,7 +493,7 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
     return m_cachedMinMaxY;
 }
 
-int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin)
+int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
 {
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
@@ -515,8 +515,10 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
     discard = false;
 
     // first check if they overlap at all
-    if (p2.x < boundingBox->GetLeftBy(type) + margin) return 0;
-    if (p1.x > boundingBox->GetRightBy(type) + margin) return 0;
+    if (horizontalOverlap) {
+        if (p2.x < boundingBox->GetLeftBy(type) + margin) return 0;
+        if (p1.x > boundingBox->GetRightBy(type) + margin) return 0;
+    }
 
     Point topBezier[4], bottomBezier[4];
     BoundingBox::CalcThickBezier(points, this->GetThickness(), this->GetAngle(), topBezier, bottomBezier);

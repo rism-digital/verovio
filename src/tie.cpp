@@ -16,6 +16,7 @@
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
+#include "dot.h"
 #include "elementpart.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -52,6 +53,8 @@ void Tie::Reset()
 
 bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4])
 {
+    if (!doc || !staff) return false;
+
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     /************** parent layers **************/
 
@@ -165,7 +168,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
 
     if ((!startParentChord || isOuterChordNote) && durElement) {
-        UpdateTiePositioning(curve, bezier, durElement, thickness, height, drawingCurveDir);
+        UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
+        curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
     }
     
     return true;
@@ -206,8 +210,13 @@ data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startP
             endPoint.x -= r2 + drawingUnit / 2;
         }
         if (startParentChord && !isOuterChordNote && startParentChord->HasDots()) {
-            Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
-            startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
+            if ((endPoint.x - startPoint.x) <= 4 * drawingUnit) {
+                startPoint.x += drawingUnit;
+            }
+            else {
+                Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
+                startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
+            }
         }
     }
     // This is the case when the tie is split over two system of two pages.
@@ -288,8 +297,8 @@ curvature_CURVEDIR Tie::GetPreferredCurveDirection(Layer *layer, Note *note,
     return drawingCurveDir;
 }
 
-void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement, int thickness,
-    int height, curvature_CURVEDIR drawingCurveDir)
+void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement,
+    Note *startNote, int drawingUnit, curvature_CURVEDIR drawingCurveDir)
 {
     ListOfObjects objects;
     ClassIdsComparison cmp({ DOT, DOTS, FLAG });
@@ -300,9 +309,24 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
         // outter ties, so there should be no issue of inner tie moving up and colliding with other elements
         if (object->Is(DOTS)) {
             bool discard = false;
-            int intersection = curve->CalcAdjustment(object, discard);
+            int margin = 0;
+            if (durElement->Is(CHORD)) {
+                // If this is chord, we need to make sure that ties is compared agains relative dot. Since all dots have
+                // one BB and this action is done for outer ties only, we can safely take height of the BB to determine
+                // margin for adjustment calculation
+                Chord *parentChord = vrv_cast<Chord *>(durElement);
+                int offset = (object->GetSelfRight() - object->GetSelfLeft()) / parentChord->GetDots();
+                if ((drawingCurveDir == curvature_CURVEDIR_above) && (startNote != parentChord->GetTopNote())) {
+                    margin = object->GetSelfBottom() - object->GetSelfTop() + offset;
+                }
+                else if ((drawingCurveDir == curvature_CURVEDIR_below) && (startNote != parentChord->GetBottomNote())) {
+                    margin = object->GetSelfBottom() - object->GetSelfTop() - offset;
+                }
+            }
+            int intersection = curve->CalcAdjustment(object, discard, margin, false);
             if (intersection == 0) continue;
-            if (std::abs(intersection) > height) intersection = intersection / std::abs(intersection) * height;
+            if (std::abs(intersection) > drawingUnit)
+                intersection = intersection / std::abs(intersection) * drawingUnit;
 
             intersection *= (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
             for (int i = 0; i < 4; ++i) {
@@ -312,15 +336,14 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
         // In case there is overlap with flag, we need to move starting point to the side, to avoid it
         else if (object->Is(FLAG)) {
             bool discard = false;
-            int intersection = curve->CalcAdjustment(object, discard, 0);
+            int intersection = curve->CalcAdjustment(object, discard);
             if (intersection != 0) {
-                bezier[0].x += height;
-                bezier[1].x += height / 2;
-                bezier[2].x = bezier[3].x - height / 2;
+                bezier[0].x += drawingUnit;
+                const int controlPointDist = (bezier[3].x - bezier[0].x) / 4;
+                bezier[1].x = bezier[0].x + controlPointDist;
+                bezier[2].x = bezier[3].x - controlPointDist;
             }
         }
-
-        curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
     }
 }
 //----------------------------------------------------------------------------
