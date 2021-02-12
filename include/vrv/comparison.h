@@ -89,6 +89,18 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// ReverseClassIdsComparison
+//----------------------------------------------------------------------------
+
+class ReverseClassIdsComparison : public ClassIdsComparison {
+
+public:
+    ReverseClassIdsComparison(const std::vector<ClassId> &classIds) : ClassIdsComparison(classIds) {}
+
+    virtual bool operator()(Object *object) { return !ClassIdsComparison::operator()(object); }
+};
+
+//----------------------------------------------------------------------------
 // InterfaceComparison
 //----------------------------------------------------------------------------
 

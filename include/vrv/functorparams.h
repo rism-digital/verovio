@@ -184,6 +184,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustClefsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the measureAligner
+ * member 1: the Doc
+ **/
+
+class AdjustClefsParams : public FunctorParams {
+public:
+    AdjustClefsParams(Doc *doc)
+    {
+        m_aligner = NULL;
+        m_doc = doc;
+    }
+    MeasureAligner *m_aligner;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustArticParams
 //----------------------------------------------------------------------------
 
@@ -1440,6 +1460,7 @@ public:
     }
     int m_minLeft;
     int m_maxRight;
+    std::vector<ClassId> m_excludeClasses;
     Functor *m_functor;
 };
 
@@ -1780,10 +1801,10 @@ class PreparePointersByLayerParams : public FunctorParams {
 public:
     PreparePointersByLayerParams()
     {
-        m_currentNote = NULL;
+        m_currentElement = NULL;
         m_lastDot = NULL;
     }
-    Note *m_currentNote;
+    LayerElement *m_currentElement;
     Dot *m_lastDot;
 };
 
@@ -1935,8 +1956,11 @@ public:
  * member 0: the previous time position
  * member 1: the previous x rel position
  * member 2: duration of the longest note
- * member 3: the doc
- * member 4: the functor to be redirected to Aligner
+ * member 3: the last alignment that was not timestamp-only
+ * member 4: the list of timestamp-only alignment that needs to be adjusted
+ * member 5: the MeasureAligner
+ * member 6: the Doc
+ * member 7: the functor to be redirected to Aligner
  **/
 
 class SetAlignmentXPosParams : public FunctorParams {
@@ -1946,12 +1970,17 @@ public:
         m_previousTime = 0.0;
         m_previousXRel = 0;
         m_longestActualDur = 0;
+        m_lastNonTimestamp = NULL;
+        m_measureAligner = NULL;
         m_doc = doc;
         m_functor = functor;
     }
     double m_previousTime;
     int m_previousXRel;
     int m_longestActualDur;
+    Alignment *m_lastNonTimestamp;
+    std::list<Alignment *> m_timestamps;
+    MeasureAligner *m_measureAligner;
     Doc *m_doc;
     Functor *m_functor;
 };

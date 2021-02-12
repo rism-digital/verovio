@@ -572,6 +572,13 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
+
+    // hidden clef
+    if (clef->GetVisible() == BOOLEAN_false) {
+        clef->SetEmptyBB();
+        return;
+    }
+
     int x, y;
     if (m_doc->GetType() == Facs && clef->HasFacs()) {
         y = ToLogicalY(staff->GetDrawingY());
@@ -676,7 +683,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
             cueSize = true;
             // HARDCODED
-            x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
+            // x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
         }
     }
 
@@ -779,7 +786,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    if (dot->m_drawingNote && dot->m_drawingNote->IsInLigature()) {
+    if (dot->m_drawingPreviousElement && dot->m_drawingPreviousElement->IsInLigature()) {
         this->DrawDotInLigature(dc, element, layer, staff, measure);
     }
     else {
@@ -788,14 +795,14 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
         if (m_doc->GetType() != Transcription) {
             // Use the note to which the points to for position
-            if (dot->m_drawingNote && !dot->m_drawingNextElement) {
+            if (dot->m_drawingPreviousElement && !dot->m_drawingNextElement) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
-                y = dot->m_drawingNote->GetDrawingY();
+                y = dot->m_drawingPreviousElement->GetDrawingY();
             }
-            if (dot->m_drawingNote && dot->m_drawingNextElement) {
-                x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingNote->GetDrawingX()) / 2);
-                x += dot->m_drawingNote->GetDrawingRadius(m_doc);
-                y = dot->m_drawingNote->GetDrawingY();
+            if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
+                x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingPreviousElement->GetDrawingX()) / 2);
+                x += dot->m_drawingPreviousElement->GetDrawingRadius(m_doc);
+                y = dot->m_drawingPreviousElement->GetDrawingY();
             }
         }
 

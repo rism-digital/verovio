@@ -274,11 +274,6 @@ public:
     virtual int PrepareLyrics(FunctorParams *functorParams);
 
     /**
-     * See Object::PreparePointersByLayer
-     */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
-
-    /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);

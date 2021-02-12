@@ -292,6 +292,11 @@ public:
     virtual int AdjustArpegEnd(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustClefChanges
+     */
+    virtual int AdjustClefChanges(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustLayers
      */
     virtual int AdjustLayers(FunctorParams *functorParams);

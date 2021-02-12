@@ -130,7 +130,9 @@ public:
      * Returns (-)VRV_UNSET in nothing for the staff specified.
      * Uses Object::GetAlignmentLeftRight
      */
-    void GetLeftRight(int staffN, int &minLeft, int &maxRight);
+    void GetLeftRight(
+        const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
 
     /**
      * Returns the GraceAligner for the Alignment.
@@ -177,6 +179,16 @@ public:
      * Return true if the alignment contains at least one reference with staffN
      */
     bool HasAlignmentReference(int staffN);
+
+    /**
+     * Return true if the alignment contains only references to timestamp attributes.
+     */
+    bool HasTimestampOnly();
+
+    /* Return true and X position of the first accidental from the accid space of alignment reference for specific staff
+     * (found by staffN parameter). Return false and 0 otherwise.
+     */
+    std::pair<int, bool> GetAccidAdjustedPosition(Doc *doc, int staffN);
 
     //----------//
     // Functors //
@@ -305,6 +317,11 @@ public:
      * Return true if the reference has elements from multiple layers.
      */
     bool HasMultipleLayer() const { return (m_layerCount > 1); }
+
+    /**
+     * Return first accidental from the accid space of the alignment reference
+     */
+    Accid *GetFrontAccid() const;
 
     //----------//
     // Functors //
@@ -445,6 +462,15 @@ public:
     ///@}
 
     /**
+     * @name Set and Get the initial tstamp duration.
+     * Setter takes a meter unit parameter.
+     */
+    ///@{
+    void SetInitialTstamp(int meterUnit);
+    double GetInitialTstampDur() const { return m_initialTstampDur; }
+    ///@}
+
+    /**
      * Get left Alignment for the measure and for the left BarLine.
      * For each MeasureAligner, we keep and Alignment for the left position.
      * The Alignment time will be always -1.0 * DUR_MAX and will appear first in the list.
@@ -517,6 +543,12 @@ private:
      * Store measure's non-justifiable margin used by the scoreDef attributes.
      */
     int m_nonJustifiableLeftMargin;
+
+    /**
+     * The time duration of the timestamp between 0.0 and 1.0.
+     * This depends on the meter signature in the preceeding scoreDef
+     */
+    double m_initialTstampDur;
 };
 
 //----------------------------------------------------------------------------
