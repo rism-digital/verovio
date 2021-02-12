@@ -138,7 +138,6 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
 
     data_STEMDIRECTION currentStemDir;
     Layer *layer = NULL;
-    Staff *currentStaff = NULL;
 
     int elementCount = 0;
 
@@ -168,7 +167,6 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
             this->m_crossStaffContent = staff;
             this->m_crossStaffRel = current->GetCrossStaffRel();
         }
-        currentStaff = staff;
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {

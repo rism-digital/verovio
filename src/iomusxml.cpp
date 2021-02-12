@@ -1791,15 +1791,18 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
     }
 
     // parse endings (prima volta, seconda volta...)
-    pugi::xpath_node ending = node.select_node("ending");
+    pugi::xml_node ending = node.child("ending");
     if (ending) {
-        std::string endingNumber = ending.node().attribute("number").as_string();
-        std::string endingType = ending.node().attribute("type").as_string();
-        std::string endingText = ending.node().text().as_string();
+        std::string endingNumber = ending.attribute("number").as_string();
+        std::string endingType = ending.attribute("type").as_string();
+        std::string endingText = ending.text().as_string();
         // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
         // endingText.c_str());
         if (endingType == "start") {
-            if (m_endingStack.empty() || NotInEndingStack(measure->GetN())) {
+            // check for corresponding stop points
+            std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
+            pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
+            if (endingEnd && (m_endingStack.empty() || NotInEndingStack(measure->GetN()))) {
                 musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
                 std::vector<Measure *> measureList;
                 measureList.push_back(measure);

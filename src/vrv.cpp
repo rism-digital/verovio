@@ -129,6 +129,19 @@ Glyph *Resources::GetGlyph(wchar_t smuflCode)
     return &s_font[smuflCode];
 }
 
+Glyph *Resources::GetGlyph(const std::string &smuflName)
+{
+    wchar_t code = GetGlyphCode(smuflName);
+    if (code == 0) return NULL;
+    return GetGlyph(code);
+}
+
+wchar_t Resources::GetGlyphCode(const std::string &smuflName)
+{
+    if (!s_smuflNames.count(smuflName)) return 0;
+    return s_smuflNames.at(smuflName);
+}
+
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
 {
     if (fontWeight == FONTWEIGHT_NONE) {
