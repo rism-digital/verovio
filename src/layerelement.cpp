@@ -1460,20 +1460,28 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         selfLeft = this->GetAlignment()->GetXRel();
     }
+    // if (this->Is(BARLINE_ATTR_RIGHT)) {
+    // selfLeft = this->GetSelfLeft();
+    // selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * drawingUnit;
+    //}
     else {
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft();
-        selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * drawingUnit;
-        
+        // selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * drawingUnit;
+
         int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
         int overlap = 0;
         for (auto &boundingBox : params->m_boundingBoxes) {
             LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
             assert(element);
             int margin = (params->m_doc->GetRightMargin(element->GetClassId()) + selfLeftMargin) * drawingUnit;
+            if (this->Is(BARLINE_ATTR_RIGHT)) {
+                overlap = overlap = std::max(overlap, element->GetSelfRight() - selfLeft + margin);
+                continue;
+            }
             bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
-            
+
             if (hasOverlap) {
                 overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
                 LogDebug("%s overlaps of %d, margin %d", this->GetClassName().c_str(), overlap, margin);
@@ -1492,12 +1500,10 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int selfRight = this->GetAlignment()->GetXRel();
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
-        selfRight = this->GetAlignment()->GetXRel()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
+        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
     }
-    else if (this->Is({CLEF, KEYSIG, MENSUR, METERSIG})) {
-        selfRight = this->GetSelfRight()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
+    else if (this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, BARLINE, CLEF, KEYSIG, MENSUR, METERSIG })) {
+        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
     }
 
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
