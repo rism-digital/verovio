@@ -480,7 +480,7 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
     if (IsElement(node, "dynamics")) {
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : node.children()) {
-            if (xmlDynamPart.text()) {
+            if (std::string(xmlDynamPart.name()) == "other-dynamics") {
                 dynamStr += xmlDynamPart.text().as_string();
             }
             else {
@@ -3007,7 +3007,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.attribute("placement").as_string()));
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : xmlDynam.children()) {
-            if (xmlDynamPart.text()) {
+            LogWarning("%s",xmlDynamPart.name());
+            if (std::string(xmlDynamPart.name()) == "other-dynamics") {
                 dynamStr += xmlDynamPart.text().as_string();
             }
             else {
