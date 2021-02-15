@@ -545,9 +545,9 @@ float View::CalcInitialSlur(
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
     AttNIntegerComparison matchStaff(STAFF, staff->GetN());
-    AttNIntegerComparison matchLayer(LAYER, layerN);
+    //AttNIntegerComparison matchLayer(LAYER, layerN);
     filters.push_back(&matchStaff);
-    filters.push_back(&matchLayer);
+    //filters.push_back(&matchLayer);
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);

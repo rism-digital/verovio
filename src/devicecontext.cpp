@@ -32,8 +32,9 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
 
 void BezierCurve::CalculateControlPointOffset(Doc *doc, int staffSize)
 {
-    m_controlPointOffset = std::min((p2.x - p1.x) / doc->GetOptions()->m_slurControlPoints.GetValue(),
-        doc->GetDrawingStaffSize(staffSize));
+    m_rightControlPointOffset = std::min(
+        (p2.x - p1.x) / doc->GetOptions()->m_slurControlPoints.GetValue(), doc->GetDrawingStaffSize(staffSize));
+    m_leftControlPointOffset = m_rightControlPointOffset;
 }
 
 //----------------------------------------------------------------------------

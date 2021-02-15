@@ -214,8 +214,14 @@ public:
      */
     ///@{
     void CalculateControlPointOffset(Doc* doc, int staffSize);
-    void SetControlPointOffset(int controlPointOffset) { m_controlPointOffset = controlPointOffset; };
-    int GetControlPointOffset() const { return m_controlPointOffset; }
+    void SetControlPointOffset(int controlPointOffset)
+    {
+        m_leftControlPointOffset = m_rightControlPointOffset = controlPointOffset;
+    };
+    void SetLeftControlPointOffset(int height) { m_leftControlPointOffset = height; }
+    void SetRightControlPointOffset(int height) { m_rightControlPointOffset = height; }
+    int GetLeftControlPointOffset() const { return m_leftControlPointOffset; }
+    int GetRightControlPointOffset() const { return m_rightControlPointOffset; }
     ///@}
 
     /**
@@ -232,7 +238,8 @@ public:
 private:
     // Control point X-axis offset for both start/end points
     // In future, when more complex shapes are required, this should probably be changed to left/right offsets
-    int m_controlPointOffset = 0;
+    int m_leftControlPointOffset = 0;
+    int m_rightControlPointOffset = 0;
     int m_leftControlHeight = 0;
     int m_rightControlHeight = 0;
 

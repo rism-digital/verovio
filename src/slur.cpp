@@ -269,21 +269,60 @@ bool Slur::AdjustSlurPosition(
 
     // If curve is cross staff and shifts are larger than current height of the control points - adjust control point
     // height to make sure that slur bends around the overlapping elements
-    if (curve->IsCrossStaff()
-        && ((maxShiftLeft > bezierCurve.GetLeftControlHeight())
-            || (maxShiftRight > bezierCurve.GetRightControlHeight()))) {
-        angle = 0.0;
-        bezierCurve.SetControlPointOffset(bezierCurve.GetControlPointOffset() / 2);
-        bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftLeft);
-        bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftRight);
-        const int shiftDifference = std::abs(maxShiftLeft - maxShiftRight);
-        if (maxShiftLeft > maxShiftRight) {
-            bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+    if (curve->IsCrossStaff()) {
+        if ((maxShiftLeft > bezierCurve.GetLeftControlHeight())
+            || (maxShiftRight > bezierCurve.GetRightControlHeight())) {
+            angle = 0.0;
+            bezierCurve.SetLeftControlPointOffset(bezierCurve.GetLeftControlPointOffset() / 2);
+            bezierCurve.SetRightControlPointOffset(bezierCurve.GetRightControlPointOffset() / 2);
+            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftLeft);
+            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftRight);
+            const int shiftDifference = std::abs(maxShiftLeft - maxShiftRight);
+            if (maxShiftLeft > maxShiftRight) {
+                bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+            }
+            else {
+                bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+            }
+            return true;
         }
         else {
-            bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+            Point points[4];
+            points[0] = bezierCurve.p1;
+            points[1] = bezierCurve.c1;
+            points[2] = bezierCurve.c2;
+            points[3] = bezierCurve.p2;
+            // Approximate bezier extrema and find time at which curve has highest/lowest Y value
+            const auto [time, yPos]
+                = BoundingBox::ApproximateBezierExtrema(points, (curve->GetDir() == curvature_CURVEDIR_above));
+                        
+            const double extremaShift = time - 0.5;
+            const int relevantPoint = extremaShift < 0 ? bezierCurve.p1.y : bezierCurve.p2.y;
+            Object *startMeasure = GetStart()->GetFirstAncestor(MEASURE);
+            Object *endMeasure = GetEnd()->GetFirstAncestor(MEASURE);
+            // We need to adjust curve based whether extrema time is higher/lower that 0.2 from the center (i.e. values
+            // between [0.3; 0.7] are ok). For values that are lower than 0.3 we need to shift left control point base
+            // to the right, and vice versa for the values above 0.7. This wouldn't exactly work for the slur that are
+            // spanning over several measures, so we ignore them here
+            if ((std::abs(extremaShift) > 0.2) && (startMeasure == endMeasure)
+                && ((std::abs(relevantPoint - yPos) > (std::abs(bezierCurve.p1.y - bezierCurve.p2.y) / 50)))) {
+                const int xDist = std::abs(bezierCurve.p1.x - bezierCurve.p2.x);
+                if (extremaShift < 0) {
+                    bezierCurve.SetLeftControlPointOffset(xDist / 2 - bezierCurve.GetRightControlPointOffset());
+                    bezierCurve.SetRightControlPointOffset(0);
+                }
+                else {
+                    bezierCurve.SetRightControlPointOffset(xDist / 2 - bezierCurve.GetLeftControlPointOffset());
+                    bezierCurve.SetLeftControlPointOffset(0);
+                }
+                return true;
+            }
+            else {
+                bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
+                bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
+                return false;
+            }            
         }
-        return true;
     }
     // otherwise it is normal slur - just move position of the start/end points up or down and recalculate angle
     else {
@@ -400,8 +439,8 @@ void Slur::GetControlPoints(BezierCurve &bezier, curvature_CURVEDIR curveDir, bo
         return;
     }
 
-    bezier.c1.x = bezier.p1.x + bezier.GetControlPointOffset();
-    bezier.c2.x = bezier.p2.x - bezier.GetControlPointOffset();
+    bezier.c1.x = bezier.p1.x + bezier.GetLeftControlPointOffset();
+    bezier.c2.x = bezier.p2.x - bezier.GetRightControlPointOffset();
 
     if (curveDir == curvature_CURVEDIR_above) {
         bezier.c1.y = bezier.p1.y + bezier.GetLeftControlHeight();

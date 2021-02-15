@@ -20,8 +20,6 @@
 #include "glyph.h"
 #include "vrv.h"
 
-#define BEZIER_APPROXIMATION 50.0
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -883,6 +881,33 @@ void BoundingBox::ApproximateBezierBoundingBox(
     pos.y = miny;
     width = maxx - minx;
     height = maxy - miny;
+}
+
+std::pair<double, int> BoundingBox::ApproximateBezierExtrema(
+    const Point bezier[4], bool isMaxExtrema, int approximationSteps)
+{
+    // Implementing Cardano's algorithm should give us proper time points for the min/max extremities on the cubic
+    // curve. However, we do not require such precision at this point, so these time points can be approximate simply by
+    // calculating Y point for T time with certain step
+    std::map<double, int> yCoodinatesAtTime;
+    const double step = 1.0 / approximationSteps;
+    for (int i = 0; i < approximationSteps + 1; ++i) {
+        const double currentTime = i * step;
+        yCoodinatesAtTime.emplace(std::make_pair(currentTime, CalcPointAtBezier(bezier, currentTime).y));
+    }
+
+    if (isMaxExtrema) {
+        return *std::max_element(yCoodinatesAtTime.begin(), yCoodinatesAtTime.end(),
+            [](const std::pair<double, int> &left, const std::pair<double, int> &right) {
+                return left.second < right.second;
+            });
+    }
+    else {
+        return *std::min_element(yCoodinatesAtTime.begin(), yCoodinatesAtTime.end(),
+            [](const std::pair<double, int> &left, const std::pair<double, int> &right) {
+                return left.second < right.second;
+            });
+    }
 }
 
 int BoundingBox::RectLeftOverlap(const Point rect1[2], const Point rect2[2], int margin, int vMargin)
