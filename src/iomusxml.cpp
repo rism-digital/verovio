@@ -522,7 +522,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
             element->AddChild(rend);
             textParent = rend;
         }
-        else if (soundNode && !soundNode.attribute("tempo")) {
+        else if (soundNode && !(soundNode.attribute("dynamics") || soundNode.attribute("tempo"))) {
             Rend *rend = new Rend();
             rend->SetHalign(HORIZONTALALIGNMENT_right);
             element->AddChild(rend);
