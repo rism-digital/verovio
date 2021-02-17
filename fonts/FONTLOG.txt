@@ -57,3 +57,4 @@ Version 5.2.46 - adding single P and S for piano pedal
 Version 5.2.47 - adding glyphs for longer rests
 Version 5.2.48 - adding baroque ornament
 Version 5.2.49 - adding arabic accidentals
+Version 5.2.50 - adding more clefs

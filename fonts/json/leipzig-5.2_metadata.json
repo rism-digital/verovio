@@ -30,8 +30,28 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.49",
+    "fontVersion": "5.2.50",
     "glyphBBoxes": {
+        "4stringTabClef": {
+            "bBoxNE": [
+                1.088,
+                2.0
+            ],
+            "bBoxSW": [
+                -0.012,
+                -2.0
+            ]
+        },
+        "6stringTabClef": {
+            "bBoxNE": [
+                1.632,
+                3.0
+            ],
+            "bBoxSW": [
+                -0.012,
+                -3.0
+            ]
+        },
         "accidentalBakiyeFlat": {
             "bBoxNE": [
                 0.988,
@@ -159,7 +179,7 @@
             ],
             "bBoxSW": [
                 0.0,
-                -1.004
+                -1.0
             ]
         },
         "accidentalParensRight": {
@@ -169,7 +189,7 @@
             ],
             "bBoxSW": [
                 0.0,
-                -1.004
+                -1.0
             ]
         },
         "accidentalQuarterToneFlatStein": {
@@ -502,6 +522,56 @@
                 -2.94
             ]
         },
+        "cClefChange": {
+            "bBoxNE": [
+                1.616,
+                1.34
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.34
+            ]
+        },
+        "cClefCombining": {
+            "bBoxNE": [
+                1.16,
+                2.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.0
+            ]
+        },
+        "cClefReversed": {
+            "bBoxNE": [
+                2.424,
+                2.008
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.008
+            ]
+        },
+        "clef15": {
+            "bBoxNE": [
+                0.92,
+                0.652
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "clef8": {
+            "bBoxNE": [
+                0.524,
+                0.628
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "dynamicFF": {
             "bBoxNE": [
                 2.22,
@@ -762,6 +832,36 @@
                 -3.02
             ]
         },
+        "fClefChange": {
+            "bBoxNE": [
+                1.848,
+                0.668
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.548
+            ]
+        },
+        "fClefReversed": {
+            "bBoxNE": [
+                2.792,
+                1.004
+            ],
+            "bBoxSW": [
+                0.016,
+                -2.324
+            ]
+        },
+        "fClefTurned": {
+            "bBoxNE": [
+                2.792,
+                1.004
+            ],
+            "bBoxSW": [
+                0.016,
+                -2.324
+            ]
+        },
         "fermataLongAbove": {
             "bBoxNE": [
                 3.156,
@@ -970,6 +1070,66 @@
             "bBoxSW": [
                 -0.004,
                 -3.572
+            ]
+        },
+        "gClef8vbCClef": {
+            "bBoxNE": [
+                3.052,
+                4.332
+            ],
+            "bBoxSW": [
+                -0.004,
+                -2.62
+            ]
+        },
+        "gClef8vbOld": {
+            "bBoxNE": [
+                4.152,
+                4.332
+            ],
+            "bBoxSW": [
+                -0.004,
+                -2.62
+            ]
+        },
+        "gClef8vbParens": {
+            "bBoxNE": [
+                2.584,
+                4.332
+            ],
+            "bBoxSW": [
+                -0.004,
+                -3.56
+            ]
+        },
+        "gClefChange": {
+            "bBoxNE": [
+                1.7258,
+                2.888
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.744
+            ]
+        },
+        "gClefReversed": {
+            "bBoxNE": [
+                2.584,
+                4.332
+            ],
+            "bBoxSW": [
+                -0.004,
+                -2.62
+            ]
+        },
+        "gClefTurned": {
+            "bBoxNE": [
+                2.584,
+                4.332
+            ],
+            "bBoxSW": [
+                -0.004,
+                -2.62
             ]
         },
         "keyboardPedalP": {
@@ -1670,6 +1830,26 @@
             "bBoxSW": [
                 0.0,
                 -0.532
+            ]
+        },
+        "octaveParensLeft": {
+            "bBoxNE": [
+                0.46,
+                1.3018
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.1
+            ]
+        },
+        "octaveParensRight": {
+            "bBoxNE": [
+                0.46,
+                1.3
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.1
             ]
         },
         "ornamentHaydn": {
@@ -2494,7 +2674,7 @@
         },
         "uniE069": {
             "bBoxNE": [
-                1.32,
+                1.3,
                 1.0
             ],
             "bBoxSW": [
