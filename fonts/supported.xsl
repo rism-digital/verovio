@@ -87,8 +87,8 @@
             <glyph glyph-code="E052" smufl-name="gClef8vb"/>
             <glyph glyph-code="E053" smufl-name="gClef8va"/>
             <glyph glyph-code="E054" smufl-name="gClef15ma"/>
-            <!--<glyph glyph-code="E055" smufl-name="gClef8vbOld"/>-->
-            <!--<glyph glyph-code="E056" smufl-name="gClef8vbCClef"/>-->
+            <glyph glyph-code="E055" smufl-name="gClef8vbOld"/>
+            <glyph glyph-code="E056" smufl-name="gClef8vbCClef"/>
             <!--<glyph glyph-code="E057" smufl-name="gClef8vbParens"/>-->
             <!--<glyph glyph-code="E058" smufl-name="gClefLigatedNumberBelow"/>-->
             <!--<glyph glyph-code="E059" smufl-name="gClefLigatedNumberAbove"/>-->
@@ -115,11 +115,11 @@
             <!--<glyph glyph-code="E070" smufl-name="fClefTriangular"/>-->
             <!--<glyph glyph-code="E071" smufl-name="cClefTriangularToFClef"/>-->
             <!--<glyph glyph-code="E072" smufl-name="fClefTriangularToCClef"/>-->
-            <!--<glyph glyph-code="E073" smufl-name="gClefReversed"/>-->
-            <!--<glyph glyph-code="E074" smufl-name="gClefTurned"/>-->
-            <!--<glyph glyph-code="E075" smufl-name="cClefReversed"/>-->
-            <!--<glyph glyph-code="E076" smufl-name="fClefReversed"/>-->
-            <!--<glyph glyph-code="E077" smufl-name="fClefTurned"/>-->
+            <glyph glyph-code="E073" smufl-name="gClefReversed"/>
+            <glyph glyph-code="E074" smufl-name="gClefTurned"/>
+            <glyph glyph-code="E075" smufl-name="cClefReversed"/>
+            <glyph glyph-code="E076" smufl-name="fClefReversed"/>
+            <glyph glyph-code="E077" smufl-name="fClefTurned"/>
             <!--<glyph glyph-code="E078" smufl-name="bridgeClef"/>-->
             <!--<glyph glyph-code="E079" smufl-name="accdnDiatonicClef"/>-->
             <!--<glyph glyph-code="E07A" smufl-name="gClefChange"/>-->
@@ -1217,8 +1217,8 @@
             <glyph glyph-code="E517" smufl-name="ventiduesima"/>
             <glyph glyph-code="E518" smufl-name="ventiduesimaAlta"/>
             <glyph glyph-code="E519" smufl-name="ventiduesimaBassa"/>
-            <!--<glyph glyph-code="E51A" smufl-name="octaveParensLeft"/>-->
-            <!--<glyph glyph-code="E51B" smufl-name="octaveParensRight"/>-->
+            <glyph glyph-code="E51A" smufl-name="octaveParensLeft"/>
+            <glyph glyph-code="E51B" smufl-name="octaveParensRight"/>
             <range_end>U+E51F</range_end>
             <range_start>U+E510</range_start>
         </octaves>
