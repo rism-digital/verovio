@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS for Python 3.9
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-18.04]
+        os: [ macos-latest, windows-latest, ubuntu-20.04]
         python-version: [3.6, 3.7, 3.8, 3.9]
         architecture: [ x86, x64 ]
         include:
@@ -37,13 +37,13 @@ jobs:
           - os: windows-latest
             architecture: x86
             platform_id: win32
-          - os: ubuntu-18.04
+          - os: ubuntu-20.04
             architecture: x64
             platform_id: manylinux_x86_64
         exclude:
           - os: macos-latest
             architecture: x86
-          - os: ubuntu-18.04
+          - os: ubuntu-20.04
             architecture: x86
 
     steps:
@@ -92,7 +92,7 @@ jobs:
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
-          CIBW_BEFORE_ALL_LINUX: yum install swig -y
+          CIBW_BEFORE_ALL_LINUX: sudo apt install swig
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
           CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
