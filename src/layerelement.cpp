@@ -1463,6 +1463,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft();
         selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+        // Remember current alignment for futher adjustments
+        params->m_currentAlignment.m_alignment = GetAlignment();
     }
 
     int offset = selfLeft - params->m_minPos;
@@ -1483,7 +1485,18 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
             + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
     }
 
-    params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
+    // In case of dots/flags we need to hold off of adjusting upcoming min position right away - if it happens that
+    // these elements do not overlap with other elements we can draw them as is and save space
+    if (Is({ DOTS, FLAG })) {
+        const int additionalOffset = selfRight - params->m_upcomingMinPos;
+        if (additionalOffset > params->m_currentAlignment.m_offset) {
+            params->m_currentAlignment.m_offset = additionalOffset;
+            params->m_currentAlignment.m_overlappingBB = this;
+        }
+    }
+    else {
+        params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
+    }
 
     return FUNCTOR_SIBLINGS;
 }

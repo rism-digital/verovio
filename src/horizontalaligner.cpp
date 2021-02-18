@@ -1001,6 +1001,31 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
     // Eventually we might want to have a more sophisticated pruning algorithm
     if (params->m_upcomingBoundingBoxes.empty()) return FUNCTOR_CONTINUE;
 
+    // Handle additional offsets that can happen when we have overlapping dots/flags. This should happen only for
+    // default alignments, so other ones should be ignored. If there are at least one bounding box that overlaps with
+    // dot/flag from the previous alignment - we need to consider additional offset for those elements. In such case,
+    // all current elements should have their XRel adjusted (as they would normally have) and increase minXPosition by
+    // the dot/flag offset
+    if (params->m_previousAlignment.m_overlappingBB && params->m_previousAlignment.m_alignment
+        && (params->m_previousAlignment.m_alignment->GetType() == ALIGNMENT_DEFAULT)) {
+        auto it = std::find_if(
+            params->m_upcomingBoundingBoxes.begin(), params->m_upcomingBoundingBoxes.end(), [params](BoundingBox *bb) {
+                return (params->m_previousAlignment.m_overlappingBB != bb)
+                    && bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
+                    && ((params->m_currentAlignment.m_alignment->GetType() == ALIGNMENT_MEASURE_RIGHT_BARLINE)
+                        || bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB));
+            });
+        if (it != params->m_upcomingBoundingBoxes.end()) {
+                params->m_currentAlignment.m_alignment->SetXRel(
+                    params->m_currentAlignment.m_alignment->GetXRel() + params->m_previousAlignment.m_offset);
+            params->m_minPos += params->m_previousAlignment.m_offset;
+
+        }
+    }
+    params->m_previousAlignment = params->m_currentAlignment;
+    // Reset current alignment
+    params->m_currentAlignment.Reset();
+
     params->m_boundingBoxes = params->m_upcomingBoundingBoxes;
     params->m_upcomingBoundingBoxes.clear();
 
