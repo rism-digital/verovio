@@ -205,6 +205,7 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                 iter->isFirst = false;
             }
             else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
+                if (staff != iter->m_staff) continue;
                 bool addSameas = true;
                 ListOfObjects objects, measureObjects;
                 ClassIdComparison matchClassId(CLEF);
