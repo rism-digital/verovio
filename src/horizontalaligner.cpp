@@ -1015,10 +1015,9 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
                         || bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB));
             });
         if (it != params->m_upcomingBoundingBoxes.end()) {
-                params->m_currentAlignment.m_alignment->SetXRel(
-                    params->m_currentAlignment.m_alignment->GetXRel() + params->m_previousAlignment.m_offset);
+            params->m_currentAlignment.m_alignment->SetXRel(
+                params->m_currentAlignment.m_alignment->GetXRel() + params->m_previousAlignment.m_offset);
             params->m_minPos += params->m_previousAlignment.m_offset;
-
         }
     }
     params->m_previousAlignment = params->m_currentAlignment;
