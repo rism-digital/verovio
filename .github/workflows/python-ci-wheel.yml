@@ -91,7 +91,6 @@ jobs:
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
           CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
-        run: python -m cibuildwheel --output-dir wheelhouse
 
       #===============================================#
       # Check build
