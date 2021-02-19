@@ -1755,11 +1755,21 @@
         "noteheadDiamondHalf": {
             "bBoxNE": [
                 1.256,
-                0.64
+                0.648
             ],
             "bBoxSW": [
                 0.0,
-                -0.64
+                -0.648
+            ]
+        },
+        "noteheadDiamondHalfWide": {
+            "bBoxNE": [
+                1.408,
+                0.648
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.648
             ]
         },
         "noteheadDiamondWhite": {
@@ -1790,6 +1800,56 @@
             "bBoxSW": [
                 0.0,
                 -0.528
+            ]
+        },
+        "noteheadParenthesisLeft": {
+            "bBoxNE": [
+                0.612,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.96
+            ]
+        },
+        "noteheadParenthesisRight": {
+            "bBoxNE": [
+                0.4,
+                0.96
+            ],
+            "bBoxSW": [
+                -0.212,
+                -0.96
+            ]
+        },
+        "noteheadSlashWhiteHalf": {
+            "bBoxNE": [
+                2.94,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "noteheadSlashWhiteWhole": {
+            "bBoxNE": [
+                3.6,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "noteheadSlashX": {
+            "bBoxNE": [
+                1.84,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
             ]
         },
         "noteheadVoidWithX": {
@@ -2764,12 +2824,12 @@
         },
         "uniE101": {
             "bBoxNE": [
-                2.032,
-                0.968
+                1.84,
+                1.0
             ],
             "bBoxSW": [
                 0.0,
-                -0.968
+                -1.0
             ]
         },
         "uniE220": {
@@ -3964,6 +4024,16 @@
                 0.0
             ]
         },
+        "noteheadDiamondHalfWide": {
+            "stemDownNW": [
+                -0.0,
+                0.0
+            ],
+            "stemUpSE": [
+                1.408,
+                0.0
+            ]
+        },
         "noteheadDiamondWhite": {
             "stemDownNW": [
                 -0.0,
@@ -4000,6 +4070,36 @@
             "stemUpSE": [
                 1.256,
                 0.164
+            ]
+        },
+        "noteheadSlashWhiteHalf": {
+            "stemDownNW": [
+                0.0,
+                -1.0
+            ],
+            "stemUpSE": [
+                2.94,
+                1.0
+            ]
+        },
+        "noteheadSlashWhiteWhole": {
+            "stemDownNW": [
+                0.0,
+                -1.0
+            ],
+            "stemUpSE": [
+                3.6,
+                1.0
+            ]
+        },
+        "noteheadSlashX": {
+            "stemDownNW": [
+                0.0,
+                -1.0
+            ],
+            "stemUpSE": [
+                1.84,
+                1.0
             ]
         },
         "noteheadVoidWithX": {
@@ -4106,12 +4206,12 @@
         },
         "uniE101": {
             "stemDownNW": [
-                -0.0,
-                -0.968
+                0.0,
+                -1.0
             ],
             "stemUpSE": [
-                2.032,
-                0.968
+                1.84,
+                1.0
             ]
         },
         "uniE260": {

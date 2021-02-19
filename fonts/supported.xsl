@@ -228,7 +228,7 @@
             <!--<glyph glyph-code="E0D7" smufl-name="noteheadDiamondDoubleWhole"/>-->
             <!--<glyph glyph-code="E0D8" smufl-name="noteheadDiamondWhole"/>-->
             <glyph glyph-code="E0D9" smufl-name="noteheadDiamondHalf"/>
-            <!--<glyph glyph-code="E0DA" smufl-name="noteheadDiamondHalfWide"/>-->
+            <glyph glyph-code="E0DA" smufl-name="noteheadDiamondHalfWide"/>
             <glyph glyph-code="E0DB" smufl-name="noteheadDiamondBlack"/>
             <glyph glyph-code="E0DC" smufl-name="noteheadDiamondBlackWide"/>
             <glyph glyph-code="E0DD" smufl-name="noteheadDiamondWhite"/>
@@ -255,8 +255,8 @@
             <!--<glyph glyph-code="E0F2" smufl-name="noteheadLargeArrowDownWhole"/>-->
             <!--<glyph glyph-code="E0F3" smufl-name="noteheadLargeArrowDownHalf"/>-->
             <!--<glyph glyph-code="E0F4" smufl-name="noteheadLargeArrowDownBlack"/>-->
-            <!--<glyph glyph-code="E0F5" smufl-name="noteheadParenthesisLeft"/>-->
-            <!--<glyph glyph-code="E0F6" smufl-name="noteheadParenthesisRight"/>-->
+            <glyph glyph-code="E0F5" smufl-name="noteheadParenthesisLeft"/>
+            <glyph glyph-code="E0F6" smufl-name="noteheadParenthesisRight"/>
             <!--<glyph glyph-code="E0F7" smufl-name="noteheadCircleSlash"/>-->
             <!--<glyph glyph-code="E0F8" smufl-name="noteheadHeavyX"/>-->
             <!--<glyph glyph-code="E0F9" smufl-name="noteheadHeavyXHat"/>-->
@@ -270,8 +270,8 @@
             <description>Slash noteheads</description>
             <!--<glyph glyph-code="E100" smufl-name="noteheadSlashVerticalEnds"/>-->
             <glyph glyph-code="E101" smufl-name="noteheadSlashHorizontalEnds"/>
-            <!--<glyph glyph-code="E102" smufl-name="noteheadSlashWhiteWhole"/>-->
-            <!--<glyph glyph-code="E103" smufl-name="noteheadSlashWhiteHalf"/>-->
+            <glyph glyph-code="E102" smufl-name="noteheadSlashWhiteWhole"/>
+            <glyph glyph-code="E103" smufl-name="noteheadSlashWhiteHalf"/>
             <!--<glyph glyph-code="E104" smufl-name="noteheadSlashDiamondWhite"/>-->
             <!--<glyph glyph-code="E105" smufl-name="noteheadSlashVerticalEndsSmall"/>-->
             <!--<glyph glyph-code="E106" smufl-name="noteheadSlashX"/>-->

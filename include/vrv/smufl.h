@@ -75,12 +75,17 @@ enum {
     SMUFL_E0B6_noteheadHalfWithX = 0xE0B6,
     SMUFL_E0B7_noteheadVoidWithX = 0xE0B7,
     SMUFL_E0D9_noteheadDiamondHalf = 0xE0D9,
+    SMUFL_E0DA_noteheadDiamondHalfWide = 0xE0DA,
     SMUFL_E0DB_noteheadDiamondBlack = 0xE0DB,
     SMUFL_E0DC_noteheadDiamondBlackWide = 0xE0DC,
     SMUFL_E0DD_noteheadDiamondWhite = 0xE0DD,
     SMUFL_E0DE_noteheadDiamondWhiteWide = 0xE0DE,
+    SMUFL_E0F5_noteheadParenthesisLeft = 0xE0F5,
+    SMUFL_E0F6_noteheadParenthesisRight = 0xE0F6,
     SMUFL_E0FA_noteheadWholeFilled = 0xE0FA,
     SMUFL_E101_noteheadSlashHorizontalEnds = 0xE101,
+    SMUFL_E102_noteheadSlashWhiteWhole = 0xE102,
+    SMUFL_E103_noteheadSlashWhiteHalf = 0xE103,
     SMUFL_E220_tremolo1 = 0xE220,
     SMUFL_E221_tremolo2 = 0xE221,
     SMUFL_E222_tremolo3 = 0xE222,
@@ -381,7 +386,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 356
+#define SMUFL_COUNT 361
 
 } // namespace vrv
 
