@@ -178,8 +178,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, int spanningType,
     bool isOuterChordNote, Point &startPoint, Point &endPoint)
 {
-    Note *startNote = vrv_cast<Note *>(GetStart());
-    Note *endNote = vrv_cast<Note *>(GetEnd());
+    Note *startNote = dynamic_cast<Note *>(GetStart());
+    Note *endNote = dynamic_cast<Note *>(GetEnd());
 
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     bool isShortTie = false;
