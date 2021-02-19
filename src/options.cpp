@@ -802,6 +802,10 @@ Options::Options()
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
 
+    m_clefChangeFactor.SetInfo("Clef change size", "Set the ratio of normal clefs to changing clefs");
+    m_clefChangeFactor.Init(0.66, 0.25, 1.0);
+    this->Register(&m_clefChangeFactor, "clefChangeFactor", &m_general);
+
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
     this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
