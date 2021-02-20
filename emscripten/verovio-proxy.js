@@ -63,6 +63,12 @@ verovio.vrvToolkit.getVersion = Module.cwrap( 'vrvToolkit_getVersion', 'string',
 // bool loadData(Toolkit *ic, const char *data)
 verovio.vrvToolkit.loadData = Module.cwrap( 'vrvToolkit_loadData', 'number', ['number', 'string'] );
 
+// bool loadZipDataBase64(Toolkit *ic, const char *data)
+verovio.vrvToolkit.loadZipDataBase64 = Module.cwrap( 'vrvToolkit_loadZipDataBase64', 'number', ['number', 'string'] );
+
+// bool loadZipDataBuffer(Toolkit *ic, const unsigned char *data, int length)
+verovio.vrvToolkit.loadZipDataBuffer = Module.cwrap( 'vrvToolkit_loadZipDataBuffer', 'number', ['number', 'number', 'number'] );
+
 // void redoLayout(Toolkit *ic)
 verovio.vrvToolkit.redoLayout = Module.cwrap( 'vrvToolkit_redoLayout', null, ['number'] );
 
@@ -204,6 +210,27 @@ verovio.toolkit.prototype.getVersion = function ()
 verovio.toolkit.prototype.loadData = function ( data )
 {
     return verovio.vrvToolkit.loadData( this.ptr, data );
+};
+
+verovio.toolkit.prototype.loadZipDataBase64 = function ( data )
+{
+    return verovio.vrvToolkit.loadZipDataBase64( this.ptr, data );
+};
+
+verovio.toolkit.prototype.loadZipDataBuffer = function ( data )
+{
+    if ( !(data instanceof ArrayBuffer ) )
+    {
+        console.error( "Parameter for loadZipDataBuffer has to be of type ArrayBuffer" );
+        return false;
+    }
+    var dataArray = new Uint8Array( data ); 
+    var dataSize = dataArray.length * dataArray.BYTES_PER_ELEMENT;
+    var dataPtr = Module._malloc( dataSize );
+    Module.HEAPU8.set( dataArray, dataPtr );
+    var res = verovio.vrvToolkit.loadZipDataBuffer( this.ptr, dataPtr, dataSize );
+    Module._free( dataPtr );
+    return res;
 };
 
 verovio.toolkit.prototype.redoLayout = function ()

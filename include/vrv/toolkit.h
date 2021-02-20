@@ -69,14 +69,26 @@ public:
     bool SetResourcePath(const std::string &path);
 
     /**
-     * Load a file with the specified type.
+     * Load a file and call Toolkit::LoadData
+     * Previously convert UTF16 files to UTF8 or extract files from MusicXML compressed files.
      */
     bool LoadFile(const std::string &filename);
 
     /**
-     * Load a string data with the specified type.
+     * Load a string data with the type previously specified in the options.
+     * Auto-detect if nothing was previously specified.
      */
     bool LoadData(const std::string &data);
+
+    /**
+     * Load a MusicXML compressed file passed as base64 encoded string.
+     */
+    bool LoadZipDataBase64(const std::string &data);
+
+    /**
+     * Load a MusicXML compressed file passed as a buffer of bytes.
+     */
+    bool LoadZipDataBuffer(const unsigned char *data, int length);
 
     /**
      * Save an MEI file.
@@ -305,6 +317,9 @@ public:
 private:
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
+    bool IsZip(const std::string &filename);
+    bool LoadZipFile(const std::string &filename);
+    bool LoadZipData(const std::vector<unsigned char> &bytes);
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
