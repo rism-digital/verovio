@@ -1,6 +1,48 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@glyph.name`
+
+## [3.2.0] - 2021-02-08
+* Support for `clef@visible` (@rettinghaus)
+* Support for `artic@glyph.num`
+* Support for arabic accidentals
+* Improved default rest positioning
+* Improved automatic cross staff rest positioning (@eNote-GmbH)
+* Improved cross-staff spacing
+* Improved slurs
+* Improved positioning of ornaments with multiple layers
+* Improved articulations in normal and cross-staff contexts
+* Improved spacing of clef changes
+* Improved timestamp events alignments by avoiding extra-space to be added
+* Improved horizontal alignment of tempo indications (@eNote-GmbH)
+* Embedding of Leland font from MuseScore
+* Method Toolkit::GetTimesForElement for accessing score times (@wergo)
+* Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
+* Options --top-margin-artic and --bottom-margin-artic for articulation margins
+* Option --tuplet-num-head for placing tuplet numbers on the side of the notehead
+
+## [3.1.0] - 2021-01-12
+* Support for "old style" multiple measure rests (@rettinghaus)
+* Support for `note@vel` and `dynamics@val` in MusicXML import (@earboxer)
+* Support for `multiRest@loc` (@rettinghaus)
+* Support for `mNum@fontsize` (@rettinghaus)
+* Support for `accidental-mark` in MusicXML import (@rettinghaus)
+* Support for double-stemmed beams (@eNote-GmbH)
+* Improved barline rendition (@rettinghaus)
+* Improved cross-staff notation with multiple layers
+* Python Package Index (PyPI) distribution (@musicEnfanthen and @alastair)
+* Option --footer extended with 'always' value to show footer with --adjust-page-height
+
+## [3.0.2] - 2020-11-17
+* Add missing default footer file
+
+## [3.0.1] - 2020-10-22
+* Fix bug with mensural notation notes
+
+## [3.0.0] - 2020-10-05
+* Support for buzz roll tremolos (@rettinghaus)
+* Support for `Sprechgesang` stems (@rettinghaus)
 * Support for `<phrase>`
 * Support (limited) for preserving XML comments in the MEI output
 * Support for `hairpin@opening` (@rettinghaus)
@@ -8,6 +50,7 @@
 * Support for pedal lines (@rettinghaus)
 * Options for controlling output tabs (--output-indent and --output-indent-tab)
 * Option to remove ids in the MEI output (--remove-ids) to be passed to GetMEI with the JS toolkit
+* Fix tremolo tuplets (@rettinghaus)
 
 ## [2.7.2] - 2020-07-23
 * Fix bug with memory in beams (@valeriyvan)
@@ -53,7 +96,7 @@
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ### Changed
-* Single file buundle for WASM build
+* Single file bundle for WASM build
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15

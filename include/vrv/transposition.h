@@ -47,14 +47,30 @@ public:
     TransPitch(int aPname, int anAccid, int anOct);
     TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW, int oct);
     TransPitch(const TransPitch &pitch);
+
+    // TransPitch operators
     TransPitch &operator=(const TransPitch &pitch);
-    static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
+    // lesser/greater operators
+    bool operator>(const TransPitch &pitch);
+    bool operator<(const TransPitch &pitch);
+    // increament/decrement operators
+    TransPitch &operator++();
+    TransPitch operator++(int);
+    TransPitch &operator--();
+    TransPitch operator--(int);
+
     data_ACCIDENTAL_GESTURAL GetAccidG() const;
     data_ACCIDENTAL_WRITTEN GetAccidW() const;
     data_PITCHNAME GetPitchName() const;
     std::wstring GetPitchString() const;
     bool IsValid(int maxAccid);
     void SetPitch(int aPname, int anAccid, int anOct);
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
 };
 
 std::ostream &operator<<(std::ostream &out, const TransPitch &pitch);
@@ -160,6 +176,10 @@ public:
     int GetGPitchClass() { return m_diatonicMapping[4]; }
     int GetAPitchClass() { return m_diatonicMapping[5]; }
     int GetBPitchClass() { return m_diatonicMapping[6]; }
+
+    //----------------//
+    // Static methods //
+    //----------------//
 
     // Input string validity helper functions.
     static bool IsValidIntervalName(const std::string &name);

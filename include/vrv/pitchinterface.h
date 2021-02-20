@@ -44,12 +44,6 @@ public:
     bool HasIdenticalPitchInterface(PitchInterface *otherPitchInterface);
 
     /**
-     * Adjust the pname and the octave for values outside the range.
-     * To be tested
-     */
-    static void AdjustPname(int &pname, int &oct);
-
-    /**
      * Shift pname and octave by a certain number of steps.
      */
     void AdjustPitchByOffset(int pitchOffset);
@@ -65,6 +59,16 @@ public:
      * given it's new and old clefs
      */
     void AdjustPitchForNewClef(Clef *oldClef, Clef *newClef);
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Adjust the pname and the octave for values outside the range.
+     * To be tested
+     */
+    static void AdjustPname(int &pname, int &oct);
 
     /**
      * Calculate the loc for a note, rest or chord considering its position in the layer.

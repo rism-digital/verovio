@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "functorparams.h"
+#include "measure.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -85,11 +86,10 @@ int Hairpin::CalcHeight(
     if ((this->GetForm() == hairpinLog_FORM_dim) && m_leftLink && m_leftLink->Is(HAIRPIN)) {
         // Do no ajust height when previous hairpin is not a full hairpin
         if (!leftPositioner || (leftPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
-        Hairpin *left = dynamic_cast<Hairpin *>(m_leftLink);
+        Hairpin *left = vrv_cast<Hairpin *>(m_leftLink);
         assert(left);
         // Take into account its length only if the left one is actually a <
         if (left->GetForm() == hairpinLog_FORM_cres) {
-            ;
             length = std::max(length, left->GetDrawingLength());
         }
     }
@@ -98,7 +98,7 @@ int Hairpin::CalcHeight(
     if ((this->GetForm() == hairpinLog_FORM_cres) && m_rightLink && m_rightLink->Is(HAIRPIN)) {
         // Do no ajust height when next hairpin is not a full hairpin
         if (!rightPositioner || (rightPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
-        Hairpin *right = dynamic_cast<Hairpin *>(m_rightLink);
+        Hairpin *right = vrv_cast<Hairpin *>(m_rightLink);
         assert(right);
         // Take into account its length only if the right one is actually a >
         if (right->GetForm() == hairpinLog_FORM_dim) {
@@ -154,13 +154,48 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
     rightLink->SetDrawingGrpId(grpId);
 }
 
+std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX)
+{
+    Measure *startMeasure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
+    Measure *endMeasure = vrv_cast<Measure *>(GetEnd()->GetFirstAncestor(MEASURE));
+
+    if (!startMeasure || !endMeasure) return { 0, 0 };
+
+    // Calculate adjustment that needs to be made for hairpin not to touch the left barline. We take doubleUnit for the
+    // default margin to consider them overlapping, which is adjusted in case we have wider barline on the left
+    int leftAdjustment = 0;
+    BarLine *leftBarline = startMeasure->GetLeftBarLine();
+    if (leftBarline) {
+        int margin = doubleUnit;
+        const int leftBarlineX = leftBarline->GetDrawingX();
+        const int diff = leftX - leftBarlineX;
+        if (leftBarline->GetForm() == BARRENDITION_rptstart) margin *= 1.5;
+        if (diff < margin) leftAdjustment = margin - diff;
+    }
+    // Same calculation is done for the right barline, with it having two barline forms that we need to consider
+    // as opposed to only one for the left barline
+    int rightAdjustment = 0;
+    BarLine *rightBarline = endMeasure->GetRightBarLine();
+    if (rightBarline) {
+        int margin = doubleUnit;
+        const int rightBarlineX = rightBarline->GetDrawingX();
+        const int diff = rightBarlineX - rightX;
+        if ((rightBarline->GetForm() == BARRENDITION_rptend) || (rightBarline->GetForm() == BARRENDITION_end)) {
+            margin *= 1.5;
+        }
+        if (diff < margin) rightAdjustment = margin - diff;
+    }
+
+    return { leftAdjustment, rightAdjustment };
+}
+
 //----------------------------------------------------------------------------
 // Hairpin functor methods
 //----------------------------------------------------------------------------
 
 int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (this->HasVgrp()) {

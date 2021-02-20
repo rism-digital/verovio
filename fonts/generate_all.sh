@@ -25,8 +25,9 @@ fi
 echo "Generating metadata for Leipzig..."
 fontforge generate_font_metadata.py Leipzig-5.2.sfd
 
-echo "Generating C++ header file ..."
+echo "Generating C++ header and implementation file ..."
 saxon supported.xsl generate-h.xsl > ../include/vrv/smufl.h
+saxon supported.xsl generate-cpp.xsl > ../src/smufl.cpp
 
 echo "Generating Bravura files ..."
 saxon Bravura.svg extract-glyphs.xsl > tmp/Bravura-bounding-boxes.svg
@@ -43,5 +44,9 @@ phantomjs generate-bbox.js tmp/Gootville-bounding-boxes.svg ../data/Gootville.xm
 echo "Generating Petaluma files ..."
 saxon Petaluma.svg extract-glyphs.xsl > tmp/Petaluma-bounding-boxes.svg
 phantomjs generate-bbox.js tmp/Petaluma-bounding-boxes.svg ../data/Petaluma.xml json/petaluma_metadata.json
+
+echo "Generating Leland files ..."
+saxon Leland.svg extract-glyphs.xsl > tmp/Leland-bounding-boxes.svg
+phantomjs generate-bbox.js tmp/Leland-bounding-boxes.svg ../data/Leland.xml json/leland_metadata.json
 
 echo "Done!"

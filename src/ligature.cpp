@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "dot.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "note.h"
@@ -27,9 +28,9 @@ namespace vrv {
 // Ligature
 //----------------------------------------------------------------------------
 
-Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureLog()
+Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureVis()
 {
-    RegisterAttClass(ATT_LIGATURELOG);
+    RegisterAttClass(ATT_LIGATUREVIS);
 
     Reset();
 }
@@ -42,7 +43,7 @@ Ligature::~Ligature()
 void Ligature::Reset()
 {
     LayerElement::Reset();
-    ResetLigatureLog();
+    ResetLigatureVis();
 
     ClearClusters();
 }
@@ -51,8 +52,11 @@ void Ligature::ClearClusters() {}
 
 bool Ligature::IsSupportedChild(Object *child)
 {
-    if (child->Is(NOTE)) {
-        assert(dynamic_cast<LayerElement *>(child));
+    if (child->Is(DOT)) {
+        assert(dynamic_cast<Dot *>(child));
+    }
+    else if (child->Is(NOTE)) {
+        assert(dynamic_cast<Note *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -74,7 +78,7 @@ void Ligature::FilterList(ArrayOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        LayerElement *currentElement = dynamic_cast<LayerElement *>(*iter);
+        LayerElement *currentElement = vrv_cast<LayerElement *>(*iter);
         assert(currentElement);
         if (!currentElement->HasInterface(INTERFACE_DURATION)) {
             iter = childList->erase(iter);
@@ -113,13 +117,13 @@ int Ligature::GetDrawingNoteShape(Note *note)
 
 int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     m_drawingShapes.clear();
 
     Note *lastNote = dynamic_cast<Note *>(this->GetList(this)->back());
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     const ArrayOfObjects *notes = this->GetList(this);
@@ -140,7 +144,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     for (auto &iter : *notes) {
 
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
 
         m_drawingShapes.push_back(LIGATURE_DEFAULT);
@@ -151,7 +155,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
         }
 
         // Look at the @lig attribute on the previous note
-        if (previousNote->GetLig() == noteAnlMensural_LIG_obliqua) oblique = true;
+        if (previousNote->GetLig() == LIGATUREFORM_obliqua) oblique = true;
         int dur1 = previousNote->GetActualDur();
         int dur2 = note->GetActualDur();
         // Same treatment for Mx and LG execpt for positionning, which is done above
@@ -241,7 +245,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
                 // nothing to change
             }
             // only set the oblique with the SB if the following B is not the start of an oblique
-            else if (note->GetLig() != noteAnlMensural_LIG_obliqua) {
+            else if (note->GetLig() != LIGATUREFORM_obliqua) {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
                 if (n1 > 0) {
                     m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
@@ -284,7 +288,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     for (auto &iter : *notes) {
 
-        Note *note = dynamic_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(iter);
         assert(note);
 
         // previousRight is 0 for the first note

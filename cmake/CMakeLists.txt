@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8...3.19)
 
 project(Verovio)
 
@@ -8,8 +8,10 @@ if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
-option(NO_DARMS_SUPPORT         "Disable Humdrum support"                      ON)
+option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        OFF)
+option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
+option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
 option(BUILD_AS_LIBRARY         "Build verovio as library"                     OFF)
@@ -89,8 +91,13 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
 )
+
+if(VRV_DYNAMIC_CAST)
+    add_definitions(-DVRV_DYNAMIC_CAST)
+endif()
 
 if(NO_DARMS_SUPPORT)
     add_definitions(-DNO_DARMS_SUPPORT)
@@ -139,29 +146,66 @@ set(all_SRC
     ../libmei/atts_visual.cpp
 )
 
+##################
+# Shared library #
+##################
+
 if (BUILD_AS_LIBRARY)
-    message(STATUS "build verovio as library")
-    add_library (
-        verovio
-        SHARED
-		../tools/c_wrapper.cpp
-        ${all_SRC}
-    )
+    message(STATUS "***** Building Verorio as shared library *****")
+    add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
+
+###########
+# WASM BC #
+###########
+
 elseif (BUILD_AS_WASM)
-    message(STATUS "build verovio as wasm bc")
-    add_library (
-        verovio
-        STATIC
-		../tools/c_wrapper.cpp
-        ${all_SRC}
-    )
+    message(STATUS "***** Building Verorio as WASM BC *****")
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+
+#################
+# Python module #
+#################
+
+elseif (BUILD_AS_PYTHON)
+    message(STATUS "***** Building Verorio as Python module *****")
+
+    # clear out policies
+    cmake_policy(SET CMP0078 NEW)
+    cmake_policy(SET CMP0086 NEW)
+
+    find_package(SWIG REQUIRED)
+    include(${SWIG_USE_FILE})
+    set(CMAKE_SWIG_FLAGS "")
+    set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)
+
+    # needed for static build on linux
+    add_definitions(-fPIC)
+
+    ### For building for specific version of Python (example for 3.4 on OS X with MacPorts installation)
+    #set(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
+    #set(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
+    #include_directories(${PYTHON_INCLUDE_DIR})
+    #swig_add_library(verovio_module_custom LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
+    #swig_link_libraries(verovio_module_custom verovio ${PYTHON_LIBRARY})
+
+    ### For building for found version of Python (comment when specific version is set)
+    find_package(PythonLibs)
+    include_directories(${PYTHON_INCLUDE_PATH})
+    message(STATUS "***** Building for Python ${PYTHONLIBS_VERSION_STRING} *****")
+    string(REPLACE "." "_" OUTPUT_VERSION_STRING ${PYTHONLIBS_VERSION_STRING})
+    swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
+    swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${PYTHON_LIBRARIES})
+
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+
+#####################
+# Command-line tool #
+#####################
+
 else()
-    message(STATUS "build verovio as executable")
-    add_executable (
-        verovio
-        ../tools/main.cpp
-        ${all_SRC}
-    )
+    message(STATUS "***** Building Verorio as command-line tool *****")
+    add_executable(verovio ../tools/main.cpp ${all_SRC})
+
 endif()
 
 install(

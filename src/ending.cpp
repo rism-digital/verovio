@@ -75,7 +75,7 @@ bool Ending::IsSupportedChild(Object *child)
 
 int Ending::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
@@ -85,7 +85,7 @@ int Ending::ConvertToPageBased(FunctorParams *functorParams)
 
 int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
@@ -95,7 +95,7 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
 int Ending::PrepareBoundaries(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
     // Endings should always have an BoundaryEnd
@@ -119,7 +119,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
 
 int Ending::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -138,7 +138,7 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
 
 int Ending::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);
@@ -148,7 +148,7 @@ int Ending::CastOffEncoding(FunctorParams *functorParams)
 
 int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (params->m_previousEnding) {

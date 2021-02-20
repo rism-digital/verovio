@@ -10,6 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <fstream>
+#include <functional>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -19,11 +21,14 @@
 
 namespace vrv {
 
-std::map<int, std::string> Option::s_breaks
-    = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_line, "line" }, { BREAKS_encoded, "encoded" } };
+std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
+    { BREAKS_line, "line" }, { BREAKS_smart, "smart" }, { BREAKS_encoded, "encoded" } };
+
+std::map<int, std::string> Option::s_condense
+    = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
 std::map<int, std::string> Option::s_footer
-    = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" } };
+    = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
 std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
@@ -31,8 +36,14 @@ std::map<int, std::string> Option::s_header
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
 
-std::map<int, std::string> Option::s_systemDivider
-    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
+    { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+
+constexpr const char *engravingDefaults
+    = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
+      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
+      "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
+      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': 0.2}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -138,6 +149,7 @@ std::string OptionBool::GetDefaultStrValue() const
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
+    m_isSet = true;
     return true;
 }
 
@@ -188,6 +200,7 @@ bool OptionDbl::SetValue(double value)
         return false;
     }
     m_value = value;
+    m_isSet = true;
     return true;
 }
 
@@ -249,6 +262,7 @@ bool OptionInt::SetValue(int value)
         return false;
     }
     m_value = value;
+    m_isSet = true;
     return true;
 }
 
@@ -272,6 +286,7 @@ void OptionString::Init(const std::string &defaultValue)
 bool OptionString::SetValue(const std::string &value)
 {
     m_value = value;
+    m_isSet = true;
     return true;
 }
 
@@ -295,6 +310,7 @@ void OptionArray::Init()
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
+    m_isSet = true;
     // m_values.erase(std::remove_if(m_values.begin(), m_values.end(),
     //                                       [](const std::string &s) { return s.empty(); }),
     //                        m_values.end());
@@ -306,6 +322,7 @@ bool OptionArray::SetValue(const std::string &value)
     // Passing a single value to an array option adds it to the values and to not replace them
     if (!value.empty()) {
         m_values.push_back(value);
+        m_isSet = true;
     }
     return true;
 }
@@ -339,6 +356,7 @@ std::string OptionArray::GetDefaultStrValue() const
 bool OptionArray::SetValue(std::vector<std::string> const &values)
 {
     m_values = values;
+    m_isSet = true;
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
     return true;
@@ -379,6 +397,7 @@ bool OptionIntMap::SetValue(const std::string &value)
     for (it = m_values->begin(); it != m_values->end(); ++it)
         if (it->second == value) {
             m_value = it->first;
+            m_isSet = true;
             return true;
         }
     LogError("Parameter '%s' not valid for '%s'", value.c_str(), GetKey().c_str());
@@ -407,6 +426,7 @@ bool OptionIntMap::SetValue(int value)
     assert(m_values->count(value));
 
     m_value = value;
+    m_isSet = true;
 
     return true;
 }
@@ -468,6 +488,7 @@ bool OptionStaffrel::SetValue(const std::string &value)
         return false;
     }
     m_value = staffrel;
+    m_isSet = true;
     return true;
 }
 
@@ -481,6 +502,105 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 {
     Att converter;
     return converter.StaffrelToStr(m_defaultValue);
+}
+
+//----------------------------------------------------------------------------
+// OptionJson
+//----------------------------------------------------------------------------
+
+void OptionJson::Init(const std::string &defaultValue)
+{
+    m_defaultValues.parse(defaultValue);
+    m_isSet = false;
+}
+
+bool OptionJson::SetValue(const std::string &jsonFilePath)
+{
+    std::ifstream in(jsonFilePath.c_str());
+    if (!in.is_open()) {
+        return false;
+    }
+
+    jsonxx::Object newValues;
+    if (!newValues.parse(in)) {
+        LogError("Input file '%s' is not valid or contains errors", jsonFilePath.c_str());
+        return false;
+    }
+
+    m_values = newValues;
+    m_isSet = true;
+
+    in.close();
+    return true;
+}
+
+int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+{
+    return static_cast<int>(GetDoubleValue(jsonNodePath, getDefault));
+}
+
+double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+{
+    JsonPath path
+        = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath) : StringPath2NodePath(m_values, jsonNodePath);
+
+    if (path.size() != jsonNodePath.size() && !getDefault) {
+        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
+    }
+
+    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>()) return 0;
+
+    return path.back().get().get<jsonxx::Number>();
+}
+
+bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value)
+{
+    if (jsonNodePath.empty()) {
+        return false;
+    }
+
+    JsonPath path = StringPath2NodePath(m_values, jsonNodePath);
+    if (path.size() != jsonNodePath.size()) {
+        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
+    }
+
+    if (path.size() != jsonNodePath.size()) {
+        return false;
+    }
+
+    path.back().get().parse(value);
+    return true;
+}
+
+OptionJson::JsonPath OptionJson::StringPath2NodePath(
+    const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
+{
+    JsonPath path;
+    if (jsonNodePath.empty() || !obj.has<jsonxx::Value>(jsonNodePath.front())) {
+        return path;
+    }
+    path.reserve(jsonNodePath.size());
+    path.push_back(const_cast<jsonxx::Value &>(obj.get<jsonxx::Value>(jsonNodePath.front())));
+    for (auto iter = jsonNodePath.begin() + 1; iter != jsonNodePath.end(); ++iter) {
+        jsonxx::Value &val = path.back();
+        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(*iter)) {
+            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
+        }
+        else if (val.is<jsonxx::Array>()) {
+            try {
+                const int index = std::stoi(*iter);
+                if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
+
+                path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
+            }
+            catch (const std::logic_error &) {
+                // invalid index, leaving
+                break;
+            }
+        }
+    }
+
+    return path;
 }
 
 //----------------------------------------------------------------------------
@@ -506,9 +626,14 @@ Options::Options()
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
 
-    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
-    m_condenseEncoded.Init(false);
-    this->Register(&m_condenseEncoded, "condenseEncoded", &m_general);
+    m_breaksSmartSb.SetInfo("Smart breaks sb usage threshold",
+        "In smart breaks mode, the portion of system width usage at which an encoded sb will be used");
+    m_breaksSmartSb.Init(0.66, 0.0, 1.0);
+    this->Register(&m_breaksSmartSb, "breaksSmartSb", &m_general);
+
+    m_condense.SetInfo("Condense", "Control condensed score layout");
+    m_condense.Init(CONDENSE_auto, &Option::s_condense);
+    this->Register(&m_condense, "condense", &m_general);
 
     m_condenseFirstPage.SetInfo("Condense first page", "When condensing a score also condense the first page");
     m_condenseFirstPage.Init(false);
@@ -526,14 +651,6 @@ Options::Options()
     m_humType.SetInfo("Humdrum type", "Include type attributes when importing from Humdrum");
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
-
-    m_justifyIncludeLastPage.SetInfo("Justify including the last page", "Justify including the last page");
-    m_justifyIncludeLastPage.Init(false);
-    this->Register(&m_justifyIncludeLastPage, "justifyIncludeLastPage", &m_general);
-
-    m_justifySystemsOnly.SetInfo("Justify systems only", "Justify systems only and not staves");
-    m_justifySystemsOnly.Init(false);
-    this->Register(&m_justifySystemsOnly, "justifySystemsOnly", &m_general);
 
     m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
     m_justifyVertically.Init(false);
@@ -617,6 +734,10 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_general);
 
+    m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
+    m_shrinkToFit.Init(false);
+    this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
+
     m_svgBoundingBoxes.SetInfo("Svg bounding boxes viewbox on svg root", "Include bounding boxes in SVG output");
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
@@ -656,7 +777,12 @@ Options::Options()
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
 
-    m_barLineWidth.SetInfo("Bar line width", "The barLine width");
+    m_barLineSeparation.SetInfo(
+        "Barline separation", "The default distance between multiple barlines when locked together");
+    m_barLineSeparation.Init(0.8, 0.5, 2.0);
+    this->Register(&m_barLineSeparation, "barLineSeparation", &m_generalLayout);
+
+    m_barLineWidth.SetInfo("Barline width", "The barLine width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
@@ -667,6 +793,15 @@ Options::Options()
     m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
+
+    m_bracketThickness.SetInfo("Bracket thickness", "The thickness of the system bracket");
+    m_bracketThickness.Init(1.0, 0.5, 2.0);
+    this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
+
+    m_engravingDefaults.SetInfo(
+        "Engraving defaults", "Path to json file describing defaults for engraving SMuFL elements");
+    m_engravingDefaults.Init(engravingDefaults);
+    this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
 
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
@@ -687,6 +822,37 @@ Options::Options()
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
+
+    m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
+    m_hairpinThickness.Init(0.2, 0.1, 0.8);
+    this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
+
+    m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
+    m_justificationStaff.Init(1., 0., 10.);
+    this->Register(&m_justificationStaff, "justificationStaff", &m_generalLayout);
+
+    m_justificationSystem.SetInfo("Spacing system justification", "The system spacing justification");
+    m_justificationSystem.Init(1., 0., 10.);
+    this->Register(&m_justificationSystem, "justificationSystem", &m_generalLayout);
+
+    m_justificationBracketGroup.SetInfo(
+        "Spacing bracket group justification", "Space between staves inside a bracketed group justification");
+    m_justificationBracketGroup.Init(1., 0., 10.);
+    this->Register(&m_justificationBracketGroup, "justificationBracketGroup", &m_generalLayout);
+
+    m_justificationBraceGroup.SetInfo(
+        "Spacing brace group justification", "Space between staves inside a braced group ijustification");
+    m_justificationBraceGroup.Init(1., 0., 10.);
+    this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
+
+    m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
+    m_ledgerLineThickness.Init(0.25, 0.10, 0.50);
+    this->Register(&m_ledgerLineThickness, "ledgerLineThickness", &m_generalLayout);
+
+    m_ledgerLineExtension.SetInfo(
+        "Ledger line extension", "The amount by which a ledger line should extend either side of a notehead");
+    m_ledgerLineExtension.Init(0.54, 0.20, 1.00);
+    this->Register(&m_ledgerLineExtension, "ledgerLineExtension", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
@@ -720,10 +886,19 @@ Options::Options()
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
 
+    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
+        "The default horizontal distance between the dots and the inner barline of a repeat barline");
+    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
+
+    m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
+    m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
+    this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
+
     m_slurControlPoints.SetInfo(
         "Slur control points", "Slur control points - higher value means more curved at the end");
     m_slurControlPoints.Init(5, 1, 10);
-    this->Register(&m_slurControlPoints, "slurControlPointsr", &m_generalLayout);
+    this->Register(&m_slurControlPoints, "slurControlPoints", &m_generalLayout);
 
     m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
     m_slurCurveFactor.Init(10, 1, 100);
@@ -742,12 +917,26 @@ Options::Options()
     this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
-    m_slurMaxSlope.Init(20, 0, 45);
+    m_slurMaxSlope.Init(20, 0, 60);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
-    m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
-    m_slurThickness.Init(0.6, 0.2, 1.2);
-    this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
+    m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
+    m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
+
+    m_slurMidpointThickness.SetInfo("Slur midpoint thickness", "The midpoint slur thickness in MEI units");
+    m_slurMidpointThickness.Init(0.6, 0.2, 1.2);
+    this->Register(&m_slurMidpointThickness, "slurMidpointThickness", &m_generalLayout);
+
+    m_spacingBraceGroup.SetInfo(
+        "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
+    m_spacingBraceGroup.Init(12, 0, 48);
+    this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
+
+    m_spacingBracketGroup.SetInfo(
+        "Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
+    m_spacingBracketGroup.Init(12, 0, 48);
+    this->Register(&m_spacingBracketGroup, "spacingBracketGroup", &m_generalLayout);
 
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
     m_spacingDurDetection.Init(false);
@@ -762,11 +951,11 @@ Options::Options()
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
 
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
-    m_spacingStaff.Init(8, 0, 24);
+    m_spacingStaff.Init(12, 0, 48);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
 
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
-    m_spacingSystem.Init(3, 0, 12);
+    m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
@@ -777,17 +966,41 @@ Options::Options()
     m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
 
+    m_subBracketThickness.SetInfo("Sub bracket thickness", "The thickness of system sub-bracket");
+    m_subBracketThickness.Init(0.20, 0.10, 2.0);
+    this->Register(&m_subBracketThickness, "subBracketThickness", &m_generalLayout);
+
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
-    m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
+    m_systemDivider.Init(SYSTEMDIVIDER_auto, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
     m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
-    m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
-    m_tieThickness.Init(0.5, 0.2, 1.0);
-    this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
+    m_textEnclosureThickness.SetInfo("Text box line thickness", "The thickness of the line text enclosing box");
+    m_textEnclosureThickness.Init(0.2, 0.10, 0.80);
+    this->Register(&m_textEnclosureThickness, "textEnclosureThickness", &m_generalLayout);
+
+    m_thickBarlineThickness.SetInfo("Thick barline thickness", "The thickness of the thick barline");
+    m_thickBarlineThickness.Init(1.0, 0.5, 2.0);
+    this->Register(&m_thickBarlineThickness, "thickBarlineThickness", &m_generalLayout);
+
+    m_tieEndpointThickness.SetInfo("Tie Endpoint thickness", "The Endpoint tie thickness in MEI units");
+    m_tieEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_tieEndpointThickness, "tieEndpointThickness", &m_generalLayout);
+
+    m_tieMidpointThickness.SetInfo("Tie midpoint thickness", "The midpoint tie thickness in MEI units");
+    m_tieMidpointThickness.Init(0.5, 0.2, 1.0);
+    this->Register(&m_tieMidpointThickness, "tieMidpointThickness", &m_generalLayout);
+
+    m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
+    m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
+    this->Register(&m_tupletBracketThickness, "tupletBracketThickness", &m_generalLayout);
+
+    m_tupletNumHead.SetInfo("Tuplet number on head", "Placement of tuplet number on the side of the note head");
+    m_tupletNumHead.Init(false);
+    this->Register(&m_tupletNumHead, "tupletNumHead", &m_generalLayout);
 
     /********* selectors *********/
 
@@ -849,6 +1062,10 @@ Options::Options()
     this->Register(&m_defaultTopMargin, "defaultTopMargin", &m_elementMargins);
 
     /// custom bottom
+
+    m_bottomMarginArtic.SetInfo("Bottom margin artic", "The margin for artic in MEI units");
+    m_bottomMarginArtic.Init(0.75, 0.0, 10.0);
+    this->Register(&m_bottomMarginArtic, "bottomMarginArtic", &m_elementMargins);
 
     m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
     m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
@@ -992,9 +1209,30 @@ Options::Options()
 
     /// custom top
 
+    m_topMarginArtic.SetInfo("Top margin artic", "The margin for artic in MEI units");
+    m_topMarginArtic.Init(0.75, 0.0, 10.0);
+    this->Register(&m_topMarginArtic, "topMarginArtic", &m_elementMargins);
+
     m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
     m_topMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
+
+    /********* Deprecated options *********/
+
+    m_deprecated.SetLabel("Deprecated options", "Deprecated");
+    m_grps.push_back(&m_deprecated);
+
+    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
+    m_condenseEncoded.Init(false);
+    this->Register(&m_condenseEncoded, "condenseEncoded", &m_deprecated);
+
+    m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
+    m_slurThickness.Init(0.6, 0.2, 2);
+    this->Register(&m_slurThickness, "slurThickness", &m_deprecated);
+
+    m_tieThickness.SetInfo("Tie  thickness", "The tie thickness in MEI units");
+    m_tieThickness.Init(0.5, 0.2, 1.0);
+    this->Register(&m_tieThickness, "tieThickness", &m_deprecated);
 
     /*
     // Example of a staffRel param
@@ -1034,6 +1272,40 @@ Options &Options::operator=(const Options &options)
 }
 
 Options::~Options() {}
+
+void Options::Sync()
+{
+    if (!m_engravingDefaults.isSet()) return;
+    // override default or passed engravingDefaults with explicitly set values
+    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = {
+        { "staffLineThickness", &m_staffLineWidth }, //
+        { "stemThickness", &m_stemWidth }, //
+        { "legerLineThickness", &m_ledgerLineThickness }, //
+        { "legerLineExtension", &m_ledgerLineExtension }, //
+        { "slurEndpointThickness", &m_slurEndpointThickness }, //
+        { "slurMidpointThickness", &m_slurMidpointThickness }, //
+        { "tieEndpointThickness", &m_tieEndpointThickness }, //
+        { "tieMidpointThickness", &m_tieMidpointThickness }, //
+        { "thinBarlineThickness", &m_barLineWidth }, //
+        { "thickBarlineThickness", &m_thickBarlineThickness }, //
+        { "barlineSeparation", &m_barLineSeparation }, //
+        { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
+        { "bracketThickness", &m_bracketThickness }, //
+        { "subBracketThickness", &m_subBracketThickness }, //
+        { "hairpinThickness", &m_hairpinThickness }, //
+        { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
+        { "lyricLineThickness", &m_lyricLineThickness }, //
+        { "tupletBracketThickness", &m_tupletBracketThickness }, //
+        { "textEnclosureThickness", &m_textEnclosureThickness } //
+    };
+
+    for (auto &pair : engravingDefaults) {
+        if (pair.second->isSet()) continue;
+
+        const double jsonValue = m_engravingDefaults.GetDoubleValue({ "engravingDefaults", pair.first });
+        pair.second->SetValueDbl(jsonValue * 2);
+    }
+}
 
 void Options::Register(Option *option, const std::string &key, OptionGrp *grp)
 {

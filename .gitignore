@@ -39,7 +39,8 @@ emscripten/CMakeCache.txt
 bindings/python/verovio_wrap.cpp
 bindings/python/verovio.pyc
 bindings/python/verovio.py
-bindings/python/_verovio.so
+bindings/python/_verovio*.so
+bindings/python/__pycache__/*
 
 # java build
 bindings/java/verovio_wrap.cxx
@@ -88,3 +89,6 @@ Debug/
 Release/
 *.vcxproj*
 *.sln
+
+# Fonts
+fonts/tmp/

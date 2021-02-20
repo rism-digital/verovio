@@ -39,12 +39,16 @@ Dynam::Dynam()
     , TimeSpanningInterface()
     , AttExtender()
     , AttLineRendBase()
+    , AttMidiValue()
+    , AttMidiValue2()
     , AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_EXTENDER);
     RegisterAttClass(ATT_LINERENDBASE);
+    RegisterAttClass(ATT_MIDIVALUE);
+    RegisterAttClass(ATT_MIDIVALUE2);
     RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
@@ -237,7 +241,7 @@ std::wstring Dynam::GetSymbolStr(const std::wstring &str)
 
 int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     if (this->HasVgrp()) {

@@ -82,7 +82,7 @@ void BoundaryStartInterface::ConvertToPageBasedBoundary(Object *object, Object *
 
 int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
     // We set its pointer to the last measure we have encountered - this can be NULL in case no measure exists before
@@ -112,7 +112,7 @@ int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
 
 int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -135,7 +135,7 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
 
 int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     assert(this->GetStart());
@@ -143,7 +143,7 @@ int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
     // We are reaching the end of an ending - put it to the param and it will be grouped with the next one if there is
     // not measure in between
     if (this->GetStart()->Is(ENDING)) {
-        params->m_previousEnding = dynamic_cast<Ending *>(this->GetStart());
+        params->m_previousEnding = vrv_cast<Ending *>(this->GetStart());
         assert(params->m_previousEnding);
         // This is the end of the first ending - generate a grpId
         if (params->m_previousEnding->GetDrawingGrpId() == 0) {
@@ -160,7 +160,7 @@ int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 
 int BoundaryStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
     // We have to be in a boundary start element

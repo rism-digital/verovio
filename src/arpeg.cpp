@@ -122,7 +122,7 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
     if (front == back) {
         // It has to be a chord in this case
         if (front->Is(NOTE)) return;
-        Chord *chord = dynamic_cast<Chord *>(front);
+        Chord *chord = vrv_cast<Chord *>(front);
         assert(chord);
         top = chord->GetTopNote();
         bottom = chord->GetBottomNote();
@@ -136,19 +136,19 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 
     // Get the first and second chord or note
     if (front->Is(CHORD)) {
-        chord1 = dynamic_cast<Chord *>(front);
+        chord1 = vrv_cast<Chord *>(front);
         assert(chord1);
     }
     else {
-        note1 = dynamic_cast<Note *>(front);
+        note1 = vrv_cast<Note *>(front);
         assert(note1);
     }
     if (back->Is(CHORD)) {
-        chord2 = dynamic_cast<Chord *>(back);
+        chord2 = vrv_cast<Chord *>(back);
         assert(chord2);
     }
     else {
-        note2 = dynamic_cast<Note *>(back);
+        note2 = vrv_cast<Note *>(back);
         assert(note2);
     }
 
@@ -174,6 +174,27 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
     }
 }
 
+Staff *Arpeg::GetCrossStaff()
+{
+    const ArrayOfObjects *refs = GetRefs();
+    if (refs->empty()) return NULL;
+
+    // Find if there is at least one element that is not cross staff
+    auto iter = std::find_if(refs->begin(), refs->end(), [](Object *obj) {
+        LayerElement *element = vrv_cast<LayerElement *>(obj);
+        assert(element);
+        return !element->m_crossStaff;
+    });
+
+    // If that's the case - return NULL, we can base arpegio location on the original staff
+    if (iter != refs->end()) return NULL;
+
+    // Otherwise return cross staff of the front element from the references
+    LayerElement *front = vrv_cast<LayerElement *>(refs->front());
+    assert(front);
+    return front->m_crossStaff;
+}
+
 //----------------------------------------------------------------------------
 // Arpeg functor methods
 //----------------------------------------------------------------------------
@@ -187,7 +208,7 @@ int Arpeg::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 {
-    AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
+    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
     assert(params);
 
     Note *topNote = NULL;
@@ -201,14 +222,17 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     // We should have call DrawArpeg before
     assert(this->GetCurrentFloatingPositioner());
 
-    Staff *topStaff = dynamic_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
+    Staff *topStaff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
     assert(topStaff);
 
-    Staff *bottomStaff = dynamic_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
+    Staff *bottomStaff = vrv_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
     assert(bottomStaff);
 
+    Staff *crossStaff = GetCrossStaff();
+    const int staffN = (crossStaff != NULL) ? crossStaff->GetN() : topStaff->GetN();
+
     int minTopLeft, maxTopRight;
-    topNote->GetAlignment()->GetLeftRight(topStaff->GetN(), minTopLeft, maxTopRight);
+    topNote->GetAlignment()->GetLeftRight(staffN, minTopLeft, maxTopRight);
 
     params->m_alignmentArpegTuples.push_back(std::make_tuple(topNote->GetAlignment(), this, topStaff->GetN(), false));
 

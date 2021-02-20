@@ -48,7 +48,7 @@ void Pb::Reset()
 
 int Pb::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     // We look if the current system has a least one measure - if yes, we assume that the <pb>

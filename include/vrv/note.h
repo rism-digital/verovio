@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "atts_externalsymbols.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
@@ -49,10 +50,11 @@ class Note : public LayerElement,
              public AttColor,
              public AttColoration,
              public AttCue,
+             public AttExtSym,
              public AttGraced,
              public AttMidiVelocity,
-             public AttNoteAnlMensural,
              public AttNoteHeads,
+             public AttNoteVisMensural,
              public AttStems,
              public AttStemsCmn,
              public AttTiePresent,
@@ -101,7 +103,7 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * @name Setter and getter for tie attribute and other pointers
+     * @name Setter and getter for accid attribute and other pointers
      */
     ///@{
     Accid *GetDrawingAccid();
@@ -117,7 +119,7 @@ public:
     ///@}
 
     /**
-     * Check if the note has leger lines.
+     * Check if the note has ledger lines.
      * If staff is passed, use it for getting the staff line number.
      * Otherwise, it will look for the Staff ancestor.
      * Set the value of ledger lines above or below.
@@ -173,12 +175,24 @@ public:
     /**
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */
-    wchar_t GetMensuralSmuflNoteHead();
+    wchar_t GetMensuralNoteheadGlyph();
+
+    /**
+     * Return a SMuFL code for the notehead
+     */
+    wchar_t GetNoteheadGlyph(const int duration) const;
 
     /**
      * Check if a note or its parent chord are visible
      */
     bool IsVisible();
+
+    /**
+     * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
+     * element if it's in unison with it
+     */
+    std::pair<int, bool> CalcNoteHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
+        bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     /**
      * MIDI timing information
@@ -199,15 +213,35 @@ public:
     char GetMIDIPitch();
     ///@}
 
+    /**
+     * Helper to adjust overlaping layers for notes
+     */
+    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+
 public:
     //----------//
     // Functors //
     //----------//
 
     /**
+     * See Object::AdjustArtic
+     */
+    virtual int AdjustArtic(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
     virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
+
+    /**
+     * See Object::ConvertMarkupArtic
+     */
+    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcArtic
+     */
+    virtual int CalcArtic(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem
@@ -238,11 +272,6 @@ public:
      * See Object::PrepareLyrics
      */
     virtual int PrepareLyrics(FunctorParams *functorParams);
-
-    /**
-     * See Object::PreparePointersByLayer
-     */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -278,6 +307,12 @@ private:
     TransPitch GetTransPitch();
 
     void UpdateFromTransPitch(const TransPitch &tp);
+
+    /**
+     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
+     * as position of the note and position of the dots
+     */
+    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted);
 
 public:
     //

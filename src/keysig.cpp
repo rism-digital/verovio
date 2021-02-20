@@ -121,7 +121,7 @@ void KeySig::FilterList(ArrayOfObjects *childList)
     m_mixedChildrenAccidType = false;
 
     for (auto &child : *childList) {
-        KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(child);
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
         assert(keyAccid);
         if (type == ACCIDENTAL_WRITTEN_NONE) {
             type = keyAccid->GetAccid();
@@ -151,7 +151,7 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType()
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     if (childList->size() > 0) {
         if (m_mixedChildrenAccidType) return ACCIDENTAL_WRITTEN_NONE;
-        KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(childList->at(0));
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(childList->at(0));
         assert(keyAccid);
         return keyAccid->GetAccid();
     }
@@ -168,7 +168,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     if (childList->size() > 0) {
         for (auto &child : *childList) {
-            KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(child);
+            KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
             assert(keyAccid);
             mapOfPitchAccid[keyAccid->GetPname()] = keyAccid->GetAccid();
         }
@@ -191,7 +191,7 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     if (childList->size() > 0) {
         if ((int)childList->size() <= pos) return symbolStr;
-        KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(childList->at(pos));
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(childList->at(pos));
         assert(keyAccid);
         accid = keyAccid->GetAccid();
         pname = keyAccid->GetPname();
@@ -218,8 +218,19 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     return symbolStr;
 }
 
+int KeySig::GetFifthsInt()
+{
+    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
+        return -1 * this->GetSig().first;
+    }
+    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
+        return this->GetSig().first;
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
-// Static methods
+// Static methods for KeySig
 //----------------------------------------------------------------------------
 
 data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int pos)
@@ -288,23 +299,13 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
     return octave;
 }
 
-int KeySig::GetFifthsInt()
-{
-    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
-        return -1 * this->GetSig().first;
-    }
-    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
-        return this->GetSig().first;
-    }
-    return 0;
-}
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 
 int KeySig::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
     LogDebug("Transposing keySig");

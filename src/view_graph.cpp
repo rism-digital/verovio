@@ -104,6 +104,25 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
     return;
 }
 
+void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius = 0)
+{
+    assert(dc); // DC cannot be NULL
+
+    BoundingBox::Swap(y1, y2);
+
+    const int penWidth = lineThinkness;
+    dc->SetPen(m_currentColour, penWidth, AxSOLID);
+    dc->SetBrush(m_currentColour, AxTRANSPARENT);
+
+    dc->DrawRoundedRectangle(
+        ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
+
+    dc->ResetPen();
+    dc->ResetBrush();
+
+    return;
+}
+
 /* Draw a filled rectangle with horizontal and vertical sides. */
 void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2)
 {
@@ -188,7 +207,7 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
 
 void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
 {
-    int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
+    const int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -224,14 +243,16 @@ void View::DrawSmuflLine(
 {
     assert(dc);
 
-    int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
-    int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
-    int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
-
     if (length <= 0) return;
 
+    const int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
+    const int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
+    int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
+
+    if (fillWidth == 0) fillWidth = m_doc->GetGlyphWidth(fill, staffSize, dimin);
+
     // We add half a fill length for an average shorter / longer line result
-    int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
+    const int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
 
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
@@ -242,8 +263,7 @@ void View::DrawSmuflLine(
         str.push_back(start);
     }
 
-    int i;
-    for (i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i) {
         str.push_back(fill);
     }
 
@@ -285,7 +305,7 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data
 }
 
 void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle, int penStyle)
+    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, float angle, int penStyle)
 {
     assert(dc);
 
@@ -306,12 +326,12 @@ void View::DrawThickBezierCurve(
     // Actually draw it
     if (penStyle == AxSOLID) {
         // Solid Thick Bezier Curves are made of two beziers, filled in.
-        dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
+        dc->SetPen(m_currentColour, std::max(1, penWidth), penStyle);
         dc->DrawComplexBezierPath(bez1, bez2);
     }
     else {
         // Dashed or Dotted Thick Bezier Curves have a uniform line width.
-        dc->SetPen(m_currentColour, thickness, penStyle);
+        dc->SetPen(m_currentColour, (thickness + penWidth) / 2, penStyle);
         dc->DrawSimpleBezierPath(bez1);
     }
     dc->ResetPen();

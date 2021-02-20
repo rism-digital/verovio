@@ -65,6 +65,7 @@ public:
         m_isDeactivatedY = false;
         m_width = 0;
         m_height = 0;
+        m_contentHeight = 0;
         m_userScaleX = 1.0;
         m_userScaleY = 1.0;
     }
@@ -80,13 +81,15 @@ public:
     ///@{
     void SetWidth(int width) { m_width = width; }
     void SetHeight(int height) { m_height = height; }
+    void SetContentHeight(int height) { m_contentHeight = height; }
     void SetUserScale(double scaleX, double scaleY)
     {
         m_userScaleX = scaleX;
         m_userScaleY = scaleY;
     }
-    int GetWidth() { return m_width; }
-    int GetHeight() { return m_height; }
+    int GetWidth() const { return m_width; }
+    int GetHeight() const { return m_height; }
+    int GetContentHeight() const { return m_contentHeight; }
     double GetUserScaleX() { return m_userScaleX; }
     double GetUserScaleY() { return m_userScaleY; }
     ///@}
@@ -252,9 +255,6 @@ public:
     virtual void EndPage() = 0;
     ///@}
 
-    /** Colour conversion method **/
-    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
-
     /**
      * @name Method for adding description element
      */
@@ -268,6 +268,13 @@ public:
      * Global styling is false by default.
      */
     virtual bool UseGlobalStyling() { return false; }
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /** Colour conversion method **/
+    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
 
 private:
     void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
@@ -289,6 +296,9 @@ private:
     /** stores the width and height of the device context */
     int m_width;
     int m_height;
+
+    /** stores the height of graphic content */
+    int m_contentHeight;
 
     /** stores the scale as requested by the used */
     double m_userScaleX;

@@ -16,6 +16,7 @@
 #include "clef.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "grpsym.h"
 #include "keysig.h"
 #include "label.h"
 #include "mensur.h"
@@ -75,7 +76,7 @@ bool ScoreDefElement::HasMeterSigInfo()
 Clef *ScoreDefElement::GetClef()
 {
     // Always check if HasClefInfo() is true before asking for it
-    Clef *clef = dynamic_cast<Clef *>(this->FindDescendantByType(CLEF, 1));
+    Clef *clef = vrv_cast<Clef *>(this->FindDescendantByType(CLEF, 1));
     assert(clef);
     return clef;
 }
@@ -92,7 +93,7 @@ Clef *ScoreDefElement::GetClefCopy()
 KeySig *ScoreDefElement::GetKeySig()
 {
     // Always check if HasKeySigInfo() is true before asking for it
-    KeySig *keySig = dynamic_cast<KeySig *>(this->FindDescendantByType(KEYSIG, 1));
+    KeySig *keySig = vrv_cast<KeySig *>(this->FindDescendantByType(KEYSIG, 1));
     assert(keySig);
     return keySig;
 }
@@ -109,7 +110,7 @@ KeySig *ScoreDefElement::GetKeySigCopy()
 Mensur *ScoreDefElement::GetMensur()
 {
     // Always check if HasMensurInfo() is true before asking for it
-    Mensur *mensur = dynamic_cast<Mensur *>(this->FindDescendantByType(MENSUR, 1));
+    Mensur *mensur = vrv_cast<Mensur *>(this->FindDescendantByType(MENSUR, 1));
     assert(mensur);
     return mensur;
 }
@@ -126,7 +127,7 @@ Mensur *ScoreDefElement::GetMensurCopy()
 MeterSig *ScoreDefElement::GetMeterSig()
 {
     // Always check if HasMeterSigInfo() is true before asking for it
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindDescendantByType(METERSIG, 1));
+    MeterSig *meterSig = vrv_cast<MeterSig *>(this->FindDescendantByType(METERSIG, 1));
     assert(meterSig);
     return meterSig;
 }
@@ -172,6 +173,9 @@ bool ScoreDef::IsSupportedChild(Object *child)
 {
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(GRPSYM)) {
+        assert(dynamic_cast<GrpSym *>(child));
     }
     else if (child->Is(KEYSIG)) {
         assert(dynamic_cast<KeySig *>(child));
@@ -306,7 +310,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     StaffDef *staffDef = NULL;
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
         if (!(*iter)->Is(STAFFDEF)) continue;
-        staffDef = dynamic_cast<StaffDef *>(*iter);
+        staffDef = vrv_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetN() == n) {
             return staffDef;
@@ -327,7 +331,7 @@ std::vector<int> ScoreDef::GetStaffNs()
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
         // It should be staffDef only, but double check.
         if (!(*iter)->Is(STAFFDEF)) continue;
-        staffDef = dynamic_cast<StaffDef *>(*iter);
+        staffDef = vrv_cast<StaffDef *>(*iter);
         assert(staffDef);
         ns.push_back(staffDef->GetN());
     }
@@ -385,7 +389,7 @@ int ScoreDef::GetMaxStaffSize()
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     // Move itself to the pageBasedSystem - do not process children
@@ -396,7 +400,7 @@ int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 
 int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 {
-    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
@@ -420,7 +424,7 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 
 int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
 {
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);

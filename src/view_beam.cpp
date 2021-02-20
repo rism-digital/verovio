@@ -106,8 +106,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
     const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();
 
-    assert(beamElementCoords->size() == 2);
-
+    if (beamElementCoords->size() != 2) {
+        LogError("View draw: <fTrem> element has invalid number of descendants.");
+        return;
+    }
     BeamElementCoord *firstElement = beamElementCoords->at(0);
     BeamElementCoord *secondElement = beamElementCoords->at(1);
 
@@ -219,7 +221,6 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
 
     // temporary variables
     int shiftY;
-    int polygonHeight;
 
     // loops
     int i;
@@ -248,7 +249,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     // For acc and rit beam (see AttBeamingVis set
     // s_y = 0 and s_y2 = 0 respectively
 
-    polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
+    const int polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
     DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
 
     /******************************************************************/
@@ -335,12 +336,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                     }
                 }
                 // we are not in a group
-                if (breakSec) {
-                    start = true;
-                }
-                else {
-                    start = false;
-                }
+                start = breakSec;
             }
             // last one
             idx = (int)noteIndexes.back();
@@ -354,37 +350,55 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                 }
             }
 
+            barY = beamInterface->m_beamWidth * (testDur - DUR_8);
+
             // draw them
             for (i = 0; i < noteCount; ++i) {
+                int barYPos = 0;
                 idx = noteIndexes.at(i);
+                if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
+                    int elemIndex = idx;
+                    if (BEAMPLACE_NONE == beamElementCoords->at(idx)->m_partialFlagPlace) {
+                        if ((0 == i) || ((noteCount - 1) == i)
+                            || (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlagPlace
+                                != beamElementCoords->at(noteIndexes.at(i + 1))->m_partialFlagPlace)) {
+                            continue;
+                        }
+                        elemIndex = i - 1;
+                    }
+                    barYPos
+                        = barY * ((BEAMPLACE_above == beamElementCoords->at(elemIndex)->m_partialFlagPlace) ? 1 : -1);
+                }
+                else {
+                    barYPos = shiftY * barY;
+                }
                 if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_THROUGH) {
                     // through should never be set on the last one
                     assert(i < noteCount - 1);
                     if (i >= noteCount - 1) continue; // assert for debug and skip otherwise
-                    y1 = beamElementCoords->at(idx)->m_yBeam + barY;
-                    y2 = beamElementCoords->at(noteIndexes.at(i + 1))->m_yBeam + barY;
-                    polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
+                    y1 = beamElementCoords->at(idx)->m_yBeam + barYPos;
+                    y2 = beamElementCoords->at(noteIndexes.at(i + 1))->m_yBeam + barYPos;
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1,
                         beamElementCoords->at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
-                    y1 = beamElementCoords->at(idx)->m_yBeam + barY;
+                    y1 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     int x2 = beamElementCoords->at(idx)->m_x + fractBeamWidth;
-                    y2 = beamSegment->m_startingY + barY + beamSegment->m_beamSlope * (x2 - beamSegment->m_startingX);
-                    polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
+                    y2 = beamSegment->m_startingY + barYPos
+                        + beamSegment->m_beamSlope * (x2 - beamSegment->m_startingX);
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
-                    y2 = beamElementCoords->at(idx)->m_yBeam + barY;
+                    y2 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     int x1 = beamElementCoords->at(idx)->m_x - fractBeamWidth;
-                    y1 = beamSegment->m_startingY + barY + beamSegment->m_beamSlope * (x1 - beamSegment->m_startingX);
-                    polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
+                    y1 = beamSegment->m_startingY + barYPos
+                        + beamSegment->m_beamSlope * (x1 - beamSegment->m_startingX);
                     DrawObliquePolygon(dc, x1, y1, beamElementCoords->at(idx)->m_x, y2, polygonHeight);
                 }
             }
 
             testDur += 1;
-            barY += shiftY * beamInterface->m_beamWidth;
+
         } // end of while
     } // end of drawing partial bars
 }

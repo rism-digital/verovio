@@ -61,6 +61,7 @@ class FloatingElement;
 class FTrem;
 class Gliss;
 class GraceGrp;
+class GrpSym;
 class Hairpin;
 class HalfmRpt;
 class Harm;
@@ -103,6 +104,7 @@ class PgHead;
 class PgHead2;
 class Phrase;
 class PitchInterface;
+class Plica;
 class PlistInterface;
 class PositionInterface;
 class Proport;
@@ -234,6 +236,7 @@ private:
     void WriteSystem(pugi::xml_node currentNode, System *system);
     void WriteBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
+    void WriteGrpSym(pugi::xml_node currentNode, GrpSym *grmSym);
     void WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot);
     void WritePgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2);
     void WritePgHead(pugi::xml_node currentNode, PgHead *pgHead);
@@ -281,6 +284,7 @@ private:
     void WriteNc(pugi::xml_node currentNode, Nc *nc);
     void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteNote(pugi::xml_node currentNode, Note *note);
+    void WritePlica(pugi::xml_node currentNode, Plica *plica);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
@@ -479,6 +483,7 @@ private:
     bool ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd);
     bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
     bool ReadPgFoot(Object *parent, pugi::xml_node pgFoot);
     bool ReadPgFoot2(Object *parent, pugi::xml_node pgFoot2);
     bool ReadPgHead(Object *parent, pugi::xml_node pgHead);
@@ -534,6 +539,7 @@ private:
     bool ReadNc(Object *parent, pugi::xml_node nc);
     bool ReadNeume(Object *parent, pugi::xml_node note);
     bool ReadNote(Object *parent, pugi::xml_node note);
+    bool ReadPlica(Object *parent, pugi::xml_node plica);
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
@@ -684,6 +690,7 @@ private:
     ///@{
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
+    void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
     void UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
@@ -725,11 +732,6 @@ private:
     bool IsAllowed(std::string element, Object *filterParent);
 
     /**
-     * A static array for storing the implemented editorial elements
-     */
-    static std::vector<std::string> s_editorialElementNames;
-
-    /**
      * The selected <mdiv>.
      * If not specified by --mdiv-x-path query, then it is the first <mdiv> in the body
      */
@@ -745,6 +747,15 @@ private:
      * The comment to be attached to the next Object
      */
     std::string m_comment;
+
+    //----------------//
+    // Static members //
+    //----------------//
+
+    /**
+     * A static array for storing the implemented editorial elements
+     */
+    static std::vector<std::string> s_editorialElementNames;
 };
 
 } // namespace vrv

@@ -58,18 +58,6 @@ bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterf
     */
 }
 
-void PitchInterface::AdjustPname(int &pname, int &oct)
-{
-    if (pname < PITCHNAME_c) {
-        if (oct > 0) oct--;
-        pname = PITCHNAME_b;
-    }
-    else if (pname > PITCHNAME_b) {
-        if (oct < 7) oct++;
-        pname = PITCHNAME_c;
-    }
-}
-
 void PitchInterface::AdjustPitchByOffset(int pitchOffset)
 {
     int pname = this->GetPname() + pitchOffset;
@@ -133,8 +121,20 @@ void PitchInterface::AdjustPitchForNewClef(Clef *oldClef, Clef *newClef)
 }
 
 //----------------------------------------------------------------------------
-// Static methods
+// Static methods for PitchInterface
 //----------------------------------------------------------------------------
+
+void PitchInterface::AdjustPname(int &pname, int &oct)
+{
+    if (pname < PITCHNAME_c) {
+        if (oct > 0) oct--;
+        pname = PITCHNAME_b;
+    }
+    else if (pname > PITCHNAME_b) {
+        if (oct < 7) oct++;
+        pname = PITCHNAME_c;
+    }
+}
 
 int PitchInterface::CalcLoc(
     LayerElement *layerElement, Layer *layer, LayerElement *crossStaffElement, bool topChordNote)
@@ -142,13 +142,13 @@ int PitchInterface::CalcLoc(
     assert(layerElement);
 
     if (layerElement->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(layerElement);
+        Chord *chord = vrv_cast<Chord *>(layerElement);
         assert(chord);
         Note *note = (topChordNote) ? chord->GetTopNote() : chord->GetBottomNote();
         return CalcLoc(note, layer, crossStaffElement);
     }
     else if (layerElement->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(layerElement);
+        Note *note = vrv_cast<Note *>(layerElement);
         assert(note);
         if (note->HasLoc()) {
             return note->GetLoc();
@@ -156,7 +156,7 @@ int PitchInterface::CalcLoc(
         return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(crossStaffElement));
     }
     else if (layerElement->Is(CUSTOS)) {
-        Custos *custos = dynamic_cast<Custos *>(layerElement);
+        Custos *custos = vrv_cast<Custos *>(layerElement);
         assert(custos);
         if (custos->HasLoc()) {
             return custos->GetLoc();

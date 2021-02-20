@@ -13,6 +13,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
+#include "vrv.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -31,6 +34,16 @@ TextDirInterface::~TextDirInterface() {}
 void TextDirInterface::Reset()
 {
     ResetPlacement();
+}
+
+int TextDirInterface::GetNumberOfLines(Object *object)
+{
+    assert(object);
+
+    ListOfObjects lbs;
+    ClassIdComparison matches(LB);
+    object->FindAllDescendantByComparison(&lbs, &matches);
+    return ((int)lbs.size() + 1);
 }
 
 } // namespace vrv

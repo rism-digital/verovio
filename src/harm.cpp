@@ -155,7 +155,7 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 
 int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
 
     std::string n = this->GetN();
@@ -176,13 +176,8 @@ int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 
 int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 {
-    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
     assert(params);
-
-    // If the harm is empty, do not adjust spacing
-    if (!this->HasContentBB()) {
-        return FUNCTOR_CONTINUE;
-    }
 
     int currentGrpId = this->GetDrawingGrpId();
 
@@ -221,10 +216,15 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
     }
 
     // Keep the one with the lowest left position (this will also be the widest)
-    for (auto const &positoner : positioners) {
-        if (!harmPositioner || (harmPositioner->GetContentLeft() > positoner->GetContentLeft())) {
-            harmPositioner = positoner;
+    for (auto const &positioner : positioners) {
+        if (!harmPositioner || (harmPositioner->GetContentLeft() > positioner->GetContentLeft())) {
+            harmPositioner = positioner;
         }
+    }
+
+    // If the harm positioner is missing or is empty, do not adjust spacing
+    if (!harmPositioner || !harmPositioner->HasContentBB()) {
+        return FUNCTOR_SIBLINGS;
     }
 
     /************** Calculate the adjustment **************/
@@ -282,7 +282,7 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 
 int Harm::Transpose(FunctorParams *functorParams)
 {
-    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
     LogDebug("Transposing harm");

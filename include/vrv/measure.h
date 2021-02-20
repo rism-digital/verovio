@@ -202,6 +202,12 @@ public:
     Staff *GetTopVisibleStaff();
 
     /**
+     * Return the botoom (last) visible staff in the measure (if any).
+     * Takes into account system optimization
+     */
+    Staff *GetBottomVisibleStaff();
+
+    /**
      * Check if the measure encloses the given time (in millisecond)
      * Return the playing repeat time (1-based), 0 otherwise
      */
@@ -245,14 +251,14 @@ public:
     ///@}
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
-    virtual int OptimizeScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefOptimize(FunctorParams *functorParams);
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -284,6 +290,11 @@ public:
      * See Object::AdjustArpeg
      */
     virtual int AdjustArpegEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustClefChanges
+     */
+    virtual int AdjustClefChanges(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustLayers

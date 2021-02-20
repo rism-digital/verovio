@@ -15,6 +15,8 @@
 #include "measure.h"
 #include "note.h"
 #include "object.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -84,6 +86,18 @@ public:
 
 protected:
     std::vector<ClassId> m_classIds;
+};
+
+//----------------------------------------------------------------------------
+// ReverseClassIdsComparison
+//----------------------------------------------------------------------------
+
+class ReverseClassIdsComparison : public ClassIdsComparison {
+
+public:
+    ReverseClassIdsComparison(const std::vector<ClassId> &classIds) : ClassIdsComparison(classIds) {}
+
+    virtual bool operator()(Object *object) { return !ClassIdsComparison::operator()(object); }
 };
 
 //----------------------------------------------------------------------------
@@ -331,32 +345,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ArticPartTypeComparison
-//----------------------------------------------------------------------------
-
-/**
- * This class evaluates if the object is an Alignment of a certain type
- */
-class ArticPartTypeComparison : public ClassIdComparison {
-
-public:
-    ArticPartTypeComparison(const ArticPartType type) : ClassIdComparison(ARTIC_PART) { m_type = type; }
-
-    void SetType(ArticPartType type) { m_type = type; }
-
-    virtual bool operator()(Object *object)
-    {
-        if (!MatchesType(object)) return false;
-        ArticPart *articPart = dynamic_cast<ArticPart *>(object);
-        assert(articPart);
-        return (articPart->GetType() == m_type);
-    }
-
-private:
-    ArticPartType m_type;
-};
-
-//----------------------------------------------------------------------------
 // MeasureAlignerTypeComparison
 //----------------------------------------------------------------------------
 
@@ -373,7 +361,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Alignment *alignment = dynamic_cast<Alignment *>(object);
+        Alignment *alignment = vrv_cast<Alignment *>(object);
         assert(alignment);
         return (alignment->GetType() == m_type);
     }
@@ -399,7 +387,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Measure *measure = dynamic_cast<Measure *>(object);
+        Measure *measure = vrv_cast<Measure *>(object);
         assert(measure);
         return (measure->EnclosesTime(m_time) > 0);
     }
@@ -425,13 +413,68 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        Note *note = dynamic_cast<Note *>(object);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
         return ((m_time >= note->GetRealTimeOnsetMilliseconds()) && (m_time <= note->GetRealTimeOffsetMilliseconds()));
     }
 
 private:
     int m_time;
+};
+
+//----------------------------------------------------------------------------
+// UuidComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId has a certain Uuid
+ */
+class UuidComparison : public ClassIdComparison {
+
+public:
+    UuidComparison(ClassId classId, const std::string &uuid) : ClassIdComparison(classId) { m_uuid = uuid; }
+
+    void SetUuid(const std::string &uuid) { m_uuid = uuid; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        return object->GetUuid() == m_uuid;
+    }
+
+private:
+    std::string m_uuid;
+};
+
+//----------------------------------------------------------------------------
+// VisibleStaffDefOrGrpObject
+//----------------------------------------------------------------------------
+/**
+ * This class evaluates if the object is a visible StaffDef or StaffGrp.
+ * As well it is able to exlude object passed to skip from the result set.
+ */
+class VisibleStaffDefOrGrpObject : public ClassIdsComparison {
+
+public:
+    VisibleStaffDefOrGrpObject() : ClassIdsComparison({ STAFFDEF, STAFFGRP }) {}
+
+    void Skip(const Object *objectToExclude) { m_objectToExclude = objectToExclude; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (object == m_objectToExclude || !ClassIdsComparison::operator()(object)) return false;
+
+        if (object->Is(STAFFDEF)) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(object);
+            return staffDef && staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
+        }
+
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(object);
+        return staffGrp && staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
+    }
+
+protected:
+    const Object *m_objectToExclude;
 };
 
 } // namespace vrv

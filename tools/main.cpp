@@ -108,7 +108,7 @@ void display_usage()
     std::cout << " -                     Use \"-\" as input file for reading from the standard input" << std::endl;
     std::cout << " -h, --help            Display this message" << std::endl;
     std::cout << " -a, --all-pages       Output all pages" << std::endl;
-    std::cout << " -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)" << std::endl;
+    std::cout << " -f, --format <s>      Select input format: abc, darms, humdrum, mei, pae, xml (MusicXML) (default is mei)" << std::endl;
     std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
     std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
     std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
@@ -278,6 +278,24 @@ int main(int argc, char **argv)
                 key = long_options[option_index].name;
                 opt = params->at(toCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
+                
+                // Handle deprecated options
+                if (key == "condense-encoded") {
+                    vrv::LogWarning("Option --condense-encoded is deprecated; use --condense encoded instead");
+                    options->m_condense.SetValue("encoded");
+                    break;
+                }
+                if (key == "slur-thickness") {
+                    vrv::LogWarning("Option --slur-thickness is deprecated; use --slur-midpoint-thickness instead");
+                    options->m_slurMidpointThickness.SetValue(optarg);
+                    break;
+                }
+                else if (key == "tie-thickness") {
+                    vrv::LogWarning("Option --tie-thickness is deprecated; use --tie-midpoint-thickness instead");
+                    options->m_tieMidpointThickness.SetValue(optarg);
+                    break;
+                }
+
                 if (optBool) {
                     optBool->SetValue(true);
                 }
@@ -345,6 +363,7 @@ int main(int argc, char **argv)
             default: break;
         }
     }
+    options->Sync();
 
     if (show_version) {
         display_version();

@@ -67,9 +67,9 @@ private:
     //
 public:
     /**
-     * A pointer to the note the point relates to.
+     * A pointer to the previous LayerElement it relates to.
      */
-    Note *m_drawingNote;
+    LayerElement *m_drawingPreviousElement;
 
     /**
      * A pointer to the next LayerElement (note, barLine, etc.)

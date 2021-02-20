@@ -54,6 +54,7 @@
 #include "attdef.h"
 #include "atttypes.h"
 #include "vrv.h"
+#include "vrvdef.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -191,6 +192,86 @@ TransPitch &TransPitch::operator=(const TransPitch &pitch)
         m_oct = pitch.m_oct;
     }
     return *this;
+}
+
+//////////////////////////////
+//
+// TransPitch::operator> -- Compare two pitches diatonically (accidental alterations are ignored).
+//    Higher pitches are greater than lower pitches.
+
+bool TransPitch::operator>(const TransPitch &pitch)
+{
+    if (this == &pitch) return false;
+
+    if (m_oct > pitch.m_oct) return true;
+    if (m_oct < pitch.m_oct) return false;
+
+    if (m_pname > pitch.m_pname) return true;
+    return false;
+}
+
+//////////////////////////////
+//
+// TransPitch::operator< -- Compare two pitches diatonically (accidental alterations are ignored).
+//    Lower pitches are less than higher pitches.
+
+bool TransPitch::operator<(const TransPitch &pitch)
+{
+    if (this == &pitch) return false;
+
+    if (m_oct < pitch.m_oct) return true;
+    if (m_oct > pitch.m_oct) return false;
+
+    if (m_pname < pitch.m_pname) return true;
+    return false;
+}
+
+//////////////////////////////
+//
+// TransPitch::operator++ -- Transpose a pitch up one diatonic step.  Any chromatic alteration
+//     will remain the same.  For example, B-flat 3 will be incremented to C-flat 4.
+
+TransPitch &TransPitch::operator++()
+{
+    if (m_pname != dpc_B) {
+        m_pname++;
+    }
+    else {
+        m_pname = dpc_C;
+        m_oct++;
+    }
+    return *this;
+}
+
+TransPitch TransPitch::operator++(int)
+{
+    TransPitch temp = *this;
+    ++*this;
+    return temp;
+}
+
+//////////////////////////////
+//
+// TransPitch::operator-- -- Transpose a pitch down one diatonic step.  Any chromatic alteration
+//     will remain the same.  For example, C-sharp 4 will be decremented to B-sharp 3.
+
+TransPitch &TransPitch::operator--()
+{
+    if (m_pname != dpc_C) {
+        m_pname--;
+    }
+    else {
+        m_pname = dpc_B;
+        m_oct--;
+    }
+    return *this;
+}
+
+TransPitch TransPitch::operator--(int)
+{
+    TransPitch temp = *this;
+    --*this;
+    return temp;
 }
 
 //////////////////////////////
@@ -496,7 +577,7 @@ int Transposer::GetTranspositionIntervalClass()
 
 //////////////////////////////
 //
-// Transposer::GetTranspositionIntervalClass -- return the interval integer
+// Transposer::GetTranspositionIntervalName -- return the interval integer
 //   as a string name that was set for use with Transposer::Transpose.
 //
 std::string Transposer::GetTranspositionIntervalName()

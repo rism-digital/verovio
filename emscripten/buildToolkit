@@ -42,7 +42,7 @@ Options:
 EOT
 }
 
-chomp (my $EMCC = `which emcc`);
+chomp (my $EMCC = `which em++`);
 chomp (my $EMCMAKE = `which emcmake`);
 chomp (my $EMMAKE = `which emmake`);
 die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
@@ -175,6 +175,7 @@ $exports .= "'_vrvToolkit_getOptions',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
 $exports .= "'_vrvToolkit_getTimeForElement',";
+$exports .= "'_vrvToolkit_getTimesForElement',";
 $exports .= "'_vrvToolkit_getVersion',";
 $exports .= "'_vrvToolkit_loadData',";
 $exports .= "'_vrvToolkit_redoLayout',";

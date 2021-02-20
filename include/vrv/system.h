@@ -87,6 +87,11 @@ public:
     int GetHeight() const;
 
     /**
+     * Return the minimus system spacing
+     */
+    int GetMinimumSystemSpacing(const Doc *doc) const;
+
+    /**
      * Return the index position of the system in its page parent
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
@@ -127,17 +132,22 @@ public:
     //----------//
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
     ///@{
-    virtual int OptimizeScoreDef(FunctorParams *functorParams);
-    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+    virtual int ScoreDefOptimize(FunctorParams *functorParams);
+    virtual int ScoreDefOptimizeEnd(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::ScoreDefSetGrpSym
+     */
+    virtual int ScoreDefSetGrpSym(FunctorParams *functorParams);
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -184,6 +194,11 @@ public:
     ///@}
 
     /**
+     * See Object::AdjustTempo
+     */
+    virtual int AdjustTempo(FunctorParams *functorParams);
+
+    /**
      * See Object::AlignVertically
      */
     ///@{
@@ -226,6 +241,11 @@ public:
      * See Object::AdjustFloatingPositioners
      */
     virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustFloatingPositionersBetween
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustSlurs

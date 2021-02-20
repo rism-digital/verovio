@@ -176,7 +176,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
 
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
-        Staff *staff = dynamic_cast<Staff *>(object);
+        Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
 
         assert(staff->m_drawingStaffDef);
@@ -404,7 +404,7 @@ void SvgDeviceContext::StartPage()
     }
     else {
         m_currentNode.append_attribute("viewBox")
-            = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetHeight() * DEFINITION_FACTOR).c_str();
+            = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetContentHeight() * DEFINITION_FACTOR).c_str();
     }
 
     // a graphic for the origin
@@ -667,7 +667,24 @@ void SvgDeviceContext::DrawRectangle(int x, int y, int width, int height)
 
 void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
-    std::string s;
+    pugi::xml_node rectChild = AppendChild("rect");
+
+    if (m_penStack.size()) {
+        Pen currentPen = m_penStack.top();
+        if (currentPen.GetWidth() > 0) rectChild.append_attribute("stroke") = GetColour(currentPen.GetColour()).c_str();
+        if (currentPen.GetWidth() > 1)
+            rectChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
+        if (currentPen.GetOpacity() != 1.0)
+            rectChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetOpacity()).c_str();
+    }
+
+    if (m_brushStack.size()) {
+        Brush currentBrush = m_brushStack.top();
+        if (currentBrush.GetColour() != AxNONE)
+            rectChild.append_attribute("fill") = GetColour(currentBrush.GetColour()).c_str();
+        if (currentBrush.GetOpacity() != 1.0)
+            rectChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
+    }
 
     // negative heights or widths are not allowed in SVG
     if (height < 0) {
@@ -679,7 +696,6 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }
 
-    pugi::xml_node rectChild = AppendChild("rect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
     rectChild.append_attribute("height") = height;
@@ -985,7 +1001,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
         if (object->IsFloatingObject()) {
-            FloatingObject *floatingObject = dynamic_cast<FloatingObject *>(object);
+            FloatingObject *floatingObject = vrv_cast<FloatingObject *>(object);
             assert(floatingObject);
             box = floatingObject->GetCurrentFloatingPositioner();
             // No bounding box found, ignore the object - this happens when the @staff is missing because the element is

@@ -26,8 +26,9 @@ namespace vrv {
 // BTrem
 //----------------------------------------------------------------------------
 
-BTrem::BTrem() : LayerElement("btrem-"), AttTremMeasured()
+BTrem::BTrem() : LayerElement("btrem-"), AttBTremLog(), AttTremMeasured()
 {
+    RegisterAttClass(ATT_BTREMLOG);
     RegisterAttClass(ATT_TREMMEASURED);
 
     Reset();
@@ -38,6 +39,7 @@ BTrem::~BTrem() {}
 void BTrem::Reset()
 {
     LayerElement::Reset();
+    ResetBTremLog();
     ResetTremMeasured();
 }
 

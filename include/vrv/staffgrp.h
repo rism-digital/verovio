@@ -11,7 +11,9 @@
 #include "atts_mei.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "grpsym.h"
 #include "object.h"
+#include "staffdef.h"
 
 namespace vrv {
 
@@ -60,18 +62,31 @@ public:
     ///@}
 
     /**
+     * Get first and last staffDef of the staff group without visibility optimization set to hidden
+     */
+    std::pair<StaffDef *, StaffDef *> GetFirstLastStaffDef();
+
+    /**
      * Return the maximum staff size in the staffGrp (100 if empty)
      */
     int GetMaxStaffSize();
+
+    /**
+     * @name Setter and getter of the group symbol
+     */
+    ///@{
+    void SetGroupSymbol(GrpSym *grpSym);
+    GrpSym *GetGroupSymbol() const { return m_groupSymbol; }
+    ///@}
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
-    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+    virtual int ScoreDefOptimizeEnd(FunctorParams *functorParams);
 
 protected:
     /**
@@ -91,6 +106,8 @@ private:
      * By default the value is OPTIMIZATION_NONE
      */
     VisibilityOptimization m_drawingVisibility;
+
+    GrpSym *m_groupSymbol;
 };
 
 } // namespace vrv

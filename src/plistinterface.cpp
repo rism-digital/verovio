@@ -90,7 +90,7 @@ void PlistInterface::SetUuidStrs()
 
 int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *object)
 {
-    PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);
+    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
     assert(params);
 
     // This should not happen?

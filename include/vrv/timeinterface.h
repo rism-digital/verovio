@@ -78,7 +78,7 @@ public:
     /**
      * Return a vector of staves looking at the @staff attribute or at the parent staff or the @startid
      */
-    std::vector<Staff *> GetTstampStaves(Measure *measure);
+    std::vector<Staff *> GetTstampStaves(Measure *measure, Object *object);
 
     //-----------------//
     // Pseudo functors //

@@ -1,6 +1,6 @@
 QT += qml quick
 
-CONFIG += c++14
+CONFIG += c++17
 TARGET = verovio-qt-demo
 
 SOURCES += main.cpp
@@ -27,6 +27,7 @@ GIT_BASE_PATH = $$shell_path($$_PRO_FILE_PWD_)/../../..
     INCLUDEPATH += ../../../include/vrv
     INCLUDEPATH += ../../../include/pugi
     INCLUDEPATH += ../../../include/utf8
+    INCLUDEPATH += ../../../include/json
     INCLUDEPATH += ../../../libmei
     INCLUDEPATH += ../lib/include
 }

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'Verovio'
-  s.version        = '3.0.0-dev'
+  s.version        = '3.3.0-dev'
   s.license        = { :type => 'LGPL' }
   s.homepage       = 'https://www.verovio.org/index.xhtml'
   s.authors        = { 'Contributors List' => 'https://github.com/rism-ch/verovio/graphs/contributors' }
@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.13'
   s.pod_target_xcconfig = {
-      "CLANG_CXX_LANGUAGE_STANDARD" => "gnu++14",
+      "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
       "CLANG_CXX_LIBRARY" => "libc++",
       "GCC_C_LANGUAGE_STANDARD" => "gnu11",
       "GCC_DYNAMIC_NO_PIC" => "NO",

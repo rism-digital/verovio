@@ -18,6 +18,8 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
+#include "dir.h"
+#include "dynam.h"
 #include "hairpin.h"
 #include "layer.h"
 #include "measure.h"
@@ -27,6 +29,7 @@
 #include "rest.h"
 #include "slur.h"
 #include "staff.h"
+#include "tie.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -41,7 +44,7 @@ namespace vrv {
 
 std::string EditorToolkitCMN::EditInfo()
 {
-    return m_chainedId;
+    return m_editInfo.json();
 }
 
 bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
@@ -50,7 +53,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         return false;
     }
 
@@ -205,7 +208,7 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
     m_chainedId = "";
     for (int i = 0; i < (int)actions.size(); i++) {
         status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
-        m_editInfo = m_chainedId;
+        m_editInfo.import("uuid", m_chainedId);
     }
     return status;
 }
@@ -283,12 +286,15 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         return false;
     }
 
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
     if (elementType == "slur") {
         element = new Slur();
+    }
+    else if (elementType == "tie") {
+        element = new Tie();
     }
     else if (elementType == "hairpin") {
         element = new Hairpin();
@@ -302,10 +308,11 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
-    interface->SetStartid(startid);
-    interface->SetEndid(endid);
+    interface->SetStartid("#" + startid);
+    interface->SetEndid("#" + endid);
 
     this->m_chainedId = element->GetUuid();
+    m_editInfo.import("uuid", element->GetUuid());
 
     return true;
 }
@@ -329,16 +336,15 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         return false;
     }
 
-    /*
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
-    if (elementType == "dynam") {
-        element = new Slur();
+    if (elementType == "dir") {
+        element = new Dir();
     }
-    else if (elementType == "hairpin") {
-        element = new Hairpin();
+    else if (elementType == "dynam") {
+        element = new Dynam();
     }
     else {
         LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
@@ -349,11 +355,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
-    interface->SetStartid(startid);
-    interface->SetEndid(endid);
+    interface->SetStartid("#" + startid);
 
     this->m_chainedId = element->GetUuid();
-    */
+    m_editInfo.import("uuid", element->GetUuid());
 
     return true;
 }
@@ -431,7 +436,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
     }
 
     if (object->Is(CHORD)) {
-        Chord *currentChord = dynamic_cast<Chord *>(object);
+        Chord *currentChord = vrv_cast<Chord *>(object);
         assert(currentChord);
         Note *note = new Note();
         currentChord->AddChild(note);
@@ -439,7 +444,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         return true;
     }
     else if (object->Is(NOTE)) {
-        Note *currentNote = dynamic_cast<Note *>(object);
+        Note *currentNote = vrv_cast<Note *>(object);
         assert(currentNote);
 
         Chord *currentChord = currentNote->IsChordTone();
@@ -493,7 +498,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         return true;
     }
     else if (object->Is(REST)) {
-        Rest *rest = dynamic_cast<Rest *>(object);
+        Rest *rest = vrv_cast<Rest *>(object);
         assert(rest);
         Note *note = new Note();
         note->DurationInterface::operator=(*rest);
@@ -587,7 +592,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             this->m_chainedId = rest->GetUuid();
             return true;
         }
-        if (beam->IsFirstInBeam(note)) {
+        if (beam->IsFirstIn(beam, note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             Object *parent = beam->GetParent();
@@ -597,7 +602,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             this->m_chainedId = rest->GetUuid();
             return true;
         }
-        else if (beam->IsLastInBeam(note)) {
+        else if (beam->IsLastIn(beam, note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             Object *parent = beam->GetParent();

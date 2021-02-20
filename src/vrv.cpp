@@ -6,12 +6,12 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "vrv.h"
-#include <iostream>
 
 //----------------------------------------------------------------------------
 
 #include <assert.h>
 #include <cmath>
+#include <iostream>
 #include <sstream>
 #include <stdarg.h>
 #include <stdio.h>
@@ -90,16 +90,13 @@ bool Resources::InitFonts()
         bool m_isMandatory;
     };
 
-    static const TextFontInfo_type textFontInfos[] = {
-        { k_defaultStyle, "Times", true },
-        { k_defaultStyle, "VerovioText-1.0", true },
-        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
+    static const TextFontInfo_type textFontInfos[] = { { k_defaultStyle, "Times", true },
+        { k_defaultStyle, "VerovioText-1.0", true }, { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
         { { FONTWEIGHT_bold, FONTSTYLE_normal }, "VerovioText-1.0", false },
         { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
         { { FONTWEIGHT_bold, FONTSTYLE_italic }, "VerovioText-1.0", false },
         { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false },
-        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "VerovioText-1.0", false }
-    };
+        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "VerovioText-1.0", false } };
 
     for (const auto &textFontInfo : textFontInfos) {
         if (!InitTextFont(textFontInfo.m_fileName, textFontInfo.m_style) && textFontInfo.m_isMandatory) {
@@ -122,6 +119,19 @@ Glyph *Resources::GetGlyph(wchar_t smuflCode)
 {
     if (!s_font.count(smuflCode)) return NULL;
     return &s_font[smuflCode];
+}
+
+Glyph *Resources::GetGlyph(const std::string &smuflName)
+{
+    wchar_t code = GetGlyphCode(smuflName);
+    if (code == 0) return NULL;
+    return GetGlyph(code);
+}
+
+wchar_t Resources::GetGlyphCode(const std::string &smuflName)
+{
+    if (!s_smuflNames.count(smuflName)) return 0;
+    return s_smuflNames.at(smuflName);
 }
 
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)

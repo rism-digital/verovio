@@ -42,7 +42,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Layer(int n = 1);
+    Layer();
     virtual ~Layer();
     virtual Object *Clone() const { return new Layer(*this); }
     virtual void Reset();
@@ -115,6 +115,18 @@ public:
      */
     int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
 
+    /**
+     * Get the list of the layer elements for the duration of an element
+     * Takes into account cross-staff situations.
+     */
+    ListOfObjects GetLayerElementsForTimeSpanOf(LayerElement *element);
+
+    /**
+     * Get the list of the layer elements used within a time span.
+     * Takes into account cross-staff situations.
+     */
+    ListOfObjects GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff);
+
     Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig() const;
     Mensur *GetCurrentMensur() const;
@@ -152,6 +164,16 @@ public:
             m_cautionStaffDefClef || m_cautionStaffDefKeySig || m_cautionStaffDefMensur || m_cautionStaffDefMeterSig);
     }
 
+    /**
+     * @name Setter and getter for the cross-staff flags
+     */
+    //@{
+    void SetCrossStaffFromAbove(bool crossStaff) { m_crossStaffFromAbove = crossStaff; }
+    bool HasCrossStaffFromAbove() const { return m_crossStaffFromAbove; }
+    void SetCrossStaffFromBelow(bool crossStaff) { m_crossStaffFromBelow = crossStaff; }
+    bool HasCrossStaffFromBelow() const { return m_crossStaffFromBelow; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -167,9 +189,9 @@ public:
     virtual int ConvertToUnCastOffMensural(FunctorParams *params);
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -213,7 +235,7 @@ public:
      * See Object::ResetDrawing
      * To be added once Layer implements LinkingInterface
      */
-    // virtual int ResetDrawing(FunctorParams *);
+    virtual int ResetDrawing(FunctorParams *);
 
 private:
     //
@@ -221,9 +243,15 @@ public:
     //
 private:
     /**
-     *
+     * The drawing stem direction of the layer based on the number of layers in the staff
      */
     data_STEMDIRECTION m_drawingStemDir;
+
+    /**
+     * Two flags indicating when a layer is also used from cross-staff content from below or above
+     */
+    bool m_crossStaffFromBelow;
+    bool m_crossStaffFromAbove;
 
     /** */
     Clef *m_staffDefClef;

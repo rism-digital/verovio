@@ -273,7 +273,10 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
 void BBoxDeviceContext::MoveTextVerticallyTo(int y)
 {
     assert(m_drawingText);
-    m_textY = y;
+    // Because this is used only for smaller sup-script / supercript it seems
+    // better not to change the y position for the BBoxDeviceContext because
+    // otherwise it moves the full bounding box - to be improve / double checked
+    // m_textY = y;
 }
 
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)

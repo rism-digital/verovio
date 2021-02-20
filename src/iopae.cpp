@@ -499,7 +499,7 @@ void PAEOutput::WriteTuplet(Tuplet *tuplet)
 {
     assert(tuplet);
 
-    Staff *staff = dynamic_cast<Staff *>(tuplet->GetFirstAncestor(STAFF));
+    Staff *staff = vrv_cast<Staff *>(tuplet->GetFirstAncestor(STAFF));
     assert(staff);
 
     double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
@@ -1967,7 +1967,7 @@ void PAEInput::parseNote(pae::Note *note)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
     if (note->acciaccatura && (element->Is(NOTE))) {
-        Note *mnote = dynamic_cast<Note *>(element);
+        Note *mnote = vrv_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
         mnote->SetGrace(GRACE_unacc);
@@ -1975,7 +1975,7 @@ void PAEInput::parseNote(pae::Note *note)
     }
 
     if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
-        Note *mnote = dynamic_cast<Note *>(element);
+        Note *mnote = vrv_cast<Note *>(element);
         assert(mnote);
         mnote->SetGrace(GRACE_acc);
         mnote->SetStemDir(STEMDIRECTION_up);

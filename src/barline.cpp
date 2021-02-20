@@ -29,7 +29,7 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttVisibility()
+BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
     RegisterAttClass(ATT_BARLINELOG);
     RegisterAttClass(ATT_COLOR);
@@ -80,7 +80,7 @@ BarLineAttr::~BarLineAttr() {}
 
 int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     assert(m_alignment);

@@ -64,6 +64,10 @@ public:
 private:
     //
 public:
+    //----------------//
+    // Static members //
+    //----------------//
+
     /**
      * Static member for setting a value from a controller.
      * Used for example in SetValue
