@@ -215,23 +215,18 @@ jobs:
   upload_testpypi:
     name: Upload to TestPyPi
     needs: [build_wheels, build_sdist]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        architecture: [ x64 ]
+    runs-on: [ubuntu-20.04]
 
     steps:
       #===============================================#
       # Set up
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.architecture }}
+          python-version: '3.9'
+          architecture: 'x64'
 
       #===============================================#
       # Dependencies
