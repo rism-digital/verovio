@@ -180,9 +180,9 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                 }
                 // if afterBarline is false at beginning of measure, move before barline
                 if (!iter->m_afterBarline && m_durTotal == 0) {
-                    AttNNumberLikeComparison comparisonMeasure(MEASURE, measureNum);
-                    Object *currentMeasure = section->FindDescendantByComparison(&comparisonMeasure);
-                    Object *previousMeasure = section->GetPrevious(currentMeasure, MEASURE);
+                    const std::string previousMeasureNum = std::to_string(std::stoi(measure->GetN()) - 1);
+                    AttNNumberLikeComparison comparisonMeasure(MEASURE, previousMeasureNum);
+                    Object *previousMeasure = section->FindDescendantByComparison(&comparisonMeasure);
                     if (!previousMeasure) {
                         AddLayerElement(layer, iter->m_clef);
                         iter->isFirst = false;
@@ -205,9 +205,15 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                 iter->isFirst = false;
             }
             else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
+                if (staff != iter->m_staff) continue;
                 bool addSameas = true;
-                ListOfObjects objects;
+                ListOfObjects objects, measureObjects;
                 ClassIdComparison matchClassId(CLEF);
+                measure->FindAllDescendantByComparison(&measureObjects, &matchClassId);
+                auto it = std::find_if(measureObjects.begin(), measureObjects.end(),
+                    [&iter](Object *obj) { return obj->GetUuid() == iter->m_clef->GetUuid(); });
+                if (it == measureObjects.end()) continue;
+
                 layer->FindAllDescendantByComparison(&objects, &matchClassId);
                 for (auto o : objects) {
                     Clef *clef = dynamic_cast<Clef *>(o);
