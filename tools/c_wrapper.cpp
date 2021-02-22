@@ -150,6 +150,18 @@ bool vrvToolkit_loadData(Toolkit *tk, const char *data)
     return tk->LoadData(data);
 }
 
+bool vrvToolkit_loadZipDataBase64(Toolkit *tk, const char *data)
+{
+    tk->ResetLogBuffer();
+    return tk->LoadZipDataBase64(data);
+}
+
+bool vrvToolkit_loadZipDataBuffer(Toolkit *tk, const unsigned char *data, int length)
+{
+    tk->ResetLogBuffer();
+    return tk->LoadZipDataBuffer(data, length);
+}
+
 const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options)
 {
     tk->ResetLogBuffer();

@@ -1359,6 +1359,7 @@
 		4D95D4FB1D74551100B2B856 /* score.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = score.cpp; path = src/score.cpp; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smufl.cpp; path = src/smufl.cpp; sourceTree = "<group>"; };
+		4D98CD0825DA5BE600DC7A2C /* zip_file.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = zip_file.hpp; path = include/zip/zip_file.hpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
 		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
@@ -1756,6 +1757,14 @@
 			name = systemelements;
 			sourceTree = "<group>";
 		};
+		4D98CD0725DA5AF300DC7A2C /* zip */ = {
+			isa = PBXGroup;
+			children = (
+				4D98CD0825DA5BE600DC7A2C /* zip_file.hpp */,
+			);
+			path = zip;
+			sourceTree = "<group>";
+		};
 		4DA0EABF22BB775F00A7EBEB /* facselements */ = {
 			isa = PBXGroup;
 			children = (
@@ -1989,6 +1998,7 @@
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
 				4DBC09271B51960100B1832C /* utf8 */,
+				4D98CD0725DA5AF300DC7A2C /* zip */,
 				BB4C4A5322A930A3001F6AF0 /* VerovioFramework */,
 				8F086EAA188534680037FD8E /* Products */,
 			);
