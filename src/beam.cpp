@@ -1375,8 +1375,8 @@ int Beam::CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2)
     const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
     int overlap = 0;
-    if (*maxOverlap > 0) {
-        overlap = *maxOverlap * directionBias;
+    if (*maxOverlap >= 0) {
+        overlap = ((*maxOverlap == 0) ? staffOffset : *maxOverlap) * directionBias;
     }
     else {
         int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / staffOffset) * 2;
