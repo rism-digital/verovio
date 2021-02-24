@@ -502,6 +502,11 @@ public:
      * Return true if the object contains any editorial content
      */
     bool HasEditorialContent();
+    
+    /**
+     * Return true if the object contains anything that is not editorial content
+     */
+    bool HasNonEditorialContent();
 
     /**
      * Saves the object (and its children) using the specified output stream.

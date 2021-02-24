@@ -760,6 +760,15 @@ bool Object::HasEditorialContent()
     return (!editorial.empty());
 }
 
+bool Object::HasNonEditorialContent()
+{
+    ListOfObjects nonEditorial;
+    IsEditorialElementComparison editorialComparison;
+    editorialComparison.ReverseComparison();
+    this->FindAllDescendantByComparison(&nonEditorial, &editorialComparison);
+    return (!nonEditorial.empty());
+}
+
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
     int deepness, bool direction, bool skipFirst)
 {
