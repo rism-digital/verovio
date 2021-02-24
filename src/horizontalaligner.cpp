@@ -1010,9 +1010,10 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
         auto it = std::find_if(
             params->m_upcomingBoundingBoxes.begin(), params->m_upcomingBoundingBoxes.end(), [params](BoundingBox *bb) {
                 return (params->m_previousAlignment.m_overlappingBB != bb)
-                    && bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
-                    && ((params->m_currentAlignment.m_alignment->GetType() == ALIGNMENT_MEASURE_RIGHT_BARLINE)
-                        || bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB));
+                    && ((bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
+                            && bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB))
+                        || ((params->m_currentAlignment.m_alignment->GetType() == ALIGNMENT_MEASURE_RIGHT_BARLINE)
+                            && (bb->GetSelfLeft() < params->m_previousAlignment.m_overlappingBB->GetSelfLeft())));
             });
         if (it != params->m_upcomingBoundingBoxes.end()) {
             params->m_currentAlignment.m_alignment->SetXRel(
