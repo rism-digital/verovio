@@ -487,7 +487,8 @@ bool Alignment::HasTimestampOnly()
     // If no child, then not timestamp
     if (!this->GetChildCount()) return false;
     // Look for everything that is not a timestamp
-    ReverseClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR });
+    ClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR });
+    notTimestamp.ReverseComparison();
     return (this->FindDescendantByComparison(&notTimestamp, 2) == NULL);
 }
 
