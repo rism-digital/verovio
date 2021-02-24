@@ -173,22 +173,28 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
     Layer *layer = m_currentLayer;
     assert(layer);
     for (auto iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
-        if ((iter->m_measureNum == measureNum) && (iter->m_scoreOnset <= m_durTotal)) {
+        if ((iter->m_measureNum == measureNum) && (iter->m_scoreOnset <= m_durTotal) && (iter->m_staff == staff)) {
             if (iter->isFirst) { // add clef when first in staff
-                if (iter->m_staff != staff) {
-                    layer = SelectLayer(-1, iter->m_staff);
-                }
                 // if afterBarline is false at beginning of measure, move before barline
                 if (!iter->m_afterBarline && m_durTotal == 0) {
-                    const std::string previousMeasureNum = std::to_string(std::stoi(measure->GetN()) - 1);
-                    AttNNumberLikeComparison comparisonMeasure(MEASURE, previousMeasureNum);
-                    Object *previousMeasure = section->FindDescendantByComparison(&comparisonMeasure);
+                    Object *previousMeasure = NULL;
+                    // First try to check whether current measure already exists in the section. Since *measure might
+                    // not match with the one in the section, comparison search should be done
+                    AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
+                    Object *sectionCurrentMeasure = section->FindDescendantByComparison(&comparisonMeasure);
+                    previousMeasure = section->GetPrevious(sectionCurrentMeasure, MEASURE);
+                    // if current measure is being processed for the first time - get last measure in the section. This
+                    // should happen only for the first staff in the multi-stave score
+                    if (!previousMeasure) {
+                        previousMeasure = section->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD);
+                    }
+                    // otherwise this is first measure, so add element as is
                     if (!previousMeasure) {
                         AddLayerElement(layer, iter->m_clef);
                         iter->isFirst = false;
                         continue;
                     }
-                    AttNIntegerComparison comparisonStaff(STAFF, staff->GetN());
+                    AttNIntegerComparison comparisonStaff(STAFF, iter->m_staff->GetN());
                     Object *previousStaff = previousMeasure->FindDescendantByComparison(&comparisonStaff);
                     AttNIntegerComparison comparisonLayer(LAYER, layer->GetN());
                     Object *prevLayer = previousStaff->FindDescendantByComparison(&comparisonLayer);
@@ -205,7 +211,6 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                 iter->isFirst = false;
             }
             else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
-                if (staff != iter->m_staff) continue;
                 bool addSameas = true;
                 ListOfObjects objects, measureObjects;
                 ClassIdComparison matchClassId(CLEF);
