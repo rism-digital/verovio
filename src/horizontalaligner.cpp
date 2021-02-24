@@ -1092,7 +1092,8 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         params->m_timestamps.clear();
     }
 
-    params->m_lastNonTimestamp = this;
+    // Do not use clef change alignment as reference since these are not aligned at this stage
+    if (this->GetType() != ALIGNMENT_CLEF) params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }
