@@ -1016,8 +1016,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
     m_doc->m_mdivScoreDef.AddChild(staffGrp);
 
     if (m_tie != NULL) {
-        delete m_tie;
-        m_tie = NULL;
+        LogWarning("Open tie will not render because tstamp2 is missing");
     }
 
     m_doc->ConvertToPageBasedDoc();
