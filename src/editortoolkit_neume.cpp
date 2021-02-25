@@ -1842,17 +1842,21 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
                 // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
                 FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
+
                 if (facsInter != NULL) {
-                    if (ulx == -1) {
-                        ulx = facsInter->GetDrawingX();
-                        uly = facsInter->GetDrawingY();
-                        lrx = facsInter->GetWidth() + ulx;
-                        lry = facsInter->GetHeight() + uly;
+                    // Update bb to valid extremes
+                    int newUlx = facsInter->GetDrawingX();
+                    int newUly = facsInter->GetDrawingY();
+                    int newLrx = facsInter->GetWidth() + newUlx;
+                    int newLry = facsInter->GetHeight() + newUly;
+                    if ((ulx > newUlx) || (ulx < 0)) {
+                        ulx = newUlx;
                     }
-                    else {
-                        lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
-                        lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                    if ((uly > newUly) || (uly < 0)) {
+                        uly = newUly;
                     }
+                    lrx = std::max(lrx, newLrx);
+                    lry = std::max(lry, newLry);
                 }
             }
             assert(fullSyl);
