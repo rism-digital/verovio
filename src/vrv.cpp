@@ -303,12 +303,14 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
 
 /** Global for LogElapsedTimeXXX functions (debugging purposes) */
 struct timeval start;
-/** For disabling log */
-bool noLog = false;
 
-#ifdef __EMSCRIPTEN__
+/** For disabling log */
+bool logging = true;
+
+/** By default log to stderr or JS console */
+bool loggingToBuffer = false;
+
 std::vector<std::string> logBuffer;
-#endif
 
 void LogElapsedTimeStart()
 {
@@ -327,92 +329,83 @@ void LogElapsedTimeEnd(const char *msg)
 
 void LogDebug(const char *fmt, ...)
 {
-    if (noLog) return;
-#if defined(DEBUG)
-#ifdef __EMSCRIPTEN__
+    if (!logging) return;
+
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_DEBUG);
+    LogString(s, CONSOLE_DEBUG);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Debug] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
-#endif
 }
 
 void LogError(const char *fmt, ...)
 {
-    if (noLog) return;
-#ifdef __EMSCRIPTEN__
+    if (!logging) return;
+
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_ERROR);
+    LogString(s, CONSOLE_ERROR);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Error] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
 }
 
 void LogMessage(const char *fmt, ...)
 {
-    if (noLog) return;
-#ifdef __EMSCRIPTEN__
+    if (!logging) return;
+
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_INFO);
+    LogString(s, CONSOLE_INFO);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Message] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
 }
 
 void LogWarning(const char *fmt, ...)
 {
-    if (noLog) return;
-#ifdef __EMSCRIPTEN__
+    if (!logging) return;
+
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_WARN);
+    LogString(s, CONSOLE_WARN);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Warning] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
 }
 
-void DisableLog()
+void EnableLog(bool value)
 {
-    noLog = true;
+    logging = value;
 }
 
+void EnableLogToBuffer(bool value)
+{
+    loggingToBuffer = value;
+}
+
+void LogString(std::string message, consoleLogLevel level)
+{
+    if (loggingToBuffer) {
+        if (LogBufferContains(message)) return;
+        logBuffer.push_back(message);
+    }
+    else {
 #ifdef __EMSCRIPTEN__
+        switch (level) {
+            case CONSOLE_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
+            case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
+            case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
+            case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
+            default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
+        }
+#else
+        fputs(message.c_str(), stderr);
+#endif
+    }
+}
+
 bool LogBufferContains(const std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
@@ -422,22 +415,6 @@ bool LogBufferContains(const std::string &s)
     }
     return false;
 }
-
-void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level)
-{
-    switch (level) {
-        case CONSOLE_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
-        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
-        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
-        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
-        default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
-    }
-
-    if (checkDuplicate && LogBufferContains(message)) return;
-    logBuffer.push_back(message);
-}
-
-#endif
 
 bool Check(Object *object)
 {

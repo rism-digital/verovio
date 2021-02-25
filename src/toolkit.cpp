@@ -1306,6 +1306,8 @@ std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
 
 bool Toolkit::Edit(const std::string &json_editorAction)
 {
+    this->ResetLogBuffer();
+
     return m_editorToolkit->ParseEditorAction(json_editorAction);
 }
 
@@ -1316,17 +1318,12 @@ std::string Toolkit::EditInfo()
 
 std::string Toolkit::GetLog()
 {
-#ifdef USE_EMSCRIPTEN
     std::string str;
     std::vector<std::string>::iterator iter;
     for (iter = logBuffer.begin(); iter != logBuffer.end(); ++iter) {
         str += (*iter);
     }
     return str;
-#else
-    // The non-js version of the app should not use this function.
-    return "";
-#endif
 }
 
 std::string Toolkit::GetVersion()
@@ -1336,13 +1333,13 @@ std::string Toolkit::GetVersion()
 
 void Toolkit::ResetLogBuffer()
 {
-#ifdef USE_EMSCRIPTEN
-    vrv::logBuffer.clear();
-#endif
+    logBuffer.clear();
 }
 
 void Toolkit::RedoLayout()
 {
+    this->ResetLogBuffer();
+
     if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
         LogWarning("No data to re-layout");
         return;
@@ -1362,6 +1359,8 @@ void Toolkit::RedoLayout()
 
 void Toolkit::RedoPagePitchPosLayout()
 {
+    this->ResetLogBuffer();
+
     Page *page = m_doc.GetDrawingPage();
 
     if (!page) {
@@ -1419,6 +1418,8 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 {
+    this->ResetLogBuffer();
+
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
@@ -1457,6 +1458,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 
 bool Toolkit::RenderToSVGFile(const std::string &filename, int pageNo)
 {
+    this->ResetLogBuffer();
+
     std::string output = RenderToSVG(pageNo, true);
 
     std::ofstream outfile;
@@ -1499,6 +1502,8 @@ void Toolkit::GetHumdrum(std::ostream &output)
 
 std::string Toolkit::RenderToMIDI()
 {
+    this->ResetLogBuffer();
+
     smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
@@ -1514,6 +1519,8 @@ std::string Toolkit::RenderToMIDI()
 
 std::string Toolkit::RenderToPAE()
 {
+    this->ResetLogBuffer();
+
     if (GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
@@ -1529,6 +1536,8 @@ std::string Toolkit::RenderToPAE()
 
 bool Toolkit::RenderToPAEFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     std::string outputString = this->RenderToPAE();
 
     std::ofstream output(filename.c_str());
@@ -1542,6 +1551,8 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
 
 std::string Toolkit::RenderToTimemap()
 {
+    this->ResetLogBuffer();
+
     std::string output;
     m_doc.ExportTimemap(output);
     return output;
@@ -1549,6 +1560,8 @@ std::string Toolkit::RenderToTimemap()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
+    this->ResetLogBuffer();
+
     jsonxx::Object o;
     jsonxx::Array a;
 
@@ -1591,6 +1604,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
@@ -1602,6 +1617,8 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
 
 bool Toolkit::RenderToTimemapFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     std::string outputString;
     m_doc.ExportTimemap(outputString);
 
@@ -1634,6 +1651,8 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {
@@ -1663,6 +1682,8 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 
 std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
     jsonxx::Object o;
 
@@ -1714,6 +1735,8 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {

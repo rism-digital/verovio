@@ -37,17 +37,14 @@ void LogDebug(const char *fmt, ...);
 void LogError(const char *fmt, ...);
 void LogMessage(const char *fmt, ...);
 void LogWarning(const char *fmt, ...);
-void DisableLog();
 
 /**
- * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
+ * Member and functions specific to loging that uses a vector of string to buffer the logs.
  */
-#ifdef __EMSCRIPTEN__
 enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR, CONSOLE_DEBUG };
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);
-void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level);
-#endif
+void LogString(std::string message, consoleLogLevel level);
 
 /**
  * Utility for comparing doubles
@@ -96,7 +93,8 @@ std::string GetVersion();
 /**
  *
  */
-extern bool noLog;
+extern bool logging;
+extern bool loggingToBuffer;
 
 /**
  * Functions for logging in milliseconds the elapsed time of an

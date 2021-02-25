@@ -41,6 +41,10 @@ enum FileFormat {
 
 void SetDefaultResourcePath(const std::string &path);
 
+// Implementation in vrv.cpp but defined here to be available in SWIG bindings
+void EnableLog(bool value);
+void EnableLogToBuffer(bool value);
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -314,6 +318,7 @@ public:
     const char *GetCString();
     ///@}
 
+protected:
 private:
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
