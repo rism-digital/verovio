@@ -422,7 +422,7 @@ int main(int argc, char **argv)
         outfile = removeExtension(infile);
     }
     else if (outfile == "-") {
-        vrv::DisableLog();
+        //vrv::EnableLog(false);
         std_output = true;
     }
     else {
