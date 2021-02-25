@@ -133,7 +133,6 @@ double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId)
 
 const char *vrvToolkit_getTimesForElement(Toolkit *tk, const char *xmlId)
 {
-    tk->ResetLogBuffer();
     tk->SetCString(tk->GetTimesForElement(xmlId));
     return tk->GetCString();
 }
@@ -146,39 +145,33 @@ const char *vrvToolkit_getVersion(Toolkit *tk)
 
 bool vrvToolkit_loadData(Toolkit *tk, const char *data)
 {
-    tk->ResetLogBuffer();
     return tk->LoadData(data);
 }
 
 bool vrvToolkit_loadZipDataBase64(Toolkit *tk, const char *data)
 {
-    tk->ResetLogBuffer();
     return tk->LoadZipDataBase64(data);
 }
 
 bool vrvToolkit_loadZipDataBuffer(Toolkit *tk, const unsigned char *data, int length)
 {
-    tk->ResetLogBuffer();
     return tk->LoadZipDataBuffer(data, length);
 }
 
 const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options)
 {
-    tk->ResetLogBuffer();
     tk->SetCString(tk->RenderToMIDI());
     return tk->GetCString();
 }
 
 const char *vrvToolkit_renderToSVG(Toolkit *tk, int page_no, const char *c_options)
 {
-    tk->ResetLogBuffer();
     tk->SetCString(tk->RenderToSVG(page_no, false));
     return tk->GetCString();
 }
 
 const char *vrvToolkit_renderToTimemap(Toolkit *tk)
 {
-    tk->ResetLogBuffer();
     tk->SetCString(tk->RenderToTimemap());
     return tk->GetCString();
 }
@@ -195,7 +188,6 @@ void vrvToolkit_redoPagePitchPosLayout(Toolkit *tk)
 
 const char *vrvToolkit_renderData(Toolkit *tk, const char *data, const char *options)
 {
-    tk->ResetLogBuffer();
     vrvToolkit_setOptions(tk, options);
     vrvToolkit_loadData(tk, data);
 
