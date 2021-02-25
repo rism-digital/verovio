@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
 * Support for `accid@glyph.num` and `@glyph.name`
 * Support for MusicXML compressed files
