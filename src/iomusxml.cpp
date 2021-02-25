@@ -185,7 +185,7 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                     previousMeasure = section->GetPrevious(sectionCurrentMeasure, MEASURE);
                     // if current measure is being processed for the first time - get last measure in the section. This
                     // should happen only for the first staff in the multi-stave score
-                    if (!previousMeasure) {
+                    if (!previousMeasure && (0 != section->GetDescendantIndex(sectionCurrentMeasure, MEASURE, 1))) {
                         previousMeasure = section->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD);
                     }
                     // otherwise this is first measure, so add element as is
@@ -196,6 +196,9 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                     }
                     AttNIntegerComparison comparisonStaff(STAFF, iter->m_staff->GetN());
                     Object *previousStaff = previousMeasure->FindDescendantByComparison(&comparisonStaff);
+                    if (previousStaff == NULL) {
+                        AddLayerElement(layer, iter->m_clef);
+                    }
                     AttNIntegerComparison comparisonLayer(LAYER, layer->GetN());
                     Object *prevLayer = previousStaff->FindDescendantByComparison(&comparisonLayer);
                     if (prevLayer == NULL) {
