@@ -152,7 +152,7 @@ set(all_SRC
 ##################
 
 if (BUILD_AS_LIBRARY)
-    message(STATUS "***** Building Verorio as shared library *****")
+    message(STATUS "***** Building Verovio as shared library *****")
     add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
 
 ###########
@@ -160,7 +160,7 @@ if (BUILD_AS_LIBRARY)
 ###########
 
 elseif (BUILD_AS_WASM)
-    message(STATUS "***** Building Verorio as WASM BC *****")
+    message(STATUS "***** Building Verovio as WASM BC *****")
     add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
 
 #################
