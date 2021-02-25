@@ -1491,7 +1491,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
             assert(controlElement);
             FloatingPositioner *positioner = controlElement->GetCurrentFloatingPositioner();
             // With MNum drawn from DrawMeasure there will be no positioner
-            if (positioner) positioner->SetEmptyBB()
+            if (positioner) positioner->SetEmptyBB();
         }
     }
 
