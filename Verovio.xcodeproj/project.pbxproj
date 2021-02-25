@@ -302,6 +302,8 @@
 		4D6DF9F720E1074100C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F820E1074200C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F920E1074500C12BBD /* subst.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6DF9F620E1072B00C12BBD /* subst.h */; };
+		4D723AD025E77FF00062E0A2 /* zip_file.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D723ACF25E77FDE0062E0A2 /* zip_file.hpp */; };
+		4D723AD525E77FF10062E0A2 /* zip_file.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D723ACF25E77FDE0062E0A2 /* zip_file.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D72A5DD208A37D1009DEC1E /* mrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEA206C00B400D022D5 /* mrpt.cpp */; };
 		4D72A5DE208A37D5009DEC1E /* mrpt2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEB206C00B400D022D5 /* mrpt2.cpp */; };
 		4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEC206C00B400D022D5 /* multirpt.cpp */; };
@@ -356,6 +358,10 @@
 		4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F81D718D4A00B2B856 /* systemelement.cpp */; };
 		4D95D4FC1D74551100B2B856 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
+		4D98CCDB25D26E3C00DC7A2C /* smufl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */; };
+		4D98CCDC25D26E3C00DC7A2C /* smufl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */; };
+		4D98CCE125D26E8F00DC7A2C /* smufl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */; };
+		4D98CCE625D26E8F00DC7A2C /* smufl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */; };
 		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
 		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
 		4D9A9C1A199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
@@ -1323,6 +1329,7 @@
 		4D674B45255F40B7008AEF4C /* plica.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plica.cpp; path = src/plica.cpp; sourceTree = "<group>"; };
 		4D6DF9F420E1071E00C12BBD /* subst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = subst.cpp; path = src/subst.cpp; sourceTree = "<group>"; };
 		4D6DF9F620E1072B00C12BBD /* subst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = subst.h; path = include/vrv/subst.h; sourceTree = "<group>"; };
+		4D723ACF25E77FDE0062E0A2 /* zip_file.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip_file.hpp; path = include/zip/zip_file.hpp; sourceTree = SOURCE_ROOT; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D766EF220ACAD3F006875D8 /* syllable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syllable.h; path = include/vrv/syllable.h; sourceTree = "<group>"; };
@@ -1354,6 +1361,7 @@
 		4D95D4FA1D74549700B2B856 /* score.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = score.h; path = include/vrv/score.h; sourceTree = "<group>"; };
 		4D95D4FB1D74551100B2B856 /* score.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = score.cpp; path = src/score.cpp; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
+		4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smufl.cpp; path = src/smufl.cpp; sourceTree = "<group>"; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
 		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
@@ -1723,6 +1731,14 @@
 			name = editorialelements;
 			sourceTree = "<group>";
 		};
+		4D723ACE25E77F520062E0A2 /* zip */ = {
+			isa = PBXGroup;
+			children = (
+				4D723ACF25E77FDE0062E0A2 /* zip_file.hpp */,
+			);
+			path = zip;
+			sourceTree = "<group>";
+		};
 		4D7D8A3C1886E36200D78B62 /* tools */ = {
 			isa = PBXGroup;
 			children = (
@@ -1984,6 +2000,7 @@
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
 				4DBC09271B51960100B1832C /* utf8 */,
+				4D723ACE25E77F520062E0A2 /* zip */,
 				BB4C4A5322A930A3001F6AF0 /* VerovioFramework */,
 				8F086EAA188534680037FD8E /* Products */,
 			);
@@ -2037,6 +2054,7 @@
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
 				4DA80D941A6940120089802D /* options.h */,
 				4D1D733B1A1D0390001E08F6 /* smufl.h */,
+				4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
 				8F59291618854BF800FE51AD /* toolkit.h */,
 				4DC3B9E4239E2ABE007F185E /* transposition.cpp */,
@@ -2417,6 +2435,7 @@
 				400FEDD4206FA74A000D3233 /* gracegrp.h in Headers */,
 				4DF440751D39567A00152B7E /* ending.h in Headers */,
 				4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */,
+				4D723AD025E77FF00062E0A2 /* zip_file.hpp in Headers */,
 				4DB3D8B41F83D08700B5FC2B /* devicecontextbase.h in Headers */,
 				4DEC4DD921C8295700D1D273 /* rdg.h in Headers */,
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
@@ -2489,6 +2508,7 @@
 				BB4C4B4022A932D7001F6AF0 /* barline.h in Headers */,
 				BB4C4B9E22A932E5001F6AF0 /* plistinterface.h in Headers */,
 				4DA0EADE22BB77AF00A7EBEB /* zone.h in Headers */,
+				4D723AD525E77FF10062E0A2 /* zip_file.hpp in Headers */,
 				BB4C4A9122A9328F001F6AF0 /* boundingbox.h in Headers */,
 				BB4C4B1422A932C8001F6AF0 /* section.h in Headers */,
 				BB4C4B8022A932DF001F6AF0 /* fb.h in Headers */,
@@ -2979,6 +2999,7 @@
 				4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */,
 				4D6331F61F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4D1694501E3A44F300569BF4 /* attconverter.cpp in Sources */,
+				4D98CCE125D26E8F00DC7A2C /* smufl.cpp in Sources */,
 				4D674B47255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */,
 				4D1694521E3A44F300569BF4 /* syl.cpp in Sources */,
@@ -3105,6 +3126,7 @@
 				4D6413782035F58200BB630E /* pages.cpp in Sources */,
 				8F086EFE188539540037FD8E /* scoredef.cpp in Sources */,
 				4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */,
+				4D98CCE625D26E8F00DC7A2C /* smufl.cpp in Sources */,
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				4DEC4DAA21C81EEC00D1D273 /* restore.cpp in Sources */,
 				36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */,
@@ -3376,6 +3398,7 @@
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4DB3D8DC1F83D14900B5FC2B /* artic.cpp in Sources */,
+				4D98CCDB25D26E3C00DC7A2C /* smufl.cpp in Sources */,
 				4D674B48255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4D4335CB1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
@@ -3575,6 +3598,7 @@
 				BB4C4AF922A932BC001F6AF0 /* restore.cpp in Sources */,
 				BB4C4AFD22A932BC001F6AF0 /* subst.cpp in Sources */,
 				BB4C4BBE22A932FC001F6AF0 /* MidiFile.cpp in Sources */,
+				4D98CCDC25D26E3C00DC7A2C /* smufl.cpp in Sources */,
 				4D674B49255F40B7008AEF4C /* plica.cpp in Sources */,
 				BB4C4A9C22A9328F001F6AF0 /* options.cpp in Sources */,
 				BB4C4A6222A9321F001F6AF0 /* atts_cmn.cpp in Sources */,

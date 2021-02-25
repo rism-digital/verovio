@@ -25,8 +25,9 @@ fi
 echo "Generating metadata for Leipzig..."
 fontforge generate_font_metadata.py Leipzig-5.2.sfd
 
-echo "Generating C++ header file ..."
+echo "Generating C++ header and implementation file ..."
 saxon supported.xsl generate-h.xsl > ../include/vrv/smufl.h
+saxon supported.xsl generate-cpp.xsl > ../src/smufl.cpp
 
 echo "Generating Bravura files ..."
 saxon Bravura.svg extract-glyphs.xsl > tmp/Bravura-bounding-boxes.svg

@@ -487,7 +487,8 @@ bool Alignment::HasTimestampOnly()
     // If no child, then not timestamp
     if (!this->GetChildCount()) return false;
     // Look for everything that is not a timestamp
-    ReverseClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR });
+    ClassIdsComparison notTimestamp({ ALIGNMENT, ALIGNMENT_REFERENCE, TIMESTAMP_ATTR });
+    notTimestamp.ReverseComparison();
     return (this->FindDescendantByComparison(&notTimestamp, 2) == NULL);
 }
 
@@ -1091,7 +1092,8 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         params->m_timestamps.clear();
     }
 
-    params->m_lastNonTimestamp = this;
+    // Do not use clef change alignment as reference since these are not aligned at this stage
+    if (this->GetType() != ALIGNMENT_CLEF) params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }

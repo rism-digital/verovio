@@ -320,8 +320,8 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if (Artic::IsCentered(articValue)) {
         y += (artic->GetDrawingPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
     }
-    // @glyph.num are (usually?) aligned for placement above and needs to be shifted when below
-    else if (artic->HasGlyphNum() && artic->GetDrawingPlace() == STAFFREL_below) {
+    // @glyph.num/name are (usually?) aligned for placement above and needs to be shifted when below
+    else if ((artic->HasGlyphNum() || artic->HasGlyphName()) && artic->GetDrawingPlace() == STAFFREL_below) {
         y -= glyphHeight;
     }
 
@@ -678,18 +678,18 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
 
-    bool cueSize = false;
+    double clefSizeFactor = 1.0;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
         if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
-            cueSize = true;
             // HARDCODED
-            // x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
+            clefSizeFactor = m_options->m_clefChangeFactor.GetValue();
+            // x -= m_doc->GetGlyphWidth(sym, clefSizeFactor * staff->m_drawingStaffSize, false) * 1.35;
         }
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
+    DrawSmuflCode(dc, x, y, sym, clefSizeFactor * staff->m_drawingStaffSize, false);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -736,11 +736,19 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         Clef *clef = layer->GetClef(element);
         y = ToLogicalY(staff->GetDrawingY());
         PitchInterface pi;
+        // Neume notation uses C3 for C clef rather than C4.
+        // Take this into account when determining location.
+        // However this doesn't affect the value for F clef.
         pi.SetPname(PITCHNAME_c);
-        pi.SetOct(3);
+        if ((staff->m_drawingNotationType == NOTATIONTYPE_neume) && (clef->GetShape() == CLEFSHAPE_C)) {
+            pi.SetOct(3);
+        }
+        else {
+            pi.SetOct(4);
+        }
         // Convert from lines & spaces from bottom to from top
-        int C3OffsetFromTop = ((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset();
-        int custosOffsetFromTop = C3OffsetFromTop + pi.PitchDifferenceTo(custos);
+        int CClefOffsetFromTop = ((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset();
+        int custosOffsetFromTop = CClefOffsetFromTop + pi.PitchDifferenceTo(custos);
         y -= custosOffsetFromTop * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {

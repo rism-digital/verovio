@@ -165,9 +165,14 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 
 wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
 {
-    // If there is glyph.num, prioritize it, otherwise check other attributes
+    // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
         wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 

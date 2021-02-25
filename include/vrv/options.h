@@ -528,6 +528,7 @@ public:
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
+    OptionBool m_svgFormatRaw;
     OptionInt m_unit;
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
@@ -544,6 +545,7 @@ public:
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionDbl m_bracketThickness;
+    OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
     OptionString m_font;
     OptionDbl m_graceFactor;
