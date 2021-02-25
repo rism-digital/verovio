@@ -190,7 +190,8 @@ private:
 // Base64 code borrowed
 //----------------------------------------------------------------------------
 
-std::string Base64Encode(unsigned char const *, unsigned int len);
+std::string Base64Encode(unsigned char const *bytesToEncode, unsigned int len);
+std::vector<unsigned char> Base64Decode(std::string const &encodedString);
 
 } // namespace vrv
 

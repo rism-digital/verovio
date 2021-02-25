@@ -2,6 +2,13 @@
 
 ## [unreleased]
 * Support for `@glyph.name`
+* Support for `accid@glyph.num` and `@glyph.name`
+* Support for MusicXML compressed files
+* Improved PyPI packages for Linux (@rettinghaus and @musicEnfanthen)
+* Method loadZipDataBase64 and loadZipDataBuffer (JS) for loading MusicXML compressed files
+* Option --clef-change-factor for adjusting clef change size (default is .66) (@rettinghaus)
+* Option --svg-format-raw for raw SVG output without indentation and line breaks
+* New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)

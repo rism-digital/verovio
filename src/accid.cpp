@@ -33,6 +33,7 @@ Accid::Accid()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
+    , AttExtSym()
 {
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -41,6 +42,7 @@ Accid::Accid()
     RegisterAttClass(ATT_ACCIDLOG);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_ENCLOSINGCHARS);
+    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -56,29 +58,43 @@ void Accid::Reset()
     ResetAccidLog();
     ResetColor();
     ResetEnclosingChars();
+    ResetExtSym();
 }
 
 std::wstring Accid::GetSymbolStr() const
 {
     if (!this->HasAccid()) return L"";
 
-    wchar_t symc = GetAccidGlyph(this->GetAccid());
+    wchar_t code = 0;
+
+    // If there is glyph.num, prioritize it
+    if (HasGlyphNum()) {
+        code = GetGlyphNum();
+        if (NULL == Resources::GetGlyph(code)) code = 0;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL == Resources::GetGlyph(code)) code = 0;
+    }
+
+    if (code == 0) code = GetAccidGlyph(this->GetAccid());
     std::wstring symbolStr;
 
     if (this->HasEnclose()) {
         if (this->GetEnclose() == ENCLOSURE_brack) {
             symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
-            symbolStr.push_back(symc);
+            symbolStr.push_back(code);
             symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
         }
         else {
             symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
-            symbolStr.push_back(symc);
+            symbolStr.push_back(code);
             symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
         }
     }
     else {
-        symbolStr.push_back(symc);
+        symbolStr.push_back(code);
     }
     return symbolStr;
 }

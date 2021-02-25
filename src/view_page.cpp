@@ -1484,6 +1484,17 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
     assert(dc);
     assert(parent);
 
+    // For ControlElement, we need to set the positioner empty bounding box if no text
+    if (parent->IsControlElement()) {
+        if (!parent->GetChildCount() || !parent->HasNonEditorialContent()) {
+            ControlElement *controlElement = vrv_cast<ControlElement *>(parent);
+            assert(controlElement);
+            FloatingPositioner *positioner = controlElement->GetCurrentFloatingPositioner();
+            assert(positioner);
+            positioner->SetEmptyBB();
+        }
+    }
+
     for (auto current : *parent->GetChildren()) {
         if (current->IsTextElement()) {
             DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
