@@ -207,7 +207,7 @@ public:
     /**
      * Set the xlink: prefex on href attributes
      */
-    void SetXlinkOnHref(bool includeXlink) { m_includeXlink = includeXlink; }
+    void SetIncludeXlink(bool includeXlink) { m_includeXlink = includeXlink; }
 
 private:
     /**
