@@ -203,6 +203,11 @@ public:
      * Set the SVG to have 'raw' formatting, with no extraneous whitespace or newlines.
      */
     void SetFormatRaw(bool rawFormat) { m_formatRaw = rawFormat; }
+    
+    /**
+     * Set the xlink: prefex on href attributes
+     */
+    void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
 
 private:
     /**
@@ -279,6 +284,8 @@ private:
     bool m_html5;
     // format output as raw, stripping extraneous whitespace and non-content newlines
     bool m_formatRaw;
+    // include xlink on href attributes
+    bool m_removeXlink;
     // indentation value (-1 for tabs)
     int m_indent;
 };
