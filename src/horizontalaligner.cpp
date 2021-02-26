@@ -1020,6 +1020,7 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
             params->m_currentAlignment.m_alignment->SetXRel(
                 params->m_currentAlignment.m_alignment->GetXRel() + params->m_previousAlignment.m_offset);
             params->m_minPos += params->m_previousAlignment.m_offset;
+            params->m_cumulatedXShift += params->m_previousAlignment.m_offset;
         }
     }
     params->m_previousAlignment = params->m_currentAlignment;
