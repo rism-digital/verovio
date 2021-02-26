@@ -2006,10 +2006,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
     pugi::xpath_node_set words = node.select_nodes("direction-type/words");
     const bool containsWords = !words.empty();
     bool containsDynamics = !node.select_node("direction-type/dynamics|direction-type/sound[@dynamics]").node().empty();
+    bool containsTempo = !node.select_node("direction-type/metronome|direction-type/sound[@tempo]").node().empty();
 
     // Directive
     int defaultY = 0; // y position attribute, only for directives and dynamics
-    if (containsWords && !containsDynamics && !soundNode.attribute("tempo")) {
+    if (containsWords && !containsTempo && !containsDynamics && !soundNode.attribute("tempo")) {
         pugi::xpath_node_set words = node.select_nodes("direction-type/*[self::words or self::coda or self::segno]");
         defaultY = words.first().node().attribute("default-y").as_int();
         std::string wordStr = words.first().node().text().as_string();
@@ -2348,8 +2349,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Tempo
-    pugi::xpath_node metronome = typeNode.child("metronome");
-    if (soundNode.attribute("tempo") || metronome) {
+    pugi::xpath_node metronome = node.select_node("direction-type/metronome");
+    if (containsTempo) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
             tempo->SetLang(words.first().node().attribute("xml:lang").as_string());
