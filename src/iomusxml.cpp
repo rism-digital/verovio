@@ -3657,6 +3657,7 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 {
     static const std::map<std::string, std::wstring> Type2VerovioText{
+        { "long", L"\xE1D0" }, // there is no matching glyph in this SMuFL range
         { "breve", L"\xE1D1" }, //
         { "whole", L"\xE1D2" }, //
         { "half", L"\xE1D3" }, //
