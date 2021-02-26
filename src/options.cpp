@@ -756,10 +756,10 @@ Options::Options()
     m_svgFormatRaw.Init(false);
     this->Register(&m_svgFormatRaw, "svgFormatRaw", &m_general);
     
-    m_svgIncludeXlink.SetInfo(
-        "Include xlink: on href attributes", "Includes the xlink: prefix on href attributes for compatibility with older SVG viewers.");
-    m_svgIncludeXlink.Init(false);
-    this->Register(&m_svgIncludeXlink, "svgIncludeXlink", &m_general);
+    m_svgRemoveXlink.SetInfo(
+        "Remove xlink: from href attributes", "Removes the xlink: prefix on href attributes for compatibility with some newer browsers.");
+    m_svgRemoveXlink.Init(false);
+    this->Register(&m_svgRemoveXlink, "svgRemoveXlink", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);

@@ -207,7 +207,7 @@ public:
     /**
      * Set the xlink: prefex on href attributes
      */
-    void SetIncludeXlink(bool includeXlink) { m_includeXlink = includeXlink; }
+    void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
 
 private:
     /**
@@ -285,7 +285,7 @@ private:
     // format output as raw, stripping extraneous whitespace and non-content newlines
     bool m_formatRaw;
     // include xlink on href attributes
-    bool m_includeXlink;
+    bool m_removeXlink;
     // indentation value (-1 for tabs)
     int m_indent;
 };
