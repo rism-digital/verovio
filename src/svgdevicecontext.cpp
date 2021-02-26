@@ -50,6 +50,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_svgBoundingBoxes = false;
     m_svgViewBox = false;
     m_html5 = false;
+    m_formatRaw = false;
     m_facsimile = false;
     m_indent = 2;
 
@@ -141,6 +142,10 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         decl.append_attribute("version") = "1.0";
         decl.append_attribute("encoding") = "UTF-8";
         decl.append_attribute("standalone") = "no";
+    }
+
+    if (m_formatRaw) {
+        output_flags |= pugi::format_raw;
     }
 
     // add description statement

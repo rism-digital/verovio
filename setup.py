@@ -113,6 +113,7 @@ verovio_module = Extension('verovio._verovio',
                                          './include/pugi',
                                          './include/utf8',
                                          './include/win32',
+                                         './include/zip',
                                          './libmei'],
                            extra_compile_args=EXTRA_COMPILE_ARGS
                            )

@@ -36,6 +36,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "gClef8vb", SMUFL_E052_gClef8vb },
     { "gClef8va", SMUFL_E053_gClef8va },
     { "gClef15ma", SMUFL_E054_gClef15ma },
+    { "gClef8vbOld", SMUFL_E055_gClef8vbOld },
+    { "gClef8vbCClef", SMUFL_E056_gClef8vbCClef },
     { "cClef", SMUFL_E05C_cClef },
     { "cClef8vb", SMUFL_E05D_cClef8vb },
     { "fClef", SMUFL_E062_fClef },
@@ -45,6 +47,11 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "fClef15ma", SMUFL_E066_fClef15ma },
     { "unpitchedPercussionClef1", SMUFL_E069_unpitchedPercussionClef1 },
     { "unpitchedPercussionClef2", SMUFL_E06A_unpitchedPercussionClef2 },
+    { "gClefReversed", SMUFL_E073_gClefReversed },
+    { "gClefTurned", SMUFL_E074_gClefTurned },
+    { "cClefReversed", SMUFL_E075_cClefReversed },
+    { "fClefReversed", SMUFL_E076_fClefReversed },
+    { "fClefTurned", SMUFL_E077_fClefTurned },
     { "timeSig0", SMUFL_E080_timeSig0 },
     { "timeSig1", SMUFL_E081_timeSig1 },
     { "timeSig2", SMUFL_E082_timeSig2 },
@@ -69,12 +76,17 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "noteheadHalfWithX", SMUFL_E0B6_noteheadHalfWithX },
     { "noteheadVoidWithX", SMUFL_E0B7_noteheadVoidWithX },
     { "noteheadDiamondHalf", SMUFL_E0D9_noteheadDiamondHalf },
+    { "noteheadDiamondHalfWide", SMUFL_E0DA_noteheadDiamondHalfWide },
     { "noteheadDiamondBlack", SMUFL_E0DB_noteheadDiamondBlack },
     { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
     { "noteheadDiamondWhite", SMUFL_E0DD_noteheadDiamondWhite },
     { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },
+    { "noteheadParenthesisLeft", SMUFL_E0F5_noteheadParenthesisLeft },
+    { "noteheadParenthesisRight", SMUFL_E0F6_noteheadParenthesisRight },
     { "noteheadWholeFilled", SMUFL_E0FA_noteheadWholeFilled },
     { "noteheadSlashHorizontalEnds", SMUFL_E101_noteheadSlashHorizontalEnds },
+    { "noteheadSlashWhiteWhole", SMUFL_E102_noteheadSlashWhiteWhole },
+    { "noteheadSlashWhiteHalf", SMUFL_E103_noteheadSlashWhiteHalf },
     { "tremolo1", SMUFL_E220_tremolo1 },
     { "tremolo2", SMUFL_E221_tremolo2 },
     { "tremolo3", SMUFL_E222_tremolo3 },
@@ -197,6 +209,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "ventiduesima", SMUFL_E517_ventiduesima },
     { "ventiduesimaAlta", SMUFL_E518_ventiduesimaAlta },
     { "ventiduesimaBassa", SMUFL_E519_ventiduesimaBassa },
+    { "octaveParensLeft", SMUFL_E51A_octaveParensLeft },
+    { "octaveParensRight", SMUFL_E51B_octaveParensRight },
     { "dynamicPiano", SMUFL_E520_dynamicPiano },
     { "dynamicMezzo", SMUFL_E521_dynamicMezzo },
     { "dynamicForte", SMUFL_E522_dynamicForte },
@@ -373,6 +387,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 347
+// 361
 
 } // namespace vrv

@@ -504,6 +504,11 @@ public:
     bool HasEditorialContent();
 
     /**
+     * Return true if the object contains anything that is not editorial content
+     */
+    bool HasNonEditorialContent();
+
+    /**
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
@@ -531,9 +536,11 @@ public:
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
+     * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
+        bool skipFirst = false);
 
     //----------------//
     // Static methods //

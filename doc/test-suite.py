@@ -49,7 +49,7 @@ if __name__ == "__main__":
         print(args.shortlist)
         with open(args.shortlist) as f:
             for line in f:
-                shortlist.append(line)
+                shortlist.append(line.strip('\n'))
                 print("File {} added to the shortlist".format(line))
 
     path1 = args.test_suite_dir.replace("\ ", " ")

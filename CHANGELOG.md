@@ -1,7 +1,21 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
+* Support for `accid@glyph.num` and `@glyph.name`
+* Support for MusicXML compressed files
+* Improved consistency of logging functions across bindings
+* Improved PyPI packages for Linux (@rettinghaus and @musicEnfanthen)
+* Function loadZipDataBase64 and loadZipDataBuffer (JS) for loading MusicXML compressed files
+* Function enableLog(bool) to enable or disable logging
+* Function enableLogToBuffer(bool) to enable logging to a buffer instead of the stderr or the JS console
+* Option --clef-change-factor for adjusting clef change size (default is .66) (@rettinghaus)
+* Option --svg-format-raw for raw SVG output without indentation and line breaks
+* New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
+* Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
+* Fixes in the MusicXML importer (@eNote-GmBH)
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
