@@ -51,6 +51,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_svgViewBox = false;
     m_html5 = false;
     m_formatRaw = false;
+    m_includeXlink = false;
     m_facsimile = false;
     m_indent = 2;
 
@@ -857,6 +858,12 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
 
     int w, h, gx, gy;
 
+    // include the `xlink:` prefix for backwards compatibility with older SVG viewers.
+    std::string hrefAttrib = "href";
+    if (m_includeXlink) {
+        hrefAttrib.insert(0, "xlink:");
+    }
+
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); ++i) {
         wchar_t c = text.at(i);
@@ -872,7 +879,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
 
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
-        useChild.append_attribute("xlink:href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
+        useChild.append_attribute(hrefAttrib.c_str()) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
