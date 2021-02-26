@@ -1487,9 +1487,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     // In case of dots/flags we need to hold off of adjusting upcoming min position right away - if it happens that
     // these elements do not overlap with other elements we can draw them as is and save space
-    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    const int layerCount = staff? staff->GetChildCount(LAYER) : 1;
-    if (Is({ DOTS, FLAG }) && (layerCount > 1)) {
+    AlignmentReference *currentReference = GetAlignment()->GetReferenceWithElement(this, params->m_staffN);
+    if (Is({ DOTS, FLAG }) && (currentReference->HasMultipleLayer() || currentReference->HasCrossStaffElements())) {
         const int additionalOffset = selfRight - params->m_upcomingMinPos;
         if (additionalOffset > params->m_currentAlignment.m_offset) {
             params->m_currentAlignment.m_offset = additionalOffset;

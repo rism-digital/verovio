@@ -313,6 +313,11 @@ public:
      */
     bool HasMultipleLayer() const { return (m_layerCount > 1); }
 
+    /**
+     * Return true if the reference has elements from cross-staff.
+     */
+    bool HasCrossStaffElements();
+
     //----------//
     // Functors //
     //----------//
