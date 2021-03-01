@@ -573,7 +573,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 
     // build a sequence based on the elements present in the metronome
     std::list<std::pair<MetronomeElements, std::string> > metronomeElements;
-    for (const auto child : metronome.children()) {
+    for (pugi::xml_node child : metronome.children()) {
         if ("beat-unit-dot" == std::string(child.name())) {
             metronomeElements.emplace_back(std::make_pair(MetronomeElements::BEAT_UNIT_DOT, ""));
         }
@@ -600,7 +600,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 // find separator or use end() if there is no separator
                 const auto separator = std::find_if(iter, metronomeElements.end(),
                     [](const auto pair) { return pair.first == MetronomeElements::SEPARATOR; });
-                const int dotCount = std::count_if(
+                const int dotCount = (int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
                 for (int i = 0; i < dotCount; i++) {
                     verovioText += L"\xE1E7"; // SMUFL augmentation dot
@@ -1687,8 +1687,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
         else if (key.node().child("key-step")) {
             if (!keySig) keySig = new KeySig();
-            for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
-                 keyStep = keyStep.next_sibling("key-step")) {
+            for (pugi::xml_node keyStep : key.node().children("key-step")) {
                 KeyAccid *keyAccid = new KeyAccid();
                 keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
                 if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
