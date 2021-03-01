@@ -155,7 +155,7 @@ setup(name='verovio',
       },
       python_requires='>=2.7',
       project_urls={
-          'Bug Reports': 'https://github.com/rism-ch/verovio/issues',
-          'Source': 'https://github.com/rism-ch/verovio',
+          'Bug Reports': 'https://github.com/rism-digital/verovio/issues',
+          'Source': 'https://github.com/rism-digital/verovio',
       },
 )
