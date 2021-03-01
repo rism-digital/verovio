@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.8...3.19)
 
 project(Verovio)
 
-set(CMAKE_BUILD_TYPE Release)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
@@ -39,10 +41,14 @@ if(MSVC)
     add_definitions(/std:c++17)
     include_directories(../include/win32)
 else()
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        message(STATUS "Enabling debug information")
+        add_definitions(-g)
+    endif()
+
     # jsonxx raises -Wdollar-in-identifier-extension
     # gcc 8.3.1 does not like -Wdollar-in-identifier-extension option.
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
-    add_definitions(-g)
     add_definitions(-std=c++17)
 
     # extra warnings similar to Xcode compiling settings (most probably covered by -Wall):
