@@ -1630,13 +1630,14 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     assert(node);
     assert(section);
     assert(measure);
+    bool divisionChange = false;
 
     // check for changes in divisions
     pugi::xml_node divisions = node.child("divisions");
     if (divisions) {
+        // we'll only convert this to MEI if it actually changes
+        divisionChange = (m_ppq != divisions.text().as_int());
         m_ppq = divisions.text().as_int();
-        // ToDo: add proper change in MEI
-        // scoreDef->SetPpq(m_ppq);
     }
 
     // read clef changes as MEI clef and add them to the stack
@@ -1678,7 +1679,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     pugi::xml_node time = node.child("time");
 
     // for now only read first key change in first part and update scoreDef
-    if ((key || time || divisions) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
+    if ((key || time || divisionChange) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
         && !node.select_node("preceding-sibling::attributes/key")) {
         ScoreDef *scoreDef = new ScoreDef();
         KeySig *keySig = NULL;
@@ -1767,6 +1768,10 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             if (meterSig) {
                 scoreDef->AddChild(meterSig);
             }
+        }
+
+        if (divisions) {
+            scoreDef->SetPpq(divisions.text().as_int());
         }
 
         section->AddChild(scoreDef);
