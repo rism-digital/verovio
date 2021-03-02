@@ -1631,6 +1631,14 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     assert(section);
     assert(measure);
 
+    // check for changes in divisions
+    pugi::xml_node divisions = node.child("divisions");
+    if (divisions) {
+        m_ppq = divisions.text().as_int();
+        // ToDo: add proper change in MEI
+        // scoreDef->SetPpq(m_ppq);
+    }
+
     // read clef changes as MEI clef and add them to the stack
     pugi::xml_node clef = node.child("clef");
     if (clef) {
