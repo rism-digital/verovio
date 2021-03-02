@@ -1696,7 +1696,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
         else if (key.child("key-step")) {
             if (!keySig) keySig = new KeySig();
-            for (pugi::xml_node keyStep : key.node().children("key-step")) {
+            for (pugi::xml_node keyStep : key.children("key-step")) {
                 KeyAccid *keyAccid = new KeyAccid();
                 keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
                 if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
@@ -3016,7 +3016,6 @@ void MusicXmlInput::ReadMusicXmlNote(
         dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.attribute("placement").as_string()));
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : xmlDynam.children()) {
-            LogWarning("%s",xmlDynamPart.name());
             if (std::string(xmlDynamPart.name()) == "other-dynamics") {
                 dynamStr += xmlDynamPart.text().as_string();
             }
