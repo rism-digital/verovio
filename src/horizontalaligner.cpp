@@ -1024,13 +1024,21 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
         && (params->m_previousAlignment.m_alignment->GetType() == ALIGNMENT_DEFAULT)) {
         auto it = std::find_if(
             params->m_upcomingBoundingBoxes.begin(), params->m_upcomingBoundingBoxes.end(), [params](BoundingBox *bb) {
+                // check if elements actually overlap
+                const bool doElementsOverlap = (bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
+                    && bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB));
+                const bool isBarlineOverlap
+                    = (std::abs(bb->GetSelfLeft() - params->m_previousAlignment.m_overlappingBB->GetSelfRight())
+                        < params->m_previousAlignment.m_offset / 2);
                 return (params->m_previousAlignment.m_overlappingBB != bb)
-                    && ((bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
-                            && bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB))
+                    && (doElementsOverlap
                         || ((params->m_currentAlignment.m_alignment->GetType() == ALIGNMENT_MEASURE_RIGHT_BARLINE)
-                            && (bb->GetSelfLeft() < params->m_previousAlignment.m_overlappingBB->GetSelfLeft())));
+                            && isBarlineOverlap));
             });
         if (it != params->m_upcomingBoundingBoxes.end()) {
+            // adjust offset if we have overlap with right barline, since we don't want to offset barline too far
+            if (params->m_currentAlignment.m_alignment->GetType() == ALIGNMENT_MEASURE_RIGHT_BARLINE)
+                params->m_previousAlignment.m_offset /= 2;
             params->m_currentAlignment.m_alignment->SetXRel(
                 params->m_currentAlignment.m_alignment->GetXRel() + params->m_previousAlignment.m_offset);
             params->m_minPos += params->m_previousAlignment.m_offset;
