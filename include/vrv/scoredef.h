@@ -111,7 +111,8 @@ class ScoreDef : public ScoreDefElement,
                  public ObjectListInterface,
                  public AttDistances,
                  public AttEndings,
-                 public AttOptimization {
+                 public AttOptimization,
+                 public AttTimeBase {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
