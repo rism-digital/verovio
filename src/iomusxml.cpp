@@ -1632,21 +1632,21 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     assert(measure);
 
     // read clef changes as MEI clef and add them to the stack
-    pugi::xpath_node clef = node.select_node("clef");
+    pugi::xml_node clef = node.child("clef");
     if (clef) {
         // check if we have a staff number
-        int staffNum = clef.node().attribute("number").as_int();
+        int staffNum = clef.attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
         Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
         assert(staff);
-        pugi::xpath_node clefSign = clef.node().select_node("sign");
-        pugi::xpath_node clefLine = clef.node().select_node("line");
+        pugi::xpath_node clefSign = clef.select_node("sign");
+        pugi::xpath_node clefLine = clef.select_node("line");
         if (clefSign && clefLine) {
             Clef *meiClef = new Clef();
             meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
             meiClef->SetLine(meiClef->AttClefShape::StrToInt(clefLine.node().text().as_string()));
             // clef octave change
-            pugi::xpath_node clefOctaveChange = clef.node().select_node("clef-octave-change");
+            pugi::xpath_node clefOctaveChange = clef.select_node("clef-octave-change");
             if (clefOctaveChange.node().text()) {
                 const int change = clefOctaveChange.node().text().as_int();
                 if (abs(change) == 1)
@@ -1660,22 +1660,23 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            const bool afterBarline = clef.node().attribute("after-barline").as_bool();
+            const bool afterBarline = clef.attribute("after-barline").as_bool();
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
 
     // key and time change
-    pugi::xpath_node key = node.select_node("key");
-    pugi::xpath_node time = node.select_node("time");
+    pugi::xml_node key = node.child("key");
+    pugi::xml_node time = node.child("time");
+
     // for now only read first key change in first part and update scoreDef
-    if ((key || time) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
+    if ((key || time || divisions) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
         && !node.select_node("preceding-sibling::attributes/key")) {
         ScoreDef *scoreDef = new ScoreDef();
         KeySig *keySig = NULL;
-        if (key.node().select_node("fifths")) {
+        if (key.select_node("fifths")) {
             if (!keySig) keySig = new KeySig();
-            const int fifths = key.node().select_node("fifths").node().text().as_int();
+            const int fifths = key.select_node("fifths").node().text().as_int();
             std::string keySigStr;
             if (fifths < 0)
                 keySigStr = StringFormat("%df", abs(fifths));
@@ -1685,7 +1686,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 keySigStr = "0";
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
-        else if (key.node().child("key-step")) {
+        else if (key.child("key-step")) {
             if (!keySig) keySig = new KeySig();
             for (pugi::xml_node keyStep : key.node().children("key-step")) {
                 KeyAccid *keyAccid = new KeyAccid();
@@ -1702,19 +1703,19 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 keySig->AddChild(keyAccid);
             }
         }
-        if (key.node().select_node("mode")) {
+        if (key.select_node("mode")) {
             if (!keySig) keySig = new KeySig();
-            keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
+            keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.select_node("mode").node().text().as_string()));
         }
-        if (key.node().select_node("cancel")) {
+        if (key.select_node("cancel")) {
             if (!keySig) keySig = new KeySig();
             keySig->SetSigShowchange(BOOLEAN_true);
         }
-        if (key.node().attribute("id")) {
+        if (key.attribute("id")) {
             if (!keySig) keySig = new KeySig();
-            keySig->SetUuid(key.node().attribute("id").as_string());
+            keySig->SetUuid(key.attribute("id").as_string());
         }
-        if (keySig) keySig->SetVisible(ConvertWordToBool(key.node().attribute("print-object").as_string()));
+        if (keySig) keySig->SetVisible(ConvertWordToBool(key.attribute("print-object").as_string()));
         // Add it if necessary
         if (keySig) {
             scoreDef->AddChild(keySig);
@@ -1722,7 +1723,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
 
         if (time) {
             MeterSig *meterSig = NULL;
-            std::string symbol = time.node().attribute("symbol").as_string();
+            std::string symbol = time.attribute("symbol").as_string();
             if (!symbol.empty()) {
                 if (!meterSig) meterSig = new MeterSig();
                 if (symbol == "cut" || symbol == "common")
@@ -1732,10 +1733,10 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meterSig->SetForm(METERFORM_norm);
             }
-            if (time.node().select_nodes("beats").size() > 1) {
+            if (time.select_nodes("beats").size() > 1) {
                 LogWarning("MusicXML import: Compound meter signatures are not supported");
             }
-            pugi::xpath_node beats = time.node().select_node("beats");
+            pugi::xpath_node beats = time.select_node("beats");
             if (beats.node().text()) {
                 if (!meterSig) meterSig = new MeterSig();
                 m_meterCount = beats.node().text().as_int();
@@ -1748,7 +1749,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 }
                 meterSig->SetCount(m_meterCount);
             }
-            pugi::xpath_node beatType = time.node().select_node("beat-type");
+            pugi::xpath_node beatType = time.select_node("beat-type");
             if (beatType.node().text()) {
                 if (!meterSig) meterSig = new MeterSig();
                 m_meterUnit = beatType.node().text().as_int();
