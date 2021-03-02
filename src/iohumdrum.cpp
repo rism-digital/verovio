@@ -12647,9 +12647,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 int measures = getMeasureDifference(dyntok, endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
-                // See issue https://github.com/rism-ch/verovio/issues/959
+                // See issue https://github.com/rism-digital/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
-                // and https://github.com/rism-ch/verovio/pull/1876
+                // and https://github.com/rism-digital/verovio/pull/1876
                 // double endingCorrection = 0.03;
                 double endingCorrection = 0.00;
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
@@ -12803,9 +12803,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 int measures = getMeasureDifference(dyntok, endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
-                // See issue https://github.com/rism-ch/verovio/issues/959
+                // See issue https://github.com/rism-digital/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
-                // and https://github.com/rism-ch/verovio/pull/1876
+                // and https://github.com/rism-digital/verovio/pull/1876
                 // double endingCorrection = 0.03;
                 double endingCorrection = 0.00;
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
@@ -18367,7 +18367,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     if (unpitchedQ) {
         int loc = hum::Convert::kernToStaffLocation(token, "*clefX");
         note->SetLoc(loc);
-        // suppress note@pname (see issue https://github.com/rism-ch/verovio/issues/1385)
+        // suppress note@pname (see issue https://github.com/rism-digital/verovio/issues/1385)
         // suppress note@oct as well
     }
 

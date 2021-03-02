@@ -331,12 +331,14 @@ void LogDebug(const char *fmt, ...)
 {
     if (!logging) return;
 
+#if defined(DEBUG)
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
     LogString(s, CONSOLE_DEBUG);
     va_end(args);
+#endif
 }
 
 void LogError(const char *fmt, ...)

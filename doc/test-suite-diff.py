@@ -12,7 +12,7 @@ import xmldiff.main as main
 ns = {'svg': 'http://www.w3.org/2000/svg'}
 
 linkToTestSuiteCat = 'https://www.verovio.org/test-suite.xhtml?cat='
-linkToTestInEditor = 'https://editor.verovio.org/?file=https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/_tests/'
+linkToTestInEditor = 'https://editor.verovio.org/?file=https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/_tests/'
 
 
 def start_webpage():
