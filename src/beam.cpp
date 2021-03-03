@@ -1361,16 +1361,24 @@ int Beam::CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2)
     for (auto object : collidingElementsList) {
         LayerElement *layerElement = vrv_cast<LayerElement *>(object);
         if (directionBias > 0) {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
+                && (layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y2))
+                continue;
             leftMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y1;
             rightMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y2;
         }
         else {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y1)
+                && (layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y2))
+                continue;
             leftMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y1;
             rightMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y2;
         }
-        
         elementOverlaps.emplace_back(std::max(leftMargin * directionBias, rightMargin * directionBias));
     }
+    if (elementOverlaps.empty()) return 0;
 
     const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
