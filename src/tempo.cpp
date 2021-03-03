@@ -107,7 +107,9 @@ int Tempo::AdjustTempo(FunctorParams *functorParams)
             align->GetLeftRight(staffN, left, right);
         }
 
-        m_drawingXRels[staffN] = left - start;
+        if (std::abs(left) != std::abs(VRV_UNSET)) {
+            m_drawingXRels[staffN] = left - start;
+        }
     }
 
     return FUNCTOR_CONTINUE;
