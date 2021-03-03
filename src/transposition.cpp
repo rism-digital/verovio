@@ -1352,7 +1352,7 @@ std::string Transposer::GetIntervalName(int intervalClass)
 
 //////////////////////////////
 //
-// Transposer::IntervalToCircleOfFifths -- Returns the circle-of-fiths count
+// Transposer::IntervalToCircleOfFifths -- Returns the circle-of-fifths count
 //    that is represented by the given interval class or interval string.
 //    Examples:  "P5"  => +1      "-P5" => -1
 //               "P4"  => -1      "-P4" => +1
@@ -1965,7 +1965,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
 //                   option for verovio.
 //     3: ([1-9][0-9]*) == a positive integer representing the diatonic interval.  1 = unison,
 //                   2 = second, 3 = third, and so on.  Compound intervals are allowed, such as
-//                   9 for a nineth (2nd plus a perfect octave), 15 for two perfect octaves.
+//                   9 for a ninth (2nd plus a perfect octave), 15 for two perfect octaves.
 //
 //
 

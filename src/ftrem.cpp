@@ -83,7 +83,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
 
     while (iter != childList->end()) {
         if (!(*iter)->Is(NOTE) && !(*iter)->Is(CHORD)) {
-            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc.)
             iter = childList->erase(iter);
             continue;
         }

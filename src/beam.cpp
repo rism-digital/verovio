@@ -99,7 +99,7 @@ void BeamSegment::CalcBeam(
 
     bool horizontal = beamInterface->IsHorizontal();
 
-    // Beam@place has precedence - however, in some cases, CalcBeam is called recusively because we need to change the
+    // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change the
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
 

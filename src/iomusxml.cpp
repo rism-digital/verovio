@@ -79,7 +79,7 @@
 
 namespace vrv {
 
-// Using flags mordent can be easily visualised with the value. E.g.
+// Using flags mordent can be easily visualized with the value. E.g.
 // 0x212 - approach and depart are both below and form is normal
 // APPR_Below | FORM_Normal | DEP_Below
 enum MordentExtSymbolFlags {
@@ -301,7 +301,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
-    // If value is iniatialized - get current layer
+    // If value is initialized - get current layer
     if (m_isLayerInitialized) return m_currentLayer;
 
     // Find voice number of node

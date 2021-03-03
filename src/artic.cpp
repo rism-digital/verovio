@@ -97,7 +97,7 @@ void Artic::SplitMultival(Object *parent)
     // Multiple valued attributes cannot be preserved as such
     if (this->IsAttribute()) {
         this->IsAttribute(false);
-        LogMessage("Mutlivalued attribute @artic on '%s' permanently converted to <artic> elements",
+        LogMessage("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
             parent->GetUuid().c_str());
     }
 }
@@ -303,7 +303,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     // for now we ignore within @place
     if (this->GetPlace() != STAFFREL_NONE) {
         m_drawingPlace = this->GetPlace();
-        // If we have a place indication do not allow to be changed to above
+        // if we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
     else if ((layerStemDir = layer->GetDrawingStemDir(params->m_parent)) != STEMDIRECTION_NONE) {

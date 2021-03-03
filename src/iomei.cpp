@@ -5668,7 +5668,7 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
     parent->AddChild(vrvAnnot);
     ReadUnsupportedAttr(annot, vrvAnnot);
-    // For Annot we do not load children because they preserved in Annot::m_content
+    // for Annot we do not load children because they preserved in Annot::m_content
     return true;
 }
 

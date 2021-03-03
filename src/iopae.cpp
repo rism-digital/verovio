@@ -256,7 +256,7 @@ void PAEOutput::WriteBarLine(BarLine *barLine)
 
     if (m_skip) return;
 
-    // We should look more precisely at its apperance...
+    // We should look more precisely at its appearance ...
     m_streamStringOutput << "/";
 }
 
@@ -1525,7 +1525,7 @@ int PAEInput::getWholeRest(const char *incipit, int *wholerest, int index)
 /**********************************
  *
  * getBarLine -- read the barLine.
- * Translation from PAE to verovio representaion:
+ * Translation from PAE to verovio representation:
  *
  BARRENDITION_single     /
  BARRENDITION_end        does not exist

@@ -86,7 +86,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     bool adjusted = false;
     if (!spannedElements->empty()) {
 
-        // Adjust the curvatur (control points are move)
+        // Adjust the curvature (control points are moved)
         int adjustedHeight = AdjustSlurCurve(doc, spannedElements, p1, rotatedP2, rotatedC1, rotatedC2, curveDir,
             slurAngle, staff->m_drawingStaffSize, true);
 
@@ -118,7 +118,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         // If we still have spanning points then move the slur but now by forcing both sides to be move
         if (!spannedElements->empty()) {
 
-            // First re-calcuate the spanning point positions
+            // First re-calculate the spanning point positions
             GetSpannedPointPositions(doc, spannedElements, p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
             // Move it and force both sides to move
