@@ -175,7 +175,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
     if (GetElementCoords()->size() != 2) {
         LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
-        return FUNCTOR_STOP;
+        return FUNCTOR_CONTINUE;
     }
 
     this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
