@@ -363,7 +363,7 @@ bool Chord::IsVisible()
         return this->GetVisible() == BOOLEAN_true;
     }
 
-    // if the chord doens't have it, see if all the children are invisible
+    // if the chord doesn't have it, see if all the children are invisible
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
@@ -575,7 +575,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     // Set them to NULL in any case
     params->m_interface = NULL;
 
-    // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
+    // Stems have been calculated previously in beam or fTrem - siblings because flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
         return FUNCTOR_SIBLINGS;

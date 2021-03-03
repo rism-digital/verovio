@@ -458,7 +458,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
         }
     }
     else {
-        // with a scoredef inbetween always set it to what we have in the encoding
+        // with a scoredef in-between always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
@@ -843,7 +843,7 @@ int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 
-    // Ajust the postion of the alignment according to what we have collected for this harm gpr
+    // Adjust the postion of the alignment according to what we have collected for this harm gpr
     m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
     params->m_overlapingHarm.clear();
 
@@ -858,7 +858,7 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 
-    // Ajust the postion of the alignment according to what we have collected for this verse
+    // Adjust the postion of the alignment according to what we have collected for this verse
     m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
     params->m_overlapingSyl.clear();
 
@@ -932,7 +932,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    // Check if the measure has some overlfowing control elements
+    // Check if the measure has some overflowing control elements
     int overflow = this->GetDrawingOverflow();
 
     if (params->m_currentSystem->GetChildCount() > 0) {

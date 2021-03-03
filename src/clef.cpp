@@ -107,7 +107,7 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
     const int proportion = (params->m_directionBias > 0) ? 0 : -1;
 
-    // Y position differes for clef shapes, so we need to take into account only a part of the glyph height
+    // Y position differs for clef shapes, so we need to take into account only a part of the glyph height
     // Proportion of the glyph about Y point is defined in the topToMiddleProportions map and used when
     // left and right margins are calculated
     const int clefPosition = staff->GetDrawingY()

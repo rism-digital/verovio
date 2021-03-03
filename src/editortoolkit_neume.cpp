@@ -288,7 +288,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ListOfObjects facsChildren;
             element->FindAllDescendantByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
-                // dont change the text bbox position
+                // don't change the text bbox position
                 if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
                     continue;
                 }
@@ -334,9 +334,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         //  Case 2:
         //      The clef you're dragging moves across other clefs. In other words the preceding and
         //      subsequent clefs are different before and after the drag. In this case elements that were
-        //      associated with this clef before the drag need to be reassociated to the clef that preceded
+        //      associated with this clef before the drag need to be re-associated to the clef that preceded
         //      this clef before the drag. Elements that become newly associated with the clef after the drag
-        //      need to be reassociated from the clef that preceeds this clef after the drag to this clef.
+        //      need to be re-associated from the clef that precedes this clef after the drag to this clef.
         //
         // Extracting the exact elements that need to have their pitch modified in each of these cases is
         // tricky, and required some dicey naming.
@@ -385,7 +385,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
         // that these calls are oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
         // So if we're changing an element's pitch from this clef to something else, we need the line of
-        // this clef to be what it was before the drag. On the other hand, if we're reassociating an element
+        // this clef to be what it was before the drag. On the other hand, if we're re-associating an element
         // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
         // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
         //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2786,7 +2786,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
     // it should also only be called in cases where finding the old clef is not required
     // since doing it based only on clefs is much more efficient than based on position
     // also if you are calling this function in a loop you should always be passing a clef argument
-    // since repeatedly finding the previous clef is very inneficient
+    // since repeatedly finding the previous clef is very inefficient
 
     if (obj->Is(CUSTOS)) {
         Custos *custos = dynamic_cast<Custos *>(obj);
@@ -2835,7 +2835,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         }
         pi->SetOct(3);
 
-        // glyphs in verovio are actually not centered, but are in the top left corner of a giant box
+        // glyphs in Verovio are actually not centered, but are in the top left corner of a giant box
         int centerY = fi->GetZone()->GetUly();
         int centerX = fi->GetZone()->GetUlx();
 

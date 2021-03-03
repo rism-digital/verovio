@@ -510,7 +510,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
     // bool keepInside = element->Is({ARTIC, ARTIC_PART, NOTE, STEM}));
     // The idea is to force only some of the elements to be inside a slur.
     // However, this currently does work because skipping an adjustment can cause collision later depending on how
-    // the slur is eventually adjusted. Keeping erverything inside now.
+    // the slur is eventually adjusted. Keeping everything inside now.
     bool keepInside = true;
     discard = false;
 
@@ -530,7 +530,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
         int rightY = 0;
         // The curve overflows on both sides
         if ((p1.x < boundingBox->GetLeftBy(type)) && p2.x > boundingBox->GetRightBy(type)) {
-            // Calcuate the y positions
+            // calculate the y positions
             leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, boundingBox->GetLeftBy(type)) - margin;
             rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, boundingBox->GetRightBy(type)) - margin;
         }
@@ -568,7 +568,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
         int rightY = 0;
         // The curve overflows on both sides
         if ((p1.x < boundingBox->GetLeftBy(type)) && p2.x > boundingBox->GetRightBy(type)) {
-            // Calcuate the y positions
+            // calculate the y positions
             leftY = BoundingBox::CalcBezierAtPosition(topBezier, boundingBox->GetLeftBy(type)) + margin;
             rightY = BoundingBox::CalcBezierAtPosition(topBezier, boundingBox->GetRightBy(type)) + margin;
         }
