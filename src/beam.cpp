@@ -1407,7 +1407,8 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
         params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
         params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
         params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
-        params->m_overlapMargin = CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
+        if (m_drawingPlace != BEAMPLACE_mixed)
+            params->m_overlapMargin = CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
 
         return FUNCTOR_CONTINUE;
     }
