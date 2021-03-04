@@ -69,6 +69,7 @@
 #import <VerovioFramework/gliss.h>
 #import <VerovioFramework/glyph.h>
 #import <VerovioFramework/gracegrp.h>
+#import <VerovioFramework/grpsym.h>
 #import <VerovioFramework/hairpin.h>
 #import <VerovioFramework/halfmrpt.h>
 #import <VerovioFramework/harm.h>
