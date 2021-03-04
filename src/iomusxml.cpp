@@ -174,7 +174,7 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
 {
     Layer *layer = m_currentLayer;
     assert(layer);
-    for (auto iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
+    for (auto iter = m_clefChangeStack.begin(); iter != m_clefChangeStack.end(); ++iter) {
         if ((iter->m_measureNum == measureNum) && (iter->m_scoreOnset <= m_durTotal) && (iter->m_staff == staff)) {
             if (iter->isFirst) { // add clef when first in staff
                 // if afterBarline is false at beginning of measure, move before barline
@@ -983,12 +983,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_doc->ConvertToPageBasedDoc();
 
     // clean up stacks
-    if (!m_hairpinStack.empty() || !m_hairpinStopStack.empty()) {
-        LogWarning(
-            "MusicXML import: There are %d hairpins left open", m_hairpinStack.size() + m_hairpinStopStack.size());
-        m_hairpinStack.clear();
-        m_hairpinStopStack.clear();
-    }
     if (!m_tieStack.empty()) {
         LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
         m_tieStack.clear();
@@ -1444,14 +1438,20 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         i++;
     }
 
-    // clean up stack of clefs, since we don't need them to persist between parts
-    if (!m_ClefChangeStack.empty()) {
-        for (musicxml::ClefChange iter : m_ClefChangeStack) {
+    // clean up stack of clefs and hairpins, since we don't need them to persist between parts
+    if (!m_clefChangeStack.empty()) {
+        for (musicxml::ClefChange iter : m_clefChangeStack) {
             if (iter.isFirst)
                 LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
                     iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
         }
-        m_ClefChangeStack.clear();
+        m_clefChangeStack.clear();
+    }
+    if (!m_hairpinStack.empty() || !m_hairpinStopStack.empty()) {
+        LogWarning(
+            "MusicXML import: There are %d hairpins left open", m_hairpinStack.size() + m_hairpinStopStack.size());
+        m_hairpinStack.clear();
+        m_hairpinStopStack.clear();
     }
 
     return false;
@@ -1589,11 +1589,11 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             staff->AddChild(emptyLayer);
         }
         // add clef changes that might occur just before a bar line and remove inserted clefs from stack
-        if (!m_ClefChangeStack.empty()) {
+        if (!m_clefChangeStack.empty()) {
             for (auto layer : *staff->GetChildren()) {
                 assert(layer);
                 std::vector<musicxml::ClefChange>::iterator iter;
-                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
+                for (iter = m_clefChangeStack.begin(); iter != m_clefChangeStack.end(); ++iter) {
                     if (iter->m_measureNum == measureNum && iter->m_staff == staff
                         && iter->m_scoreOnset == m_durTotal) {
                         if (iter->isFirst) { // add clef when first in staff
@@ -1670,7 +1670,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
             const bool afterBarline = clef.attribute("after-barline").as_bool();
-            m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
+            m_clefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
 
@@ -2157,6 +2157,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Hairpins
     pugi::xpath_node_set wedges = node.select_nodes("direction-type/wedge");
     for (pugi::xpath_node_set::const_iterator wedge = wedges.begin(); wedge != wedges.end(); ++wedge) {
+        LogWarning("wedge %s %s", wedge->node().attribute("id").as_string(), wedge->node().attribute("type").as_string());
         int hairpinNumber = wedge->node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge->node(), "type", "stop")) {
@@ -2526,7 +2527,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // reset figured bass offset
     m_durFb = 0;
 
-    if (!m_ClefChangeStack.empty() && !isChord) AddClef(section, measure, staff, measureNum);
+    if (!m_clefChangeStack.empty() && !isChord) AddClef(section, measure, staff, measureNum);
 
     LayerElement *element = NULL;
 
