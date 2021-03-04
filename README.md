@@ -2,38 +2,38 @@
 [![PyPI](https://img.shields.io/pypi/v/verovio)](https://pypi.org/project/verovio/)
 [![PyPI - Wheel](https://img.shields.io/pypi/wheel/verovio)](https://pypi.org/project/verovio/)
 [![AppVeyor status](https://ci.appveyor.com/api/projects/status/121cxhmtwurxffh0?svg=true)](https://ci.appveyor.com/project/LaurentPugin/verovio-r1t6l)
-[![GH Actions status](https://github.com/rism-ch/verovio/workflows/Verovio%20CI%20Build/badge.svg)](https://github.com/rism-ch/verovio/actions?query=workflow%3A%22Verovio+CI+Build%22)
+[![GH Actions status](https://github.com/rism-digital/verovio/workflows/Verovio%20CI%20Build/badge.svg)](https://github.com/rism-digital/verovio/actions?query=workflow%3A%22Verovio+CI+Build%22)
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
 Verovio is written in standard 2017 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](http://www.verovio.org/tutorial.xhtml) for web integration and user interaction.
 
-![Choice interaction](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/movies/reflow.gif)
+![Choice interaction](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/movies/reflow.gif)
 
 
 Verovio uses the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
-The project page is http://www.verovio.org. Verovio is available under the LGPL license (see [COPYING](https://github.com/rism-ch/verovio/blob/develop/COPYING) and [COPYING.LESSER](https://github.com/rism-ch/verovio/blob/develop/COPYING.LESSER)).
+The project page is http://www.verovio.org. Verovio is available under the LGPL license (see [COPYING](https://github.com/rism-digital/verovio/blob/develop/COPYING) and [COPYING.LESSER](https://github.com/rism-digital/verovio/blob/develop/COPYING.LESSER)).
 
 Building and use instructions by environment
 --------------------------------------------
 
-See the [wiki](https://github.com/rism-ch/verovio/wiki/Building-instructions), with instructions for:
+See the [wiki](https://github.com/rism-digital/verovio/wiki/Building-instructions), with instructions for:
 
-* [Command-line tool](https://github.com/rism-ch/verovio/wiki/Building-instructions#command-line-tool)
-* [XCode](https://github.com/rism-ch/verovio/wiki/Building-instructions#xcode)
-* [Visual Studio](https://github.com/rism-ch/verovio/wiki/Building-instructions#visual-studio)
-* [JavaScript](https://github.com/rism-ch/verovio/wiki/Building-instructions#javascript-toolkit)
-* [NPM](https://github.com/rism-ch/verovio/wiki/Building-instructions#npm)
-* [Python](https://github.com/rism-ch/verovio/wiki/Building-instructions#building-the-python-toolkit)
-* [Java](https://github.com/rism-ch/verovio/wiki/Building-instructions#building-the-java-toolkit)
-* [CocoaPods](https://github.com/rism-ch/verovio/wiki/Building-instructions#cocoapods)
+* [Command-line tool](https://github.com/rism-digital/verovio/wiki/Building-instructions#command-line-tool)
+* [XCode](https://github.com/rism-digital/verovio/wiki/Building-instructions#xcode)
+* [Visual Studio](https://github.com/rism-digital/verovio/wiki/Building-instructions#visual-studio)
+* [JavaScript](https://github.com/rism-digital/verovio/wiki/Building-instructions#javascript-toolkit)
+* [NPM](https://github.com/rism-digital/verovio/wiki/Building-instructions#npm)
+* [Python](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-python-toolkit)
+* [Java](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-java-toolkit)
+* [CocoaPods](https://github.com/rism-digital/verovio/wiki/Building-instructions#cocoapods)
 
 
 LibMEI
 ------
 
-The code for the attribute classes of Verovio are generated from the MEI schema using a modified version of LibMEI available [here](https://github.com/rism-ch/libmei). The code generated is included in the Verovio repository and the LibMEI repository does not need to be cloned for building Verovio.
+The code for the attribute classes of Verovio are generated from the MEI schema using a modified version of LibMEI available [here](https://github.com/rism-digital/libmei). The code generated is included in the Verovio repository and the LibMEI repository does not need to be cloned for building Verovio.
 
 Major releases of Verovio and MEI versions:
 * Verovio 1.x.x ⇔ MEI 3.0
@@ -54,6 +54,7 @@ The following libraries are embedded in Verovio:
 | [MidiFile](https://github.com/craigsapp/midifile)   | Standard MIDI file export  |
 | [pugixml](https://pugixml.org/)                     | XML data parser            |
 | [UTF-CPP](http://utfcpp.sourceforge.net/)           | UTF character conversions  |
+| [MINIZ-CPP](https://github.com/tfussell/miniz-cpp/) | ZIP files reading/writing  |
 
 Contributing
 ------------
@@ -65,7 +66,7 @@ Example output
 
 The sample page of music shown below was generated with version 2.4.0-dev-2748fed
 
-![Example page](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)
+![Example page](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)
 
 Example resources using verovio
 -------------------------------

@@ -43,11 +43,13 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
+#include "zip_file.hpp"
 
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
+const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
 
 std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
     = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
@@ -299,6 +301,9 @@ bool Toolkit::LoadFile(const std::string &filename)
     if (IsUTF16(filename)) {
         return LoadUTF16File(filename);
     }
+    if (IsZip(filename)) {
+        return LoadZipFile(filename);
+    }
 
     std::ifstream in(filename.c_str());
     if (!in.is_open()) {
@@ -367,6 +372,87 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
 
     return LoadData(utf8line);
+}
+
+bool Toolkit::IsZip(const std::string &filename)
+{
+    std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!fin.is_open()) {
+        return false;
+    }
+
+    char data[4];
+    memset(data, 0, 4);
+    fin.read(data, 4);
+    fin.close();
+
+    if (memcmp(data, ZIP_SIGNATURE, 4) == 0) return true;
+
+    return false;
+}
+
+bool Toolkit::LoadZipFile(const std::string &filename)
+{
+    std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!fin.is_open()) {
+        return false;
+    }
+
+    fin.seekg(0, std::ios::end);
+    std::streamsize fileSize = (std::streamsize)fin.tellg();
+    fin.clear();
+    fin.seekg(0, std::wios::beg);
+
+    std::vector<unsigned char> bytes;
+    bytes.reserve(fileSize + 1);
+
+    unsigned char buffer;
+    while (fin.read((char *)&buffer, sizeof(unsigned char))) {
+        bytes.push_back(buffer);
+    }
+
+    return LoadZipData(bytes);
+}
+
+bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
+{
+    miniz_cpp::zip_file file(bytes);
+
+    std::string filename;
+    // Look for the meta file in the zip
+    for (auto &member : file.infolist()) {
+        if (member.filename == "META-INF/container.xml") {
+            std::string container = file.read(member.filename);
+            // Find the file name with an xpath query
+            pugi::xml_document doc;
+            doc.load_buffer(container.c_str(), container.size());
+            pugi::xml_node root = doc.first_child();
+            pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
+            filename = rootfile.attribute("full-path").value();
+            break;
+        }
+    }
+
+    if (!filename.empty()) {
+        LogMessage("Loading file '%s' in the archive", filename.c_str());
+        return LoadData(file.read(filename));
+    }
+    else {
+        LogError("No file to load found in the archive");
+        return false;
+    }
+}
+
+bool Toolkit::LoadZipDataBase64(const std::string &data)
+{
+    std::vector<unsigned char> bytes = Base64Decode(data);
+    return LoadZipData(bytes);
+}
+
+bool Toolkit::LoadZipDataBuffer(const unsigned char *data, int length)
+{
+    std::vector<unsigned char> bytes(data, data + length);
+    return LoadZipData(bytes);
 }
 
 void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
@@ -1213,6 +1299,8 @@ std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
 
 bool Toolkit::Edit(const std::string &json_editorAction)
 {
+    this->ResetLogBuffer();
+
     return m_editorToolkit->ParseEditorAction(json_editorAction);
 }
 
@@ -1223,17 +1311,12 @@ std::string Toolkit::EditInfo()
 
 std::string Toolkit::GetLog()
 {
-#ifdef USE_EMSCRIPTEN
     std::string str;
     std::vector<std::string>::iterator iter;
     for (iter = logBuffer.begin(); iter != logBuffer.end(); ++iter) {
         str += (*iter);
     }
     return str;
-#else
-    // The non-js version of the app should not use this function.
-    return "";
-#endif
 }
 
 std::string Toolkit::GetVersion()
@@ -1243,13 +1326,13 @@ std::string Toolkit::GetVersion()
 
 void Toolkit::ResetLogBuffer()
 {
-#ifdef USE_EMSCRIPTEN
-    vrv::logBuffer.clear();
-#endif
+    logBuffer.clear();
 }
 
 void Toolkit::RedoLayout()
 {
+    this->ResetLogBuffer();
+
     if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
         LogWarning("No data to re-layout");
         return;
@@ -1266,6 +1349,8 @@ void Toolkit::RedoLayout()
 
 void Toolkit::RedoPagePitchPosLayout()
 {
+    this->ResetLogBuffer();
+
     Page *page = m_doc.GetDrawingPage();
 
     if (!page) {
@@ -1323,6 +1408,8 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 {
+    this->ResetLogBuffer();
+
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
@@ -1350,6 +1437,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     }
 
     svg.SetHtml5(m_options->m_svgHtml5.GetValue());
+    svg.SetFormatRaw(m_options->m_svgFormatRaw.GetValue());
+    svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
 
     // render the page
     RenderToDeviceContext(pageNo, &svg);
@@ -1361,6 +1450,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 
 bool Toolkit::RenderToSVGFile(const std::string &filename, int pageNo)
 {
+    this->ResetLogBuffer();
+
     std::string output = RenderToSVG(pageNo, true);
 
     std::ofstream outfile;
@@ -1403,6 +1494,8 @@ void Toolkit::GetHumdrum(std::ostream &output)
 
 std::string Toolkit::RenderToMIDI()
 {
+    this->ResetLogBuffer();
+
     smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
@@ -1418,6 +1511,8 @@ std::string Toolkit::RenderToMIDI()
 
 std::string Toolkit::RenderToPAE()
 {
+    this->ResetLogBuffer();
+
     if (GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
@@ -1433,6 +1528,8 @@ std::string Toolkit::RenderToPAE()
 
 bool Toolkit::RenderToPAEFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     std::string outputString = this->RenderToPAE();
 
     std::ofstream output(filename.c_str());
@@ -1446,6 +1543,8 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
 
 std::string Toolkit::RenderToTimemap()
 {
+    this->ResetLogBuffer();
+
     std::string output;
     m_doc.ExportTimemap(output);
     return output;
@@ -1453,6 +1552,8 @@ std::string Toolkit::RenderToTimemap()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
+    this->ResetLogBuffer();
+
     jsonxx::Object o;
     jsonxx::Array a;
 
@@ -1495,6 +1596,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
@@ -1506,6 +1609,8 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
 
 bool Toolkit::RenderToTimemapFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     std::string outputString;
     m_doc.ExportTimemap(outputString);
 
@@ -1538,6 +1643,8 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {
@@ -1567,6 +1674,8 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 
 std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
     jsonxx::Object o;
 
@@ -1618,6 +1727,8 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {

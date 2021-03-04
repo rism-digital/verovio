@@ -393,7 +393,8 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
 
     // Ignore layers that are empty (or with @sameas)
     ListOfObjects layers;
-    IsEmptyComparison matchTypeLayer(LAYER, true);
+    IsEmptyComparison matchTypeLayer(LAYER);
+    matchTypeLayer.ReverseComparison();
     this->FindAllDescendantByComparison(&layers, &matchTypeLayer);
 
     ListOfObjects mRests;

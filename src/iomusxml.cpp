@@ -79,7 +79,7 @@
 
 namespace vrv {
 
-// Using flags mordent can be easily visualised with the value. E.g.
+// Using flags mordent can be easily visualized with the value. E.g.
 // 0x212 - approach and depart are both below and form is normal
 // APPR_Below | FORM_Normal | DEP_Below
 enum MordentExtSymbolFlags {
@@ -90,6 +90,8 @@ enum MordentExtSymbolFlags {
     DEP_Above = 0x1,
     DEP_Below = 0x2
 };
+
+enum class MetronomeElements { BEAT_UNIT, BEAT_UNIT_DOT, PER_MINUTE, SEPARATOR };
 
 //----------------------------------------------------------------------------
 // MusicXmlInput
@@ -173,23 +175,32 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
     Layer *layer = m_currentLayer;
     assert(layer);
     for (auto iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
-        if ((iter->m_measureNum == measureNum) && (iter->m_scoreOnset <= m_durTotal)) {
+        if ((iter->m_measureNum == measureNum) && (iter->m_scoreOnset <= m_durTotal) && (iter->m_staff == staff)) {
             if (iter->isFirst) { // add clef when first in staff
-                if (iter->m_staff != staff) {
-                    layer = SelectLayer(-1, iter->m_staff);
-                }
                 // if afterBarline is false at beginning of measure, move before barline
                 if (!iter->m_afterBarline && m_durTotal == 0) {
-                    const std::string previousMeasureNum = std::to_string(std::stoi(measure->GetN()) - 1);
-                    AttNNumberLikeComparison comparisonMeasure(MEASURE, previousMeasureNum);
-                    Object *previousMeasure = section->FindDescendantByComparison(&comparisonMeasure);
+                    Object *previousMeasure = NULL;
+                    // First try to check whether current measure already exists in the section. Since *measure might
+                    // not match with the one in the section, comparison search should be done
+                    AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
+                    Object *sectionCurrentMeasure = section->FindDescendantByComparison(&comparisonMeasure);
+                    previousMeasure = section->GetPrevious(sectionCurrentMeasure, MEASURE);
+                    // if current measure is being processed for the first time - get last measure in the section. This
+                    // should happen only for the first staff in the multi-stave score
+                    if (!previousMeasure && (0 != section->GetDescendantIndex(sectionCurrentMeasure, MEASURE, 1))) {
+                        previousMeasure = section->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD);
+                    }
+                    // otherwise this is first measure, so add element as is
                     if (!previousMeasure) {
                         AddLayerElement(layer, iter->m_clef);
                         iter->isFirst = false;
                         continue;
                     }
-                    AttNIntegerComparison comparisonStaff(STAFF, staff->GetN());
+                    AttNIntegerComparison comparisonStaff(STAFF, iter->m_staff->GetN());
                     Object *previousStaff = previousMeasure->FindDescendantByComparison(&comparisonStaff);
+                    if (previousStaff == NULL) {
+                        AddLayerElement(layer, iter->m_clef);
+                    }
                     AttNIntegerComparison comparisonLayer(LAYER, layer->GetN());
                     Object *prevLayer = previousStaff->FindDescendantByComparison(&comparisonLayer);
                     if (prevLayer == NULL) {
@@ -205,7 +216,6 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                 iter->isFirst = false;
             }
             else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
-                if (staff != iter->m_staff) continue;
                 bool addSameas = true;
                 ListOfObjects objects, measureObjects;
                 ClassIdComparison matchClassId(CLEF);
@@ -291,7 +301,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
-    // If value is iniatialized - get current layer
+    // If value is initialized - get current layer
     if (m_isLayerInitialized) return m_currentLayer;
 
     // Find voice number of node
@@ -555,67 +565,93 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     std::string rawText;
     bool paren = false;
     if (metronome.attribute("parentheses").as_bool()) {
-        rawText = "(";
+        Text *text = new Text();
+        text->SetText(UTF8to16("("));
+        tempo->AddChild(text);
         paren = true;
     }
-    Text *text;
-    if (!rawText.empty()) {
-        text = new Text();
-        text->SetText(UTF8to16(rawText));
-        tempo->AddChild(text);
-    }
 
-    const int dotCount = (int)metronome.select_nodes("beat-unit-dot").size();
-    if (dotCount) {
-        tempo->SetMmDots(dotCount);
-    }
-
-    const pugi::xml_node beatunit = metronome.child("beat-unit");
-    if (beatunit) {
-        std::wstring verovioText;
-        const std::string content = beatunit.text().as_string();
-        tempo->SetMmUnit(ConvertTypeToDur(content));
-        verovioText = ConvertTypeToVerovioText(content);
-        for (int i = 0; i < dotCount; i++) {
-            verovioText += L"\xE1E7"; // SMUFL augmentation dot
+    // build a sequence based on the elements present in the metronome
+    std::list<std::pair<MetronomeElements, std::string> > metronomeElements;
+    for (pugi::xml_node child : metronome.children()) {
+        if ("beat-unit-dot" == std::string(child.name())) {
+            metronomeElements.emplace_back(std::make_pair(MetronomeElements::BEAT_UNIT_DOT, ""));
         }
-        if (!verovioText.empty()) {
-            Rend *rend = new Rend;
-            rend->SetFontname("VerovioText");
-            text = new Text();
-            text->SetText(verovioText);
-            rend->AddChild(text);
-            tempo->AddChild(rend);
-        }
-    }
-
-    rawText = "";
-    const pugi::xml_node perminute = metronome.child("per-minute");
-    if (perminute) {
-        const std::string mm = perminute.text().as_string();
-        // Use the first floating-point number on the line to set @mm:
-        std::string matches("0123456789");
-        std::size_t offset = mm.find_first_of(matches);
-        if (offset < mm.length()) {
-            const float mmval = std::stof(mm.substr(offset));
-            tempo->SetMm(mmval);
-        }
-        if (!mm.empty()) {
-            std::stringstream sstream;
-            if (beatunit) {
-                sstream << " = ";
+        else if ("beat-unit" == std::string(child.name())) {
+            if (!metronomeElements.empty()) {
+                metronomeElements.emplace_back(std::make_pair(MetronomeElements::SEPARATOR, " = "));
             }
-            sstream << mm;
-            rawText = sstream.str();
+            metronomeElements.emplace_back(std::make_pair(MetronomeElements::BEAT_UNIT, child.text().as_string()));
+        }
+        else if ("per-minute" == std::string(child.name())) {
+            if (!metronomeElements.empty()) {
+                metronomeElements.emplace_back(std::make_pair(MetronomeElements::SEPARATOR, " = "));
+            }
+            metronomeElements.emplace_back(std::make_pair(MetronomeElements::PER_MINUTE, child.text().as_string()));
         }
     }
-    if (paren) {
-        rawText += ")";
+
+    bool start = true;
+    // process metronome element sequence
+    for (auto iter = metronomeElements.begin(); iter != metronomeElements.end(); ++iter) {
+        switch (iter->first) {
+            case MetronomeElements::BEAT_UNIT: {
+                std::wstring verovioText = ConvertTypeToVerovioText(iter->second);
+                // find separator or use end() if there is no separator
+                const auto separator = std::find_if(iter, metronomeElements.end(),
+                    [](const auto pair) { return pair.first == MetronomeElements::SEPARATOR; });
+                const int dotCount = (int)std::count_if(
+                    iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
+                for (int i = 0; i < dotCount; i++) {
+                    verovioText += L"\xE1E7"; // SMUFL augmentation dot
+                }
+                // set @mmUnit and @mmDots attributes only based on the first beat-unit in the sequence
+                if (start) {
+                    tempo->SetMmUnit(ConvertTypeToDur(iter->second));
+                    if (dotCount) tempo->SetMmDots(dotCount);
+                    start = false;
+                }
+                if (!verovioText.empty()) {
+                    Rend *rend = new Rend;
+                    rend->SetFontname("VerovioText");
+                    Text *text = new Text();
+                    text->SetText(verovioText);
+                    rend->AddChild(text);
+                    tempo->AddChild(rend);
+                }
+                break;
+            }
+            case MetronomeElements::BEAT_UNIT_DOT: {
+                // don't do anything here, dots are counted in the BEAT_UNIT section
+                break;
+            }
+            case MetronomeElements::PER_MINUTE: {
+                // Use the first floating-point number on the line to set @mm:
+                std::string matches("0123456789");
+                std::size_t offset = iter->second.find_first_of(matches);
+                if (offset < iter->second.length()) {
+                    const float mmval = std::stof(iter->second.substr(offset));
+                    tempo->SetMm(mmval);
+                }
+                if (!iter->second.empty()) {
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(iter->second));
+                    tempo->AddChild(text);
+                }
+                break;
+            }
+            case MetronomeElements::SEPARATOR: {
+                Text *text = new Text();
+                text->SetText(UTF8to16(iter->second));
+                tempo->AddChild(text);
+                break;
+            }
+        }
     }
 
-    if (!rawText.empty()) {
-        text = new Text();
-        text->SetText(UTF8to16(rawText));
+    if (paren) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(")"));
         tempo->AddChild(text);
     }
 }
@@ -1651,8 +1687,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
         else if (key.node().child("key-step")) {
             if (!keySig) keySig = new KeySig();
-            for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
-                 keyStep = keyStep.next_sibling("key-step")) {
+            for (pugi::xml_node keyStep : key.node().children("key-step")) {
                 KeyAccid *keyAccid = new KeyAccid();
                 keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
                 if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
@@ -1998,10 +2033,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
     pugi::xpath_node_set words = node.select_nodes("direction-type/words");
     const bool containsWords = !words.empty();
     bool containsDynamics = !node.select_node("direction-type/dynamics|direction-type/sound[@dynamics]").node().empty();
+    bool containsTempo = !node.select_node("direction-type/metronome|direction-type/sound[@tempo]").node().empty();
 
     // Directive
     int defaultY = 0; // y position attribute, only for directives and dynamics
-    if (containsWords && !containsDynamics && !soundNode.attribute("tempo")) {
+    if (containsWords && !containsTempo && !containsDynamics && !soundNode.attribute("tempo")) {
         pugi::xpath_node_set words = node.select_nodes("direction-type/*[self::words or self::coda or self::segno]");
         defaultY = words.first().node().attribute("default-y").as_int();
         std::string wordStr = words.first().node().text().as_string();
@@ -2340,8 +2376,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Tempo
-    pugi::xpath_node metronome = typeNode.child("metronome");
-    if (soundNode.attribute("tempo") || metronome) {
+    pugi::xpath_node metronome = node.select_node("direction-type/metronome");
+    if (containsTempo) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
             tempo->SetLang(words.first().node().attribute("xml:lang").as_string());
@@ -3648,6 +3684,7 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 {
     static const std::map<std::string, std::wstring> Type2VerovioText{
+        { "long", L"\xE1D0" }, // there is no matching glyph in this SMuFL range
         { "breve", L"\xE1D1" }, //
         { "whole", L"\xE1D2" }, //
         { "half", L"\xE1D3" }, //

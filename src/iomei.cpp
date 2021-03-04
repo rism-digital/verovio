@@ -1350,7 +1350,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
-    // pedal->WriteVerticalGroup(currentNode);
+    pedal->WriteVerticalGroup(currentNode);
     pedal->WriteVerticalGroup(currentNode);
 }
 
@@ -1492,6 +1492,7 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
+    accid->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
@@ -4723,6 +4724,7 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
     vrvAccid->ReadEnclosingChars(accid);
+    vrvAccid->ReadExtSym(accid);
 
     parent->AddChild(vrvAccid);
     ReadUnsupportedAttr(accid, vrvAccid);
@@ -5666,7 +5668,7 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
     parent->AddChild(vrvAnnot);
     ReadUnsupportedAttr(annot, vrvAnnot);
-    // For Annot we do not load children because they preserved in Annot::m_content
+    // for Annot we do not load children because they preserved in Annot::m_content
     return true;
 }
 

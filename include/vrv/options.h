@@ -527,6 +527,8 @@ public:
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
+    OptionBool m_svgFormatRaw;
+    OptionBool m_svgRemoveXlink;
     OptionInt m_unit;
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;

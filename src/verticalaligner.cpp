@@ -530,7 +530,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
     // The initial next position is the original position of the first group. Nothing will happen for it.
     int nextYRel = grpIdYRel.at(0).second;
 
-    // For each grpId (sorted, see above), loop to find the highest / lowest positon to put the next group
+    // For each grpId (sorted, see above), loop to find the highest / lowest position to put the next group
     // The move the next group (if not already higher or lower)
     for (auto const &grp : grpIdYRel) {
         // Check if the next group it not already higher or lower.
@@ -663,7 +663,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         auto i = overflowBoxes->begin();
         auto end = overflowBoxes->end();
         while (i != end) {
-            // find all the overflowing elements from the staff that overlap horizonatally
+            // find all the overflowing elements from the staff that overlap horizontally
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // update the yRel accordingly
@@ -726,7 +726,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
         bool adjusted = false;
         while (i != end) {
 
-            // find all the overflowing elements from the staff that overlap horizonatally
+            // find all the overflowing elements from the staff that overlap horizontally
             i = std::find_if(
                 i, end, [positioner](BoundingBox *elem) { return positioner->HorizontalContentOverlap(elem); });
             if (i != end) {
@@ -759,7 +759,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
     assert(params);
 
     ArrayOfFloatingPositioners positioners;
-    // make a temporary copy of positionners with a classId desired and that have a drawing grpId
+    // make a temporary copy of positioners with a classId desired and that have a drawing grpId
     std::copy_if(m_floatingPositioners.begin(), m_floatingPositioners.end(), std::back_inserter(positioners),
         [params](FloatingPositioner *positioner) {
             assert(positioner->GetObject());
@@ -768,7 +768,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
                 (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
                     != params->m_classIds.end())
                 && (positioner->GetObject()->GetDrawingGrpId() != 0)
-                && (positioner->GetDrawingPlace() == params->m_place));
+                && (positioner->GetDrawingPlace() == params->m_place) && !positioner->HasEmptyBB());
         });
 
     if (positioners.empty()) {
@@ -805,7 +805,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
         // The already move them, so the loop below is not necessary.
     }
     else {
-        // Now go through all the positioners again and ajust the YRel with the value of the pair
+        // Now go through all the positioners again and adjust the YRel with the value of the pair
         for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
             int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
             auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),

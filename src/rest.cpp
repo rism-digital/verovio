@@ -435,11 +435,13 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
 int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
+    int duration = GetActualDur();
+    if (duration > DURATION_128) duration = DURATION_128;
     return g_defaultRests.at(layer)
         .at(RL_sameLayer == layer ? location.second : RA_none)
         .at(isTopLayer ? RLP_restOnTopLayer : RLP_restOnBottomLayer)
         .at(0 == location.first % 2 ? RNP_noteOnLine : RNP_noteInSpace)
-        .at(GetActualDur());
+        .at(duration);
 }
 
 //----------------------------------------------------------------------------

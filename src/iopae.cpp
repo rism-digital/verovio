@@ -256,7 +256,7 @@ void PAEOutput::WriteBarLine(BarLine *barLine)
 
     if (m_skip) return;
 
-    // We should look more precisely at its apperance...
+    // We should look more precisely at its appearance ...
     m_streamStringOutput << "/";
 }
 
@@ -1016,8 +1016,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
     m_doc->m_mdivScoreDef.AddChild(staffGrp);
 
     if (m_tie != NULL) {
-        delete m_tie;
-        m_tie = NULL;
+        LogWarning("Open tie will not render because tstamp2 is missing");
     }
 
     m_doc->ConvertToPageBasedDoc();
@@ -1526,7 +1525,7 @@ int PAEInput::getWholeRest(const char *incipit, int *wholerest, int index)
 /**********************************
  *
  * getBarLine -- read the barLine.
- * Translation from PAE to verovio representaion:
+ * Translation from PAE to verovio representation:
  *
  BARRENDITION_single     /
  BARRENDITION_end        does not exist

@@ -264,7 +264,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     wchar_t code = GetNoteheadGlyph(GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
-    // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
+    // For changing this, change Note::CalcStem and Note::PrepareLayerElementParts
     if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralNoteheadGlyph();
@@ -833,7 +833,7 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
+    // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
         return FUNCTOR_SIBLINGS;

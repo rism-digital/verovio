@@ -526,7 +526,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += (stemDir == STEMDIRECTION_down) ? beamStep : -beamStep;
     }
 
-    // by default draw 3 slashes (e.g., for a temolo on a whole note)
+    // by default draw 3 slashes (e.g., for a tremolo on a whole note)
     if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
     if (stemMod == STEMMODIFIER_z) {
         if (stemDir == STEMDIRECTION_down) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -736,11 +736,19 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         Clef *clef = layer->GetClef(element);
         y = ToLogicalY(staff->GetDrawingY());
         PitchInterface pi;
+        // Neume notation uses C3 for C clef rather than C4.
+        // Take this into account when determining location.
+        // However this doesn't affect the value for F clef.
         pi.SetPname(PITCHNAME_c);
-        pi.SetOct(3);
+        if ((staff->m_drawingNotationType == NOTATIONTYPE_neume) && (clef->GetShape() == CLEFSHAPE_C)) {
+            pi.SetOct(3);
+        }
+        else {
+            pi.SetOct(4);
+        }
         // Convert from lines & spaces from bottom to from top
-        int C3OffsetFromTop = ((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset();
-        int custosOffsetFromTop = C3OffsetFromTop + pi.PitchDifferenceTo(custos);
+        int CClefOffsetFromTop = ((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset();
+        int custosOffsetFromTop = CClefOffsetFromTop + pi.PitchDifferenceTo(custos);
         y -= custosOffsetFromTop * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
