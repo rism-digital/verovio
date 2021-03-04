@@ -1272,9 +1272,12 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    const int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
+    int stemLenInHalfUnits = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
+        if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {
+            stemLenInHalfUnits = standardStemLen - m_maxShortening;
+        }
         this->m_shortened = true;
         extend = false;
     }
@@ -1340,6 +1343,59 @@ void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
     }
 }
 
+int Beam::CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2)
+{
+    Layer *parentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
+    if (!parentLayer) return 0;
+    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
+    // here, there's nothing to be done
+    auto collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    if (collidingElementsList.empty()) return 0;
+
+    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    assert(staff);
+
+    int leftMargin = 0;
+    int rightMargin = 0;
+    std::vector<int> elementOverlaps;
+    for (auto object : collidingElementsList) {
+        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+        if (directionBias > 0) {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
+                && (layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y2))
+                continue;
+            leftMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        else {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y1)
+                && (layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y2))
+                continue;
+            leftMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        elementOverlaps.emplace_back(std::max(leftMargin * directionBias, rightMargin * directionBias));
+    }
+    if (elementOverlaps.empty()) return 0;
+
+    const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
+    int overlap = 0;
+    if (*maxOverlap >= 0) {
+        overlap = ((*maxOverlap == 0) ? staffOffset : *maxOverlap) * directionBias;
+    }
+    else {
+        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / staffOffset) * 2;
+        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
+        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+            [maxShorteningInHalfUnits](
+                BeamElementCoord *coord) { coord->m_maxShortening = maxShorteningInHalfUnits; });
+    }
+    return overlap;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -1359,10 +1415,11 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
         params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
         params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
         params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+        if (m_drawingPlace != BEAMPLACE_mixed)
+            params->m_overlapMargin = CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
+
         return FUNCTOR_CONTINUE;
     }
-
-    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
 
     const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
     const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;

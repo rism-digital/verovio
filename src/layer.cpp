@@ -325,15 +325,39 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
     return (int)layerCountInTimeSpanParams.m_layers.size();
 }
 
-ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
+ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool excludeCurrent)
 {
     assert(element);
 
     Measure *measure = static_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
+    double time = 0.0;
+    double duration = 0.0;
     Alignment *alignment = element->GetAlignment();
-    assert(alignment);
+    // Get duration and time if element has alignment
+    if (alignment) {
+        time = alignment->GetTime();
+        duration = element->GetAlignmentDuration();
+    }
+    // If it is Beam, try to get alignments for first and last elements and calculate duration of the beam based on
+    // those 
+    else if (!alignment && element->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(element);
+        const ArrayOfObjects *beamChildren = beam->GetList(beam);
+
+        LayerElement *first = vrv_cast<LayerElement *>(beamChildren->front());
+        LayerElement *last = vrv_cast<LayerElement *>(beamChildren->back());
+
+        if (!first || !last) return {};
+
+        time = first->GetAlignment()->GetTime();
+        double lastTime = last->GetAlignment()->GetTime();
+        duration = lastTime - time + last->GetAlignmentDuration();
+    }
+    else {
+        return {};
+    }
 
     Layer *layer = NULL;
     Staff *staff = element->GetCrossStaff(layer);
@@ -343,10 +367,11 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
     // At this stage we have the parent or the cross-staff
     assert(staff);
 
-    return GetLayerElementsInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+    return GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
 }
 
-ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff)
+ListOfObjects Layer::GetLayerElementsInTimeSpan(
+    double time, double duration, Measure *measure, int staff, bool excludeCurrent)
 {
     assert(measure);
 
@@ -354,6 +379,7 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Me
     LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(GetCurrentMeterSig(), GetCurrentMensur(), this);
     layerElementsInTimeSpanParams.m_time = time;
     layerElementsInTimeSpanParams.m_duration = duration;
+    layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
 
     ArrayOfComparisons filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);

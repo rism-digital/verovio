@@ -1796,7 +1796,12 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     assert(params);
 
     Layer *currentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
-    if (!currentLayer || (currentLayer != params->m_layer) || IsScoreDefElement() || Is(MREST)) return FUNCTOR_SIBLINGS;
+    // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
+    if ((!params->m_allLayersButCurrent && (currentLayer != params->m_layer))
+        || (params->m_allLayersButCurrent && (currentLayer == params->m_layer))) {
+        return FUNCTOR_SIBLINGS;
+    }
+    if (!currentLayer || IsScoreDefElement() || Is(MREST)) return FUNCTOR_SIBLINGS;
     if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink()) return FUNCTOR_CONTINUE;
 
     const double duration = !GetParent()->Is(CHORD)
