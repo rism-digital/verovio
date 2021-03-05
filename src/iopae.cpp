@@ -2034,11 +2034,13 @@ void PAEInput::parseNote(pae::Note *note)
     }
 
     // last note of a chord
-    if (!note->chord && m_is_in_chord) {
-        Note *mnote = dynamic_cast<Note *>(element);
-        assert(mnote);
-        mnote->ResetAugmentDots();
-        mnote->ResetDurationLogical();
+    if (m_is_in_chord) {
+        if (!note->chord && !note->rest) {
+            Note *mnote = dynamic_cast<Note *>(element);
+            assert(mnote);
+            mnote->ResetAugmentDots();
+            mnote->ResetDurationLogical();
+        }
         popContainer();
         m_is_in_chord = false;
     }
