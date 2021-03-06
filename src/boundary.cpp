@@ -90,7 +90,7 @@ int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
     // This can happen with a editorial container around a scoreDef at the beginning
     this->SetMeasure(params->m_lastMeasure);
 
-    // Endings are also set as Measure::m_drawingEnding for all meaasures in between - when we reach the end boundary of
+    // Endings are also set as Measure::m_drawingEnding for all measures in between - when we reach the end boundary of
     // an ending, we need to set the m_currentEnding to NULL
     if (params->m_currentEnding && this->GetStart()->Is(ENDING)) {
         params->m_currentEnding = NULL;

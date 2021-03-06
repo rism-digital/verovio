@@ -205,7 +205,7 @@ public:
     void SetFormatRaw(bool rawFormat) { m_formatRaw = rawFormat; }
     
     /**
-     * Set the xlink: prefex on href attributes
+     * Removes the xlink: prefex on href attributes, necessary for some newer browsers.
      */
     void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
 
@@ -284,7 +284,7 @@ private:
     bool m_html5;
     // format output as raw, stripping extraneous whitespace and non-content newlines
     bool m_formatRaw;
-    // include xlink on href attributes
+    // remove xlink from href attributes
     bool m_removeXlink;
     // indentation value (-1 for tabs)
     int m_indent;

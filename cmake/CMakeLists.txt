@@ -158,7 +158,7 @@ set(all_SRC
 ##################
 
 if (BUILD_AS_LIBRARY)
-    message(STATUS "***** Building Verorio as shared library *****")
+    message(STATUS "***** Building Verovio as shared library *****")
     add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
 
 ###########
@@ -166,7 +166,7 @@ if (BUILD_AS_LIBRARY)
 ###########
 
 elseif (BUILD_AS_WASM)
-    message(STATUS "***** Building Verorio as WASM BC *****")
+    message(STATUS "***** Building Verovio as WASM BC *****")
     add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
 
 #################
@@ -174,7 +174,7 @@ elseif (BUILD_AS_WASM)
 #################
 
 elseif (BUILD_AS_PYTHON)
-    message(STATUS "***** Building Verorio as Python module *****")
+    message(STATUS "***** Building Verovio as Python module *****")
 
     # clear out policies
     cmake_policy(SET CMP0078 NEW)
@@ -183,6 +183,11 @@ elseif (BUILD_AS_PYTHON)
     find_package(SWIG REQUIRED)
     include(${SWIG_USE_FILE})
     set(CMAKE_SWIG_FLAGS "")
+
+    if(Python_VERSION VERSION_GREATER_EQUAL 3)
+      list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
+    endif()
+
     set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)
 
     # needed for static build on linux
@@ -210,7 +215,7 @@ elseif (BUILD_AS_PYTHON)
 #####################
 
 else()
-    message(STATUS "***** Building Verorio as command-line tool *****")
+    message(STATUS "***** Building Verovio as command-line tool *****")
     add_executable(verovio ../tools/main.cpp ${all_SRC})
 
 endif()

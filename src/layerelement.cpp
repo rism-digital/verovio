@@ -272,7 +272,7 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
             below = staffBelow->GetAlignment();
         }
     }
-    // Stems cross-staff beam need special treament but only if the beam itself is not cross-staff
+    // Stems cross-staff beam need special treatment but only if the beam itself is not cross-staff
     if (this->Is({ ARTIC, STEM }) && beam && beam->m_crossStaffContent && !beam->m_crossStaff) {
         data_STAFFREL_basic direction = beam->m_crossStaffRel;
         if (direction == STAFFREL_basic_above) {
@@ -394,12 +394,12 @@ int LayerElement::GetDrawingY() const
 
     // Look if we have a crossStaff situation
     Object *object = this->m_crossStaff; // GetCrossStaff();
-    // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g.,
-    // artic, syl)
+    // First get the first layerElement parent (if any) but only if the element is not directly relative to staff
+    // (e.g. artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
     // Otherwise get the first staff
     if (!object) object = this->GetFirstAncestor(STAFF);
-    // Otherwise the first measure (this is the case with barLineAttr
+    // Otherwise the first measure (this is the case with barLineAttr)
     if (!object) object = this->GetFirstAncestor(MEASURE);
 
     assert(object);
@@ -483,14 +483,14 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticTy
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
             return note->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         }
-        // We should also take into accound the stem shift to the right
+        // We should also take into account the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
             return stemmedDrawingInterface->GetDrawingStemEnd(this).y;
         }
         else {
-            // This does not take into account the glyph actual size.
+            // this does not take into account the glyph's actual size
             return note->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         }
     }
@@ -521,11 +521,11 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
             return note->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         }
-        // We should also take into accound the stem shift to the right
+        // We should also take into account the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
-            // This does not take into account the glyph actual size.
+            // this does not take into account the glyph's actual size
             return note->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         }
         else {
@@ -1223,7 +1223,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 // I've described how to implement 64ths and beyond below
 
                 // we need to check for bottom and top alignment because a 32nd rest that's top is in the space
-                // under the staff (d4 on treble) can not be moved any closer to center by an incriment of 1
+                // under the staff (d4 on treble) can not be moved any closer to center by an increment of 1
                 // because the dots will collide with the staff
                 // whereas a 16th rest that is in the same "loc" as the 32nd is actually below the 32nd
                 // (the top of the 16th will be in note b3 on treble clef) so can be moved closer to the staff
@@ -1383,7 +1383,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     int offset = selfRight - params->m_graceMaxPos;
     if (offset > 0) {
         this->GetGraceAlignment()->SetXRel(this->GetGraceAlignment()->GetXRel() - offset);
-        // Also move the cumultated x shift and the minimum position for the next alignment accordingly
+        // Also move the accumulated x shift and the minimum position for the next alignment accordingly
         params->m_graceCumulatedXShift += (-offset);
         params->m_graceUpcomingMaxPos += (-offset);
     }
@@ -1468,7 +1468,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int offset = selfLeft - params->m_minPos;
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
-        // Also move the cumultated x shift and the minimum position for the next alignment accordingly
+        // Also move the accumulated x shift and the minimum position for the next alignment accordingly
         params->m_cumulatedXShift += (-offset);
         params->m_upcomingMinPos += (-offset);
     }
@@ -1796,7 +1796,12 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     assert(params);
 
     Layer *currentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
-    if (!currentLayer || (currentLayer != params->m_layer) || IsScoreDefElement() || Is(MREST)) return FUNCTOR_SIBLINGS;
+    // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
+    if ((!params->m_allLayersButCurrent && (currentLayer != params->m_layer))
+        || (params->m_allLayersButCurrent && (currentLayer == params->m_layer))) {
+        return FUNCTOR_SIBLINGS;
+    }
+    if (!currentLayer || IsScoreDefElement() || Is(MREST)) return FUNCTOR_SIBLINGS;
     if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink()) return FUNCTOR_CONTINUE;
 
     const double duration = !GetParent()->Is(CHORD)

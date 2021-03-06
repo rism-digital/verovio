@@ -101,7 +101,7 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
     FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
-    // Only Dir and Dynam can be spanning with @next (extender)
+    // Only dir and dynam can be spanning with @next (extender)
     if (!object->Is({ DIR, DYNAM })) {
         return FUNCTOR_CONTINUE;
     }
