@@ -750,9 +750,9 @@ Options::Options()
         "Raw formatting for SVG output", "Writes SVG out with no line indenting or non-content newlines.");
     m_svgFormatRaw.Init(false);
     this->Register(&m_svgFormatRaw, "svgFormatRaw", &m_general);
-    
-    m_svgRemoveXlink.SetInfo(
-        "Remove xlink: from href attributes", "Removes the xlink: prefix on href attributes for compatibility with some newer browsers.");
+
+    m_svgRemoveXlink.SetInfo("Remove xlink: from href attributes",
+        "Removes the xlink: prefix on href attributes for compatibility with some newer browsers.");
     m_svgRemoveXlink.Init(false);
     this->Register(&m_svgRemoveXlink, "svgRemoveXlink", &m_general);
 
