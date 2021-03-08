@@ -433,7 +433,7 @@ private:
      */
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
-    std::vector<musicxml::ClefChange> m_ClefChangeStack;
+    std::vector<musicxml::ClefChange> m_clefChangeStack;
     /* stack of new arpeggios that get more notes added. */
     std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> > m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */

@@ -637,7 +637,7 @@ int System::AlignSystems(FunctorParams *functorParams)
 
     params->m_justificationSum += m_systemAligner.GetJustificationSum(params->m_doc);
     if (!this->GetIdx()) {
-        // remove extra system justification factor to get exaclty (systemsCount-1)*justificationSystem
+        // remove extra system justification factor to get exactly (systemsCount-1)*justificationSystem
         params->m_justificationSum -= params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     }
 
@@ -904,7 +904,7 @@ int System::UnCastOff(FunctorParams *functorParams)
     UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
     assert(params);
 
-    // Just move all the content of the system to the continous one (parameter)
+    // Just move all the content of the system to the continuous one (parameter)
     // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
     params->m_currentSystem->MoveChildrenFrom(this);

@@ -172,9 +172,9 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         if (current->Is({ NOTE, CHORD })) {
             // Look at the stemDir to see if we have multiple stem Dir
             if (!this->m_hasMultipleStemDir) {
-                // At this stage, BeamCoord::m_stem is not necssary set, so we need to look at the Note / Chord original
-                // value Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the
-                // beam
+                // At this stage, BeamCoord::m_stem is not necessary set, so we need to look at the Note / Chord
+                // original value Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first
+                // note of the beam
                 currentStemDir = m_beamElementCoords.at(elementCount)->GetStemDir();
                 if (currentStemDir != STEMDIRECTION_NONE) {
                     if ((this->m_notesStemDir != STEMDIRECTION_NONE) && (this->m_notesStemDir != currentStemDir)) {
@@ -218,7 +218,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
     this->m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
 
-    // Always set stem diretion to up for grace note beam unless stem direction is provided
+    // Always set stem direction to up for grace note beam unless stem direction is provided
     if (this->m_cueSize && (this->m_notesStemDir == STEMDIRECTION_NONE)) {
         this->m_notesStemDir = STEMDIRECTION_up;
     }

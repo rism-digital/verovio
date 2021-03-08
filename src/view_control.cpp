@@ -177,7 +177,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         LinkingInterface *linkingInterface = element->GetLinkingInterface();
         assert(linkingInterface);
         if (linkingInterface->GetNextLink()) {
-            // The end link has to have a TimePointInterface becase we ensure it is a ControlElement
+            // The end link has to have a TimePointInterface, because we ensure it is a ControlElement
             TimePointInterface *nextInterface = linkingInterface->GetNextLink()->GetTimePointInterface();
             assert(nextInterface);
             end = nextInterface->GetStart();
@@ -307,7 +307,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawGliss(dc, dynamic_cast<Gliss *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(HAIRPIN)) {
-            // cast to Harprin check in DrawHairpin
+            // cast to Hairpin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(PHRASE)) {
@@ -534,7 +534,7 @@ void View::DrawHairpin(
 
     m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
-    // We calculate points for cresc by default. Start/End have to be swapped
+    // We calculate points for cresc. by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
     int y1 = hairpin->GetDrawingY();
@@ -550,15 +550,15 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a cresc. Reduce the opening end
+        // In this case, we are drawing the first half of a cresc. and reduce the opening end
         else if (spanningType == SPANNING_START) {
             endY = endY / 2;
         }
-        // Now this is the case we are drawing the end of a cresc. Increase the opening start
+        // Now this is the case we are drawing the end of a cresc. and increase the opening start
         else if (spanningType == SPANNING_END) {
             startY = endY / 2;
         }
-        // Finally, cres accross the system, increase the start and reduce the end
+        // Finally, cres. accross the system, increase the start and reduce the end
         else {
             startY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
             endY = 2 * startY;
@@ -796,7 +796,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         }
     }
     // This is the case when the tie is split over two system of two pages.
-    // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
+    // In this case, we are now drawing it's beginning to the end of the measure (i.e. the last aligner)
     else if (spanningType == SPANNING_START) {
         if (note1) {
             y1 = note1->GetDrawingY();
@@ -941,7 +941,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "", tie->GetUuid(), false);
-    // set pen width and calculate tie thickness coeficient to adjust tie width in according to it
+    // set pen width and calculate tie thickness coefficient to adjust tie width in according to it
     const int penWidth
         = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (m_tieThicknessCoeficient <= 0) {
@@ -1187,7 +1187,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         // nothing to adjust
     }
 
-    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instantiate a temporary
     // object
     // in order not to reset the Syl bounding box.
     F fConnector;
@@ -1259,7 +1259,7 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
-    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instantiate a temporary
     // object
     // in order not to reset the Syl bounding box.
     Syl sylConnector;
@@ -1363,7 +1363,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     if (!system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff)) {
         return;
     }
-    // Special case: because the positionner objects are reset in ResetVerticalAlignment we
+    // Special case: because the positioner objects are reset in ResetVerticalAlignment we
     // need to reset the value of the DrawingXRel each time. The value is stored in Arpeg.
     arpeg->GetCurrentFloatingPositioner()->SetDrawingXRel(arpeg->GetDrawingXRel());
 
@@ -1564,7 +1564,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             params.m_y -= m_doc->GetTextXHeight(&dynamTxt, false) / 2;
         }
 
-        // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
+        // If the dynamic is a symbol (pp, mf, etc.) draw it as one SMuFL string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));

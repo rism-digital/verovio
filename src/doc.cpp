@@ -251,7 +251,7 @@ void Doc::CalculateMidiTimemap()
 {
     m_MIDITimemapTempo = 0.0;
 
-    // This happens if the document was never cast off (layout none option in the toolkit)
+    // This happens if the document was never cast off (breaks none option in the toolkit)
     if (!m_drawingPage && GetPageCount() == 1) {
         Page *page = this->SetDrawingPage(0);
         if (!page) {
@@ -317,7 +317,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
-    // The tree is used to process each staff/layer/verse separatly
+    // The tree is used to process each staff/layer/verse separately
     // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
@@ -822,7 +822,7 @@ void Doc::ScoreDefOptimizeDoc()
 
 void Doc::ScoreDefSetGrpSymDoc()
 {
-    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attirbutes that determine
+    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attributes that determine
     // their positioning
     Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
     // m_mdivScoreDef.Process(&scoreDefSetGrpSym, NULL);
@@ -976,7 +976,7 @@ void Doc::UnCastOffDoc()
 
     pages->AddChild(contentPage);
 
-    // LogDebug("ContinousLayout: %d pages", this->GetChildCount());
+    // LogDebug("ContinuousLayout: %d pages", this->GetChildCount());
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
@@ -1064,7 +1064,7 @@ void Doc::ConvertToCastOffMensuralDoc()
     // Do not convert facs files
     if (this->GetType() == Facs) return;
 
-    // We are converting to measure music in a definitiv way
+    // We are converting to measure music in a definite way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
         m_isMensuralMusicOnly = false;
     }
@@ -1732,7 +1732,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPageContentWidth = m_drawingPageWidth - m_drawingPageMarginLeft - m_drawingPageMarginRight;
 
     // From here we could check if values have changed
-    // Since  m_options->m_interlDefin stays the same, it's useless to do it
+    // Since m_options->m_interlDefin stays the same, it's useless to do it
     // every time for now.
 
     m_drawingBeamMaxSlope = this->m_options->m_beamMaxSlope.GetValue();
