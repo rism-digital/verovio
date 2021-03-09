@@ -167,7 +167,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     const int thickness = drawingUnit * doc->GetOptions()->m_tieMidpointThickness.GetValue();
     curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
 
-    if ((!startParentChord || isOuterChordNote) && durElement) {
+    if ((!startParentChord || isOuterChordNote) && durElement && (spanningType != SPANNING_END)) {
         UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
         curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
     }
@@ -304,12 +304,21 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
     ClassIdsComparison cmp({ DOT, DOTS, FLAG });
     durElement->FindAllDescendantByComparison(&objects, &cmp);
 
+    int dotsPosition = 0;
     for (auto object : objects) {
         // if we have possible overlap with dots, we need to move tie up/down to avoid it. This happens only for the
         // outter ties, so there should be no issue of inner tie moving up and colliding with other elements
         if (object->Is(DOTS)) {
             bool discard = false;
-            int margin = 0;
+            // initial margin is non-zero to make sure that we adjust ties that are very close to the dots, but don't overlap with them
+            int margin = 25;
+            // overlap with elements opposite to direction of the tie; this is needed to make sure there is no overlap
+            // with dots BB that is on the curving side of the tie. Ideally this should be changed when each dot in the
+            // chord gets separate BB
+            int oppositeOverlap = 0;
+            // calculate position for the tie in case there is overlap with FLAG in the future
+            dotsPosition = object->GetDrawingX()
+                + (1 + dynamic_cast<AttAugmentDots *>(durElement)->GetDots()) * drawingUnit;
             if (durElement->Is(CHORD)) {
                 // If this is chord, we need to make sure that ties is compared agains relative dot. Since all dots have
                 // one BB and this action is done for outer ties only, we can safely take height of the BB to determine
@@ -322,13 +331,24 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
                 else if ((drawingCurveDir == curvature_CURVEDIR_below) && (startNote != parentChord->GetBottomNote())) {
                     margin = object->GetSelfBottom() - object->GetSelfTop() - offset;
                 }
+                const int overlap = curve->CalcAdjustment(object, discard);
+                if ((overlap > 0) && (overlap < 1.5 * offset)) {
+                    oppositeOverlap = overlap;
+                }
             }
+            // calculate intersection with curve based on margin
+            const int step = drawingUnit / 2;
             int intersection = curve->CalcAdjustment(object, discard, margin, false);
-            if (intersection == 0) continue;
-            if (std::abs(intersection) > drawingUnit)
-                intersection = intersection / std::abs(intersection) * drawingUnit;
+            if (intersection) {
+                intersection = (intersection / step + 1) * step + 0.5 * step;
+                intersection *= (drawingCurveDir == curvature_CURVEDIR_below) ? -1 : 1;
+            }
+            else if (oppositeOverlap) {
+                intersection = (oppositeOverlap / step) * step * 0.5;
+            }
+            else
+                continue;
 
-            intersection *= (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
             for (int i = 0; i < 4; ++i) {
                 bezier[i].y += intersection;
             }
@@ -338,7 +358,14 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
             bool discard = false;
             int intersection = curve->CalcAdjustment(object, discard);
             if (intersection != 0) {
-                bezier[0].x += drawingUnit;
+                // in case there is an overlap with flag and dots are present - shift tie starting point to the right of
+                // the dot, otherwise shift it just enough to avoid overlapping with flag
+                if (!dotsPosition) {
+                    bezier[0].x += drawingUnit;
+                }
+                else {
+                    bezier[0].x = dotsPosition;
+                }
                 const int controlPointDist = (bezier[3].x - bezier[0].x) / 4;
                 bezier[1].x = bezier[0].x + controlPointDist;
                 bezier[2].x = bezier[3].x - controlPointDist;
