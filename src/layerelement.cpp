@@ -1488,7 +1488,10 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     // In case of dots/flags we need to hold off of adjusting upcoming min position right away - if it happens that
     // these elements do not overlap with other elements we can draw them as is and save space
     AlignmentReference *currentReference = GetAlignment()->GetReferenceWithElement(this, params->m_staffN);
-    if (Is({ DOTS, FLAG }) && (currentReference->HasMultipleLayer() || currentReference->HasCrossStaffElements())) {
+    Alignment *nextAlignment = vrv_cast<Alignment *>(GetAlignment()->GetParent()->GetNext(GetAlignment(), ALIGNMENT));
+    AlignmentType next = nextAlignment ? nextAlignment->GetType() : ALIGNMENT_DEFAULT;
+    if (Is({ DOTS, FLAG }) && (currentReference->HasMultipleLayer() || currentReference->HasCrossStaffElements())
+        && (next != ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
         const int additionalOffset = selfRight - params->m_upcomingMinPos;
         if (additionalOffset > params->m_currentAlignment.m_offset) {
             params->m_currentAlignment.m_offset = additionalOffset;
