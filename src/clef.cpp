@@ -29,6 +29,7 @@ Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), 
 {
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_LINELOC);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
     RegisterAttClass(ATT_VISIBILITY);
@@ -43,6 +44,7 @@ void Clef::Reset()
     LayerElement::Reset();
     ResetClefShape();
     ResetColor();
+    ResetExtSym();
     ResetLineLoc();
     ResetOctaveDisplacement();
     ResetVisibility();
@@ -82,6 +84,22 @@ int Clef::GetClefLocOffset() const
 int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place)
 {
     return place << 24 | octaveDis << 16 | line << 8 | shape;
+}
+
+wchar_t Clef::GetClefGlyph() const
+{
+    // If there is glyph.num, prioritize it
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    return NULL;
 }
 
 //----------------------------------------------------------------------------
