@@ -1589,6 +1589,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
+    clef->WriteExtSym(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
     clef->WriteVisibility(currentNode);
@@ -4851,6 +4852,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
+    vrvClef->ReadExtSym(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
     vrvClef->ReadVisibility(clef);
