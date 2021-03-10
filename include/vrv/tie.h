@@ -71,8 +71,8 @@ public:
 
 private:
     // Calculate initial position X position and return stem direction of the startNote
-    data_STEMDIRECTION CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, int spanningType,
-        bool isOuterChordNote, Point &startPoint, Point &endPoint);
+    data_STEMDIRECTION CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord,
+        int spanningType, bool isOuterChordNote, Point &startPoint, Point &endPoint);
 
     // Helper function to get preferred curve direction based on the number of conditions (like note direction, position
     // on the staff, etc.)

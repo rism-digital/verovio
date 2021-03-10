@@ -76,6 +76,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     bool isOuterChordNote = false;
     LayerElement *durElement = NULL;
     Chord *startParentChord = NULL;
+    Chord *endParentChord = NULL;
     Layer *layer1 = NULL;
     if (note1) {
         durElement = note1;
@@ -88,13 +89,16 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
         if ((note1 == startParentChord->GetTopNote()) || (note1 == startParentChord->GetBottomNote()))
             isOuterChordNote = true;
     }
+    if (note2) {
+        endParentChord = note2->IsChordTone();
+    }
 
     /************** x positions **************/
 
     Point startPoint(x1, staff->GetDrawingY());
     Point endPoint(x2, staff->GetDrawingY());
-    data_STEMDIRECTION noteStemDir
-        = CalculateXPosition(doc, staff, startParentChord, spanningType, isOuterChordNote, startPoint, endPoint);
+    data_STEMDIRECTION noteStemDir = CalculateXPosition(
+        doc, staff, startParentChord, endParentChord, spanningType, isOuterChordNote, startPoint, endPoint);
 
     /************** direction **************/
 
@@ -104,13 +108,27 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     /************** y position **************/
 
+    bool isShortTie = false;
+    // shortTie correction cannot be applied for chords
+    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 6 * drawingUnit)) {
+        isShortTie = true;
+    }
+
     if (drawingCurveDir == curvature_CURVEDIR_above) {
         startPoint.y += drawingUnit / 2;
         endPoint.y += drawingUnit / 2;
+        if (isShortTie) {
+            startPoint.y += drawingUnit;
+            endPoint.y += drawingUnit;
+        }
     }
     else {
         startPoint.y -= drawingUnit / 2;
         endPoint.y -= drawingUnit / 2;
+        if (isShortTie) {
+            startPoint.y -= drawingUnit;
+            endPoint.y -= drawingUnit;
+        }
     }
 
     /************** bezier points **************/
@@ -162,8 +180,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     return true;
 }
 
-data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, int spanningType,
-    bool isOuterChordNote, Point &startPoint, Point &endPoint)
+data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord,
+    int spanningType, bool isOuterChordNote, Point &startPoint, Point &endPoint)
 {
     Note *startNote = dynamic_cast<Note *>(GetStart());
     Note *endNote = dynamic_cast<Note *>(GetEnd());
@@ -171,7 +189,7 @@ data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startP
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     bool isShortTie = false;
     // shortTie correction cannot be applied for chords
-    if (!startParentChord && (endPoint.x - startPoint.x < 6 * drawingUnit)) {
+    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 6 * drawingUnit)) {
         isShortTie = true;
     }
 
