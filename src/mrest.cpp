@@ -22,12 +22,12 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
+MRest::MRest() : LayerElement("mrest-"), DurationInterface(), PositionInterface(), AttColor(), AttCue(), AttVisibility()
 {
+    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_FERMATAPRESENT);
     RegisterAttClass(ATT_VISIBILITY);
 
     Reset();
@@ -38,10 +38,10 @@ MRest::~MRest() {}
 void MRest::Reset()
 {
     LayerElement::Reset();
+    DurationInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
     ResetCue();
-    ResetFermataPresent();
     ResetVisibility();
 }
 

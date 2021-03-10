@@ -9,6 +9,7 @@
 #define __VRV_MREST_H__
 
 #include "atts_shared.h"
+#include "durationinterface.h"
 #include "layerelement.h"
 #include "positioninterface.h"
 
@@ -22,10 +23,10 @@ namespace vrv {
  * This class models the MEI <mRest> element.
  */
 class MRest : public LayerElement,
+              public DurationInterface,
               public PositionInterface,
               public AttColor,
               public AttCue,
-              public AttFermataPresent,
               public AttVisibility {
 public:
     /**
@@ -46,6 +47,7 @@ public:
      */
     ///@{
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     ///@}
 
     //----------//
