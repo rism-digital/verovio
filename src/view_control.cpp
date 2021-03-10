@@ -2455,6 +2455,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int y1 = ending->GetDrawingY();
 
+        dc->StartCustomGraphic("voltaBracket");
+
         FontInfo currentFont = *m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize);
         // currentFont.SetWeight(FONTWEIGHT_bold);
         // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
@@ -2503,6 +2505,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             && (ending->GetLendsym() != LINESTARTENDSYMBOL_none)) {
             DrawFilledRectangle(dc, x2 - lineWidth, y1, x2, y2);
         }
+
+        dc->EndCustomGraphic();
     }
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
