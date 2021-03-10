@@ -2639,6 +2639,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             else {
                 MRest *mRest = new MRest();
                 element = mRest;
+                mRest->SetDurPpq(duration);
                 if (cue) mRest->SetCue(BOOLEAN_true);
                 if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
                 if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
