@@ -104,26 +104,13 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     /************** y position **************/
 
-    bool isShortTie = false;
-    // shortTie correction cannot be applied for chords
-    if (!startParentChord && (endPoint.x - startPoint.x < 6 * drawingUnit)) {
-        isShortTie = true;
-    }
     if (drawingCurveDir == curvature_CURVEDIR_above) {
         startPoint.y += drawingUnit / 2;
         endPoint.y += drawingUnit / 2;
-        if (isShortTie) {
-            startPoint.y += drawingUnit;
-            endPoint.y += drawingUnit;
-        }
     }
     else {
         startPoint.y -= drawingUnit / 2;
         endPoint.y -= drawingUnit / 2;
-        if (isShortTie) {
-            startPoint.y -= drawingUnit;
-            endPoint.y -= drawingUnit;
-        }
     }
 
     /************** bezier points **************/
