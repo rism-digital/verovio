@@ -63,7 +63,7 @@ enum AlignmentType {
 //----------------------------------------------------------------------------
 
 /**
- * This class stores an alignement position elements will point to
+ * This class stores an alignment position elements will point to
  */
 class Alignment : public Object {
 public:
@@ -270,7 +270,7 @@ private:
 
 /**
  * This class stores a references of LayerElements for a staff.
- * The staff identification (@n) is given by the attCommon and takes into accound
+ * The staff identification (@n) is given by the attCommon and takes into account
  * cross-staff situations.
  * Its children of the alignment are references.
  */

@@ -26,7 +26,7 @@ class Stem;
 
 /**
  * This class is an interface for elements with duration, such as notes and rests.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instantiate directly.
  */
 class DrawingListInterface {
 public:
@@ -92,7 +92,7 @@ public:
     /**
      * Return information about the position in the beam.
      * (no const since the cached list is updated)
-     * Object * is a pointer to the object implementing the interface (e.g, Beam, FTrem)
+     * Object * is a pointer to the object implementing the interface (e.g, Beam, fTrem)
      */
     ///@{
     bool IsFirstIn(Object *object, LayerElement *element);
@@ -162,7 +162,7 @@ public:
  * This class is an interface for MEI scoreDef or staffDef attributes clef, keysig and mensur.
  * It can either hold element or attribute values. Element values are hold in normal objects
  * (e.g., Clef) and attribute values are hold in dedicated Object classes (e.g., ClefAttr)
- * During rendering, only Element object are used. They are obained by the GetXXXCopy methods
+ * During rendering, only Element object are used. They are obtained by the GetXXXCopy methods
  * that create a copy of the Element object or a corresponding Element object if a attribute value
  * object is hold.
  */

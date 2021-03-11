@@ -112,7 +112,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     const int yRight = tupletBracket->GetDrawingYRight() - lineWidth / 2;
     int bracketHeight;
 
-    // Draw a bracked with a gap
+    // Draw a bracket with a gap
     if (tupletBracket->GetAlignedNum() && tupletBracket->GetAlignedNum()->HasSelfBB()) {
         const int xNumLeft
             = tupletBracket->GetAlignedNum()->GetSelfLeft() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);

@@ -1652,12 +1652,14 @@ public:
     {
         m_time = 0.0;
         m_duration = 0.0;
+        m_allLayersButCurrent = false;
         m_meterSig = meterSig;
         m_mensur = mensur;
         m_layer = layer;
     }
     double m_time;
     double m_duration;
+    bool m_allLayersButCurrent;
     ListOfObjects m_elements;
     MeterSig *m_meterSig;
     Mensur *m_mensur;

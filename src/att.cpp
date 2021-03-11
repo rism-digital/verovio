@@ -425,7 +425,7 @@ data_MODUSMAIOR Att::StrToModusmaior(std::string value, bool logWarning) const
 {
     if (value == "2") return MODUSMAIOR_2;
     if (value == "3") return MODUSMAIOR_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MODUSMAIOR '%s'", value.c_str());
     return MODUSMAIOR_NONE;
 }
 
@@ -436,7 +436,7 @@ std::string Att::ModusminorToStr(data_MODUSMINOR data) const
         case MODUSMINOR_2: value = "2"; break;
         case MODUSMINOR_3: value = "3"; break;
         default:
-            LogWarning("Unknown modusmaior '%d'", data);
+            LogWarning("Unknown modusminor '%d'", data);
             value = "";
             break;
     }
@@ -447,7 +447,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value, bool logWarning) const
 {
     if (value == "2") return MODUSMINOR_2;
     if (value == "3") return MODUSMINOR_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MODUSMINOR '%s'", value.c_str());
     return MODUSMINOR_NONE;
 }
 
@@ -471,7 +471,7 @@ data_OCTAVE_DIS Att::StrToOctaveDis(std::string value, bool logWarning) const
     if (value == "8") return OCTAVE_DIS_8;
     if (value == "15") return OCTAVE_DIS_15;
     if (value == "22") return OCTAVE_DIS_22;
-    if (logWarning && !value.empty()) LogWarning("Unsupported octave dis '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.OCTAVE.DIS '%s'", value.c_str());
     return OCTAVE_DIS_NONE;
 }
 
@@ -495,7 +495,7 @@ data_ORIENTATION Att::StrToOrientation(std::string value, bool logWarning) const
     if (value == "reversed") return ORIENTATION_reversed;
     if (value == "90CW") return ORIENTATION_90CW;
     if (value == "90CCW") return ORIENTATION_90CCW;
-    if (logWarning && !value.empty()) LogWarning("Unsupported orientation '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.ORIENTATION '%s'", value.c_str());
     return ORIENTATION_NONE;
 }
 
@@ -572,7 +572,7 @@ data_PITCHNAME Att::StrToPitchname(std::string value, bool logWarning) const
     if (value == "g") return PITCHNAME_g;
     if (value == "a") return PITCHNAME_a;
     if (value == "b") return PITCHNAME_b;
-    if (logWarning && !value.empty()) LogWarning("Unsupported pitch name '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.PITCHNAME '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 
@@ -623,7 +623,7 @@ data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
 {
     if (value == "2") return PROLATIO_2;
     if (value == "3") return PROLATIO_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported prolatio '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.PROLATIO '%s'", value.c_str());
     return PROLATIO_NONE;
 }
 
@@ -645,7 +645,7 @@ data_TEMPUS Att::StrToTempus(std::string value, bool logWarning) const
 {
     if (value == "2") return TEMPUS_2;
     if (value == "3") return TEMPUS_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported tempus '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.TEMPUS '%s'", value.c_str());
     return TEMPUS_NONE;
 }
 
@@ -669,7 +669,7 @@ data_TIE Att::StrToTie(std::string value, bool logWarning) const
     if (value == "i") return TIE_i;
     if (value == "m") return TIE_m;
     if (value == "t") return TIE_t;
-    if (logWarning && !value.empty()) LogWarning("Unsupported tie '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.TIE '%s'", value.c_str());
     return TIE_NONE;
 }
 

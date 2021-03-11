@@ -80,7 +80,7 @@ bool Resources::InitFonts()
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
 
     if (s_font.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMUFL glyphs but could load only %d.", SMUFL_COUNT, s_font.size());
+        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, s_font.size());
         return false;
     }
 

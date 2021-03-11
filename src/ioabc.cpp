@@ -600,7 +600,7 @@ void ABCInput::parseKey(std::string &keyString)
 
         if (keyString[i]) {
             std::string modeString(&keyString[i]);
-            // capitalisation is ignored for the modes
+            // capitalization is ignored for the modes
             // and in fact only the first three letters of each mode are parsed
             modeString = modeString.substr(0, 3);
             for (char &c : modeString) {

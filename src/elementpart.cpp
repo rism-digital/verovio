@@ -303,7 +303,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
     }
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
-    // check if there is an overlap on the left or on the right and displace stem's parent correspondigly
+    // check if there is an overlap on the left or on the right and displace stem's parent correspondingly
     for (auto element : otherElements) {
         int right = HorizontalLeftOverlap(element, doc, 0, 0);
         int left = HorizontalRightOverlap(element, doc, 0, 0);
@@ -314,7 +314,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         Flag *currentFlag = NULL;
         currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
-        if (currentFlag) {
+        if (currentFlag && currentFlag->m_drawingNbFlags) {
             wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
             const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
             horizontalMargin += flagWidth;

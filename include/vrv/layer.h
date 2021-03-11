@@ -118,14 +118,16 @@ public:
     /**
      * Get the list of the layer elements for the duration of an element
      * Takes into account cross-staff situations.
+     * If excludeCurrent is specified, gets the list of layer elements for all layers except current
      */
-    ListOfObjects GetLayerElementsForTimeSpanOf(LayerElement *element);
+    ListOfObjects GetLayerElementsForTimeSpanOf(LayerElement *element, bool excludeCurrent = false);
 
     /**
      * Get the list of the layer elements used within a time span.
      * Takes into account cross-staff situations.
      */
-    ListOfObjects GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff);
+    ListOfObjects GetLayerElementsInTimeSpan(
+        double time, double duration, Measure *measure, int staff, bool excludeCurrent);
 
     Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig() const;
