@@ -1010,7 +1010,13 @@ int Note::CalcDots(FunctorParams *functorParams)
 
         // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
         const bool isDotShifted(loc % 2 == 0);
-        if (isDotShifted) ++loc;
+        if (isDotShifted) {
+            Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+            if (layer->GetN() % 2)
+                ++loc;
+            else
+                --loc;
+        }
         dotLocs->push_back(loc);
 
         // Stem up, shorter than 4th and not in beam
