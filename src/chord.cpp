@@ -9,8 +9,11 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <iostream>
+#include <functional> 
+#include <numeric>
 
 //----------------------------------------------------------------------------
 
@@ -30,6 +33,28 @@
 #include "vrv.h"
 
 namespace vrv {
+
+// Helper template function to calculate optiomal dot locations based on note locations in the chord. Takes iterators
+// for the begin/end of the range; reverse iterators should be passed if reverse order is specified
+template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin, Iterator end, bool isReverseOrder)
+{
+    // location adjustment that should be applied when looking for optimal position
+    std::vector<int> locAdjust{ 1, 2, -3 };
+    if (isReverseOrder) std::transform(locAdjust.begin(), locAdjust.end(), locAdjust.begin(), std::negate<int>());
+    std::set<int> dotLocations;
+    for (auto iter = begin; iter != end; ++iter) {
+        bool result = false;
+        if (*iter % 2 != 0) std::tie(std::ignore, result) = dotLocations.insert(*iter);
+        if (!result) {
+            for (auto adjust : locAdjust) {
+                if ((*iter + adjust) % 2 == 0) continue;
+                std::tie(std::ignore, result) = dotLocations.insert(*iter + adjust);
+                if (result) break;
+            }
+        }
+    }
+    return dotLocations;
+}
 
 //----------------------------------------------------------------------------
 // Chord
@@ -673,66 +698,56 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetTopNote());
     assert(this->GetBottomNote());
 
+    // Get note locations first
+    std::set<int> noteLocations;
     for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
         Note *note = vrv_cast<Note *>(*rit);
         assert(note);
-
         if (note->GetDots() == 0) {
             continue;
         }
-
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-
-        std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-        int loc = note->GetDrawingLoc();
-
-        // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-        if ((loc % 2) == 0) {
-            // defaults to the space above the staffline first
-            // if that position is not on the list already, we're good to go
-            if (std::find(dotLocs->begin(), dotLocs->end(), loc + 1) == dotLocs->end()) {
-                loc += 1;
-            }
-            // if it is on the list, we should try the spot a doubleUnit below
-            else if (std::find(dotLocs->begin(), dotLocs->end(), loc - 1) == dotLocs->end()) {
-                loc -= 1;
-            }
-            // otherwise, any other space looks weird so let's not draw it
-            else {
-                continue;
-            }
-        }
-        // similar if it's not on a staff line
-        else {
-            // see if the optimal place exists already
-            if (std::find(dotLocs->begin(), dotLocs->end(), loc) == dotLocs->end()) {
-            }
-            // if it does, then look up a space first
-            else if (std::find(dotLocs->begin(), dotLocs->end(), loc + 2) == dotLocs->end()) {
-                loc += 2;
-            }
-            // then look down a space
-            else if (std::find(dotLocs->begin(), dotLocs->end(), loc - 2) == dotLocs->end()) {
-                loc -= 2;
-            }
-            // otherwise let's not draw it
-            else {
-                continue;
-            }
-        }
-
-        // finally, make sure it's not outside the acceptable extremes of the chord.
-        // however, this does take into account cross-staff chords because it looks only at the top and bottom notes.
-        // when it would be necessary to look at top and bottom for each staff
-        if (!this->HasCrossStaff()) {
-            if (loc > this->GetTopNote()->GetDrawingLoc() + 1) continue;
-            if (loc < this->GetBottomNote()->GetDrawingLoc() - 1) continue;
-        }
-
-        // if it's not, add it to the dots list and go back to DrawChord
-        dotLocs->push_back(loc);
+        noteLocations.insert(note->GetDrawingLoc());
     }
+
+    // calculate optimal dot locations both in normal and reverse orders
+    auto first = CalculateDotLocations(noteLocations.begin(), noteLocations.end(), false);
+    auto second = CalculateDotLocations(noteLocations.rbegin(), noteLocations.rend(), true);
+    //
+    std::vector<int> firstElem, secondElem;
+    const std::set<int> *firstRef, *secondRef;
+    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    const bool isUppelLayer = (currentLayer->GetN() % 2);
+    // On upper layer normal order positioning is prioritized, hence assign positions in the same order as they were
+    // calculated. This way, if differences in positioning are the same for both normal/reverse orders, normal is going
+    // to be selected
+    if (isUppelLayer) {
+        firstElem.assign(first.begin(), first.end());
+        secondElem.assign(second.begin(), second.end());
+        firstRef = &first;
+        secondRef = &second;
+    } 
+    // ... and vice versa for the bottom layer, where reverse ordering is in priority
+    else {
+        firstElem.assign(second.begin(), second.end());
+        secondElem.assign(first.begin(), first.end());
+        firstRef = &second;
+        secondRef = &first;
+    }
+
+    // substract note and dot positions and calculate difference between all locations. This way, better positioning can
+    // be determined by taking order, where difference between dot and note positions is the smallest
+    std::transform(firstElem.begin(), firstElem.end(), noteLocations.begin(), firstElem.begin(), std::minus<int>());
+    std::transform(secondElem.begin(), secondElem.end(), noteLocations.begin(), secondElem.begin(), std::minus<int>());
+    int firstDiff = std::transform_reduce(
+        firstElem.begin(), firstElem.end(), 0, std::plus<>{}, static_cast<double (*)(double)>(std::fabs));
+    int secondDiff = std::transform_reduce(
+        secondElem.begin(), secondElem.end(), 0, std::plus<>{}, static_cast<double (*)(double)>(std::fabs));
+    std::set<int> dotLocations = (secondDiff < firstDiff) ? *secondRef : *firstRef;
+
+    Layer *layer = NULL;
+    Staff *staff = GetCrossStaff(layer);
+    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+    dotLocs->insert(dotLocs->end(), dotLocations.begin(), dotLocations.end());
 
     return FUNCTOR_CONTINUE;
 }
