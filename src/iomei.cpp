@@ -1753,10 +1753,10 @@ void MEIOutput::WriteMRest(pugi::xml_node currentNode, MRest *mRest)
     assert(mRest);
 
     WriteLayerElement(currentNode, mRest);
+    WriteDurationInterface(currentNode, mRest);
     WritePositionInterface(currentNode, mRest);
     mRest->WriteColor(currentNode);
     mRest->WriteCue(currentNode);
-    mRest->WriteFermataPresent(currentNode);
     mRest->WriteVisibility(currentNode);
 }
 
