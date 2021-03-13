@@ -1182,64 +1182,55 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
 
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
-            Clef *clef = NULL;
-            pugi::xpath_node clefSign;
-            xpath = StringFormat("clef[@number='%d']/sign", i + 1);
-            clefSign = it->select_node(xpath.c_str());
+            std::string xpath = StringFormat("clef[@number='%d']", i + 1);
+            pugi::xpath_node clef = it->select_node(xpath.c_str());
             // if not, look at a common one
-            if (!clefSign) {
-                clefSign = it->select_node("clef/sign");
+            if (!clef) {
+                clef = it->select_node("clef");
             }
-            if (clefSign.node().text()) {
-                if (!clef) clef = new Clef();
-                clef->SetShape(clef->AttClefShape::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
-            }
-            // clef line
-            pugi::xpath_node clefLine;
-            xpath = StringFormat("clef[@number='%d']/line", i + 1);
-            clefLine = it->select_node(xpath.c_str());
-            if (!clefLine) {
-                clefLine = it->select_node("clef/line[not(@number)]");
-            }
-            if (clefLine.node().text()) {
-                if (!clef) clef = new Clef();
-                if (clef->GetShape() != CLEFSHAPE_perc) {
-                    clef->SetLine(clefLine.node().text().as_int());
+            pugi::xml_node clefSign = clef.node().child("sign");
+            if (clefSign && (std::string(clefSign.text().as_string()) != "none")) {
+                Clef *meiClef = new Clef();
+                meiClef->SetColor(clef.node().attribute("color").as_string());
+                meiClef->SetVisible(ConvertWordToBool(clef.node().attribute("print-object").as_string()));
+                meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign).substr(0, 4)));
+
+                // clef line
+                pugi::xml_node clefLine = clef.node().child("line");
+                if (clefLine.text()) {
+                    if (meiClef->GetShape() != CLEFSHAPE_perc) {
+                        meiClef->SetLine(clefLine.text().as_int());
+                    }
                 }
-            }
-            else if (clef) {
-                switch (clef->GetShape()) {
-                    case CLEFSHAPE_C: clef->SetLine(3); break;
-                    case CLEFSHAPE_F: clef->SetLine(4); break;
-                    case CLEFSHAPE_G: clef->SetLine(2); break;
-                    case CLEFSHAPE_TAB: clef->SetLine(5); break;
-                    default: break;
+                else {
+                    switch (meiClef->GetShape()) {
+                        case CLEFSHAPE_C: meiClef->SetLine(3); break;
+                        case CLEFSHAPE_F: meiClef->SetLine(4); break;
+                        case CLEFSHAPE_G: meiClef->SetLine(2); break;
+                        case CLEFSHAPE_TAB: meiClef->SetLine(5); break;
+                        default: break;
+                    }
                 }
-            }
-            // clef octave change
-            pugi::xpath_node clefOctaveChange;
-            xpath = StringFormat("clef[@number='%d']/clef-octave-change", i + 1);
-            clefOctaveChange = it->select_node(xpath.c_str());
-            if (!clefOctaveChange) {
-                clefOctaveChange = it->select_node("clef/clef-octave-change");
-            }
-            if (clefOctaveChange.node().text()) {
-                int change = clefOctaveChange.node().text().as_int();
-                if (!clef) clef = new Clef();
-                if (abs(change) == 1)
-                    clef->SetDis(OCTAVE_DIS_8);
-                else if (abs(change) == 2)
-                    clef->SetDis(OCTAVE_DIS_15);
-                else if (abs(change) == 3)
-                    clef->SetDis(OCTAVE_DIS_22);
-                if (change < 0)
-                    clef->SetDisPlace(STAFFREL_basic_below);
-                else if (change > 0)
-                    clef->SetDisPlace(STAFFREL_basic_above);
-            }
-            // add it if necessary
-            if (clef) {
-                staffDef->AddChild(clef);
+
+                // clef octave change
+                pugi::xml_node clefOctaveChange = clef.node().child("clef-octave-change");
+                if (clefOctaveChange) {
+                    int change = clefOctaveChange.text().as_int();
+                    switch (abs(change)) {
+                        case 1: meiClef->SetDis(OCTAVE_DIS_8); break;
+                        case 2: meiClef->SetDis(OCTAVE_DIS_15); break;
+                        case 3: meiClef->SetDis(OCTAVE_DIS_22); break;
+                        default: break;
+                    }
+                    if (change < 0) {
+                        meiClef->SetDisPlace(STAFFREL_basic_below);
+                    }
+                    else if (change > 0) {
+                        meiClef->SetDisPlace(STAFFREL_basic_above);
+                    }
+                }
+
+                staffDef->AddChild(meiClef);
             }
 
             // key sig
@@ -1648,26 +1639,30 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         staffNum = (staffNum < 1) ? 1 : staffNum;
         Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
         assert(staff);
-        pugi::xpath_node clefSign = clef.select_node("sign");
-        pugi::xpath_node clefLine = clef.select_node("line");
+        pugi::xml_node clefSign = clef.child("sign");
+        pugi::xml_node clefLine = clef.child("line");
         if (clefSign && clefLine) {
             Clef *meiClef = new Clef();
-            meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
-            meiClef->SetLine(meiClef->AttClefShape::StrToInt(clefLine.node().text().as_string()));
+            meiClef->SetColor(clef.attribute("color").as_string());
+            meiClef->SetVisible(ConvertWordToBool(clef.attribute("print-object").as_string()));
+            meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign).substr(0, 4)));
+            meiClef->SetLine(meiClef->AttClefShape::StrToInt(clefLine.text().as_string()));
             // clef octave change
-            pugi::xpath_node clefOctaveChange = clef.select_node("clef-octave-change");
-            if (clefOctaveChange.node().text()) {
-                const int change = clefOctaveChange.node().text().as_int();
-                if (abs(change) == 1)
-                    meiClef->SetDis(OCTAVE_DIS_8);
-                else if (abs(change) == 2)
-                    meiClef->SetDis(OCTAVE_DIS_15);
-                else if (abs(change) == 3)
-                    meiClef->SetDis(OCTAVE_DIS_22);
-                if (change < 0)
+            pugi::xml_node clefOctaveChange = clef.child("clef-octave-change");
+            if (clefOctaveChange) {
+                int change = clefOctaveChange.text().as_int();
+                switch (abs(change)) {
+                    case 1: meiClef->SetDis(OCTAVE_DIS_8); break;
+                    case 2: meiClef->SetDis(OCTAVE_DIS_15); break;
+                    case 3: meiClef->SetDis(OCTAVE_DIS_22); break;
+                    default: break;
+                }
+                if (change < 0) {
                     meiClef->SetDisPlace(STAFFREL_basic_below);
-                else
+                }
+                else if (change > 0) {
                     meiClef->SetDisPlace(STAFFREL_basic_above);
+                }
             }
             const bool afterBarline = clef.attribute("after-barline").as_bool();
             m_clefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
