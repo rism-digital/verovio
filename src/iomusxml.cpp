@@ -1234,16 +1234,19 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
 
             // key sig
-            KeySig *keySig = NULL;
             xpath = StringFormat("key[@number='%d']", i + 1);
             pugi::xpath_node key = it->select_node(xpath.c_str());
             if (!key) {
                 key = it->select_node("key");
             }
             if (key) {
-                if (!keySig) keySig = new KeySig();
-                if (key.node().select_node("fifths")) {
-                    int fifths = atoi(key.node().select_node("fifths").node().text().as_string());
+                KeySig *keySig = new KeySig();
+                keySig->SetVisible(ConvertWordToBool(key.node().attribute("print-object").as_string()));
+                if (key.node().attribute("id")) {
+                    keySig->SetUuid(key.node().attribute("id").as_string());
+                }
+                if (key.node().child("fifths")) {
+                    int fifths = key.node().child("fifths").text().as_int();
                     std::string keySigStr;
                     if (fifths < 0)
                         keySigStr = StringFormat("%df", abs(fifths));
@@ -1252,6 +1255,13 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     else
                         keySigStr = "0";
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
+
+                    if (key.node().child("mode")) {
+                        const std::string xmlMode = key.node().child("mode").text().as_string();
+                        if (std::strncmp(xmlMode.c_str(), "none", 4)) {
+                            keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
+                        }
+                    }
                 }
                 else if (key.node().child("key-step")) {
                     for (pugi::xml_node keyStep : key.node().children("key-step")) {
@@ -1269,19 +1279,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         keySig->AddChild(keyAccid);
                     }
                 }
-                if (key.node().child("mode")) {
-                    const std::string xmlMode = key.node().child("mode").text().as_string();
-                    if (std::strncmp(xmlMode.c_str(), "none", 4)) {
-                        keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
-                    }
-                }
-                if (key.node().attribute("id")) {
-                    if (!keySig) keySig = new KeySig();
-                    keySig->SetUuid(key.node().attribute("id").as_string());
-                }
-            }
-            // add it if necessary
-            if (keySig) {
                 staffDef->AddChild(keySig);
             }
 
@@ -1689,6 +1686,12 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             else
                 keySigStr = "0";
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
+            if (key.child("cancel")) {
+                keySig->SetSigShowchange(BOOLEAN_true);
+            }
+            if (key.child("mode")) {
+                keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.select_node("mode").node().text().as_string()));
+            }
         }
         else if (key.child("key-step")) {
             if (!keySig) keySig = new KeySig();
@@ -1706,14 +1709,6 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 }
                 keySig->AddChild(keyAccid);
             }
-        }
-        if (key.select_node("mode")) {
-            if (!keySig) keySig = new KeySig();
-            keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.select_node("mode").node().text().as_string()));
-        }
-        if (key.select_node("cancel")) {
-            if (!keySig) keySig = new KeySig();
-            keySig->SetSigShowchange(BOOLEAN_true);
         }
         if (key.attribute("id")) {
             if (!keySig) keySig = new KeySig();
