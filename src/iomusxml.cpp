@@ -1193,6 +1193,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 Clef *meiClef = new Clef();
                 meiClef->SetColor(clef.node().attribute("color").as_string());
                 meiClef->SetVisible(ConvertWordToBool(clef.node().attribute("print-object").as_string()));
+                if (clef.node().attribute("id")) {
+                    meiClef->SetUuid(clef.node().attribute("id").as_string());
+                }
                 meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign).substr(0, 4)));
 
                 // clef line
