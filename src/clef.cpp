@@ -99,7 +99,45 @@ wchar_t Clef::GetClefGlyph() const
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
-    return NULL;
+    wchar_t code = 0;
+    // cmn clefs
+    int shapeOctaveDis = Clef::ClefId(this->GetShape(), 0, this->GetDis(), this->GetDisPlace());
+    // G clef
+    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+        code = SMUFL_E050_gClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+        code = SMUFL_E052_gClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
+        code = SMUFL_E051_gClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
+        code = SMUFL_E053_gClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
+        code = SMUFL_E054_gClef15ma;
+    // C clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+        code = SMUFL_E05C_cClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+        code = SMUFL_E05D_cClef8vb;
+    else if (this->GetShape() == CLEFSHAPE_C)
+        code = SMUFL_E05C_cClef;
+    // F clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+        code = SMUFL_E062_fClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+        code = SMUFL_E064_fClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
+        code = SMUFL_E063_fClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
+        code = SMUFL_E065_fClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
+        code = SMUFL_E066_fClef15ma;
+    else if (this->GetShape() == CLEFSHAPE_F)
+        code = SMUFL_E062_fClef;
+    // Perc clef
+    else if (this->GetShape() == CLEFSHAPE_perc)
+        code = SMUFL_E069_unpitchedPercussionClef1;
+
+    return code;
 }
 
 //----------------------------------------------------------------------------
