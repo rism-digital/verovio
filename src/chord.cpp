@@ -665,6 +665,49 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+void Chord::CaltOptimalDots(Dots *dots, Staff* staff, const std::set<int> &noteLocations)
+{
+    // calculate optimal dot locations both in normal and reverse orders
+    std::set<int> forwardLocations = CalculateDotLocations(noteLocations.begin(), noteLocations.end(), false);
+    std::set<int> backwardLocations = CalculateDotLocations(noteLocations.rbegin(), noteLocations.rend(), true);
+    //
+    std::vector<int> firstElem, secondElem;
+    const std::set<int> *firstRef, *secondRef;
+    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    const bool isUppelLayer = (currentLayer->GetN() % 2);
+    // On upper layer normal order positioning is prioritized, hence assign positions in the same order as they were
+    // calculated. This way, if differences in positioning are the same for both normal/reverse orders, normal is going
+    // to be selected
+    if (isUppelLayer) {
+        firstElem.assign(forwardLocations.begin(), forwardLocations.end());
+        secondElem.assign(backwardLocations.begin(), backwardLocations.end());
+        firstRef = &forwardLocations;
+        secondRef = &backwardLocations;
+    }
+    // ... and vice versa for the bottom layer, where reverse ordering is in priority
+    else {
+        firstElem.assign(backwardLocations.begin(), backwardLocations.end());
+        secondElem.assign(forwardLocations.begin(), forwardLocations.end());
+        firstRef = &backwardLocations;
+        secondRef = &forwardLocations;
+    }
+
+    // substract note and dot positions and calculate difference between all locations. This way, better positioning can
+    // be determined by taking order, where difference between dot and note positions is the smallest
+    std::transform(firstElem.begin(), firstElem.end(), noteLocations.begin(), firstElem.begin(), std::minus<int>());
+    std::transform(secondElem.begin(), secondElem.end(), noteLocations.begin(), secondElem.begin(), std::minus<int>());
+    // apply std::abs to elements in the vectors and then calculate sum of the elements. Can be achieved with
+    // std::transform_reduce, but gcc needs to support it
+    std::transform(firstElem.begin(), firstElem.end(), firstElem.begin(), static_cast<float (*)(float)>(&std::abs));
+    std::transform(secondElem.begin(), secondElem.end(), secondElem.begin(), static_cast<float (*)(float)>(&std::abs));
+    const int firstDiff = std::accumulate(firstElem.begin(), firstElem.end(), 0);
+    const int secondDiff = std::accumulate(secondElem.begin(), secondElem.end(), 0);
+    std::set<int> dotLocations = (secondDiff < firstDiff) ? *secondRef : *firstRef;
+
+    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+    dotLocs->insert(dotLocs->end(), dotLocations.begin(), dotLocations.end());
+}
+
 int Chord::CalcDots(FunctorParams *functorParams)
 {
     CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
@@ -699,55 +742,25 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetBottomNote());
 
     // Get note locations first
-    std::set<int> noteLocations;
+    std::map<Staff*, std::set<int>> noteLocations;
     for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
         Note *note = vrv_cast<Note *>(*rit);
         assert(note);
         if (note->GetDots() == 0) {
             continue;
         }
-        noteLocations.insert(note->GetDrawingLoc());
+
+        Layer *layer = NULL;
+        Staff *staff = note->GetCrossStaff(layer);
+        if (noteLocations.end() == noteLocations.find(staff)) {
+            noteLocations[staff] = {};
+        }
+        noteLocations[staff].insert(note->GetDrawingLoc());
     }
 
-    // calculate optimal dot locations both in normal and reverse orders
-    auto first = CalculateDotLocations(noteLocations.begin(), noteLocations.end(), false);
-    auto second = CalculateDotLocations(noteLocations.rbegin(), noteLocations.rend(), true);
-    //
-    std::vector<int> firstElem, secondElem;
-    const std::set<int> *firstRef, *secondRef;
-    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    const bool isUppelLayer = (currentLayer->GetN() % 2);
-    // On upper layer normal order positioning is prioritized, hence assign positions in the same order as they were
-    // calculated. This way, if differences in positioning are the same for both normal/reverse orders, normal is going
-    // to be selected
-    if (isUppelLayer) {
-        firstElem.assign(first.begin(), first.end());
-        secondElem.assign(second.begin(), second.end());
-        firstRef = &first;
-        secondRef = &second;
-    } 
-    // ... and vice versa for the bottom layer, where reverse ordering is in priority
-    else {
-        firstElem.assign(second.begin(), second.end());
-        secondElem.assign(first.begin(), first.end());
-        firstRef = &second;
-        secondRef = &first;
+    for (auto loc : noteLocations) {
+        CaltOptimalDots(dots, loc.first, loc.second);
     }
-
-    // substract note and dot positions and calculate difference between all locations. This way, better positioning can
-    // be determined by taking order, where difference between dot and note positions is the smallest
-    std::transform(firstElem.begin(), firstElem.end(), noteLocations.begin(), firstElem.begin(), std::minus<int>());
-    std::transform(secondElem.begin(), secondElem.end(), noteLocations.begin(), secondElem.begin(), std::minus<int>());
-    int firstDiff = std::transform_reduce(
-        firstElem.begin(), firstElem.end(), 0, std::plus<>{}, static_cast<double (*)(double)>(std::fabs));
-    int secondDiff = std::transform_reduce(
-        secondElem.begin(), secondElem.end(), 0, std::plus<>{}, static_cast<double (*)(double)>(std::fabs));
-    std::set<int> dotLocations = (secondDiff < firstDiff) ? *secondRef : *firstRef;
-
-    Layer *layer = NULL;
-    Staff *staff = GetCrossStaff(layer);
-    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-    dotLocs->insert(dotLocs->end(), dotLocations.begin(), dotLocations.end());
 
     return FUNCTOR_CONTINUE;
 }
