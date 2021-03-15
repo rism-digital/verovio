@@ -60,11 +60,6 @@ public:
     //----------------//
 
     /**
-     * Return a clef id based on the various parameters
-     */
-    static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place);
-
-    /**
      * Retrieves the appropriate SMuFL code for a data_CLEFSHAPE
      */
     wchar_t GetClefGlyph() const;
