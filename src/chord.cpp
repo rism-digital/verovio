@@ -673,12 +673,11 @@ void Chord::CaltOptimalDots(Dots *dots, Staff* staff, const std::set<int> &noteL
     //
     std::vector<int> firstElem, secondElem;
     const std::set<int> *firstRef, *secondRef;
-    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    const bool isUppelLayer = (currentLayer->GetN() % 2);
+    const bool isUpwardDirection = (GetDrawingStemDir() == STEMDIRECTION_up);
     // On upper layer normal order positioning is prioritized, hence assign positions in the same order as they were
     // calculated. This way, if differences in positioning are the same for both normal/reverse orders, normal is going
     // to be selected
-    if (isUppelLayer) {
+    if (isUpwardDirection) {
         firstElem.assign(forwardLocations.begin(), forwardLocations.end());
         secondElem.assign(backwardLocations.begin(), backwardLocations.end());
         firstRef = &forwardLocations;
