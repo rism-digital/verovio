@@ -51,7 +51,7 @@ class Tie;
 class Trill;
 
 //----------------------------------------------------------------------------
-// namespace for local MusicXml classes
+// namespace for local MusicXML classes
 //----------------------------------------------------------------------------
 
 namespace musicxml {
@@ -172,7 +172,7 @@ private:
     void ReadMusicXmlTitle(pugi::xml_node title);
 
     /*
-     * @name Top level methods for reading MusicXml part and measure elements.
+     * @name Top level methods for reading MusicXML part and measure elements.
      */
     ///@{
     bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
@@ -181,13 +181,13 @@ private:
     ///@}
 
     /*
-     * Methods for reading the first MusicXml attributes element as MEI staffDef.
+     * Methods for reading the first MusicXML attributes element as MEI staffDef.
      * Returns the number of staves in the part.
      */
     int ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset);
 
     /*
-     * @name Methods for reading the content of a MusicXml measure.
+     * @name Methods for reading the content of a MusicXML measure.
      */
     ///@{
     void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string &measureNum);
@@ -223,7 +223,7 @@ private:
     void AddLayerElement(Layer *layer, LayerElement *element, int duration = 0);
 
     /*
-     * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
+     * Returns the appropriate layer for a node looking at its MusicXML staff and voice elements.
      */
     Layer *SelectLayer(pugi::xml_node node, Measure *measure);
 
