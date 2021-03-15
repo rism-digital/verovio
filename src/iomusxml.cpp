@@ -975,7 +975,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 ending->AddChild(*jter); // add <measure> to <ending>
                 logString = logString + ((*jter == measureList.back()) ? ")." : ", ");
             }
-            LogMessage(logString.c_str());
+            LogDebug(logString.c_str());
         }
         m_endingStack.clear();
     }
@@ -2157,8 +2157,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Hairpins
     pugi::xpath_node_set wedges = node.select_nodes("direction-type/wedge");
     for (pugi::xpath_node_set::const_iterator wedge = wedges.begin(); wedge != wedges.end(); ++wedge) {
-        LogWarning(
-            "wedge %s %s", wedge->node().attribute("id").as_string(), wedge->node().attribute("type").as_string());
         int hairpinNumber = wedge->node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge->node(), "type", "stop")) {
