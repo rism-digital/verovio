@@ -36,6 +36,7 @@ class Gliss;
 class Hairpin;
 class Harm;
 class InstrDef;
+class KeySig;
 class Label;
 class LabelAbbr;
 class Layer;
@@ -237,6 +238,14 @@ private:
      * Creates the layer if not found.
      */
     Layer *SelectLayer(int layerNb, Staff *staff);
+
+    /*
+     * @name Methods for converting the content of MusicXML attributes.
+     */
+    ///@{
+    Clef *ConvertClef(const pugi::xml_node &clef);
+    KeySig *ConvertKey(const pugi::xml_node &key);
+    ///@}
 
     /*
      * Remove the last ClassId element on top of m_elementStack.

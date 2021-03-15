@@ -1185,104 +1185,17 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             std::string xpath = StringFormat("clef[@number='%d']", i + 1);
             pugi::xpath_node clef = it->select_node(xpath.c_str());
             // if not, look at a common one
-            if (!clef) {
-                clef = it->select_node("clef");
-            }
-            pugi::xml_node clefSign = clef.node().child("sign");
-            if (clefSign && (std::string(clefSign.text().as_string()) != "none")) {
-                Clef *meiClef = new Clef();
-                meiClef->SetColor(clef.node().attribute("color").as_string());
-                meiClef->SetVisible(ConvertWordToBool(clef.node().attribute("print-object").as_string()));
-                if (clef.node().attribute("id")) {
-                    meiClef->SetUuid(clef.node().attribute("id").as_string());
-                }
-                meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign).substr(0, 4)));
-
-                // clef line
-                pugi::xml_node clefLine = clef.node().child("line");
-                if (clefLine.text()) {
-                    if (meiClef->GetShape() != CLEFSHAPE_perc) {
-                        meiClef->SetLine(clefLine.text().as_int());
-                    }
-                }
-                else {
-                    switch (meiClef->GetShape()) {
-                        case CLEFSHAPE_C: meiClef->SetLine(3); break;
-                        case CLEFSHAPE_F: meiClef->SetLine(4); break;
-                        case CLEFSHAPE_G: meiClef->SetLine(2); break;
-                        case CLEFSHAPE_TAB: meiClef->SetLine(5); break;
-                        default: break;
-                    }
-                }
-
-                // clef octave change
-                pugi::xml_node clefOctaveChange = clef.node().child("clef-octave-change");
-                if (clefOctaveChange) {
-                    int change = clefOctaveChange.text().as_int();
-                    switch (abs(change)) {
-                        case 1: meiClef->SetDis(OCTAVE_DIS_8); break;
-                        case 2: meiClef->SetDis(OCTAVE_DIS_15); break;
-                        case 3: meiClef->SetDis(OCTAVE_DIS_22); break;
-                        default: break;
-                    }
-                    if (change < 0) {
-                        meiClef->SetDisPlace(STAFFREL_basic_below);
-                    }
-                    else if (change > 0) {
-                        meiClef->SetDisPlace(STAFFREL_basic_above);
-                    }
-                }
-
-                staffDef->AddChild(meiClef);
-            }
+            if (!clef) clef = it->select_node("clef");
+            Clef *meiClef = ConvertClef(clef.node());
+            if (meiClef) staffDef->AddChild(meiClef);
 
             // key sig
             xpath = StringFormat("key[@number='%d']", i + 1);
             pugi::xpath_node key = it->select_node(xpath.c_str());
-            if (!key) {
-                key = it->select_node("key");
-            }
+            if (!key) key = it->select_node("key");
             if (key) {
-                KeySig *keySig = new KeySig();
-                keySig->SetVisible(ConvertWordToBool(key.node().attribute("print-object").as_string()));
-                if (key.node().attribute("id")) {
-                    keySig->SetUuid(key.node().attribute("id").as_string());
-                }
-                if (key.node().child("fifths")) {
-                    int fifths = key.node().child("fifths").text().as_int();
-                    std::string keySigStr;
-                    if (fifths < 0)
-                        keySigStr = StringFormat("%df", abs(fifths));
-                    else if (fifths > 0)
-                        keySigStr = StringFormat("%ds", fifths);
-                    else
-                        keySigStr = "0";
-                    keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
-
-                    if (key.node().child("mode")) {
-                        const std::string xmlMode = key.node().child("mode").text().as_string();
-                        if (std::strncmp(xmlMode.c_str(), "none", 4)) {
-                            keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
-                        }
-                    }
-                }
-                else if (key.node().child("key-step")) {
-                    for (pugi::xml_node keyStep : key.node().children("key-step")) {
-                        KeyAccid *keyAccid = new KeyAccid();
-                        keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
-                        if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
-                            data_ACCIDENTAL_GESTURAL accidValue
-                                = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
-                            keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
-                            if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
-                                keyAccid->SetAccid(
-                                    ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
-                            }
-                        }
-                        keySig->AddChild(keyAccid);
-                    }
-                }
-                staffDef->AddChild(keySig);
+                KeySig *meiKey = ConvertKey(key.node());
+                staffDef->AddChild(meiKey);
             }
 
             // staff details
@@ -1639,31 +1552,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         staffNum = (staffNum < 1) ? 1 : staffNum;
         Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
         assert(staff);
-        pugi::xml_node clefSign = clef.child("sign");
-        pugi::xml_node clefLine = clef.child("line");
-        if (clefSign && clefLine) {
-            Clef *meiClef = new Clef();
-            meiClef->SetColor(clef.attribute("color").as_string());
-            meiClef->SetVisible(ConvertWordToBool(clef.attribute("print-object").as_string()));
-            meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign).substr(0, 4)));
-            meiClef->SetLine(meiClef->AttClefShape::StrToInt(clefLine.text().as_string()));
-            // clef octave change
-            pugi::xml_node clefOctaveChange = clef.child("clef-octave-change");
-            if (clefOctaveChange) {
-                int change = clefOctaveChange.text().as_int();
-                switch (abs(change)) {
-                    case 1: meiClef->SetDis(OCTAVE_DIS_8); break;
-                    case 2: meiClef->SetDis(OCTAVE_DIS_15); break;
-                    case 3: meiClef->SetDis(OCTAVE_DIS_22); break;
-                    default: break;
-                }
-                if (change < 0) {
-                    meiClef->SetDisPlace(STAFFREL_basic_below);
-                }
-                else if (change > 0) {
-                    meiClef->SetDisPlace(STAFFREL_basic_above);
-                }
-            }
+        Clef *meiClef = ConvertClef(clef);
+        if (meiClef) {
             const bool afterBarline = clef.attribute("after-barline").as_bool();
             m_clefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
@@ -1677,50 +1567,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     if ((key || time || divisionChange) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
         && !node.select_node("preceding-sibling::attributes/key")) {
         ScoreDef *scoreDef = new ScoreDef();
-        KeySig *keySig = NULL;
-        if (key.select_node("fifths")) {
-            if (!keySig) keySig = new KeySig();
-            const int fifths = key.select_node("fifths").node().text().as_int();
-            std::string keySigStr;
-            if (fifths < 0)
-                keySigStr = StringFormat("%df", abs(fifths));
-            else if (fifths > 0)
-                keySigStr = StringFormat("%ds", fifths);
-            else
-                keySigStr = "0";
-            keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
-            if (key.child("cancel")) {
-                keySig->SetSigShowchange(BOOLEAN_true);
-            }
-            if (key.child("mode")) {
-                keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.select_node("mode").node().text().as_string()));
-            }
-        }
-        else if (key.child("key-step")) {
-            if (!keySig) keySig = new KeySig();
-            for (pugi::xml_node keyStep : key.children("key-step")) {
-                KeyAccid *keyAccid = new KeyAccid();
-                keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
-                if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
-                    data_ACCIDENTAL_GESTURAL accidValue
-                        = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
-                    keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
-                    if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
-                        keyAccid->SetAccid(
-                            ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
-                    }
-                }
-                keySig->AddChild(keyAccid);
-            }
-        }
-        if (key.attribute("id")) {
-            if (!keySig) keySig = new KeySig();
-            keySig->SetUuid(key.attribute("id").as_string());
-        }
-        if (keySig) keySig->SetVisible(ConvertWordToBool(key.attribute("print-object").as_string()));
-        // Add it if necessary
-        if (keySig) {
-            scoreDef->AddChild(keySig);
+        if (key) {
+            KeySig *meiKey = ConvertKey(key);
+            scoreDef->AddChild(meiKey);
         }
 
         if (time) {
@@ -3514,6 +3363,106 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
     if (beamStart.attribute("id")) beam->SetUuid(beamStart.attribute("id").as_string());
     AddLayerElement(layer, beam);
     m_elementStackMap.at(layer).push_back(beam);
+}
+
+Clef *MusicXmlInput::ConvertClef(const pugi::xml_node &clef)
+{
+    pugi::xml_node clefSign = clef.child("sign");
+    if (clefSign && (std::string(clefSign.text().as_string()) != "none")) {
+        Clef *meiClef = new Clef();
+        meiClef->SetColor(clef.attribute("color").as_string());
+        meiClef->SetVisible(ConvertWordToBool(clef.attribute("print-object").as_string()));
+        if (clef.attribute("id")) {
+            meiClef->SetUuid(clef.attribute("id").as_string());
+        }
+        meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign).substr(0, 4)));
+
+        // clef line
+        pugi::xml_node clefLine = clef.child("line");
+        if (clefLine.text()) {
+            if (meiClef->GetShape() != CLEFSHAPE_perc) {
+                meiClef->SetLine(clefLine.text().as_int());
+            }
+        }
+        else {
+            switch (meiClef->GetShape()) {
+                case CLEFSHAPE_C: meiClef->SetLine(3); break;
+                case CLEFSHAPE_F: meiClef->SetLine(4); break;
+                case CLEFSHAPE_G: meiClef->SetLine(2); break;
+                case CLEFSHAPE_TAB: meiClef->SetLine(5); break;
+                default: break;
+            }
+        }
+
+        // clef octave change
+        pugi::xml_node clefOctaveChange = clef.child("clef-octave-change");
+        if (clefOctaveChange) {
+            int change = clefOctaveChange.text().as_int();
+            switch (abs(change)) {
+                case 1: meiClef->SetDis(OCTAVE_DIS_8); break;
+                case 2: meiClef->SetDis(OCTAVE_DIS_15); break;
+                case 3: meiClef->SetDis(OCTAVE_DIS_22); break;
+                default: break;
+            }
+            if (change < 0) {
+                meiClef->SetDisPlace(STAFFREL_basic_below);
+            }
+            else if (change > 0) {
+                meiClef->SetDisPlace(STAFFREL_basic_above);
+            }
+        }
+        return meiClef;
+    }
+
+    return NULL;
+}
+
+KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
+{
+    KeySig *keySig = new KeySig();
+    keySig->SetVisible(ConvertWordToBool(key.attribute("print-object").as_string()));
+    if (key.attribute("id")) {
+        keySig->SetUuid(key.attribute("id").as_string());
+    }
+    if (key.child("fifths")) {
+        int fifths = key.child("fifths").text().as_int();
+        std::string keySigStr;
+        if (fifths < 0)
+            keySigStr = StringFormat("%df", abs(fifths));
+        else if (fifths > 0)
+            keySigStr = StringFormat("%ds", fifths);
+        else
+            keySigStr = "0";
+        keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
+
+        if (key.child("cancel")) {
+            keySig->SetSigShowchange(BOOLEAN_true);
+        }
+        if (key.child("mode")) {
+            const std::string xmlMode = key.child("mode").text().as_string();
+            if (std::strncmp(xmlMode.c_str(), "none", 4)) {
+                keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
+            }
+        }
+    }
+    else if (key.child("key-step")) {
+        for (pugi::xml_node keyStep : key.children("key-step")) {
+            KeyAccid *keyAccid = new KeyAccid();
+            keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
+            if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
+                data_ACCIDENTAL_GESTURAL accidValue
+                    = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
+                if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
+                    keyAccid->SetAccid(
+                        ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                }
+            }
+            keySig->AddChild(keyAccid);
+        }
+    }
+
+    return keySig;
 }
 
 //////////////////////////////////////////////////////////////////////////////
