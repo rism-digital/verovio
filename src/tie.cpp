@@ -110,7 +110,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     bool isShortTie = false;
     // shortTie correction cannot be applied for chords
-    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 6 * drawingUnit)) {
+    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit)) {
         isShortTie = true;
     }
 
@@ -189,7 +189,7 @@ data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startP
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     bool isShortTie = false;
     // shortTie correction cannot be applied for chords
-    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 6 * drawingUnit)) {
+    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit)) {
         isShortTie = true;
     }
 
