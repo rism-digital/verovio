@@ -386,7 +386,7 @@ int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *att
     const auto &option = doc->GetOptions()->m_spacingStaff;
     int spacing = option.GetValue() * doc->GetDrawingUnit(GetStaffSize());
 
-    if (!option.isSet() && attSpacing->HasSpacingStaff()) {
+    if (!option.IsSet() && attSpacing->HasSpacingStaff()) {
         spacing = attSpacing->GetSpacingStaff() * doc->GetDrawingUnit(100);
     }
     return spacing;
@@ -415,13 +415,13 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                 }
                 case SystemAligner::SpacingType::Brace: {
                     const auto &option = doc->GetOptions()->m_spacingBraceGroup;
-                    spacing = option.isSet() ? option.GetValue() * doc->GetDrawingUnit(GetStaffSize())
+                    spacing = option.IsSet() ? option.GetValue() * doc->GetDrawingUnit(GetStaffSize())
                                              : GetMinimumStaffSpacing(doc, scoreDefSpacing);
                     break;
                 }
                 case SystemAligner::SpacingType::Bracket: {
                     const auto &option = doc->GetOptions()->m_spacingBracketGroup;
-                    spacing = option.isSet() ? option.GetValue() * doc->GetDrawingUnit(GetStaffSize())
+                    spacing = option.IsSet() ? option.GetValue() * doc->GetDrawingUnit(GetStaffSize())
                                              : GetMinimumStaffSpacing(doc, scoreDefSpacing);
                     break;
                 }

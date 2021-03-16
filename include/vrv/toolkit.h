@@ -272,7 +272,7 @@ public:
      */
     ///@{
     bool SetScale(int scale);
-    int GetScale() { return m_scale.GetValue(); }
+    int GetScale() { return m_options->m_scale.GetValue(); }
     ///@}
 
     /**
@@ -333,7 +333,6 @@ public:
 private:
     Doc m_doc;
     View m_view;
-    OptionInt m_scale;
     FileFormat m_inputFrom;
     FileFormat m_outputTo;
 
