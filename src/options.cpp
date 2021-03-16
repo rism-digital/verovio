@@ -33,9 +33,6 @@ std::map<int, std::string> Option::s_footer
 std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_measureNumber
-    = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
-
 std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
     { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
@@ -896,8 +893,8 @@ Options::Options()
     m_measureMinWidth.Init(15, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
 
-    m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
-    m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
+    m_measureNumber.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
+    m_measureNumber.Init(0, 0, 64, false);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
