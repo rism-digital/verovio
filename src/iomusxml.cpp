@@ -1003,21 +1003,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
         m_slurStopStack.clear();
     }
-    if (!m_openDashesStack.empty()) { // open dashes without ending
-        std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
-        for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
-            LogWarning(
-                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetUuid().c_str());
-        }
-        m_openDashesStack.clear();
-    }
-    if (!m_bracketStack.empty()) { // open brackets without ending
-        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
-        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
-        }
-        m_bracketStack.clear();
-    }
     if (!m_glissStack.empty()) {
         std::vector<Gliss *>::iterator iter;
         for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
@@ -1342,7 +1327,22 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         i++;
     }
 
-    // clean up stack of clefs and hairpins, since we don't need them to persist between parts
+    // clean up part specific stacks
+    if (!m_openDashesStack.empty()) { // open dashes without ending
+        std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
+        for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+            LogWarning(
+                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetUuid().c_str());
+        }
+        m_openDashesStack.clear();
+    }
+    if (!m_bracketStack.empty()) { // open brackets without ending
+        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
+        }
+        m_bracketStack.clear();
+    }
     if (!m_clefChangeStack.empty()) {
         for (musicxml::ClefChange iter : m_clefChangeStack) {
             if (iter.isFirst)
