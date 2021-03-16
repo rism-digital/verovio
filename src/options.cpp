@@ -893,9 +893,9 @@ Options::Options()
     m_measureMinWidth.Init(15, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
 
-    m_measureNumber.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
-    m_measureNumber.Init(0, 0, 64, false);
-    this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
+    m_mnumInterval.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
+    m_mnumInterval.Init(0, 0, 64, false);
+    this->Register(&m_mnumInterval, "mnumInterval", &m_generalLayout);
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");

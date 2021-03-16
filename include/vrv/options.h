@@ -564,7 +564,7 @@ public:
     OptionDbl m_lyricTopMinMargin;
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
-    OptionInt m_measureNumber;
+    OptionInt m_mnumInterval;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;

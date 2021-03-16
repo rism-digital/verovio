@@ -923,7 +923,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
             // Draw non-generated measure numbers
             // If mnumInterval is 0, draw system starting measure numbers > 1,
             // otherwise, draw every (mnumInterval)th measure number.
-            int mnumInterval = m_options->m_measureNumber.GetValue();
+            int mnumInterval = m_options->m_mnumInterval.GetValue();
             if ((mnumInterval == 0 && measure == systemStart && measure->GetN() != "0" && measure->GetN() != "1")
                 || !mnum->IsGenerated()
                 || (mnumInterval >= 1 && (std::atoi(measure->GetN().c_str()) % mnumInterval == 0))
