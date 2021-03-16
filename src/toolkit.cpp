@@ -68,7 +68,9 @@ char *Toolkit::m_humdrumBuffer = NULL;
 
 Toolkit::Toolkit(bool initFont)
 {
-    m_scale = DEFAULT_SCALE;
+    m_scale.Init(DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
+    m_scale.SetInfo("Scale percent", "Scale of the output in percent");
+    m_scale.SetKey("scale");
     m_inputFrom = AUTO;
 
     m_humdrumBuffer = NULL;
@@ -107,13 +109,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
 
 bool Toolkit::SetScale(int scale)
 {
-    if (scale < MIN_SCALE || scale > MAX_SCALE) {
-        LogError("Scale out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE,
-            MAX_SCALE);
-        return false;
-    }
-    m_scale = scale;
-    return true;
+    return m_scale.SetValue(scale);
 }
 
 bool Toolkit::SetOutputTo(std::string const &outputTo)
@@ -1268,7 +1264,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // set dimensions
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
-    double userScale = m_view.GetPPUFactor() * m_scale / 100;
+    double userScale = m_view.GetPPUFactor() * m_scale.GetValue() / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
     if (m_doc.GetType() == Facs) {
