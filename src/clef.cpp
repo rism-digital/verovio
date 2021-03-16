@@ -103,20 +103,10 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
     }
 
     switch (notationtype) {
-        case NOTATIONTYPE_mensural_black:
-            // mensural clefs
-            switch (this->GetShape()) {
-                case CLEFSHAPE_G:
-                    // G clef doesn't exist in black notation, so should never get here, but just in case.
-                    return SMUFL_E901_mensuralGclefPetrucci;
-                    break;
-                case CLEFSHAPE_F:
-                    return SMUFL_E902_chantFclef;
-                    break;
-                default:
-                    return SMUFL_E906_chantCclef;
-                    break;
-            }
+        case NOTATIONTYPE_neume:
+            // neume clefs
+            return (this->GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
+            break;
         case NOTATIONTYPE_mensural:
         case NOTATIONTYPE_mensural_white:
             // mensural clefs
@@ -131,10 +121,18 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
                     return SMUFL_E909_mensuralCclefPetrucciPosMiddle;
                     break;
             }
-        case NOTATIONTYPE_neume:
-            // neume clefs
-            return (this->GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
-            break;
+        case NOTATIONTYPE_mensural_black:
+            switch (this->GetShape()) {
+                case CLEFSHAPE_C:
+                    return SMUFL_E906_chantCclef;
+                    break;
+                case CLEFSHAPE_F:
+                    return SMUFL_E902_chantFclef;
+                    break;
+                default:
+                    // G clef doesn't exist in black notation, so should never get here, but just in case.
+                    if (!this->GetDis()) return SMUFL_E901_mensuralGclefPetrucci;
+            }
         default:
             // cmn clefs
             switch (this->GetShape()) {
