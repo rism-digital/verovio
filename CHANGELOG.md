@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
 
 ## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
