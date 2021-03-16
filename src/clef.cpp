@@ -59,10 +59,15 @@ int Clef::GetClefLocOffset() const
     }
 
     int offset = 0;
-    if (GetShape() == CLEFSHAPE_G)
+    if (GetShape() == CLEFSHAPE_G) {
         offset = -4;
-    else if (GetShape() == CLEFSHAPE_F)
+    }
+    else if (GetShape() == CLEFSHAPE_GG) {
+        offset = 3;
+    }
+    else if (GetShape() == CLEFSHAPE_F) {
         offset = 4;
+    }
 
     offset += (GetLine() - 1) * 2;
 
@@ -71,6 +76,9 @@ int Clef::GetClefLocOffset() const
         disPlace = -1;
     else if (GetDisPlace() == STAFFREL_basic_below)
         disPlace = 1;
+
+    // ignore disPlace for gClef8vbOld
+    if (GetShape() == CLEFSHAPE_GG) disPlace = 0;
 
     if ((disPlace != 0) && (GetDis() != OCTAVE_DIS_NONE)) offset += (disPlace * (GetDis() - 1));
 
