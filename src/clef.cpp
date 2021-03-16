@@ -29,6 +29,7 @@ Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), 
 {
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_LINELOC);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
     RegisterAttClass(ATT_VISIBILITY);
@@ -43,6 +44,7 @@ void Clef::Reset()
     LayerElement::Reset();
     ResetClefShape();
     ResetColor();
+    ResetExtSym();
     ResetLineLoc();
     ResetOctaveDisplacement();
     ResetVisibility();
@@ -57,10 +59,15 @@ int Clef::GetClefLocOffset() const
     }
 
     int offset = 0;
-    if (GetShape() == CLEFSHAPE_G)
+    if (GetShape() == CLEFSHAPE_G) {
         offset = -4;
-    else if (GetShape() == CLEFSHAPE_F)
+    }
+    else if (GetShape() == CLEFSHAPE_GG) {
+        offset = 3;
+    }
+    else if (GetShape() == CLEFSHAPE_F) {
         offset = 4;
+    }
 
     offset += (GetLine() - 1) * 2;
 
@@ -69,6 +76,9 @@ int Clef::GetClefLocOffset() const
         disPlace = -1;
     else if (GetDisPlace() == STAFFREL_basic_below)
         disPlace = 1;
+
+    // ignore disPlace for gClef8vbOld
+    if (GetShape() == CLEFSHAPE_GG) disPlace = 0;
 
     if ((disPlace != 0) && (GetDis() != OCTAVE_DIS_NONE)) offset += (disPlace * (GetDis() - 1));
 
@@ -79,9 +89,91 @@ int Clef::GetClefLocOffset() const
 // Static methods for Clef
 //----------------------------------------------------------------------------
 
-int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place)
+wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
 {
-    return place << 24 | octaveDis << 16 | line << 8 | shape;
+    // If there is glyph.num, prioritize it
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    switch (notationtype) {
+        case NOTATIONTYPE_mensural_black:
+            // mensural clefs
+            switch (this->GetShape()) {
+                case CLEFSHAPE_G:
+                    // G clef doesn't exist in black notation, so should never get here, but just in case.
+                    return SMUFL_E901_mensuralGclefPetrucci;
+                    break;
+                case CLEFSHAPE_F:
+                    return SMUFL_E902_chantFclef;
+                    break;
+                default:
+                    return SMUFL_E906_chantCclef;
+                    break;
+            }
+        case NOTATIONTYPE_mensural:
+        case NOTATIONTYPE_mensural_white:
+            // mensural clefs
+            switch (this->GetShape()) {
+                case CLEFSHAPE_G:
+                    return SMUFL_E901_mensuralGclefPetrucci;
+                    break;
+                case CLEFSHAPE_F:
+                    return SMUFL_E904_mensuralFclefPetrucci;
+                    break;
+                default:
+                    return SMUFL_E909_mensuralCclefPetrucciPosMiddle;
+                    break;
+            }
+        case NOTATIONTYPE_neume:
+            // neume clefs
+            return (this->GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
+            break;
+        default:
+            // cmn clefs
+            switch (this->GetShape()) {
+                case CLEFSHAPE_G:
+                    switch (this->GetDis()) {
+                        case OCTAVE_DIS_8:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
+                                                                                 : SMUFL_E052_gClef8vb;
+                            break;
+                        case OCTAVE_DIS_15:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
+                                                                                 : SMUFL_E051_gClef15mb;
+                            break;
+                        default: return SMUFL_E050_gClef; break;
+                    }
+                case CLEFSHAPE_GG: return SMUFL_E055_gClef8vbOld;
+                case CLEFSHAPE_F:
+                    switch (this->GetDis()) {
+                        case OCTAVE_DIS_8:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E065_fClef8va
+                                                                                 : SMUFL_E064_fClef8vb;
+                            break;
+                        case OCTAVE_DIS_15:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E066_fClef15ma
+                                                                                 : SMUFL_E063_fClef15mb;
+                            break;
+                        default: return SMUFL_E062_fClef; break;
+                    }
+                case CLEFSHAPE_C:
+                    switch (this->GetDis()) {
+                        case OCTAVE_DIS_8: return SMUFL_E05D_cClef8vb; break;
+                        default: return SMUFL_E05C_cClef; break;
+                    }
+                case CLEFSHAPE_perc: return SMUFL_E069_unpitchedPercussionClef1;
+                default: break;
+            }
+    }
+
+    return 0;
 }
 
 //----------------------------------------------------------------------------
