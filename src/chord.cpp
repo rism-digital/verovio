@@ -673,7 +673,9 @@ void Chord::CaltOptimalDots(Dots *dots, Staff* staff, const std::set<int> &noteL
     //
     std::vector<int> firstElem, secondElem;
     const std::set<int> *firstRef, *secondRef;
-    const bool isUpwardDirection = (GetDrawingStemDir() == STEMDIRECTION_up);
+    Staff *currentStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    const bool isUpwardDirection
+        = (GetDrawingStemDir() == STEMDIRECTION_up) || (currentStaff->GetChildCount(STAFF) == 1);
     // On upper layer normal order positioning is prioritized, hence assign positions in the same order as they were
     // calculated. This way, if differences in positioning are the same for both normal/reverse orders, normal is going
     // to be selected

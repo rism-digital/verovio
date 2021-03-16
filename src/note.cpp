@@ -1011,8 +1011,8 @@ int Note::CalcDots(FunctorParams *functorParams)
         // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
         const bool isDotShifted(loc % 2 == 0);
         if (isDotShifted) {
-            Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-            if (GetDrawingStemDir() == STEMDIRECTION_up)
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            if ((GetDrawingStemDir() == STEMDIRECTION_up) || (staff->GetChildCount(STAFF) == 1))
                 ++loc;
             else
                 --loc;
