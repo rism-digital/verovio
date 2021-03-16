@@ -1018,12 +1018,6 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "format") {
-                LogWarning("Option format is deprecated; use from instead");
-                if (json.has<jsonxx::String>("format")) {
-                    SetInputFrom(json.get<jsonxx::String>("format"));
-                }
-            }
             if (iter->first == "from") {
                 if (json.has<jsonxx::String>("from")) {
                     SetInputFrom(json.get<jsonxx::String>("from"));
@@ -1040,136 +1034,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                 }
             }
             // Deprecated option
-            else if (iter->first == "appXPathQueries") {
-                LogWarning("Option appXPathQueries is deprecated; use appXPathQuery with an array instead");
-                jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
-                std::vector<std::string> queries;
-                Option *opt = m_options->GetItems()->at("appXPathQuery");
-                assert(opt);
-                int i;
-                for (i = 0; i < (int)values.size(); ++i) {
-                    if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
-                }
-                opt->SetValueArray(queries);
-            }
-            else if (iter->first == "border") {
-                LogWarning("Option border is deprecated; use pageMarginBottom, pageMarginLeft, pageMarginRight and "
-                           "pageMarginTop instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("border")) {
-                    double border = json.get<jsonxx::Number>("border");
-                    opt = m_options->GetItems()->at("pageMarginBottom");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginLeft");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginRight");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginTop");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                }
-            }
-            else if (iter->first == "choiceXPathQueries") {
-                LogWarning("Option choiceXPathQueries is deprecated; use choiceXPathQuery with an array instead");
-                jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
-                std::vector<std::string> queries;
-                Option *opt = m_options->GetItems()->at("choiceXPathQuery");
-                assert(opt);
-                int i;
-                for (i = 0; i < (int)values.size(); ++i) {
-                    if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
-                }
-                opt->SetValueArray(queries);
-            }
-            else if (iter->first == "condenseEncoded") {
-                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("condense");
-                assert(opt);
-                if (json.has<jsonxx::Number>("condenseEncoded")) {
-                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
-                        opt->SetValue("encoded");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "ignoreLayout") {
-                LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("breaks");
-                assert(opt);
-                if (json.has<jsonxx::Number>("ignoreLayout")) {
-                    if ((int)json.get<jsonxx::Number>("ignoreLayout") == 1) {
-                        opt->SetValue("auto");
-                    }
-                    else {
-                        opt->SetValue("encoded");
-                    }
-                }
-            }
-            else if (iter->first == "inputFormat") {
-                LogWarning("Option inputFormat is deprecated; use from instead");
-                if (json.has<jsonxx::String>("inputFormat")) {
-                    SetInputFrom(json.get<jsonxx::String>("inputFormat"));
-                }
-            }
-            else if (iter->first == "noFooter") {
-                LogWarning("Option noFooter is deprecated; use footer: \"auto\"|\"encoded\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("footer");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noFooter")) {
-                    if ((int)json.get<jsonxx::Number>("noFooter") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "noLayout") {
-                LogWarning("Option noLayout is deprecated; use breaks: \"auto\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("breaks");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noLayout")) {
-                    if ((int)json.get<jsonxx::Number>("noLayout") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "noHeader") {
-                LogWarning("Option noHeader is deprecated; use header: \"auto\"|\"encoded\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("header");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noHeader")) {
-                    if ((int)json.get<jsonxx::Number>("noHeader") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "slurThickness") {
-                LogWarning("Option slurThickness is deprecated; use slurMidpointThickness instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("slurThickness")) {
-                    double thickness = json.get<jsonxx::Number>("slurThickness");
-                    opt = m_options->GetItems()->at("slurMidpointThickness");
-                    assert(opt);
-                    opt->SetValueDbl(thickness);
-                }
-            }
+            /*
             else if (iter->first == "tieThickness") {
                 vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
                 Option *opt = NULL;
@@ -1180,6 +1045,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     opt->SetValueDbl(thickness);
                 }
             }
+            */
             else {
                 LogError("Unsupported option '%s'", iter->first.c_str());
             }
