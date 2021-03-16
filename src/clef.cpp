@@ -81,7 +81,7 @@ int Clef::GetClefLocOffset() const
 // Static methods for Clef
 //----------------------------------------------------------------------------
 
-wchar_t Clef::GetClefGlyph() const
+wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
 {
     // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
@@ -94,36 +94,67 @@ wchar_t Clef::GetClefGlyph() const
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
-    // cmn clefs
-    switch (this->GetShape()) {
-        case CLEFSHAPE_G:
-            switch (this->GetDis()) {
-                case OCTAVE_DIS_8:
-                    return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va : SMUFL_E052_gClef8vb;
-                    break;
-                case OCTAVE_DIS_15:
-                    return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va : SMUFL_E051_gClef15mb;
-                    break;
-                default: return SMUFL_E050_gClef; break;
+    switch (notationtype) {
+        case NOTATIONTYPE_mensural:
+            //
+            if (notationtype == NOTATIONTYPE_mensural_black) {
+                if (this->GetShape() == CLEFSHAPE_G)
+                    // G clef doesn't exist in black notation, so should never get here, but just in case.
+                    return SMUFL_E901_mensuralGclefPetrucci;
+                else if (this->GetShape() == CLEFSHAPE_F)
+                    return SMUFL_E902_chantFclef;
+                else if (this->GetShape() == CLEFSHAPE_C)
+                    return SMUFL_E906_chantCclef;
             }
-        case CLEFSHAPE_GG: return SMUFL_E055_gClef8vbOld;
-        case CLEFSHAPE_F:
-            switch (this->GetDis()) {
-                case OCTAVE_DIS_8:
-                    return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E065_fClef8va : SMUFL_E064_fClef8vb;
-                    break;
-                case OCTAVE_DIS_15:
-                    return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E066_fClef15ma : SMUFL_E063_fClef15mb;
-                    break;
-                default: return SMUFL_E062_fClef; break;
+            else {
+                if (this->GetShape() == CLEFSHAPE_G)
+                    return SMUFL_E901_mensuralGclefPetrucci;
+                else if (this->GetShape() == CLEFSHAPE_F)
+                    return SMUFL_E904_mensuralFclefPetrucci;
+                else if (this->GetShape() == CLEFSHAPE_C)
+                    return SMUFL_E909_mensuralCclefPetrucciPosMiddle;
             }
-        case CLEFSHAPE_C:
-            switch (this->GetDis()) {
-                case OCTAVE_DIS_8: return SMUFL_E05D_cClef8vb; break;
-                default: return SMUFL_E05C_cClef; break;
+            break;
+        case NOTATIONTYPE_neume:
+            // neume clefs
+            return (this->GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
+            break;
+        default:
+            // cmn clefs
+            switch (this->GetShape()) {
+                case CLEFSHAPE_G:
+                    switch (this->GetDis()) {
+                        case OCTAVE_DIS_8:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
+                                                                                 : SMUFL_E052_gClef8vb;
+                            break;
+                        case OCTAVE_DIS_15:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
+                                                                                 : SMUFL_E051_gClef15mb;
+                            break;
+                        default: return SMUFL_E050_gClef; break;
+                    }
+                case CLEFSHAPE_GG: return SMUFL_E055_gClef8vbOld;
+                case CLEFSHAPE_F:
+                    switch (this->GetDis()) {
+                        case OCTAVE_DIS_8:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E065_fClef8va
+                                                                                 : SMUFL_E064_fClef8vb;
+                            break;
+                        case OCTAVE_DIS_15:
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E066_fClef15ma
+                                                                                 : SMUFL_E063_fClef15mb;
+                            break;
+                        default: return SMUFL_E062_fClef; break;
+                    }
+                case CLEFSHAPE_C:
+                    switch (this->GetDis()) {
+                        case OCTAVE_DIS_8: return SMUFL_E05D_cClef8vb; break;
+                        default: return SMUFL_E05C_cClef; break;
+                    }
+                case CLEFSHAPE_perc: return SMUFL_E069_unpitchedPercussionClef1;
+                default: break;
             }
-        case CLEFSHAPE_perc: return SMUFL_E069_unpitchedPercussionClef1;
-        default: break;
     }
 
     return 0;

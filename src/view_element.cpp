@@ -588,37 +588,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         y = staff->GetDrawingY();
         x = element->GetDrawingX();
     }
-    wchar_t sym = clef->GetClefGlyph();
-    bool isMensural = Att::IsMensuralType(staff->m_drawingNotationType);
-    bool isNeume = staff->m_drawingNotationType == NOTATIONTYPE_neume;
 
-    // mensural clefs
-    if (isMensural) {
-        if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
-            if (sym == SMUFL_E050_gClef)
-                // G clef doesn't exist in black notation, so should never get here, but just in case.
-                sym = SMUFL_E901_mensuralGclefPetrucci;
-            else if (sym == SMUFL_E05C_cClef)
-                sym = SMUFL_E906_chantCclef;
-            else if (sym == SMUFL_E062_fClef)
-                sym = SMUFL_E902_chantFclef;
-        }
-        else {
-            if (sym == SMUFL_E050_gClef)
-                sym = SMUFL_E901_mensuralGclefPetrucci;
-            else if (sym == SMUFL_E05C_cClef)
-                sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
-            else if (sym == SMUFL_E062_fClef)
-                sym = SMUFL_E904_mensuralFclefPetrucci;
-        }
-    }
-    // neume clefs
-    else if (isNeume) {
-        if (clef->GetShape() == CLEFSHAPE_C)
-            sym = SMUFL_E906_chantCclef;
-        else if (clef->GetShape() == CLEFSHAPE_F)
-            sym = SMUFL_E902_chantFclef;
-    }
+    wchar_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
 
     if (sym == 0) {
         clef->SetEmptyBB();
