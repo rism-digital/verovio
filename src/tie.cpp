@@ -309,6 +309,7 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
     ClassIdsComparison cmp({ DOT, DOTS, FLAG });
     durElement->FindAllDescendantByComparison(&objects, &cmp);
 
+    int adjust = 0;
     int dotsPosition = 0;
     for (auto object : objects) {
         // if we have possible overlap with dots, we need to move tie up/down to avoid it. This happens only for the
@@ -354,9 +355,7 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
             else
                 continue;
 
-            for (int i = 0; i < 4; ++i) {
-                bezier[i].y += intersection;
-            }
+            if (std::abs(intersection) > std::abs(adjust)) adjust = intersection;
         }
         // In case there is overlap with flag, we need to move starting point to the side, to avoid it
         else if (object->Is(FLAG)) {
@@ -377,6 +376,12 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
             }
         }
     }
+    if (adjust) {
+        for (int i = 0; i < 4; ++i) {
+            bezier[i].y += adjust;
+        }
+    }
+
 }
 //----------------------------------------------------------------------------
 // Tie functor methods
