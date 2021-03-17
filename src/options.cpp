@@ -61,6 +61,12 @@ void Option::SetInfo(const std::string &title, const std::string &description)
     m_description = description;
 }
 
+void Option::SetShortOption(char shortOption, bool isCmdOnly)
+{
+    m_shortOption = shortOption;
+    m_isCmdOnly = isCmdOnly;
+}
+
 bool Option::SetValueBool(bool value)
 {
     // If not overriden
@@ -101,6 +107,83 @@ std::string Option::GetDefaultStrValue() const
     // If not overriden
     assert(false);
     return "[unspecified]";
+}
+
+jsonxx::Object Option::ToJson() const
+{
+    jsonxx::Object opt;
+    opt << "title" << this->GetTitle();
+    opt << "description" << this->GetDescription();
+
+    const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(this);
+    const OptionInt *optInt = dynamic_cast<const OptionInt *>(this);
+    const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(this);
+    const OptionString *optString = dynamic_cast<const OptionString *>(this);
+    const OptionArray *optArray = dynamic_cast<const OptionArray *>(this);
+    const OptionBool *optBool = dynamic_cast<const OptionBool *>(this);
+
+    if (optBool) {
+        opt << "type"
+            << "bool";
+        opt << "default" << optBool->GetDefault();
+    }
+    else if (optDbl) {
+        opt << "type"
+            << "double";
+        jsonxx::Value value(optDbl->GetDefault());
+        value.precision_ = 2;
+        opt << "default" << value;
+        value = optDbl->GetMin();
+        value.precision_ = 2;
+        opt << "min" << value;
+        value = optDbl->GetMax();
+        value.precision_ = 2;
+        opt << "max" << value;
+    }
+    else if (optInt) {
+        opt << "type"
+            << "int";
+        opt << "default" << optInt->GetDefault();
+        opt << "min" << optInt->GetMin();
+        opt << "max" << optInt->GetMax();
+    }
+    else if (optString) {
+        opt << "type"
+            << "std::string";
+        opt << "default" << optString->GetDefault();
+    }
+    else if (optArray) {
+        opt << "type"
+            << "array";
+        std::vector<std::string> strValues = optArray->GetDefault();
+        std::vector<std::string>::iterator strIter;
+        jsonxx::Array values;
+        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
+            values << (*strIter);
+        }
+        opt << "default" << values;
+    }
+    else if (optIntMap) {
+        opt << "type"
+            << "std::string-list";
+        opt << "default" << optIntMap->GetDefaultStrValue();
+        std::vector<std::string> strValues = optIntMap->GetStrValues(false);
+        std::vector<std::string>::iterator strIter;
+        jsonxx::Array values;
+        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
+            values << (*strIter);
+        }
+        opt << "values" << values;
+    }
+
+    if (this->IsCmdOnly()) {
+        opt << "cmdOnly" << true;
+    }
+    if (this->GetShortOption()) {
+        opt << "shortOption" << std::string(1, this->GetShortOption());
+    }
+
+    return opt;
 }
 
 //----------------------------------------------------------------------------
@@ -609,6 +692,80 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
 
 Options::Options()
 {
+    /********* Base (short) option *********/
+
+    // These are not registered in a group and not listed in Toolkit::GetOptions
+    // There are listed in Toolkit::GetAvailableOptions through Options::GetBaseOptGrp
+
+    m_baseOptions.SetLabel("Base short options", "0-base");
+
+    m_standardOutput.SetInfo(
+        "Standard output", "Use \"-\" as input file or set the \"--stdin\" option for reading from the standard input");
+    m_standardOutput.Init(false);
+    m_standardOutput.SetKey("stdin");
+    m_standardOutput.SetShortOption(' ', true);
+    m_baseOptions.AddOption(&m_standardOutput);
+
+    m_help.SetInfo("Help", "Display this message");
+    m_help.Init(false);
+    m_help.SetKey("help");
+    m_help.SetShortOption('h', true);
+    m_baseOptions.AddOption(&m_help);
+
+    m_allPpages.SetInfo("All pages", "Output all pages");
+    m_allPpages.Init(false);
+    m_allPpages.SetKey("allPages");
+    m_allPpages.SetShortOption('a', true);
+    m_baseOptions.AddOption(&m_allPpages);
+
+    m_inputFormat.SetInfo("Input from",
+        "Select input format from: \"abc\", \"darms\", \"humdrum\", \"mei\", \"pae\", \"xml\" (musicxml)");
+    m_inputFormat.Init("mei");
+    m_inputFormat.SetKey("inputFrom");
+    m_inputFormat.SetShortOption('f', true);
+    m_baseOptions.AddOption(&m_inputFormat);
+
+    m_outfile.SetInfo("Output file", "Output file name (use \"-\" as file name for standard output)");
+    m_outfile.Init("svg");
+    m_outfile.SetKey("outfile");
+    m_outfile.SetShortOption('o', true);
+    m_baseOptions.AddOption(&m_outfile);
+
+    m_page.SetInfo("Page", "Select the page to engrave (default is 1)");
+    m_page.Init(0, 0, 0);
+    m_page.SetKey("page");
+    m_page.SetShortOption('p', true);
+    m_baseOptions.AddOption(&m_page);
+
+    m_resourcePath.SetInfo("Resource path", "Path to the directory with Verovio resources");
+    m_resourcePath.Init("/usr/local/share/verovio");
+    m_resourcePath.SetKey("resourcePath");
+    m_resourcePath.SetShortOption('r', true);
+    m_baseOptions.AddOption(&m_resourcePath);
+
+    m_scale.SetInfo("Scale percent", "Scale of the output in percent");
+    m_scale.Init(DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
+    m_scale.SetKey("scale");
+    m_scale.SetShortOption('s', false);
+
+    m_outputTo.SetInfo("Output to", "Select output format to: \"mei\", \"pb-mei\", \"svg\", or \"midi\"");
+    m_outputTo.Init("svg");
+    m_outputTo.SetKey("outputTo");
+    m_outputTo.SetShortOption('t', true);
+    m_baseOptions.AddOption(&m_outputTo);
+
+    m_version.SetInfo("Version number", "Display the version number");
+    m_version.Init(false);
+    m_version.SetKey("version");
+    m_version.SetShortOption('v', true);
+    m_baseOptions.AddOption(&m_version);
+
+    m_xmlIdSeed.SetInfo("XML IDs seed", "Seed the random number generator for XML IDs (default is random)");
+    m_xmlIdSeed.Init(0, 0, 0);
+    m_xmlIdSeed.SetKey("xmlIdSeed");
+    m_xmlIdSeed.SetShortOption('x', false);
+    m_baseOptions.AddOption(&m_xmlIdSeed);
+
     /********* General *********/
 
     m_general.SetLabel("Input and page layout options", "1-general");
@@ -647,6 +804,10 @@ Options::Options()
     m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
+
+    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
+    m_expand.Init("");
+    this->Register(&m_expand, "expand", &m_general);
 
     m_humType.SetInfo("Humdrum type", "Include type attributes when importing from Humdrum");
     m_humType.Init(false);
@@ -730,9 +891,9 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
-    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
-    m_expand.Init("");
-    this->Register(&m_expand, "expand", &m_general);
+    m_removeIds.SetInfo("Remove IDs in MEI", "Remove XML IDs in the MEI output that are not referenced");
+    m_removeIds.Init(false);
+    this->Register(&m_removeIds, "removeIds", &m_general);
 
     m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
     m_shrinkToFit.Init(false);
@@ -1233,20 +1394,14 @@ Options::Options()
 
     /********* Deprecated options *********/
 
+    /*
     m_deprecated.SetLabel("Deprecated options", "Deprecated");
     m_grps.push_back(&m_deprecated);
 
     m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
     m_condenseEncoded.Init(false);
     this->Register(&m_condenseEncoded, "condenseEncoded", &m_deprecated);
-
-    m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
-    m_slurThickness.Init(0.6, 0.2, 2);
-    this->Register(&m_slurThickness, "slurThickness", &m_deprecated);
-
-    m_tieThickness.SetInfo("Tie  thickness", "The tie thickness in MEI units");
-    m_tieThickness.Init(0.5, 0.2, 1.0);
-    this->Register(&m_tieThickness, "tieThickness", &m_deprecated);
+    */
 
     /*
     // Example of a staffRel param
@@ -1289,7 +1444,7 @@ Options::~Options() {}
 
 void Options::Sync()
 {
-    if (!m_engravingDefaults.isSet()) return;
+    if (!m_engravingDefaults.IsSet()) return;
     // override default or passed engravingDefaults with explicitly set values
     std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = {
         { "staffLineThickness", &m_staffLineWidth }, //
@@ -1314,7 +1469,7 @@ void Options::Sync()
     };
 
     for (auto &pair : engravingDefaults) {
-        if (pair.second->isSet()) continue;
+        if (pair.second->IsSet()) continue;
 
         const double jsonValue = m_engravingDefaults.GetDoubleValue({ "engravingDefaults", pair.first });
         pair.second->SetValueDbl(jsonValue * 2);
@@ -1329,6 +1484,27 @@ void Options::Register(Option *option, const std::string &key, OptionGrp *grp)
     m_items[key] = option;
     option->SetKey(key);
     grp->AddOption(option);
+}
+
+jsonxx::Object Options::GetBaseOptGrp()
+{
+    jsonxx::Object grpBase;
+    jsonxx::Object baseOpts;
+    grpBase << "name" << m_baseOptions.GetLabel();
+
+    const std::vector<Option *> *options = this->GetBaseOptions();
+    for (auto const &option : *options) {
+        baseOpts << option->GetKey() << option->ToJson();
+    }
+
+    grpBase << "options" << baseOpts;
+
+    return grpBase;
+}
+
+const std::vector<Option *> *Options::GetBaseOptions()
+{
+    return m_baseOptions.GetOptions();
 }
 
 } // namespace vrv

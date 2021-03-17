@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
 
 ## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
