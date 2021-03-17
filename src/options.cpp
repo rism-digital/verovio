@@ -747,6 +747,7 @@ Options::Options()
     m_scale.Init(DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
     m_scale.SetKey("scale");
     m_scale.SetShortOption('s', false);
+    m_baseOptions.AddOption(&m_scale);
 
     m_outputTo.SetInfo("Output to", "Select output format to: \"mei\", \"pb-mei\", \"svg\", or \"midi\"");
     m_outputTo.Init("svg");
