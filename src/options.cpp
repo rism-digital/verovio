@@ -718,12 +718,12 @@ Options::Options()
     m_allPpages.SetShortOption('a', true);
     m_baseOptions.AddOption(&m_allPpages);
 
-    m_inputFormat.SetInfo("Input from",
+    m_inputFrom.SetInfo("Input from",
         "Select input format from: \"abc\", \"darms\", \"humdrum\", \"mei\", \"pae\", \"xml\" (musicxml)");
-    m_inputFormat.Init("mei");
-    m_inputFormat.SetKey("inputFrom");
-    m_inputFormat.SetShortOption('f', true);
-    m_baseOptions.AddOption(&m_inputFormat);
+    m_inputFrom.Init("mei");
+    m_inputFrom.SetKey("inputFrom");
+    m_inputFrom.SetShortOption('f', false);
+    m_baseOptions.AddOption(&m_inputFrom);
 
     m_outfile.SetInfo("Output file", "Output file name (use \"-\" as file name for standard output)");
     m_outfile.Init("svg");

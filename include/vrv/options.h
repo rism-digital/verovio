@@ -528,7 +528,7 @@ public:
     OptionBool m_standardOutput;
     OptionBool m_help;
     OptionBool m_allPpages;
-    OptionString m_inputFormat;
+    OptionString m_inputFrom;
     OptionString m_outfile;
     OptionInt m_page;
     OptionString m_resourcePath;
