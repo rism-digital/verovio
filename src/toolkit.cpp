@@ -68,7 +68,6 @@ char *Toolkit::m_humdrumBuffer = NULL;
 
 Toolkit::Toolkit(bool initFont)
 {
-    m_scale = DEFAULT_SCALE;
     m_inputFrom = AUTO;
 
     m_humdrumBuffer = NULL;
@@ -107,13 +106,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
 
 bool Toolkit::SetScale(int scale)
 {
-    if (scale < MIN_SCALE || scale > MAX_SCALE) {
-        LogError("Scale out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE,
-            MAX_SCALE);
-        return false;
-    }
-    m_scale = scale;
-    return true;
+    return m_options->m_scale.SetValue(scale);
 }
 
 bool Toolkit::SetOutputTo(std::string const &outputTo)
@@ -137,7 +130,7 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
         m_outputTo = PAE;
     }
     else if (outputTo != "svg") {
-        LogError("Output format can only be: mei, pb-mei, humdrum, midi, timemap or svg");
+        LogError("Output format '%s' is not supported", outputTo.c_str());
         return false;
     }
     return true;
@@ -185,7 +178,7 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
         m_inputFrom = AUTO;
     }
     else {
-        LogError("Input format can only be: mei, humdrum, pae, abc, musicxml or darms");
+        LogError("Input format '%s' is not supported", inputFrom.c_str());
         return false;
     }
     return true;
@@ -802,7 +795,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
     int pageNo = 0;
-    bool removeIds = false;
+    bool removeIds = m_options->m_removeIds.GetValue();
 
     jsonxx::Object json;
 
@@ -904,91 +897,24 @@ std::string Toolkit::GetAvailableOptions() const
     jsonxx::Object o;
     jsonxx::Object grps;
 
-    std::vector<OptionGrp *> *grp = m_options->GetGrps();
-    std::vector<OptionGrp *>::iterator grpIter;
+    grps << "0-base" << m_options->GetBaseOptGrp();
 
-    for (grpIter = grp->begin(); grpIter != grp->end(); ++grpIter) {
+    std::vector<OptionGrp *> *optionGrps = m_options->GetGrps();
+    for (auto const &optionGrp : *optionGrps) {
 
         jsonxx::Object grp;
-        grp << "name" << (*grpIter)->GetLabel();
+        grp << "name" << optionGrp->GetLabel();
 
         jsonxx::Object opts;
 
-        const std::vector<Option *> *options = (*grpIter)->GetOptions();
-        std::vector<Option *>::const_iterator iter;
+        const std::vector<Option *> *options = optionGrp->GetOptions();
 
-        for (iter = options->begin(); iter != options->end(); ++iter) {
-
-            jsonxx::Object opt;
-            opt << "title" << (*iter)->GetTitle();
-            opt << "description" << (*iter)->GetDescription();
-
-            const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
-            const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
-            const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(*iter);
-            const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
-            const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
-            const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
-
-            if (optBool) {
-                opt << "type"
-                    << "bool";
-                opt << "default" << optBool->GetDefault();
-            }
-            else if (optDbl) {
-                opt << "type"
-                    << "double";
-                jsonxx::Value value(optDbl->GetDefault());
-                value.precision_ = 2;
-                opt << "default" << value;
-                value = optDbl->GetMin();
-                value.precision_ = 2;
-                opt << "min" << value;
-                value = optDbl->GetMax();
-                value.precision_ = 2;
-                opt << "max" << value;
-            }
-            else if (optInt) {
-                opt << "type"
-                    << "int";
-                opt << "default" << optInt->GetDefault();
-                opt << "min" << optInt->GetMin();
-                opt << "max" << optInt->GetMax();
-            }
-            else if (optString) {
-                opt << "type"
-                    << "std::string";
-                opt << "default" << optString->GetDefault();
-            }
-            else if (optArray) {
-                opt << "type"
-                    << "array";
-                std::vector<std::string> strValues = optArray->GetDefault();
-                std::vector<std::string>::iterator strIter;
-                jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-                    values << (*strIter);
-                }
-                opt << "default" << values;
-            }
-            else if (optIntMap) {
-                opt << "type"
-                    << "std::string-list";
-                opt << "default" << optIntMap->GetDefaultStrValue();
-                std::vector<std::string> strValues = optIntMap->GetStrValues(false);
-                std::vector<std::string>::iterator strIter;
-                jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-                    values << (*strIter);
-                }
-                opt << "values" << values;
-            }
-
-            opts << (*iter)->GetKey() << opt;
+        for (auto const &option : *options) {
+            opts << option->GetKey() << option->ToJson();
         }
 
         grp << "options" << opts;
-        grps << (*grpIter)->GetId() << grp;
+        grps << optionGrp->GetId() << grp;
     }
 
     o << "groups" << grps;
@@ -1011,15 +937,9 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "format") {
-                LogWarning("Option format is deprecated; use from instead");
-                if (json.has<jsonxx::String>("format")) {
-                    SetInputFrom(json.get<jsonxx::String>("format"));
-                }
-            }
-            if (iter->first == "from") {
-                if (json.has<jsonxx::String>("from")) {
-                    SetInputFrom(json.get<jsonxx::String>("from"));
+            if (iter->first == "inputFrom") {
+                if (json.has<jsonxx::String>("inputFrom")) {
+                    SetInputFrom(json.get<jsonxx::String>("inputFrom"));
                 }
             }
             else if (iter->first == "scale") {
@@ -1033,136 +953,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                 }
             }
             // Deprecated option
-            else if (iter->first == "appXPathQueries") {
-                LogWarning("Option appXPathQueries is deprecated; use appXPathQuery with an array instead");
-                jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
-                std::vector<std::string> queries;
-                Option *opt = m_options->GetItems()->at("appXPathQuery");
-                assert(opt);
-                int i;
-                for (i = 0; i < (int)values.size(); ++i) {
-                    if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
-                }
-                opt->SetValueArray(queries);
-            }
-            else if (iter->first == "border") {
-                LogWarning("Option border is deprecated; use pageMarginBottom, pageMarginLeft, pageMarginRight and "
-                           "pageMarginTop instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("border")) {
-                    double border = json.get<jsonxx::Number>("border");
-                    opt = m_options->GetItems()->at("pageMarginBottom");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginLeft");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginRight");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginTop");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                }
-            }
-            else if (iter->first == "choiceXPathQueries") {
-                LogWarning("Option choiceXPathQueries is deprecated; use choiceXPathQuery with an array instead");
-                jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
-                std::vector<std::string> queries;
-                Option *opt = m_options->GetItems()->at("choiceXPathQuery");
-                assert(opt);
-                int i;
-                for (i = 0; i < (int)values.size(); ++i) {
-                    if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
-                }
-                opt->SetValueArray(queries);
-            }
-            else if (iter->first == "condenseEncoded") {
-                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("condense");
-                assert(opt);
-                if (json.has<jsonxx::Number>("condenseEncoded")) {
-                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
-                        opt->SetValue("encoded");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "ignoreLayout") {
-                LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("breaks");
-                assert(opt);
-                if (json.has<jsonxx::Number>("ignoreLayout")) {
-                    if ((int)json.get<jsonxx::Number>("ignoreLayout") == 1) {
-                        opt->SetValue("auto");
-                    }
-                    else {
-                        opt->SetValue("encoded");
-                    }
-                }
-            }
-            else if (iter->first == "inputFormat") {
-                LogWarning("Option inputFormat is deprecated; use from instead");
-                if (json.has<jsonxx::String>("inputFormat")) {
-                    SetInputFrom(json.get<jsonxx::String>("inputFormat"));
-                }
-            }
-            else if (iter->first == "noFooter") {
-                LogWarning("Option noFooter is deprecated; use footer: \"auto\"|\"encoded\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("footer");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noFooter")) {
-                    if ((int)json.get<jsonxx::Number>("noFooter") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "noLayout") {
-                LogWarning("Option noLayout is deprecated; use breaks: \"auto\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("breaks");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noLayout")) {
-                    if ((int)json.get<jsonxx::Number>("noLayout") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "noHeader") {
-                LogWarning("Option noHeader is deprecated; use header: \"auto\"|\"encoded\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("header");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noHeader")) {
-                    if ((int)json.get<jsonxx::Number>("noHeader") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "slurThickness") {
-                LogWarning("Option slurThickness is deprecated; use slurMidpointThickness instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("slurThickness")) {
-                    double thickness = json.get<jsonxx::Number>("slurThickness");
-                    opt = m_options->GetItems()->at("slurMidpointThickness");
-                    assert(opt);
-                    opt->SetValueDbl(thickness);
-                }
-            }
+            /*
             else if (iter->first == "tieThickness") {
                 vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
                 Option *opt = NULL;
@@ -1173,6 +964,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     opt->SetValueDbl(thickness);
                 }
             }
+            */
             else {
                 LogError("Unsupported option '%s'", iter->first.c_str());
             }
@@ -1392,7 +1184,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // set dimensions
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
-    double userScale = m_view.GetPPUFactor() * m_scale / 100;
+    double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
     if (m_doc.GetType() == Facs) {
