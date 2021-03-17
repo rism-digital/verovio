@@ -141,7 +141,7 @@ int System::GetHeight() const
 int System::GetMinimumSystemSpacing(const Doc *doc) const
 {
     const auto &spacingSystem = doc->GetOptions()->m_spacingSystem;
-    if (!spacingSystem.isSet()) {
+    if (!spacingSystem.IsSet()) {
         assert(m_drawingScoreDef);
         if (m_drawingScoreDef->HasSpacingSystem()) {
             return m_drawingScoreDef->GetSpacingSystem() * doc->GetDrawingUnit(100);
