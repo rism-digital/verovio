@@ -944,9 +944,9 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "input-from") {
-                if (json.has<jsonxx::String>("input-from")) {
-                    SetInputFrom(json.get<jsonxx::String>("input-from"));
+            if (iter->first == "inputFrom") {
+                if (json.has<jsonxx::String>("inputFrom")) {
+                    SetInputFrom(json.get<jsonxx::String>("inputFrom"));
                 }
             }
             else if (iter->first == "scale") {
