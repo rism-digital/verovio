@@ -132,7 +132,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
-                std::string id = StringFormat("%s-%s", m_glyphPostfixId.c_str(), child.attribute("id").value());
+                std::string id = StringFormat("%s-%s", child.attribute("id").value(), m_glyphPostfixId.c_str());
                 child.attribute("id").set_value(id.c_str());
                 defs.append_copy(child);
             }
