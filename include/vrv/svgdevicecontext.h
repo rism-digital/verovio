@@ -289,7 +289,7 @@ private:
     // indentation value (-1 for tabs)
     int m_indent;
     // prefix to be added to font glyphs
-    std::string m_glyphPrefix;
+    std::string m_glyphPostfixId;
 };
 
 } // namespace vrv
