@@ -548,6 +548,8 @@ public:
 
     static void SeedUuid(unsigned int seed = 0);
 
+    static std::string GenerateRandUuid();
+
     static bool sortByUlx(Object *a, Object *b);
 
     //----------//

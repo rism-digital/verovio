@@ -203,7 +203,7 @@ public:
      * Set the SVG to have 'raw' formatting, with no extraneous whitespace or newlines.
      */
     void SetFormatRaw(bool rawFormat) { m_formatRaw = rawFormat; }
-    
+
     /**
      * Removes the xlink: prefex on href attributes, necessary for some newer browsers.
      */
@@ -288,6 +288,8 @@ private:
     bool m_removeXlink;
     // indentation value (-1 for tabs)
     int m_indent;
+    // prefix to be added to font glyphs
+    std::string m_glyphPrefix;
 };
 
 } // namespace vrv

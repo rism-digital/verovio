@@ -584,12 +584,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
-
-    m_uuid = m_classid + std::string(str);
+    m_uuid = m_classid + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -919,6 +914,16 @@ void Object::SeedUuid(unsigned int seed)
     else {
         std::srand(seed);
     }
+}
+
+std::string Object::GenerateRandUuid()
+{
+    int nr = std::rand();
+    char str[17];
+    // I do not want to use a stream for doing this!
+    snprintf(str, 17, "%016d", nr);
+
+    return std::string(str);
 }
 
 bool Object::sortByUlx(Object *a, Object *b)
