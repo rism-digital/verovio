@@ -59,8 +59,6 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
-enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
-
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -119,7 +117,6 @@ public:
     static std::map<int, std::string> s_condense;
     static std::map<int, std::string> s_footer;
     static std::map<int, std::string> s_header;
-    static std::map<int, std::string> s_measureNumber;
     static std::map<int, std::string> s_systemDivider;
 
 protected:
@@ -528,7 +525,7 @@ public:
     OptionBool m_standardOutput;
     OptionBool m_help;
     OptionBool m_allPpages;
-    OptionString m_inputFormat;
+    OptionString m_inputFrom;
     OptionString m_outfile;
     OptionInt m_page;
     OptionString m_resourcePath;
@@ -614,7 +611,7 @@ public:
     OptionDbl m_lyricTopMinMargin;
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
-    OptionIntMap m_measureNumber;
+    OptionInt m_mnumInterval;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
