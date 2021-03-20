@@ -1857,6 +1857,7 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
     rest->WriteCue(currentNode);
+    rest->WriteExtSym(currentNode);
     rest->WriteRestVisMensural(currentNode);
 }
 
@@ -5191,6 +5192,7 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
     vrvRest->ReadCue(rest);
+    vrvRest->ReadExtSym(rest);
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
