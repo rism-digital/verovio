@@ -1217,7 +1217,7 @@ Options::Options()
     m_transposeSelectedOnly.Init(false);
     this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
-    /********* The layout left margin by element *********/
+    /********* The layout margins by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");
     m_grps.push_back(&m_elementMargins);
