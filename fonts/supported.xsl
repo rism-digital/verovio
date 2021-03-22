@@ -1484,15 +1484,15 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         </stringTechniques>
         <pluckedTechniques>
             <description>Plucked techniques</description>
-            <!--<glyph glyph-code="E630" smufl-name="pluckedSnapPizzicatoBelow"/>-->
-            <!--<glyph glyph-code="E631" smufl-name="pluckedSnapPizzicatoAbove"/>-->
-            <!--<glyph glyph-code="E632" smufl-name="pluckedBuzzPizzicato"/>-->
-            <!--<glyph glyph-code="E633" smufl-name="pluckedLeftHandPizzicato"/>-->
+            <glyph glyph-code="E630" smufl-name="pluckedSnapPizzicatoBelow"/>
+            <glyph glyph-code="E631" smufl-name="pluckedSnapPizzicatoAbove"/>
+            <glyph glyph-code="E632" smufl-name="pluckedBuzzPizzicato"/>
+            <glyph glyph-code="E633" smufl-name="pluckedLeftHandPizzicato"/>
             <!--<glyph glyph-code="E634" smufl-name="arpeggiatoUp"/>-->
             <!--<glyph glyph-code="E635" smufl-name="arpeggiatoDown"/>-->
             <!--<glyph glyph-code="E636" smufl-name="pluckedWithFingernails"/>-->
             <!--<glyph glyph-code="E637" smufl-name="pluckedFingernailFlick"/>-->
-            <!--<glyph glyph-code="E638" smufl-name="pluckedDamp"/>-->
+            <glyph glyph-code="E638" smufl-name="pluckedDamp"/>
             <!--<glyph glyph-code="E639" smufl-name="pluckedDampAll"/>-->
             <!--<glyph glyph-code="E63A" smufl-name="pluckedPlectrum"/>-->
             <!--<glyph glyph-code="E63B" smufl-name="pluckedDampOnStem"/>-->
