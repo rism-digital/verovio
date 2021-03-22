@@ -889,6 +889,10 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
+    m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
+    m_preserveAnalyticalMarkup.Init(false);
+    this->Register(&m_preserveAnalyticalMarkup, "preserveAnalyticalMarkup", &m_general);
+
     m_removeIds.SetInfo("Remove IDs in MEI", "Remove XML IDs in the MEI output that are not referenced");
     m_removeIds.Init(false);
     this->Register(&m_removeIds, "removeIds", &m_general);
