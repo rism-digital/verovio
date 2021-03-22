@@ -77,7 +77,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
     if (noteDots != -1) {
         duration = 2 * duration - (duration / pow(2, noteDots));
     }
-    // LogDebug("Duration %d; Dot %d; Alignement %f", noteDur, GetDots(), duration);
+    // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, GetDots(), duration);
     return duration;
 }
 
@@ -94,15 +94,25 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
         if (this->HasNum()) num *= this->GetNum();
         if (this->HasNumbase()) numBase *= this->GetNumbase();
     }
-    // perfecta in tempus imperfectum
-    else if ((this->GetDurQuality() == DURQUALITY_mensural_perfecta) && (currentMensur->GetTempus() == TEMPUS_2)) {
-        num *= 2;
-        numBase *= 3;
+    // perfecta in imperfect mensuration (two perfectas in the place of the original three imperfectas)
+    else if (this->GetDurQuality() == DURQUALITY_mensural_perfecta) {
+        if (((this->GetDur() == DURATION_longa) && (currentMensur->GetModusminor() == MODUSMINOR_2))
+            || ((this->GetDur() == DURATION_brevis) && (currentMensur->GetTempus() == TEMPUS_2))
+            || ((this->GetDur() == DURATION_semibrevis) && (currentMensur->GetProlatio() == PROLATIO_2))
+            || (this->GetDur() == DURATION_minima) || (this->GetDur() == DURATION_semiminima)
+            || (this->GetDur() == DURATION_fusa) || (this->GetDur() == DURATION_semifusa)) {
+            num *= 2;
+            numBase *= 3;
+        }
     }
-    // imperfecta in tempus perfectum (e.g. not imperfectum since perfectum is assumed by default)
-    else if ((this->GetDurQuality() == DURQUALITY_mensural_imperfecta) && (currentMensur->GetTempus() != TEMPUS_2)) {
-        num *= 3;
-        numBase *= 2;
+    // imperfecta in perfect mensuration (three imperfectas in the place of the two original perfectas)
+    else if (this->GetDurQuality() == DURQUALITY_mensural_imperfecta) {
+        if (((this->GetDur() == DURATION_longa) && (currentMensur->GetModusminor() != MODUSMINOR_2))
+            || ((this->GetDur() == DURATION_brevis) && (currentMensur->GetTempus() != TEMPUS_2))
+            || ((this->GetDur() == DURATION_semibrevis) && (currentMensur->GetProlatio() != PROLATIO_2))) {
+            num *= 3;
+            numBase *= 2;
+        }
     }
     // altera, maior, or duplex
     else if (this->HasDurQuality()
@@ -131,7 +141,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
             break;
     }
     duration *= (double)numBase / (double)num;
-    // LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", noteDur, num, numbase, duration, ratio);
+    // LogDebug("Duration %d; %d/%d; Alignment %f; Ratio %f", noteDur, num, numbase, duration, ratio);
     duration = durRound(duration);
     return duration;
 }

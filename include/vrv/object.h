@@ -504,6 +504,11 @@ public:
     bool HasEditorialContent();
 
     /**
+     * Return true if the object contains anything that is not editorial content
+     */
+    bool HasNonEditorialContent();
+
+    /**
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
@@ -531,15 +536,19 @@ public:
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
+     * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
+        bool skipFirst = false);
 
     //----------------//
     // Static methods //
     //----------------//
 
     static void SeedUuid(unsigned int seed = 0);
+
+    static std::string GenerateRandUuid();
 
     static bool sortByUlx(Object *a, Object *b);
 
@@ -764,6 +773,11 @@ public:
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the x position of accidental.
+     */
+    virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * @name Adjust the x position of a right barline in order to make sure the is no text content
      * overlflowing in the right margin
      */
@@ -955,15 +969,15 @@ public:
      * It also includes a scoreDef for each measure where a change occured before.
      * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
-    virtual int SetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
 
     /**
      * Optimize the scoreDef for each system.
      * For automatic breaks, looks for staves with only mRests.
      */
     ///@{
-    virtual int OptimizeScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int OptimizeScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimizeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -974,7 +988,7 @@ public:
     /**
      * Unset the initial scoreDef of each system and measure
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefUnsetCurrent(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
@@ -1007,7 +1021,7 @@ public:
     /**
      * Prepare group symbol starting and ending staffDefs for drawing
      */
-    virtual int PrepareGroupSymbols(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Associate LayerElement with @facs to the appropriate zone

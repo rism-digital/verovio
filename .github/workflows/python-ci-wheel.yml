@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS for Python 3.9
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-18.04]
+        os: [ macos-latest, windows-latest, ubuntu-20.04]
         python-version: [3.6, 3.7, 3.8, 3.9]
         architecture: [ x86, x64 ]
         include:
@@ -37,13 +37,13 @@ jobs:
           - os: windows-latest
             architecture: x86
             platform_id: win32
-          - os: ubuntu-18.04
+          - os: ubuntu-20.04
             architecture: x64
             platform_id: manylinux_x86_64
         exclude:
           - os: macos-latest
             architecture: x86
-          - os: ubuntu-18.04
+          - os: ubuntu-20.04
             architecture: x86
 
     steps:
@@ -64,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install cibuildwheel==1.7.1 twine
+          python -m pip install twine
 
       #===============================================#
       # Prepare identifier
@@ -74,29 +74,23 @@ jobs:
           # Remove dot from python-version for CIBW and prefix with cp
           id=cp$(echo ${{ matrix.python-version }} | sed -e 's/\.//g')-${{ matrix.platform_id }}
           echo CIBW_BUILD_IDENTIFIER=$id >> $GITHUB_ENV
-
-      # TODO: Can be removed when everything is set up
-      - name: Check CIBW_BUILD_IDENTIFIER
-        shell: bash
-        run: echo ${{ env.CIBW_BUILD_IDENTIFIER }}
-
-      # TODO: Can be removed when everything is set up
-      - name: Get Build Identifiers provided by cibuildwheel for ${{ matrix.os }}-${{ matrix.architecture }}
-        run: python -m cibuildwheel --print-build-identifiers
+          echo $id
 
       #===============================================#
       # wheels
       - name: Build wheels
+        uses: joerick/cibuildwheel@v1.9.0
+        with:
+          output-dir: wheelhouse
         env:
           CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_MANYLINUX_I686_IMAGE: manylinux2014
-          CIBW_BEFORE_ALL_LINUX: yum install swig -y
+          # TODO: change back to "manylinux2014" when cibuildwheel releases new version
+          CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:2021-02-17-8d1372a
+          CIBW_MANYLINUX_I686_IMAGE: quay.io/pypa/manylinux2014_i686:2021-02-17-8d1372a
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
-          CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
-        run: python -m cibuildwheel --output-dir wheelhouse
+          CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python -py3 ./bindings/python/verovio.i
 
       #===============================================#
       # Check build
@@ -138,12 +132,8 @@ jobs:
   #         BUILD SOURCE DISTRIBUTION             #
   #===============================================#
   build_sdist:
-    name: Build sdist (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-18.04]
-        python-version: [3.9]
+    name: Build sdist
+    runs-on: [ubuntu-20.04]
 
     steps:
       #===============================================#
@@ -155,7 +145,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.9'
 
       #===============================================#
       # Swig
@@ -211,7 +201,7 @@ jobs:
       # Upload artifact
       - uses: actions/upload-artifact@v2
         with:
-          name: sdist-${{ runner.os }}-python-${{ matrix.python-version }}
+          name: sdist-${{ runner.os }}-python-3.9
           path: dist/*.tar.gz
 
 
@@ -221,23 +211,18 @@ jobs:
   upload_testpypi:
     name: Upload to TestPyPi
     needs: [build_wheels, build_sdist]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-18.04]
-        python-version: [3.9]
-        architecture: [ x64 ]
+    runs-on: [ubuntu-20.04]
 
     steps:
       #===============================================#
       # Set up
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.architecture }}
+          python-version: '3.9'
+          architecture: 'x64'
 
       #===============================================#
       # Dependencies

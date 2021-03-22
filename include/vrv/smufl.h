@@ -35,6 +35,8 @@ enum {
     SMUFL_E052_gClef8vb = 0xE052,
     SMUFL_E053_gClef8va = 0xE053,
     SMUFL_E054_gClef15ma = 0xE054,
+    SMUFL_E055_gClef8vbOld = 0xE055,
+    SMUFL_E056_gClef8vbCClef = 0xE056,
     SMUFL_E05C_cClef = 0xE05C,
     SMUFL_E05D_cClef8vb = 0xE05D,
     SMUFL_E062_fClef = 0xE062,
@@ -44,6 +46,11 @@ enum {
     SMUFL_E066_fClef15ma = 0xE066,
     SMUFL_E069_unpitchedPercussionClef1 = 0xE069,
     SMUFL_E06A_unpitchedPercussionClef2 = 0xE06A,
+    SMUFL_E073_gClefReversed = 0xE073,
+    SMUFL_E074_gClefTurned = 0xE074,
+    SMUFL_E075_cClefReversed = 0xE075,
+    SMUFL_E076_fClefReversed = 0xE076,
+    SMUFL_E077_fClefTurned = 0xE077,
     SMUFL_E080_timeSig0 = 0xE080,
     SMUFL_E081_timeSig1 = 0xE081,
     SMUFL_E082_timeSig2 = 0xE082,
@@ -68,12 +75,17 @@ enum {
     SMUFL_E0B6_noteheadHalfWithX = 0xE0B6,
     SMUFL_E0B7_noteheadVoidWithX = 0xE0B7,
     SMUFL_E0D9_noteheadDiamondHalf = 0xE0D9,
+    SMUFL_E0DA_noteheadDiamondHalfWide = 0xE0DA,
     SMUFL_E0DB_noteheadDiamondBlack = 0xE0DB,
     SMUFL_E0DC_noteheadDiamondBlackWide = 0xE0DC,
     SMUFL_E0DD_noteheadDiamondWhite = 0xE0DD,
     SMUFL_E0DE_noteheadDiamondWhiteWide = 0xE0DE,
+    SMUFL_E0F5_noteheadParenthesisLeft = 0xE0F5,
+    SMUFL_E0F6_noteheadParenthesisRight = 0xE0F6,
     SMUFL_E0FA_noteheadWholeFilled = 0xE0FA,
     SMUFL_E101_noteheadSlashHorizontalEnds = 0xE101,
+    SMUFL_E102_noteheadSlashWhiteWhole = 0xE102,
+    SMUFL_E103_noteheadSlashWhiteHalf = 0xE103,
     SMUFL_E220_tremolo1 = 0xE220,
     SMUFL_E221_tremolo2 = 0xE221,
     SMUFL_E222_tremolo3 = 0xE222,
@@ -196,6 +208,8 @@ enum {
     SMUFL_E517_ventiduesima = 0xE517,
     SMUFL_E518_ventiduesimaAlta = 0xE518,
     SMUFL_E519_ventiduesimaBassa = 0xE519,
+    SMUFL_E51A_octaveParensLeft = 0xE51A,
+    SMUFL_E51B_octaveParensRight = 0xE51B,
     SMUFL_E520_dynamicPiano = 0xE520,
     SMUFL_E521_dynamicMezzo = 0xE521,
     SMUFL_E522_dynamicForte = 0xE522,
@@ -372,7 +386,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 347
+#define SMUFL_COUNT 361
 
 } // namespace vrv
 

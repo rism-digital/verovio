@@ -77,14 +77,14 @@ int Hairpin::CalcHeight(
     // Something is probably wrong before...
     if (!this->GetDrawingLength()) return endY;
 
-    // Do not adjust heigt when not a full hairpin
+    // Do not adjust height when not a full hairpin
     if (spanningType != SPANNING_START_END) return endY;
 
     int length = this->GetDrawingLength();
 
     // Second of a <>
     if ((this->GetForm() == hairpinLog_FORM_dim) && m_leftLink && m_leftLink->Is(HAIRPIN)) {
-        // Do no ajust height when previous hairpin is not a full hairpin
+        // Do no adjust height when previous hairpin is not a full hairpin
         if (!leftPositioner || (leftPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
         Hairpin *left = vrv_cast<Hairpin *>(m_leftLink);
         assert(left);
@@ -96,7 +96,7 @@ int Hairpin::CalcHeight(
 
     // First of a <>
     if ((this->GetForm() == hairpinLog_FORM_cres) && m_rightLink && m_rightLink->Is(HAIRPIN)) {
-        // Do no ajust height when next hairpin is not a full hairpin
+        // Do no adjust height when next hairpin is not a full hairpin
         if (!rightPositioner || (rightPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
         Hairpin *right = vrv_cast<Hairpin *>(m_rightLink);
         assert(right);

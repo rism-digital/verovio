@@ -221,17 +221,22 @@ public:
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-    void SetCurrentScoreDefDoc(bool force = false);
+    void ScoreDefSetCurrentDoc(bool force = false);
 
     /**
      * Check whether we need to optimize score based on the condense option
      */
-    bool IsOptimizationNeeded();
+    bool ScoreDefNeedsOptimization();
 
     /**
      * Optimize the scoreDef once the document is cast-off.
      */
-    void OptimizeScoreDefDoc();
+    void ScoreDefOptimizeDoc();
+
+    /**
+     * Set the GrpSym start / end for each System once ScoreDef is set and (if necessary) optimized
+     */
+    void ScoreDefSetGrpSymDoc();
 
     /**
      * Prepare the document for drawing.
@@ -509,7 +514,7 @@ private:
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.
-     * If yes, SetCurrentScoreDef will not parse the document (again) unless
+     * If yes, ScoreDefSetCurrent will not parse the document (again) unless
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;

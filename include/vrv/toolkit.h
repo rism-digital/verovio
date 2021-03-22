@@ -41,6 +41,10 @@ enum FileFormat {
 
 void SetDefaultResourcePath(const std::string &path);
 
+// Implementation in vrv.cpp but defined here to be available in SWIG bindings
+void EnableLog(bool value);
+void EnableLogToBuffer(bool value);
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -56,30 +60,66 @@ public:
     virtual ~Toolkit();
     ///@}
 
-    /** We just use the doc uuid as uuid */
+    /**
+     * Return the ID of the Toolkit instance.
+     */
     std::string GetUuid() { return m_doc.GetUuid(); }
 
-    /** We just use the doc options */
+    /**
+     * Return the Options object of the Toolkit instance.
+     */
     Options *GetOptions() { return m_options; }
 
     /**
-     * Set the resource path. To be called if the constructor had initFont=false.
-     * This needs refactoring.
+     * Set the resource path for the Toolkit instance.
+     *
+     * This method needs to be called if the constructor had initFont=false or if the resource path
+     * needs to be changed.
+     *
+     * @param path The path to the resource directory
      */
     bool SetResourcePath(const std::string &path);
 
     /**
-     * Load a file with the specified type.
+     * Load a file from the file system.
+     *
+     * Previously convert UTF16 files to UTF8 or extract files from MusicXML compressed files.
+     *
+     * @param filename The filename to be loaded
      */
     bool LoadFile(const std::string &filename);
 
     /**
-     * Load a string data with the specified type.
+     * Load a string data with the type previously specified in the options.
+     *
+     * By default, the methods try to auto-detect the type.
+     *
+     * @param data A string with the data (e.g., MEI data) to be loaded
      */
     bool LoadData(const std::string &data);
 
     /**
+     * Load a MusicXML compressed file passed as base64 encoded string.
+     *
+     * @param data A ZIP file in base64 encoded string
+     */
+    bool LoadZipDataBase64(const std::string &data);
+
+    /**
+     * Load a MusicXML compressed file passed as a buffer of bytes.
+     *
+     * @param data A ZIP file as a buffer of bytes
+     * @param length The size of the data buffer
+     */
+    bool LoadZipDataBuffer(const unsigned char *data, int length);
+
+    /**
      * Save an MEI file.
+     *
+     * This is a lond description for Save.
+     *
+     * @param filename This parameter is the filename
+     * @param jsonOptions There are the options. It cannot be null
      */
     bool SaveFile(const std::string &filename, const std::string &jsonOptions);
 
@@ -256,7 +296,7 @@ public:
      */
     ///@{
     bool SetScale(int scale);
-    int GetScale() { return m_scale; }
+    int GetScale() { return m_options->m_scale.GetValue(); }
     ///@}
 
     /**
@@ -302,9 +342,13 @@ public:
     const char *GetCString();
     ///@}
 
+protected:
 private:
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
+    bool IsZip(const std::string &filename);
+    bool LoadZipFile(const std::string &filename);
+    bool LoadZipData(const std::vector<unsigned char> &bytes);
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
@@ -313,7 +357,6 @@ public:
 private:
     Doc m_doc;
     View m_view;
-    int m_scale;
     FileFormat m_inputFrom;
     FileFormat m_outputTo;
 

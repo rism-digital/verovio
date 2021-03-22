@@ -303,7 +303,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
     }
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
-    // check if there is an overlap on the left or on the right and displace stem's parent correspondigly
+    // check if there is an overlap on the left or on the right and displace stem's parent correspondingly
     for (auto element : otherElements) {
         int right = HorizontalLeftOverlap(element, doc, 0, 0);
         int left = HorizontalRightOverlap(element, doc, 0, 0);
@@ -314,7 +314,7 @@ void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         Flag *currentFlag = NULL;
         currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
-        if (currentFlag) {
+        if (currentFlag && currentFlag->m_drawingNbFlags) {
             wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
             const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
             horizontalMargin += flagWidth;
@@ -337,7 +337,8 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
 
     const data_STEMDIRECTION stemDirection = GetDrawingStemDir();
     // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
-    const wchar_t flagGlyph = (duration >= DURATION_16) ? SMUFL_E242_flag16thUp : flag->GetFlagGlyph(stemDirection);
+    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    if (duration < DURATION_16) flagGlyph = flag->GetFlagGlyph(stemDirection);
     const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
     const int relevantGlyphHeight = (stemDirection == STEMDIRECTION_up) ? glyphHeight / 2 : glyphHeight;
 
@@ -530,7 +531,9 @@ int Stem::CalcStem(FunctorParams *functorParams)
         flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
-        if (!this->HasStemLen() && this->HasStemMod()) slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
+            slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        }
     }
 
     // Adjust basic stem length to number of slashes

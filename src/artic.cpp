@@ -97,7 +97,7 @@ void Artic::SplitMultival(Object *parent)
     // Multiple valued attributes cannot be preserved as such
     if (this->IsAttribute()) {
         this->IsAttribute(false);
-        LogMessage("Mutlivalued attribute @artic on '%s' permanently converted to <artic> elements",
+        LogMessage("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
             parent->GetUuid().c_str());
     }
 }
@@ -165,9 +165,14 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 
 wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
 {
-    // If there is glyph.num, prioritize it, otherwise check other attributes
+    // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
         wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
@@ -283,15 +288,12 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     /************** placement **************/
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
 
-    if (params->m_parent->m_crossStaff) {
-        staff = params->m_parent->m_crossStaff;
+    if (params->m_parent->m_crossLayer) {
         layer = params->m_parent->m_crossLayer;
     }
 
@@ -301,7 +303,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     // for now we ignore within @place
     if (this->GetPlace() != STAFFREL_NONE) {
         m_drawingPlace = this->GetPlace();
-        // If we have a place indication do not allow to be changed to above
+        // if we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
     else if ((layerStemDir = layer->GetDrawingStemDir(params->m_parent)) != STEMDIRECTION_NONE) {
@@ -366,12 +368,9 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
 
-    if (this->m_crossStaff && this->m_crossLayer) {
+    if (this->m_crossStaff) {
         staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
     }
 
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);

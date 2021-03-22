@@ -68,9 +68,14 @@ void Pedal::Reset()
 
 wchar_t Pedal::GetPedalGlyph() const
 {
-    // If there is glyph.num, prioritize it, otherwise check other attributes
+    // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
         wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 

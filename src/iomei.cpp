@@ -1028,6 +1028,7 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     scoreDef->WriteDistances(currentNode);
     scoreDef->WriteEndings(currentNode);
     scoreDef->WriteOptimization(currentNode);
+    scoreDef->WriteTimeBase(currentNode);
 }
 
 void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
@@ -1350,7 +1351,6 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
-    // pedal->WriteVerticalGroup(currentNode);
     pedal->WriteVerticalGroup(currentNode);
 }
 
@@ -1492,6 +1492,7 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
+    accid->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
@@ -1587,6 +1588,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
+    clef->WriteExtSym(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
     clef->WriteVisibility(currentNode);
@@ -3570,6 +3572,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     vrvScoreDef->ReadDistances(scoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
     vrvScoreDef->ReadOptimization(scoreDef);
+    vrvScoreDef->ReadTimeBase(scoreDef);
 
     if (!m_hasScoreDef && m_useScoreDefForDoc) {
         m_hasScoreDef = true;
@@ -4723,6 +4726,7 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
     vrvAccid->ReadEnclosingChars(accid);
+    vrvAccid->ReadExtSym(accid);
 
     parent->AddChild(vrvAccid);
     ReadUnsupportedAttr(accid, vrvAccid);
@@ -4847,6 +4851,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
+    vrvClef->ReadExtSym(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
     vrvClef->ReadVisibility(clef);
@@ -5666,7 +5671,7 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
     parent->AddChild(vrvAnnot);
     ReadUnsupportedAttr(annot, vrvAnnot);
-    // For Annot we do not load children because they preserved in Annot::m_content
+    // for Annot we do not load children because they preserved in Annot::m_content
     return true;
 }
 

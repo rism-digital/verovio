@@ -496,7 +496,7 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
     Functor findByUuid(&Object::FindByUuid);
     FindByUuidParams findbyUuidParams;
     findbyUuidParams.m_uuid = uuid;
-    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction);
+    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction, true);
     return findbyUuidParams.m_element;
 }
 
@@ -510,7 +510,7 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 {
     Functor findByComparison(&Object::FindByComparison);
     FindByComparisonParams findByComparisonParams(comparison);
-    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction, true);
     return findByComparisonParams.m_element;
 }
 
@@ -518,7 +518,7 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 {
     Functor findExtremeByComparison(&Object::FindExtremeByComparison);
     FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
-    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction, true);
     return findExtremeByComparisonParams.m_element;
 }
 
@@ -530,7 +530,7 @@ void Object::FindAllDescendantByComparison(
 
     Functor findAllByComparison(&Object::FindAllByComparison);
     FindAllByComparisonParams findAllByComparisonParams(comparison, objects);
-    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
 }
 
 void Object::FindAllDescendantBetween(
@@ -541,7 +541,7 @@ void Object::FindAllDescendantBetween(
 
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllBetween, &findAllBetweenParams);
+    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx) const
@@ -584,12 +584,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
-
-    m_uuid = m_classid + std::string(str);
+    m_uuid = m_classid + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -760,8 +755,17 @@ bool Object::HasEditorialContent()
     return (!editorial.empty());
 }
 
+bool Object::HasNonEditorialContent()
+{
+    ListOfObjects nonEditorial;
+    IsEditorialElementComparison editorialComparison;
+    editorialComparison.ReverseComparison();
+    this->FindAllDescendantByComparison(&nonEditorial, &editorialComparison);
+    return (!nonEditorial.empty());
+}
+
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
-    int deepness, bool direction)
+    int deepness, bool direction, bool skipFirst)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -792,7 +796,9 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
-    functor->Call(this, functorParams);
+    if (!skipFirst) {
+        functor->Call(this, functorParams);
+    }
 
     // do not go any deeper in this case
     if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
@@ -852,9 +858,11 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
-    if (endFunctor) {
+    if (endFunctor && !skipFirst) {
         endFunctor->Call(this, functorParams);
     }
+
+    skipFirst = false;
 }
 
 int Object::Save(Output *output)
@@ -906,6 +914,16 @@ void Object::SeedUuid(unsigned int seed)
     else {
         std::srand(seed);
     }
+}
+
+std::string Object::GenerateRandUuid()
+{
+    int nr = std::rand();
+    char str[17];
+    // I do not want to use a stream for doing this!
+    snprintf(str, 17, "%016d", nr);
+
+    return std::string(str);
 }
 
 bool Object::sortByUlx(Object *a, Object *b)
@@ -1416,9 +1434,9 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetCurrentScoreDef(FunctorParams *functorParams)
+int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
 {
-    SetCurrentScoreDefParams *params = vrv_params_cast<SetCurrentScoreDefParams *>(functorParams);
+    ScoreDefSetCurrentParams *params = vrv_params_cast<ScoreDefSetCurrentParams *>(functorParams);
     assert(params);
 
     assert(params->m_upcomingScoreDef);

@@ -1,6 +1,25 @@
 # Changelog
 
 ## [unreleased]
+* Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
+* Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
+
+## [3.3.0] - 2021-02-25
+* Support for `@glyph.name`
+* Support for `accid@glyph.num` and `@glyph.name`
+* Support for MusicXML compressed files
+* Improved consistency of logging functions across bindings
+* Improved PyPI packages for Linux (@rettinghaus and @musicEnfanthen)
+* Function loadZipDataBase64 and loadZipDataBuffer (JS) for loading MusicXML compressed files
+* Function enableLog(bool) to enable or disable logging
+* Function enableLogToBuffer(bool) to enable logging to a buffer instead of the stderr or the JS console
+* Option --clef-change-factor for adjusting clef change size (default is .66) (@rettinghaus)
+* Option --svg-format-raw for raw SVG output without indentation and line breaks
+* New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
+* Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
+* Fixes in the MusicXML importer (@eNote-GmBH)
+
+## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
 * Support for `artic@glyph.num`
 * Support for arabic accidentals
@@ -12,10 +31,11 @@
 * Improved articulations in normal and cross-staff contexts
 * Improved spacing of clef changes
 * Improved timestamp events alignments by avoiding extra-space to be added
+* Improved horizontal alignment of tempo indications (@eNote-GmbH)
 * Embedding of Leland font from MuseScore
 * Method Toolkit::GetTimesForElement for accessing score times (@wergo)
 * Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
-* Options `--top-margin-artic and --bottom-margin-artic for articulation margins
+* Options --top-margin-artic and --bottom-margin-artic for articulation margins
 * Option --tuplet-num-head for placing tuplet numbers on the side of the notehead
 
 ## [3.1.0] - 2021-01-12
@@ -307,17 +327,17 @@
 * Several bug fixes and code refactoring enhancement
 
 ## [Pre-release versions]
-- [0.9.13](https://github.com/rism-ch/verovio/releases/tag/version-0.9.13)
-- [0.9.12](https://github.com/rism-ch/verovio/releases/tag/version-0.9.12)
-- [0.9.11](https://github.com/rism-ch/verovio/releases/tag/version-0.9.11)
-- [0.9.10](https://github.com/rism-ch/verovio/releases/tag/version-0.9.10)
-- [0.9.9](https://github.com/rism-ch/verovio/releases/tag/version-0.9.9)
-- [0.9.8](https://github.com/rism-ch/verovio/releases/tag/version-0.9.8)
-- [0.9.7](https://github.com/rism-ch/verovio/releases/tag/version-0.9.7)
-- [0.9.6](https://github.com/rism-ch/verovio/releases/tag/version-0.9.6)
-- [0.9.5](https://github.com/rism-ch/verovio/releases/tag/version-0.9.5)
-- [0.9.4](https://github.com/rism-ch/verovio/releases/tag/version-0.9.4)
-- [0.9.3](https://github.com/rism-ch/verovio/releases/tag/version-0.9.3)
-- [0.9.2](https://github.com/rism-ch/verovio/releases/tag/version-0.9.2)
-- [0.9.1](https://github.com/rism-ch/verovio/releases/tag/version-0.9.1)
-- [0.9.0](https://github.com/rism-ch/verovio/releases/tag/version-0.9.0)
+- [0.9.13](https://github.com/rism-digital/verovio/releases/tag/version-0.9.13)
+- [0.9.12](https://github.com/rism-digital/verovio/releases/tag/version-0.9.12)
+- [0.9.11](https://github.com/rism-digital/verovio/releases/tag/version-0.9.11)
+- [0.9.10](https://github.com/rism-digital/verovio/releases/tag/version-0.9.10)
+- [0.9.9](https://github.com/rism-digital/verovio/releases/tag/version-0.9.9)
+- [0.9.8](https://github.com/rism-digital/verovio/releases/tag/version-0.9.8)
+- [0.9.7](https://github.com/rism-digital/verovio/releases/tag/version-0.9.7)
+- [0.9.6](https://github.com/rism-digital/verovio/releases/tag/version-0.9.6)
+- [0.9.5](https://github.com/rism-digital/verovio/releases/tag/version-0.9.5)
+- [0.9.4](https://github.com/rism-digital/verovio/releases/tag/version-0.9.4)
+- [0.9.3](https://github.com/rism-digital/verovio/releases/tag/version-0.9.3)
+- [0.9.2](https://github.com/rism-digital/verovio/releases/tag/version-0.9.2)
+- [0.9.1](https://github.com/rism-digital/verovio/releases/tag/version-0.9.1)
+- [0.9.0](https://github.com/rism-digital/verovio/releases/tag/version-0.9.0)

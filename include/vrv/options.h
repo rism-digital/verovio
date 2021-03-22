@@ -59,8 +59,6 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
-enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
-
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -73,7 +71,12 @@ enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDI
 class Option {
 public:
     // constructors and destructors
-    Option() : m_isSet(false) {}
+    Option()
+    {
+        m_isSet = false;
+        m_shortOption = 0;
+        m_isCmdOnly = false;
+    }
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
 
@@ -91,7 +94,16 @@ public:
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
 
-    bool isSet() const { return m_isSet; }
+    bool IsSet() const { return m_isSet; }
+
+    void SetShortOption(char shortOption, bool isCmdOnly);
+    char GetShortOption() const { return m_shortOption; }
+    bool IsCmdOnly() const { return m_isCmdOnly; }
+
+    /**
+     * Return a JSON object for the option
+     */
+    jsonxx::Object ToJson() const;
 
 public:
     //----------------//
@@ -105,7 +117,6 @@ public:
     static std::map<int, std::string> s_condense;
     static std::map<int, std::string> s_footer;
     static std::map<int, std::string> s_header;
-    static std::map<int, std::string> s_measureNumber;
     static std::map<int, std::string> s_systemDivider;
 
 protected:
@@ -115,6 +126,10 @@ protected:
 
 private:
     std::string m_key;
+    /* the character for a short option - not set (0) by default) */
+    char m_shortOption;
+    /* a flag indicating that the option is available only on the command line */
+    bool m_isCmdOnly;
 };
 
 //----------------------------------------------------------------------------
@@ -127,7 +142,7 @@ private:
 class OptionBool : public Option {
 public:
     // constructors and destructors
-    OptionBool() {}
+    OptionBool() { m_defaultValue = false; }
     virtual ~OptionBool() {}
     virtual void CopyTo(Option *option);
     void Init(bool defaultValue);
@@ -161,7 +176,12 @@ private:
 class OptionDbl : public Option {
 public:
     // constructors and destructors
-    OptionDbl() {}
+    OptionDbl()
+    {
+        m_defaultValue = 0.0;
+        m_minValue = 0.0;
+        m_maxValue = 0.0;
+    }
     virtual ~OptionDbl() {}
     virtual void CopyTo(Option *option);
     void Init(double defaultValue, double minValue, double maxValue);
@@ -198,7 +218,12 @@ private:
 class OptionInt : public Option {
 public:
     // constructors and destructors
-    OptionInt() {}
+    OptionInt()
+    {
+        m_defaultValue = 0;
+        m_minValue = 0;
+        m_maxValue = 0;
+    }
     virtual ~OptionInt() {}
     virtual void CopyTo(Option *option);
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
@@ -479,6 +504,10 @@ public:
 
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
 
+    jsonxx::Object GetBaseOptGrp();
+
+    const std::vector<Option *> *GetBaseOptions();
+
     // post processing of parameters
     void Sync();
 
@@ -489,6 +518,21 @@ public:
     /**
      * Comments in implementation file options.cpp
      */
+    OptionGrp m_baseOptions;
+
+    // These options are only given for documentation - except for m_scale
+    // They are ordered by short option alphabetical order
+    OptionBool m_standardOutput;
+    OptionBool m_help;
+    OptionBool m_allPpages;
+    OptionString m_inputFrom;
+    OptionString m_outfile;
+    OptionInt m_page;
+    OptionString m_resourcePath;
+    OptionInt m_scale;
+    OptionString m_outputTo;
+    OptionBool m_version;
+    OptionInt m_xmlIdSeed;
 
     /**
      * General
@@ -503,6 +547,7 @@ public:
     OptionBool m_condenseFirstPage;
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
+    OptionString m_expand;
     OptionBool m_humType;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
@@ -523,11 +568,13 @@ public:
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
-    OptionString m_expand;
+    OptionBool m_removeIds;
     OptionBool m_shrinkToFit;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
+    OptionBool m_svgFormatRaw;
+    OptionBool m_svgRemoveXlink;
     OptionInt m_unit;
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
@@ -544,6 +591,7 @@ public:
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionDbl m_bracketThickness;
+    OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
     OptionString m_font;
     OptionDbl m_graceFactor;
@@ -564,7 +612,7 @@ public:
     OptionDbl m_lyricTopMinMargin;
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
-    OptionIntMap m_measureNumber;
+    OptionInt m_mnumInterval;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
@@ -661,10 +709,6 @@ public:
      * Deprecated options
      */
     OptionGrp m_deprecated;
-
-    OptionBool m_condenseEncoded;
-    OptionDbl m_slurThickness;
-    OptionDbl m_tieThickness;
 
 private:
     /** The array of style parameters */

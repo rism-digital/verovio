@@ -63,7 +63,7 @@ enum AlignmentType {
 //----------------------------------------------------------------------------
 
 /**
- * This class stores an alignement position elements will point to
+ * This class stores an alignment position elements will point to
  */
 class Alignment : public Object {
 public:
@@ -185,11 +185,6 @@ public:
      */
     bool HasTimestampOnly();
 
-    /* Return true and X position of the first accidental from the accid space of alignment reference for specific staff
-     * (found by staffN parameter). Return false and 0 otherwise.
-     */
-    std::pair<int, bool> GetAccidAdjustedPosition(Doc *doc, int staffN);
-
     //----------//
     // Functors //
     //----------//
@@ -275,7 +270,7 @@ private:
 
 /**
  * This class stores a references of LayerElements for a staff.
- * The staff identification (@n) is given by the attCommon and takes into accound
+ * The staff identification (@n) is given by the attCommon and takes into account
  * cross-staff situations.
  * Its children of the alignment are references.
  */
@@ -318,11 +313,6 @@ public:
      */
     bool HasMultipleLayer() const { return (m_layerCount > 1); }
 
-    /**
-     * Return first accidental from the accid space of the alignment reference
-     */
-    Accid *GetFrontAccid() const;
-
     //----------//
     // Functors //
     //----------//
@@ -343,9 +333,9 @@ public:
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
 private:
     //

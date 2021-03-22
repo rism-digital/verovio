@@ -227,23 +227,34 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
     if (this->GetStart()->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(this->GetStart());
         assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        startStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        // First check if the chord itself is cross-staff
+        startStaff = chord->GetCrossStaff(layer);
+        if (!startStaff) {
+            // If not look at its content
+            Staff *staffAbove = NULL;
+            Staff *staffBelow = NULL;
+            chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+            startStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        }
     }
-    else
+    else {
         startStaff = this->GetStart()->GetCrossStaff(layer);
+    }
 
     // Same for the end point
     Staff *endStaff = NULL;
     if (this->GetEnd()->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(this->GetEnd());
         assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        // First check if the chord itself is cross-staff
+        endStaff = chord->GetCrossStaff(layer);
+        if (!endStaff) {
+            // If not look at its content
+            Staff *staffAbove = NULL;
+            Staff *staffBelow = NULL;
+            chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+            endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        }
     }
     else {
         endStaff = this->GetEnd()->GetCrossStaff(layer);

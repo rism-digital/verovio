@@ -317,7 +317,7 @@ int Measure::GetDrawingOverflow()
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
@@ -458,7 +458,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
         }
     }
     else {
-        // with a scoredef inbetween always set it to what we have in the encoding
+        // with a scoredef in-between always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
@@ -577,9 +577,9 @@ int Measure::SaveEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
 }
 
-int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int Measure::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
-    UnsetCurrentScoreDefParams *params = vrv_params_cast<UnsetCurrentScoreDefParams *>(functorParams);
+    ScoreDefUnsetCurrentParams *params = vrv_params_cast<ScoreDefUnsetCurrentParams *>(functorParams);
     assert(params);
 
     if (m_drawingScoreDef) {
@@ -593,9 +593,9 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::OptimizeScoreDef(FunctorParams *functorParams)
+int Measure::ScoreDefOptimize(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     if (!params->m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
@@ -843,7 +843,7 @@ int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 
-    // Ajust the postion of the alignment according to what we have collected for this harm gpr
+    // Adjust the postion of the alignment according to what we have collected for this harm gpr
     m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
     params->m_overlapingHarm.clear();
 
@@ -858,7 +858,7 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 
-    // Ajust the postion of the alignment according to what we have collected for this verse
+    // Adjust the postion of the alignment according to what we have collected for this verse
     m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
     params->m_overlapingSyl.clear();
 
@@ -932,7 +932,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    // Check if the measure has some overlfowing control elements
+    // Check if the measure has some overflowing control elements
     int overflow = this->GetDrawingOverflow();
 
     if (params->m_currentSystem->GetChildCount() > 0) {

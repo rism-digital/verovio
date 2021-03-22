@@ -8,6 +8,7 @@
 #ifndef __VRV_ACCID_H__
 #define __VRV_ACCID_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_gestural.h"
 #include "layerelement.h"
 #include "positioninterface.h"
@@ -29,7 +30,8 @@ class Accid : public LayerElement,
               public AttAccidentalGestural,
               public AttAccidLog,
               public AttColor,
-              public AttEnclosingChars {
+              public AttEnclosingChars,
+              public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

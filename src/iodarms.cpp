@@ -173,7 +173,7 @@ int DarmsInput::parseMeter(int pos, const char *data)
     }
 
     // See if followed by numerical meter
-    if (isdigit(data[pos])) { // Coupound meter
+    if (isdigit(data[pos])) { // compound meter
         int n1, n2;
         n1 = data[pos] - ASCII_NUMBER_OFFSET; // old school conversion to int
         if (isdigit(data[pos + 1])) {
@@ -461,7 +461,7 @@ bool DarmsInput::Import(const std::string &data_str)
 
     m_doc->Reset();
     m_doc->SetType(Raw);
-    // The mdiv
+    // The mDiv
     Mdiv *mdiv = new Mdiv();
     mdiv->m_visibility = Visible;
     m_doc->AddChild(mdiv);

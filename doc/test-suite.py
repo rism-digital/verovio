@@ -12,6 +12,11 @@ import verovio
 
 ns = {'mei': 'http://www.music-encoding.org/ns/mei'}
 
+# Optional list for processing only listed test files 
+# Files must be listed in a file passed with --shortlist, one by line
+# Ex. 'accid/accid-001.mei'
+shortlist = []
+
 testOptions = {
     'adjustPageHeight': True,
     'breaks': 'auto',
@@ -27,6 +32,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("test_suite_dir")
     parser.add_argument("output_dir")
+    parser.add_argument("--shortlist", nargs='?', default='')
     args = parser.parse_args()
 
     tk = verovio.toolkit(False)
@@ -37,6 +43,14 @@ if __name__ == "__main__":
     defaultOptions = json.loads(tk.getOptions(True))
 
     tk.setResourcePath('../../data')
+
+    # look if we have a shortlist file and read it
+    if len(args.shortlist) > 0:
+        print(args.shortlist)
+        with open(args.shortlist) as f:
+            for line in f:
+                shortlist.append(line.strip('\n'))
+                print("File {} added to the shortlist".format(line))
 
     path1 = args.test_suite_dir.replace("\ ", " ")
     path2 = args.output_dir.replace("\ ", " ")
@@ -58,11 +72,15 @@ if __name__ == "__main__":
             if item2.startswith('.'):
                 continue
 
+            if shortlist and not(os.path.join(item1, item2) in shortlist):
+                continue
+
             # reset the options
             options = {**defaultOptions, **testOptions}
 
             # filenames (input MEI and output SVG)
             meiFile = os.path.join(path1, item1, item2)
+            print(meiFile)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')

@@ -175,7 +175,7 @@ void Page::LayOutTranscription(bool force)
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
-    // Set the pitch / pos alignement
+    // Set the pitch / pos alignment
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
@@ -267,7 +267,7 @@ void Page::LayOutHorizontally()
         this->Process(&setAlignmentX, &setAlignmentXPosParams);
     }
 
-    // Set the pitch / pos alignement
+    // Set the pitch / pos alignment
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
@@ -359,6 +359,11 @@ void Page::LayOutHorizontally()
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
 
+    // Adjust the tempo
+    Functor adjustTempo(&Object::AdjustTempo);
+    AdjustTempoParams adjustTempoParams(doc);
+    this->Process(&adjustTempo, &adjustTempoParams);
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsXParams(doc);
     Functor adjustTupletsX(&Object::AdjustTupletsX);
@@ -433,7 +438,7 @@ void Page::LayOutVertically()
 
     // If slurs were adjusted we need to redraw to adjust the bounding boxes
     if (adjustSlursParams.m_adjusted) {
-        // There is a problem here with cross-staff slurs: if they have been ajusted, the
+        // There is a problem here with cross-staff slurs: if they have been adjusted, the
         // Slur::m_isCrossStaff flag will trigger View::DrawSlurInitial to be called again.
         // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
         // but in between, we can have wrong collisions detections. To be improved
@@ -447,12 +452,12 @@ void Page::LayOutVertically()
     Functor setOverflowBBoxesEnd(&Object::SetOverflowBBoxesEnd);
     this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
 
-    // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
+    // Adjust the positioners of floating elements (slurs, hairpin, dynam, etc)
     Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
     AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
     this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
 
-    // Adjust the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
+    // Adjust the overlap of the staff aligments by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
     AdjustStaffOverlapParams adjustStaffOverlapParams(&adjustStaffOverlap);
     this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
@@ -463,7 +468,7 @@ void Page::LayOutVertically()
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
 
-    // Adjust the positioners of floationg elements placed between staves
+    // Adjust the positioners of floating elements placed between staves
     Functor adjustFloatingPositionersBetween(&Object::AdjustFloatingPositionersBetween);
     AdjustFloatingPositionersBetweenParams adjustFloatingPositionersBetweenParams(
         doc, &adjustFloatingPositionersBetween);
@@ -476,7 +481,6 @@ void Page::LayOutVertically()
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlursParams.m_crossStaffSlurs) {
-        LogMessage("XStaff slurs");
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(&adjustSlurs, &adjustSlursParams);
@@ -540,7 +544,7 @@ void Page::JustifyVertically()
         return;
     }
 
-    // Vertical justificaiton is not enabled
+    // Vertical justification is not enabled
     if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
         return;
     }
@@ -587,7 +591,7 @@ void Page::LayOutPitchPos()
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    // Set the pitch / pos alignement
+    // Set the pitch / pos alignment
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
@@ -700,7 +704,7 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
 
 int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    // Same functor, but we have not FunctorParams so we just re-instanciate it
+    // Same functor, but we have not FunctorParams so we just re-instantiate it
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
 
     RunningElement *header = this->GetHeader();
