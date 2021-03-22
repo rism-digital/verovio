@@ -247,8 +247,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "ornamentTurnSlash", SMUFL_E569_ornamentTurnSlash },
     { "ornamentTurnUp", SMUFL_E56A_ornamentTurnUp },
     { "ornamentTurnUpS", SMUFL_E56B_ornamentTurnUpS },
-    { "ornamentMordent", SMUFL_E56C_ornamentMordent },
-    { "ornamentMordentInverted", SMUFL_E56D_ornamentMordentInverted },
+    { "ornamentShortTrill", SMUFL_E56C_ornamentShortTrill },
+    { "ornamentMordent", SMUFL_E56D_ornamentMordent },
     { "ornamentTremblement", SMUFL_E56E_ornamentTremblement },
     { "ornamentHaydn", SMUFL_E56F_ornamentHaydn },
     { "ornamentVerticalLine", SMUFL_E583_ornamentVerticalLine },
@@ -285,6 +285,11 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "stringsUpBow", SMUFL_E612_stringsUpBow },
     { "stringsUpBowTurned", SMUFL_E613_stringsUpBowTurned },
     { "stringsHarmonic", SMUFL_E614_stringsHarmonic },
+    { "pluckedSnapPizzicatoBelow", SMUFL_E630_pluckedSnapPizzicatoBelow },
+    { "pluckedSnapPizzicatoAbove", SMUFL_E631_pluckedSnapPizzicatoAbove },
+    { "pluckedBuzzPizzicato", SMUFL_E632_pluckedBuzzPizzicato },
+    { "pluckedLeftHandPizzicato", SMUFL_E633_pluckedLeftHandPizzicato },
+    { "pluckedDamp", SMUFL_E638_pluckedDamp },
     { "vocalSprechgesang", SMUFL_E645_vocalSprechgesang },
     { "keyboardPedalPed", SMUFL_E650_keyboardPedalPed },
     { "keyboardPedalP", SMUFL_E651_keyboardPedalP },
@@ -387,6 +392,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 361
+// 366
 
 } // namespace vrv
