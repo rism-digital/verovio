@@ -1012,7 +1012,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         const bool isDotShifted(loc % 2 == 0);
         if (isDotShifted) {
             Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            if ((GetDrawingStemDir() == STEMDIRECTION_up) || (staff->GetChildCount(STAFF) == 1))
+            if ((GetDrawingStemDir() == STEMDIRECTION_up) || (staff->GetChildCount(LAYER) == 1))
                 ++loc;
             else
                 --loc;
