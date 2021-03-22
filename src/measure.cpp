@@ -738,6 +738,31 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Measure::AdjustDots(FunctorParams *functorParams)
+{
+    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
+    assert(params);
+
+    if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
+
+    std::vector<int>::iterator iter;
+    ArrayOfComparisons filters;
+    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
+        filters.clear();
+        // Create ad comparison object for each type / @n
+        std::vector<int> ns;
+        // -1 for barline attributes that need to be taken into account each time
+        ns.push_back(BARLINE_REFERENCES);
+        ns.push_back(*iter);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
+        filters.push_back(&matchStaff);
+
+        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Measure::AdjustAccidX(FunctorParams *functorParams)
 {
     AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);

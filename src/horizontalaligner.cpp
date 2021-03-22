@@ -1020,6 +1020,59 @@ int Alignment::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
+{
+    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_elements.empty() && !params->m_dots.empty()) {
+        // overlapping elements
+        std::multimap<LayerElement*, LayerElement*> overlapElements;
+        
+        for (auto dot : params->m_dots) {
+            //bool doesNotOverlap = true;
+            for (LayerElement *element : params->m_elements) {
+                if (dot->HorizontalSelfOverlap(element, 30) && dot->VerticalSelfOverlap(element, 0/*60?*/)) {
+                    if (element->Is({ CHORD, NOTE })) {
+                        if (dynamic_cast<AttAugmentDots *>(element)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, element);
+                    }
+                    else if (Object *chord = element->GetFirstAncestor(CHORD, UNLIMITED_DEPTH); chord) {
+                        if (vrv_cast<Chord *>(chord)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(chord));
+                    } 
+                    else if (Object *note = element->GetFirstAncestor(NOTE, UNLIMITED_DEPTH); note) {
+                        if (vrv_cast<Note *>(note)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(note));
+                    }
+                    else {
+                        // nothing here, should be removed
+                        assert(false);
+                    }
+                }
+            }
+        }
+
+        if (!overlapElements.empty()) {
+            for (auto dot : params->m_dots) {
+                auto pair = overlapElements.equal_range(dot);
+                int max = 0;
+                for (auto it = pair.first; it != pair.second; ++it) {
+                    const int diff
+                        = it->second->GetDrawingX() + it->first->GetDrawingXRel() - it->first->GetDrawingX();
+                    if (diff > max) max = diff;
+                }
+                if (max) dot->SetDrawingXRel(dot->GetDrawingXRel() + max);
+            }
+        }
+    }
+    
+    params->m_elements.clear();
+    params->m_dots.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Alignment::HorizontalSpaceForDuration(
     double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {

@@ -236,6 +236,11 @@ public:
      * See Object::AdjustBeams
      */
     virtual int AdjustBeams(FunctorParams *);
+    
+    /**
+     * See Object::AdjustDots
+     */
+    virtual int AdjustDots(FunctorParams *);
 
     /**
      * See Object::ResetHorizontalAlignment

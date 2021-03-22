@@ -314,6 +314,16 @@ void Page::LayOutHorizontally()
     AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustLayers, &adjustLayersParams);
 
+    Functor adjustDots(&Object::AdjustDots);
+    Functor adjustDotsEnd(&Object::AdjustDotsEnd);
+    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->m_mdivScoreDef.GetStaffNs());
+    this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
+
+    // adjust Layers again
+    AdjustLayersParams newAdjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
+    newAdjustLayersParams.m_ignoreDots = false;
+    this->Process(&adjustLayers, &newAdjustLayersParams);
+
     // Adjust the X position of the accidentals, including in chords
     Functor adjustAccidX(&Object::AdjustAccidX);
     AdjustAccidXParams adjustAccidXParams(doc, &adjustAccidX);

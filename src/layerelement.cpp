@@ -1318,6 +1318,22 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::AdjustDots(FunctorParams *functorParams)
+{
+    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
+    assert(params);
+
+    if (Is(NOTE) && GetParent()->Is(CHORD)) return FUNCTOR_SIBLINGS;
+    if (Is(DOTS)) {
+        params->m_dots.push_back(this);
+    }
+    else {
+        params->m_elements.push_back(this);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int LayerElement::AdjustLayers(FunctorParams *functorParams)
 {
     AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
@@ -1336,22 +1352,17 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
-    if (this->Is({ DOTS, NOTE }) && this->HasSelfBB()) {
-        params->m_current.push_back(this);
+    if (this->HasSelfBB()) {
+        if (this->Is({ NOTE/*, STEM*/ })) {
+            params->m_current.push_back(this);
+        }
+        else if (!params->m_ignoreDots && this->Is(DOTS)) {
+            params->m_current.push_back(this);
+        }
     }
 
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
-
-    if (this->Is(NOTE)) {
-        params->m_currentNote = vrv_cast<Note *>(this);
-        assert(params->m_currentNote);
-        if (!params->m_currentNote->IsChordTone()) params->m_currentChord = NULL;
-    }
-    else if (this->Is(CHORD)) {
-        params->m_currentChord = vrv_cast<Chord *>(this);
-        assert(params->m_currentChord);
-    }
 
     AdjustOverlappingLayers(params->m_doc, params->m_previous, params->m_unison);
 

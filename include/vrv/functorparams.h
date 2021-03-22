@@ -226,6 +226,31 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustDotsParams
+//----------------------------------------------------------------------------
+
+/**
+ * 
+ **/
+
+class AdjustDotsParams : public FunctorParams {
+public:
+    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    {
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+        m_staffNs = staffNs;
+    }
+    std::vector<int> m_staffNs;
+    std::vector<LayerElement *> m_elements;
+    std::vector<LayerElement *> m_dots;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
 
@@ -413,6 +438,7 @@ public:
         m_functor = functor;
         m_staffNs = staffNs;
         m_unison = false;
+        m_ignoreDots = true;
     }
     std::vector<int> m_staffNs;
     int m_currentLayerN;
@@ -423,6 +449,7 @@ public:
     Doc *m_doc;
     Functor *m_functor;
     bool m_unison;
+    bool m_ignoreDots;
 };
 
 //----------------------------------------------------------------------------
