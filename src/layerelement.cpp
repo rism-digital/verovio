@@ -1353,7 +1353,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
     if (this->HasSelfBB()) {
-        if (this->Is({ NOTE/*, STEM*/ })) {
+        if (this->Is({ NOTE, STEM })) {
             params->m_current.push_back(this);
         }
         else if (!params->m_ignoreDots && this->Is(DOTS)) {
@@ -1367,6 +1367,161 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     AdjustOverlappingLayers(params->m_doc, params->m_previous, params->m_unison);
 
     return FUNCTOR_SIBLINGS;
+}
+
+void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison) 
+{
+    if (Is(NOTE) && GetParent()->Is(CHORD)) return;
+    else if (Is(STEM) && isUnison) {
+        isUnison = false;
+        return;
+    }
+
+    auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, false);
+    isUnison = isInUnison;
+    if (isUnison) return;
+
+    if (Is({ DOTS, STEM })) {
+        LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+        assert(parent);
+        parent->SetDrawingXRel(parent->GetDrawingXRel() + margin);
+    }
+    else {
+        SetDrawingXRel(GetDrawingXRel() + margin);
+    }
+
+}
+
+std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool isLowerElement, bool unison)
+{
+    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    assert(staff);
+
+    bool isInUnison = false;
+    int shift = 0;
+
+    for (int i = 0; i < int(otherElements.size()); ++i) {
+        int verticalMargin = 0;
+        int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        bool isUnisonElement = false;
+        // Handle stem collisions
+        if (Is(STEM)) {
+            Stem *stem = vrv_cast<Stem *>(this);
+            if (otherElements.at(i)->Is(NOTE)) {
+                shift += stem->CompareToElementPosition(doc, otherElements.at(i), -shift);
+            }
+            else if (otherElements.at(i)->Is(DOTS) && HorizontalSelfOverlap(otherElements.at(i), horizontalMargin)) {
+                shift += stem->HorizontalLeftOverlap(otherElements.at(i), doc, 0, 0) + horizontalMargin / 2;
+            }
+            if (shift) return { shift, isInUnison };
+        }
+        // handle note collisions
+        else if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
+            Note *currentNote = vrv_cast<Note *>(this);
+            Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
+            assert(previousNote);
+            isUnisonElement = currentNote->IsUnissonWith(previousNote, true);
+            // Unisson, look at the duration for the note heads
+            if (unison && currentNote->IsUnissonWith(previousNote, false)) {
+                int previousDuration = previousNote->GetDrawingDur();
+                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
+                bool isEdgeElement = false;
+                if (isPreviousCoord) {
+                    Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
+                    data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
+                    previousDuration = parentChord->GetDur();
+                    isEdgeElement
+                        = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
+                        || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
+                }
+                // Reduce the margin to 0 for whole notes unisson
+                else if ((currentNote->GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
+                    horizontalMargin = 0;
+                }
+                if (!isPreviousCoord || isEdgeElement || isChordElement) {
+                    if ((currentNote->GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
+                        isInUnison = true;
+                        continue;
+                    }
+                    else if ((currentNote->GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
+                        isInUnison = true;
+                        continue;
+                    }
+                }
+                else {
+                    horizontalMargin *= -1;
+                }
+            }
+            else if (previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() > 1) {
+                continue;
+            }
+            else if (previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() == 1) {
+                horizontalMargin = 0;
+            }
+            else if ((previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() < 0)
+                && (previousNote->GetDrawingStemDir()
+                    != currentNote->GetDrawingStemDir()) /* && !isChordElement*/) {
+                if (previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() == -1) {
+                    horizontalMargin *= -1;
+                }
+                else if ((currentNote->GetDrawingDur() <= DUR_1) && (previousNote->GetDrawingDur() <= DUR_1)) {
+                    continue;
+                }
+                else if (previousNote->m_crossStaff || m_crossStaff)
+                    continue;
+                else {
+                    horizontalMargin *= -1;
+                    verticalMargin = horizontalMargin;
+                }
+            }
+        }
+        // handle dot/stem collision
+        else if (Is(DOTS) && otherElements.at(i)->Is(STEM)) {
+            // No need for shift if dot is adjusted
+            Dots *dot = vrv_cast<Dots *>(this);
+            if (dot->IsAdjusted()) continue;
+
+            Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
+            const int right = stem->HorizontalLeftOverlap(this, doc, 0, 0);
+            shift = -right - horizontalMargin / 2;
+            return { shift, isInUnison };
+        }
+
+        if (Is(NOTE) && !otherElements.at(i)->Is(STEM)) {
+            // Nothing to do if we have no vertical overlap
+            if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) continue;
+
+            // Nothing to do either if we have no horizontal overlap
+            if (!HorizontalSelfOverlap(otherElements.at(i), horizontalMargin + shift)) continue;
+
+            if (horizontalMargin < 0 || isLowerElement) {
+                shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
+                if (!isUnisonElement) shift -= horizontalMargin;
+            }
+            else if ((horizontalMargin >= 0) || isChordElement) {
+                shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+
+                // Make additional adjustments for cross-staff and unison notes
+                if (m_crossStaff) shift -= horizontalMargin;
+                if (isInUnison) shift *= -1;
+            }
+            else {
+                // Otherwise move the appropriate parent to the right
+                shift -= horizontalMargin
+                    - HorizontalRightOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+            }
+        }
+    }
+
+    // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
+    // That way accidental will be near note that actually has accidental and not near lowest-layer note
+    if (Is(NOTE) && isChordElement && unison && (shift > 0)) {
+        Note *currentNote = vrv_cast<Note *>(this);
+        if (currentNote->GetDrawingAccid()) shift *= -1;
+    }
+
+    return { shift, isInUnison };
 }
 
 int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)

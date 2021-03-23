@@ -449,8 +449,8 @@ void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> 
     for (auto iter : *notes) {
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
-        auto [overlap, isInUnison]
-            = note->CalcNoteHorizontalOverlap(doc, otherElements, true, isLowerPosition, expectedElementsInUnison > 0);
+        auto [overlap, isInUnison] = note->CalcElementHorizontalOverlap(
+            doc, otherElements, true, isLowerPosition, expectedElementsInUnison > 0);
         if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
             margin = overlap;
         }

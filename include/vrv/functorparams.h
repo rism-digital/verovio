@@ -230,7 +230,12 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * 
+ * member 0: the list of staffN in the top-level scoreDef
+ * member 1: the list of all elements (except for dots) in for the alignment in the staff
+ * member 2: the list of all dots in for the alignment in the staff
+ * member 3: the Doc
+ * member 4: the Functor for redirection to the MeasureAligner
+ * member 5: the end Functor for redirection
  **/
 
 class AdjustDotsParams : public FunctorParams {
