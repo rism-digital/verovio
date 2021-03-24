@@ -1096,11 +1096,11 @@ std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
     return a.json();
 }
 
-bool Toolkit::Edit(const std::string &json_editorAction)
+bool Toolkit::Edit(const std::string &editorAction)
 {
     this->ResetLogBuffer();
 
-    return m_editorToolkit->ParseEditorAction(json_editorAction);
+    return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
 std::string Toolkit::EditInfo()
@@ -1208,7 +1208,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     return true;
 }
 
-std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
+std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 {
     this->ResetLogBuffer();
 
@@ -1244,7 +1244,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     // render the page
     RenderToDeviceContext(pageNo, &svg);
 
-    std::string out_str = svg.GetStringSVG(xml_declaration);
+    std::string out_str = svg.GetStringSVG(xmlDeclaration);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }
