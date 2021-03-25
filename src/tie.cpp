@@ -86,8 +86,6 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     if (startParentChord) {
         durElement = startParentChord;
         if (startParentChord->m_crossStaff) layer1 = startParentChord->m_crossLayer;
-        //if ((note1 == startParentChord->GetTopNote()) || (note1 == startParentChord->GetBottomNote()))
-        //    isOuterChordNote = true;
     }
     if (note2) {
         endParentChord = note2->IsChordTone();
