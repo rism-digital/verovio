@@ -1378,8 +1378,10 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
     }
 
     auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, false);
-    isUnison = isInUnison;
-    if (isUnison) return;
+    if (Is(NOTE)) {
+        isUnison = isInUnison;
+        if (isUnison) return;
+    }
 
     if (Is({ DOTS, STEM })) {
         LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
@@ -1414,7 +1416,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
             else if (otherElements.at(i)->Is(DOTS) && HorizontalSelfOverlap(otherElements.at(i), horizontalMargin)) {
                 shift += stem->HorizontalLeftOverlap(otherElements.at(i), doc, 0, 0) + horizontalMargin / 2;
             }
-            if (shift) return { shift, isInUnison };
+            if (shift) break;
         }
         // handle note collisions
         else if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
@@ -1477,15 +1479,20 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
             }
         }
         // handle dot/stem collision
-        else if (Is(DOTS) && otherElements.at(i)->Is(STEM)) {
+        else if (Is(DOTS) && !otherElements.at(i)->Is(DOTS)) {
             // No need for shift if dot is adjusted
             Dots *dot = vrv_cast<Dots *>(this);
-            if (dot->IsAdjusted()) continue;
+            if (dot->IsAdjusted() || !HorizontalSelfOverlap(otherElements.at(i), horizontalMargin)) continue;
 
-            Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
-            const int right = stem->HorizontalLeftOverlap(this, doc, 0, 0);
-            shift = -right - horizontalMargin / 2;
-            return { shift, isInUnison };
+            if (otherElements.at(i)->Is(STEM)) {
+                Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
+                const int right = stem->HorizontalLeftOverlap(this, doc, 0, 0);
+                shift += -right - horizontalMargin / 2;
+                break;
+            }
+            else {
+                shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
+            }
         }
 
         if (Is(NOTE) && !otherElements.at(i)->Is(STEM)) {
