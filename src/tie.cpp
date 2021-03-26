@@ -100,12 +100,12 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     switch (spanningType) {
         case SPANNING_START_END:
-        case SPANNING_START: {
-            if (note1) noteStemDir = note1->GetDrawingStemDir();
-            break;
-        }
+        case SPANNING_START: 
         case SPANNING_END: {
-            if (note2) noteStemDir = note2->GetDrawingStemDir();
+            if (note1)
+                noteStemDir = note1->GetDrawingStemDir();
+            else if (note2)
+                noteStemDir = note2->GetDrawingStemDir();
             break;
         }
         default: break;
