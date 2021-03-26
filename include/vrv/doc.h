@@ -322,7 +322,7 @@ public:
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
-    void ConvertMarkupDoc(bool permanent = false);
+    void ConvertMarkupDoc(bool permanent = true);
 
     /**
      * Transpose the content of the doc.

@@ -1352,7 +1352,6 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     pedal->WriteVerticalGroup(currentNode);
-    pedal->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WritePhrase(pugi::xml_node currentNode, Phrase *phrase)
@@ -1589,6 +1588,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
+    clef->WriteExtSym(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
     clef->WriteVisibility(currentNode);
@@ -2925,7 +2925,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
-        m_doc->ConvertMarkupDoc();
+        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
     }
 
     if (success && !m_hasScoreDef) {
@@ -4851,6 +4851,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
+    vrvClef->ReadExtSym(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
     vrvClef->ReadVisibility(clef);

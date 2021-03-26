@@ -8,6 +8,7 @@
 #ifndef __VRV_CLEF_H__
 #define __VRV_CLEF_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 
@@ -25,6 +26,7 @@ class ScoreDefInterface;
 class Clef : public LayerElement,
              public AttClefShape,
              public AttColor,
+             public AttExtSym,
              public AttLineLoc,
              public AttOctaveDisplacement,
              public AttVisibility {
@@ -58,9 +60,9 @@ public:
     //----------------//
 
     /**
-     * Return a clef id based on the various parameters
+     * Retrieves the appropriate SMuFL code for a data_CLEFSHAPE
      */
-    static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place);
+    wchar_t GetClefGlyph(data_NOTATIONTYPE) const;
 
     //----------//
     // Functors //
