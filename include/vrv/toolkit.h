@@ -523,6 +523,10 @@ public:
     //------------------------------------------------//
     
     /**
+     * @defgroup nodoc
+     */
+    
+    /**
      * @name Public methods that are not listed in the documentation
      *
      * @internal They are marked with \@ingroup nodoc
@@ -584,8 +588,14 @@ public:
      */
     const char *GetHumdrumBuffer();
     
+    /**
+     * @ingroup nodoc
+     */
     void SetInputFrom(FileFormat format) { m_inputFrom = format; }
     
+    /**
+     * @ingroup nodoc
+     */
     int GetOutputTo() { return m_outputTo; }
     
     ///@}
