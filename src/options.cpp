@@ -971,6 +971,10 @@ Options::Options()
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
 
+    m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
+    m_dynamDist.Init(1.0, 0.5, 8.0);
+    this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
+
     m_engravingDefaults.SetInfo(
         "Engraving defaults", "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(engravingDefaults);

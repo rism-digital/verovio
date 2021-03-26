@@ -592,6 +592,7 @@ public:
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionDbl m_bracketThickness;
+    OptionDbl m_dynamDist;
     OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
     OptionString m_font;

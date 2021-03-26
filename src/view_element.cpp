@@ -615,7 +615,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     double clefSizeFactor = 1.0;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
         if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
-            // HARDCODED
             clefSizeFactor = m_options->m_clefChangeFactor.GetValue();
             // x -= m_doc->GetGlyphWidth(sym, clefSizeFactor * staff->m_drawingStaffSize, false) * 1.35;
         }
