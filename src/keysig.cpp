@@ -266,6 +266,12 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
         case (CLEFSHAPE_G << 8 | 4): keySet = 3; break;
         case (CLEFSHAPE_G << 8 | 5): keySet = 4; break;
 
+        case (CLEFSHAPE_GG << 8 | 1): keySet = 0; break;
+        case (CLEFSHAPE_GG << 8 | 2): keySet = 1; break;
+        case (CLEFSHAPE_GG << 8 | 3): keySet = 2; break;
+        case (CLEFSHAPE_GG << 8 | 4): keySet = 3; break;
+        case (CLEFSHAPE_GG << 8 | 5): keySet = 4; break;
+
         case (CLEFSHAPE_C << 8 | 1): keySet = 2; break;
         case (CLEFSHAPE_C << 8 | 2): keySet = 3; break;
         case (CLEFSHAPE_C << 8 | 3): keySet = 4; break;

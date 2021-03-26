@@ -69,6 +69,8 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_currentNode = m_svgNode;
 
     m_outdata.clear();
+
+    m_glyphPostfixId = Object::GenerateRandUuid();
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}
@@ -130,6 +132,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
+                std::string id = StringFormat("%s-%s", child.attribute("id").value(), m_glyphPostfixId.c_str());
+                child.attribute("id").set_value(id.c_str());
                 defs.append_copy(child);
             }
         }
@@ -881,7 +885,8 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
 
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
-        useChild.append_attribute(hrefAttrib.c_str()) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
+        useChild.append_attribute(hrefAttrib.c_str())
+            = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
