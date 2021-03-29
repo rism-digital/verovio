@@ -1254,7 +1254,7 @@ void MEIOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
     WriteControlElement(currentNode, breath);
     WriteTimePointInterface(currentNode, breath);
     breath->WriteColor(currentNode);
-    breath->WritePlacement(currentNode);
+    breath->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
@@ -1293,7 +1293,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WriteColor(currentNode);
     fermata->WriteExtSym(currentNode);
     fermata->WriteFermataVis(currentNode);
-    fermata->WritePlacement(currentNode);
+    fermata->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
@@ -1327,7 +1327,7 @@ void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WriteHairpinVis(currentNode);
-    hairpin->WritePlacement(currentNode);
+    hairpin->WritePlacementRelStaff(currentNode);
     hairpin->WriteVerticalGroup(currentNode);
 }
 
@@ -1363,7 +1363,7 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
     mordent->WriteColor(currentNode);
     mordent->WriteExtSym(currentNode);
     mordent->WriteOrnamentAccid(currentNode);
-    mordent->WritePlacement(currentNode);
+    mordent->WritePlacementRelStaff(currentNode);
     mordent->WriteMordentLog(currentNode);
 }
 
@@ -1391,7 +1391,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteExtSym(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
-    pedal->WritePlacement(currentNode);
+    pedal->WritePlacementRelStaff(currentNode);
     pedal->WriteVerticalGroup(currentNode);
 }
 
@@ -1484,7 +1484,7 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     trill->WriteLineRend(currentNode);
     trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
-    trill->WritePlacement(currentNode);
+    trill->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
@@ -1496,7 +1496,7 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     turn->WriteColor(currentNode);
     turn->WriteExtSym(currentNode);
     turn->WriteOrnamentAccid(currentNode);
-    turn->WritePlacement(currentNode);
+    turn->WritePlacementRelStaff(currentNode);
     turn->WriteTurnLog(currentNode);
 }
 
@@ -1558,7 +1558,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     artic->WriteArticulation(currentNode);
     artic->WriteColor(currentNode);
     artic->WriteExtSym(currentNode);
-    artic->WritePlacement(currentNode);
+    artic->WritePlacementRelEvent(currentNode);
 }
 
 void MEIOutput::WriteBarLine(pugi::xml_node currentNode, BarLine *barLine)
@@ -2190,7 +2190,7 @@ void MEIOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *
 {
     assert(interface);
 
-    interface->WritePlacement(element);
+    interface->WritePlacementRelStaff(element);
 }
 
 void MEIOutput::WriteTimePointInterface(pugi::xml_node element, TimePointInterface *interface)
@@ -4278,7 +4278,7 @@ bool MEIInput::ReadBreath(Object *parent, pugi::xml_node breath)
 
     ReadTimePointInterface(breath, vrvBreath);
     vrvBreath->ReadColor(breath);
-    vrvBreath->ReadPlacement(breath);
+    vrvBreath->ReadPlacementRelStaff(breath);
 
     parent->AddChild(vrvBreath);
     ReadUnsupportedAttr(breath, vrvBreath);
@@ -4329,7 +4329,7 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     vrvFermata->ReadColor(fermata);
     vrvFermata->ReadExtSym(fermata);
     vrvFermata->ReadFermataVis(fermata);
-    vrvFermata->ReadPlacement(fermata);
+    vrvFermata->ReadPlacementRelStaff(fermata);
 
     parent->AddChild(vrvFermata);
     ReadUnsupportedAttr(fermata, vrvFermata);
@@ -4375,7 +4375,7 @@ bool MEIInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadHairpinVis(hairpin);
-    vrvHairpin->ReadPlacement(hairpin);
+    vrvHairpin->ReadPlacementRelStaff(hairpin);
     vrvHairpin->ReadVerticalGroup(hairpin);
 
     parent->AddChild(vrvHairpin);
@@ -4426,7 +4426,7 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     vrvMordent->ReadColor(mordent);
     vrvMordent->ReadExtSym(mordent);
     vrvMordent->ReadOrnamentAccid(mordent);
-    vrvMordent->ReadPlacement(mordent);
+    vrvMordent->ReadPlacementRelStaff(mordent);
     vrvMordent->ReadMordentLog(mordent);
 
     parent->AddChild(vrvMordent);
@@ -4462,7 +4462,7 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     vrvPedal->ReadExtSym(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPedalVis(pedal);
-    vrvPedal->ReadPlacement(pedal);
+    vrvPedal->ReadPlacementRelStaff(pedal);
     vrvPedal->ReadVerticalGroup(pedal);
 
     parent->AddChild(vrvPedal);
@@ -4571,7 +4571,7 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     vrvTrill->ReadLineRend(trill);
     vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
-    vrvTrill->ReadPlacement(trill);
+    vrvTrill->ReadPlacementRelStaff(trill);
 
     parent->AddChild(vrvTrill);
     ReadUnsupportedAttr(trill, vrvTrill);
@@ -4591,7 +4591,7 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
     vrvTurn->ReadColor(turn);
     vrvTurn->ReadExtSym(turn);
     vrvTurn->ReadOrnamentAccid(turn);
-    vrvTurn->ReadPlacement(turn);
+    vrvTurn->ReadPlacementRelStaff(turn);
     vrvTurn->ReadTurnLog(turn);
 
     parent->AddChild(vrvTurn);
@@ -4901,7 +4901,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadColor(artic);
     vrvArtic->ReadExtSym(artic);
-    vrvArtic->ReadPlacement(artic);
+    vrvArtic->ReadPlacementRelEvent(artic);
 
     if (vrvArtic->GetArtic().size() > 1) {
         m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
@@ -5721,7 +5721,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
 
 bool MEIInput::ReadTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
 {
-    interface->ReadPlacement(element);
+    interface->ReadPlacementRelStaff(element);
     return true;
 }
 
