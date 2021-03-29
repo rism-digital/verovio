@@ -580,6 +580,29 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustXPosAlignmentOffset
+//----------------------------------------------------------------------------
+// Class to hold information about alignment, possible offset and overlapping bounding box. This is a helper class to be
+// used solely with AdjustXPosParams to store information regarding current/previous alignment that are being processed
+class AdjustXPosAlignmentOffset {
+public:
+    AdjustXPosAlignmentOffset() : m_offset(0), m_overlappingBB(NULL) {};
+
+    void Reset()
+    {
+        m_alignment = NULL;
+        m_offset = 0;
+        m_overlappingBB = NULL;
+    }
+
+public:
+    // data members
+    Alignment *m_alignment;
+    int m_offset;
+    BoundingBox *m_overlappingBB;
+};
+
+//----------------------------------------------------------------------------
 // AdjustXPosParams
 //----------------------------------------------------------------------------
 
@@ -594,6 +617,8 @@ public:
  * member 7: the Doc
  * member 8: the Functor for redirection to the MeasureAligner
  * member 9: the end Functor for redirection
+ * member 10: current aligner that is being processed
+ * member 11: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -619,6 +644,8 @@ public:
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
+    AdjustXPosAlignmentOffset m_currentAlignment;
+    AdjustXPosAlignmentOffset m_previousAlignment;
 };
 
 //----------------------------------------------------------------------------

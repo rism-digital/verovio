@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Improved horizontal layout with dots and flags (@Enote-GmbH)
 * Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
 * Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
 
@@ -17,7 +18,7 @@
 * Option --svg-format-raw for raw SVG output without indentation and line breaks
 * New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
 * Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
-* Fixes in the MusicXML importer (@eNote-GmBH)
+* Fixes in the MusicXML importer (@Enote-GmbH)
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
