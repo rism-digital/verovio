@@ -128,14 +128,16 @@ void Chord::AddChild(Object *child)
         return;
     }
 
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        m_children.insert(m_children.begin(), child);
+        children->insert(children->begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children->push_back(child);
     }
     Modify();
 }
@@ -288,7 +290,7 @@ int Chord::GetXMax()
     return x;
 }
 
-void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
+void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow, Layer **layerAbove, Layer **layerBelow)
 {
     staffAbove = NULL;
     staffBelow = NULL;
@@ -301,6 +303,7 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
     assert(bottomNote);
     if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
         staffBelow = bottomNote->m_crossStaff;
+        if (layerBelow) (*layerBelow) = bottomNote->m_crossLayer;
     }
 
     // The last note is the top
@@ -308,31 +311,7 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
     assert(topNote);
     if (topNote->m_crossStaff && topNote->m_crossLayer) {
         staffAbove = topNote->m_crossStaff;
-    }
-}
-
-void Chord::GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow)
-{
-    assert(element);
-    assert(alignment);
-
-    // Only flags and stems need to be skipped
-    if (!element->Is({ FLAG, STEM })) return;
-
-    // Nothing to do if there is not cross-staff
-    if (!this->HasCrossStaff()) return;
-
-    Staff *staff = alignment->GetStaff();
-    assert(staff);
-
-    Staff *staffAbove = NULL;
-    Staff *staffBelow = NULL;
-    this->GetCrossStaffExtremes(staffAbove, staffBelow);
-    if (staffAbove && (staffAbove != staff)) {
-        skipAbove = true;
-    }
-    if (staffBelow && (staffBelow != staff)) {
-        skipBelow = true;
+        if (layerAbove) (*layerAbove) = topNote->m_crossLayer;
     }
 }
 
@@ -384,7 +363,7 @@ bool Chord::IsVisible()
         return this->GetVisible() == BOOLEAN_true;
     }
 
-    // if the chord doens't have it, see if all the children are invisible
+    // if the chord doesn't have it, see if all the children are invisible
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
@@ -413,6 +392,52 @@ bool Chord::HasNoteWithDots()
     }
 
     return false;
+}
+
+void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    int margin = 0;
+    // get positions of other elements
+    std::set<int> otherElementLocations;
+    for (auto element : otherElements) {
+        if (element->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(element);
+            assert(note);
+            otherElementLocations.insert(note->GetDrawingLoc());
+        }
+    }
+    const ArrayOfObjects *notes = GetList(this);
+    assert(notes);
+    // get current chord positions
+    std::set<int> chordElementLocations;
+    for (auto iter : *notes) {
+        Note *note = vrv_cast<Note *>(iter);
+        assert(note);
+        chordElementLocations.insert(note->GetDrawingLoc());
+    }
+    const int expectedElementsInUnison
+        = CountElementsInUnison(chordElementLocations, otherElementLocations, GetDrawingStemDir());
+    const bool isLowerPosition = (STEMDIRECTION_down == GetDrawingStemDir() && (otherElementLocations.size() > 0)
+        && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
+    int actualElementsInUnison = 0;
+    // process each note of the chord separately, storing locations in the set
+    for (auto iter : *notes) {
+        Note *note = vrv_cast<Note *>(iter);
+        assert(note);
+        auto [overlap, isInUnison]
+            = note->CalcNoteHorizontalOverlap(doc, otherElements, true, isLowerPosition, expectedElementsInUnison > 0);
+        if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
+            margin = overlap;
+        }
+        if (isInUnison) ++actualElementsInUnison;
+    }
+
+    if (expectedElementsInUnison && (expectedElementsInUnison == actualElementsInUnison)) {
+        isUnison = true;
+    }
+    else if (margin) {
+        SetDrawingXRel(GetDrawingXRel() + margin);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -471,6 +496,77 @@ int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Chord::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &artic : params->m_articsToConvert) {
+        artic->SplitMultival(this);
+    }
+    params->m_articsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::CalcArtic(FunctorParams *functorParams)
+{
+    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
+    assert(params);
+
+    params->m_parent = this;
+    params->m_stemDir = this->GetDrawingStemDir();
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    params->m_staffAbove = staff;
+    params->m_staffBelow = staff;
+    params->m_layerAbove = layer;
+    params->m_layerBelow = layer;
+    params->m_crossStaffAbove = false;
+    params->m_crossStaffBelow = false;
+
+    if (this->m_crossStaff) {
+        params->m_staffAbove = this->m_crossStaff;
+        params->m_staffBelow = this->m_crossStaff;
+        params->m_layerAbove = this->m_crossLayer;
+        params->m_layerBelow = this->m_crossLayer;
+        params->m_crossStaffAbove = true;
+        params->m_crossStaffBelow = true;
+    }
+    else {
+        this->GetCrossStaffExtremes(
+            params->m_staffAbove, params->m_staffBelow, &params->m_layerAbove, &params->m_layerBelow);
+        if (params->m_staffAbove) {
+            params->m_crossStaffAbove = true;
+            params->m_staffBelow = staff;
+            params->m_layerBelow = layer;
+        }
+        else if (params->m_staffBelow) {
+            params->m_crossStaffBelow = true;
+            params->m_staffAbove = staff;
+            params->m_layerAbove = layer;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::AdjustArtic(FunctorParams *functorParams)
+{
+    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
+    assert(params);
+
+    params->m_parent = this;
+    params->m_articAbove.clear();
+    params->m_articBelow.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Chord::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
@@ -479,7 +575,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     // Set them to NULL in any case
     params->m_interface = NULL;
 
-    // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
+    // Stems have been calculated previously in beam or fTrem - siblings because flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
         return FUNCTOR_SIBLINGS;
@@ -497,7 +593,10 @@ int Chord::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (this->m_crossStaff) {
+        staff = this->m_crossStaff;
+        layer = this->m_crossLayer;
+    }
 
     // Cache the in params to avoid further lookup
     params->m_staff = staff;
@@ -642,7 +741,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!currentStem) {
         currentStem = new Stem();
@@ -651,7 +750,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     currentStem->AttGraced::operator=(*this);
     currentStem->AttStems::operator=(*this);
     currentStem->AttStemsCmn::operator=(*this);
-    if (this->GetActualDur() < DUR_2) {
+    if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);
     }
 

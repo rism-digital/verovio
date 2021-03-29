@@ -18,9 +18,10 @@ class MidiFile;
 
 namespace vrv {
 
-class ClassIdComparison;
+class Artic;
 class BoundaryStartInterface;
 class Chord;
+class ClassIdComparison;
 class Clef;
 class Doc;
 class Dot;
@@ -54,6 +55,7 @@ class Syl;
 class System;
 class SystemAligner;
 class Transposer;
+class TupletNum;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -146,6 +148,80 @@ public:
     ArrayOfAligmentArpegTuples m_alignmentArpegTuples;
     MeasureAligner *m_measureAligner;
     Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustBeamParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the beam that should be adjusted
+ * member 1: y coordinate of the beam left side
+ * member 2: y coordinate of the beam right side
+ * member 3: overlap margin that beam needs to be displaced by
+ * member 4: the Doc
+ **/
+
+class AdjustBeamParams : public FunctorParams {
+public:
+    AdjustBeamParams(Doc *doc)
+    {
+        m_beam = NULL;
+        m_y1 = 0;
+        m_y2 = 0;
+        m_directionBias = 0;
+        m_overlapMargin = 0;
+        m_doc = doc;
+    }
+
+    Object *m_beam;
+    int m_y1;
+    int m_y2;
+    int m_directionBias;
+    int m_overlapMargin;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustClefsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the measureAligner
+ * member 1: the Doc
+ **/
+
+class AdjustClefsParams : public FunctorParams {
+public:
+    AdjustClefsParams(Doc *doc)
+    {
+        m_aligner = NULL;
+        m_doc = doc;
+    }
+    MeasureAligner *m_aligner;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class AdjustArticParams : public FunctorParams {
+public:
+    AdjustArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+    }
+    std::list<Artic *> m_articAbove;
+    std::list<Artic *> m_articBelow;
+    LayerElement *m_parent;
     Doc *m_doc;
 };
 
@@ -323,6 +399,7 @@ public:
  * member 5: the current chord (if any)
  * member 6: the doc
  * member 7: a pointer to the functor for passing it to the system aligner
+ * member 8: flag whether element is in unison
  **/
 
 class AdjustLayersParams : public FunctorParams {
@@ -335,6 +412,7 @@ public:
         m_doc = doc;
         m_functor = functor;
         m_staffNs = staffNs;
+        m_unison = false;
     }
     std::vector<int> m_staffNs;
     int m_currentLayerN;
@@ -344,6 +422,7 @@ public:
     Chord *m_currentChord;
     Doc *m_doc;
     Functor *m_functor;
+    bool m_unison;
 };
 
 //----------------------------------------------------------------------------
@@ -351,8 +430,10 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 1: the doc
- * member 2: a pointer to the functor for passing it to the system aligner
+ * member 0: a flag indicating that at least one slur had to be adjusted
+ * member 1: a flag indicating that there is at least one cross-staff slur
+ * member 2: the doc
+ * member 3: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustSlursParams : public FunctorParams {
@@ -360,10 +441,12 @@ public:
     AdjustSlursParams(Doc *doc, Functor *functor)
     {
         m_adjusted = false;
+        m_crossStaffSlurs = false;
         m_doc = doc;
         m_functor = functor;
     }
     bool m_adjusted;
+    bool m_crossStaffSlurs;
     Doc *m_doc;
     Functor *m_functor;
 };
@@ -421,6 +504,56 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustTempoParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the systemAligner
+ * member 1: the doc
+ **/
+
+class AdjustTempoParams : public FunctorParams {
+public:
+    AdjustTempoParams(Doc *doc)
+    {
+        m_systemAligner = NULL;
+        m_doc = doc;
+    }
+
+    SystemAligner *m_systemAligner;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustTupletNumOverlapParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: tupletNum relative position for which is being calculatied
+ * member 1: drawing position of tupletNum
+ * member 2: margin for tupletNum vertical overlap
+ * member 3: flag to indicate whether cross-staff elements should be considered
+ * member 4: resulting relative Y for the tupletNum
+ **/
+class AdjustTupletNumOverlapParams : public FunctorParams {
+public:
+    AdjustTupletNumOverlapParams(TupletNum *tupletNum)
+    {
+        m_tupletNum = tupletNum;
+        m_drawingNumPos = STAFFREL_basic_NONE;
+        m_verticalMargin = 0;
+        m_ignoreCrossStaff = false;
+        m_yRel = 0;
+    }
+
+    TupletNum *m_tupletNum;
+    data_STAFFREL_basic m_drawingNumPos;
+    int m_verticalMargin;
+    bool m_ignoreCrossStaff;
+    int m_yRel;
+};
+
+//----------------------------------------------------------------------------
 // AdjustXOverflowParams
 //----------------------------------------------------------------------------
 
@@ -447,6 +580,29 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustXPosAlignmentOffset
+//----------------------------------------------------------------------------
+// Class to hold information about alignment, possible offset and overlapping bounding box. This is a helper class to be
+// used solely with AdjustXPosParams to store information regarding current/previous alignment that are being processed
+class AdjustXPosAlignmentOffset {
+public:
+    AdjustXPosAlignmentOffset() : m_offset(0), m_overlappingBB(NULL) {};
+
+    void Reset()
+    {
+        m_alignment = NULL;
+        m_offset = 0;
+        m_overlappingBB = NULL;
+    }
+
+public:
+    // data members
+    Alignment *m_alignment;
+    int m_offset;
+    BoundingBox *m_overlappingBB;
+};
+
+//----------------------------------------------------------------------------
 // AdjustXPosParams
 //----------------------------------------------------------------------------
 
@@ -461,6 +617,8 @@ public:
  * member 7: the Doc
  * member 8: the Functor for redirection to the MeasureAligner
  * member 9: the end Functor for redirection
+ * member 10: current aligner that is being processed
+ * member 11: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -488,6 +646,8 @@ public:
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
+    AdjustXPosAlignmentOffset m_currentAlignment;
+    AdjustXPosAlignmentOffset m_previousAlignment;
 };
 
 //----------------------------------------------------------------------------
@@ -666,7 +826,34 @@ public:
 // CalcArticParams
 //----------------------------------------------------------------------------
 
-// Use FunctorDocParams
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class CalcArticParams : public FunctorParams {
+public:
+    CalcArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+        m_staffAbove = NULL;
+        m_staffBelow = NULL;
+        m_layerAbove = NULL;
+        m_layerBelow = NULL;
+        m_crossStaffAbove = false;
+        m_crossStaffBelow = false;
+    }
+    LayerElement *m_parent;
+    data_STEMDIRECTION m_stemDir;
+    Staff *m_staffAbove;
+    Staff *m_staffBelow;
+    Layer *m_layerAbove;
+    Layer *m_layerBelow;
+    bool m_crossStaffAbove;
+    bool m_crossStaffBelow;
+    Doc *m_doc;
+};
 
 //----------------------------------------------------------------------------
 // CalcChordNoteHeads
@@ -889,11 +1076,12 @@ public:
  * member 5: the current scoreDef width
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
+ * member 8: whether to smartly use encoded system breaks
  **/
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc)
+    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc, bool smart)
     {
         m_contentSystem = contentSystem;
         m_page = page;
@@ -902,6 +1090,7 @@ public:
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
         m_doc = doc;
+        m_smart = smart;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -911,6 +1100,7 @@ public:
     int m_currentScoreDefWidth;
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
+    bool m_smart;
 };
 
 //----------------------------------------------------------------------------
@@ -935,6 +1125,20 @@ public:
     Chord *m_currentChord;
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
+// ConvertMarkupArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector<Artic *>* that needs to be converted
+ **/
+
+class ConvertMarkupArticParams : public FunctorParams {
+public:
+    ConvertMarkupArticParams() {}
+    std::vector<Artic *> m_articsToConvert;
 };
 
 //----------------------------------------------------------------------------
@@ -1306,6 +1510,7 @@ public:
     }
     int m_minLeft;
     int m_maxRight;
+    std::vector<ClassId> m_excludeClasses;
     Functor *m_functor;
 };
 
@@ -1428,7 +1633,6 @@ public:
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1450,50 +1654,18 @@ public:
     {
         m_time = 0.0;
         m_duration = 0.0;
+        m_allLayersButCurrent = false;
         m_meterSig = meterSig;
         m_mensur = mensur;
         m_layer = layer;
     }
     double m_time;
     double m_duration;
+    bool m_allLayersButCurrent;
     ListOfObjects m_elements;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Layer *m_layer;
-};
-
-//----------------------------------------------------------------------------
-// OptimizeScoreDefParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current scoreDef
- * member 1: the current staffDef
- * member 2: the flag indicating if we are optimizing encoded layout
- * member 3: the doc
- **/
-
-class OptimizeScoreDefParams : public FunctorParams {
-public:
-    OptimizeScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
-    {
-        m_currentScoreDef = NULL;
-        m_encoded = false;
-        m_firstScoreDef = true;
-        m_hasFermata = false;
-        m_hasTempo = false;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-    }
-    ScoreDef *m_currentScoreDef;
-    bool m_encoded;
-    bool m_firstScoreDef;
-    bool m_hasFermata;
-    bool m_hasTempo;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -1647,10 +1819,10 @@ class PreparePointersByLayerParams : public FunctorParams {
 public:
     PreparePointersByLayerParams()
     {
-        m_currentNote = NULL;
+        m_currentElement = NULL;
         m_lastDot = NULL;
     }
-    Note *m_currentNote;
+    LayerElement *m_currentElement;
     Dot *m_lastDot;
 };
 
@@ -1802,8 +1974,11 @@ public:
  * member 0: the previous time position
  * member 1: the previous x rel position
  * member 2: duration of the longest note
- * member 3: the doc
- * member 4: the functor to be redirected to Aligner
+ * member 3: the last alignment that was not timestamp-only
+ * member 4: the list of timestamp-only alignment that needs to be adjusted
+ * member 5: the MeasureAligner
+ * member 6: the Doc
+ * member 7: the functor to be redirected to Aligner
  **/
 
 class SetAlignmentXPosParams : public FunctorParams {
@@ -1813,12 +1988,17 @@ public:
         m_previousTime = 0.0;
         m_previousXRel = 0;
         m_longestActualDur = 0;
+        m_lastNonTimestamp = NULL;
+        m_measureAligner = NULL;
         m_doc = doc;
         m_functor = functor;
     }
     double m_previousTime;
     int m_previousXRel;
     int m_longestActualDur;
+    Alignment *m_lastNonTimestamp;
+    std::list<Alignment *> m_timestamps;
+    MeasureAligner *m_measureAligner;
     Doc *m_doc;
     Functor *m_functor;
 };
@@ -1844,7 +2024,41 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// SetCurrentScoreDefParams
+// ScoreDefOptimizeParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ * member 2: the flag indicating if we are optimizing encoded layout
+ * member 3: the doc
+ **/
+
+class ScoreDefOptimizeParams : public FunctorParams {
+public:
+    ScoreDefOptimizeParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_encoded = false;
+        m_firstScoreDef = true;
+        m_hasFermata = false;
+        m_hasTempo = false;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDef *m_currentScoreDef;
+    bool m_encoded;
+    bool m_firstScoreDef;
+    bool m_hasFermata;
+    bool m_hasTempo;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
+// ScoreDefSetCurrentParams
 //----------------------------------------------------------------------------
 
 /**
@@ -1857,9 +2071,9 @@ public:
  * member 6: the doc
  **/
 
-class SetCurrentScoreDefParams : public FunctorParams {
+class ScoreDefSetCurrentParams : public FunctorParams {
 public:
-    SetCurrentScoreDefParams(Doc *doc, ScoreDef *upcomingScoreDef)
+    ScoreDefSetCurrentParams(Doc *doc, ScoreDef *upcomingScoreDef)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
@@ -1876,6 +2090,34 @@ public:
     System *m_currentSystem;
     bool m_drawLabels;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// ScoreDefSetGrpSymParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor to be redirected to the System::m_currentScoreDef
+ **/
+
+class ScoreDefSetGrpSymParams : public FunctorParams {
+public:
+    ScoreDefSetGrpSymParams(Functor *functor) { m_functor = functor; }
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// ScoreDefUnsetCurrentParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor to be redirected to Aligner
+ **/
+
+class ScoreDefUnsetCurrentParams : public FunctorParams {
+public:
+    ScoreDefUnsetCurrentParams(Functor *functor) { m_functor = functor; }
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -1971,20 +2213,6 @@ public:
 class ReorderByXPosParams : public FunctorParams {
 public:
     int modifications = 0;
-};
-
-//----------------------------------------------------------------------------
-// UnsetCurrentScoreDefParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the functor to be redirected to Aligner
- **/
-
-class UnsetCurrentScoreDefParams : public FunctorParams {
-public:
-    UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
-    Functor *m_functor;
 };
 
 } // namespace vrv

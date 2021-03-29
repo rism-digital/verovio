@@ -52,7 +52,7 @@ public:
     /**
      * Return the number of system (children are System object only)
      */
-    int GetSystemCount() const { return (int)m_children.size(); }
+    int GetSystemCount() const { return (int)GetChildren()->size(); }
 
     /**
      * @name Get and set the pixel per unit factor.
@@ -193,7 +193,7 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized by the Object::SetCurrentScoreDef functor.
+     * The value is initialized by the Object::ScoreDefSetCurrent functor.
      */
     ScoreDef m_drawingScoreDef;
 

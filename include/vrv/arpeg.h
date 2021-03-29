@@ -57,6 +57,11 @@ public:
     void GetDrawingTopBottomNotes(Note *&top, Note *&bottom);
 
     /**
+     * Get cross staff of the front element if all elements of arpeggio are cross-staff
+     */
+    Staff *GetCrossStaff();
+
+    /**
      * @name Getter to interfaces
      */
     ///@{

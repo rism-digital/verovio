@@ -99,6 +99,11 @@ void Staff::CloneReset()
     m_drawingTuning = NULL;
 }
 
+const ArrayOfObjects *Staff::GetChildren(bool docChildren) const
+{
+    return Object::GetChildren(true);
+}
+
 void Staff::ClearLedgerLines()
 {
     if (m_ledgerLinesAbove) {
@@ -293,6 +298,29 @@ void Staff::SetFromFacsimile(Doc *doc)
     this->AdjustDrawingStaffSize();
 }
 
+bool Staff::IsOnStaffLine(int y, Doc *doc)
+{
+    assert(doc);
+
+    return ((y - this->GetDrawingY()) % (2 * doc->GetDrawingUnit(this->m_drawingStaffSize)) == 0);
+}
+
+int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
+{
+    assert(doc);
+
+    int yPos = y - this->GetDrawingY();
+    int distance = yPos % doc->GetDrawingUnit(this->m_drawingStaffSize);
+    if (place == STAFFREL_above) {
+        if (distance > 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) - distance;
+        return y - distance + doc->GetDrawingUnit(this->m_drawingStaffSize);
+    }
+    else {
+        if (distance < 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) + distance;
+        return y - distance - doc->GetDrawingUnit(this->m_drawingStaffSize);
+    }
+}
+
 //----------------------------------------------------------------------------
 // LedgerLine
 //----------------------------------------------------------------------------
@@ -357,7 +385,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int Staff::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     m_drawingStaffDef = NULL;
     m_drawingTuning = NULL;
@@ -365,9 +393,9 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::OptimizeScoreDef(FunctorParams *functorParams)
+int Staff::ScoreDefOptimize(FunctorParams *functorParams)
 {
-    OptimizeScoreDefParams *params = vrv_params_cast<OptimizeScoreDefParams *>(functorParams);
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
     assert(params);
 
     assert(params->m_currentScoreDef);
@@ -375,7 +403,7 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
 
     if (!staffDef) {
         LogDebug(
-            "Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::OptimizeScoreDef", this->GetN());
+            "Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::ScoreDefOptimize", this->GetN());
         return FUNCTOR_SIBLINGS;
     }
 
@@ -393,7 +421,8 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
 
     // Ignore layers that are empty (or with @sameas)
     ListOfObjects layers;
-    IsEmptyComparison matchTypeLayer(LAYER, true);
+    IsEmptyComparison matchTypeLayer(LAYER);
+    matchTypeLayer.ReverseComparison();
     this->FindAllDescendantByComparison(&layers, &matchTypeLayer);
 
     ListOfObjects mRests;
@@ -551,8 +580,20 @@ int Staff::CalcStem(FunctorParams *)
     ListOfObjects layers;
     this->FindAllDescendantByComparison(&layers, &isLayer);
 
-    // Not more than one layer - drawing stem dir remains unset
+    if (layers.empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Not more than one layer - drawing stem dir remains unset unless there is cross-staff content
     if (layers.size() < 2) {
+        Layer *layer = vrv_cast<Layer *>(layers.front());
+        assert(layer);
+        if (layer->HasCrossStaffFromBelow()) {
+            layer->SetDrawingStemDir(STEMDIRECTION_up);
+        }
+        else if (layer->HasCrossStaffFromAbove()) {
+            layer->SetDrawingStemDir(STEMDIRECTION_down);
+        }
         return FUNCTOR_CONTINUE;
     }
 

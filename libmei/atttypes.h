@@ -33,7 +33,40 @@ enum data_ACCIDENTAL_GESTURAL {
     ACCIDENTAL_GESTURAL_sd,
     ACCIDENTAL_GESTURAL_fu,
     ACCIDENTAL_GESTURAL_fd,
+    ACCIDENTAL_GESTURAL_bms,
+    ACCIDENTAL_GESTURAL_kms,
+    ACCIDENTAL_GESTURAL_bs,
+    ACCIDENTAL_GESTURAL_ks,
+    ACCIDENTAL_GESTURAL_kf,
+    ACCIDENTAL_GESTURAL_bf,
+    ACCIDENTAL_GESTURAL_kmf,
+    ACCIDENTAL_GESTURAL_bmf,
     ACCIDENTAL_GESTURAL_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.GESTURAL.basic
+ */
+enum data_ACCIDENTAL_GESTURAL_basic {
+    ACCIDENTAL_GESTURAL_basic_NONE = 0,
+    ACCIDENTAL_GESTURAL_basic_s,
+    ACCIDENTAL_GESTURAL_basic_f,
+    ACCIDENTAL_GESTURAL_basic_ss,
+    ACCIDENTAL_GESTURAL_basic_ff,
+    ACCIDENTAL_GESTURAL_basic_n,
+    ACCIDENTAL_GESTURAL_basic_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.GESTURAL.extended
+ */
+enum data_ACCIDENTAL_GESTURAL_extended {
+    ACCIDENTAL_GESTURAL_extended_NONE = 0,
+    ACCIDENTAL_GESTURAL_extended_su,
+    ACCIDENTAL_GESTURAL_extended_sd,
+    ACCIDENTAL_GESTURAL_extended_fu,
+    ACCIDENTAL_GESTURAL_extended_fd,
+    ACCIDENTAL_GESTURAL_extended_MAX
 };
 
 /**
@@ -63,7 +96,69 @@ enum data_ACCIDENTAL_WRITTEN {
     ACCIDENTAL_WRITTEN_3qf,
     ACCIDENTAL_WRITTEN_1qs,
     ACCIDENTAL_WRITTEN_3qs,
+    ACCIDENTAL_WRITTEN_bms,
+    ACCIDENTAL_WRITTEN_kms,
+    ACCIDENTAL_WRITTEN_bs,
+    ACCIDENTAL_WRITTEN_ks,
+    ACCIDENTAL_WRITTEN_kf,
+    ACCIDENTAL_WRITTEN_bf,
+    ACCIDENTAL_WRITTEN_kmf,
+    ACCIDENTAL_WRITTEN_bmf,
     ACCIDENTAL_WRITTEN_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.WRITTEN.basic
+ */
+enum data_ACCIDENTAL_WRITTEN_basic {
+    ACCIDENTAL_WRITTEN_basic_NONE = 0,
+    ACCIDENTAL_WRITTEN_basic_s,
+    ACCIDENTAL_WRITTEN_basic_f,
+    ACCIDENTAL_WRITTEN_basic_ss,
+    ACCIDENTAL_WRITTEN_basic_x,
+    ACCIDENTAL_WRITTEN_basic_ff,
+    ACCIDENTAL_WRITTEN_basic_xs,
+    ACCIDENTAL_WRITTEN_basic_sx,
+    ACCIDENTAL_WRITTEN_basic_ts,
+    ACCIDENTAL_WRITTEN_basic_tf,
+    ACCIDENTAL_WRITTEN_basic_n,
+    ACCIDENTAL_WRITTEN_basic_nf,
+    ACCIDENTAL_WRITTEN_basic_ns,
+    ACCIDENTAL_WRITTEN_basic_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.WRITTEN.extended
+ */
+enum data_ACCIDENTAL_WRITTEN_extended {
+    ACCIDENTAL_WRITTEN_extended_NONE = 0,
+    ACCIDENTAL_WRITTEN_extended_su,
+    ACCIDENTAL_WRITTEN_extended_sd,
+    ACCIDENTAL_WRITTEN_extended_fu,
+    ACCIDENTAL_WRITTEN_extended_fd,
+    ACCIDENTAL_WRITTEN_extended_nu,
+    ACCIDENTAL_WRITTEN_extended_nd,
+    ACCIDENTAL_WRITTEN_extended_1qf,
+    ACCIDENTAL_WRITTEN_extended_3qf,
+    ACCIDENTAL_WRITTEN_extended_1qs,
+    ACCIDENTAL_WRITTEN_extended_3qs,
+    ACCIDENTAL_WRITTEN_extended_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.aeu
+ */
+enum data_ACCIDENTAL_aeu {
+    ACCIDENTAL_aeu_NONE = 0,
+    ACCIDENTAL_aeu_bms,
+    ACCIDENTAL_aeu_kms,
+    ACCIDENTAL_aeu_bs,
+    ACCIDENTAL_aeu_ks,
+    ACCIDENTAL_aeu_kf,
+    ACCIDENTAL_aeu_bf,
+    ACCIDENTAL_aeu_kmf,
+    ACCIDENTAL_aeu_bmf,
+    ACCIDENTAL_aeu_MAX
 };
 
 /**
@@ -896,6 +991,7 @@ enum data_METERSIGN {
     METERSIGN_NONE = 0,
     METERSIGN_common,
     METERSIGN_cut,
+    METERSIGN_open,
     METERSIGN_MAX
 };
 
@@ -1090,12 +1186,62 @@ enum data_MODE {
     MODE_major,
     MODE_minor,
     MODE_dorian,
+    MODE_hypodorian,
     MODE_phrygian,
+    MODE_hypophrygian,
     MODE_lydian,
+    MODE_hypolydian,
     MODE_mixolydian,
+    MODE_hypomixolydian,
+    MODE_peregrinus,
+    MODE_ionian,
+    MODE_hypoionian,
     MODE_aeolian,
+    MODE_hypoaeolian,
     MODE_locrian,
+    MODE_hypolocrian,
     MODE_MAX
+};
+
+/**
+ * MEI data.MODE.cmn
+ */
+enum data_MODE_cmn {
+    MODE_cmn_NONE = 0,
+    MODE_cmn_major,
+    MODE_cmn_minor,
+    MODE_cmn_MAX
+};
+
+/**
+ * MEI data.MODE.extended
+ */
+enum data_MODE_extended {
+    MODE_extended_NONE = 0,
+    MODE_extended_ionian,
+    MODE_extended_hypoionian,
+    MODE_extended_aeolian,
+    MODE_extended_hypoaeolian,
+    MODE_extended_locrian,
+    MODE_extended_hypolocrian,
+    MODE_extended_MAX
+};
+
+/**
+ * MEI data.MODE.gregorian
+ */
+enum data_MODE_gregorian {
+    MODE_gregorian_NONE = 0,
+    MODE_gregorian_dorian,
+    MODE_gregorian_hypodorian,
+    MODE_gregorian_phrygian,
+    MODE_gregorian_hypophrygian,
+    MODE_gregorian_lydian,
+    MODE_gregorian_hypolydian,
+    MODE_gregorian_mixolydian,
+    MODE_gregorian_hypomixolydian,
+    MODE_gregorian_peregrinus,
+    MODE_gregorian_MAX
 };
 
 /**
@@ -1977,8 +2123,7 @@ enum measurement_UNIT {
  */
 enum meiVersion_MEIVERSION {
     meiVersion_MEIVERSION_NONE = 0,
-    meiVersion_MEIVERSION_4_0_0,
-    meiVersion_MEIVERSION_4_0_1,
+    meiVersion_MEIVERSION_5_0_0_dev,
     meiVersion_MEIVERSION_MAX
 };
 
@@ -2063,16 +2208,6 @@ enum ncForm_RELLEN {
     ncForm_RELLEN_l,
     ncForm_RELLEN_s,
     ncForm_RELLEN_MAX
-};
-
-/**
- * MEI att.note.anl.mensural@lig
- */
-enum noteAnlMensural_LIG {
-    noteAnlMensural_LIG_NONE = 0,
-    noteAnlMensural_LIG_recta,
-    noteAnlMensural_LIG_obliqua,
-    noteAnlMensural_LIG_MAX
 };
 
 /**

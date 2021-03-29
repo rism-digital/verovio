@@ -49,6 +49,13 @@ public:
      */
     data_HORIZONTALALIGNMENT GetChildRendAlignment();
 
+    /**
+     * Check if the ControlElement applies at a point where there is more than on layer.
+     * Returns that placement accordingly - otherwise return the default passed as parameter.
+     * Applied only for trill, mordent, and turn elements.
+     */
+    data_STAFFREL GetLayerPlace(data_STAFFREL defaultValue);
+
     //----------//
     // Functors //
     //----------//

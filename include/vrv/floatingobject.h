@@ -125,6 +125,10 @@ private:
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
 
+    //----------------//
+    // Static members //
+    //----------------//
+
     /**
      * A vector for storing object / ids mapping.
      * When a group is created based on an object address, it is stack on the vector.
@@ -268,7 +272,7 @@ public:
 
     /**
      * Moves bounding points vertically by a specified distance downward
-    */
+     */
     void MoveFrontVertical(int distance);
     void MoveBackVertical(int distance);
 
@@ -281,7 +285,7 @@ public:
      * Calculate the adjustment needed for an element for the curve not to overlap with it.
      * Discard will be true if the element already fits.
      */
-    int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0);
+    int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
 
     /**
      * @name Getters for the current parameters

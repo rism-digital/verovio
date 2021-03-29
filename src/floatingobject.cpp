@@ -207,7 +207,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         Mordent *mordent = vrv_cast<Mordent *>(object);
         assert(mordent);
         // mordent above by default;
-        m_place = (mordent->GetPlace() != STAFFREL_NONE) ? mordent->GetPlace() : STAFFREL_above;
+        m_place = (mordent->GetPlace() != STAFFREL_NONE) ? mordent->GetPlace() : mordent->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(OCTAVE)) {
         Octave *octave = vrv_cast<Octave *>(object);
@@ -243,14 +243,15 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     else if (object->Is(TRILL)) {
         Trill *trill = vrv_cast<Trill *>(object);
         assert(trill);
+        trill->GetStart();
         // trill above by default;
-        m_place = (trill->GetPlace() != STAFFREL_NONE) ? trill->GetPlace() : STAFFREL_above;
+        m_place = (trill->GetPlace() != STAFFREL_NONE) ? trill->GetPlace() : trill->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(TURN)) {
         Turn *turn = vrv_cast<Turn *>(object);
         assert(turn);
         // turn above by default;
-        m_place = (turn->GetPlace() != STAFFREL_NONE) ? turn->GetPlace() : STAFFREL_above;
+        m_place = (turn->GetPlace() != STAFFREL_NONE) ? turn->GetPlace() : turn->GetLayerPlace(STAFFREL_above);
     }
     else {
         m_place = STAFFREL_NONE;
@@ -500,7 +501,7 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
     return m_cachedMinMaxY;
 }
 
-int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin)
+int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
 {
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
@@ -517,13 +518,15 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
     // bool keepInside = element->Is({ARTIC, ARTIC_PART, NOTE, STEM}));
     // The idea is to force only some of the elements to be inside a slur.
     // However, this currently does work because skipping an adjustment can cause collision later depending on how
-    // the slur is eventually adjusted. Keeping erverything inside now.
+    // the slur is eventually adjusted. Keeping everything inside now.
     bool keepInside = true;
     discard = false;
 
     // first check if they overlap at all
-    if (p2.x < boundingBox->GetLeftBy(type) + margin) return 0;
-    if (p1.x > boundingBox->GetRightBy(type) + margin) return 0;
+    if (horizontalOverlap) {
+        if (p2.x < boundingBox->GetLeftBy(type) + margin) return 0;
+        if (p1.x > boundingBox->GetRightBy(type) + margin) return 0;
+    }
 
     Point topBezier[4], bottomBezier[4];
     BoundingBox::CalcThickBezier(points, this->GetThickness(), this->GetAngle(), topBezier, bottomBezier);
@@ -537,7 +540,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
         int rightY = 0;
         // The curve overflows on both sides
         if ((p1.x < boundingBox->GetLeftBy(type)) && p2.x > boundingBox->GetRightBy(type)) {
-            // Calcuate the y positions
+            // calculate the y positions
             leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, boundingBox->GetLeftBy(type)) - margin;
             rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, boundingBox->GetRightBy(type)) - margin;
         }
@@ -575,7 +578,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
         int rightY = 0;
         // The curve overflows on both sides
         if ((p1.x < boundingBox->GetLeftBy(type)) && p2.x > boundingBox->GetRightBy(type)) {
-            // Calcuate the y positions
+            // calculate the y positions
             leftY = BoundingBox::CalcBezierAtPosition(topBezier, boundingBox->GetLeftBy(type)) + margin;
             rightY = BoundingBox::CalcBezierAtPosition(topBezier, boundingBox->GetRightBy(type)) + margin;
         }

@@ -175,7 +175,7 @@ void Page::LayOutTranscription(bool force)
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
-    // Set the pitch / pos alignement
+    // Set the pitch / pos alignment
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
@@ -267,7 +267,7 @@ void Page::LayOutHorizontally()
         this->Process(&setAlignmentX, &setAlignmentXPosParams);
     }
 
-    // Set the pitch / pos alignement
+    // Set the pitch / pos alignment
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
@@ -290,6 +290,11 @@ void Page::LayOutHorizontally()
     Functor calcDots(&Object::CalcDots);
     this->Process(&calcDots, &calcDotsParams);
 
+    // Adjust the position of outside articulations
+    CalcArticParams calcArticParams(doc);
+    Functor calcArtic(&Object::CalcArtic);
+    this->Process(&calcArtic, &calcArticParams);
+
     // Render it for filling the bounding box
     View view;
     view.SetDoc(doc);
@@ -297,6 +302,11 @@ void Page::LayOutHorizontally()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    // Adjust the position of outside articulations
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
 
     // Adjust the x position of the LayerElement where multiple layer collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
@@ -331,6 +341,12 @@ void Page::LayOutHorizontally()
         doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
+    // Adjust the spacing of clef changes since they are skipped in AdjustXPos
+    // Look at each clef change and  move them to the left and add space if necessary
+    Functor adjustClefChanges(&Object::AdjustClefChanges);
+    AdjustClefsParams adjustClefChangesParams(doc);
+    this->Process(&adjustClefChanges, &adjustClefChangesParams);
+
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     PrepareProcessingListsParams prepareProcessingListsParams;
@@ -349,6 +365,11 @@ void Page::LayOutHorizontally()
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+
+    // Adjust the tempo
+    Functor adjustTempo(&Object::AdjustTempo);
+    AdjustTempoParams adjustTempoParams(doc);
+    this->Process(&adjustTempo, &adjustTempoParams);
 
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsXParams(doc);
@@ -393,11 +414,6 @@ void Page::LayOutVertically()
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
-    // Adjust the position of outside articulations
-    FunctorDocParams calcArticParams(doc);
-    Functor calcArtic(&Object::CalcArtic);
-    this->Process(&calcArtic, &calcArticParams);
-
     // Render it for filling the bounding box
     View view;
     BBoxDeviceContext bBoxDC(&view, 0, 0);
@@ -411,6 +427,12 @@ void Page::LayOutVertically()
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
+    // Adjust the position of the beams in regards of layer elements
+    AdjustBeamParams adjustBeamParams(doc);
+    Functor adjustBeams(&Object::AdjustBeams);
+    Functor adjustBeamsEnd(&Object::AdjustBeamsEnd);
+    this->Process(&adjustBeams, &adjustBeamParams, &adjustBeamsEnd);
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsYParams(doc);
     Functor adjustTupletsY(&Object::AdjustTupletsY);
@@ -423,6 +445,10 @@ void Page::LayOutVertically()
 
     // If slurs were adjusted we need to redraw to adjust the bounding boxes
     if (adjustSlursParams.m_adjusted) {
+        // There is a problem here with cross-staff slurs: if they have been adjusted, the
+        // Slur::m_isCrossStaff flag will trigger View::DrawSlurInitial to be called again.
+        // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
+        // but in between, we can have wrong collisions detections. To be improved
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
@@ -433,12 +459,12 @@ void Page::LayOutVertically()
     Functor setOverflowBBoxesEnd(&Object::SetOverflowBBoxesEnd);
     this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
 
-    // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
+    // Adjust the positioners of floating elements (slurs, hairpin, dynam, etc)
     Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
     AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
     this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
 
-    // Adjust the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
+    // Adjust the overlap of the staff aligments by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
     AdjustStaffOverlapParams adjustStaffOverlapParams(&adjustStaffOverlap);
     this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
@@ -449,7 +475,7 @@ void Page::LayOutVertically()
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
 
-    // Adjust the positioners of floationg elements placed between staves
+    // Adjust the positioners of floating elements placed between staves
     Functor adjustFloatingPositionersBetween(&Object::AdjustFloatingPositionersBetween);
     AdjustFloatingPositionersBetweenParams adjustFloatingPositionersBetweenParams(
         doc, &adjustFloatingPositionersBetween);
@@ -459,6 +485,13 @@ void Page::LayOutVertically()
     Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);
     this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
+
+    // Redraw are re-adjust the position of the slurs when we have cross-staff ones
+    if (adjustSlursParams.m_crossStaffSlurs) {
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+        this->Process(&adjustSlurs, &adjustSlursParams);
+    }
 
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();
@@ -518,7 +551,7 @@ void Page::JustifyVertically()
         return;
     }
 
-    // Vertical justificaiton is not enabled
+    // Vertical justification is not enabled
     if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
         return;
     }
@@ -565,7 +598,7 @@ void Page::LayOutPitchPos()
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    // Set the pitch / pos alignement
+    // Set the pitch / pos alignment
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
@@ -588,14 +621,13 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(m_children.back());
+    System *last = dynamic_cast<System *>(GetChildren()->back());
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
-    // Not sure what to do with the footer when adjusted page height is requested...
-    // if (this->GetFooter()) {
-    //    height += this->GetFooter()->GetTotalHeight();
-    //}
+    if (this->GetFooter()) {
+        height += this->GetFooter()->GetTotalHeight();
+    }
 
     return height;
 }
@@ -612,7 +644,7 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto &child : m_children) {
+    for (auto &child : *this->GetChildren()) {
         System *system = dynamic_cast<System *>(child);
         if (system) {
             // we include the left margin and the right margin
@@ -679,7 +711,7 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
 
 int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    // Same functor, but we have not FunctorParams so we just re-instanciate it
+    // Same functor, but we have not FunctorParams so we just re-instantiate it
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
 
     RunningElement *header = this->GetHeader();
@@ -738,12 +770,6 @@ int Page::AlignSystems(FunctorParams *functorParams)
         header->SetDrawingYRel(params->m_shift);
         params->m_shift -= header->GetTotalHeight() + bottomMarginPgHead;
     }
-    RunningElement *footer = this->GetFooter();
-    if (footer) {
-        // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight());
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -758,6 +784,18 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
     RunningElement *footer = this->GetFooter();
     if (footer) {
         this->m_drawingJustifiableHeight -= footer->GetTotalHeight();
+
+        // Move it up below the last system
+        if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
+            if (GetChildCount()) {
+                System *last = dynamic_cast<System *>(GetChildren()->back());
+                assert(last);
+                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight());
+            }
+        }
+        else {
+            footer->SetDrawingYRel(footer->GetTotalHeight());
+        }
     }
 
     return FUNCTOR_CONTINUE;

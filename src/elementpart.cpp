@@ -70,7 +70,7 @@ void Flag::Reset()
     m_drawingNbFlags = 0;
 }
 
-wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
+wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir)
 {
     if (stemDir == STEMDIRECTION_up) {
         switch (m_drawingNbFlags) {
@@ -102,7 +102,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
 
 Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
 {
-    code = this->GetSmuflCode(STEMDIRECTION_up);
+    code = this->GetFlagGlyph(STEMDIRECTION_up);
 
     int h = doc->GetGlyphHeight(code, staffSize, graceSize);
     return Point(0, h + doc->GetGlyphDescender(code, staffSize, graceSize));
@@ -110,7 +110,7 @@ Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
 
 Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
 {
-    code = this->GetSmuflCode(STEMDIRECTION_down);
+    code = this->GetFlagGlyph(STEMDIRECTION_down);
 
     return Point(0, doc->GetGlyphDescender(code, staffSize, graceSize));
 }
@@ -295,6 +295,98 @@ bool Stem::IsSupportedChild(Object *child)
     return true;
 }
 
+void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+{
+    if (isUnison) {
+        isUnison = false;
+        return;
+    }
+    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    assert(staff);
+    // check if there is an overlap on the left or on the right and displace stem's parent correspondingly
+    for (auto element : otherElements) {
+        int right = HorizontalLeftOverlap(element, doc, 0, 0);
+        int left = HorizontalRightOverlap(element, doc, 0, 0);
+        if (!right || !left) continue;
+
+        LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+        assert(parent);
+        int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        Flag *currentFlag = NULL;
+        currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
+        if (currentFlag && currentFlag->m_drawingNbFlags) {
+            wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
+            const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
+            horizontalMargin += flagWidth;
+        }
+
+        if (right < left) {
+            parent->SetDrawingXRel(parent->GetDrawingXRel() + right + horizontalMargin);
+        }
+        else {
+            parent->SetDrawingXRel(parent->GetDrawingXRel() - horizontalMargin - left);
+        }
+        return;
+    }
+}
+
+void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
+{
+    LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+    if (!parent) return;
+
+    const data_STEMDIRECTION stemDirection = GetDrawingStemDir();
+    // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
+    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    if (duration < DURATION_16) flagGlyph = flag->GetFlagGlyph(stemDirection);
+    const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
+    const int relevantGlyphHeight = (stemDirection == STEMDIRECTION_up) ? glyphHeight / 2 : glyphHeight;
+
+    // Make sure that flags don't overlap with notehead. Upward flags cannot overlap with noteheads so check
+    // only downward ones
+    const int adjustmentStep = doc->GetDrawingUnit(staffSize);
+    if (stemDirection == STEMDIRECTION_down) {
+        const int noteheadMargin = GetDrawingStemLen() - (glyphHeight + parent->GetDrawingRadius(doc));
+        if ((duration > DURATION_16) && (noteheadMargin < 0)) {
+            int offset = 0;
+            if (noteheadMargin % adjustmentStep < -adjustmentStep / 3 * 2) offset = adjustmentStep / 2;
+            const int heightToAdjust = (noteheadMargin / adjustmentStep) * adjustmentStep - offset;
+            SetDrawingStemLen(GetDrawingStemLen() - heightToAdjust);
+            flag->SetDrawingYRel(-GetDrawingStemLen());
+        }
+    }
+
+    Note *note = NULL;
+    if (parent->Is(NOTE)) {
+        note = vrv_cast<Note *>(parent);
+    }
+    else if (parent->Is(CHORD)) {
+        note = vrv_cast<Chord *>(parent)->GetTopNote();
+    }
+    int ledgerAbove = 0;
+    int ledgerBelow = 0;
+    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow)) return;
+    if (((stemDirection == STEMDIRECTION_up) && !ledgerBelow)
+        || ((stemDirection == STEMDIRECTION_down) && !ledgerAbove))
+        return;
+
+    // Make sure that flags don't overlap with first (top or bottom) ledger line (effectively avoiding all ledgers)
+    const int directionBias = (stemDirection == STEMDIRECTION_down) ? -1 : 1;
+    const int position = GetDrawingY() - GetDrawingStemLen() - directionBias * relevantGlyphHeight;
+    const int ledgerPosition = verticalCenter - 6 * directionBias * adjustmentStep;
+    const int displacementMargin = (position - ledgerPosition) * directionBias;
+
+    if (displacementMargin < 0) {
+        int offset = 0;
+        if ((stemDirection == STEMDIRECTION_down) && (displacementMargin % adjustmentStep > -adjustmentStep / 3)) {
+            offset = adjustmentStep / 2;
+        }
+        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
+        SetDrawingStemLen(GetDrawingStemLen() + heightToAdjust);
+        flag->SetDrawingYRel(-GetDrawingStemLen());
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -379,6 +471,14 @@ int Stem::CalcStem(FunctorParams *functorParams)
     int stemShift = params->m_doc->GetDrawingStemWidth(staffSize) / 2;
     bool drawingCueSize = this->GetDrawingCueSize();
 
+    // For notes longer than half notes the stem is always 0
+    if (params->m_dur < DUR_2) {
+        this->SetDrawingXRel(0);
+        this->SetDrawingYRel(0);
+        this->SetDrawingStemLen(0);
+        return FUNCTOR_CONTINUE;
+    }
+
     /************ Set the position, the length and adjust to the note head ************/
 
     int baseStem = 0;
@@ -424,25 +524,30 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
-    int slashFactor = (this->GetStemMod() < 6) ? this->GetStemMod() - 4 : 0;
+    int slashFactor = (this->GetStemMod() < 8) ? this->GetStemMod() - 1 : 0;
 
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
-        flag = vrv_cast<Flag *>(this->FindDescendantByType(FLAG));
+        flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
-        if (!this->HasStemLen() && this->HasStemMod()) slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
+            slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        }
     }
 
     // Adjust basic stem length to number of slashes
-    int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
-        + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-    if (abs(baseStem) < ((slashFactor + 4) * tremStep)) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - slashFactor * tremStep);
-        }
-        else {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + slashFactor * tremStep);
+    if (slashFactor && !this->HasStemLen()) {
+        const int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
+            + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
+        while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
+            if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+                this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
+            }
+            else {
+                this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
+            }
+            --slashFactor;
         }
     }
 
@@ -461,9 +566,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
         flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
-
-    // Do not adjust the length of grace notes - this is debatable and should probably become as styling option
-    if (params->m_isGraceNote) return FUNCTOR_CONTINUE;
 
     int flagHeight = 0;
 
@@ -491,10 +593,14 @@ int Stem::CalcStem(FunctorParams *functorParams)
         adjust = true;
     }
 
-    if (adjust) {
+    // Do not adjust the length of grace notes - this is debatable and should probably become as styling option
+    // However we still want flags from grace notes not to overlap with ledger lines
+    if (adjust && !params->m_isGraceNote) {
         this->SetDrawingStemLen(this->GetDrawingStemLen() + (endY - params->m_verticalCenter));
         if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
+
+    if (flag) AdjustFlagPlacement(params->m_doc, flag, staffSize, params->m_verticalCenter, params->m_dur);
 
     return FUNCTOR_CONTINUE;
 }

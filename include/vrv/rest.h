@@ -15,7 +15,6 @@
 
 namespace vrv {
 
-
 class TransPitch;
 
 enum RestLayer { RL_UNSET = -1, RL_sameLayer, RL_otherLayer };
@@ -81,11 +80,6 @@ public:
      */
     wchar_t GetRestGlyph() const;
 
-    /**
-     * Get the vertical offset for each glyph.
-     */
-    int GetRestLocOffset(int loc);
-
     //----------//
     // Functors //
     //----------//
@@ -126,8 +120,7 @@ public:
     int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
 
 private:
-
-     /**
+    /**
      * Helper function to update rest oloc/ploc based on the input TransPitch
      */
     void UpdateFromTransLoc(const TransPitch &tp);
@@ -136,7 +129,7 @@ private:
      * Get the rest vertical location relative to location of elements placed on other layers
      */
     std::pair<int, RestAccidental> GetLocationRelativeToOtherLayers(
-        const ListOfObjects &layersList, Layer *currentLayer);
+        const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer);
 
     /**
      * Get the rest vertical location relative to location of elements placed on current layers
@@ -163,8 +156,6 @@ public:
     //
 private:
 };
-
-
 
 } // namespace vrv
 

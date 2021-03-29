@@ -81,7 +81,7 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
     int nextFreeSpace = 0;
 
     if (overlap > 0) {
-        // We have enough space to absorb the overla completely
+        // We have enough space to absorb the overlay completely
         if (freeSpace > overlap) {
             this->SetDrawingXRel(this->GetDrawingXRel() - overlap);
             // The space is set to 0. This means that consecutive overlaps will not be recursively absorbed.

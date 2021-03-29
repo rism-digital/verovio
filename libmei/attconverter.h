@@ -32,8 +32,23 @@ public:
     std::string AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data) const;
     data_ACCIDENTAL_GESTURAL StrToAccidentalGestural(const std::string &value, bool logWarning = true) const;
 
+    std::string AccidentalGesturalBasicToStr(data_ACCIDENTAL_GESTURAL_basic data) const;
+    data_ACCIDENTAL_GESTURAL_basic StrToAccidentalGesturalBasic(const std::string &value, bool logWarning = true) const;
+
+    std::string AccidentalGesturalExtendedToStr(data_ACCIDENTAL_GESTURAL_extended data) const;
+    data_ACCIDENTAL_GESTURAL_extended StrToAccidentalGesturalExtended(const std::string &value, bool logWarning = true) const;
+
     std::string AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) const;
     data_ACCIDENTAL_WRITTEN StrToAccidentalWritten(const std::string &value, bool logWarning = true) const;
+
+    std::string AccidentalWrittenBasicToStr(data_ACCIDENTAL_WRITTEN_basic data) const;
+    data_ACCIDENTAL_WRITTEN_basic StrToAccidentalWrittenBasic(const std::string &value, bool logWarning = true) const;
+
+    std::string AccidentalWrittenExtendedToStr(data_ACCIDENTAL_WRITTEN_extended data) const;
+    data_ACCIDENTAL_WRITTEN_extended StrToAccidentalWrittenExtended(const std::string &value, bool logWarning = true) const;
+
+    std::string AccidentalAeuToStr(data_ACCIDENTAL_aeu data) const;
+    data_ACCIDENTAL_aeu StrToAccidentalAeu(const std::string &value, bool logWarning = true) const;
 
     std::string ArticulationToStr(data_ARTICULATION data) const;
     data_ARTICULATION StrToArticulation(const std::string &value, bool logWarning = true) const;
@@ -169,6 +184,15 @@ public:
 
     std::string ModeToStr(data_MODE data) const;
     data_MODE StrToMode(const std::string &value, bool logWarning = true) const;
+
+    std::string ModeCmnToStr(data_MODE_cmn data) const;
+    data_MODE_cmn StrToModeCmn(const std::string &value, bool logWarning = true) const;
+
+    std::string ModeExtendedToStr(data_MODE_extended data) const;
+    data_MODE_extended StrToModeExtended(const std::string &value, bool logWarning = true) const;
+
+    std::string ModeGregorianToStr(data_MODE_gregorian data) const;
+    data_MODE_gregorian StrToModeGregorian(const std::string &value, bool logWarning = true) const;
 
     std::string ModsrelationshipToStr(data_MODSRELATIONSHIP data) const;
     data_MODSRELATIONSHIP StrToModsrelationship(const std::string &value, bool logWarning = true) const;
@@ -382,9 +406,6 @@ public:
 
     std::string NcFormRellenToStr(ncForm_RELLEN data) const;
     ncForm_RELLEN StrToNcFormRellen(const std::string &value, bool logWarning = true) const;
-
-    std::string NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const;
-    noteAnlMensural_LIG StrToNoteAnlMensuralLig(const std::string &value, bool logWarning = true) const;
 
     std::string NoteGesExtremisToStr(noteGes_EXTREMIS data) const;
     noteGes_EXTREMIS StrToNoteGesExtremis(const std::string &value, bool logWarning = true) const;

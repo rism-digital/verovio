@@ -497,7 +497,7 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
     Functor findByUuid(&Object::FindByUuid);
     FindByUuidParams findbyUuidParams;
     findbyUuidParams.m_uuid = uuid;
-    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction);
+    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction, true);
     return findbyUuidParams.m_element;
 }
 
@@ -511,7 +511,7 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 {
     Functor findByComparison(&Object::FindByComparison);
     FindByComparisonParams findByComparisonParams(comparison);
-    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction, true);
     return findByComparisonParams.m_element;
 }
 
@@ -519,7 +519,7 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 {
     Functor findExtremeByComparison(&Object::FindExtremeByComparison);
     FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
-    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction, true);
     return findExtremeByComparisonParams.m_element;
 }
 
@@ -531,7 +531,7 @@ void Object::FindAllDescendantByComparison(
 
     Functor findAllByComparison(&Object::FindAllByComparison);
     FindAllByComparisonParams findAllByComparisonParams(comparison, objects);
-    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
 }
 
 void Object::FindAllDescendantBetween(
@@ -542,7 +542,7 @@ void Object::FindAllDescendantBetween(
 
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllBetween, &findAllBetweenParams);
+    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx) const
@@ -585,28 +585,12 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
-
-    m_uuid = m_classid + std::string(str);
+    m_uuid = m_classid + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
 {
     GenerateUuid();
-}
-
-void Object::SeedUuid(unsigned int seed)
-{
-    // Init random number generator for uuids
-    if (seed == 0) {
-        std::srand((unsigned int)std::time(0));
-    }
-    else {
-        std::srand(seed);
-    }
 }
 
 void Object::SetParent(Object *parent)
@@ -772,8 +756,17 @@ bool Object::HasEditorialContent()
     return (!editorial.empty());
 }
 
+bool Object::HasNonEditorialContent()
+{
+    ListOfObjects nonEditorial;
+    IsEditorialElementComparison editorialComparison;
+    editorialComparison.ReverseComparison();
+    this->FindAllDescendantByComparison(&nonEditorial, &editorialComparison);
+    return (!nonEditorial.empty());
+}
+
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
-    int deepness, bool direction)
+    int deepness, bool direction, bool skipFirst)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -804,7 +797,9 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
-    functor->Call(this, functorParams);
+    if (!skipFirst) {
+        functor->Call(this, functorParams);
+    }
 
     // do not go any deeper in this case
     if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
@@ -864,9 +859,11 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
-    if (endFunctor) {
+    if (endFunctor && !skipFirst) {
         endFunctor->Call(this, functorParams);
     }
+
+    skipFirst = false;
 }
 
 int Object::Save(Output *output)
@@ -903,6 +900,91 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
     FindChildByComparisonParams params(comp, start);
     this->Process(&findPreviousChildByComparison, &params);
     return params.m_element;
+}
+
+//----------------------------------------------------------------------------
+// Static methods for Object
+//----------------------------------------------------------------------------
+
+void Object::SeedUuid(unsigned int seed)
+{
+    // Init random number generator for uuids
+    if (seed == 0) {
+        std::srand((unsigned int)std::time(0));
+    }
+    else {
+        std::srand(seed);
+    }
+}
+
+std::string Object::GenerateRandUuid()
+{
+    int nr = std::rand();
+    char str[17];
+    // I do not want to use a stream for doing this!
+    snprintf(str, 17, "%016d", nr);
+
+    return std::string(str);
+}
+
+bool Object::sortByUlx(Object *a, Object *b)
+{
+    FacsimileInterface *fa = NULL, *fb = NULL;
+    InterfaceComparison comp(INTERFACE_FACSIMILE);
+    if (a->GetFacsimileInterface() && a->GetFacsimileInterface()->HasFacs())
+        fa = a->GetFacsimileInterface();
+    else {
+        ListOfObjects children;
+        a->FindAllDescendantByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            if ((*it)->Is(SYL)) continue;
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+                fa = temp;
+            }
+        }
+    }
+    if (b->GetFacsimileInterface() && b->GetFacsimileInterface()->HasFacs())
+        fb = b->GetFacsimileInterface();
+    else {
+        ListOfObjects children;
+        b->FindAllDescendantByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            if ((*it)->Is(SYL)) continue;
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+                fb = temp;
+            }
+        }
+    }
+
+    // Preserve ordering of neume components in ligature
+    if (a->Is(NC) && b->Is(NC)) {
+        Nc *nca = dynamic_cast<Nc *>(a);
+        Nc *ncb = dynamic_cast<Nc *>(b);
+        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+            Object *parent = a->GetParent();
+            assert(parent);
+            if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
+                // Return nc with higher pitch
+                return nca->PitchDifferenceTo(ncb) > 0; // If object a has the higher pitch
+            }
+        }
+    }
+
+    if (fa == NULL || fb == NULL) {
+        if (fa == NULL) {
+            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
+        }
+        if (fb == NULL) {
+            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
+        }
+        return false;
+    }
+
+    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
 //----------------------------------------------------------------------------
@@ -1353,9 +1435,9 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetCurrentScoreDef(FunctorParams *functorParams)
+int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
 {
-    SetCurrentScoreDefParams *params = vrv_params_cast<SetCurrentScoreDefParams *>(functorParams);
+    ScoreDefSetCurrentParams *params = vrv_params_cast<ScoreDefSetCurrentParams *>(functorParams);
     assert(params);
 
     assert(params->m_upcomingScoreDef);
@@ -1509,6 +1591,8 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
+    if (this->Is(params->m_excludeClasses)) return FUNCTOR_CONTINUE;
+
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
 
@@ -1571,18 +1655,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // Ignore beam in cross-staff situation
-    if (this->Is(BEAM)) {
-        Beam *beam = dynamic_cast<Beam *>(this);
-        if (beam && beam->m_isCrossStaff) return FUNCTOR_CONTINUE;
-    }
-
-    // Ignore stem for notes in cross-staff situation and in beams
-    if (this->Is(STEM)) {
-        Note *note = dynamic_cast<Note *>(this->GetParent());
-        if (note && note->m_crossStaff && note->IsInBeam()) return FUNCTOR_CONTINUE;
-    }
-
     if (this->Is(FB) || this->Is(FIGURE)) {
         return FUNCTOR_CONTINUE;
     }
@@ -1602,34 +1674,28 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     LayerElement *current = vrv_cast<LayerElement *>(this);
     assert(current);
 
-    bool skipAbove = false;
-    bool skipBelow = false;
-    Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
-    if (chord && params->m_staffAlignment) {
-        chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
+    StaffAlignment *above = NULL;
+    StaffAlignment *below = NULL;
+    current->GetOverflowStaffAlignments(above, below);
+
+    if (above) {
+        int overflowAbove = above->CalcOverflowAbove(current);
+        int staffSize = above->GetStaffSize();
+        if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+            // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            above->SetOverflowAbove(overflowAbove);
+            above->AddBBoxAbove(current);
+        }
     }
 
-    StaffAlignment *alignment = params->m_staffAlignment;
-    Layer *crossLayer = NULL;
-    Staff *crossStaff = current->GetCrossStaff(crossLayer);
-    if (crossStaff && crossStaff->GetAlignment()) {
-        alignment = crossStaff->GetAlignment();
-    }
-
-    int staffSize = alignment->GetStaffSize();
-
-    int overflowAbove = alignment->CalcOverflowAbove(current);
-    if (!skipAbove && (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
-        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
-        alignment->SetOverflowAbove(overflowAbove);
-        alignment->AddBBoxAbove(current);
-    }
-
-    int overflowBelow = alignment->CalcOverflowBelow(current);
-    if (!skipBelow && (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
-        // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-        alignment->SetOverflowBelow(overflowBelow);
-        alignment->AddBBoxBelow(current);
+    if (below) {
+        int overflowBelow = below->CalcOverflowBelow(current);
+        int staffSize = below->GetStaffSize();
+        if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+            // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            below->SetOverflowBelow(overflowBelow);
+            below->AddBBoxBelow(current);
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -1681,66 +1747,6 @@ int Object::SaveEnd(FunctorParams *functorParams)
         return FUNCTOR_STOP;
     }
     return FUNCTOR_CONTINUE;
-}
-
-bool Object::sortByUlx(Object *a, Object *b)
-{
-    FacsimileInterface *fa = NULL, *fb = NULL;
-    InterfaceComparison comp(INTERFACE_FACSIMILE);
-    if (a->GetFacsimileInterface() && a->GetFacsimileInterface()->HasFacs())
-        fa = a->GetFacsimileInterface();
-    else {
-        ListOfObjects children;
-        a->FindAllDescendantByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
-            assert(temp);
-            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
-                fa = temp;
-            }
-        }
-    }
-    if (b->GetFacsimileInterface() && b->GetFacsimileInterface()->HasFacs())
-        fb = b->GetFacsimileInterface();
-    else {
-        ListOfObjects children;
-        b->FindAllDescendantByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
-            assert(temp);
-            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
-                fb = temp;
-            }
-        }
-    }
-
-    // Preserve ordering of neume components in ligature
-    if (a->Is(NC) && b->Is(NC)) {
-        Nc *nca = dynamic_cast<Nc *>(a);
-        Nc *ncb = dynamic_cast<Nc *>(b);
-        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
-            Object *parent = a->GetParent();
-            assert(parent);
-            if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
-                // Return nc with higher pitch
-                return nca->PitchDifferenceTo(ncb) > 0; // If object a has the higher pitch
-            }
-        }
-    }
-
-    if (fa == NULL || fb == NULL) {
-        if (fa == NULL) {
-            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
-        }
-        if (fb == NULL) {
-            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
-        }
-        return false;
-    }
-
-    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
 int Object::ReorderByXPos(FunctorParams *functorParams)

@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8...3.19)
 
 project(Verovio)
 
-set(CMAKE_BUILD_TYPE Release)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
+option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        OFF)
 option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
@@ -26,6 +29,7 @@ include_directories(
     ../include/json
     ../include/pugi
     ../include/utf8
+    ../include/zip
     ../include/vrv
     ../libmei
 )
@@ -37,10 +41,14 @@ if(MSVC)
     add_definitions(/std:c++17)
     include_directories(../include/win32)
 else()
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        message(STATUS "Enabling debug information")
+        add_definitions(-g)
+    endif()
+
     # jsonxx raises -Wdollar-in-identifier-extension
     # gcc 8.3.1 does not like -Wdollar-in-identifier-extension option.
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
-    add_definitions(-g)
     add_definitions(-std=c++17)
 
     # extra warnings similar to Xcode compiling settings (most probably covered by -Wall):
@@ -90,8 +98,13 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
 )
+
+if(VRV_DYNAMIC_CAST)
+    add_definitions(-DVRV_DYNAMIC_CAST)
+endif()
 
 if(NO_DARMS_SUPPORT)
     add_definitions(-DNO_DARMS_SUPPORT)
@@ -141,29 +154,71 @@ set(all_SRC
     ../libmei/atts_visual.cpp
 )
 
+##################
+# Shared library #
+##################
+
 if (BUILD_AS_LIBRARY)
-    message(STATUS "build verovio as library")
-    add_library (
-        verovio
-        SHARED
-		../tools/c_wrapper.cpp
-        ${all_SRC}
-    )
+    message(STATUS "***** Building Verovio as shared library *****")
+    add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
+
+###########
+# WASM BC #
+###########
+
 elseif (BUILD_AS_WASM)
-    message(STATUS "build verovio as wasm bc")
-    add_library (
-        verovio
-        STATIC
-		../tools/c_wrapper.cpp
-        ${all_SRC}
-    )
+    message(STATUS "***** Building Verovio as WASM BC *****")
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+
+#################
+# Python module #
+#################
+
+elseif (BUILD_AS_PYTHON)
+    message(STATUS "***** Building Verovio as Python module *****")
+
+    # clear out policies
+    cmake_policy(SET CMP0078 NEW)
+    cmake_policy(SET CMP0086 NEW)
+
+    find_package(SWIG REQUIRED)
+    include(${SWIG_USE_FILE})
+    set(CMAKE_SWIG_FLAGS "")
+
+    if(Python_VERSION VERSION_GREATER_EQUAL 3)
+      list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
+    endif()
+
+    set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)
+
+    # needed for static build on linux
+    add_definitions(-fPIC)
+
+    ### For building for specific version of Python (example for 3.4 on OS X with MacPorts installation)
+    #set(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
+    #set(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
+    #include_directories(${PYTHON_INCLUDE_DIR})
+    #swig_add_library(verovio_module_custom LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
+    #swig_link_libraries(verovio_module_custom verovio ${PYTHON_LIBRARY})
+
+    ### For building for found version of Python (comment when specific version is set)
+    find_package(PythonLibs)
+    include_directories(${PYTHON_INCLUDE_PATH})
+    message(STATUS "***** Building for Python ${PYTHONLIBS_VERSION_STRING} *****")
+    string(REPLACE "." "_" OUTPUT_VERSION_STRING ${PYTHONLIBS_VERSION_STRING})
+    swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
+    swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${PYTHON_LIBRARIES})
+
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+
+#####################
+# Command-line tool #
+#####################
+
 else()
-    message(STATUS "build verovio as executable")
-    add_executable (
-        verovio
-        ../tools/main.cpp
-        ${all_SRC}
-    )
+    message(STATUS "***** Building Verovio as command-line tool *****")
+    add_executable(verovio ../tools/main.cpp ${all_SRC})
+
 endif()
 
 install(

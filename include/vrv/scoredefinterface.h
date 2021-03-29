@@ -31,6 +31,7 @@ class ScoreDefInterface : public Interface,
                           public AttMeasureNumbers,
                           public AttMidiTempo,
                           public AttMultinumMeasures,
+                          public AttSpacing,
                           public AttSystems {
 public:
     /**

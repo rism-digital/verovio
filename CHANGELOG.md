@@ -1,6 +1,61 @@
 # Changelog
 
 ## [unreleased]
+* Improved horizontal layout with dots and flags (@Enote-GmbH)
+* Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
+* Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
+
+## [3.3.0] - 2021-02-25
+* Support for `@glyph.name`
+* Support for `accid@glyph.num` and `@glyph.name`
+* Support for MusicXML compressed files
+* Improved consistency of logging functions across bindings
+* Improved PyPI packages for Linux (@rettinghaus and @musicEnfanthen)
+* Function loadZipDataBase64 and loadZipDataBuffer (JS) for loading MusicXML compressed files
+* Function enableLog(bool) to enable or disable logging
+* Function enableLogToBuffer(bool) to enable logging to a buffer instead of the stderr or the JS console
+* Option --clef-change-factor for adjusting clef change size (default is .66) (@rettinghaus)
+* Option --svg-format-raw for raw SVG output without indentation and line breaks
+* New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
+* Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
+* Fixes in the MusicXML importer (@Enote-GmbH)
+
+## [3.2.0] - 2021-02-08
+* Support for `clef@visible` (@rettinghaus)
+* Support for `artic@glyph.num`
+* Support for arabic accidentals
+* Improved default rest positioning
+* Improved automatic cross staff rest positioning (@eNote-GmbH)
+* Improved cross-staff spacing
+* Improved slurs
+* Improved positioning of ornaments with multiple layers
+* Improved articulations in normal and cross-staff contexts
+* Improved spacing of clef changes
+* Improved timestamp events alignments by avoiding extra-space to be added
+* Improved horizontal alignment of tempo indications (@eNote-GmbH)
+* Embedding of Leland font from MuseScore
+* Method Toolkit::GetTimesForElement for accessing score times (@wergo)
+* Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
+* Options --top-margin-artic and --bottom-margin-artic for articulation margins
+* Option --tuplet-num-head for placing tuplet numbers on the side of the notehead
+
+## [3.1.0] - 2021-01-12
+* Support for "old style" multiple measure rests (@rettinghaus)
+* Support for `note@vel` and `dynamics@val` in MusicXML import (@earboxer)
+* Support for `multiRest@loc` (@rettinghaus)
+* Support for `mNum@fontsize` (@rettinghaus)
+* Support for `accidental-mark` in MusicXML import (@rettinghaus)
+* Support for double-stemmed beams (@eNote-GmbH)
+* Improved barline rendition (@rettinghaus)
+* Improved cross-staff notation with multiple layers
+* Python Package Index (PyPI) distribution (@musicEnfanthen and @alastair)
+* Option --footer extended with 'always' value to show footer with --adjust-page-height
+
+## [3.0.2] - 2020-11-17
+* Add missing default footer file
+
+## [3.0.1] - 2020-10-22
+* Fix bug with mensural notation notes
 
 ## [3.0.0] - 2020-10-05
 * Support for buzz roll tremolos (@rettinghaus)
@@ -12,6 +67,7 @@
 * Support for pedal lines (@rettinghaus)
 * Options for controlling output tabs (--output-indent and --output-indent-tab)
 * Option to remove ids in the MEI output (--remove-ids) to be passed to GetMEI with the JS toolkit
+* Fix tremolo tuplets (@rettinghaus)
 
 ## [2.7.2] - 2020-07-23
 * Fix bug with memory in beams (@valeriyvan)
@@ -57,7 +113,7 @@
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ### Changed
-* Single file buundle for WASM build
+* Single file bundle for WASM build
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15
@@ -272,17 +328,17 @@
 * Several bug fixes and code refactoring enhancement
 
 ## [Pre-release versions]
-- [0.9.13](https://github.com/rism-ch/verovio/releases/tag/version-0.9.13)
-- [0.9.12](https://github.com/rism-ch/verovio/releases/tag/version-0.9.12)
-- [0.9.11](https://github.com/rism-ch/verovio/releases/tag/version-0.9.11)
-- [0.9.10](https://github.com/rism-ch/verovio/releases/tag/version-0.9.10)
-- [0.9.9](https://github.com/rism-ch/verovio/releases/tag/version-0.9.9)
-- [0.9.8](https://github.com/rism-ch/verovio/releases/tag/version-0.9.8)
-- [0.9.7](https://github.com/rism-ch/verovio/releases/tag/version-0.9.7)
-- [0.9.6](https://github.com/rism-ch/verovio/releases/tag/version-0.9.6)
-- [0.9.5](https://github.com/rism-ch/verovio/releases/tag/version-0.9.5)
-- [0.9.4](https://github.com/rism-ch/verovio/releases/tag/version-0.9.4)
-- [0.9.3](https://github.com/rism-ch/verovio/releases/tag/version-0.9.3)
-- [0.9.2](https://github.com/rism-ch/verovio/releases/tag/version-0.9.2)
-- [0.9.1](https://github.com/rism-ch/verovio/releases/tag/version-0.9.1)
-- [0.9.0](https://github.com/rism-ch/verovio/releases/tag/version-0.9.0)
+- [0.9.13](https://github.com/rism-digital/verovio/releases/tag/version-0.9.13)
+- [0.9.12](https://github.com/rism-digital/verovio/releases/tag/version-0.9.12)
+- [0.9.11](https://github.com/rism-digital/verovio/releases/tag/version-0.9.11)
+- [0.9.10](https://github.com/rism-digital/verovio/releases/tag/version-0.9.10)
+- [0.9.9](https://github.com/rism-digital/verovio/releases/tag/version-0.9.9)
+- [0.9.8](https://github.com/rism-digital/verovio/releases/tag/version-0.9.8)
+- [0.9.7](https://github.com/rism-digital/verovio/releases/tag/version-0.9.7)
+- [0.9.6](https://github.com/rism-digital/verovio/releases/tag/version-0.9.6)
+- [0.9.5](https://github.com/rism-digital/verovio/releases/tag/version-0.9.5)
+- [0.9.4](https://github.com/rism-digital/verovio/releases/tag/version-0.9.4)
+- [0.9.3](https://github.com/rism-digital/verovio/releases/tag/version-0.9.3)
+- [0.9.2](https://github.com/rism-digital/verovio/releases/tag/version-0.9.2)
+- [0.9.1](https://github.com/rism-digital/verovio/releases/tag/version-0.9.1)
+- [0.9.0](https://github.com/rism-digital/verovio/releases/tag/version-0.9.0)

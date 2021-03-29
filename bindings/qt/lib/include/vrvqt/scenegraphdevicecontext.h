@@ -97,8 +97,8 @@ public:
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
-    void DrawText(
-        const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET) override;
+    void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
+        int width = VRV_UNSET, int height = VRV_UNSET) override;
     void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph) override;
     void DrawSpline(int n, vrv::Point points[]) override;
     void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) override;

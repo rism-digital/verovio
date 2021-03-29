@@ -32,6 +32,23 @@ class Comparison {
 public:
     virtual bool operator()(Object *object) = 0;
     virtual bool MatchesType(Object *object) = 0;
+    // For classes that do a reverse comparison, return reversed result
+    bool Result(bool comparison) { return (m_reverse) ? !comparison : comparison; }
+    // Set reverse comparison.
+    // This is possible only for Comparison classes that allow it explicitly
+    void ReverseComparison()
+    {
+        assert(m_supportReverse);
+        m_reverse = true;
+    }
+
+protected:
+    // This is set to true in contructor of classes that allow it
+    bool m_supportReverse = false;
+
+private:
+    // The flag indicating if a reverse comparison needs to be done
+    bool m_reverse = false;
 };
 
 //----------------------------------------------------------------------------
@@ -72,14 +89,18 @@ protected:
 class ClassIdsComparison : public Comparison {
 
 public:
-    ClassIdsComparison(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
+    ClassIdsComparison(const std::vector<ClassId> &classIds)
+    {
+        m_classIds = classIds;
+        m_supportReverse = true;
+    }
 
     virtual bool operator()(Object *object)
     {
         if (object->Is(m_classIds)) {
-            return true;
+            return Result(true);
         }
-        return false;
+        return Result(false);
     }
 
     bool MatchesType(Object *object) { return true; }
@@ -145,12 +166,12 @@ protected:
 class IsEditorialElementComparison : public Comparison {
 
 public:
-    IsEditorialElementComparison() : Comparison() {}
+    IsEditorialElementComparison() : Comparison() { m_supportReverse = true; }
 
     virtual bool operator()(Object *object)
     {
-        if (object->IsEditorialElement()) return true;
-        return false;
+        if (object->IsEditorialElement()) return Result(true);
+        return Result(false);
     }
 
     bool MatchesType(Object *object) { return true; }
@@ -166,22 +187,18 @@ public:
 class IsEmptyComparison : public ClassIdComparison {
 
 public:
-    IsEmptyComparison(ClassId classId, bool reverse = false) : ClassIdComparison(classId) { m_reverse = reverse; }
+    IsEmptyComparison(ClassId classId) : ClassIdComparison(classId) { m_supportReverse = true; }
 
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
         if (object->GetChildCount() == 0) {
-            if (!m_reverse) return true;
+            return Result(true);
         }
         else {
-            if (m_reverse) return true;
+            return Result(false);
         }
-        return false;
     }
-
-private:
-    bool m_reverse;
 };
 
 //----------------------------------------------------------------------------
@@ -333,32 +350,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ArticPartTypeComparison
-//----------------------------------------------------------------------------
-
-/**
- * This class evaluates if the object is an Alignment of a certain type
- */
-class ArticPartTypeComparison : public ClassIdComparison {
-
-public:
-    ArticPartTypeComparison(const ArticPartType type) : ClassIdComparison(ARTIC_PART) { m_type = type; }
-
-    void SetType(ArticPartType type) { m_type = type; }
-
-    virtual bool operator()(Object *object)
-    {
-        if (!MatchesType(object)) return false;
-        ArticPart *articPart = vrv_cast<ArticPart *>(object);
-        assert(articPart);
-        return (articPart->GetType() == m_type);
-    }
-
-private:
-    ArticPartType m_type;
-};
-
-//----------------------------------------------------------------------------
 // MeasureAlignerTypeComparison
 //----------------------------------------------------------------------------
 
@@ -434,6 +425,30 @@ public:
 
 private:
     int m_time;
+};
+
+//----------------------------------------------------------------------------
+// UuidComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId has a certain Uuid
+ */
+class UuidComparison : public ClassIdComparison {
+
+public:
+    UuidComparison(ClassId classId, const std::string &uuid) : ClassIdComparison(classId) { m_uuid = uuid; }
+
+    void SetUuid(const std::string &uuid) { m_uuid = uuid; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        return object->GetUuid() == m_uuid;
+    }
+
+private:
+    std::string m_uuid;
 };
 
 //----------------------------------------------------------------------------

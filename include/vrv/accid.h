@@ -8,6 +8,7 @@
 #ifndef __VRV_ACCID_H__
 #define __VRV_ACCID_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_gestural.h"
 #include "layerelement.h"
 #include "positioninterface.h"
@@ -29,7 +30,8 @@ class Accid : public LayerElement,
               public AttAccidentalGestural,
               public AttAccidLog,
               public AttColor,
-              public AttEnclosingChars {
+              public AttEnclosingChars,
+              public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -66,6 +68,10 @@ public:
     std::wstring GetSymbolStr() const;
 
     bool AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
+
+    //----------------//
+    // Static methods //
+    //----------------//
 
     /**
      * @name Method used for drawing accidentals on ornaments
@@ -115,9 +121,12 @@ public:
         else if (first->GetDrawingY() > second->GetDrawingY()) {
             return false;
         }
-        // with unissons, natural should always be the last accidental
         else {
-            return (first->GetAccid() != ACCIDENTAL_WRITTEN_n);
+            // with unissons, natural should always be the last accidental (assuming there is a natural)
+            if ((first->GetAccid() == ACCIDENTAL_WRITTEN_n) || (second->GetAccid() == ACCIDENTAL_WRITTEN_n)) {
+                return (first->GetAccid() != ACCIDENTAL_WRITTEN_n);
+            }
+            return first->GetDrawingY() < second->GetDrawingY();
         }
     }
 };

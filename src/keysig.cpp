@@ -50,7 +50,7 @@ int KeySig::octave_map[2][9][7] = {
     {
         // sharps
         // C,  D,  E,  F,  G,  A,  B
-        { 01, 01, 01, 01, 01, 00, 00 }, // freench g
+        { 01, 01, 01, 01, 01, 00, 00 }, // french g
         { 01, 01, 01, 01, 01, 00, 00 }, // treble
         { 00, 00, 00, 00, 00, 00, 00 }, // soprano
         { 00, 00, 00, 00, 00, 00, 00 }, // mezzo
@@ -218,8 +218,19 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     return symbolStr;
 }
 
+int KeySig::GetFifthsInt()
+{
+    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
+        return -1 * this->GetSig().first;
+    }
+    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
+        return this->GetSig().first;
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
-// Static methods
+// Static methods for KeySig
 //----------------------------------------------------------------------------
 
 data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int pos)
@@ -255,6 +266,12 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
         case (CLEFSHAPE_G << 8 | 4): keySet = 3; break;
         case (CLEFSHAPE_G << 8 | 5): keySet = 4; break;
 
+        case (CLEFSHAPE_GG << 8 | 1): keySet = 0; break;
+        case (CLEFSHAPE_GG << 8 | 2): keySet = 1; break;
+        case (CLEFSHAPE_GG << 8 | 3): keySet = 2; break;
+        case (CLEFSHAPE_GG << 8 | 4): keySet = 3; break;
+        case (CLEFSHAPE_GG << 8 | 5): keySet = 4; break;
+
         case (CLEFSHAPE_C << 8 | 1): keySet = 2; break;
         case (CLEFSHAPE_C << 8 | 2): keySet = 3; break;
         case (CLEFSHAPE_C << 8 | 3): keySet = 4; break;
@@ -288,16 +305,6 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
     return octave;
 }
 
-int KeySig::GetFifthsInt()
-{
-    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
-        return -1 * this->GetSig().first;
-    }
-    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
-        return this->GetSig().first;
-    }
-    return 0;
-}
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

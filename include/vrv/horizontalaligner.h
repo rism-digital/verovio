@@ -63,7 +63,7 @@ enum AlignmentType {
 //----------------------------------------------------------------------------
 
 /**
- * This class stores an alignement position elements will point to
+ * This class stores an alignment position elements will point to
  */
 class Alignment : public Object {
 public:
@@ -130,7 +130,9 @@ public:
      * Returns (-)VRV_UNSET in nothing for the staff specified.
      * Uses Object::GetAlignmentLeftRight
      */
-    void GetLeftRight(int staffN, int &minLeft, int &maxRight);
+    void GetLeftRight(
+        const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
 
     /**
      * Returns the GraceAligner for the Alignment.
@@ -177,6 +179,11 @@ public:
      * Return true if the alignment contains at least one reference with staffN
      */
     bool HasAlignmentReference(int staffN);
+
+    /**
+     * Return true if the alignment contains only references to timestamp attributes.
+     */
+    bool HasTimestampOnly();
 
     //----------//
     // Functors //
@@ -263,7 +270,7 @@ private:
 
 /**
  * This class stores a references of LayerElements for a staff.
- * The staff identification (@n) is given by the attCommon and takes into accound
+ * The staff identification (@n) is given by the attCommon and takes into account
  * cross-staff situations.
  * Its children of the alignment are references.
  */
@@ -306,6 +313,11 @@ public:
      */
     bool HasMultipleLayer() const { return (m_layerCount > 1); }
 
+    /**
+     * Return true if the reference has elements from cross-staff.
+     */
+    bool HasCrossStaffElements();
+
     //----------//
     // Functors //
     //----------//
@@ -326,9 +338,9 @@ public:
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
 private:
     //
@@ -372,7 +384,7 @@ public:
      */
     virtual bool CopyChildren() const { return false; }
 
-    int GetAlignmentCount() const { return (int)m_children.size(); }
+    int GetAlignmentCount() const { return (int)GetChildren()->size(); }
 
     //----------//
     // Functors //
@@ -442,6 +454,15 @@ public:
      */
     ///@{
     int GetNonJustifiableMargin() const { return m_nonJustifiableLeftMargin; }
+    ///@}
+
+    /**
+     * @name Set and Get the initial tstamp duration.
+     * Setter takes a meter unit parameter.
+     */
+    ///@{
+    void SetInitialTstamp(int meterUnit);
+    double GetInitialTstampDur() const { return m_initialTstampDur; }
     ///@}
 
     /**
@@ -517,6 +538,12 @@ private:
      * Store measure's non-justifiable margin used by the scoreDef attributes.
      */
     int m_nonJustifiableLeftMargin;
+
+    /**
+     * The time duration of the timestamp between 0.0 and 1.0.
+     * This depends on the meter signature in the preceeding scoreDef
+     */
+    double m_initialTstampDur;
 };
 
 //----------------------------------------------------------------------------

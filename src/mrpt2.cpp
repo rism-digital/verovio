@@ -28,8 +28,10 @@ namespace vrv {
 // MRpt2
 //----------------------------------------------------------------------------
 
-MRpt2::MRpt2() : LayerElement("mrpt2-")
+MRpt2::MRpt2() : LayerElement("mrpt2-"), AttColor()
 {
+    RegisterAttClass(ATT_COLOR);
+
     Reset();
 }
 
@@ -38,6 +40,7 @@ MRpt2::~MRpt2() {}
 void MRpt2::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
 }
 
 } // namespace vrv

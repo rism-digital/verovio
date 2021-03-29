@@ -16,6 +16,7 @@
 #include "clef.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "grpsym.h"
 #include "keysig.h"
 #include "label.h"
 #include "mensur.h"
@@ -145,11 +146,17 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
 //----------------------------------------------------------------------------
 
 ScoreDef::ScoreDef()
-    : ScoreDefElement("scoredef-"), ObjectListInterface(), AttDistances(), AttEndings(), AttOptimization()
+    : ScoreDefElement("scoredef-")
+    , ObjectListInterface()
+    , AttDistances()
+    , AttEndings()
+    , AttOptimization()
+    , AttTimeBase()
 {
     RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_ENDINGS);
     RegisterAttClass(ATT_OPTIMIZATION);
+    RegisterAttClass(ATT_TIMEBASE);
 
     Reset();
 }
@@ -172,6 +179,9 @@ bool ScoreDef::IsSupportedChild(Object *child)
 {
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(GRPSYM)) {
+        assert(dynamic_cast<GrpSym *>(child));
     }
     else if (child->Is(KEYSIG)) {
         assert(dynamic_cast<KeySig *>(child));

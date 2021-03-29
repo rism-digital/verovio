@@ -33,6 +33,7 @@ Accid::Accid()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
+    , AttExtSym()
 {
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -41,6 +42,7 @@ Accid::Accid()
     RegisterAttClass(ATT_ACCIDLOG);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_ENCLOSINGCHARS);
+    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -56,29 +58,43 @@ void Accid::Reset()
     ResetAccidLog();
     ResetColor();
     ResetEnclosingChars();
+    ResetExtSym();
 }
 
 std::wstring Accid::GetSymbolStr() const
 {
     if (!this->HasAccid()) return L"";
 
-    wchar_t symc = GetAccidGlyph(this->GetAccid());
+    wchar_t code = 0;
+
+    // If there is glyph.num, prioritize it
+    if (HasGlyphNum()) {
+        code = GetGlyphNum();
+        if (NULL == Resources::GetGlyph(code)) code = 0;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL == Resources::GetGlyph(code)) code = 0;
+    }
+
+    if (code == 0) code = GetAccidGlyph(this->GetAccid());
     std::wstring symbolStr;
 
     if (this->HasEnclose()) {
         if (this->GetEnclose() == ENCLOSURE_brack) {
             symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
-            symbolStr.push_back(symc);
+            symbolStr.push_back(code);
             symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
         }
         else {
             symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
-            symbolStr.push_back(symc);
+            symbolStr.push_back(code);
             symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
         }
     }
     else {
-        symbolStr.push_back(symc);
+        symbolStr.push_back(code);
     }
     return symbolStr;
 }
@@ -130,7 +146,7 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;
             std::vector<Accid *>::iterator iter;
-            // Recursively adjust all accidental that are on the left because enough space was previousy available
+            // Recursively adjust all accidental that are on the left because enough space was previously available
             for (iter = leftAccids.begin(); iter != leftAccids.end(); ++iter) {
                 this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset);
             }
@@ -140,6 +156,10 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
     return false;
 }
+
+//----------------------------------------------------------------------------
+// Static methods for Accid
+//----------------------------------------------------------------------------
 
 wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 {
@@ -167,6 +187,14 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
         case ACCIDENTAL_WRITTEN_3qf: symc = SMUFL_E281_accidentalThreeQuarterTonesFlatZimmermann; break;
         case ACCIDENTAL_WRITTEN_1qs: symc = SMUFL_E282_accidentalQuarterToneSharpStein; break;
         case ACCIDENTAL_WRITTEN_3qs: symc = SMUFL_E283_accidentalThreeQuarterTonesSharpStein; break;
+        case ACCIDENTAL_WRITTEN_bms: symc = SMUFL_E447_accidentalBuyukMucennebSharp; break;
+        case ACCIDENTAL_WRITTEN_kms: symc = SMUFL_E446_accidentalKucukMucennebSharp; break;
+        case ACCIDENTAL_WRITTEN_bs: symc = SMUFL_E445_accidentalBakiyeSharp; break;
+        case ACCIDENTAL_WRITTEN_ks: symc = SMUFL_E444_accidentalKomaSharp; break;
+        case ACCIDENTAL_WRITTEN_kf: symc = SMUFL_E443_accidentalKomaFlat; break;
+        case ACCIDENTAL_WRITTEN_bf: symc = SMUFL_E442_accidentalBakiyeFlat; break;
+        case ACCIDENTAL_WRITTEN_kmf: symc = SMUFL_E441_accidentalKucukMucennebFlat; break;
+        case ACCIDENTAL_WRITTEN_bmf: symc = SMUFL_E440_accidentalBuyukMucennebFlat; break;
         default: break;
     }
     return symc;

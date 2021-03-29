@@ -225,7 +225,6 @@ public:
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
-    static void SeedUuid(unsigned int seed = 0);
 
     /**
      * Methods for setting / getting comments
@@ -255,9 +254,15 @@ public:
     Object *GetChild(int idx, const ClassId classId);
 
     /**
-     * Return a cont pointer to the children
+     * Return a const pointer to the children
      */
-    const ArrayOfObjects *GetChildren() { return &m_children; }
+    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const { return &m_children; }
+
+    /**
+     * Return a pointer to the children that allows modification.
+     * This method should be all only in AddChild overrides methods
+     */
+    ArrayOfObjects *GetChildrenForModification() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -499,6 +504,11 @@ public:
     bool HasEditorialContent();
 
     /**
+     * Return true if the object contains anything that is not editorial content
+     */
+    bool HasNonEditorialContent();
+
+    /**
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
@@ -526,9 +536,21 @@ public:
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
+     * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
+        bool skipFirst = false);
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    static void SeedUuid(unsigned int seed = 0);
+
+    static std::string GenerateRandUuid();
+
+    static bool sortByUlx(Object *a, Object *b);
 
     //----------//
     // Functors //
@@ -628,6 +650,15 @@ public:
     ///@}
 
     /**
+     * Convert markup of artic@artic multi value into distinct artic elements.
+     * See Doc::ConvertMarkupAnalyticalDoc
+     */
+    ///@{
+    virtual int ConvertMarkupArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
      * See Doc::ConvertScoreDefMarkupDoc
      */
@@ -709,6 +740,11 @@ public:
     ///@}
 
     /**
+     * Adjust the spacing for clef changes.
+     */
+    virtual int AdjustClefChanges(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position the outside articulations.
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -735,6 +771,11 @@ public:
      * Adjust the x position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the x position of accidental.
+     */
+    virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * @name Adjust the x position of a right barline in order to make sure the is no text content
@@ -805,9 +846,24 @@ public:
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Calculate the vertical position adjustment for the beam if it overlaps with layer elements
+     */
+    virtual int AdjustBeams(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Apply position adjustment that has been calculated previously
+     */
+    virtual int AdjustBeamsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the postion position of slurs.
      */
     virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the articulations.
+     */
+    virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position the outside articulations with slur.
@@ -847,6 +903,11 @@ public:
      * Calculate the y position of tuplet brackets and num
      */
     virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Calculate the y relative position of tupletNum based on overlaps with other elements
+     */
+    virtual int AdjustTupletNumOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.
@@ -908,15 +969,15 @@ public:
      * It also includes a scoreDef for each measure where a change occured before.
      * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
-    virtual int SetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
 
     /**
      * Optimize the scoreDef for each system.
      * For automatic breaks, looks for staves with only mRests.
      */
     ///@{
-    virtual int OptimizeScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int OptimizeScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefOptimizeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -927,7 +988,7 @@ public:
     /**
      * Unset the initial scoreDef of each system and measure
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefUnsetCurrent(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
@@ -956,6 +1017,11 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
+
+    /**
+     * Prepare group symbol starting and ending staffDefs for drawing
+     */
+    virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Associate LayerElement with @facs to the appropriate zone
@@ -1179,8 +1245,6 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
-    static bool sortByUlx(Object *a, Object *b);
-
 protected:
     //
 private:
@@ -1202,13 +1266,14 @@ public:
     ArrayOfStrAttr m_unsupported;
 
 protected:
+    //
+private:
     /**
      * A vector of child objects.
      * Unless SetAsReferenceObject is set or with detached and relinquished, the children are own by it.
      */
     ArrayOfObjects m_children;
 
-private:
     /**
      * A pointer to the parent object;
      */
@@ -1275,6 +1340,10 @@ private:
      * A flag indicating if the Object is a copy created by an expanded expansion element.
      */
     bool m_isExpansion;
+
+    //----------------//
+    // Static members //
+    //----------------//
 
     /**
      * A static counter for uuid generation.

@@ -251,14 +251,14 @@ public:
     ///@}
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::UnscoreDefSetCurrent
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::OptimizeScoreDef
+     * See Object::ScoreDefOptimize
      */
-    virtual int OptimizeScoreDef(FunctorParams *functorParams);
+    virtual int ScoreDefOptimize(FunctorParams *functorParams);
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -290,6 +290,11 @@ public:
      * See Object::AdjustArpeg
      */
     virtual int AdjustArpegEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustClefChanges
+     */
+    virtual int AdjustClefChanges(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustLayers

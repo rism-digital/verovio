@@ -26,7 +26,7 @@ class Stem;
 
 /**
  * This class is an interface for elements with duration, such as notes and rests.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instantiate directly.
  */
 class DrawingListInterface {
 public:
@@ -76,8 +76,9 @@ private:
 /**
  * This class is an interface for MEI beam elements (beam, beamSpan).
  * It stores stem drawing values.
+ * It is also an ObjectListInterface.
  */
-class BeamDrawingInterface {
+class BeamDrawingInterface : public ObjectListInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -86,6 +87,16 @@ public:
     BeamDrawingInterface();
     virtual ~BeamDrawingInterface();
     virtual void Reset();
+    ///@}
+
+    /**
+     * Return information about the position in the beam.
+     * (no const since the cached list is updated)
+     * Object * is a pointer to the object implementing the interface (e.g, Beam, fTrem)
+     */
+    ///@{
+    bool IsFirstIn(Object *object, LayerElement *element);
+    bool IsLastIn(Object *object, LayerElement *element);
     ///@}
 
     /**
@@ -99,19 +110,30 @@ public:
     bool IsRepeatedPattern();
 
     /**
+     * Checks whether difference between highest and lowest notes of the beam is just one step
+     */
+    bool HasOneStepHeight();
+
+    /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoords();
 
 protected:
-    //
+    /**
+     * Return the position of the element in the beam.
+     * For notes, lookup the position of the parent chord.
+     */
+    int GetPosition(Object *object, LayerElement *element);
+
 public:
     // values to be set before calling CalcBeam
     bool m_changingDur;
     bool m_beamHasChord;
     bool m_hasMultipleStemDir;
     bool m_cueSize;
-    bool m_isCrossStaff;
+    Staff *m_crossStaffContent;
+    data_STAFFREL_basic m_crossStaffRel;
     int m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
@@ -140,7 +162,7 @@ public:
  * This class is an interface for MEI scoreDef or staffDef attributes clef, keysig and mensur.
  * It can either hold element or attribute values. Element values are hold in normal objects
  * (e.g., Clef) and attribute values are hold in dedicated Object classes (e.g., ClefAttr)
- * During rendering, only Element object are used. They are obained by the GetXXXCopy methods
+ * During rendering, only Element object are used. They are obtained by the GetXXXCopy methods
  * that create a copy of the Element object or a corresponding Element object if a attribute value
  * object is hold.
  */

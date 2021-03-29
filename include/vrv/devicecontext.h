@@ -256,9 +256,6 @@ public:
     virtual void EndPage() = 0;
     ///@}
 
-    /** Colour conversion method **/
-    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
-
     /**
      * @name Method for adding description element
      */
@@ -272,6 +269,13 @@ public:
      * Global styling is false by default.
      */
     virtual bool UseGlobalStyling() { return false; }
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /** Colour conversion method **/
+    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
 
 private:
     void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);

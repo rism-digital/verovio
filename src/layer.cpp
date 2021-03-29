@@ -75,6 +75,8 @@ void Layer::Reset()
     ResetStaffDefObjects();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
+    m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
 }
 
 void Layer::CloneReset()
@@ -93,6 +95,8 @@ void Layer::CloneReset()
     m_cautionStaffDefMeterSig = NULL;
 
     m_drawingStemDir = STEMDIRECTION_NONE;
+    m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
 }
 
 void Layer::ResetStaffDefObjects()
@@ -233,7 +237,15 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
         return STEMDIRECTION_NONE;
     }
     else {
-        return m_drawingStemDir;
+        if (this->m_crossStaffFromBelow) {
+            return (element->m_crossStaff) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+        else if (this->m_crossStaffFromAbove) {
+            return (element->m_crossStaff) ? STEMDIRECTION_up : STEMDIRECTION_down;
+        }
+        else {
+            return m_drawingStemDir;
+        }
     }
 }
 
@@ -313,15 +325,39 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
     return (int)layerCountInTimeSpanParams.m_layers.size();
 }
 
-ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
+ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool excludeCurrent)
 {
     assert(element);
 
     Measure *measure = static_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
+    double time = 0.0;
+    double duration = 0.0;
     Alignment *alignment = element->GetAlignment();
-    assert(alignment);
+    // Get duration and time if element has alignment
+    if (alignment) {
+        time = alignment->GetTime();
+        duration = element->GetAlignmentDuration();
+    }
+    // If it is Beam, try to get alignments for first and last elements and calculate
+    // the duration of the beam based on those
+    else if (!alignment && element->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(element);
+        const ArrayOfObjects *beamChildren = beam->GetList(beam);
+
+        LayerElement *first = vrv_cast<LayerElement *>(beamChildren->front());
+        LayerElement *last = vrv_cast<LayerElement *>(beamChildren->back());
+
+        if (!first || !last) return {};
+
+        time = first->GetAlignment()->GetTime();
+        double lastTime = last->GetAlignment()->GetTime();
+        duration = lastTime - time + last->GetAlignmentDuration();
+    }
+    else {
+        return {};
+    }
 
     Layer *layer = NULL;
     Staff *staff = element->GetCrossStaff(layer);
@@ -331,10 +367,11 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
     // At this stage we have the parent or the cross-staff
     assert(staff);
 
-    return GetLayerElementsInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+    return GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
 }
 
-ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff)
+ListOfObjects Layer::GetLayerElementsInTimeSpan(
+    double time, double duration, Measure *measure, int staff, bool excludeCurrent)
 {
     assert(measure);
 
@@ -342,6 +379,7 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Me
     LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(GetCurrentMeterSig(), GetCurrentMensur(), this);
     layerElementsInTimeSpanParams.m_time = time;
     layerElementsInTimeSpanParams.m_duration = duration;
+    layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
 
     ArrayOfComparisons filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
@@ -483,7 +521,7 @@ int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
+int Layer::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     ResetStaffDefObjects();
 
@@ -539,16 +577,22 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
         params->m_scoreDefRole = SCOREDEF_INTERMEDIATE;
 
     if (this->GetStaffDefClef()) {
-        GetStaffDefClef()->AlignHorizontally(params);
+        if (GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
+            GetStaffDefClef()->AlignHorizontally(params);
+        }
     }
     if (this->GetStaffDefKeySig()) {
-        GetStaffDefKeySig()->AlignHorizontally(params);
+        if (GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
+            GetStaffDefKeySig()->AlignHorizontally(params);
+        }
     }
     if (this->GetStaffDefMensur()) {
         GetStaffDefMensur()->AlignHorizontally(params);
     }
     if (this->GetStaffDefMeterSig()) {
-        GetStaffDefMeterSig()->AlignHorizontally(params);
+        if (GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
+            GetStaffDefMeterSig()->AlignHorizontally(params);
+        }
     }
 
     params->m_scoreDefRole = SCOREDEF_NONE;
@@ -636,6 +680,13 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     params->m_currentMensur = GetCurrentMensur();
     params->m_currentMeterSig = GetCurrentMeterSig();
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::ResetDrawing(FunctorParams *functorParams)
+{
+    this->m_crossStaffFromBelow = false;
+    this->m_crossStaffFromAbove = false;
     return FUNCTOR_CONTINUE;
 }
 

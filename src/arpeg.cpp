@@ -55,15 +55,15 @@ void Arpeg::Reset()
 
 int Arpeg::GetDrawingX() const
 {
-    // Getting the position of the current positionner (we have only one for arpeg because values in
+    // Getting the position of the current positioner (we have only one for arpeg because values in
     // @staff are not taken into account for arpeg (only @plist)
-    // The positionner for Arpeg uses the top note as objectX
+    // The positioner for Arpeg uses the top note as objectX
     if (this->GetCurrentFloatingPositioner()) {
         return (GetCurrentFloatingPositioner()->GetDrawingX());
     }
 
     // Otherwise get the measure - no cast to Measure is necessary
-    LogDebug("Accessing an arpeg x without positionner");
+    LogDebug("Accessing an arpeg x without positioner");
     Object *measure = this->GetFirstAncestor(MEASURE);
     assert(measure);
 
@@ -87,8 +87,8 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
     ResetCachedDrawingX();
 
     m_drawingXRel = drawingXRel;
-    // Also update the positonner drawingXRel - this is a duplcation but we need it in
-    // the positionner too for the bounding box calculation and for the DrawingX value
+    // Also update the positioner drawingXRel - this is a duplication but we need it in
+    // the positioner too for the bounding box calculation and for the DrawingX value
     // See GetDrawingX
     if (GetCurrentFloatingPositioner()) {
         GetCurrentFloatingPositioner()->SetDrawingXRel(m_drawingXRel);
@@ -174,6 +174,27 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
     }
 }
 
+Staff *Arpeg::GetCrossStaff()
+{
+    const ArrayOfObjects *refs = GetRefs();
+    if (refs->empty()) return NULL;
+
+    // Find if there is at least one element that is not cross staff
+    auto iter = std::find_if(refs->begin(), refs->end(), [](Object *obj) {
+        LayerElement *element = vrv_cast<LayerElement *>(obj);
+        assert(element);
+        return !element->m_crossStaff;
+    });
+
+    // If that's the case - return NULL, we can base arpeggio location on the original staff
+    if (iter != refs->end()) return NULL;
+
+    // Otherwise return cross staff of the front element from the references
+    LayerElement *front = vrv_cast<LayerElement *>(refs->front());
+    assert(front);
+    return front->m_crossStaff;
+}
+
 //----------------------------------------------------------------------------
 // Arpeg functor methods
 //----------------------------------------------------------------------------
@@ -207,8 +228,11 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     Staff *bottomStaff = vrv_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
     assert(bottomStaff);
 
+    Staff *crossStaff = GetCrossStaff();
+    const int staffN = (crossStaff != NULL) ? crossStaff->GetN() : topStaff->GetN();
+
     int minTopLeft, maxTopRight;
-    topNote->GetAlignment()->GetLeftRight(topStaff->GetN(), minTopLeft, maxTopRight);
+    topNote->GetAlignment()->GetLeftRight(staffN, minTopLeft, maxTopRight);
 
     params->m_alignmentArpegTuples.push_back(std::make_tuple(topNote->GetAlignment(), this, topStaff->GetN(), false));
 

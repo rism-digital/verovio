@@ -207,7 +207,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
-    // however, we expect the actualy width to be shifted on the left/top
+    // however, we expect the actually width to be shifted on the left/top
     // e.g. with 7, 4 on the left and 3 on the right
     if (penWidth % 2) {
         p1++;
@@ -300,7 +300,7 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
 void BBoxDeviceContext::MoveTextVerticallyTo(int y)
 {
     assert(m_drawingText);
-    // Because this is used only for smaller sup-script / supercript it seems
+    // Because this is used only for smaller subscript / superscript it seems
     // better not to change the y position for the BBoxDeviceContext because
     // otherwise it moves the full bounding box - to be improve / double checked
     // m_textY = y;
@@ -410,8 +410,8 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
     // the array may not be empty
     assert(!m_objects.empty());
 
-    // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View
-    // object)
+    // we need to store logical coordinates in the objects, we need to convert them back
+    // (this is why we need a View object)
     if (!m_isDeactivatedX) {
         (m_objects.back())->UpdateSelfBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
         if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top()->GetPointSize());

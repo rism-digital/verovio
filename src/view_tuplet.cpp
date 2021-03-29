@@ -62,7 +62,7 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // We do it here because we have no dedicated functor to do it (which would be an overkill)
     if (tuplet->GetDrawingBracketPos() == STAFFREL_basic_NONE) {
-        tuplet->CalcDrawingBracketAndNumPos();
+        tuplet->CalcDrawingBracketAndNumPos(m_doc->GetOptions()->m_tupletNumHead.GetValue());
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -112,7 +112,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     const int yRight = tupletBracket->GetDrawingYRight() - lineWidth / 2;
     int bracketHeight;
 
-    // Draw a bracked with a gap
+    // Draw a bracket with a gap
     if (tupletBracket->GetAlignedNum() && tupletBracket->GetAlignedNum()->HasSelfBB()) {
         const int xNumLeft
             = tupletBracket->GetAlignedNum()->GetSelfLeft() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);

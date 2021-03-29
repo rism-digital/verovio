@@ -41,6 +41,14 @@ std::string AttConverter::AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data)
         case ACCIDENTAL_GESTURAL_sd: value = "sd"; break;
         case ACCIDENTAL_GESTURAL_fu: value = "fu"; break;
         case ACCIDENTAL_GESTURAL_fd: value = "fd"; break;
+        case ACCIDENTAL_GESTURAL_bms: value = "bms"; break;
+        case ACCIDENTAL_GESTURAL_kms: value = "kms"; break;
+        case ACCIDENTAL_GESTURAL_bs: value = "bs"; break;
+        case ACCIDENTAL_GESTURAL_ks: value = "ks"; break;
+        case ACCIDENTAL_GESTURAL_kf: value = "kf"; break;
+        case ACCIDENTAL_GESTURAL_bf: value = "bf"; break;
+        case ACCIDENTAL_GESTURAL_kmf: value = "kmf"; break;
+        case ACCIDENTAL_GESTURAL_bmf: value = "bmf"; break;
         default:
             LogWarning("Unknown value '%d' for data.ACCIDENTAL.GESTURAL", data);
             value = "";
@@ -60,9 +68,73 @@ data_ACCIDENTAL_GESTURAL AttConverter::StrToAccidentalGestural(const std::string
     if (value == "sd") return ACCIDENTAL_GESTURAL_sd;
     if (value == "fu") return ACCIDENTAL_GESTURAL_fu;
     if (value == "fd") return ACCIDENTAL_GESTURAL_fd;
+    if (value == "bms") return ACCIDENTAL_GESTURAL_bms;
+    if (value == "kms") return ACCIDENTAL_GESTURAL_kms;
+    if (value == "bs") return ACCIDENTAL_GESTURAL_bs;
+    if (value == "ks") return ACCIDENTAL_GESTURAL_ks;
+    if (value == "kf") return ACCIDENTAL_GESTURAL_kf;
+    if (value == "bf") return ACCIDENTAL_GESTURAL_bf;
+    if (value == "kmf") return ACCIDENTAL_GESTURAL_kmf;
+    if (value == "bmf") return ACCIDENTAL_GESTURAL_bmf;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.GESTURAL", value.c_str());
     return ACCIDENTAL_GESTURAL_NONE;
+}
+
+std::string AttConverter::AccidentalGesturalBasicToStr(data_ACCIDENTAL_GESTURAL_basic data) const
+{
+    std::string value;
+    switch (data) {
+        case ACCIDENTAL_GESTURAL_basic_s: value = "s"; break;
+        case ACCIDENTAL_GESTURAL_basic_f: value = "f"; break;
+        case ACCIDENTAL_GESTURAL_basic_ss: value = "ss"; break;
+        case ACCIDENTAL_GESTURAL_basic_ff: value = "ff"; break;
+        case ACCIDENTAL_GESTURAL_basic_n: value = "n"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.GESTURAL.basic", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_GESTURAL_basic AttConverter::StrToAccidentalGesturalBasic(const std::string &value, bool logWarning) const
+{
+    if (value == "s") return ACCIDENTAL_GESTURAL_basic_s;
+    if (value == "f") return ACCIDENTAL_GESTURAL_basic_f;
+    if (value == "ss") return ACCIDENTAL_GESTURAL_basic_ss;
+    if (value == "ff") return ACCIDENTAL_GESTURAL_basic_ff;
+    if (value == "n") return ACCIDENTAL_GESTURAL_basic_n;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.GESTURAL.basic", value.c_str());
+    return ACCIDENTAL_GESTURAL_basic_NONE;
+}
+
+std::string AttConverter::AccidentalGesturalExtendedToStr(data_ACCIDENTAL_GESTURAL_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case ACCIDENTAL_GESTURAL_extended_su: value = "su"; break;
+        case ACCIDENTAL_GESTURAL_extended_sd: value = "sd"; break;
+        case ACCIDENTAL_GESTURAL_extended_fu: value = "fu"; break;
+        case ACCIDENTAL_GESTURAL_extended_fd: value = "fd"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.GESTURAL.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_GESTURAL_extended AttConverter::StrToAccidentalGesturalExtended(const std::string &value, bool logWarning) const
+{
+    if (value == "su") return ACCIDENTAL_GESTURAL_extended_su;
+    if (value == "sd") return ACCIDENTAL_GESTURAL_extended_sd;
+    if (value == "fu") return ACCIDENTAL_GESTURAL_extended_fu;
+    if (value == "fd") return ACCIDENTAL_GESTURAL_extended_fd;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.GESTURAL.extended", value.c_str());
+    return ACCIDENTAL_GESTURAL_extended_NONE;
 }
 
 std::string AttConverter::AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) const
@@ -91,6 +163,14 @@ std::string AttConverter::AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) c
         case ACCIDENTAL_WRITTEN_3qf: value = "3qf"; break;
         case ACCIDENTAL_WRITTEN_1qs: value = "1qs"; break;
         case ACCIDENTAL_WRITTEN_3qs: value = "3qs"; break;
+        case ACCIDENTAL_WRITTEN_bms: value = "bms"; break;
+        case ACCIDENTAL_WRITTEN_kms: value = "kms"; break;
+        case ACCIDENTAL_WRITTEN_bs: value = "bs"; break;
+        case ACCIDENTAL_WRITTEN_ks: value = "ks"; break;
+        case ACCIDENTAL_WRITTEN_kf: value = "kf"; break;
+        case ACCIDENTAL_WRITTEN_bf: value = "bf"; break;
+        case ACCIDENTAL_WRITTEN_kmf: value = "kmf"; break;
+        case ACCIDENTAL_WRITTEN_bmf: value = "bmf"; break;
         default:
             LogWarning("Unknown value '%d' for data.ACCIDENTAL.WRITTEN", data);
             value = "";
@@ -123,9 +203,134 @@ data_ACCIDENTAL_WRITTEN AttConverter::StrToAccidentalWritten(const std::string &
     if (value == "3qf") return ACCIDENTAL_WRITTEN_3qf;
     if (value == "1qs") return ACCIDENTAL_WRITTEN_1qs;
     if (value == "3qs") return ACCIDENTAL_WRITTEN_3qs;
+    if (value == "bms") return ACCIDENTAL_WRITTEN_bms;
+    if (value == "kms") return ACCIDENTAL_WRITTEN_kms;
+    if (value == "bs") return ACCIDENTAL_WRITTEN_bs;
+    if (value == "ks") return ACCIDENTAL_WRITTEN_ks;
+    if (value == "kf") return ACCIDENTAL_WRITTEN_kf;
+    if (value == "bf") return ACCIDENTAL_WRITTEN_bf;
+    if (value == "kmf") return ACCIDENTAL_WRITTEN_kmf;
+    if (value == "bmf") return ACCIDENTAL_WRITTEN_bmf;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.WRITTEN", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
+}
+
+std::string AttConverter::AccidentalWrittenBasicToStr(data_ACCIDENTAL_WRITTEN_basic data) const
+{
+    std::string value;
+    switch (data) {
+        case ACCIDENTAL_WRITTEN_basic_s: value = "s"; break;
+        case ACCIDENTAL_WRITTEN_basic_f: value = "f"; break;
+        case ACCIDENTAL_WRITTEN_basic_ss: value = "ss"; break;
+        case ACCIDENTAL_WRITTEN_basic_x: value = "x"; break;
+        case ACCIDENTAL_WRITTEN_basic_ff: value = "ff"; break;
+        case ACCIDENTAL_WRITTEN_basic_xs: value = "xs"; break;
+        case ACCIDENTAL_WRITTEN_basic_sx: value = "sx"; break;
+        case ACCIDENTAL_WRITTEN_basic_ts: value = "ts"; break;
+        case ACCIDENTAL_WRITTEN_basic_tf: value = "tf"; break;
+        case ACCIDENTAL_WRITTEN_basic_n: value = "n"; break;
+        case ACCIDENTAL_WRITTEN_basic_nf: value = "nf"; break;
+        case ACCIDENTAL_WRITTEN_basic_ns: value = "ns"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.WRITTEN.basic", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_WRITTEN_basic AttConverter::StrToAccidentalWrittenBasic(const std::string &value, bool logWarning) const
+{
+    if (value == "s") return ACCIDENTAL_WRITTEN_basic_s;
+    if (value == "f") return ACCIDENTAL_WRITTEN_basic_f;
+    if (value == "ss") return ACCIDENTAL_WRITTEN_basic_ss;
+    if (value == "x") return ACCIDENTAL_WRITTEN_basic_x;
+    if (value == "ff") return ACCIDENTAL_WRITTEN_basic_ff;
+    if (value == "xs") return ACCIDENTAL_WRITTEN_basic_xs;
+    if (value == "sx") return ACCIDENTAL_WRITTEN_basic_sx;
+    if (value == "ts") return ACCIDENTAL_WRITTEN_basic_ts;
+    if (value == "tf") return ACCIDENTAL_WRITTEN_basic_tf;
+    if (value == "n") return ACCIDENTAL_WRITTEN_basic_n;
+    if (value == "nf") return ACCIDENTAL_WRITTEN_basic_nf;
+    if (value == "ns") return ACCIDENTAL_WRITTEN_basic_ns;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.WRITTEN.basic", value.c_str());
+    return ACCIDENTAL_WRITTEN_basic_NONE;
+}
+
+std::string AttConverter::AccidentalWrittenExtendedToStr(data_ACCIDENTAL_WRITTEN_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case ACCIDENTAL_WRITTEN_extended_su: value = "su"; break;
+        case ACCIDENTAL_WRITTEN_extended_sd: value = "sd"; break;
+        case ACCIDENTAL_WRITTEN_extended_fu: value = "fu"; break;
+        case ACCIDENTAL_WRITTEN_extended_fd: value = "fd"; break;
+        case ACCIDENTAL_WRITTEN_extended_nu: value = "nu"; break;
+        case ACCIDENTAL_WRITTEN_extended_nd: value = "nd"; break;
+        case ACCIDENTAL_WRITTEN_extended_1qf: value = "1qf"; break;
+        case ACCIDENTAL_WRITTEN_extended_3qf: value = "3qf"; break;
+        case ACCIDENTAL_WRITTEN_extended_1qs: value = "1qs"; break;
+        case ACCIDENTAL_WRITTEN_extended_3qs: value = "3qs"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.WRITTEN.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_WRITTEN_extended AttConverter::StrToAccidentalWrittenExtended(const std::string &value, bool logWarning) const
+{
+    if (value == "su") return ACCIDENTAL_WRITTEN_extended_su;
+    if (value == "sd") return ACCIDENTAL_WRITTEN_extended_sd;
+    if (value == "fu") return ACCIDENTAL_WRITTEN_extended_fu;
+    if (value == "fd") return ACCIDENTAL_WRITTEN_extended_fd;
+    if (value == "nu") return ACCIDENTAL_WRITTEN_extended_nu;
+    if (value == "nd") return ACCIDENTAL_WRITTEN_extended_nd;
+    if (value == "1qf") return ACCIDENTAL_WRITTEN_extended_1qf;
+    if (value == "3qf") return ACCIDENTAL_WRITTEN_extended_3qf;
+    if (value == "1qs") return ACCIDENTAL_WRITTEN_extended_1qs;
+    if (value == "3qs") return ACCIDENTAL_WRITTEN_extended_3qs;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.WRITTEN.extended", value.c_str());
+    return ACCIDENTAL_WRITTEN_extended_NONE;
+}
+
+std::string AttConverter::AccidentalAeuToStr(data_ACCIDENTAL_aeu data) const
+{
+    std::string value;
+    switch (data) {
+        case ACCIDENTAL_aeu_bms: value = "bms"; break;
+        case ACCIDENTAL_aeu_kms: value = "kms"; break;
+        case ACCIDENTAL_aeu_bs: value = "bs"; break;
+        case ACCIDENTAL_aeu_ks: value = "ks"; break;
+        case ACCIDENTAL_aeu_kf: value = "kf"; break;
+        case ACCIDENTAL_aeu_bf: value = "bf"; break;
+        case ACCIDENTAL_aeu_kmf: value = "kmf"; break;
+        case ACCIDENTAL_aeu_bmf: value = "bmf"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.aeu", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_aeu AttConverter::StrToAccidentalAeu(const std::string &value, bool logWarning) const
+{
+    if (value == "bms") return ACCIDENTAL_aeu_bms;
+    if (value == "kms") return ACCIDENTAL_aeu_kms;
+    if (value == "bs") return ACCIDENTAL_aeu_bs;
+    if (value == "ks") return ACCIDENTAL_aeu_ks;
+    if (value == "kf") return ACCIDENTAL_aeu_kf;
+    if (value == "bf") return ACCIDENTAL_aeu_bf;
+    if (value == "kmf") return ACCIDENTAL_aeu_kmf;
+    if (value == "bmf") return ACCIDENTAL_aeu_bmf;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.aeu", value.c_str());
+    return ACCIDENTAL_aeu_NONE;
 }
 
 std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
@@ -1906,6 +2111,7 @@ std::string AttConverter::MetersignToStr(data_METERSIGN data) const
     switch (data) {
         case METERSIGN_common: value = "common"; break;
         case METERSIGN_cut: value = "cut"; break;
+        case METERSIGN_open: value = "open"; break;
         default:
             LogWarning("Unknown value '%d' for data.METERSIGN", data);
             value = "";
@@ -1918,6 +2124,7 @@ data_METERSIGN AttConverter::StrToMetersign(const std::string &value, bool logWa
 {
     if (value == "common") return METERSIGN_common;
     if (value == "cut") return METERSIGN_cut;
+    if (value == "open") return METERSIGN_open;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.METERSIGN", value.c_str());
     return METERSIGN_NONE;
@@ -2299,11 +2506,20 @@ std::string AttConverter::ModeToStr(data_MODE data) const
         case MODE_major: value = "major"; break;
         case MODE_minor: value = "minor"; break;
         case MODE_dorian: value = "dorian"; break;
+        case MODE_hypodorian: value = "hypodorian"; break;
         case MODE_phrygian: value = "phrygian"; break;
+        case MODE_hypophrygian: value = "hypophrygian"; break;
         case MODE_lydian: value = "lydian"; break;
+        case MODE_hypolydian: value = "hypolydian"; break;
         case MODE_mixolydian: value = "mixolydian"; break;
+        case MODE_hypomixolydian: value = "hypomixolydian"; break;
+        case MODE_peregrinus: value = "peregrinus"; break;
+        case MODE_ionian: value = "ionian"; break;
+        case MODE_hypoionian: value = "hypoionian"; break;
         case MODE_aeolian: value = "aeolian"; break;
+        case MODE_hypoaeolian: value = "hypoaeolian"; break;
         case MODE_locrian: value = "locrian"; break;
+        case MODE_hypolocrian: value = "hypolocrian"; break;
         default:
             LogWarning("Unknown value '%d' for data.MODE", data);
             value = "";
@@ -2317,14 +2533,114 @@ data_MODE AttConverter::StrToMode(const std::string &value, bool logWarning) con
     if (value == "major") return MODE_major;
     if (value == "minor") return MODE_minor;
     if (value == "dorian") return MODE_dorian;
+    if (value == "hypodorian") return MODE_hypodorian;
     if (value == "phrygian") return MODE_phrygian;
+    if (value == "hypophrygian") return MODE_hypophrygian;
     if (value == "lydian") return MODE_lydian;
+    if (value == "hypolydian") return MODE_hypolydian;
     if (value == "mixolydian") return MODE_mixolydian;
+    if (value == "hypomixolydian") return MODE_hypomixolydian;
+    if (value == "peregrinus") return MODE_peregrinus;
+    if (value == "ionian") return MODE_ionian;
+    if (value == "hypoionian") return MODE_hypoionian;
     if (value == "aeolian") return MODE_aeolian;
+    if (value == "hypoaeolian") return MODE_hypoaeolian;
     if (value == "locrian") return MODE_locrian;
+    if (value == "hypolocrian") return MODE_hypolocrian;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.MODE", value.c_str());
     return MODE_NONE;
+}
+
+std::string AttConverter::ModeCmnToStr(data_MODE_cmn data) const
+{
+    std::string value;
+    switch (data) {
+        case MODE_cmn_major: value = "major"; break;
+        case MODE_cmn_minor: value = "minor"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.MODE.cmn", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODE_cmn AttConverter::StrToModeCmn(const std::string &value, bool logWarning) const
+{
+    if (value == "major") return MODE_cmn_major;
+    if (value == "minor") return MODE_cmn_minor;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MODE.cmn", value.c_str());
+    return MODE_cmn_NONE;
+}
+
+std::string AttConverter::ModeExtendedToStr(data_MODE_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case MODE_extended_ionian: value = "ionian"; break;
+        case MODE_extended_hypoionian: value = "hypoionian"; break;
+        case MODE_extended_aeolian: value = "aeolian"; break;
+        case MODE_extended_hypoaeolian: value = "hypoaeolian"; break;
+        case MODE_extended_locrian: value = "locrian"; break;
+        case MODE_extended_hypolocrian: value = "hypolocrian"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.MODE.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODE_extended AttConverter::StrToModeExtended(const std::string &value, bool logWarning) const
+{
+    if (value == "ionian") return MODE_extended_ionian;
+    if (value == "hypoionian") return MODE_extended_hypoionian;
+    if (value == "aeolian") return MODE_extended_aeolian;
+    if (value == "hypoaeolian") return MODE_extended_hypoaeolian;
+    if (value == "locrian") return MODE_extended_locrian;
+    if (value == "hypolocrian") return MODE_extended_hypolocrian;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MODE.extended", value.c_str());
+    return MODE_extended_NONE;
+}
+
+std::string AttConverter::ModeGregorianToStr(data_MODE_gregorian data) const
+{
+    std::string value;
+    switch (data) {
+        case MODE_gregorian_dorian: value = "dorian"; break;
+        case MODE_gregorian_hypodorian: value = "hypodorian"; break;
+        case MODE_gregorian_phrygian: value = "phrygian"; break;
+        case MODE_gregorian_hypophrygian: value = "hypophrygian"; break;
+        case MODE_gregorian_lydian: value = "lydian"; break;
+        case MODE_gregorian_hypolydian: value = "hypolydian"; break;
+        case MODE_gregorian_mixolydian: value = "mixolydian"; break;
+        case MODE_gregorian_hypomixolydian: value = "hypomixolydian"; break;
+        case MODE_gregorian_peregrinus: value = "peregrinus"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.MODE.gregorian", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODE_gregorian AttConverter::StrToModeGregorian(const std::string &value, bool logWarning) const
+{
+    if (value == "dorian") return MODE_gregorian_dorian;
+    if (value == "hypodorian") return MODE_gregorian_hypodorian;
+    if (value == "phrygian") return MODE_gregorian_phrygian;
+    if (value == "hypophrygian") return MODE_gregorian_hypophrygian;
+    if (value == "lydian") return MODE_gregorian_lydian;
+    if (value == "hypolydian") return MODE_gregorian_hypolydian;
+    if (value == "mixolydian") return MODE_gregorian_mixolydian;
+    if (value == "hypomixolydian") return MODE_gregorian_hypomixolydian;
+    if (value == "peregrinus") return MODE_gregorian_peregrinus;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MODE.gregorian", value.c_str());
+    return MODE_gregorian_NONE;
 }
 
 std::string AttConverter::ModsrelationshipToStr(data_MODSRELATIONSHIP data) const
@@ -4265,8 +4581,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
 {
     std::string value;
     switch (data) {
-        case meiVersion_MEIVERSION_4_0_0: value = "4.0.0"; break;
-        case meiVersion_MEIVERSION_4_0_1: value = "4.0.1"; break;
+        case meiVersion_MEIVERSION_5_0_0_dev: value = "5.0.0-dev"; break;
         default:
             LogWarning("Unknown value '%d' for att.meiVersion@meiversion", data);
             value = "";
@@ -4277,8 +4592,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
 
 meiVersion_MEIVERSION AttConverter::StrToMeiVersionMeiversion(const std::string &value, bool logWarning) const
 {
-    if (value == "4.0.0") return meiVersion_MEIVERSION_4_0_0;
-    if (value == "4.0.1") return meiVersion_MEIVERSION_4_0_1;
+    if (value == "5.0.0-dev") return meiVersion_MEIVERSION_5_0_0_dev;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meiVersion@meiversion", value.c_str());
     return meiVersion_MEIVERSION_NONE;
@@ -4472,29 +4786,6 @@ ncForm_RELLEN AttConverter::StrToNcFormRellen(const std::string &value, bool log
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.ncForm@rellen", value.c_str());
     return ncForm_RELLEN_NONE;
-}
-
-std::string AttConverter::NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const
-{
-    std::string value;
-    switch (data) {
-        case noteAnlMensural_LIG_recta: value = "recta"; break;
-        case noteAnlMensural_LIG_obliqua: value = "obliqua"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.note.anl.mensural@lig", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-noteAnlMensural_LIG AttConverter::StrToNoteAnlMensuralLig(const std::string &value, bool logWarning) const
-{
-    if (value == "recta") return noteAnlMensural_LIG_recta;
-    if (value == "obliqua") return noteAnlMensural_LIG_obliqua;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.note.anl.mensural@lig", value.c_str());
-    return noteAnlMensural_LIG_NONE;
 }
 
 std::string AttConverter::NoteGesExtremisToStr(noteGes_EXTREMIS data) const

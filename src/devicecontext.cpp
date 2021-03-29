@@ -155,7 +155,15 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
             glyph = Resources::GetGlyph(c);
         }
         if (!glyph) {
-            glyph = unkown;
+            // There is no glyph for space, and we would use 'o' to increase extend width. However 'o' is wider than
+            // space, which led to incorrect rendering. For the time being, set width to that of '.' instead.
+            // This will probably need to be improved to change with font size/style
+            if (c == L' ') {
+                glyph = Resources::GetTextGlyph(L'.');
+            }
+            else {
+                glyph = unkown;
+            }
         }
         AddGlyphToTextExtend(glyph, extend);
     }
@@ -195,7 +203,7 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
     partialHeight = ceil(tmp / (double)glyph->GetUnitsPerEm());
     tmp = y * m_fontStack.top()->GetPointSize();
     y = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    // Following lines were commented out because result of these assignemens were not used (dead store)
+    // Following lines were commented out because result of these assignments were not used (dead store)
     // tmp = x * m_fontStack.top()->GetPointSize();
     // x = ceil(tmp / (double)glyph->GetUnitsPerEm());
 

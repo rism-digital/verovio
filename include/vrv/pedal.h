@@ -65,7 +65,7 @@ public:
      * Get the SMuFL glyph for the pedal based on function or glyph.num
      */
     wchar_t GetPedalGlyph() const;
-                  
+
     //----------//
     // Functors //
     //----------//

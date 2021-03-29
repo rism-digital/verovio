@@ -836,7 +836,7 @@ public:
     int GetLry() const { return m_lry; }
     bool HasLry() const;
     //
-    void SetRotate(double rotate) { m_rotate = rotate; }
+    void SetRotate(double rotate_) { m_rotate = rotate_; }
     double GetRotate() const { return m_rotate; }
     bool HasRotate() const;
     ///@}
@@ -850,10 +850,15 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
-    /** Indicates the rotate of the bounding box. **/
+    /**
+     * Indicates the amount by which the contents of this element have been rotated
+     * clockwise or, if applicable, how the orientation of the element self should be
+     * interpreted, with respect to the normal orientation of the parent surface.
+     * The orientation is expressed in arc degrees.
+     **/
     double m_rotate;
 
-    /* include <attlry> */
+    /* include <attrotate> */
 };
 
 //----------------------------------------------------------------------------
@@ -2903,8 +2908,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMm(int mm_) { m_mm = mm_; }
-    int GetMm() const { return m_mm; }
+    void SetMm(double mm_) { m_mm = mm_; }
+    double GetMm() const { return m_mm; }
     bool HasMm() const;
     //
     void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; }
@@ -2920,11 +2925,11 @@ private:
     /**
      * Used to describe tempo in terms of beats (often the meter signature denominator)
      * per minute, ala M.M.
-     * (Maezel's Metronome). Do not confuse this attribute with midi.bpm or midi.mspb.
+     * (Maelzel's Metronome). Do not confuse this attribute with midi.bpm or midi.mspb.
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
-    int m_mm;
+    double m_mm;
     /** Captures the metronomic unit. **/
     data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
@@ -3773,22 +3778,97 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttPlacement
+// AttPlacementOnStaff
 //----------------------------------------------------------------------------
 
-class AttPlacement : public Att {
+class AttPlacementOnStaff : public Att {
 public:
-    AttPlacement();
-    virtual ~AttPlacement();
+    AttPlacementOnStaff();
+    virtual ~AttPlacementOnStaff();
 
     /** Reset the default values for the attribute class **/
-    void ResetPlacement();
+    void ResetPlacementOnStaff();
 
     /** Read the values for the attribute class **/
-    bool ReadPlacement(pugi::xml_node element);
+    bool ReadPlacementOnStaff(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WritePlacement(pugi::xml_node element);
+    bool WritePlacementOnStaff(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOnstaff(data_BOOLEAN onstaff_) { m_onstaff = onstaff_; }
+    data_BOOLEAN GetOnstaff() const { return m_onstaff; }
+    bool HasOnstaff() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the placement of the item within the staff.
+     * A value of 'true' means on the staff, and 'false' off the staff.
+     **/
+    data_BOOLEAN m_onstaff;
+
+    /* include <attonstaff> */
+};
+
+//----------------------------------------------------------------------------
+// AttPlacementRelEvent
+//----------------------------------------------------------------------------
+
+class AttPlacementRelEvent : public Att {
+public:
+    AttPlacementRelEvent();
+    virtual ~AttPlacementRelEvent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPlacementRelEvent();
+
+    /** Read the values for the attribute class **/
+    bool ReadPlacementRelEvent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePlacementRelEvent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPlace(data_STAFFREL place_) { m_place = place_; }
+    data_STAFFREL GetPlace() const { return m_place; }
+    bool HasPlace() const;
+    ///@}
+
+private:
+    /** Records the placement of the beam relative to the events it affects. **/
+    data_STAFFREL m_place;
+
+    /* include <attplace> */
+};
+
+//----------------------------------------------------------------------------
+// AttPlacementRelStaff
+//----------------------------------------------------------------------------
+
+class AttPlacementRelStaff : public Att {
+public:
+    AttPlacementRelStaff();
+    virtual ~AttPlacementRelStaff();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPlacementRelStaff();
+
+    /** Read the values for the attribute class **/
+    bool ReadPlacementRelStaff(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePlacementRelStaff(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -4755,6 +4835,10 @@ public:
     data_STEMPOSITION GetStemPos() const { return m_stemPos; }
     bool HasStemPos() const;
     //
+    void SetStemSameas(std::string stemSameas_) { m_stemSameas = stemSameas_; }
+    std::string GetStemSameas() const { return m_stemSameas; }
+    bool HasStemSameas() const;
+    //
     void SetStemVisible(data_BOOLEAN stemVisible_) { m_stemVisible = stemVisible_; }
     data_BOOLEAN GetStemVisible() const { return m_stemVisible; }
     bool HasStemVisible() const;
@@ -4780,6 +4864,12 @@ private:
     data_STEMMODIFIER m_stemMod;
     /** Records the position of the stem in relation to the note head(s). **/
     data_STEMPOSITION m_stemPos;
+    /**
+     * Points to a note element in a different layer whose stem is shared.
+     * The linked notes should be rendered like a chord though they are part of
+     * different layers.
+     **/
+    std::string m_stemSameas;
     /** Determines whether a stem should be displayed. **/
     data_BOOLEAN m_stemVisible;
     /** Records the output x coordinate of the stem's attachment point. **/
