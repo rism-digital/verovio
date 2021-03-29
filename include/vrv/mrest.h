@@ -14,6 +14,9 @@
 
 namespace vrv {
 
+class Layer;
+class Staff;
+
 //----------------------------------------------------------------------------
 // MRest
 //----------------------------------------------------------------------------
@@ -47,6 +50,11 @@ public:
     ///@{
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
     ///@}
+
+    /**
+     * Get the vertical location for mRest considering other layer elements
+     */
+    int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
 
     //----------//
     // Functors //

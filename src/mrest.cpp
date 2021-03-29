@@ -13,8 +13,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "fermata.h"
 #include "functorparams.h"
+#include "layer.h"
+#include "pitchinterface.h"
+#include "rest.h"
+#include "staff.h"
 
 namespace vrv {
 
@@ -77,6 +82,40 @@ int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
     PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     return FUNCTOR_CONTINUE;
+}
+
+int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocation)
+{
+    Staff *parentStaff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    if (!layer) return defaultLocation;
+    // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
+    if (parentStaff->GetChildCount(LAYER) != 2) return defaultLocation;
+
+    ListOfObjects layers;
+    ClassIdComparison matchType(LAYER);
+    parentStaff->FindAllDescendantByComparison(&layers, &matchType);
+    const bool isTopLayer = (vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
+
+    auto otherLayerIter = isTopLayer ? std::prev(layers.end()) : layers.begin();
+    auto collidingElementsList = vrv_cast<Layer *>(*otherLayerIter)->GetLayerElementsForTimeSpanOf(this);
+
+    // find all locations for other layer
+    std::vector<int> locations;
+    for (auto element : collidingElementsList) {
+        if (element->Is({ CHORD, NOTE })) {
+            LayerElement *layerElement = vrv_cast<LayerElement *>(element);
+            int loc = PitchInterface::CalcLoc(layerElement, layer, layerElement, isTopLayer);
+            locations.push_back(loc);
+        }
+        else if (element->Is(REST)) {
+            Rest *rest = vrv_cast<Rest *>(element);
+            int loc = rest->GetDrawingLoc();
+            locations.push_back(loc);
+        }
+    }
+
+    return isTopLayer ? *std::max_element(locations.begin(), locations.end()) + 4
+                                      : *std::min_element(locations.begin(), locations.end()) - 5;
 }
 
 } // namespace vrv
