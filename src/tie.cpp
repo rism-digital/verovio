@@ -86,25 +86,47 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     if (startParentChord) {
         durElement = startParentChord;
         if (startParentChord->m_crossStaff) layer1 = startParentChord->m_crossLayer;
-        if ((note1 == startParentChord->GetTopNote()) || (note1 == startParentChord->GetBottomNote()))
-            isOuterChordNote = true;
     }
     if (note2) {
         endParentChord = note2->IsChordTone();
     }
 
-    /************** x positions **************/
 
     Point startPoint(x1, staff->GetDrawingY());
     Point endPoint(x2, staff->GetDrawingY());
-    data_STEMDIRECTION noteStemDir = CalculateXPosition(
-        doc, staff, startParentChord, endParentChord, spanningType, isOuterChordNote, startPoint, endPoint);
+
+    /************** note stem direction **************/
+
+    data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
+    switch (spanningType) {
+        case SPANNING_START_END:
+        case SPANNING_START: 
+        case SPANNING_END: {
+            if (note1)
+                noteStemDir = note1->GetDrawingStemDir();
+            else if (note2)
+                noteStemDir = note2->GetDrawingStemDir();
+            break;
+        }
+        default: break;
+    }
 
     /************** direction **************/
 
     bool isAboveStaffCenter = startPoint.y > (staff->GetDrawingY() - 4 * drawingUnit);
-    curvature_CURVEDIR drawingCurveDir = GetPreferredCurveDirection(
-        layer1, note1, startParentChord, noteStemDir, isAboveStaffCenter);
+    curvature_CURVEDIR drawingCurveDir
+        = GetPreferredCurveDirection(layer1, note1, startParentChord, noteStemDir, isAboveStaffCenter);
+    if (startParentChord) {
+        if (((curvature_CURVEDIR_above == drawingCurveDir) && (note1 == startParentChord->GetTopNote()))
+            || ((curvature_CURVEDIR_below == drawingCurveDir) && (note1 == startParentChord->GetBottomNote()))) {
+            isOuterChordNote = true;
+        }
+    }
+
+    /************** x positions **************/
+
+    CalculateXPosition(
+        doc, staff, startParentChord, endParentChord, spanningType, isOuterChordNote, startPoint, endPoint);
 
     /************** y position **************/
 
@@ -180,7 +202,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     return true;
 }
 
-data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord,
+void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord,
     int spanningType, bool isOuterChordNote, Point &startPoint, Point &endPoint)
 {
     Note *startNote = dynamic_cast<Note *>(GetStart());
@@ -195,13 +217,11 @@ data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startP
 
     int r1 = drawingUnit;
     int r2 = r1;
-    data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     // the normal case
     if (spanningType == SPANNING_START_END) {
         if (startNote) {
             startPoint.y = startNote->GetDrawingY();
             endPoint.y = startPoint.y;
-            noteStemDir = startNote->GetDrawingStemDir();
         }
         else if (endNote) {
             endPoint.y = endNote->GetDrawingY();
@@ -231,7 +251,6 @@ data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startP
             startPoint.y = startNote->GetDrawingY();
             endPoint.y = startPoint.y;
             r1 = startNote->GetDrawingRadius(doc);
-            noteStemDir = startNote->GetDrawingStemDir();
         }
         if (!isShortTie) {
             startPoint.x += r1 + drawingUnit / 2;
@@ -254,14 +273,11 @@ data_STEMDIRECTION Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startP
             endPoint.y = endNote->GetDrawingY();
             startPoint.y = endPoint.y;
             r2 = endNote->GetDrawingRadius(doc);
-            noteStemDir = endNote->GetDrawingStemDir();
         }
         if (!isShortTie) {
             endPoint.x -= r2 + drawingUnit / 2;
         }
     }
-
-    return noteStemDir;
 }
 
 curvature_CURVEDIR Tie::GetPreferredCurveDirection(Layer *layer, Note *note,
