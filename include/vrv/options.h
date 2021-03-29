@@ -685,6 +685,7 @@ public:
     OptionDbl m_leftMarginNote;
     OptionDbl m_leftMarginRest;
     OptionDbl m_leftMarginRightBarLine;
+    OptionDbl m_leftMarginTabRhythm;
     //
     OptionDbl m_rightMarginAccid;
     OptionDbl m_rightMarginBarLine;
@@ -702,6 +703,7 @@ public:
     OptionDbl m_rightMarginNote;
     OptionDbl m_rightMarginRest;
     OptionDbl m_rightMarginRightBarLine;
+    OptionDbl m_rightMarginTabRhythm;
     //
     OptionDbl m_topMarginArtic;
     OptionDbl m_topMarginHarm;

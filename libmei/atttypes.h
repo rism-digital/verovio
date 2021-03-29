@@ -508,6 +508,16 @@ enum data_COMPASSDIRECTION_extended {
 };
 
 /**
+ * MEI data.COURSETUNING
+ */
+enum data_COURSETUNING {
+    COURSETUNING_NONE = 0,
+    COURSETUNING_guitar_drop_D,
+    COURSETUNING_lute_renaissance_6,
+    COURSETUNING_MAX
+};
+
+/**
  * MEI data.DIVISIO
  */
 enum data_DIVISIO {
@@ -1291,6 +1301,10 @@ enum data_NOTATIONTYPE {
     NOTATIONTYPE_mensural,
     NOTATIONTYPE_mensural_black,
     NOTATIONTYPE_mensural_white,
+    NOTATIONTYPE_tab_lute_french,
+    NOTATIONTYPE_tab_lute_italian,
+    NOTATIONTYPE_tab_lute_german,
+    NOTATIONTYPE_tab_guitar,
     NOTATIONTYPE_neume,
     NOTATIONTYPE_tab,
     NOTATIONTYPE_MAX

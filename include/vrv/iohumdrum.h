@@ -753,7 +753,8 @@ protected:
     template <class ELEMENT> void addVerovioTextElement(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
-    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place, bool showplace);
+    template <class ELEMENT> void setPlaceRelStaff(ELEMENT *element, const std::string &place, bool showplace);
+    template <class ELEMENT> void setPlaceRelEvent(ELEMENT *element, const std::string &place, bool showplace);
     template <class ELEMENT>
     void setMeterSymbol(
         ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL, hum::HTp metertok = NULL);

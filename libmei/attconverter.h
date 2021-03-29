@@ -89,6 +89,9 @@ public:
     std::string CompassdirectionExtendedToStr(data_COMPASSDIRECTION_extended data) const;
     data_COMPASSDIRECTION_extended StrToCompassdirectionExtended(const std::string &value, bool logWarning = true) const;
 
+    std::string CoursetuningToStr(data_COURSETUNING data) const;
+    data_COURSETUNING StrToCoursetuning(const std::string &value, bool logWarning = true) const;
+
     std::string DivisioToStr(data_DIVISIO data) const;
     data_DIVISIO StrToDivisio(const std::string &value, bool logWarning = true) const;
 

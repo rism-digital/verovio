@@ -29,6 +29,7 @@
 #include "smufl.h"
 #include "staff.h"
 #include "syl.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "transposition.h"
 #include "verse.h"
@@ -56,6 +57,7 @@ Note::Note()
     , AttExtSym()
     , AttGraced()
     , AttMidiVelocity()
+    , AttNoteGesTab()
     , AttNoteHeads()
     , AttNoteVisMensural()
     , AttStems()
@@ -71,6 +73,7 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_GRACED);
+    RegisterAttClass(ATT_NOTEGESTAB);
     RegisterAttClass(ATT_NOTEHEADS);
     RegisterAttClass(ATT_NOTEVISMENSURAL);
     RegisterAttClass(ATT_MIDIVELOCITY);
@@ -96,6 +99,7 @@ void Note::Reset()
     ResetCue();
     ResetExtSym();
     ResetGraced();
+    ResetNoteGesTab();
     ResetNoteHeads();
     ResetNoteVisMensural();
     ResetMidiVelocity();
@@ -231,6 +235,39 @@ bool Note::IsClusterExtreme() const
         return true;
     else
         return false;
+}
+
+TabGrp *Note::IsTabGrpNote() const
+{
+    return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+}
+
+std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
+{
+    if (notationType == NOTATIONTYPE_tab_lute_italian) {
+        std::wstring fretStr;
+        int fret = this->GetTabFret();
+        // Maximum allowed would be 19 (always bindly addind 1 as first figure)
+        if (fret > 9) fretStr.push_back(SMUFL_EBE1_luteItalianFret1);
+        switch (fret % 10) {
+            case 0: fretStr.push_back(SMUFL_EBE0_luteItalianFret0); break;
+            case 1: fretStr.push_back(SMUFL_EBE1_luteItalianFret1); break;
+            case 2: fretStr.push_back(SMUFL_EBE2_luteItalianFret2); break;
+            case 3: fretStr.push_back(SMUFL_EBE3_luteItalianFret3); break;
+            case 4: fretStr.push_back(SMUFL_EBE4_luteItalianFret4); break;
+            case 5: fretStr.push_back(SMUFL_EBE5_luteItalianFret5); break;
+            case 6: fretStr.push_back(SMUFL_EBE6_luteItalianFret6); break;
+            case 7: fretStr.push_back(SMUFL_EBE7_luteItalianFret7); break;
+            case 8: fretStr.push_back(SMUFL_EBE8_luteItalianFret8); break;
+            case 9: fretStr.push_back(SMUFL_EBE9_luteItalianFret9); break;
+            default: break;
+        }
+        return fretStr;
+    }
+    else {
+        std::string str = StringFormat("%d", this->GetTabFret());
+        return UTF8to16(str);
+    }
 }
 
 bool Note::IsUnissonWith(Note *note, bool ignoreAccid)

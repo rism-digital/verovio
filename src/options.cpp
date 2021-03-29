@@ -1318,6 +1318,10 @@ Options::Options()
     m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginRightBarLine, "leftMarginRightBarLine", &m_elementMargins);
 
+    m_leftMarginTabRhythm.SetInfo("Left margin tabRhyhtm", "The margin for tabRhythm in MEI units");
+    m_leftMarginTabRhythm.Init(1.0, 0.0, 2.0);
+    this->Register(&m_leftMarginTabRhythm, "leftMarginTabRhythm", &m_elementMargins);
+
     /// custom right
 
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
@@ -1383,6 +1387,10 @@ Options::Options()
     m_rightMarginRightBarLine.SetInfo("Right margin right barLine", "The right margin for right barLine in MEI units");
     m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
+
+    m_rightMarginTabRhythm.SetInfo("Right margin tabRhyhtm", "The right margin for tabRhythm in MEI units");
+    m_rightMarginTabRhythm.Init(0.0, 0.0, 2.0);
+    this->Register(&m_rightMarginTabRhythm, "rightMarginTabRhythm", &m_elementMargins);
 
     /// custom top
 
