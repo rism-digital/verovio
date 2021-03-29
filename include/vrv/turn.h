@@ -28,7 +28,7 @@ class Turn : public ControlElement,
              public AttColor,
              public AttExtSym,
              public AttOrnamentAccid,
-             public AttPlacement,
+             public AttPlacementRelStaff,
              public AttTurnLog {
 public:
     /**
