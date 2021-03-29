@@ -28,14 +28,14 @@ Turn::Turn()
     , AttColor()
     , AttExtSym()
     , AttOrnamentAccid()
-    , AttPlacement()
+    , AttPlacementRelStaff()
     , AttTurnLog()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_ORNAMENTACCID);
-    RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     RegisterAttClass(ATT_TURNLOG);
 
     Reset();
@@ -50,7 +50,7 @@ void Turn::Reset()
     ResetColor();
     ResetExtSym();
     ResetOrnamentAccid();
-    ResetPlacement();
+    ResetPlacementRelStaff();
     ResetTurnLog();
 }
 

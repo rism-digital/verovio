@@ -10431,7 +10431,7 @@ void HumdrumInput::colorVerse(Verse *verse, std::string &token)
 
 template <class ELEMENT> void HumdrumInput::setPlace(ELEMENT *element, const std::string &place, bool showplace)
 {
-    element->SetPlace(element->AttPlacement::StrToStaffrel(place));
+    element->SetPlace(element->AttPlacementRelStaff::StrToStaffrel(place));
     if (m_humtype && showplace) {
         appendTypeTag(element, "placed");
     }

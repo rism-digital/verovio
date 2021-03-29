@@ -36,7 +36,7 @@ Pedal::Pedal()
     , AttExtSym()
     , AttPedalLog()
     , AttPedalVis()
-    , AttPlacement()
+    , AttPlacementRelStaff()
     , AttVerticalGroup()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -44,7 +44,7 @@ Pedal::Pedal()
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PEDALLOG);
     RegisterAttClass(ATT_PEDALVIS);
-    RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
@@ -60,7 +60,7 @@ void Pedal::Reset()
     ResetExtSym();
     ResetPedalLog();
     ResetPedalVis();
-    ResetPlacement();
+    ResetPlacementRelStaff();
     ResetVerticalGroup();
 
     m_endsWithBounce = false;
