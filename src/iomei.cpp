@@ -1889,7 +1889,6 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteExtSym(currentNode);
     note->WriteGraced(currentNode);
     note->WriteMidiVelocity(currentNode);
-    note->WriteNoteAnlMensural(currentNode);
     note->WriteNoteGesTab(currentNode);
     note->WriteNoteHeads(currentNode);
     note->WriteNoteVisMensural(currentNode);
@@ -5302,7 +5301,6 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadExtSym(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadMidiVelocity(note);
-    vrvNote->ReadNoteAnlMensural(note);
     vrvNote->ReadNoteGesTab(note);
     vrvNote->ReadNoteHeads(note);
     vrvNote->ReadNoteVisMensural(note);
