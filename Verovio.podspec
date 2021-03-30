@@ -10,14 +10,14 @@ Pod::Spec.new do |s|
   s.source_files        = 'src/**/*.{h,cpp,cc}',
                           'include/{hum,json,midi,pugi,utf8,vrv}/*.{h,hpp}',
                           'libmei/{attclasses,attconverter,atts_analytical,atts_cmn,atts_cmnornaments}.{h,cpp}',
-                          'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_gestural,atts_mei}.{h,cpp}', 
+                          'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_frettab,atts_gestural,atts_mei}.{h,cpp}', 
                           'libmei/{atts_mensural,atts_midi,atts_neumes,atts_pagebased,atts_shared}.{h,cpp}',
                           'libmei/{atts_visual,atttypes}.{h,cpp}',
                           'include/zip/zip_file.hpp'
   s.public_header_files = 'src/**/*.{h}',
                           'include/{hum,json,midi,pugi,utf8,vrv}/*.{h,hpp}',
                           'libmei/{attclasses,attconverter,atts_analytical,atts_cmn,atts_cmnornaments}.{h}',
-                          'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_gestural,atts_mei}.{h}', 
+                          'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_frettab,atts_gestural,atts_mei}.{h}', 
                           'libmei/{atts_mensural,atts_midi,atts_neumes,atts_pagebased,atts_shared}.{h}',
                           'libmei/{atts_visual,atttypes}.{h}'
   s.resources      = 'data'

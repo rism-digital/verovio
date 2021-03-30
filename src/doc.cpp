@@ -1615,6 +1615,7 @@ double Doc::GetLeftMargin(const ClassId classId) const
     if (classId == MULTIRPT) return m_options->m_leftMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_leftMarginNote.GetValue();
     if (classId == REST) return m_options->m_leftMarginRest.GetValue();
+    if (classId == TABRHYTHM) return m_options->m_leftMarginTabRhythm.GetValue();
     return m_options->m_defaultLeftMargin.GetValue();
 }
 
@@ -1636,6 +1637,7 @@ double Doc::GetRightMargin(const ClassId classId) const
     if (classId == MULTIRPT) return m_options->m_rightMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_rightMarginNote.GetValue();
     if (classId == REST) return m_options->m_rightMarginRest.GetValue();
+    if (classId == TABRHYTHM) return m_options->m_rightMarginTabRhythm.GetValue();
     return m_options->m_defaultRightMargin.GetValue();
 }
 

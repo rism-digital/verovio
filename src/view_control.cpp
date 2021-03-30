@@ -41,6 +41,7 @@
 #include "octave.h"
 #include "options.h"
 #include "pedal.h"
+#include "pitchinflection.h"
 #include "reh.h"
 #include "rend.h"
 #include "slur.h"
@@ -72,7 +73,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, PHRASE, OCTAVE, SLUR, TIE })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -159,7 +160,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ BRACKETSPAN, HAIRPIN, OCTAVE })) return;
+            if (element->Is({ BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
         }
     }
 
@@ -323,6 +324,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
         else if (element->Is(PEDAL)) {
             DrawPedalLine(dc, dynamic_cast<Pedal *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(PITCHINFLECTION)) {
+            // cast to PitchInflection check in DrawPitchInflection
+            DrawPitchInflection(
+                dc, dynamic_cast<PitchInflection *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(SLUR)) {
             // For slurs we limit support to one value in @staff
@@ -723,6 +729,99 @@ void View::DrawOctave(
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(octave, this);
+}
+
+void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflection, int x1, int x2, Staff *staff,
+    char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(pitchInflection);
+    assert(staff);
+
+    int topY = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+    Note *note1 = dynamic_cast<Note *>(pitchInflection->GetStart());
+    Note *note2 = dynamic_cast<Note *>(pitchInflection->GetEnd());
+
+    if (!note1 && !note2) {
+        // no note, obviously nothing to do...
+        // this also means that notes with tstamp events are not supported
+        return;
+    }
+
+    bool up = false;
+
+    int y1 = (up) ? note1->GetDrawingY() : topY;
+    int y2 = (up) ? topY : note2->GetDrawingY();
+    int xControl = x2;
+    int yControl = y1;
+    bool drawArrow = true;
+    
+    if (spanningType == SPANNING_START) {
+        drawArrow = false;
+        // We need to re-calculate the y2 when going down
+        if (!up) {
+            y2 = staff->GetDrawingY() + note2->GetDrawingYRel();
+        }
+        y2 -= (y2 - y1) / 2;
+        yControl = y1 + (y2 - y1) / 4;
+        xControl = x2 - (x2 - x1) / 4;
+    }
+    else if (spanningType == SPANNING_END) {
+        // We need to recalcultate the y1 when going up
+        if (up) {
+            y1 = staff->GetDrawingY() + note1->GetDrawingYRel();
+        }
+        y1 += (y2 - y1) / 2;
+        yControl = y1 + (y2 - y1) / 4;
+        xControl = x2 - (x2 - x1) / 4;
+    }
+    else if (spanningType == SPANNING_MIDDLE) {
+        // For now just skip bend that span over an entire measure since they probably do not exist
+        return;
+    }
+
+    Point points[3];
+    points[0].x = ToDeviceContextX(x1);
+    points[0].y = ToDeviceContextY(y1);
+    points[1].x = ToDeviceContextX(xControl);
+    points[1].y = ToDeviceContextY(yControl);
+    points[2].x = ToDeviceContextX(x2);
+    points[2].y = ToDeviceContextY(y2);
+
+    int arrowWidth = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    int arrowHeight = arrowWidth * 3 / 2;
+    arrowHeight = (up) ? arrowHeight : -arrowHeight;
+    Point arrow[3];
+    arrow[0].x = ToDeviceContextX(x2 - arrowWidth);
+    arrow[0].y = ToDeviceContextY(y2);
+    arrow[1].x = ToDeviceContextX(x2 + arrowWidth);
+    arrow[1].y = ToDeviceContextY(y2);
+    arrow[2].x = ToDeviceContextX(x2);
+    arrow[2].y = ToDeviceContextY(y2 + arrowHeight);
+
+    /************** draw it **************/
+
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(pitchInflection, "spanning-pinflection", "");
+
+    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    dc->SetBrush(m_currentColour, AxSOLID);
+
+    dc->DrawQuadBezierPath(points);
+    if (drawArrow) {
+        dc->DrawPolygon(3, arrow);
+    }
+
+    dc->ResetPen();
+    dc->ResetBrush();
+
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(pitchInflection, this);
 }
 
 void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic)

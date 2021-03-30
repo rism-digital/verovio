@@ -641,6 +641,8 @@ public:
     std::vector<int> m_staffNs;
     std::vector<BoundingBox *> m_boundingBoxes;
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
+    std::vector<ClassId> m_includes;
+    std::vector<ClassId> m_excludes;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;

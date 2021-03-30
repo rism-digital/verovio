@@ -47,6 +47,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
+#include "tuning.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -1524,10 +1525,16 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
+        assert(staff->m_drawingTuning == NULL);
+        staff->m_drawingTuning = dynamic_cast<Tuning *>(params->m_currentStaffDef->FindDescendantByType(TUNING));
         staff->m_drawingLines = params->m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
+        staff->m_drawingStaffSize = 100;
         if (params->m_currentStaffDef->HasScale()) {
             staff->m_drawingStaffSize = params->m_currentStaffDef->GetScale();
+        }
+        if (staff->IsTablature()) {
+            staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
         }
         return FUNCTOR_CONTINUE;
     }

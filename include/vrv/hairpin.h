@@ -27,7 +27,7 @@ class Hairpin : public ControlElement,
                 public AttColor,
                 public AttHairpinLog,
                 public AttHairpinVis,
-                public AttPlacement,
+                public AttPlacementRelStaff,
                 public AttVerticalGroup {
 public:
     /**

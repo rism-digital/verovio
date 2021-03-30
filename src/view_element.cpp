@@ -193,6 +193,12 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(SYLLABLE)) {
         DrawSyllable(dc, element, layer, staff, measure);
     }
+    else if (element->Is(TABGRP)) {
+        DrawTabGrp(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(TABRHYTHM)) {
+        DrawTabRhythm(dc, element, layer, staff, measure);
+    }
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
@@ -1269,6 +1275,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (note->IsMensuralDur()) {
         DrawMensuralNote(dc, element, layer, staff, measure);
+        return;
+    }
+    if (note->IsTabGrpNote()) {
+        DrawTabNote(dc, element, layer, staff, measure);
         return;
     }
 

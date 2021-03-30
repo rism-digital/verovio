@@ -28,14 +28,14 @@ Mordent::Mordent()
     , AttColor()
     , AttExtSym()
     , AttOrnamentAccid()
-    , AttPlacement()
+    , AttPlacementRelStaff()
     , AttMordentLog()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_ORNAMENTACCID);
-    RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     RegisterAttClass(ATT_MORDENTLOG);
 
     Reset();
@@ -50,7 +50,7 @@ void Mordent::Reset()
     ResetColor();
     ResetExtSym();
     ResetOrnamentAccid();
-    ResetPlacement();
+    ResetPlacementRelStaff();
     ResetMordentLog();
 }
 
