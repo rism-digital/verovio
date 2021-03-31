@@ -759,7 +759,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
         noteLocations[staff].insert(note->GetDrawingLoc());
     }
 
-    for (auto loc : noteLocations) {
+    for (const auto &loc : noteLocations) {
         CaltOptimalDots(dots, loc.first, loc.second);
     }
 
