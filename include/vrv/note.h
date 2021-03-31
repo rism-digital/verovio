@@ -209,6 +209,11 @@ public:
         bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     /**
+     * Correct dots placement depending on other dots present in the current alignment
+     */
+    int CorrectDotsPlacement(Staff *staff, int NoteLoc, int dotLoc, bool isDotShifted);
+
+    /**
      * MIDI timing information
      */
     ///@{

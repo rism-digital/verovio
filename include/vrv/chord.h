@@ -15,6 +15,7 @@
 
 namespace vrv {
 
+class Dots;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
@@ -208,6 +209,11 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
+    /**
+     * Helper function for calculation of optimal locations for dots
+     */
+    void CaltOptimalDots(Dots *dots, Staff* staff, const std::set<int> &noteLocations);
+
     /**
      * Clear the m_clusters vector and delete all the objects.
      */
