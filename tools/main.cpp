@@ -135,12 +135,12 @@ void display_option(vrv::Option *option)
 
     std::cout << option_str << option->GetDescription();
 
-    if (optInt && (optInt->GetDefault() != optInt->GetMin() != optInt->GetMax())) {
+    if (optInt && (optInt->GetDefault() != optInt->GetMin()) && (optInt->GetDefault() != optInt->GetMax())) {
         std::cout << " (default: " << optInt->GetDefault();
         std::cout << "; min: " << optInt->GetMin();
         std::cout << "; max: " << optInt->GetMax() << ")";
     }
-    if (optDbl && (optDbl->GetDefault() != optDbl->GetMin() != optDbl->GetMax())) {
+    if (optDbl && (optDbl->GetDefault() != optDbl->GetMin()) && (optDbl->GetDefault() != optDbl->GetMax())) {
         std::cout << std::fixed << " (default: " << optDbl->GetDefault();
         std::cout << std::fixed << "; min: " << optDbl->GetMin();
         std::cout << std::fixed << "; max: " << optDbl->GetMax() << ")";
