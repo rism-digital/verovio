@@ -756,11 +756,11 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     int yControl = y1;
     // Always true for now
     bool drawArrow = true;
-    
+
     // We need to handle system breaks
     if (spanningType == SPANNING_START) {
         drawArrow = false;
-        // We need to re-calculate the y2 when going down (we need an end note) because we 
+        // We need to re-calculate the y2 when going down (we need an end note) because we
         if (!up && note2) {
             // Make it relative to the current (start) staff
             y2 = staff->GetDrawingY() + note2->GetDrawingYRel();
