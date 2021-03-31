@@ -111,24 +111,14 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
         case NOTATIONTYPE_mensural_white:
             // mensural clefs
             switch (this->GetShape()) {
-                case CLEFSHAPE_G:
-                    return SMUFL_E901_mensuralGclefPetrucci;
-                    break;
-                case CLEFSHAPE_F:
-                    return SMUFL_E904_mensuralFclefPetrucci;
-                    break;
-                default:
-                    return SMUFL_E909_mensuralCclefPetrucciPosMiddle;
-                    break;
+                case CLEFSHAPE_G: return SMUFL_E901_mensuralGclefPetrucci; break;
+                case CLEFSHAPE_F: return SMUFL_E904_mensuralFclefPetrucci; break;
+                default: return SMUFL_E909_mensuralCclefPetrucciPosMiddle; break;
             }
         case NOTATIONTYPE_mensural_black:
             switch (this->GetShape()) {
-                case CLEFSHAPE_C:
-                    return SMUFL_E906_chantCclef;
-                    break;
-                case CLEFSHAPE_F:
-                    return SMUFL_E902_chantFclef;
-                    break;
+                case CLEFSHAPE_C: return SMUFL_E906_chantCclef; break;
+                case CLEFSHAPE_F: return SMUFL_E902_chantFclef; break;
                 default:
                     // G clef doesn't exist in black notation, so should never get here, but just in case.
                     if (!this->GetDis()) return SMUFL_E901_mensuralGclefPetrucci;

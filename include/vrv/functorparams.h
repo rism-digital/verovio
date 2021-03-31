@@ -586,7 +586,7 @@ public:
 // used solely with AdjustXPosParams to store information regarding current/previous alignment that are being processed
 class AdjustXPosAlignmentOffset {
 public:
-    AdjustXPosAlignmentOffset() : m_offset(0), m_overlappingBB(NULL) {};
+    AdjustXPosAlignmentOffset() : m_offset(0), m_overlappingBB(NULL){};
 
     void Reset()
     {

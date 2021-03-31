@@ -72,9 +72,10 @@ data_ARTICULATION Artic::GetArticFirst()
     return articList.front();
 }
 
-void Artic::SplitMultival(Object *parent)
+void Artic::SplitMultival()
 {
-    if (parent != this->GetParent()) parent = this->GetParent();
+    Object *parent = this->GetParent();
+    assert(parent);
 
     std::vector<data_ARTICULATION> articList = this->GetArtic();
     if (articList.empty()) return;

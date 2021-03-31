@@ -140,7 +140,7 @@ public:
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawQuadBezierPath(Point bezier[3]) = 0; 
+    virtual void DrawQuadBezierPath(Point bezier[3]) = 0;
     virtual void DrawCubicBezierPath(Point bezier[4]) = 0;
     virtual void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) = 0;
     virtual void DrawCircle(int x, int y, int radius) = 0;

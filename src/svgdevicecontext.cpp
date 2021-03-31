@@ -494,7 +494,8 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d Q%d,%d %d,%d", // Base string
         bezier[0].x, bezier[0].y, // M Command
-        bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y).c_str();
+        bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
+                                          .c_str();
     pathChild.append_attribute("fill") = "none";
     pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
     pathChild.append_attribute("stroke-linecap") = "round";

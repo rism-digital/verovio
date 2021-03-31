@@ -741,37 +741,42 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     int topY = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     Note *note1 = dynamic_cast<Note *>(pitchInflection->GetStart());
+    // If the start is a note, use it y as base, otherwhise the position above the staff
+    int baseY1 = (note1) ? note1->GetDrawingY() : topY;
     Note *note2 = dynamic_cast<Note *>(pitchInflection->GetEnd());
+    // If the end is a note, use it y as base, otherwhise the position above the staff
+    int baseY2 = (note2) ? note2->GetDrawingY() : topY;
 
-    if (!note1 && !note2) {
-        // no note, obviously nothing to do...
-        // this also means that notes with tstamp events are not supported
-        return;
-    }
+    // If we start on a note, then going up
+    bool up = note1 ? true : false;
 
-    bool up = false;
-
-    int y1 = (up) ? note1->GetDrawingY() : topY;
-    int y2 = (up) ? topY : note2->GetDrawingY();
+    int y1 = (up) ? baseY1 : topY;
+    int y2 = (up) ? topY : baseY2;
     int xControl = x2;
     int yControl = y1;
+    // Always true for now
     bool drawArrow = true;
-    
+
+    // We need to handle system breaks
     if (spanningType == SPANNING_START) {
         drawArrow = false;
-        // We need to re-calculate the y2 when going down
-        if (!up) {
+        // We need to re-calculate the y2 when going down (we need an end note) because we
+        if (!up && note2) {
+            // Make it relative to the current (start) staff
             y2 = staff->GetDrawingY() + note2->GetDrawingYRel();
         }
+        // Adjust the control points - y2 is in the middle
         y2 -= (y2 - y1) / 2;
         yControl = y1 + (y2 - y1) / 4;
         xControl = x2 - (x2 - x1) / 4;
     }
     else if (spanningType == SPANNING_END) {
-        // We need to recalcultate the y1 when going up
-        if (up) {
+        // We need to recalcultate the y1 when going up (we need a start note)
+        if (up and note1) {
+            // Make it relative to the current (end) staff
             y1 = staff->GetDrawingY() + note1->GetDrawingYRel();
         }
+        // Adjust the control points - y1 is in the middle
         y1 += (y2 - y1) / 2;
         yControl = y1 + (y2 - y1) / 4;
         xControl = x2 - (x2 - x1) / 4;
@@ -802,10 +807,12 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
 
     /************** draw it **************/
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
-    else
+    }
+    else {
         dc->StartGraphic(pitchInflection, "spanning-pinflection", "");
+    }
 
     dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -818,10 +825,12 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     dc->ResetPen();
     dc->ResetBrush();
 
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
+    }
+    else {
         dc->EndGraphic(pitchInflection, this);
+    }
 }
 
 void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
