@@ -113,7 +113,7 @@ int EditorialElement::ConvertMarkupArticEnd(FunctorParams *functorParams)
     assert(params);
 
     for (auto &artic : params->m_articsToConvert) {
-        artic->SplitMultival(this);
+        artic->SplitMultival();
     }
     params->m_articsToConvert.clear();
 

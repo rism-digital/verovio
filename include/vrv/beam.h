@@ -183,8 +183,8 @@ protected:
     virtual void FilterList(ArrayOfObjects *childList);
 
     /**
-     * Helper function to calculate overlap with layer elements that 
-     * are placed within the duration of the beam 
+     * Helper function to calculate overlap with layer elements that
+     * are placed within the duration of the beam
      */
     int CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2);
 

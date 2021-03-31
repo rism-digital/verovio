@@ -18,7 +18,11 @@ namespace vrv {
 // Artic
 //----------------------------------------------------------------------------
 
-class Artic : public LayerElement, public AttArticulation, public AttColor, public AttExtSym, public AttPlacementRelEvent {
+class Artic : public LayerElement,
+              public AttArticulation,
+              public AttColor,
+              public AttExtSym,
+              public AttPlacementRelEvent {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -45,7 +49,7 @@ public:
      * Split the multi-valued artic attributes into distinct artic elements.
      * Applied by ConvertMarkupArtic functor.
      */
-    void SplitMultival(Object *parent);
+    void SplitMultival();
 
     void GetAllArtics(bool direction, std::vector<Artic *> &artics);
 

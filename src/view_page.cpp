@@ -930,8 +930,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
             int mnumInterval = m_options->m_mnumInterval.GetValue();
             if ((mnumInterval == 0 && measure == systemStart && measure->GetN() != "0" && measure->GetN() != "1")
                 || !mnum->IsGenerated()
-                || (mnumInterval >= 1 && (std::atoi(measure->GetN().c_str()) % mnumInterval == 0))
-            ) {
+                || (mnumInterval >= 1 && (std::atoi(measure->GetN().c_str()) % mnumInterval == 0))) {
                 DrawMNum(dc, mnum, measure);
             }
         }
@@ -1100,8 +1099,6 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
-    
-    
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
         // Skewed lines - with Facs (neumes) only for now

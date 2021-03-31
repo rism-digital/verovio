@@ -125,14 +125,12 @@ void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
     Point pMin = bezier[0].min(bezier[2]);
     Point pMax = bezier[0].max(bezier[2]);
 
-    
     // From https://iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
-    if( (bezier[1].x < pMin.x) || (bezier[1].x > pMax.x) || (bezier[1].y < pMin.y) || (bezier[1].y > pMax.y) )
-    {
-        //vec2 t = clamp((p0-p1)/(p0-2.0*p1+p2),0.0,1.0);
-        int tx = std::clamp((bezier[0].x - bezier[1].x)/(bezier[0].x - 2.0 * bezier[1].x + bezier[2].x), 0.0, 1.0);
-        int ty = std::clamp((bezier[0].y - bezier[1].y)/(bezier[0].y - 2.0 * bezier[1].y + bezier[2].y), 0.0, 1.0);
-        //vec2 s = 1.0 - t;
+    if ((bezier[1].x < pMin.x) || (bezier[1].x > pMax.x) || (bezier[1].y < pMin.y) || (bezier[1].y > pMax.y)) {
+        // vec2 t = clamp((p0-p1)/(p0-2.0*p1+p2),0.0,1.0);
+        int tx = std::clamp((bezier[0].x - bezier[1].x) / (bezier[0].x - 2.0 * bezier[1].x + bezier[2].x), 0.0, 1.0);
+        int ty = std::clamp((bezier[0].y - bezier[1].y) / (bezier[0].y - 2.0 * bezier[1].y + bezier[2].y), 0.0, 1.0);
+        // vec2 s = 1.0 - t;
         int sx = 1.0 - tx;
         int sy = 1.0 - ty;
         // vec2 q = s*s*p0 + 2.0*s*t*p1 + t*t*p2;
@@ -141,7 +139,7 @@ void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
         pMin = pMin.min(Point(qx, qy));
         pMax = pMax.max(Point(qx, qy));
     }
-    
+
     UpdateBB(pMin.x, pMin.y, pMax.x, pMax.y);
 }
 

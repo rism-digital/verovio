@@ -2804,7 +2804,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
                 artic->SetArtic(artics);
                 artic->SetColor(articulation.attribute("color").as_string());
-                artic->SetPlace(artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
+                artic->SetPlace(
+                    artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
                 element->AddChild(artic);
                 artics.clear();
             }
@@ -2860,7 +2861,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         Breath *breath = new Breath();
         m_controlElements.push_back(std::make_pair(measureNum, breath));
         breath->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        breath->SetPlace(breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
+        breath->SetPlace(
+            breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
         breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     }
@@ -2960,7 +2962,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // long
         mordent->SetLong(ConvertWordToBool(xmlMordent.node().attribute("long").as_string()));
         // place
-        mordent->SetPlace(mordent->AttPlacementRelStaff::StrToStaffrel(xmlMordent.node().attribute("placement").as_string()));
+        mordent->SetPlace(
+            mordent->AttPlacementRelStaff::StrToStaffrel(xmlMordent.node().attribute("placement").as_string()));
         // form
         mordent->SetForm(mordentLog_FORM_lower);
         for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {

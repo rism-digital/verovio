@@ -1022,8 +1022,8 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
     // the dot/flag offset
     if (params->m_previousAlignment.m_overlappingBB && params->m_previousAlignment.m_alignment
         && (params->m_previousAlignment.m_alignment->GetType() == ALIGNMENT_DEFAULT)) {
-        auto it = std::find_if(params->m_upcomingBoundingBoxes.begin(), params->m_upcomingBoundingBoxes.end(),
-            [params](BoundingBox *bb) {
+        auto it = std::find_if(
+            params->m_upcomingBoundingBoxes.begin(), params->m_upcomingBoundingBoxes.end(), [params](BoundingBox *bb) {
                 if (params->m_previousAlignment.m_overlappingBB == bb) return false;
                 // check if elements actually overlap
                 return (bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
