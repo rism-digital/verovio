@@ -216,8 +216,8 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_above : STAFFREL_below;
     }
     else if (object->Is(PITCHINFLECTION)) {
-        PitchInflection *pitchInflection = vrv_cast<PitchInflection *>(object);
-        assert(pitchInflection);
+        // PitchInflection *pitchInflection = vrv_cast<PitchInflection *>(object);
+        // assert(pitchInflection);
         // pitchInflection above by default;
         // m_place = (pitchInflection->GetPlace() != STAFFREL_NONE) ? pitchInflection->GetPlace() : STAFFREL_above;
         m_place = STAFFREL_above;

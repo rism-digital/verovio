@@ -1193,11 +1193,11 @@
             <!--<glyph glyph-code="E4EF" smufl-name="restHBarLeft"/>-->
             <!--<glyph glyph-code="E4F0" smufl-name="restHBarMiddle"/>-->
             <!--<glyph glyph-code="E4F1" smufl-name="restHBarRight"/>-->
-            <!--<glyph glyph-code="E4F2" smufl-name="restQuarterOld"/>-->
+            <glyph glyph-code="E4F2" smufl-name="restQuarterOld"/>
             <!--<glyph glyph-code="E4F3" smufl-name="restDoubleWholeLegerLine"/>-->
             <!--<glyph glyph-code="E4F4" smufl-name="restWholeLegerLine"/>-->
             <!--<glyph glyph-code="E4F5" smufl-name="restHalfLegerLine"/>-->
-            <!--<glyph glyph-code="E4F6" smufl-name="restQuarterZ"/>-->
+            <glyph glyph-code="E4F6" smufl-name="restQuarterZ"/>
             <range_end>U+E4FF</range_end>
             <range_start>U+E4E0</range_start>
         </rests>

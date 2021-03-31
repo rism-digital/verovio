@@ -196,6 +196,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "rest256th", SMUFL_E4EB_rest256th },
     { "rest512th", SMUFL_E4EC_rest512th },
     { "rest1024th", SMUFL_E4ED_rest1024th },
+    { "restQuarterOld", SMUFL_E4F2_restQuarterOld },
+    { "restQuarterZ", SMUFL_E4F6_restQuarterZ },
     { "repeat1Bar", SMUFL_E500_repeat1Bar },
     { "repeat2Bars", SMUFL_E501_repeat2Bars },
     { "repeat4Bars", SMUFL_E502_repeat4Bars },
@@ -405,6 +407,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 379
+// 381
 
 } // namespace vrv

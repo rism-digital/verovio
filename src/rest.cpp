@@ -150,12 +150,19 @@ RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental)
 //----------------------------------------------------------------------------
 
 Rest::Rest()
-    : LayerElement("rest-"), DurationInterface(), PositionInterface(), AttColor(), AttCue(), AttRestVisMensural()
+    : LayerElement("rest-")
+    , DurationInterface()
+    , PositionInterface()
+    , AttColor()
+    , AttCue()
+    , AttExtSym()
+    , AttRestVisMensural()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CUE);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
 }
@@ -169,6 +176,7 @@ void Rest::Reset()
     PositionInterface::Reset();
     ResetColor();
     ResetCue();
+    ResetExtSym();
     ResetRestVisMensural();
 }
 
@@ -210,23 +218,33 @@ void Rest::AddChild(Object *child)
 
 wchar_t Rest::GetRestGlyph() const
 {
-    int symc = 0;
-    switch (this->GetActualDur()) {
-        case DUR_LG: symc = SMUFL_E4E1_restLonga; break;
-        case DUR_BR: symc = SMUFL_E4E2_restDoubleWhole; break;
-        case DUR_1: symc = SMUFL_E4E3_restWhole; break;
-        case DUR_2: symc = SMUFL_E4E4_restHalf; break;
-        case DUR_4: symc = SMUFL_E4E5_restQuarter; break;
-        case DUR_8: symc = SMUFL_E4E6_rest8th; break;
-        case DUR_16: symc = SMUFL_E4E7_rest16th; break;
-        case DUR_32: symc = SMUFL_E4E8_rest32nd; break;
-        case DUR_64: symc = SMUFL_E4E9_rest64th; break;
-        case DUR_128: symc = SMUFL_E4EA_rest128th; break;
-        case DUR_256: symc = SMUFL_E4EB_rest256th; break;
-        case DUR_512: symc = SMUFL_E4EC_rest512th; break;
-        case DUR_1024: symc = SMUFL_E4ED_rest1024th; break;
+    // If there is glyph.num, prioritize it
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
     }
-    return symc;
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    switch (this->GetActualDur()) {
+        case DUR_LG: return SMUFL_E4E1_restLonga; break;
+        case DUR_BR: return SMUFL_E4E2_restDoubleWhole; break;
+        case DUR_1: return SMUFL_E4E3_restWhole; break;
+        case DUR_2: return SMUFL_E4E4_restHalf; break;
+        case DUR_4: return SMUFL_E4E5_restQuarter; break;
+        case DUR_8: return SMUFL_E4E6_rest8th; break;
+        case DUR_16: return SMUFL_E4E7_rest16th; break;
+        case DUR_32: return SMUFL_E4E8_rest32nd; break;
+        case DUR_64: return SMUFL_E4E9_rest64th; break;
+        case DUR_128: return SMUFL_E4EA_rest128th; break;
+        case DUR_256: return SMUFL_E4EB_rest256th; break;
+        case DUR_512: return SMUFL_E4EC_rest512th; break;
+        case DUR_1024: return SMUFL_E4ED_rest1024th; break;
+    }
+    return 0;
 }
 
 void Rest::UpdateFromTransLoc(const TransPitch &tp)

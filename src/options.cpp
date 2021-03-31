@@ -966,6 +966,10 @@ Options::Options()
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
 
+    m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
+    m_dynamDist.Init(1.0, 0.5, 8.0);
+    this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
+
     m_engravingDefaults.SetInfo(
         "Engraving defaults", "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(engravingDefaults);
@@ -1216,7 +1220,7 @@ Options::Options()
     m_transposeSelectedOnly.Init(false);
     this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
-    /********* The layout left margin by element *********/
+    /********* The layout margins by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");
     m_grps.push_back(&m_elementMargins);
