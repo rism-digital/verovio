@@ -85,6 +85,7 @@ enum ClassId {
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
+    COURSE,
     DOC,
     FACSIMILE,
     FB,
@@ -112,6 +113,7 @@ enum ClassId {
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
     TIMESTAMP_ALIGNER,
+    TUNING,
     ZONE,
     // Ids for EditorialElement child classes
     EDITORIAL_ELEMENT,
@@ -169,6 +171,7 @@ enum ClassId {
     OCTAVE,
     PEDAL,
     PHRASE,
+    PITCHINFLECTION,
     REH,
     SLUR,
     TEMPO,
@@ -216,6 +219,8 @@ enum ClassId {
     STEM,
     SYL,
     SYLLABLE,
+    TABGRP,
+    TABRHYTHM,
     TIMESTAMP_ATTR,
     TUPLET,
     TUPLET_BRACKET,
@@ -403,6 +408,9 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 /** Define the maximum levels between a ligature and its notes **/
 #define MAX_LIGATURE_DEPTH -1
 
+/** Define the maximum levels between a tabGrp and its children **/
+#define MAX_TABGRP_DEPTH -1
+
 /** Define the maximum levels between a tuplet and its notes **/
 #define MAX_TUPLET_DEPTH -1
 
@@ -578,6 +586,12 @@ enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7
+
+//----------------------------------------------------------------------------
+// Temporary - to be made an option?
+//----------------------------------------------------------------------------
+
+#define TABLATURE_STAFF_RATIO 1.3
 
 #define SUPER_SCRIPT_FACTOR 0.58
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline

@@ -179,6 +179,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, PHRASE);
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, PEDAL);
+    DrawSystemList(dc, system, PITCHINFLECTION);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
     DrawSystemList(dc, system, ENDING);
@@ -220,6 +221,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == PEDAL)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == PITCHINFLECTION)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == SYL)) {
@@ -604,7 +608,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    dc->DrawComplexBezierPath(bez1, bez2);
+    dc->DrawCubicBezierPathFilled(bez1, bez2);
 
     // on produit l'image reflet vers le bas: 0 est identique
     points[0].y = ToDeviceContextY(y2);
@@ -625,7 +629,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->DrawComplexBezierPath(bez1, bez2);
+    dc->DrawCubicBezierPathFilled(bez1, bez2);
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -1097,10 +1101,35 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
-        // For drawing rectangles instead of lines
-        y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        // Skewed lines - with Facs (neumes) only for now
+        if (y1 != y2) {
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            // For drawing rectangles instead of lines
+            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        }
+        else {
+            SegmentedLine line(x1, x2);
+            // We do not need to do this during layout calculation - and only with tablature
+            if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature()) {
+                Object fullLine;
+                fullLine.SetParent(system);
+                fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
+                fullLine.UpdateContentBBoxX(x1, x2);
+                int margin = m_doc->GetDrawingUnit(100) / 2;
+                ListOfObjects notes;
+                ClassIdComparison matchClassId(NOTE);
+                staff->FindAllDescendantByComparison(&notes, &matchClassId);
+                for (auto &note : notes) {
+                    if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
+                        line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+                    }
+                }
+            }
+            DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
+            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y2 = y1;
+        }
     }
 
     dc->ResetPen();

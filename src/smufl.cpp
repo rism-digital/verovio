@@ -381,6 +381,19 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "luteDuration8th", SMUFL_EBAA_luteDuration8th },
     { "luteDuration16th", SMUFL_EBAB_luteDuration16th },
     { "luteDuration32nd", SMUFL_EBAC_luteDuration32nd },
+    { "luteFrenchFretA", SMUFL_EBC0_luteFrenchFretA },
+    { "luteFrenchFretB", SMUFL_EBC1_luteFrenchFretB },
+    { "luteFrenchFretC", SMUFL_EBC2_luteFrenchFretC },
+    { "luteFrenchFretD", SMUFL_EBC3_luteFrenchFretD },
+    { "luteFrenchFretE", SMUFL_EBC4_luteFrenchFretE },
+    { "luteFrenchFretF", SMUFL_EBC5_luteFrenchFretF },
+    { "luteFrenchFretG", SMUFL_EBC6_luteFrenchFretG },
+    { "luteFrenchFretH", SMUFL_EBC7_luteFrenchFretH },
+    { "luteFrenchFretI", SMUFL_EBC8_luteFrenchFretI },
+    { "luteFrenchFretK", SMUFL_EBC9_luteFrenchFretK },
+    { "luteFrenchFretL", SMUFL_EBCA_luteFrenchFretL },
+    { "luteFrenchFretM", SMUFL_EBCB_luteFrenchFretM },
+    { "luteFrenchFretN", SMUFL_EBCC_luteFrenchFretN },
     { "luteItalianFret0", SMUFL_EBE0_luteItalianFret0 },
     { "luteItalianFret1", SMUFL_EBE1_luteItalianFret1 },
     { "luteItalianFret2", SMUFL_EBE2_luteItalianFret2 },
@@ -394,6 +407,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 368
+// 381
 
 } // namespace vrv

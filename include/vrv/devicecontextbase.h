@@ -184,6 +184,20 @@ public:
     }
 
     Point operator-() const { return Point(-x, -y); }
+
+    Point min(const Point &p) const
+    {
+        int x = std::min(this->x, p.x);
+        int y = std::min(this->y, p.y);
+        return Point(x, y);
+    }
+
+    Point max(const Point &p) const
+    {
+        int x = std::max(this->x, p.x);
+        int y = std::max(this->y, p.y);
+        return Point(x, y);
+    }
 };
 
 // ---------------------------------------------------------------------------

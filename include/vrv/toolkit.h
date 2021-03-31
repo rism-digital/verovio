@@ -60,13 +60,14 @@ public:
     /**
      * Constructor.
      *
-     * @param initFont If set to false, resource path is not initialized and SetResourcePath will have to be called explicitely
+     * @param initFont If set to false, resource path is not initialized and SetResourcePath will have to be called
+     * explicitely
      */
     Toolkit(bool initFont = true);
     virtual ~Toolkit();
-    
+
     ///@}
-    
+
     /**
      *************************************************************************
      * @name Utility methods
@@ -91,7 +92,7 @@ public:
      * @return True if the resources was successfully loaded
      */
     bool SetResourcePath(const std::string &path);
-    
+
     /**
      * Get the log content for the latest operation
      *
@@ -105,9 +106,9 @@ public:
      * @return the version number as a string
      */
     std::string GetVersion();
-    
+
     ///@}
-    
+
     /**
      **************************************************************************
      * @name Loading methods
@@ -151,7 +152,7 @@ public:
      * @return True if the data was successfully loaded
      */
     bool LoadZipDataBuffer(const unsigned char *data, int length);
-    
+
     /**
      * Return the number of pages in the loaded document
      *
@@ -160,7 +161,7 @@ public:
      * @return The number of pages
      */
     int GetPageCount();
-    
+
     ///@}
 
     /**
@@ -169,7 +170,7 @@ public:
      **************************************************************************
      */
     ///@{
-    
+
     /**
      * Return a dictionary of all the options
      *
@@ -177,7 +178,7 @@ public:
      * @return A stringified JSON object
      */
     std::string GetOptions(bool defaultValues) const;
-    
+
     /**
      * Return all available options grouped by category
      *
@@ -186,7 +187,7 @@ public:
      * @return A stringified JSON object
      */
     std::string GetAvailableOptions() const;
-    
+
     /**
      * Set option values
      *
@@ -196,7 +197,7 @@ public:
      * @return True if the options were successfully set
      */
     bool SetOptions(const std::string &jsonOptions);
-    
+
     /**
      * Get the value for an option
      *
@@ -205,7 +206,7 @@ public:
      * @return The option value as a string
      */
     std::string GetOption(const std::string &option, bool defaultValue = false) const;
-    
+
     /**
      * Set the value for an option
      *
@@ -214,7 +215,7 @@ public:
      * @return True if the option was successfully set
      */
     bool SetOption(const std::string &option, const std::string &value);
-    
+
     /**
      * Set the scale option
      *
@@ -222,14 +223,14 @@ public:
      * @return True if the option was successfully set
      */
     bool SetScale(int scale);
-    
+
     /**
      * Get the scale option
      *
      * @return the scale option as integer
      */
     int GetScale() { return m_options->m_scale.GetValue(); }
-    
+
     /**
      * Set the input from option
      *
@@ -237,7 +238,7 @@ public:
      * @return True if the option was successfully set
      */
     bool SetInputFrom(std::string const &inputFrom);
-    
+
     /**
      * Set the output to option
      *
@@ -245,9 +246,9 @@ public:
      * @return True if the option was successfully set
      */
     bool SetOutputTo(std::string const &outputTo);
-    
+
     ///@}
-    
+
     /**
      **************************************************************************
      * @name Experimental editor methods
@@ -269,9 +270,9 @@ public:
      * @return The editor status as a string
      **/
     std::string EditInfo();
-    
+
     ///@}
-    
+
     /**
      **************************************************************************
      * @name Rendering methods
@@ -298,7 +299,7 @@ public:
      * @return True if the file was successfully written
      */
     bool RenderToSVGFile(const std::string &filename, int pageNo = 1);
-    
+
     /**
      * Render the document to MIDI
      *
@@ -315,7 +316,7 @@ public:
      * @return True if the file was successfully written
      */
     bool RenderToMIDIFile(const std::string &filename);
-    
+
     /**
      * Render a document to Plaine and Easie
      *
@@ -342,7 +343,7 @@ public:
      * @return The timemap as a string
      */
     std::string RenderToTimemap();
-    
+
     /**
      * Render a document to timemap and save it to the file
      *
@@ -352,9 +353,9 @@ public:
      * @return True if the file was successfully written
      */
     bool RenderToTimemapFile(const std::string &filename);
-    
+
     //@}
-    
+
     /**
      **************************************************************************
      * @name Humdrum related methods
@@ -368,7 +369,7 @@ public:
      * @return The humdrum buffer as a string
      */
     std::string GetHumdrum();
-    
+
     /**
      * Write the humdrum buffer to the file
      *
@@ -378,16 +379,16 @@ public:
      * @return True if the file was successfully written
      */
     bool GetHumdrumFile(const std::string &filename);
-    
+
     ///@}
-    
+
     /**
      **************************************************************************
      * @name MEI related methods
      **************************************************************************
      */
     ///@{
-    
+
     /**
      * Get the MEI as a string
      *
@@ -397,8 +398,7 @@ public:
      * noXmlIds: true or false; false by default - remove all @xml:id not used in the data;
      */
     std::string GetMEI(const std::string &jsonOptions);
-    
-    
+
     /**
      * Get the MEI and save it to the file
      *
@@ -409,9 +409,9 @@ public:
      * @return True if the file was successfully written
      */
     bool SaveFile(const std::string &filename, const std::string &jsonOptions);
-    
+
     ///@}
-    
+
     /**
      **************************************************************************
      * @name Data access methods
@@ -426,7 +426,7 @@ public:
      * @return A stringified JSON object with the page and notes being played
      */
     std::string GetElementsAtTime(int millisec);
-    
+
     /**
      * Return the page on which the element is the ID (xml:id) is rendered
      *
@@ -462,7 +462,7 @@ public:
      * @return A stringified JSON object with all IDs
      */
     std::string GetExpansionIdsForElement(const std::string &xmlId);
-    
+
     /**
      * Return the time at which the element is the ID (xml:id) is played
      *
@@ -493,7 +493,7 @@ public:
      * @return A stringified JSON object with the values
      */
     std::string GetTimesForElement(const std::string &xmlId);
-    
+
     ///@}
 
     /**
@@ -504,7 +504,8 @@ public:
     /**
      * Redo the layout of the loaded data
      *
-     * This can be called once the rendering option were changed, for example with a new page (sceen) height or a new zoom level.
+     * This can be called once the rendering option were changed, for example with a new page (sceen) height or a new
+     * zoom level.
      */
     void RedoLayout();
 
@@ -515,24 +516,24 @@ public:
      * RedoLayout() needs to be called for a full recalculation.
      */
     void RedoPagePitchPosLayout();
-    
+
     ///@}
-    
+
     //------------------------------------------------//
     // Public methods not listed in the documentation //
     //------------------------------------------------//
-    
+
     /**
      * @defgroup nodoc
      */
-    
+
     /**
      * @name Public methods that are not listed in the documentation
      *
      * @internal They are marked with \@ingroup nodoc
      */
     ///@{
-    
+
     /**
      * Render the page to the deviceContext
      *
@@ -541,21 +542,21 @@ public:
      * @ingroup nodoc
      */
     bool RenderToDeviceContext(int pageNo, DeviceContext *deviceContext);
-    
+
     /**
      * Return the Options object of the Toolkit instance.
      *
      * @ingroup nodoc
      */
     Options *GetOptions() { return m_options; }
-    
+
     /**
      * Copy the data to the cstring internal buffer
      *
      * @ingroup nodoc
      */
     void SetCString(const std::string &data);
-    
+
     /**
      * Return the content of the cstring internal buffer
      *
@@ -564,21 +565,21 @@ public:
      * @ingroup nodoc
      */
     const char *GetCString();
-    
+
     /**
      * Write the Humdrum buffer to the outputstream
      *
      * @ingroup nodoc
      */
     void GetHumdrum(std::ostream &output);
-    
+
     /**
      * Copy the data to the humdrum internal buffer
      *
      * @ingroup nodoc
      */
     void SetHumdrumBuffer(const char *contents);
-    
+
     /**
      * Return the content of the humdrum internal buffer
      *
@@ -587,31 +588,30 @@ public:
      * @ingroup nodoc
      */
     const char *GetHumdrumBuffer();
-    
+
     /**
      * @ingroup nodoc
      */
     void SetInputFrom(FileFormat format) { m_inputFrom = format; }
-    
+
     /**
      * @ingroup nodoc
      */
     int GetOutputTo() { return m_outputTo; }
-    
-    ///@}
 
+    ///@}
 
 protected:
     /**
      * Identify the input file type for auto loading of input data
      */
     FileFormat IdentifyInputFrom(const std::string &data);
-    
+
     /**
      * Resets the vrv::logBuffer.
      */
     void ResetLogBuffer();
-    
+
 private:
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);

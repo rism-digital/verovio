@@ -123,6 +123,7 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
                     // G clef doesn't exist in black notation, so should never get here, but just in case.
                     if (!this->GetDis()) return SMUFL_E901_mensuralGclefPetrucci;
             }
+            [[fallthrough]];
         default:
             // cmn clefs
             switch (this->GetShape()) {

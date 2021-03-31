@@ -49,9 +49,11 @@
 #include "space.h"
 #include "staff.h"
 #include "syl.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "timestamp.h"
+#include "tuning.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "view.h"
@@ -842,6 +844,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     Ligature *ligatureParent = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = dynamic_cast<Rest *>(this->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
+    TabGrp *tabGrpParent = dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
@@ -851,6 +854,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (restParent) {
         m_alignment = restParent->GetAlignment();
+    }
+    else if (tabGrpParent) {
+        m_alignment = tabGrpParent->GetAlignment();
     }
     else if (this->Is({ DOTS, FLAG, STEM })) {
         assert(false);
@@ -1089,7 +1095,13 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         assert(note);
         Chord *chord = note->IsChordTone();
         int loc = 0;
-        if (note->HasPname() || note->HasLoc()) {
+        TabGrp *tabGrp = note->IsTabGrpNote();
+        if (tabGrp) {
+            assert(staffY->m_drawingTuning);
+            loc = staffY->m_drawingTuning->CalcPitchPos(
+                note->GetTabCourse(), staffY->m_drawingNotationType, staffY->m_drawingLines);
+        }
+        else if (note->HasPname() || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
@@ -1437,6 +1449,16 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // if nothing to do with this type of element
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_SIBLINGS;
+    }
+
+    // If we have a list of types to excludes and it is one of them, stop it
+    if (!params->m_excludes.empty() && this->Is(params->m_excludes)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // If we have a list of types to include and it is not one of them, stop it
+    if (!params->m_includes.empty() && !this->Is(params->m_includes)) {
+        return FUNCTOR_CONTINUE;
     }
 
     if (this->HasSameasLink()) {

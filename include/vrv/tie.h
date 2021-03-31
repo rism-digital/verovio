@@ -80,7 +80,7 @@ private:
         Layer *layer, Note *note, Chord *startParentChord, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
 
     // Update tie positioning based on the overlaps with posible layerElements such as dots/flags
-    void UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement, 
+    void UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement,
         Note *startNote, int height, curvature_CURVEDIR drawingCurveDir);
 
 public:

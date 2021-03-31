@@ -1,8 +1,4 @@
-// From
-// https://github.com/NicoG60/miniz-cpp
-// Commit
-// e46f60027bc815c9bdda77052f844f39cd00b83f
-
+// From https://github.com/rism-digital/miniz-cpp
 
 // Copyright (c) 2014-2017 Thomas Fussell
 //
@@ -538,12 +534,17 @@ typedef int mz_bool;
 
 #ifndef MINIZ_NO_ARCHIVE_APIS
 
+/*
 enum
 {
   MZ_ZIP_MAX_IO_BUF_SIZE = 64*1024,
   MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE = 260,
   MZ_ZIP_MAX_ARCHIVE_FILE_COMMENT_SIZE = 256
 };
+*/
+#define MZ_ZIP_MAX_IO_BUF_SIZE 64*1024
+#define MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE 260
+#define MZ_ZIP_MAX_ARCHIVE_FILE_COMMENT_SIZE 256
 
 typedef struct
 {
@@ -887,7 +888,16 @@ typedef mz_bool (*tdefl_put_buf_func_ptr)(const void* pBuf, int len, void *pUser
 // tdefl_compress_mem_to_output() compresses a block to an output stream. The above helpers use this function internally.
 mz_bool tdefl_compress_mem_to_output(const void *pBuf, size_t buf_len, tdefl_put_buf_func_ptr pPut_buf_func, void *pPut_buf_user, int flags);
 
-enum { TDEFL_MAX_HUFF_TABLES = 3, TDEFL_MAX_HUFF_SYMBOLS_0 = 288, TDEFL_MAX_HUFF_SYMBOLS_1 = 32, TDEFL_MAX_HUFF_SYMBOLS_2 = 19, TDEFL_LZ_DICT_SIZE = 32768, TDEFL_LZ_DICT_SIZE_MASK = TDEFL_LZ_DICT_SIZE - 1, TDEFL_MIN_MATCH_LEN = 3, TDEFL_MAX_MATCH_LEN = 258 };
+
+//enum { TDEFL_MAX_HUFF_TABLES = 3, TDEFL_MAX_HUFF_SYMBOLS_0 = 288, TDEFL_MAX_HUFF_SYMBOLS_1 = 32, TDEFL_MAX_HUFF_SYMBOLS_2 = 19, TDEFL_LZ_DICT_SIZE = 32768, TDEFL_LZ_DICT_SIZE_MASK = TDEFL_LZ_DICT_SIZE - 1, TDEFL_MIN_MATCH_LEN = 3, TDEFL_MAX_MATCH_LEN = 258 };
+#define TDEFL_MAX_HUFF_TABLES 3
+#define TDEFL_MAX_HUFF_SYMBOLS_0 288
+#define TDEFL_MAX_HUFF_SYMBOLS_1 32
+#define TDEFL_MAX_HUFF_SYMBOLS_2 19
+#define TDEFL_LZ_DICT_SIZE 32768
+#define TDEFL_LZ_DICT_SIZE_MASK (TDEFL_LZ_DICT_SIZE - 1)
+#define TDEFL_MIN_MATCH_LEN 3
+#define TDEFL_MAX_MATCH_LEN 258
 
 // TDEFL_OUT_BUF_SIZE MUST be large enough to hold a single entire compressed output block (using static/fixed Huffman codes).
 #if TDEFL_LESS_MEMORY
@@ -1553,7 +1563,10 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
       {
         mz_uint8 *p = r->m_tables[0].m_code_size; mz_uint i;
         r->m_table_sizes[0] = 288; r->m_table_sizes[1] = 32; TINFL_MEMSET(r->m_tables[1].m_code_size, 5, 32);
-        for ( i = 0; i <= 143; ++i) *p++ = 8; for ( ; i <= 255; ++i) *p++ = 9; for ( ; i <= 279; ++i) *p++ = 7; for ( ; i <= 287; ++i) *p++ = 8;
+        for ( i = 0; i <= 143; ++i) *p++ = 8;
+        for ( ; i <= 255; ++i) *p++ = 9;
+        for ( ; i <= 279; ++i) *p++ = 7;
+        for ( ; i <= 287; ++i) *p++ = 8;
       }
       else
       {
@@ -2343,7 +2356,10 @@ static MZ_FORCEINLINE void tdefl_find_match(tdefl_compressor *d, mz_uint lookahe
         if (TDEFL_READ_UNALIGNED_WORD(&d->m_dict[probe_pos + match_len - 1]) == c01) break;
       TDEFL_PROBE; TDEFL_PROBE; TDEFL_PROBE;
     }
-    if (!dist) break; q = (const mz_uint16*)(d->m_dict + probe_pos); if (TDEFL_READ_UNALIGNED_WORD(q) != s01) continue; p = s; probe_len = 32;
+    if (!dist) break;
+    q = (const mz_uint16*)(d->m_dict + probe_pos);
+    if (TDEFL_READ_UNALIGNED_WORD(q) != s01) continue;
+    p = s; probe_len = 32;
     do { } while ( (TDEFL_READ_UNALIGNED_WORD(++p) == TDEFL_READ_UNALIGNED_WORD(++q)) && (TDEFL_READ_UNALIGNED_WORD(++p) == TDEFL_READ_UNALIGNED_WORD(++q)) &&
                    (TDEFL_READ_UNALIGNED_WORD(++p) == TDEFL_READ_UNALIGNED_WORD(++q)) && (TDEFL_READ_UNALIGNED_WORD(++p) == TDEFL_READ_UNALIGNED_WORD(++q)) && (--probe_len > 0) );
     if (!probe_len)

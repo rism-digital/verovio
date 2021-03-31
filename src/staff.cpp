@@ -28,6 +28,7 @@
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
+#include "tuning.h"
 #include "verse.h"
 #include "vrv.h"
 #include "zone.h"
@@ -75,6 +76,7 @@ void Staff::Reset()
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
+    m_drawingTuning = NULL;
 
     ClearLedgerLines();
 }
@@ -94,6 +96,7 @@ void Staff::CloneReset()
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
+    m_drawingTuning = NULL;
 }
 
 const ArrayOfObjects *Staff::GetChildren(bool docChildren) const
@@ -213,6 +216,30 @@ bool Staff::DrawingIsVisible()
     StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
     assert(staffDef);
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
+}
+
+bool Staff::IsMensural()
+{
+    bool isMensural = (this->m_drawingNotationType == NOTATIONTYPE_mensural
+        || this->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || this->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    return isMensural;
+}
+
+bool Staff::IsNeume()
+{
+    bool isNeume = (this->m_drawingNotationType == NOTATIONTYPE_neume);
+    return isNeume;
+}
+
+bool Staff::IsTablature()
+{
+    bool isTablature
+        = (this->m_drawingNotationType == NOTATIONTYPE_tab || this->m_drawingNotationType == NOTATIONTYPE_tab_guitar
+            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
+            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_french
+            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_german);
+    return isTablature;
 }
 
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)
@@ -361,6 +388,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
 int Staff::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     m_drawingStaffDef = NULL;
+    m_drawingTuning = NULL;
 
     return FUNCTOR_CONTINUE;
 }

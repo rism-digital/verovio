@@ -586,7 +586,7 @@ public:
 // used solely with AdjustXPosParams to store information regarding current/previous alignment that are being processed
 class AdjustXPosAlignmentOffset {
 public:
-    AdjustXPosAlignmentOffset() : m_offset(0), m_overlappingBB(NULL) {};
+    AdjustXPosAlignmentOffset() : m_offset(0), m_overlappingBB(NULL){};
 
     void Reset()
     {
@@ -641,6 +641,8 @@ public:
     std::vector<int> m_staffNs;
     std::vector<BoundingBox *> m_boundingBoxes;
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
+    std::vector<ClassId> m_includes;
+    std::vector<ClassId> m_excludes;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;

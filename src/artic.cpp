@@ -34,12 +34,12 @@ std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, 
 // Artic
 //----------------------------------------------------------------------------
 
-Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacement()
+Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_EXTSYM);
-    RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
     Reset();
 }
@@ -52,7 +52,7 @@ void Artic::Reset()
     ResetArticulation();
     ResetColor();
     ResetExtSym();
-    ResetPlacement();
+    ResetPlacementRelEvent();
 
     m_drawingPlace = STAFFREL_NONE;
 }
@@ -72,9 +72,10 @@ data_ARTICULATION Artic::GetArticFirst()
     return articList.front();
 }
 
-void Artic::SplitMultival(Object *parent)
+void Artic::SplitMultival()
 {
-    assert(parent == this->GetParent());
+    Object *parent = this->GetParent();
+    assert(parent);
 
     std::vector<data_ARTICULATION> articList = this->GetArtic();
     if (articList.empty()) return;
@@ -85,7 +86,7 @@ void Artic::SplitMultival(Object *parent)
         Artic *artic = new Artic();
         artic->SetArtic({ *iter });
         artic->AttColor::operator=(*this);
-        artic->AttPlacement::operator=(*this);
+        artic->AttPlacementRelEvent::operator=(*this);
         artic->SetParent(parent);
         parent->InsertChild(artic, idx);
         idx++;

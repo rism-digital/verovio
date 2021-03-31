@@ -29,6 +29,7 @@
 #include "smufl.h"
 #include "staff.h"
 #include "syl.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "transposition.h"
 #include "verse.h"
@@ -56,6 +57,7 @@ Note::Note()
     , AttExtSym()
     , AttGraced()
     , AttMidiVelocity()
+    , AttNoteGesTab()
     , AttNoteHeads()
     , AttNoteVisMensural()
     , AttStems()
@@ -71,6 +73,7 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_GRACED);
+    RegisterAttClass(ATT_NOTEGESTAB);
     RegisterAttClass(ATT_NOTEHEADS);
     RegisterAttClass(ATT_NOTEVISMENSURAL);
     RegisterAttClass(ATT_MIDIVELOCITY);
@@ -96,6 +99,7 @@ void Note::Reset()
     ResetCue();
     ResetExtSym();
     ResetGraced();
+    ResetNoteGesTab();
     ResetNoteHeads();
     ResetNoteVisMensural();
     ResetMidiVelocity();
@@ -231,6 +235,39 @@ bool Note::IsClusterExtreme() const
         return true;
     else
         return false;
+}
+
+TabGrp *Note::IsTabGrpNote() const
+{
+    return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+}
+
+std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
+{
+    if (notationType == NOTATIONTYPE_tab_lute_italian) {
+        std::wstring fretStr;
+        int fret = this->GetTabFret();
+        // Maximum allowed would be 19 (always bindly addind 1 as first figure)
+        if (fret > 9) fretStr.push_back(SMUFL_EBE1_luteItalianFret1);
+        switch (fret % 10) {
+            case 0: fretStr.push_back(SMUFL_EBE0_luteItalianFret0); break;
+            case 1: fretStr.push_back(SMUFL_EBE1_luteItalianFret1); break;
+            case 2: fretStr.push_back(SMUFL_EBE2_luteItalianFret2); break;
+            case 3: fretStr.push_back(SMUFL_EBE3_luteItalianFret3); break;
+            case 4: fretStr.push_back(SMUFL_EBE4_luteItalianFret4); break;
+            case 5: fretStr.push_back(SMUFL_EBE5_luteItalianFret5); break;
+            case 6: fretStr.push_back(SMUFL_EBE6_luteItalianFret6); break;
+            case 7: fretStr.push_back(SMUFL_EBE7_luteItalianFret7); break;
+            case 8: fretStr.push_back(SMUFL_EBE8_luteItalianFret8); break;
+            case 9: fretStr.push_back(SMUFL_EBE9_luteItalianFret9); break;
+            default: break;
+        }
+        return fretStr;
+    }
+    else {
+        std::string str = StringFormat("%d", this->GetTabFret());
+        return UTF8to16(str);
+    }
 }
 
 bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
@@ -769,7 +806,7 @@ int Note::ConvertMarkupArticEnd(FunctorParams *functorParams)
     assert(params);
 
     for (auto &artic : params->m_articsToConvert) {
-        artic->SplitMultival(this);
+        artic->SplitMultival();
     }
     params->m_articsToConvert.clear();
 
@@ -1010,7 +1047,15 @@ int Note::CalcDots(FunctorParams *functorParams)
 
         // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
         const bool isDotShifted(loc % 2 == 0);
-        if (isDotShifted) ++loc;
+        if (isDotShifted) {
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            if ((GetDrawingStemDir() == STEMDIRECTION_up) || (staff->GetChildCount(LAYER) == 1))
+                ++loc;
+            else
+                --loc;
+        }
+
+        loc = CorrectDotsPlacement(staff, GetDrawingLoc(), loc, isDotShifted);
         dotLocs->push_back(loc);
 
         // Stem up, shorter than 4th and not in beam
@@ -1025,6 +1070,53 @@ int Note::CalcDots(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+int Note::CorrectDotsPlacement(Staff *staff, int noteLoc, int dotLoc, bool isDotShifted)
+{
+    if (staff->GetChildCount(LAYER) > 2) return dotLoc;
+
+    ListOfObjects objects;
+    ClassIdsComparison cmp({ DOTS, NOTE });
+    Alignment *alignment = GetAlignment();
+    alignment->FindAllDescendantByComparison(&objects, &cmp, 2);
+
+    // process all dots and notes in the alignment and save them separately - notes as vector and dot locations as set
+    std::set<int> dotLocations;
+    std::vector<Note *> otherNotes;
+    for (const auto element : objects) {
+        if (element->Is(DOTS)) {
+            std::list<int> *dotLocs = vrv_cast<Dots *>(element)->GetDotLocsForStaff(staff);
+            if (dotLocs->empty()) continue;
+            std::copy(dotLocs->begin(), dotLocs->end(), std::inserter(dotLocations, dotLocations.begin()));
+        }
+        else {
+            if (this == element) continue;
+            Note *note = vrv_cast<Note *>(element);
+            otherNotes.push_back(note);
+        }
+    }
+
+    int newLocation = dotLoc;
+    for (Note *note : otherNotes) {
+        if (IsUnissonWith(note)) {
+            if (note->HasDots()) {
+                return isDotShifted ? noteLoc + 1 : dotLoc;
+            }
+            continue;
+        }
+        if (note->GetDrawingLoc() == newLocation) {
+            // mirror dot location (if it was placed above - try placing it below now)
+            newLocation = 2 * noteLoc - dotLoc;
+        }
+    }
+
+    // if there already exists a dot on the preferred location
+    if (dotLocations.find(newLocation) != dotLocations.end()) {
+        newLocation = 2 * noteLoc - dotLoc;
+    }
+
+    return newLocation;
 }
 
 int Note::CalcLedgerLines(FunctorParams *functorParams)

@@ -2789,19 +2789,19 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         </renaissanceLuteTablature>
         <frenchAndEnglishRenaissanceLuteTablature>
             <description>French and English Renaissance lute tablature</description>
-            <!--<glyph glyph-code="EBC0" smufl-name="luteFrenchFretA"/>-->
-            <!--<glyph glyph-code="EBC1" smufl-name="luteFrenchFretB"/>-->
-            <!--<glyph glyph-code="EBC2" smufl-name="luteFrenchFretC"/>-->
-            <!--<glyph glyph-code="EBC3" smufl-name="luteFrenchFretD"/>-->
-            <!--<glyph glyph-code="EBC4" smufl-name="luteFrenchFretE"/>-->
-            <!--<glyph glyph-code="EBC5" smufl-name="luteFrenchFretF"/>-->
-            <!--<glyph glyph-code="EBC6" smufl-name="luteFrenchFretG"/>-->
-            <!--<glyph glyph-code="EBC7" smufl-name="luteFrenchFretH"/>-->
-            <!--<glyph glyph-code="EBC8" smufl-name="luteFrenchFretI"/>-->
-            <!--<glyph glyph-code="EBC9" smufl-name="luteFrenchFretK"/>-->
-            <!--<glyph glyph-code="EBCA" smufl-name="luteFrenchFretL"/>-->
-            <!--<glyph glyph-code="EBCB" smufl-name="luteFrenchFretM"/>-->
-            <!--<glyph glyph-code="EBCC" smufl-name="luteFrenchFretN"/>-->
+            <glyph glyph-code="EBC0" smufl-name="luteFrenchFretA"/>
+            <glyph glyph-code="EBC1" smufl-name="luteFrenchFretB"/>
+            <glyph glyph-code="EBC2" smufl-name="luteFrenchFretC"/>
+            <glyph glyph-code="EBC3" smufl-name="luteFrenchFretD"/>
+            <glyph glyph-code="EBC4" smufl-name="luteFrenchFretE"/>
+            <glyph glyph-code="EBC5" smufl-name="luteFrenchFretF"/>
+            <glyph glyph-code="EBC6" smufl-name="luteFrenchFretG"/>
+            <glyph glyph-code="EBC7" smufl-name="luteFrenchFretH"/>
+            <glyph glyph-code="EBC8" smufl-name="luteFrenchFretI"/>
+            <glyph glyph-code="EBC9" smufl-name="luteFrenchFretK"/>
+            <glyph glyph-code="EBCA" smufl-name="luteFrenchFretL"/>
+            <glyph glyph-code="EBCB" smufl-name="luteFrenchFretM"/>
+            <glyph glyph-code="EBCC" smufl-name="luteFrenchFretN"/>
             <!--<glyph glyph-code="EBCD" smufl-name="luteFrench7thCourse"/>-->
             <!--<glyph glyph-code="EBCE" smufl-name="luteFrench8thCourse"/>-->
             <!--<glyph glyph-code="EBCF" smufl-name="luteFrench9thCourse"/>-->
