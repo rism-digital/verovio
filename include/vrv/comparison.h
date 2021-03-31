@@ -262,6 +262,7 @@ public:
     AttNIntegerAnyComparison(ClassId classId, std::vector<int> ns) : ClassIdComparison(classId) { m_ns = ns; }
 
     void SetNs(std::vector<int> ns) { m_ns = ns; }
+    void AppendN(int n) { m_ns.push_back(n); }
 
     virtual bool operator()(Object *object)
     {

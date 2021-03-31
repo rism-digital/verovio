@@ -184,6 +184,18 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         }
     }
 
+    if (start->m_crossStaff != end->m_crossStaff) {
+        curve->SetCrossStaff(end->m_crossStaff);
+    }
+    // Check if the two elements are in different staves (but themselves not cross-staff)
+    else {
+        Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
+        assert(startStaff);
+        Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+        assert(endStaff);
+        if (startStaff->GetN() != endStaff->GetN()) curve->SetCrossStaff(endStaff);
+    }
+
     /************** calculate the radius for adjusting the x position **************/
 
     int startRadius = 0;
@@ -544,9 +556,15 @@ float View::CalcInitialSlur(
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
-    AttNIntegerComparison matchStaff(STAFF, staff->GetN());
-    //AttNIntegerComparison matchLayer(LAYER, layerN);
+    AttNIntegerAnyComparison matchStaff(STAFF, { staff->GetN() });
+    if (Staff *startStaff = vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF)); startStaff != staff) {
+        matchStaff.AppendN(startStaff->GetN());
+    }
+    else if (Staff *endStaff = vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF)); endStaff != staff) {
+        matchStaff.AppendN(endStaff->GetN());
+    }
     filters.push_back(&matchStaff);
+    // AttNIntegerComparison matchLayer(LAYER, layerN);
     //filters.push_back(&matchLayer);
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
