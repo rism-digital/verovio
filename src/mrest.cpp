@@ -114,8 +114,15 @@ int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocati
         }
     }
 
-    return isTopLayer ? *std::max_element(locations.begin(), locations.end()) + 4
-                                      : *std::min_element(locations.begin(), locations.end()) - 3;
+    const int locAdjust = isTopLayer? 4 : -2;
+    int extremePoint = isTopLayer ? *std::max_element(locations.begin(), locations.end())
+                                      : *std::min_element(locations.begin(), locations.end());
+    extremePoint += locAdjust;
+    if (( (extremePoint % 2 != 0))) {
+        extremePoint += isTopLayer? 1 : -1;
+    }
+
+    return extremePoint;
 }
 
 } // namespace vrv
