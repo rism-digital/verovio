@@ -114,7 +114,7 @@ int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocati
         }
     }
 
-    const int locAdjust = isTopLayer? 4 : -2;
+    const int locAdjust = isTopLayer? 3 : -2;
     int extremePoint = isTopLayer ? *std::max_element(locations.begin(), locations.end())
                                       : *std::min_element(locations.begin(), locations.end());
     extremePoint += locAdjust;
