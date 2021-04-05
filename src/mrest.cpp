@@ -113,14 +113,18 @@ int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocati
             locations.push_back(loc);
         }
     }
+    // if there are no other elements - just return default location
+    if (locations.empty()) return defaultLocation;
 
     const int locAdjust = isTopLayer? 3 : -2;
     int extremePoint = isTopLayer ? *std::max_element(locations.begin(), locations.end())
                                       : *std::min_element(locations.begin(), locations.end());
     extremePoint += locAdjust;
-    if (( (extremePoint % 2 != 0))) {
+    if (extremePoint % 2 != 0) {
         extremePoint += isTopLayer? 1 : -1;
     }
+    // make sure that lower layer don't go above centre, and vice versa for upper layer
+    if ((isTopLayer && (extremePoint < 4)) || (!isTopLayer && (extremePoint > 4))) extremePoint = 4;
 
     return extremePoint;
 }
