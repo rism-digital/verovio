@@ -190,10 +190,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     // Check if the two elements are in different staves (but themselves not cross-staff)
     else {
         Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
-        assert(startStaff);
         Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
-        assert(endStaff);
-        if (startStaff->GetN() != endStaff->GetN()) curve->SetCrossStaff(endStaff);
+        if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) curve->SetCrossStaff(endStaff);
     }
 
     /************** calculate the radius for adjusting the x position **************/
@@ -553,25 +551,45 @@ float View::CalcInitialSlur(
     findSpannedLayerElementsParams.m_maxPos = bezier.p2.x;
     findSpannedLayerElementsParams.m_classIds
         = { ACCID, ARTIC, CHORD, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
-    ArrayOfComparisons filters;
+    
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
-    AttNIntegerAnyComparison matchStaff(STAFF, { staff->GetN() });
-    if (Staff *startStaff = vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF)); startStaff != staff) {
-        matchStaff.AppendN(startStaff->GetN());
+    std::set<int> measureNumbers;
+    measureNumbers.emplace(staff->GetN());
+    Staff *startStaff = slur->GetStart()->m_crossStaff ? slur->GetStart()->m_crossStaff
+                                                       : vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF));
+    Staff *endStaff = slur->GetEnd()->m_crossStaff ? slur->GetEnd()->m_crossStaff
+                                                     : vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF));
+    if (startStaff && (startStaff != staff)) {
+        measureNumbers.emplace(startStaff->GetN());
     }
-    else if (Staff *endStaff = vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF)); endStaff != staff) {
-        matchStaff.AppendN(endStaff->GetN());
+    else if (endStaff && (endStaff != staff)) {
+        measureNumbers.emplace(endStaff->GetN());
     }
-    filters.push_back(&matchStaff);
     // AttNIntegerComparison matchLayer(LAYER, layerN);
     //filters.push_back(&matchLayer);
 
-    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
+    // With the way FindSpannedLayerElements is implemented it's not currently possible to use AttNIntegerAnyComparison
+    // for the filter, since processing goes staff by staff and process stops as soon as maxPos is reached. To
+    // circumvent that, we're going to process each staff separately and add all overlapping elements together in the
+    // end
+    std::vector<LayerElement *> elements;
+    for (auto measureNum : measureNumbers) {
+        ArrayOfComparisons filters;
+        AttNIntegerComparison matchStaff(STAFF, measureNum);
+        filters.push_back(&matchStaff);
+        Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
+        system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
+
+        if (!findSpannedLayerElementsParams.m_elements.empty()) {
+            elements.insert(elements.end(), std::make_move_iterator(findSpannedLayerElementsParams.m_elements.begin()),
+                std::make_move_iterator(findSpannedLayerElementsParams.m_elements.end()));
+        }
+        findSpannedLayerElementsParams.m_elements.clear();
+    }
 
     curve->ClearSpannedElements();
-    for (auto element : findSpannedLayerElementsParams.m_elements) {
+    for (auto element : elements) {
 
         Point pRotated;
         Point pLeft;

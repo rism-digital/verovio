@@ -263,20 +263,22 @@ int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedEl
 bool Slur::AdjustSlurPosition(
     Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides)
 {
+    bool isNotAdjustable = false;
     const int margin = doc->GetDrawingUnit(100);
-    auto [maxShiftLeft, maxShiftRight] = CalculateAdjustedSlurShift(curve, bezierCurve, margin, forceBothSides);
+    auto [maxShiftLeft, maxShiftRight]
+        = CalculateAdjustedSlurShift(curve, bezierCurve, margin, forceBothSides, isNotAdjustable);
     if (!maxShiftLeft && !maxShiftRight) return false;
 
     // If curve is cross staff and shifts are larger than current height of the control points - adjust control point
     // height to make sure that slur bends around the overlapping elements
-    if (curve->IsCrossStaff()) {
+    if (curve->IsCrossStaff() && !isNotAdjustable) {
         if ((maxShiftLeft > bezierCurve.GetLeftControlHeight())
             || (maxShiftRight > bezierCurve.GetRightControlHeight())) {
             angle = 0.0;
             bezierCurve.SetLeftControlPointOffset(bezierCurve.GetLeftControlPointOffset() / 2);
             bezierCurve.SetRightControlPointOffset(bezierCurve.GetRightControlPointOffset() / 2);
-            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftLeft);
-            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftRight);
+            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + maxShiftLeft);
+            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + maxShiftRight);
             const int shiftDifference = std::abs(maxShiftLeft - maxShiftRight);
             if (maxShiftLeft > maxShiftRight) {
                 bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
@@ -298,8 +300,9 @@ bool Slur::AdjustSlurPosition(
                         
             const double extremaShift = time - 0.5;
             const int relevantPoint = extremaShift < 0 ? bezierCurve.p1.y : bezierCurve.p2.y;
-            Object *startMeasure = GetStart()->GetFirstAncestor(MEASURE);
-            Object *endMeasure = GetEnd()->GetFirstAncestor(MEASURE);
+            Object *startMeasure
+                = GetStart()->m_crossStaff ? GetStart()->m_crossStaff : GetStart()->GetFirstAncestor(MEASURE);
+            Object *endMeasure = GetEnd()->m_crossStaff ? GetEnd()->m_crossStaff : GetEnd()->GetFirstAncestor(MEASURE);
             // We need to adjust curve based whether extrema time is higher/lower that 0.2 from the center (i.e. values
             // between [0.3; 0.7] are ok). For values that are lower than 0.3 we need to shift left control point base
             // to the right, and vice versa for the values above 0.7. This wouldn't exactly work for the slur that are
@@ -318,6 +321,7 @@ bool Slur::AdjustSlurPosition(
                 return true;
             }
             else {
+                maxShiftLeft = maxShiftRight = 0.8 * std::min(maxShiftLeft, maxShiftRight);
                 bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
                 bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
                 return false;
@@ -326,10 +330,24 @@ bool Slur::AdjustSlurPosition(
     }
     // otherwise it is normal slur - just move position of the start/end points up or down and recalculate angle
     else {
+        // if slur is in the state where it cannot be adjusted (e.g. when there is too bid intersection with other
+        // elements), then try to adjust one of the ends of the slur. Non-adjustable slur generally end up having one of
+        // their ends just hanging over the staff (since we lift both ends of slur), so by doing following adjustment
+        // it's possible to make those slurs look slightly better
+        if (isNotAdjustable) {
+            if ((std::abs(maxShiftLeft) > std::abs(maxShiftRight)) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+                maxShiftRight /= 4;
+            }
+            else if ((std::abs(maxShiftLeft) < std::abs(maxShiftRight))
+                && (curve->GetDir() == curvature_CURVEDIR_above)) {
+                maxShiftLeft /= 4;
+            }                 
+        }
         bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
         bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
 
-        angle = GetAdjustedSlurAngle(doc, bezierCurve.p1, bezierCurve.p2, curve->GetDir(), !curve->IsCrossStaff());
+        angle = GetAdjustedSlurAngle(
+            doc, bezierCurve.p1, bezierCurve.p2, curve->GetDir(), !curve->IsCrossStaff() && !isNotAdjustable);
         //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
         return false;
     }
@@ -337,17 +355,33 @@ bool Slur::AdjustSlurPosition(
 
 
 std::pair<int, int> Slur::CalculateAdjustedSlurShift(
-    FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int margin, bool forceBothSides)
+    FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int margin, bool forceBothSides, bool &isNotAdjustable)
 {
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
 
-    int dist = abs(bezierCurve.p2.x - bezierCurve.p1.x);
+    int dist = std::abs(bezierCurve.p2.x - bezierCurve.p1.x);
     float posXRatio = 1.0;
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
     // Actually nothing to do
     if (spannedElements->empty()) return { 0, 0 };
+
+    // Find max/min value for the spanning elements within the slur
+    int extremeY = VRV_UNSET;
+    std::for_each(spannedElements->begin(), spannedElements->end(),
+        [dir = curve->GetDir(), &extremeY](CurveSpannedElement *element) {
+            if (dir == curvature_CURVEDIR_above) {
+                const int y = element->m_boundingBox->GetSelfTop();
+                extremeY = std::max(y, extremeY);
+            }
+            else {
+                const int y = element->m_boundingBox->GetSelfBottom();
+                extremeY = std::min(y, extremeY);
+            }
+        });
+    const int leftPointMaxHeight = extremeY - bezierCurve.p1.y;
+    const int rightPointMaxHeight = extremeY - bezierCurve.p2.y;
 
     for (auto spannedElement : *spannedElements) {
 
@@ -381,7 +415,6 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(
         }
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
 
-        // intersection += doc->GetDrawingUnit(100);
         if (intersection > 0) {
             int leftShift = (forceBothSides || leftPoint) ? intersection : intersection * posXRatio;
             int rightShift = (forceBothSides || !leftPoint) ? intersection : intersection * posXRatio;
@@ -389,6 +422,22 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(
             maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
             maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
         }
+        
+        // if intersection happens on the start/end of the slur, make sure that there is enough place for proper slur to
+        // be drawn. If intersection is too large, cross-staff slurs should not be drawn with adjusted angles to avoid
+        // extreme cases
+        const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
+        if (((distanceRatio < 0.1) && (intersection > leftPointMaxHeight / 2))
+            || ((distanceRatio > 0.9) && (intersection > rightPointMaxHeight / 2)))
+            isNotAdjustable = true;
+    }
+    if (curve->GetDir() == curvature_CURVEDIR_above) {
+        if (leftPointMaxHeight + margin < 0) maxShiftLeft = 0;
+        if (rightPointMaxHeight + margin < 0) maxShiftRight = 0;
+    }
+    else {
+        if (leftPointMaxHeight + margin > 0) maxShiftLeft = 0;
+        if (rightPointMaxHeight + margin > 0) maxShiftRight = 0;
     }
 
     return { maxShiftLeft, maxShiftRight };
