@@ -3507,7 +3507,11 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
         { "flat-down", ACCIDENTAL_WRITTEN_fd }, //
         { "flat-up", ACCIDENTAL_WRITTEN_fu }, //
         { "triple-sharp", ACCIDENTAL_WRITTEN_ts }, //
-        { "triple-flat", ACCIDENTAL_WRITTEN_tf } //
+        { "triple-flat", ACCIDENTAL_WRITTEN_tf }, //
+        { "slash-quarter-sharp", ACCIDENTAL_WRITTEN_bms }, //
+        { "slash-sharp", ACCIDENTAL_WRITTEN_ks }, //
+        { "slash-flat", ACCIDENTAL_WRITTEN_bf }, //
+        { "double-slash-flat", ACCIDENTAL_WRITTEN_bmf } //
     };
 
     const auto result = Accidental2Accid.find(value);
