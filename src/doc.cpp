@@ -1654,7 +1654,7 @@ double Doc::GetBottomMargin(const ClassId classId) const
     // For these we also need to look at the scoreDef
     double margin = m_options->m_defaultBottomMargin.GetValue();
     if (classId == DYNAM) {
-        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
+        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : m_options->m_dynamDist.GetValue();
     }
     else if (classId == HARM) {
         margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
@@ -1669,7 +1669,7 @@ double Doc::GetTopMargin(const ClassId classId) const
     // For these we also need to look at the scoreDef
     double margin = m_options->m_defaultTopMargin.GetValue();
     if (classId == DYNAM) {
-        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
+        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : m_options->m_dynamDist.GetValue();
     }
     else if (classId == HARM) {
         margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
