@@ -331,6 +331,8 @@ void Page::LayOutHorizontally()
     adjustXPosParams.m_excludes.clear();
     adjustXPosParams.m_includes.push_back(TABRHYTHM);
     adjustXPosParams.m_includes.push_back(BARLINE_ATTR_RIGHT);
+    adjustXPosParams.m_includes.push_back(METERSIG);
+    adjustXPosParams.m_includes.push_back(KEYSIG);
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
