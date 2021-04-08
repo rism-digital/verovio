@@ -324,9 +324,9 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
         if (GetAlignment()->GetTime() != vrv_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = RA_none;
             // limit how much rest can be offset when there is duration overlap, but no x position overlap
-            if (abs(currentElementInfo.first) > 4) {
+            if ((isTopLayer && (currentElementInfo.first > 12)) || (!isTopLayer && (currentElementInfo.first < -4))) {
                 if (finalElementInfo.first != VRV_UNSET) continue;
-                currentElementInfo.first = isTopLayer ? 4 : -4;
+                currentElementInfo.first = isTopLayer ? 12 : -4;
             }
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
@@ -373,7 +373,7 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
     if (VRV_UNSET == previousElementLoc) return nextElementLoc;
     if (VRV_UNSET == nextElementLoc) return previousElementLoc;
 
-    return isTopLayer ? std::min(previousElementLoc, nextElementLoc) : std::max(previousElementLoc, nextElementLoc);
+    return (previousElementLoc + nextElementLoc) / 2; 
 }
 
 int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer)
