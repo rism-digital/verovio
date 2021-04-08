@@ -11,8 +11,8 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <functional>
 #include <iostream>
-#include <functional> 
 #include <numeric>
 
 //----------------------------------------------------------------------------
@@ -665,7 +665,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-void Chord::CaltOptimalDots(Dots *dots, Staff* staff, const std::set<int> &noteLocations)
+void Chord::CaltOptimalDots(Dots *dots, Staff *staff, const std::set<int> &noteLocations)
 {
     // calculate optimal dot locations both in normal and reverse orders
     std::set<int> forwardLocations = CalculateDotLocations(noteLocations.begin(), noteLocations.end(), false);
@@ -743,7 +743,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetBottomNote());
 
     // Get note locations first
-    std::map<Staff*, std::set<int>> noteLocations;
+    std::map<Staff *, std::set<int> > noteLocations;
     for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
         Note *note = vrv_cast<Note *>(*rit);
         assert(note);
