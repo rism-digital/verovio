@@ -296,8 +296,14 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         }
     }
 
-    return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
-                      : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
+    // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
+    // margin that will adjust rest position
+    const int marginLocation = isTopLayer ? 6 : 2;
+    const int optimalLocation = isTopLayer
+        ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
+        : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
+    
+    return optimalLocation;
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
@@ -370,10 +376,18 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
         ? GetElementLocation(nextElement, currentLayer, !isTopLayer).first
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, isTopLayer);
 
-    if (VRV_UNSET == previousElementLoc) return nextElementLoc;
-    if (VRV_UNSET == nextElementLoc) return previousElementLoc;
+    int currentOptimalLocation = 0;
+    if (VRV_UNSET == previousElementLoc) currentOptimalLocation = nextElementLoc;
+    else if (VRV_UNSET == nextElementLoc)
+        currentOptimalLocation = previousElementLoc;
+    else {
+        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2; 
+    }
+    const int marginLocation = isTopLayer ? 10 : -2;
+    currentOptimalLocation = isTopLayer ? std::min(currentOptimalLocation, marginLocation)
+                                        : std::max(currentOptimalLocation, marginLocation);
 
-    return (previousElementLoc + nextElementLoc) / 2; 
+    return currentOptimalLocation;
 }
 
 int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer)
