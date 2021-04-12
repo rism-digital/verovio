@@ -1134,14 +1134,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             // should be refined later
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
-                Layer *firstLayer = vrv_cast<Layer *>(staffY->FindDescendantByType(LAYER));
-                assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN()) {
-                    loc += 2;
-                }
-                else {
-                    loc -= 2;
-                }
+                loc = mRest->GetOptimalLayerLocation(staffY, layerY, loc);
             }
         }
 
