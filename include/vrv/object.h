@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <functional>
 #include <iterator>
 #include <map>
 #include <string>
@@ -1526,6 +1527,29 @@ public:
     //
 private:
     ClassId m_classId;
+};
+
+//----------------------------------------------------------------------------
+// ObjectFactory
+//----------------------------------------------------------------------------
+
+class ObjectFactory {
+
+public:
+    static ObjectFactory *GetInstance();
+    Object *Create(std::string name);
+    void RegisterFunction(std::string name, std::function<Object *(void)> function);
+
+public:
+    std::map<std::string, std::function<Object *(void)> > registry;
+};
+
+template <class T> class Registrar {
+public:
+    Registrar(std::string name)
+    {
+        ObjectFactory::GetInstance()->RegisterFunction(name, [](void) -> Object * { return new T(); });
+    }
 };
 
 } // namespace vrv

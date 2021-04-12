@@ -1170,6 +1170,37 @@ void Functor::Call(Object *ptr, FunctorParams *functorParams)
 }
 
 //----------------------------------------------------------------------------
+// ObjectFactory methods
+//----------------------------------------------------------------------------
+
+ObjectFactory *ObjectFactory::GetInstance()
+{
+    static ObjectFactory factory;
+    return &factory;
+}
+
+Object *ObjectFactory::Create(std::string name)
+{
+    Object *instance = NULL;
+
+    auto it = registry.find(name);
+    if (it != registry.end()) instance = it->second();
+
+    if (instance) {
+        return instance;
+    }
+    else {
+        LogError("Factory for '%s' not found", name.c_str());
+        return NULL;
+    }
+}
+
+void ObjectFactory::RegisterFunction(std::string name, std::function<Object *(void)> function)
+{
+    registry[name] = function;
+}
+
+//----------------------------------------------------------------------------
 // Object functor methods
 //----------------------------------------------------------------------------
 
