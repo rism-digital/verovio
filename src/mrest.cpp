@@ -123,7 +123,8 @@ int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocati
     if (extremePoint % 2 != 0) {
         extremePoint += isTopLayer? 1 : -1;
     }
-    // make sure that lower layer don't go above centre, and vice versa for upper layer
+    // Make sure that lower layer don't go above centre, and vice versa for upper layer.
+    // Hardcoded, so for the time being this is going to properly adjust mRests only on the 5-line staves
     if (isTopLayer && (extremePoint < 6)) {
         extremePoint = 6;
     }
