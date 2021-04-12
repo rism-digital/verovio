@@ -25,6 +25,8 @@ namespace vrv {
 #define AxGREEN 255 << 8
 #define AxCYAN 255 << 8 | 255
 #define AxLIGHT_GREY 127 << 16 | 127 << 8 | 127
+#undef max
+#undef min
 
 /*  Polygon filling mode */
 enum { AxODDEVEN_RULE = 1, AxWINDING_RULE };

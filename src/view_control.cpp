@@ -772,7 +772,7 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     }
     else if (spanningType == SPANNING_END) {
         // We need to recalcultate the y1 when going up (we need a start note)
-        if (up and note1) {
+        if (up && note1) {
             // Make it relative to the current (end) staff
             y1 = staff->GetDrawingY() + note1->GetDrawingYRel();
         }
