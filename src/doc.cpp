@@ -1651,31 +1651,46 @@ double Doc::GetRightMargin(const ClassId classId) const
 double Doc::GetBottomMargin(const ClassId classId) const
 {
     if (classId == ARTIC) return m_options->m_bottomMarginArtic.GetValue();
-    // For these we also need to look at the scoreDef
-    double margin = m_options->m_defaultBottomMargin.GetValue();
-    if (classId == DYNAM) {
-        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : m_options->m_dynamDist.GetValue();
-    }
-    else if (classId == HARM) {
-        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
-                                                    : m_options->m_bottomMarginHarm.GetValue();
-    }
-    return margin;
+    if (classId == HARM) return m_options->m_bottomMarginHarm.GetValue();
+    return m_options->m_defaultBottomMargin.GetValue();
 }
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
     if (classId == ARTIC) return m_options->m_topMarginArtic.GetValue();
-    // For these we also need to look at the scoreDef
-    double margin = m_options->m_defaultTopMargin.GetValue();
-    if (classId == DYNAM) {
-        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : m_options->m_dynamDist.GetValue();
+    if (classId == HARM) return m_options->m_topMarginHarm.GetValue();
+    return m_options->m_defaultTopMargin.GetValue();
+}
+
+double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition) const
+{
+    double distance = 0.0;
+    if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
+        // #1 Inspect the scoreDef attributes
+        if (classId == DYNAM && m_mdivScoreDef.HasDynamDist()) {
+            distance = m_mdivScoreDef.GetDynamDist();
+        }
+        else if (classId == HARM && m_mdivScoreDef.HasHarmDist()) {
+            distance = m_mdivScoreDef.GetHarmDist();
+        }
+        
+        // #2 Inspect the staffDef attributes
+        const StaffDef* staffDef = const_cast<ScoreDef*>(&m_mdivScoreDef)->GetStaffDef(staffIndex);
+        if (staffDef != NULL) {
+            if (classId == DYNAM && staffDef->HasDynamDist()) {
+                distance = staffDef->GetDynamDist();
+            }
+            else if (classId == HARM && staffDef->HasHarmDist()) {
+                distance = staffDef->GetHarmDist();
+            }
+        }
+        
+        // #3 Apply CLI option
+        if (classId == DYNAM && m_options->m_dynamDist.IsSet()) {
+            distance = m_options->m_dynamDist.GetValue();
+        }
     }
-    else if (classId == HARM) {
-        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
-                                                    : m_options->m_topMarginHarm.GetValue();
-    }
-    return margin;
+    return distance;
 }
 
 Page *Doc::SetDrawingPage(int pageIdx)
