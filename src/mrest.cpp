@@ -124,7 +124,12 @@ int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocati
         extremePoint += isTopLayer? 1 : -1;
     }
     // make sure that lower layer don't go above centre, and vice versa for upper layer
-    if ((isTopLayer && (extremePoint < 4)) || (!isTopLayer && (extremePoint > 4))) extremePoint = 4;
+    if (isTopLayer && (extremePoint < 6)) {
+        extremePoint = 6;
+    }
+    else if (!isTopLayer && (extremePoint > 4)) {
+        extremePoint = 4;
+    }
 
     return extremePoint;
 }
