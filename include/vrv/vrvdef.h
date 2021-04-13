@@ -344,6 +344,8 @@ typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 typedef std::vector<std::pair<std::wstring, bool> > ArrayOfStringDynamTypePairs;
 
+typedef std::map<std::string, std::function<Object *(void)> > MapOfStrConstructors;
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff

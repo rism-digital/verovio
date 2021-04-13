@@ -1181,13 +1181,13 @@ ObjectFactory *ObjectFactory::GetInstance()
 
 Object *ObjectFactory::Create(std::string name)
 {
-    Object *instance = NULL;
+    Object *object = NULL;
 
-    auto it = registry.find(name);
-    if (it != registry.end()) instance = it->second();
+    MapOfStrConstructors::iterator it = s_registry.find(name);
+    if (it != s_registry.end()) object = it->second();
 
-    if (instance) {
-        return instance;
+    if (object) {
+        return object;
     }
     else {
         LogError("Factory for '%s' not found", name.c_str());
@@ -1195,9 +1195,9 @@ Object *ObjectFactory::Create(std::string name)
     }
 }
 
-void ObjectFactory::RegisterFunction(std::string name, std::function<Object *(void)> function)
+void ObjectFactory::Register(std::string name, std::function<Object *(void)> function)
 {
-    registry[name] = function;
+    s_registry[name] = function;
 }
 
 //----------------------------------------------------------------------------

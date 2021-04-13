@@ -1536,19 +1536,38 @@ private:
 class ObjectFactory {
 
 public:
+    /**
+     * A static method returning a static object in order to guarantee initialisation
+     */
     static ObjectFactory *GetInstance();
+    
+    /**
+     * Create the object by making a lookup in the register
+     */
     Object *Create(std::string name);
-    void RegisterFunction(std::string name, std::function<Object *(void)> function);
+    
+    /**
+     * Add the name / constructor map entry to the static register
+     */
+    void Register(std::string name, std::function<Object *(void)> function);
 
 public:
-    std::map<std::string, std::function<Object *(void)> > registry;
+    MapOfStrConstructors s_registry;
 };
 
-template <class T> class Registrar {
+
+//----------------------------------------------------------------------------
+// ClassRegistrar
+//----------------------------------------------------------------------------
+
+template <class T> class ClassRegistrar {
 public:
-    Registrar(std::string name)
+    /**
+     * The contructor registering the name / constructor map
+     */
+    ClassRegistrar(std::string name)
     {
-        ObjectFactory::GetInstance()->RegisterFunction(name, [](void) -> Object * { return new T(); });
+        ObjectFactory::GetInstance()->Register(name, [](void) -> Object * { return new T(); });
     }
 };
 
