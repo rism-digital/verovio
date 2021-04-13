@@ -30,6 +30,8 @@ namespace vrv {
 // Syl
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Syl> s_factory("syl");
+
 Syl::Syl() : LayerElement("syl-"), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());

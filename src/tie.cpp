@@ -30,6 +30,8 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Tie> s_factory("tie");
+
 Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());

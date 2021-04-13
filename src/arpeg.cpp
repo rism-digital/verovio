@@ -27,6 +27,8 @@ namespace vrv {
 // Arpeg
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Arpeg> s_factory("arpeg");
+
 Arpeg::Arpeg()
     : ControlElement("arpeg-"), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis(), AttColor()
 {

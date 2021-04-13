@@ -34,6 +34,8 @@ namespace vrv {
 // Tuplet
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Tuplet> s_factory("tuplet");
+
 Tuplet::Tuplet()
     : LayerElement("tuplet-")
     , ObjectListInterface()

@@ -28,6 +28,8 @@ namespace vrv {
 // Choice
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Choice> s_factory("choice");
+
 Choice::Choice() : EditorialElement("choice-")
 {
     m_level = EDITORIAL_UNDEFINED;

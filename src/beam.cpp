@@ -1018,6 +1018,8 @@ void BeamSegment::CalcSetValues()
 // Beam
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Beam> s_factory("beam");
+
 Beam::Beam() : LayerElement("beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);

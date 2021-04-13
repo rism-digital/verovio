@@ -28,6 +28,8 @@ namespace vrv {
 // MultiRpt
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<MultiRpt> s_factory("multiRpt");
+
 MultiRpt::MultiRpt() : LayerElement("multirpt-"), AttNumbered()
 {
     RegisterAttClass(ATT_NUMBERED);

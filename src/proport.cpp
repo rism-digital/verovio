@@ -13,6 +13,8 @@ namespace vrv {
 // Proport
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Proport> s_factory("proport");
+
 Proport::Proport() : LayerElement("prop-"), AttDurationRatio()
 {
     RegisterAttClass(ATT_DURATIONRATIO);

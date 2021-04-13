@@ -149,6 +149,8 @@ RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental)
 // Rest
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Rest> s_factory("rest");
+
 Rest::Rest()
     : LayerElement("rest-")
     , DurationInterface()

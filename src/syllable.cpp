@@ -27,6 +27,8 @@ namespace vrv {
 // Syllable
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Syllable> s_factory("syllable");
+
 Syllable::Syllable() : LayerElement("syllable-"), ObjectListInterface(), AttColor(), AttSlashCount()
 {
     Init();

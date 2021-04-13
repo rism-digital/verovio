@@ -23,6 +23,8 @@ namespace vrv {
 // Fermata
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Fermata> s_factory("fermata");
+
 Fermata::Fermata()
     : ControlElement("fermata-"), TimePointInterface(), AttColor(), AttExtSym(), AttFermataVis(), AttPlacementRelStaff()
 {

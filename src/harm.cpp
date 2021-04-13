@@ -31,6 +31,8 @@ namespace vrv {
 // Harm
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Harm> s_factory("harm");
+
 Harm::Harm()
     : ControlElement("harm-")
     , TextListInterface()

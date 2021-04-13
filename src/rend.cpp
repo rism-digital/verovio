@@ -26,6 +26,8 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Rend> s_factory("rend");
+
 Rend::Rend()
     : TextElement("rend-")
     , AreaPosInterface()

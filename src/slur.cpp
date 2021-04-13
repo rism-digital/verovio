@@ -29,6 +29,8 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Slur> s_factory("slur");
+
 Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());

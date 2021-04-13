@@ -23,6 +23,8 @@ namespace vrv {
 // LabelAbbr
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<LabelAbbr> s_factory("labelAbbe");
+
 LabelAbbr::LabelAbbr() : Object("labelAbbr-"), TextListInterface()
 {
     Reset();

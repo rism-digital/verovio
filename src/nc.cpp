@@ -25,6 +25,8 @@ namespace vrv {
 // Nc
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Nc> s_factory("nc");
+
 Nc::Nc()
     : LayerElement("nc-")
     , DurationInterface()

@@ -27,6 +27,8 @@ namespace vrv {
 // StaffDef
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<StaffDef> s_factory("staffDef");
+
 StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
     , AttDistances()

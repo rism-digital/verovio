@@ -45,6 +45,8 @@ namespace vrv {
 // Note
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Note> s_factory("note");
+
 Note::Note()
     : LayerElement("note-")
     , StemmedDrawingInterface()

@@ -27,6 +27,8 @@ namespace vrv {
 // Pb
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Pb> s_factory("pb");
+
 Pb::Pb() : SystemElement("pb-"), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);

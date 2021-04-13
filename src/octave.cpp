@@ -21,6 +21,8 @@ namespace vrv {
 // Octave
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Octave> s_factory("octave");
+
 Octave::Octave()
     : ControlElement("octave-")
     , TimeSpanningInterface()

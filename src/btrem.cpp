@@ -26,6 +26,8 @@ namespace vrv {
 // BTrem
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<BTrem> s_factory("btrem");
+
 BTrem::BTrem() : LayerElement("btrem-"), AttBTremLog(), AttTremMeasured()
 {
     RegisterAttClass(ATT_BTREMLOG);

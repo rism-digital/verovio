@@ -22,6 +22,8 @@ namespace vrv {
 // Dot
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Dot> s_factory("dot");
+
 Dot::Dot() : LayerElement("dot-"), PositionInterface(), AttColor(), AttDotLog()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());

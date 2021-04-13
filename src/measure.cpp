@@ -43,6 +43,8 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Measure> s_factory("measure");
+
 Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object("measure-")
     , AttBarring()

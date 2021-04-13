@@ -66,6 +66,8 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<KeySig> s_factory("keySig");
+
 KeySig::KeySig()
     : LayerElement("keysig-")
     , ObjectListInterface()

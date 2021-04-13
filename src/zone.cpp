@@ -22,13 +22,18 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Zone
 //----------------------------------------------------------------------------
+
+static ClassRegistrar<Zone> s_factory("zone");
+
 Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated()
 {
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_COORDINATED);
     Reset();
 }
+
 Zone::~Zone() {}
+
 void Zone::Reset()
 {
     ResetTyped();

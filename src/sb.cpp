@@ -27,6 +27,8 @@ namespace vrv {
 // Sb
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Sb> s_factory("sb");
+
 Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);

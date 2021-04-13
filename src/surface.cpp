@@ -24,13 +24,18 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Surface
 //----------------------------------------------------------------------------
+
+static ClassRegistrar<Surface> s_factory("surface");
+
 Surface::Surface() : Object("surface-"), AttTyped(), AttCoordinated()
 {
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_COORDINATED);
     Reset();
 }
+
 Surface::~Surface() {}
+
 void Surface::Reset()
 {
     ResetTyped();

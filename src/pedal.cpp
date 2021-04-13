@@ -29,6 +29,8 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Pedal> s_factory("pedal");
+
 Pedal::Pedal()
     : ControlElement("pedal-")
     , TimeSpanningInterface()

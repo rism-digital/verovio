@@ -23,6 +23,8 @@ namespace vrv {
 // Fb
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Fb> s_factory("fb");
+
 Fb::Fb() : Object("fb-")
 {
 

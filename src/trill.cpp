@@ -22,6 +22,8 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Trill> s_factory("trill");
+
 Trill::Trill()
     : ControlElement("trill-")
     , TimeSpanningInterface()

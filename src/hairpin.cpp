@@ -27,6 +27,8 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Hairpin> s_factory("hairpin");
+
 Hairpin::Hairpin()
     : ControlElement("hairpin-")
     , TimeSpanningInterface()

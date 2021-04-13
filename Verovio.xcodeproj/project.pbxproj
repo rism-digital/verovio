@@ -2040,8 +2040,8 @@
 				40F910061E2799640081B7BB /* trill.h */,
 				40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */,
 				40D0D5E11E3BD7FE00E6BF5C /* turn.h */,
-				35FDEBCD24B6DBC100AC1696 /* fing.h */,
 				35FDEBD024B6DC5B00AC1696 /* fing.cpp */,
+				35FDEBCD24B6DBC100AC1696 /* fing.h */,
 			);
 			name = controlelements;
 			sourceTree = "<group>";

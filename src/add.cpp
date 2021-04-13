@@ -21,6 +21,8 @@ namespace vrv {
 // Add
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Add> s_factory("add");
+
 Add::Add() : EditorialElement("add-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);

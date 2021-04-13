@@ -24,6 +24,8 @@ namespace vrv {
 // AnchoredText
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<AnchoredText> s_factory("anchorText");
+
 AnchoredText::AnchoredText() : ControlElement("anchtxt-"), TextDirInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());

@@ -21,6 +21,8 @@ namespace vrv {
 // Damage
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Damage> s_factory("damage");
+
 Damage::Damage() : EditorialElement("lem-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);

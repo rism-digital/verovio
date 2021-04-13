@@ -21,6 +21,8 @@ namespace vrv {
 // Supplied
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Supplied> s_factory("supplied");
+
 Supplied::Supplied() : EditorialElement("supplied-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);

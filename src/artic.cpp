@@ -34,6 +34,8 @@ std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, 
 // Artic
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Artic> s_factory("artic");
+
 Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
 {
     RegisterAttClass(ATT_ARTICULATION);

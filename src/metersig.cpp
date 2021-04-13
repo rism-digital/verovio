@@ -23,6 +23,8 @@ namespace vrv {
 // MeterSig
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<MeterSig> s_factory("meterSig");
+
 MeterSig::MeterSig() : LayerElement("msig-"), AttMeterSigLog(), AttMeterSigVis()
 {
     RegisterAttClass(ATT_METERSIGLOG);

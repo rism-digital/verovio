@@ -23,6 +23,8 @@ namespace vrv {
 // App
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<App> s_factory("app");
+
 App::App() : EditorialElement("app-")
 {
     m_level = EDITORIAL_UNDEFINED;

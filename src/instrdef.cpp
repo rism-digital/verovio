@@ -22,6 +22,8 @@ namespace vrv {
 // InstrDef
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<InstrDef> s_factory("instrDef");
+
 InstrDef::InstrDef() : Object("instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
 {
     RegisterAttClass(ATT_CHANNELIZED);
