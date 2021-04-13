@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <functional>
 #include <iterator>
 #include <map>
 #include <string>
@@ -1526,6 +1527,48 @@ public:
     //
 private:
     ClassId m_classId;
+};
+
+//----------------------------------------------------------------------------
+// ObjectFactory
+//----------------------------------------------------------------------------
+
+class ObjectFactory {
+
+public:
+    /**
+     * A static method returning a static object in order to guarantee initialisation
+     */
+    static ObjectFactory *GetInstance();
+    
+    /**
+     * Create the object by making a lookup in the register
+     */
+    Object *Create(std::string name);
+    
+    /**
+     * Add the name / constructor map entry to the static register
+     */
+    void Register(std::string name, std::function<Object *(void)> function);
+
+public:
+    MapOfStrConstructors s_registry;
+};
+
+
+//----------------------------------------------------------------------------
+// ClassRegistrar
+//----------------------------------------------------------------------------
+
+template <class T> class ClassRegistrar {
+public:
+    /**
+     * The contructor registering the name / constructor map
+     */
+    ClassRegistrar(std::string name)
+    {
+        ObjectFactory::GetInstance()->Register(name, [](void) -> Object * { return new T(); });
+    }
 };
 
 } // namespace vrv
