@@ -718,6 +718,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     dc->EndGraphic(element, this);
+
+    /************ Draw children (accidentals, etc) ************/
+    DrawLayerChildren(dc, custos, layer, staff, measure);
 }
 
 void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1392,7 +1395,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     /************ Draw children (dots) ************/
-
     DrawLayerChildren(dc, rest, layer, staff, measure);
 }
 
