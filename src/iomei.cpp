@@ -5031,6 +5031,20 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
 
+    // copied from ReadNote -- this should be moved to a common method
+    AttAccidental accidental;
+    accidental.ReadAccidental(custos); 
+    AttAccidentalGestural accidentalGestural;
+    accidentalGestural.ReadAccidentalGestural(custos);
+    if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
+        Accid *vrvAccid = new Accid();
+        vrvAccid->IsAttribute(true);
+        vrvAccid->SetAccid(accidental.GetAccid());
+        vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
+        vrvCustos->AddChild(vrvAccid);
+    }
+    // -- end copy
+
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
     return ReadLayerChildren(vrvCustos, custos, vrvCustos);
