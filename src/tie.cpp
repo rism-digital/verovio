@@ -327,6 +327,7 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
     int adjust = 0;
     int dotsPosition = 0;
     for (auto object : objects) {
+        if (!object->HasSelfBB()) continue;
         // if we have possible overlap with dots, we need to move tie up/down to avoid it. This happens only for the
         // outter ties, so there should be no issue of inner tie moving up and colliding with other elements
         if (object->Is(DOTS)) {
