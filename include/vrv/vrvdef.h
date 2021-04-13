@@ -155,7 +155,7 @@ enum ClassId {
     SYSTEM_ELEMENT_max,
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
-    ANCHORED_TEXT,
+    ANCHOREDTEXT,
     ARPEG,
     BRACKETSPAN,
     BREATH,
@@ -343,6 +343,10 @@ typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 typedef std::vector<std::pair<std::wstring, bool> > ArrayOfStringDynamTypePairs;
+
+typedef std::map<std::string, std::function<Object *(void)> > MapOfStrConstructors;
+
+typedef std::map<std::string, ClassId> MapOfStrClassIds;
 
 /**
  * Generic int map recursive structure for storing hierachy of values

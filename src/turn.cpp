@@ -22,6 +22,8 @@ namespace vrv {
 // Turn
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Turn> s_factory("turn", TURN);
+
 Turn::Turn()
     : ControlElement("turn-")
     , TimePointInterface()

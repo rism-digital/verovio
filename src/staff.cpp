@@ -39,6 +39,8 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Staff> s_factory("staff", STAFF);
+
 Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);

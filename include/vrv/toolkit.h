@@ -621,8 +621,7 @@ private:
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    static std::map<std::string, ClassId> s_MEItoClassIdMap;
-
+    //
 private:
     Doc m_doc;
     View m_view;

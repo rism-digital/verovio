@@ -25,6 +25,8 @@ namespace vrv {
 // Dir
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Dir> s_factory("dir", DIR);
+
 Dir::Dir()
     : ControlElement("dir-")
     , TextListInterface()

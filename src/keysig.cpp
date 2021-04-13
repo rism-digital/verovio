@@ -66,6 +66,8 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<KeySig> s_factory("keySig", KEYSIG);
+
 KeySig::KeySig()
     : LayerElement("keysig-")
     , ObjectListInterface()
@@ -299,7 +301,7 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
         else if (clef->GetDisPlace() == STAFFREL_basic_below)
             disPlace = (clef->GetDis() == OCTAVE_DIS_8) ? 1 : 2;
     }
-    if  (clef->GetShape() == CLEFSHAPE_GG) disPlace = 1;
+    if (clef->GetShape() == CLEFSHAPE_GG) disPlace = 1;
 
     octave -= disPlace;
 

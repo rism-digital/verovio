@@ -31,6 +31,8 @@ namespace vrv {
 // Verse
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Verse> s_factory("verse", VERSE);
+
 Verse::Verse() : LayerElement("verse-"), AttColor(), AttLang(), AttNInteger(), AttTypography()
 {
     RegisterAttClass(ATT_COLOR);

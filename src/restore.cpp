@@ -21,6 +21,8 @@ namespace vrv {
 // Restore
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Restore> s_factory("restore", RESTORE);
+
 Restore::Restore() : EditorialElement("restore-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);

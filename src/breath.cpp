@@ -21,6 +21,8 @@ namespace vrv {
 // Breath
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Breath> s_factory("breath", BREATH);
+
 Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
