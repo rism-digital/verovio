@@ -1689,6 +1689,9 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
         if (classId == DYNAM && m_options->m_dynamDist.IsSet()) {
             distance = m_options->m_dynamDist.GetValue();
         }
+        else if (classId == HARM && m_options->m_harmDist.IsSet()) {
+            distance = m_options->m_harmDist.GetValue();
+        }
     }
     return distance;
 }

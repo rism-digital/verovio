@@ -972,7 +972,7 @@ Options::Options()
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
 
     m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
-    m_dynamDist.Init(1.0, 0.5, 8.0);
+    m_dynamDist.Init(4.0, 1.0, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
 
     m_engravingDefaults.SetInfo(
@@ -1007,6 +1007,10 @@ Options::Options()
     m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
+    
+    m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
+    m_harmDist.Init(4.0, 1.0, 16.0);
+    this->Register(&m_harmDist, "harmDist", &m_generalLayout);
 
     m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
     m_justificationStaff.Init(1., 0., 10.);
