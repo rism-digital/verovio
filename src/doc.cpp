@@ -1662,7 +1662,7 @@ double Doc::GetTopMargin(const ClassId classId) const
     return m_options->m_defaultTopMargin.GetValue();
 }
 
-double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition) const
+double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition)
 {
     double distance = 0.0;
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
@@ -1675,7 +1675,7 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
         }
         
         // #2 Inspect the staffDef attributes
-        const StaffDef* staffDef = const_cast<ScoreDef*>(&m_mdivScoreDef)->GetStaffDef(staffIndex);
+        const StaffDef* staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
         if (staffDef != NULL) {
             if (classId == DYNAM && staffDef->HasDynamDist()) {
                 distance = staffDef->GetDynamDist();
