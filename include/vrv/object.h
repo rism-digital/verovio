@@ -1542,17 +1542,23 @@ public:
     static ObjectFactory *GetInstance();
 
     /**
-     * Create the object by making a lookup in the register
+     * Create the object from the MEI element string name by making a lookup in the register
      */
     Object *Create(std::string name);
 
     /**
      * Add the name / constructor map entry to the static register
      */
-    void Register(std::string name, std::function<Object *(void)> function);
+    void Register(std::string name, ClassId classId, std::function<Object *(void)> function);
+
+    /**
+     * Get the correspondings ClassIds from the vector of MEI element string names
+     */
+    void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    MapOfStrConstructors s_registry;
+    MapOfStrConstructors s_ctorsRegistry;
+    MapOfStrClassIds s_classIdsRegistry;
 };
 
 //----------------------------------------------------------------------------
@@ -1564,9 +1570,9 @@ public:
     /**
      * The contructor registering the name / constructor map
      */
-    ClassRegistrar(std::string name)
+    ClassRegistrar(std::string name, ClassId classId)
     {
-        ObjectFactory::GetInstance()->Register(name, [](void) -> Object * { return new T(); });
+        ObjectFactory::GetInstance()->Register(name, classId, [](void) -> Object * { return new T(); });
     }
 };
 

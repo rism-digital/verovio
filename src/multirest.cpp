@@ -13,7 +13,7 @@ namespace vrv {
 // MultiRest
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<MultiRest> s_factory("multiRest");
+static ClassRegistrar<MultiRest> s_factory("multiRest", MULTIREST);
 
 MultiRest::MultiRest()
     : LayerElement("multirest-"), PositionInterface(), AttColor(), AttMultiRestVis(), AttNumbered(), AttWidth()

@@ -22,7 +22,7 @@ namespace vrv {
 // Dot
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Dot> s_factory("dot");
+static ClassRegistrar<Dot> s_factory("dot", DOT);
 
 Dot::Dot() : LayerElement("dot-"), PositionInterface(), AttColor(), AttDotLog()
 {

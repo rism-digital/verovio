@@ -42,7 +42,7 @@ std::map<std::string, NeumeGroup> Neume::s_neumes
 // Neume
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Neume> s_factory("neume");
+static ClassRegistrar<Neume> s_factory("neume", NEUME);
 
 Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor()
 {

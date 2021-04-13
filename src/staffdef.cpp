@@ -27,7 +27,7 @@ namespace vrv {
 // StaffDef
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<StaffDef> s_factory("staffDef");
+static ClassRegistrar<StaffDef> s_factory("staffDef", STAFFDEF);
 
 StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")

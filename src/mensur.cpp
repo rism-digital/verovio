@@ -27,7 +27,7 @@ int Mensur::s_numBase = 2;
 // Mensur
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Mensur> s_factory("mensur");
+static ClassRegistrar<Mensur> s_factory("mensur", MENSUR);
 
 Mensur::Mensur()
     : LayerElement("mensur-")

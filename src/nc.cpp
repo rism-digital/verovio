@@ -25,7 +25,7 @@ namespace vrv {
 // Nc
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Nc> s_factory("nc");
+static ClassRegistrar<Nc> s_factory("nc", NC);
 
 Nc::Nc()
     : LayerElement("nc-")

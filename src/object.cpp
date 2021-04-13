@@ -1183,8 +1183,8 @@ Object *ObjectFactory::Create(std::string name)
 {
     Object *object = NULL;
 
-    MapOfStrConstructors::iterator it = s_registry.find(name);
-    if (it != s_registry.end()) object = it->second();
+    MapOfStrConstructors::iterator it = s_ctorsRegistry.find(name);
+    if (it != s_ctorsRegistry.end()) object = it->second();
 
     if (object) {
         return object;
@@ -1195,9 +1195,22 @@ Object *ObjectFactory::Create(std::string name)
     }
 }
 
-void ObjectFactory::Register(std::string name, std::function<Object *(void)> function)
+void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
-    s_registry[name] = function;
+    for (auto str : classStrings) {
+        if (s_classIdsRegistry.count(str) > 0) {
+            classIds.push_back(s_classIdsRegistry.at(str));
+        }
+        else {
+            LogDebug("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+}
+
+void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
+{
+    s_ctorsRegistry[name] = function;
+    s_classIdsRegistry[name] = classId;
 }
 
 //----------------------------------------------------------------------------

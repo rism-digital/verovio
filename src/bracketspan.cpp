@@ -25,7 +25,7 @@ namespace vrv {
 // BracketSpan
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<BracketSpan> s_factory("bracketSpan");
+static ClassRegistrar<BracketSpan> s_factory("bracketSpan", BRACKETSPAN);
 
 BracketSpan::BracketSpan()
     : ControlElement("bspan-")

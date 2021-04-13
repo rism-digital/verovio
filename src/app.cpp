@@ -23,7 +23,7 @@ namespace vrv {
 // App
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<App> s_factory("app");
+static ClassRegistrar<App> s_factory("app", APP);
 
 App::App() : EditorialElement("app-")
 {

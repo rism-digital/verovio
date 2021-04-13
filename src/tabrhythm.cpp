@@ -21,7 +21,7 @@ namespace vrv {
 // TabRhythm
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<TabRhythm> s_factory("tabRhythm");
+static ClassRegistrar<TabRhythm> s_factory("tabRhythm", TABRHYTHM);
 
 TabRhythm::TabRhythm() : LayerElement("tabrhythm-"), AttNNumberLike()
 {

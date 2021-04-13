@@ -21,7 +21,7 @@ namespace vrv {
 // Octave
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Octave> s_factory("octave");
+static ClassRegistrar<Octave> s_factory("octave", OCTAVE);
 
 Octave::Octave()
     : ControlElement("octave-")

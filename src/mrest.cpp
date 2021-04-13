@@ -27,7 +27,7 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<MRest> s_factory("mRest");
+static ClassRegistrar<MRest> s_factory("mRest", MREST);
 
 MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
 {

@@ -28,7 +28,7 @@ namespace vrv {
 // KeyAccid
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<KeyAccid> s_factory("keyAccid");
+static ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
 
 KeyAccid::KeyAccid() : LayerElement("keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
 {

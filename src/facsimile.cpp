@@ -25,7 +25,7 @@ namespace vrv {
 // Facsimile
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Facsimile> s_factory("facsimile");
+static ClassRegistrar<Facsimile> s_factory("facsimile", FACSIMILE);
 
 Facsimile::Facsimile() : Object("facsimile-") {}
 

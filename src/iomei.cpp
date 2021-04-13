@@ -389,7 +389,7 @@ bool MEIOutput::WriteObject(Object *object)
     }
 
     // Measure elements
-    else if (object->Is(ANCHORED_TEXT)) {
+    else if (object->Is(ANCHOREDTEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
     }

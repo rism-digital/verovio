@@ -25,7 +25,7 @@ namespace vrv {
 // Surface
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Surface> s_factory("surface");
+static ClassRegistrar<Surface> s_factory("surface", SURFACE);
 
 Surface::Surface() : Object("surface-"), AttTyped(), AttCoordinated()
 {

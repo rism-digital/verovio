@@ -22,7 +22,7 @@ namespace vrv {
 // Mordent
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Mordent> s_factory("mordent");
+static ClassRegistrar<Mordent> s_factory("mordent", MORDENT);
 
 Mordent::Mordent()
     : ControlElement("mordent-")

@@ -29,7 +29,7 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Slur> s_factory("slur");
+static ClassRegistrar<Slur> s_factory("slur", SLUR);
 
 Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {

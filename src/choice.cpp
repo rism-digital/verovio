@@ -28,7 +28,7 @@ namespace vrv {
 // Choice
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Choice> s_factory("choice");
+static ClassRegistrar<Choice> s_factory("choice", CHOICE);
 
 Choice::Choice() : EditorialElement("choice-")
 {

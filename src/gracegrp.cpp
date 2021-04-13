@@ -27,7 +27,7 @@ namespace vrv {
 // GraceGrp
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<GraceGrp> s_factory("graceGrp");
+static ClassRegistrar<GraceGrp> s_factory("graceGrp", GRACEGRP);
 
 GraceGrp::GraceGrp() : LayerElement("gracegrp-"), AttColor(), AttGraced(), AttGraceGrpLog()
 {
