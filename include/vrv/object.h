@@ -1540,12 +1540,12 @@ public:
      * A static method returning a static object in order to guarantee initialisation
      */
     static ObjectFactory *GetInstance();
-    
+
     /**
      * Create the object by making a lookup in the register
      */
     Object *Create(std::string name);
-    
+
     /**
      * Add the name / constructor map entry to the static register
      */
@@ -1554,7 +1554,6 @@ public:
 public:
     MapOfStrConstructors s_registry;
 };
-
 
 //----------------------------------------------------------------------------
 // ClassRegistrar
