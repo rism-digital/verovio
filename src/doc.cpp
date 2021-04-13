@@ -1666,7 +1666,15 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
 {
     double distance = 0.0;
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
-        // #1 Inspect the scoreDef attributes
+        // #1 Apply default values
+        if (classId == DYNAM) {
+            distance = m_options->m_dynamDist.GetDefault();
+        }
+        else if (classId == HARM) {
+            distance = m_options->m_harmDist.GetDefault();
+        }
+        
+        // #2 Inspect the scoreDef attributes
         if (classId == DYNAM && m_mdivScoreDef.HasDynamDist()) {
             distance = m_mdivScoreDef.GetDynamDist();
         }
@@ -1674,7 +1682,7 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
             distance = m_mdivScoreDef.GetHarmDist();
         }
         
-        // #2 Inspect the staffDef attributes
+        // #3 Inspect the staffDef attributes
         const StaffDef* staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
         if (staffDef != NULL) {
             if (classId == DYNAM && staffDef->HasDynamDist()) {
@@ -1685,7 +1693,7 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
             }
         }
         
-        // #3 Apply CLI option
+        // #4 Apply CLI option
         if (classId == DYNAM && m_options->m_dynamDist.IsSet()) {
             distance = m_options->m_dynamDist.GetValue();
         }

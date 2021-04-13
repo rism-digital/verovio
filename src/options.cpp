@@ -1009,7 +1009,7 @@ Options::Options()
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
     
     m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
-    m_harmDist.Init(4.0, 1.0, 16.0);
+    m_harmDist.Init(2.0, 1.0, 16.0);
     this->Register(&m_harmDist, "harmDist", &m_generalLayout);
 
     m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
