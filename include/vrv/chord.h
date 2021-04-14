@@ -166,11 +166,6 @@ public:
     virtual int AdjustArtic(FunctorParams *functorParams);
 
     /**
-     * See Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
-
-    /**
      * See Object::ConvertMarkupAnalytical
      */
     ///@{

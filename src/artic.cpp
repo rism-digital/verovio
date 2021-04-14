@@ -74,9 +74,8 @@ data_ARTICULATION Artic::GetArticFirst()
     return articList.front();
 }
 
-void Artic::SplitMultival()
+void Artic::SplitMultival(Object *parent)
 {
-    Object *parent = this->GetParent();
     assert(parent);
 
     std::vector<data_ARTICULATION> articList = this->GetArtic();
@@ -279,7 +278,7 @@ int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
     ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
     assert(params);
 
-    if (this->GetArtic().size() > 1) params->m_articsToConvert.push_back(this);
+    if (this->GetArtic().size() > 1) params->m_articPairsToConvert.emplace_back(std::make_pair(GetParent(), this));
 
     return FUNCTOR_CONTINUE;
 }

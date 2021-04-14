@@ -179,6 +179,11 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::ConvertMarkupArtic
+     */
+    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToCastOffMensural
