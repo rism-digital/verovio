@@ -34,7 +34,7 @@ brew install clang-format
 
 ### Running clang-format
 
-*Please make sure you use version 5.0*
+*Please make sure you use version 11.0 or more recent*
 
 To use clang-format to adjust a single file:
 
