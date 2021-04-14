@@ -637,7 +637,7 @@ private:
     ///@}
 
     /**
-     * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
+     * @name Methods for reading MEI LayerElement, EditorialElement and interfaces
      */
     ///@{
     bool ReadControlElement(pugi::xml_node element, ControlElement *object);
@@ -717,6 +717,13 @@ private:
     // to MEI 3.0.0 (Page-Based MEI only)
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
+    ///@}
+
+     /**
+     * @name Methods for reading MEI common attributes
+     */
+    ///@{
+    void ReadAccidAttr(pugi::xml_node node, Object *object);
     ///@}
 
 public:
