@@ -391,6 +391,7 @@ int Dots::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
 
     m_dotLocsByStaff.clear();
+    m_isAdjusted = false;
 
     return FUNCTOR_CONTINUE;
 }
