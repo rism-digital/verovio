@@ -719,7 +719,7 @@ private:
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
     ///@}
 
-     /**
+    /**
      * @name Methods for reading MEI common attributes
      */
     ///@{

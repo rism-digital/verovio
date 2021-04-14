@@ -722,7 +722,6 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     DrawLayerChildren(dc, custos, layer, staff, measure);
 
     dc->EndGraphic(element, this);
-
 }
 
 void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
