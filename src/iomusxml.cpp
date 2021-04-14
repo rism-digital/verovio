@@ -441,14 +441,12 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
     std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
     for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
         if ((iter->second.m_number == number) && ((iter->second.m_measureNum).compare(measure->GetN()) == 0)) {
-            slur->SetStartid(m_ID);
             slur->SetEndid("#" + iter->first->GetUuid());
             m_slurStopStack.erase(iter);
             return;
         }
     }
     // create new slur otherwise
-    slur->SetStartid(m_ID);
     musicxml::OpenSlur openSlur(number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
 }
@@ -2752,6 +2750,31 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
+        // slurs
+        pugi::xpath_node_set slurs = node.select_nodes("notations/slur");
+        for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
+            pugi::xml_node slur = it->node();
+            int slurNumber = slur.attribute("number").as_int();
+            slurNumber = (slurNumber < 1) ? 1 : slurNumber;
+            if (HasAttributeWithValue(slur, "type", "stop")) {
+                CloseSlur(measure, slurNumber, note);
+            }
+            else if (HasAttributeWithValue(slur, "type", "start")) {
+                Slur *meiSlur = new Slur();
+                // color
+                meiSlur->SetColor(slur.attribute("color").as_string());
+                // lineform
+                meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
+                // placement and orientation
+                meiSlur->SetCurvedir(InferCurvedir(slur));
+                if (slur.attribute("id")) meiSlur->SetUuid(slur.attribute("id").as_string());
+                meiSlur->SetStartid("#" + note->GetUuid());
+                // add it to the stack
+                m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
+                OpenSlur(measure, slurNumber, meiSlur);
+            }
+        }
+
         // ties
         pugi::xpath_node startTie = notations.node().select_node("tied[@type='start']");
         pugi::xpath_node endTie = notations.node().select_node("tied[@type='stop']");
@@ -3146,30 +3169,6 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
-    // slur
-    pugi::xpath_node_set slurs = node.select_nodes("notations/slur");
-    for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
-        pugi::xml_node slur = it->node();
-        int slurNumber = slur.attribute("number").as_int();
-        slurNumber = (slurNumber < 1) ? 1 : slurNumber;
-        if (HasAttributeWithValue(slur, "type", "stop")) {
-            CloseSlur(measure, slurNumber, element);
-        }
-        else if (HasAttributeWithValue(slur, "type", "start")) {
-            Slur *meiSlur = new Slur();
-            // color
-            meiSlur->SetColor(slur.attribute("color").as_string());
-            // lineform
-            meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
-            // placement and orientation
-            meiSlur->SetCurvedir(InferCurvedir(slur));
-            if (slur.attribute("id")) meiSlur->SetUuid(slur.attribute("id").as_string());
-            // add it to the stack
-            m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
-            OpenSlur(measure, slurNumber, meiSlur);
-        }
-    }
-
     // tremolo end
     if (tremolo) {
         if (HasAttributeWithValue(tremolo.node(), "type", "stop")) {
@@ -3507,7 +3506,11 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
         { "flat-down", ACCIDENTAL_WRITTEN_fd }, //
         { "flat-up", ACCIDENTAL_WRITTEN_fu }, //
         { "triple-sharp", ACCIDENTAL_WRITTEN_ts }, //
-        { "triple-flat", ACCIDENTAL_WRITTEN_tf } //
+        { "triple-flat", ACCIDENTAL_WRITTEN_tf }, //
+        { "slash-quarter-sharp", ACCIDENTAL_WRITTEN_bms }, //
+        { "slash-sharp", ACCIDENTAL_WRITTEN_ks }, //
+        { "slash-flat", ACCIDENTAL_WRITTEN_bf }, //
+        { "double-slash-flat", ACCIDENTAL_WRITTEN_bmf } //
     };
 
     const auto result = Accidental2Accid.find(value);
