@@ -490,6 +490,19 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 // Layer functor methods
 //----------------------------------------------------------------------------
 
+int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &[parent, artic] : params->m_articPairsToConvert) {
+        artic->SplitMultival(parent);
+    }
+    params->m_articPairsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
