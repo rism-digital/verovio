@@ -5021,6 +5021,21 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     return true;
 }
 
+void MEIInput::ReadAccidAttr(pugi::xml_node node, Object *object)
+{
+    AttAccidental accidental;
+    accidental.ReadAccidental(node);
+    AttAccidentalGestural accidentalGestural;
+    accidentalGestural.ReadAccidentalGestural(node);
+    if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
+        Accid *vrvAccid = new Accid();
+        vrvAccid->IsAttribute(true);
+        vrvAccid->SetAccid(accidental.GetAccid());
+        vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
+        object->AddChild(vrvAccid);
+    }
+}
+
 bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
 {
     Custos *vrvCustos = new Custos();
@@ -5030,6 +5045,8 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
+
+    ReadAccidAttr(custos, vrvCustos);
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
@@ -5322,17 +5339,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         vrvNote->AddChild(vrvArtic);
     }
 
-    AttAccidental accidental;
-    accidental.ReadAccidental(note);
-    AttAccidentalGestural accidentalGestural;
-    accidentalGestural.ReadAccidentalGestural(note);
-    if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
-        Accid *vrvAccid = new Accid();
-        vrvAccid->IsAttribute(true);
-        vrvAccid->SetAccid(accidental.GetAccid());
-        vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
-        vrvNote->AddChild(vrvAccid);
-    }
+    ReadAccidAttr(note, vrvNote);
 
     if (vrvNote->HasTie()) {
         m_doc->SetMarkup(MARKUP_ANALYTICAL_TIE);

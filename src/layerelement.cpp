@@ -1065,8 +1065,16 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 m_alignment->AddToAccidSpace(accid);
         }
         else {
-            // do something for accid that are not children of a note - e.g., mensural?
-            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
+            Custos *custos = vrv_cast<Custos *>(this->GetFirstAncestor(CUSTOS));
+            if (custos) {
+                m_alignment->AddToAccidSpace(
+                    accid); // If this is not added, the custos is drawn an octave below the custos
+            }
+            else {
+                // do something for accid that are not children of a note - e.g., mensural?
+                this->SetDrawingYRel(
+                    staffY->CalcPitchPosYRel(params->m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
+            }
         }
     }
     else if (this->Is(CHORD)) {
