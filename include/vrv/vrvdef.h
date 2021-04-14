@@ -9,6 +9,7 @@
 #define __VRV_DEF_H__
 
 #include <algorithm>
+#include <functional>
 #include <list>
 #include <map>
 #include <vector>

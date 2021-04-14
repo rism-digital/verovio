@@ -1135,7 +1135,7 @@ public:
 class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
-    std::vector<Artic *> m_articsToConvert;
+    std::vector<std::pair<Object *, Artic *> > m_articPairsToConvert;
 };
 
 //----------------------------------------------------------------------------

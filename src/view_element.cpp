@@ -717,6 +717,10 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
     }
 
+    /************ Draw children (accidentals, etc) ************/
+    // Drawing the children should be done before ending the graphic. Otherwise the SVG tree will not match the MEI one
+    DrawLayerChildren(dc, custos, layer, staff, measure);
+
     dc->EndGraphic(element, this);
 }
 
@@ -1392,7 +1396,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     /************ Draw children (dots) ************/
-
     DrawLayerChildren(dc, rest, layer, staff, measure);
 }
 
