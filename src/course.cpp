@@ -19,6 +19,8 @@ namespace vrv {
 // Course
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Course> s_factory("course", COURSE);
+
 Course::Course() : Object("course-"), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);

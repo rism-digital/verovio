@@ -38,6 +38,8 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Layer> s_factory("layer", LAYER);
+
 Layer::Layer()
     : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {

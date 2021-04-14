@@ -1170,6 +1170,50 @@ void Functor::Call(Object *ptr, FunctorParams *functorParams)
 }
 
 //----------------------------------------------------------------------------
+// ObjectFactory methods
+//----------------------------------------------------------------------------
+
+ObjectFactory *ObjectFactory::GetInstance()
+{
+    static ObjectFactory factory;
+    return &factory;
+}
+
+Object *ObjectFactory::Create(std::string name)
+{
+    Object *object = NULL;
+
+    MapOfStrConstructors::iterator it = s_ctorsRegistry.find(name);
+    if (it != s_ctorsRegistry.end()) object = it->second();
+
+    if (object) {
+        return object;
+    }
+    else {
+        LogError("Factory for '%s' not found", name.c_str());
+        return NULL;
+    }
+}
+
+void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
+{
+    for (auto str : classStrings) {
+        if (s_classIdsRegistry.count(str) > 0) {
+            classIds.push_back(s_classIdsRegistry.at(str));
+        }
+        else {
+            LogDebug("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+}
+
+void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
+{
+    s_ctorsRegistry[name] = function;
+    s_classIdsRegistry[name] = classId;
+}
+
+//----------------------------------------------------------------------------
 // Object functor methods
 //----------------------------------------------------------------------------
 

@@ -27,6 +27,8 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<MRest> s_factory("mRest", MREST);
+
 MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -84,12 +86,12 @@ int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocation)
+int MRest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
 {
     if (!layer) return defaultLocation;
     Staff *parentStaff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(parentStaff);
-    
+
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (parentStaff->GetChildCount(LAYER) != 2) return defaultLocation;
 
@@ -118,12 +120,12 @@ int MRest::GetOptimalLayerLocation(Staff* staff, Layer* layer, int defaultLocati
     // if there are no other elements - just return default location
     if (locations.empty()) return defaultLocation;
 
-    const int locAdjust = isTopLayer? 3 : -2;
+    const int locAdjust = isTopLayer ? 3 : -2;
     int extremePoint = isTopLayer ? *std::max_element(locations.begin(), locations.end())
-                                      : *std::min_element(locations.begin(), locations.end());
+                                  : *std::min_element(locations.begin(), locations.end());
     extremePoint += locAdjust;
     if (extremePoint % 2 != 0) {
-        extremePoint += isTopLayer? 1 : -1;
+        extremePoint += isTopLayer ? 1 : -1;
     }
     // Make sure that lower layer don't go above centre, and vice versa for upper layer.
     // Hardcoded, so for the time being this is going to properly adjust mRests only on the 5-line staves

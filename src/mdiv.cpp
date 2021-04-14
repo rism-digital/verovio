@@ -23,6 +23,8 @@ namespace vrv {
 // Mdiv
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
+
 Mdiv::Mdiv() : Object("mdiv-"), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);

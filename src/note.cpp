@@ -45,6 +45,8 @@ namespace vrv {
 // Note
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Note> s_factory("note", NOTE);
+
 Note::Note()
     : LayerElement("note-")
     , StemmedDrawingInterface()
@@ -125,7 +127,7 @@ void Note::Reset()
 
 bool Note::IsSupportedChild(Object *child)
 {
-    // additional verification for accid and artic - this will no be raised with editorial markup, though
+    // additional verification for accid and artic - this will not be raised with editorial markup, though
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
         if (this->FindDescendantByComparison(&isAttributeComparison))

@@ -24,6 +24,8 @@ namespace vrv {
 // Reh
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Reh> s_factory("reh", REH);
+
 Reh::Reh() : ControlElement("reh-"), TextDirInterface(), TimePointInterface(), AttColor(), AttLang(), AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());

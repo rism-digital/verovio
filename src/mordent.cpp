@@ -22,6 +22,8 @@ namespace vrv {
 // Mordent
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Mordent> s_factory("mordent", MORDENT);
+
 Mordent::Mordent()
     : ControlElement("mordent-")
     , TimePointInterface()

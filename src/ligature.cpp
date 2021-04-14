@@ -28,6 +28,8 @@ namespace vrv {
 // Ligature
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Ligature> s_factory("ligature", LIGATURE);
+
 Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureVis()
 {
     RegisterAttClass(ATT_LIGATUREVIS);

@@ -22,6 +22,8 @@ namespace vrv {
 // PitchInflection
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<PitchInflection> s_factory("pitchInflection", PITCHINFLECTION);
+
 PitchInflection::PitchInflection() : ControlElement("pinflexion-"), TimeSpanningInterface()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());

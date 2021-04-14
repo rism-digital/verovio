@@ -29,6 +29,8 @@ namespace vrv {
 // Tempo
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Tempo> s_factory("tempo", TEMPO);
+
 Tempo::Tempo()
     : ControlElement("tempo-"), TextDirInterface(), TimePointInterface(), AttLang(), AttMidiTempo(), AttMmTempo()
 {
