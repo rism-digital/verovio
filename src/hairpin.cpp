@@ -13,11 +13,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "dynam.h"
 #include "functorparams.h"
 #include "measure.h"
+#include "system.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -156,7 +158,7 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
     rightLink->SetDrawingGrpId(grpId);
 }
 
-std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX)
+std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX, int spanningType)
 {
     Measure *startMeasure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
     Measure *endMeasure = vrv_cast<Measure *>(GetEnd()->GetFirstAncestor(MEASURE));
@@ -167,17 +169,31 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
     // default margin to consider them overlapping, which is adjusted in case we have wider barline on the left
     int leftAdjustment = 0;
     BarLine *leftBarline = startMeasure->GetLeftBarLine();
-    if (leftBarline) {
+    if (leftBarline && (spanningType == SPANNING_START_END || spanningType == SPANNING_START)) {
         int margin = doubleUnit;
         const int leftBarlineX = leftBarline->GetDrawingX();
         const int diff = leftX - leftBarlineX;
         if (leftBarline->GetForm() == BARRENDITION_rptstart) margin *= 1.5;
         if (diff < margin) leftAdjustment = margin - diff;
     }
-    // Same calculation is done for the right barline, with it having two barline forms that we need to consider
-    // as opposed to only one for the left barline
+
+    // Similar calculation is done for the right barline, with it having two barline forms that we need to consider
+    // as opposed to only one for the left barline. Additionally, when we have spanning hairpins, correct barline should
+    // be selected - when processing start of the spanning hairpin, we should check for the last measure of the current
+    // system, instead of the endMeasure
     int rightAdjustment = 0;
-    BarLine *rightBarline = endMeasure->GetRightBarLine();
+    BarLine *rightBarline = NULL;
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
+        rightBarline = endMeasure->GetRightBarLine();
+    }
+    else if (spanningType == SPANNING_START)
+    {
+        System *startSystem = vrv_cast<System *>(GetStart()->GetFirstAncestor(SYSTEM));
+        ClassIdComparison cmp(MEASURE);
+        Measure *measure
+            = vrv_cast<Measure *>(startSystem->FindDescendantByComparison(&cmp, UNLIMITED_DEPTH, BACKWARD));
+        if (measure) rightBarline = measure->GetRightBarLine();
+    }
     if (rightBarline) {
         int margin = doubleUnit;
         const int rightBarlineX = rightBarline->GetDrawingX();
@@ -187,6 +203,8 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
         }
         if (diff < margin) rightAdjustment = margin - diff;
     }
+
+    
 
     return { leftAdjustment, rightAdjustment };
 }
