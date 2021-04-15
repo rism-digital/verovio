@@ -377,9 +377,12 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, isTopLayer);
 
     int currentOptimalLocation = 0;
-    if (VRV_UNSET == previousElementLoc) currentOptimalLocation = nextElementLoc;
-    else if (VRV_UNSET == nextElementLoc)
+    if (VRV_UNSET == previousElementLoc) {
+        currentOptimalLocation = nextElementLoc;
+    }
+    else if (VRV_UNSET == nextElementLoc) {
         currentOptimalLocation = previousElementLoc;
+    }
     else {
         currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2; 
     }
