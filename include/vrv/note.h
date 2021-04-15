@@ -202,11 +202,9 @@ public:
     bool IsVisible();
 
     /**
-     * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
-     * element if it's in unison with it
+     * Correct dots placement depending on other dots present in the current alignment
      */
-    std::pair<int, bool> CalcNoteHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
-        bool isChordElement, bool isLowerElement = false, bool unison = true);
+    int CorrectDotsPlacement(Staff *staff, int NoteLoc, int dotLoc, bool isDotShifted);
 
     /**
      * Correct dots placement depending on other dots present in the current alignment
@@ -231,11 +229,6 @@ public:
     double GetScoreTimeDuration();
     char GetMIDIPitch();
     ///@}
-
-    /**
-     * Helper to adjust overlaping layers for notes
-     */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
 
 public:
     //----------//

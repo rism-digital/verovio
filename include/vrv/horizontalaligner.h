@@ -227,6 +227,11 @@ public:
      */
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
+    /**
+     * See Object::AdjustDotsEnd
+     */
+    virtual int AdjustDotsEnd(FunctorParams *);
+
 private:
     /**
      * Retrieve the AlignmentReference with staffN.

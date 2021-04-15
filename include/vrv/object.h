@@ -746,6 +746,14 @@ public:
     virtual int AdjustClefChanges(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the position of the dots for multiple layers
+     */
+    ///@{
+    virtual int AdjustDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustDotsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Adjust the position the outside articulations.
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
