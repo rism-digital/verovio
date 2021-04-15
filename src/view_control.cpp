@@ -524,14 +524,13 @@ void View::DrawHairpin(
     }
 
     // Store the full drawing length
-    if (spanningType == SPANNING_START_END) {
-        const auto [leftOverlap, rightOverlap]
-            = hairpin->GetBarlineOverlapAdjustment(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2);
-        x1 += leftOverlap;
-        x2 -= rightOverlap;
+    const auto [leftOverlap, rightOverlap] = hairpin->GetBarlineOverlapAdjustment(
+        m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2, spanningType);
+    x1 += leftOverlap;
+    x2 -= rightOverlap;
 
-        hairpin->SetDrawingLength(x2 - x1);
-    }
+    hairpin->SetDrawingLength(x2 - x1);
+
 
     hairpinLog_FORM form = hairpin->GetForm();
 
