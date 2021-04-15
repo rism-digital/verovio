@@ -186,13 +186,14 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
         rightBarline = endMeasure->GetRightBarLine();
     }
-    else if (spanningType == SPANNING_START)
-    {
+    else if (spanningType == SPANNING_START) {
         System *startSystem = vrv_cast<System *>(GetStart()->GetFirstAncestor(SYSTEM));
-        ClassIdComparison cmp(MEASURE);
-        Measure *measure
-            = vrv_cast<Measure *>(startSystem->FindDescendantByComparison(&cmp, UNLIMITED_DEPTH, BACKWARD));
-        if (measure) rightBarline = measure->GetRightBarLine();
+        if (startSystem) {
+            ClassIdComparison cmp(MEASURE);
+            Measure *measure
+                = vrv_cast<Measure *>(startSystem->FindDescendantByComparison(&cmp, UNLIMITED_DEPTH, BACKWARD));
+            if (measure) rightBarline = measure->GetRightBarLine();
+        }
     }
     if (rightBarline) {
         int margin = doubleUnit;
@@ -203,8 +204,6 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
         }
         if (diff < margin) rightAdjustment = margin - diff;
     }
-
-    
 
     return { leftAdjustment, rightAdjustment };
 }
