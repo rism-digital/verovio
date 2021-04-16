@@ -266,6 +266,46 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
         }
         return fretStr;
     }
+    else if (notationType == NOTATIONTYPE_tab_lute_french) {
+        std::wstring fretStr;
+        const int fret = GetTabFret();
+        const int course = GetTabCourse();
+        if (course >= 11) {
+            // french tab uses number 4 ... for courses 11 ..., always open fret a.
+            // TODO need Baroque font SMUFL_xxxx_luteDiapason4, 5, 6 ... or somesuch.
+            //      Temporary kludge, use SMUFL_EBE4_luteItalianFret4 ... .
+            fretStr.push_back(SMUFL_EBE4_luteItalianFret4 + course - 11);
+        }
+        else {
+            // courses 8..10 use slashes followed by fret letter
+            if (course >= 8) {
+                // TODO need SMUFL_xxxx_luteDiapasonSlash or 3 glyphs "/", "//", "///".
+                //      Temporary kludge, use SMUFL_E101_noteheadSlashHorizontalEnds, doesn't
+                //      look right but serves as a place holder.
+                fretStr = std::wstring(course - 7, SMUFL_E101_noteheadSlashHorizontalEnds);
+            }
+
+            static const wchar_t letter[] = {
+                SMUFL_EBC0_luteFrenchFretA,
+                SMUFL_EBC1_luteFrenchFretB,
+                SMUFL_EBC2_luteFrenchFretC,
+                SMUFL_EBC3_luteFrenchFretD,
+                SMUFL_EBC4_luteFrenchFretE,
+                SMUFL_EBC5_luteFrenchFretF,
+                SMUFL_EBC6_luteFrenchFretG,
+                SMUFL_EBC7_luteFrenchFretH,
+                SMUFL_EBC8_luteFrenchFretI,
+                SMUFL_EBC9_luteFrenchFretK,
+                SMUFL_EBCA_luteFrenchFretL,
+                SMUFL_EBCB_luteFrenchFretM,
+                SMUFL_EBCC_luteFrenchFretN,
+            };
+
+            // TODO what if fret > 12?  Some tablatures use fret p.
+            if (fret >= 0 && fret < static_cast<int>(sizeof(letter) / sizeof(letter[0]))) fretStr += letter[fret];
+        }
+        return fretStr;
+    }
     else {
         std::string str = StringFormat("%d", this->GetTabFret());
         return UTF8to16(str);
