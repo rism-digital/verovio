@@ -17,6 +17,7 @@
 #include "arpeg.h"
 #include "comparison.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "floatingobject.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -1055,6 +1056,61 @@ int Alignment::AdjustAccidX(FunctorParams *functorParams)
     for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
         iter->second->Process(params->m_functor, functorParams);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
+{
+    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
+    assert(params);
+
+    // process dots only if there is at least 1 dot (vertical group) in the alignment
+    if (!params->m_elements.empty() && !params->m_dots.empty()) {
+        // multimap of overlapping dots with other elements
+        std::multimap<LayerElement*, LayerElement*> overlapElements;
+        
+        // Try to find which dots can be groupped together. To achieve this, find layer elements that collide with these
+        // dots. Then find if their parents (note/chord) have dots - if they do then we can group these dots together,
+        // otherwise they should be kept separate
+        for (auto dot : params->m_dots) {
+            for (LayerElement *element : params->m_elements) {
+                if (dot->HorizontalSelfOverlap(element, 30) && dot->VerticalSelfOverlap(element, 60)) {
+                    if (element->Is({ CHORD, NOTE })) {
+                        if (dynamic_cast<AttAugmentDots *>(element)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, element);
+                    }
+                    else if (Object *chord = element->GetFirstAncestor(CHORD, UNLIMITED_DEPTH); chord) {
+                        if (vrv_cast<Chord *>(chord)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(chord));
+                    } 
+                    else if (Object *note = element->GetFirstAncestor(NOTE, UNLIMITED_DEPTH); note) {
+                        if (vrv_cast<Note *>(note)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(note));
+                    }
+                }
+            }
+        }
+
+        // if at least one overlapping element has been found, make sure to adjust relative positioning of the dots in
+        // the group to the rightmost one
+        if (!overlapElements.empty()) {
+            for (auto dot : params->m_dots) {
+                auto pair = overlapElements.equal_range(dot);
+                int max = 0;
+                for (auto it = pair.first; it != pair.second; ++it) {
+                    const int diff
+                        = it->second->GetDrawingX() + it->first->GetDrawingXRel() - it->first->GetDrawingX();
+                    if (diff > max) max = diff;
+                }
+                if (max) dot->SetDrawingXRel(dot->GetDrawingXRel() + max);
+                vrv_cast<Dots *>(dot)->IsAdjusted(true);
+            }
+        }
+    }
+    
+    params->m_elements.clear();
+    params->m_dots.clear();
 
     return FUNCTOR_CONTINUE;
 }

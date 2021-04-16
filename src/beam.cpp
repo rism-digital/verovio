@@ -1444,6 +1444,20 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
 
     if (params->m_beam != this) return FUNCTOR_CONTINUE;
 
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    if (parentLayer) {
+        // find elements on the other layers for the duration of the current beam
+        auto otherLayersElements = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+        if (!otherLayersElements.empty()) {
+            // call AdjustBeams separately for each element to find possible overlaps
+            params->m_isOtherLayer = true;
+            for (auto element : otherLayersElements) {
+                element->AdjustBeams(params);
+            }
+            params->m_isOtherLayer = false;
+        }
+    }
+
     // set overlap margin for each coord in the beam
     if (params->m_overlapMargin) {
         std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),

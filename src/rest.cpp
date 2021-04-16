@@ -298,8 +298,14 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         }
     }
 
-    return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
-                      : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
+    // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
+    // margin that will adjust rest position
+    const int marginLocation = isTopLayer ? 6 : 2;
+    const int optimalLocation = isTopLayer
+        ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
+        : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
+    
+    return optimalLocation;
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
@@ -326,9 +332,9 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
         if (GetAlignment()->GetTime() != vrv_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = RA_none;
             // limit how much rest can be offset when there is duration overlap, but no x position overlap
-            if (abs(currentElementInfo.first) > 4) {
+            if ((isTopLayer && (currentElementInfo.first > 12)) || (!isTopLayer && (currentElementInfo.first < -4))) {
                 if (finalElementInfo.first != VRV_UNSET) continue;
-                currentElementInfo.first = isTopLayer ? 4 : -4;
+                currentElementInfo.first = isTopLayer ? 12 : -4;
             }
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
@@ -372,10 +378,21 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
         ? GetElementLocation(nextElement, currentLayer, !isTopLayer).first
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, isTopLayer);
 
-    if (VRV_UNSET == previousElementLoc) return nextElementLoc;
-    if (VRV_UNSET == nextElementLoc) return previousElementLoc;
+    int currentOptimalLocation = 0;
+    if (VRV_UNSET == previousElementLoc) {
+        currentOptimalLocation = nextElementLoc;
+    }
+    else if (VRV_UNSET == nextElementLoc) {
+        currentOptimalLocation = previousElementLoc;
+    }
+    else {
+        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2; 
+    }
+    const int marginLocation = isTopLayer ? 10 : -2;
+    currentOptimalLocation = isTopLayer ? std::min(currentOptimalLocation, marginLocation)
+                                        : std::max(currentOptimalLocation, marginLocation);
 
-    return isTopLayer ? std::min(previousElementLoc, nextElementLoc) : std::max(previousElementLoc, nextElementLoc);
+    return currentOptimalLocation;
 }
 
 int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer)
@@ -467,6 +484,42 @@ int Rest::GetRestOffsetFromOptions(
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Rest::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_beam) return FUNCTOR_SIBLINGS;
+
+    // Calculate possible overlap for the rest with beams
+    int leftMargin = 0, rightMargin = 0;
+    const int beams = vrv_cast<Beam *>(params->m_beam)->m_shortestDur - DUR_4;
+    const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
+    if (params->m_directionBias > 0) {
+        leftMargin = params->m_y1 - beams * beamWidth - GetSelfTop();
+        rightMargin = params->m_y2 - beams * beamWidth - GetSelfTop();
+    }
+    else {
+        leftMargin = GetSelfBottom() - params->m_y1 - beams * beamWidth;
+        rightMargin = GetSelfBottom() - params->m_y2 - beams * beamWidth;
+    }
+
+    // Adjust drawing location for the rest based on the overlap with beams. Adjustmend should be an even number, so
+    // that rest is positioned properly
+    const int overlapMargin = std::min(leftMargin, rightMargin);
+    if (overlapMargin < 0) {
+        Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+        assert(staff);
+        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
+        const int newLoc = GetDrawingLoc() + locAdjust - locAdjust % 2;
+        SetDrawingLoc(newLoc);
+        SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {

@@ -173,6 +173,7 @@ public:
         m_directionBias = 0;
         m_overlapMargin = 0;
         m_doc = doc;
+        m_isOtherLayer = false;
     }
 
     Object *m_beam;
@@ -181,6 +182,7 @@ public:
     int m_directionBias;
     int m_overlapMargin;
     Doc *m_doc;
+    bool m_isOtherLayer;
 };
 
 //----------------------------------------------------------------------------
@@ -223,6 +225,36 @@ public:
     std::list<Artic *> m_articBelow;
     LayerElement *m_parent;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustDotsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the list of staffN in the top-level scoreDef
+ * member 1: the list of all elements (except for dots) in for the alignment in the staff
+ * member 2: the list of all dots in for the alignment in the staff
+ * member 3: the Doc
+ * member 4: the Functor for redirection to the MeasureAligner
+ * member 5: the end Functor for redirection
+ **/
+
+class AdjustDotsParams : public FunctorParams {
+public:
+    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    {
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+        m_staffNs = staffNs;
+    }
+    std::vector<int> m_staffNs;
+    std::vector<LayerElement *> m_elements;
+    std::vector<LayerElement *> m_dots;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -413,6 +445,7 @@ public:
         m_functor = functor;
         m_staffNs = staffNs;
         m_unison = false;
+        m_ignoreDots = true;
     }
     std::vector<int> m_staffNs;
     int m_currentLayerN;
@@ -423,6 +456,7 @@ public:
     Doc *m_doc;
     Functor *m_functor;
     bool m_unison;
+    bool m_ignoreDots;
 };
 
 //----------------------------------------------------------------------------
