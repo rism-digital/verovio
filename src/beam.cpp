@@ -103,7 +103,7 @@ void BeamSegment::CalcBeam(
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
 
-    CalcBeamStemLength(staff, beamInterface->m_drawingPlace == BEAMPLACE_below ? STEMDIRECTION_down : STEMDIRECTION_up);
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace);
 
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         CalcMixedBeamPlace(staff);
@@ -115,6 +115,7 @@ void BeamSegment::CalcBeam(
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (!beamInterface->m_crossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
             CalcBeamInit(layer, staff, doc, beamInterface, place);
+            CalcBeamStemLength(staff, beamInterface->m_drawingPlace);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
     }
@@ -908,8 +909,9 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     // if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
-void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
 {
+    const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     for (auto coord : m_beamElementCoordRefs) {
         coord->SetClosestNote(stemDir);
