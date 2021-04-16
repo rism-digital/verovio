@@ -354,15 +354,19 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::CalcStemLenInThirdUnits(Staff *staff)
+int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 {
     assert(staff);
+    
+    if (stemDir != STEMDIRECTION_down && stemDir != STEMDIRECTION_up) {
+        return 0;
+    }
 
     int baseStem = STANDARD_STEMLENGTH * 3;
 
     int shortening = 0;
 
-    int unitToLine = (this->GetDrawingStemDir() == STEMDIRECTION_up)
+    int unitToLine = (stemDir == STEMDIRECTION_up)
         ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
         : this->GetDrawingLoc();
     if (unitToLine < 5) {
@@ -378,7 +382,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff)
 
     // Limit shortening with duration shorter than quarter not when not in a beam
     if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+        if (stemDir == STEMDIRECTION_up) {
             shortening = std::min(4, shortening);
         }
         else {

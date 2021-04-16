@@ -277,7 +277,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;
-    virtual int CalcStemLenInThirdUnits(Staff *staff) = 0;
+    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) = 0;
     ///@}
 
 protected:
