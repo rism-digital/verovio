@@ -282,7 +282,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
                 //      look right but serves as a place holder.
                 fretStr = std::wstring(course - 7, SMUFL_E101_noteheadSlashHorizontalEnds);
             }
-         
+
             static const wchar_t letter[] = {
                 SMUFL_EBC0_luteFrenchFretA,
                 SMUFL_EBC1_luteFrenchFretB,
@@ -298,10 +298,9 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
                 SMUFL_EBCB_luteFrenchFretM,
                 SMUFL_EBCC_luteFrenchFretN,
             };
-            
+
             // TODO what if fret > 12?  Some tablatures use fret p.
-            if (fret >= 0 && fret < static_cast<int>(sizeof(letter) / sizeof(letter[0])))
-                fretStr += letter[fret];
+            if (fret >= 0 && fret < static_cast<int>(sizeof(letter) / sizeof(letter[0]))) fretStr += letter[fret];
         }
         return fretStr;
     }

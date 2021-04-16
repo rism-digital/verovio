@@ -105,9 +105,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     else {
 
         std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
-        wchar_t code = (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french)
-                ? SMUFL_EBC0_luteFrenchFretA
-                : SMUFL_EBE0_luteItalianFret0;
+        wchar_t code = (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) ? SMUFL_EBC0_luteFrenchFretA
+                                                                                      : SMUFL_EBE0_luteItalianFret0;
         int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false);
         y -= (m_doc->GetGlyphHeight(code, glyphSize, drawingCueSize) / 2);
         x += radius - (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
