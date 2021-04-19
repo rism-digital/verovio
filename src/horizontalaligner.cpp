@@ -1158,8 +1158,31 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
         iter->second->SetGraceAligmentXPos(params->m_doc);
     }
-
-    SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
+    int offset = 0;
+    if (m_type == ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+        Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+        if (measure) {
+            const int staffSize = 100;
+            const int barLineThickWidth = params->m_doc->GetDrawingUnit(staffSize)
+                * params->m_doc->GetOptions()->m_thickBarlineThickness.GetValue();
+            data_BARRENDITION rightBarLine = measure->GetDrawingRightBarLine();
+            switch (rightBarLine) {
+                case BARRENDITION_rptend:
+                case BARRENDITION_end: {
+                    offset = barLineThickWidth;
+                    break;
+                }
+                case BARRENDITION_dbl:
+                case BARRENDITION_dbldotted:
+                case BARRENDITION_dbldashed: {
+                    offset = barLineThickWidth / 2;
+                    break;
+                }
+                default: break;
+            }
+        }
+    }
+    SetXRel(offset + params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
 
