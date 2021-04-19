@@ -358,7 +358,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 {
     assert(staff);
     
-    if (stemDir != STEMDIRECTION_down && stemDir != STEMDIRECTION_up) {
+    if ((stemDir != STEMDIRECTION_down) && (stemDir != STEMDIRECTION_up)) {
         return 0;
     }
 
