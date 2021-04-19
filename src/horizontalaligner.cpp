@@ -1163,13 +1163,14 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
         if (measure) {
             const int staffSize = 100;
-            const int barLineThickWidth = params->m_doc->GetDrawingUnit(staffSize)
-                * params->m_doc->GetOptions()->m_thickBarlineThickness.GetValue();
+            const int drawingUnit = params->m_doc->GetDrawingUnit(staffSize);
+            const int barLineThickWidth = drawingUnit * params->m_doc->GetOptions()->m_thickBarlineThickness.GetValue();
+            const int barLineSeparation = drawingUnit * params->m_doc->GetOptions()->m_barLineSeparation.GetValue();
             data_BARRENDITION rightBarLine = measure->GetDrawingRightBarLine();
             switch (rightBarLine) {
                 case BARRENDITION_rptend:
                 case BARRENDITION_end: {
-                    offset = barLineThickWidth;
+                    offset = barLineThickWidth + barLineSeparation;
                     break;
                 }
                 case BARRENDITION_dbl:
