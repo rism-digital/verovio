@@ -1271,7 +1271,7 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
 {
     if (!m_closestNote) return 0;
 
-    const bool onStaffLine = m_closestNote->GetDrawingLoc() % 2;
+    const bool onStaffLine = (m_closestNote->GetDrawingLoc() % 2 == 0);
     bool extend = onStaffLine;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
