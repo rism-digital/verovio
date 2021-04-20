@@ -595,6 +595,10 @@ void OptionJson::Init(JsonSource source, const std::string &defaultValue)
     m_isSet = false;
 }
 
+JsonSource OptionJson::GetSource() const {
+    return m_source;
+}
+
 bool OptionJson::SetValue(const std::string &value)
 {
     const bool ok = ReadJson(m_values, value);

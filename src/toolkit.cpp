@@ -974,10 +974,23 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
             opt->SetValueArray(strValues);
         }
+        else if (json.has<jsonxx::Object>(iter->first)) {
+            const OptionJson* optJson = dynamic_cast<OptionJson*>(opt);
+            if ((optJson != NULL) && (optJson->GetSource() == JsonSource::String)) {
+                // Pass reduced json to json-option
+                jsonxx::Object obj;
+                obj << iter->first << json.get<jsonxx::Object>(iter->first);
+                std::stringstream ss;
+                ss << obj.json();
+                opt->SetValue(ss.str());
+            }
+        }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());
         }
     }
+    
+    m_options->Sync();
 
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed

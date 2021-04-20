@@ -437,6 +437,8 @@ public:
     OptionJson() = default;
     virtual ~OptionJson() = default;
     void Init(JsonSource source, const std::string &defaultValue);
+    
+    JsonSource GetSource() const;
 
     bool SetValue(const std::string &value) override;
     
