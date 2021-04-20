@@ -105,7 +105,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     else {
 
         std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
-        wchar_t code = SMUFL_EBE0_luteItalianFret0;
+        wchar_t code = (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) ? SMUFL_EBC0_luteFrenchFretA
+                                                                                      : SMUFL_EBE0_luteItalianFret0;
         int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false);
         y -= (m_doc->GetGlyphHeight(code, glyphSize, drawingCueSize) / 2);
         x += radius - (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
@@ -139,7 +140,7 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
-    int drawingDur = tabGrp->GetActualDur();
+    int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
     int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
     x += radius;
