@@ -422,6 +422,9 @@ private:
 // OptionJson
 //----------------------------------------------------------------------------
 
+// Distinguish whether Json is passed directly or should be read from file
+enum class JsonSource { String, FilePath };
+
 /**
  * This class is for Json input params
  */
@@ -433,11 +436,11 @@ public:
     //
     OptionJson() = default;
     virtual ~OptionJson() = default;
-    virtual void Init(const std::string &defaultValue);
+    void Init(JsonSource source, const std::string &defaultValue);
 
-    virtual bool SetValue(const std::string &jsonFilePath);
-    // virtual std::string GetStrValue() const;
-
+    bool SetValue(const std::string &value) override;
+    
+    bool HasValue(const std::vector<std::string> &jsonNodePath) const;
     int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     //
@@ -445,8 +448,12 @@ public:
     //
 protected:
     JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
-    //
+    
+    // Read json from string or file
+    bool ReadJson(jsonxx::Object& output, const std::string &input) const;
 private:
+    JsonSource m_source = JsonSource::String;
+    
     jsonxx::Object m_values;
     jsonxx::Object m_defaultValues;
 };
@@ -595,6 +602,7 @@ public:
     OptionDbl m_dynamDist;
     OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
+    OptionJson m_engravingDefaultsFile;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
