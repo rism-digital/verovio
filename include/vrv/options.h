@@ -422,7 +422,7 @@ private:
 // OptionJson
 //----------------------------------------------------------------------------
 
-// Distinguish whether Json is passed directly or should be read from file
+/// Distinguish whether Json is passed directly or should be read from file
 enum class JsonSource { String, FilePath };
 
 /**
@@ -430,28 +430,42 @@ enum class JsonSource { String, FilePath };
  */
 
 class OptionJson : public Option {
-    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
-
+    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value>>;
 public:
-    //
+    /**
+     * @name Constructor, destructor and initialization
+     */
+    ///@{
     OptionJson() = default;
     virtual ~OptionJson() = default;
+    void CopyTo(Option *option) override;
     void Init(JsonSource source, const std::string &defaultValue);
+    ///@}
     
     JsonSource GetSource() const;
-
-    bool SetValue(const std::string &value) override;
     
+    /**
+     * @name Interface methods: accessing values as string
+     */
+    ///@{
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
+    ///@}
+    
+    /**
+     * @name Accessing values as json node path
+     */
+    ///@{
     bool HasValue(const std::vector<std::string> &jsonNodePath) const;
     int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
-    //
     bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
-    //
+    ///@}
 protected:
     JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
     
-    // Read json from string or file
+    /// Read json from string or file
     bool ReadJson(jsonxx::Object& output, const std::string &input) const;
 private:
     JsonSource m_source = JsonSource::String;

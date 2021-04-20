@@ -588,6 +588,13 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 // OptionJson
 //----------------------------------------------------------------------------
 
+void OptionJson::CopyTo(Option *option)
+{
+    OptionJson *child = dynamic_cast<OptionJson*>(option);
+    assert(child);
+    *child = *this;
+}
+
 void OptionJson::Init(JsonSource source, const std::string &defaultValue)
 {
     m_source = source;
@@ -614,6 +621,18 @@ bool OptionJson::SetValue(const std::string &value)
         }
     }
     return ok;
+}
+
+std::string OptionJson::GetStrValue() const {
+    std::stringstream ss;
+    ss << m_values;
+    return ss.str();
+}
+
+std::string OptionJson::GetDefaultStrValue() const {
+    std::stringstream ss;
+    ss << m_defaultValues;
+    return ss.str();
 }
 
 bool OptionJson::ReadJson(jsonxx::Object& output, const std::string &input) const
