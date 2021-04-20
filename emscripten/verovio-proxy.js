@@ -81,14 +81,14 @@ verovio.vrvToolkit.renderData = Module.cwrap( 'vrvToolkit_renderData', 'string',
 // char *renderToMidi(Toolkit *ic, const char *rendering_options)
 verovio.vrvToolkit.renderToMIDI = Module.cwrap( 'vrvToolkit_renderToMIDI', 'string', ['number', 'string'] );
 
+// char *renderToPAE(Toolkit *ic)
+verovio.vrvToolkit.renderToPAE = Module.cwrap( 'vrvToolkit_renderToPAE', 'string' );
+
 // char *renderToSvg(Toolkit *ic, int pageNo, const char *rendering_options)
 verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string', ['number', 'number', 'string'] );
 
 // char *renderToTimemap(Toolkit *ic)
 verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number'] );
-
-// char *renderToPAE(Toolkit *ic)
-verovio.vrvToolkit.renderToPAE = Module.cwrap( 'vrvToolkit_renderToPAE', 'string' );
 
 // void setOptions(Toolkit *ic, const char *options) 
 verovio.vrvToolkit.setOptions = Module.cwrap( 'vrvToolkit_setOptions', null, ['number', 'string'] );
@@ -268,6 +268,11 @@ verovio.toolkit.prototype.renderToMidi = function ( options )
     return verovio.vrvToolkit.renderToMIDI( this.ptr, JSON.stringify( options ) );
 };
 
+verovio.toolkit.prototype.renderToPAE = function ()
+{
+    return verovio.vrvToolkit.renderToPAE( this.ptr );
+};
+
 verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )
 {
     return verovio.vrvToolkit.renderToSVG( this.ptr, pageNo, JSON.stringify( options ) );
@@ -276,11 +281,6 @@ verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )
 verovio.toolkit.prototype.renderToTimemap = function ()
 {
     return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr ) );
-};
-
-verovio.toolkit.prototype.renderToPAE = function ()
-{
-    return verovio.vrvToolkit.renderToPAE( this.ptr );
 };
 
 verovio.toolkit.prototype.setOptions = function ( options )
