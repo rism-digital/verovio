@@ -33,6 +33,7 @@ bool vrvToolkit_loadZipDataBuffer(Toolkit *tk, const unsigned char *data, int le
 const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options);
 const char *vrvToolkit_renderToSVG(Toolkit *tk, int page_no, const char *c_options);
 const char *vrvToolkit_renderToTimemap(Toolkit *tk);
+const char *vrvToolkit_renderToPAE(Toolkit *tk);
 void vrvToolkit_redoLayout(Toolkit *tk);
 void vrvToolkit_redoPagePitchPosLayout(Toolkit *tk);
 const char *vrvToolkit_renderData(Toolkit *tk, const char *data, const char *options);

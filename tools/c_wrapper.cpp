@@ -176,6 +176,12 @@ const char *vrvToolkit_renderToTimemap(Toolkit *tk)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_renderToPAE(Toolkit *tk)
+{
+    tk->SetCString(tk->RenderToPAE());
+    return tk->GetCString();
+}
+
 void vrvToolkit_redoLayout(Toolkit *tk)
 {
     tk->RedoLayout();
