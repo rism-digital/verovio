@@ -81,6 +81,9 @@ verovio.vrvToolkit.renderData = Module.cwrap( 'vrvToolkit_renderData', 'string',
 // char *renderToMidi(Toolkit *ic, const char *rendering_options)
 verovio.vrvToolkit.renderToMIDI = Module.cwrap( 'vrvToolkit_renderToMIDI', 'string', ['number', 'string'] );
 
+// char *renderToPAE(Toolkit *ic)
+verovio.vrvToolkit.renderToPAE = Module.cwrap( 'vrvToolkit_renderToPAE', 'string' );
+
 // char *renderToSvg(Toolkit *ic, int pageNo, const char *rendering_options)
 verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string', ['number', 'number', 'string'] );
 
@@ -263,6 +266,11 @@ verovio.toolkit.prototype.renderToMidi = function ( options )
 {
     console.warn( "Method renderToMidi is deprecated; use renderToMIDI instead" );
     return verovio.vrvToolkit.renderToMIDI( this.ptr, JSON.stringify( options ) );
+};
+
+verovio.toolkit.prototype.renderToPAE = function ()
+{
+    return verovio.vrvToolkit.renderToPAE( this.ptr );
 };
 
 verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )

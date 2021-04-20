@@ -173,6 +173,7 @@ public:
         m_directionBias = 0;
         m_overlapMargin = 0;
         m_doc = doc;
+        m_isOtherLayer = false;
     }
 
     Object *m_beam;
@@ -181,6 +182,7 @@ public:
     int m_directionBias;
     int m_overlapMargin;
     Doc *m_doc;
+    bool m_isOtherLayer;
 };
 
 //----------------------------------------------------------------------------

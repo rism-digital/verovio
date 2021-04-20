@@ -87,6 +87,11 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustBeams
+     */
+    virtual int AdjustBeams(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
     virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
