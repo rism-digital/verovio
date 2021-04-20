@@ -146,7 +146,12 @@ vrv::Point SceneGraphDeviceContext::GetLogicalOrigin()
     return m_logicalOrigin;
 }
 
-void SceneGraphDeviceContext::DrawSimpleBezierPath(vrv::Point bezier[])
+void SceneGraphDeviceContext::DrawQuadBezierPath(vrv::Point bezier[])
+{
+    qWarning() << "Warning:" << __FUNCTION__ << "not supported";
+}
+
+void SceneGraphDeviceContext::DrawCubicBezierPath(vrv::Point bezier[])
 {
     qWarning() << "Warning:" << __FUNCTION__ << "not supported";
 }
@@ -161,7 +166,7 @@ QRgb GetRgbFromPen(const vrv::Pen &pen)
     }
 }
 
-void SceneGraphDeviceContext::DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4])
+void SceneGraphDeviceContext::DrawCubicBezierPathFilled(vrv::Point bezier1[4], vrv::Point bezier2[4])
 {
     // Note: No support for vertex antialiasing. Use a top-level QQuickView with multisample antialiasing.
     // TODO: Add vertex antialiasing, refer to

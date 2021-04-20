@@ -86,8 +86,9 @@ public:
      * @name Drawing methods
      */
     ///@{
-    void DrawSimpleBezierPath(vrv::Point bezier[4]) override;
-    void DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4]) override;
+    void DrawQuadBezierPath(Point bezier[3]) override;
+    void DrawCubicBezierPath(Point bezier[4]) override;
+    void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
     void DrawCircle(int x, int y, int radius) override;
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
