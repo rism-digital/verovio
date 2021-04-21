@@ -903,19 +903,21 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), adjust) };
             params->m_measureAligner->AdjustProportionally(boundaries);
             // After adjusting, make sure that arpeggio does not overlap with elements from the previous alignment
-            auto [currentMin, currentMax] = GetAlignmentTopBottom();
-            Note *topNote = NULL;
-            Note *bottomNote = NULL;
-            std::get<1>(*iter)->GetDrawingTopBottomNotes(topNote, bottomNote);
-            if (topNote && bottomNote) {
-                const int arpegMax = topNote->GetDrawingY() + drawingUnit / 2;
-                const int arpegMin = bottomNote->GetDrawingY() - drawingUnit / 2;
-                // Make sure that there is vertical overlap, otherwise do not shift arpeggo
-                if (((currentMin < arpegMin) && (currentMax > arpegMin))
-                    || ((currentMax > arpegMax) && (currentMin < arpegMax))) {
-                    std::get<0>(*iter)->SetXRel(std::get<0>(*iter)->GetXRel() + overlap + drawingUnit / 2);
+            if (m_type == ALIGNMENT_CLEF) {
+                auto [currentMin, currentMax] = GetAlignmentTopBottom();
+                Note *topNote = NULL;
+                Note *bottomNote = NULL;
+                std::get<1>(*iter)->GetDrawingTopBottomNotes(topNote, bottomNote);
+                if (topNote && bottomNote) {
+                    const int arpegMax = topNote->GetDrawingY() + drawingUnit / 2;
+                    const int arpegMin = bottomNote->GetDrawingY() - drawingUnit / 2;
+                    // Make sure that there is vertical overlap, otherwise do not shift arpeggo
+                    if (((currentMin < arpegMin) && (currentMax > arpegMin))
+                        || ((currentMax > arpegMax) && (currentMin < arpegMax))) {
+                        std::get<0>(*iter)->SetXRel(std::get<0>(*iter)->GetXRel() + overlap + drawingUnit / 2);
+                    }
                 }
-            }       
+            }
         }
 
         // We can remove it from the list
