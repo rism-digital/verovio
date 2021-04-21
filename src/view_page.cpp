@@ -789,9 +789,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
     const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = m_doc->GetDrawingUnit(staffSize) * m_options->m_barLineSeparation.GetValue();
-    const int barSpace = barLineSeparation + barLineWidth;
-    const int barLinesGap = barLineThickWidth - barLineWidth;
-    int x2 = x + barSpace;
+    //const int barLinesGap = barLineThickWidth;
+    int x2 = x + barLineSeparation;
 
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(staffSize) * 16 / 13;
@@ -839,16 +838,16 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     }
     else if (barLine->GetForm() == BARRENDITION_rptend) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x + barSpace + barLineWidth, line, barLineThickWidth);
+        DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth / 2, line, barLineThickWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_rptboth) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x + barSpace + barLinesGap / 2, line, barLineThickWidth);
-        DrawVerticalSegmentedLine(dc, x + 2 * barSpace + barLinesGap, line, barLineWidth);
+        DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth / 2, line, barLineThickWidth);
+        DrawVerticalSegmentedLine(dc, x2 + barLineSeparation + barLineThickWidth, line, barLineWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_rptstart) {
         DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
-        DrawVerticalSegmentedLine(dc, x2 + (barLineThickWidth - barLineWidth) / 2, line, barLineWidth);
+        DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth / 2, line, barLineWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_invis) {
         barLine->SetEmptyBB();
@@ -887,7 +886,7 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     const int barLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_barLineWidth.GetValue();
     const int thickBarLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = m_doc->GetDrawingUnit(100) * m_options->m_barLineSeparation.GetValue();
-    const int xShift = thickBarLineWidth + dotSeparation + barLineSeparation + r;
+    const int xShift = thickBarLineWidth + dotSeparation + barLineSeparation + r + barLineWidth;
 
     const int x1 = x - (dotSeparation + r) - barLineWidth;
     const int x2 = x + xShift;
@@ -896,12 +895,12 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if (barLine->GetForm() == BARRENDITION_rptstart) {
-        DrawDot(dc, x2, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x2, yTop, staff->m_drawingStaffSize);
+        DrawDot(dc, x2 - thickBarLineWidth / 2 , yBottom, staff->m_drawingStaffSize);
+        DrawDot(dc, x2 - thickBarLineWidth / 2, yTop, staff->m_drawingStaffSize);
     }
     if (barLine->GetForm() == BARRENDITION_rptboth) {
-        DrawDot(dc, x2 + barLineSeparation + 2 * barLineWidth, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x2 + barLineSeparation + 2 * barLineWidth, yTop, staff->m_drawingStaffSize);
+        DrawDot(dc, x2 + barLineSeparation, yBottom, staff->m_drawingStaffSize);
+        DrawDot(dc, x2 + barLineSeparation, yTop, staff->m_drawingStaffSize);
     }
     if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_rptboth)) {
         DrawDot(dc, x1, yBottom, staff->m_drawingStaffSize);
