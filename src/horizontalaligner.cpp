@@ -626,6 +626,27 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
     return reference;
 }
 
+std::pair<int, int> Alignment::GetAlignmentTopBottom()
+{
+    int max = VRV_UNSET, min = VRV_UNSET;
+    // Iterate over each element in each alignment reference and find max/min Y value - these will serve as top/bottom
+    // values for the Alignment
+    for (auto child : *GetChildren()) {
+        AlignmentReference *reference = dynamic_cast<AlignmentReference *>(child);
+        for (auto element : *reference->GetChildren()) {
+            const int top = element->GetSelfTop();
+            if ((VRV_UNSET == max) || (top > max)) {
+                max = top;
+            }
+            const int bottom = element->GetSelfBottom();
+            if ((VRV_UNSET == min) || (bottom < min)) {
+                min = bottom;
+            }
+        }
+    }
+    return {min, max};
+}
+
 void Alignment::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
@@ -873,13 +894,30 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             continue;
         }
 
-        int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        const int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        const int drawingUnit = params->m_doc->GetDrawingUnit(100);
         // HARDCODED
-        overlap += params->m_doc->GetDrawingUnit(100) / 2 * 3;
+        int adjust = overlap + drawingUnit / 2 * 3;
         // LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
-        if (overlap > 0) {
-            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), overlap) };
+        if (adjust > 0) {
+            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), adjust) };
             params->m_measureAligner->AdjustProportionally(boundaries);
+            // After adjusting, make sure that arpeggio does not overlap with elements from the previous alignment
+            if (m_type == ALIGNMENT_CLEF) {
+                auto [currentMin, currentMax] = GetAlignmentTopBottom();
+                Note *topNote = NULL;
+                Note *bottomNote = NULL;
+                std::get<1>(*iter)->GetDrawingTopBottomNotes(topNote, bottomNote);
+                if (topNote && bottomNote) {
+                    const int arpegMax = topNote->GetDrawingY() + drawingUnit / 2;
+                    const int arpegMin = bottomNote->GetDrawingY() - drawingUnit / 2;
+                    // Make sure that there is vertical overlap, otherwise do not shift arpeggo
+                    if (((currentMin < arpegMin) && (currentMax > arpegMin))
+                        || ((currentMax > arpegMax) && (currentMin < arpegMax))) {
+                        std::get<0>(*iter)->SetXRel(std::get<0>(*iter)->GetXRel() + overlap + drawingUnit / 2);
+                    }
+                }
+            }
         }
 
         // We can remove it from the list
