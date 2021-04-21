@@ -80,7 +80,7 @@ public:
     /**
      * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
-    wchar_t GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place);
+    wchar_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
 
     //----------------//
     // Static methods //

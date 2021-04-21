@@ -71,7 +71,7 @@ void Flag::Reset()
     m_drawingNbFlags = 0;
 }
 
-wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir)
+wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir) const
 {
     if (stemDir == STEMDIRECTION_up) {
         switch (m_drawingNbFlags) {

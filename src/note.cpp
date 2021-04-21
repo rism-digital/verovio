@@ -434,7 +434,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
     return baseStem;
 }
 
-wchar_t Note::GetMensuralNoteheadGlyph()
+wchar_t Note::GetMensuralNoteheadGlyph() const
 {
     assert(this->IsMensuralDur());
 

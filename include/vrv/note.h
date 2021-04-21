@@ -189,7 +189,7 @@ public:
     /**
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */
-    wchar_t GetMensuralNoteheadGlyph();
+    wchar_t GetMensuralNoteheadGlyph() const;
 
     /**
      * Return a SMuFL code for the notehead
