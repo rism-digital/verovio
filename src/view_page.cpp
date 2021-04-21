@@ -854,7 +854,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     }
     else if (barLine->GetForm() == BARRENDITION_end) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineThickWidth);
+        DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth / 2, line, barLineThickWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_dbl) {
         // Narrow the bars a little bit - should be centered?
