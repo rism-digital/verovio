@@ -397,7 +397,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 {
     assert(staff);
-    
+
     if ((stemDir != STEMDIRECTION_down) && (stemDir != STEMDIRECTION_up)) {
         return 0;
     }
@@ -406,9 +406,8 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 
     int shortening = 0;
 
-    int unitToLine = (stemDir == STEMDIRECTION_up)
-        ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
-        : this->GetDrawingLoc();
+    int unitToLine = (stemDir == STEMDIRECTION_up) ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
+                                                   : this->GetDrawingLoc();
     if (unitToLine < 5) {
         switch (unitToLine) {
             case 4: shortening = 1; break;

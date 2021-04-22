@@ -187,13 +187,13 @@ public:
     double GetBottomMargin(const ClassId classId) const;
     double GetTopMargin(const ClassId classId) const;
     ///@}
-    
+
     /**
      * Get the default distance from the staff for the object
      * The distance is given in x * MEI UNIT
      */
     double GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
-    
+
     /**
      * Prepare the MIDI timemap for MIDI and timemap file export.
      * Run trough all the layers and fill the score-time and performance timing variables.
