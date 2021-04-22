@@ -777,6 +777,10 @@ Options::Options()
     m_adjustPageWidth.Init(false);
     this->Register(&m_adjustPageWidth, "adjustPageWidth", &m_general);
 
+    m_alternativeOctaveSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
+    m_alternativeOctaveSymbols.Init(false);
+    this->Register(&m_alternativeOctaveSymbols, "alternativeOctaveSymbols", &m_general);
+
     m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);

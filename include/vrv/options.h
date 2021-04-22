@@ -541,6 +541,7 @@ public:
 
     OptionBool m_adjustPageHeight;
     OptionBool m_adjustPageWidth;
+    OptionBool m_alternativeOctaveSymbols;
     OptionIntMap m_breaks;
     OptionDbl m_breaksSmartSb;
     OptionIntMap m_condense;
