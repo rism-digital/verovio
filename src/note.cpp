@@ -871,33 +871,52 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    // Nothing to do for notes that are not in a cluster
-    if (!this->m_cluster) return FUNCTOR_SIBLINGS;
+    bool mixedCue = false;
+    if (Chord *chord = this->IsChordTone(); chord != NULL) {
+        mixedCue = (chord->GetDrawingCueSize() != this->GetDrawingCueSize());
+    }
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    // Nothing to do for notes that are not in a cluster and without cue mixing
+    if (!m_cluster && !mixedCue) return FUNCTOR_SIBLINGS;
+
+    if (m_crossStaff) staff = m_crossStaff;
 
     int staffSize = staff->m_drawingStaffSize;
 
     int radius = this->GetDrawingRadius(params->m_doc);
+
+    // If chord consists partially of cue notes we may have to shift the noteheads
+    int cueShift = 0;
+    if (mixedCue && (this->GetDrawingStemDir() == STEMDIRECTION_up)) {
+        const double cueScaling = params->m_doc->GetCueScaling();
+        assert(cueScaling > 0.0);
+
+        if (this->GetDrawingCueSize()) {
+            cueShift = (1.0 / cueScaling - 1.0) * 2 * radius; // shift to the right
+        }
+        else {
+            cueShift = (cueScaling - 1.0) * 2 * radius; // shift to the left
+        }
+    }
 
     /************** notehead direction **************/
 
     bool flippedNotehead = false;
 
     // if the note is clustered, calculations are different
-    if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
+    if (m_cluster && this->GetDrawingStemDir() == STEMDIRECTION_down) {
         // stem down/even cluster = noteheads start on left (incorrect side)
-        if (this->m_cluster->size() % 2 == 0) {
-            flippedNotehead = (this->m_clusterPosition % 2 != 0);
+        if (m_cluster->size() % 2 == 0) {
+            flippedNotehead = (m_clusterPosition % 2 != 0);
         }
         // else they start on normal side
         else {
-            flippedNotehead = (this->m_clusterPosition % 2 == 0);
+            flippedNotehead = (m_clusterPosition % 2 == 0);
         }
     }
     else {
         // flipped noteheads start on normal side no matter what
-        flippedNotehead = (this->m_clusterPosition % 2 == 0);
+        flippedNotehead = (m_clusterPosition % 2 == 0);
     }
 
     // positions notehead
@@ -909,6 +928,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
             this->SetDrawingXRel(-2 * radius + params->m_doc->GetDrawingStemWidth(staffSize));
         }
     }
+    this->SetDrawingXRel(this->GetDrawingXRel() + cueShift);
 
     this->SetFlippedNotehead(flippedNotehead);
 

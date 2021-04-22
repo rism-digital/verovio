@@ -1586,7 +1586,12 @@ int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
 
 int Doc::GetCueSize(int value) const
 {
-    return value * this->m_options->m_graceFactor.GetValue();
+    return value * this->GetCueScaling();
+}
+
+double Doc::GetCueScaling() const
+{
+    return m_options->m_graceFactor.GetValue();
 }
 
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
