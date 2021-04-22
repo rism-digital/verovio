@@ -590,7 +590,7 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 
 void OptionJson::CopyTo(Option *option)
 {
-    OptionJson *child = dynamic_cast<OptionJson*>(option);
+    OptionJson *child = dynamic_cast<OptionJson *>(option);
     assert(child);
     *child = *this;
 }
@@ -602,7 +602,8 @@ void OptionJson::Init(JsonSource source, const std::string &defaultValue)
     m_isSet = false;
 }
 
-JsonSource OptionJson::GetSource() const {
+JsonSource OptionJson::GetSource() const
+{
     return m_source;
 }
 
@@ -623,19 +624,21 @@ bool OptionJson::SetValue(const std::string &value)
     return ok;
 }
 
-std::string OptionJson::GetStrValue() const {
+std::string OptionJson::GetStrValue() const
+{
     std::stringstream ss;
     ss << m_values;
     return ss.str();
 }
 
-std::string OptionJson::GetDefaultStrValue() const {
+std::string OptionJson::GetDefaultStrValue() const
+{
     std::stringstream ss;
     ss << m_defaultValues;
     return ss.str();
 }
 
-bool OptionJson::ReadJson(jsonxx::Object& output, const std::string &input) const
+bool OptionJson::ReadJson(jsonxx::Object &output, const std::string &input) const
 {
     bool ok = false;
     jsonxx::Object content;
@@ -651,7 +654,7 @@ bool OptionJson::ReadJson(jsonxx::Object& output, const std::string &input) cons
         ok = content.parse(in);
         in.close();
     }
-    
+
     if (ok) {
         output = content;
     }
@@ -662,7 +665,7 @@ bool OptionJson::HasValue(const std::vector<std::string> &jsonNodePath) const
 {
     const JsonPath valPath = StringPath2NodePath(m_values, jsonNodePath);
     const JsonPath defPath = StringPath2NodePath(m_defaultValues, jsonNodePath);
-    
+
     return (valPath.size() == jsonNodePath.size()) || (defPath.size() == jsonNodePath.size());
 }
 
@@ -1027,11 +1030,10 @@ Options::Options()
     m_dynamDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
 
-    m_engravingDefaults.SetInfo(
-        "Engraving defaults", "Json describing defaults for engraving SMuFL elements");
+    m_engravingDefaults.SetInfo("Engraving defaults", "Json describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(JsonSource::String, engravingDefaults);
     this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
-    
+
     m_engravingDefaultsFile.SetInfo(
         "Engraving defaults file", "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaultsFile.Init(JsonSource::FilePath, "");
@@ -1064,7 +1066,7 @@ Options::Options()
     m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
-    
+
     m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
     m_harmDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_harmDist, "harmDist", &m_generalLayout);
@@ -1545,15 +1547,15 @@ void Options::Sync()
 
     for (const auto &pair : engravingDefaults) {
         if (pair.second->IsSet()) continue;
-        
+
         const std::vector<std::string> jsonNodePath = { "engravingDefaults", pair.first };
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
             const double jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
-            pair.second->SetValueDbl(jsonValue * 2.0);      // convert from staff spaces to MEI units
+            pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
         }
         else if (m_engravingDefaults.HasValue(jsonNodePath)) {
             const double jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
-            pair.second->SetValueDbl(jsonValue * 2.0);      // convert from staff spaces to MEI units
+            pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
         }
     }
 }

@@ -430,7 +430,8 @@ enum class JsonSource { String, FilePath };
  */
 
 class OptionJson : public Option {
-    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value>>;
+    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
+
 public:
     /**
      * @name Constructor, destructor and initialization
@@ -441,20 +442,20 @@ public:
     void CopyTo(Option *option) override;
     void Init(JsonSource source, const std::string &defaultValue);
     ///@}
-    
+
     JsonSource GetSource() const;
-    
+
     /**
-     * @name Interface methods: accessing values as string
+     * Interface methods: accessing values as string
      */
     ///@{
     bool SetValue(const std::string &value) override;
     std::string GetStrValue() const override;
     std::string GetDefaultStrValue() const override;
     ///@}
-    
+
     /**
-     * @name Accessing values as json node path
+     * Accessing values as json node path
      */
     ///@{
     bool HasValue(const std::vector<std::string> &jsonNodePath) const;
@@ -464,12 +465,13 @@ public:
     ///@}
 protected:
     JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
-    
+
     /// Read json from string or file
-    bool ReadJson(jsonxx::Object& output, const std::string &input) const;
+    bool ReadJson(jsonxx::Object &output, const std::string &input) const;
+
 private:
     JsonSource m_source = JsonSource::String;
-    
+
     jsonxx::Object m_values;
     jsonxx::Object m_defaultValues;
 };
