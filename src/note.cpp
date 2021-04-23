@@ -397,7 +397,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 {
     assert(staff);
-    
+
     if ((stemDir != STEMDIRECTION_down) && (stemDir != STEMDIRECTION_up)) {
         return 0;
     }
@@ -406,9 +406,8 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 
     int shortening = 0;
 
-    int unitToLine = (stemDir == STEMDIRECTION_up)
-        ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
-        : this->GetDrawingLoc();
+    int unitToLine = (stemDir == STEMDIRECTION_up) ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
+                                                   : this->GetDrawingLoc();
     if (unitToLine < 5) {
         switch (unitToLine) {
             case 4: shortening = 1; break;
@@ -871,44 +870,68 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    // Nothing to do for notes that are not in a cluster
-    if (!this->m_cluster) return FUNCTOR_SIBLINGS;
+    bool mixedCue = false;
+    if (Chord *chord = this->IsChordTone(); chord != NULL) {
+        mixedCue = (chord->GetDrawingCueSize() != this->GetDrawingCueSize());
+    }
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    // Nothing to do for notes that are not in a cluster and without cue mixing
+    if (!m_cluster && !mixedCue) return FUNCTOR_SIBLINGS;
+
+    if (m_crossStaff) staff = m_crossStaff;
 
     int staffSize = staff->m_drawingStaffSize;
 
-    int radius = this->GetDrawingRadius(params->m_doc);
+    int diameter = 2 * this->GetDrawingRadius(params->m_doc);
+
+    // If chord consists partially of cue notes we may have to shift the noteheads
+    int cueShift = 0;
+    if (mixedCue && (this->GetDrawingStemDir() == STEMDIRECTION_up)) {
+        const double cueScaling = params->m_doc->GetCueScaling();
+        assert(cueScaling > 0.0);
+
+        if (this->GetDrawingCueSize()) {
+            // Note is cue and chord is not
+            cueShift = (1.0 / cueScaling - 1.0) * diameter; // shift to the right
+        }
+        else {
+            // Chord is cue and note is not
+            cueShift = (cueScaling - 1.0) * diameter; // shift to the left
+        }
+    }
 
     /************** notehead direction **************/
 
     bool flippedNotehead = false;
 
     // if the note is clustered, calculations are different
-    if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
-        // stem down/even cluster = noteheads start on left (incorrect side)
-        if (this->m_cluster->size() % 2 == 0) {
-            flippedNotehead = (this->m_clusterPosition % 2 != 0);
+    if (m_cluster) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
+            // stem down/even cluster = noteheads start on left (incorrect side)
+            if (m_cluster->size() % 2 == 0) {
+                flippedNotehead = (m_clusterPosition % 2 != 0);
+            }
+            // else they start on normal side
+            else {
+                flippedNotehead = (m_clusterPosition % 2 == 0);
+            }
         }
-        // else they start on normal side
         else {
-            flippedNotehead = (this->m_clusterPosition % 2 == 0);
+            // flipped noteheads start on normal side no matter what
+            flippedNotehead = (m_clusterPosition % 2 == 0);
         }
-    }
-    else {
-        // flipped noteheads start on normal side no matter what
-        flippedNotehead = (this->m_clusterPosition % 2 == 0);
     }
 
     // positions notehead
     if (flippedNotehead) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingXRel(2 * radius - params->m_doc->GetDrawingStemWidth(staffSize));
+            this->SetDrawingXRel(diameter - params->m_doc->GetDrawingStemWidth(staffSize));
         }
         else {
-            this->SetDrawingXRel(-2 * radius + params->m_doc->GetDrawingStemWidth(staffSize));
+            this->SetDrawingXRel(-diameter + params->m_doc->GetDrawingStemWidth(staffSize));
         }
     }
+    this->SetDrawingXRel(this->GetDrawingXRel() + cueShift);
 
     this->SetFlippedNotehead(flippedNotehead);
 

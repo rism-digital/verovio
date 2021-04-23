@@ -1579,7 +1579,12 @@ int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
 
 int Doc::GetCueSize(int value) const
 {
-    return value * this->m_options->m_graceFactor.GetValue();
+    return value * this->GetCueScaling();
+}
+
+double Doc::GetCueScaling() const
+{
+    return m_options->m_graceFactor.GetValue();
 }
 
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
@@ -1661,18 +1666,18 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
         if (classId == DYNAM) {
             distance = m_options->m_dynamDist.GetDefault();
-            
+
             // Inspect the scoreDef attribute
             if (m_mdivScoreDef.HasDynamDist()) {
                 distance = m_mdivScoreDef.GetDynamDist();
             }
-            
+
             // Inspect the staffDef attributes
-            const StaffDef* staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
+            const StaffDef *staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
             if (staffDef != NULL && staffDef->HasDynamDist()) {
                 distance = staffDef->GetDynamDist();
             }
-        
+
             // Apply CLI option if set
             if (m_options->m_dynamDist.IsSet()) {
                 distance = m_options->m_dynamDist.GetValue();
@@ -1680,18 +1685,18 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
         }
         else if (classId == HARM) {
             distance = m_options->m_harmDist.GetDefault();
-            
+
             // Inspect the scoreDef attribute
             if (m_mdivScoreDef.HasHarmDist()) {
                 distance = m_mdivScoreDef.GetHarmDist();
             }
-            
+
             // Inspect the staffDef attributes
-            const StaffDef* staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
+            const StaffDef *staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
             if (staffDef != NULL && staffDef->HasHarmDist()) {
                 distance = staffDef->GetHarmDist();
             }
-            
+
             // Apply CLI option if set
             if (m_options->m_harmDist.IsSet()) {
                 distance = m_options->m_harmDist.GetValue();
