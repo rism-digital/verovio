@@ -6,6 +6,8 @@
 * Improvement of the the positioning of mRest (@eNote-GmbH)
 * Improvement of alignment for dots in different voices (@eNote-GmbH)
 * Improvement of rendering of ties that collide with dots (@eNote-GmbH)
+* Improvement of barLine positioning (@eNote-GmbH)
+* Method renderToPAE added to the JS toolkit (@davidrizo)
 * Preliminary support for tablature (experimental work)
 * Option --preserve-analytical-markup to preserve analytical markup (default is now off) (@rettinghaus)
 * Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
