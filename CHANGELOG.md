@@ -2,6 +2,7 @@
 
 ## [unreleased]
 * Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
+* Support for chords with cuesize notes (@eNote-GmbH)
 * Improved horizontal layout with dots and flags (@eNote-GmbH)
 * Improvement of the the positioning of mRest (@eNote-GmbH)
 * Improvement of alignment for dots in different voices (@eNote-GmbH)
