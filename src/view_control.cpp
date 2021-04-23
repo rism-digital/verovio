@@ -709,18 +709,53 @@ void View::DrawOctave(
             }
         }
 
-        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
-        dc->SetBrush(m_currentColour, AxSOLID);
+        // Add additional symbols for octave if corresponding option is provided. In that case, line shifted be shifted
+        // further to the right to account for the width of the symbol
+        if (m_doc->GetOptions()->m_alternativeOctaveSymbols.GetValue()) {
+            std::wstring octaveSymbol;
+            (disPlace == STAFFREL_basic_above) ? octaveSymbol.append(L"va") : octaveSymbol.append(L"vb");
 
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
-        // draw the ending vertical line if not the end of the system
-        if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
-            dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
-                ToDeviceContextY(y2 + lineWidth / 2));
+            Text text;
+            text.SetParent(octave);
+            text.SetText(octaveSymbol);
+
+            FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+            currentFont.SetStyle(FONTSTYLE_italic);
+            currentFont.SetWeight(FONTWEIGHT_bold);
+            currentFont.SetPointSize(0.75 * currentFont.GetPointSize());
+
+            dc->SetFont(&currentFont);
+            // Get extend for the additional octave symbol to adjust positioning of the octave line
+            TextExtend octaveSymbolExtend;
+            dc->GetTextExtent(octaveSymbol, &octaveSymbolExtend, false);
+            TextDrawingParams params;
+            params.m_x = x1;
+            params.m_y = yCode;
+            // shift symbol up to align with top side of the octave symbol and line
+            if (disPlace == STAFFREL_basic_above) params.m_y += extend.m_height - octaveSymbolExtend.m_height;
+
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
+            DrawTextElement(dc, &text, params);
+            dc->EndText();
+            dc->ResetFont();
+            // adjust starting position of the line based on the width of additional octave symbol
+            x1 += octaveSymbolExtend.m_width;
         }
 
-        dc->ResetPen();
-        dc->ResetBrush();
+        if (x1 < x2) {
+            dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+            dc->SetBrush(m_currentColour, AxSOLID);
+
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+            // draw the ending vertical line if not the end of the system
+            if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
+                dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
+                    ToDeviceContextY(y2 + lineWidth / 2));
+            }
+
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
     }
 
     if (graphic)
