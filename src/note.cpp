@@ -882,7 +882,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
     int staffSize = staff->m_drawingStaffSize;
 
-    int radius = this->GetDrawingRadius(params->m_doc);
+    int diameter = 2 * this->GetDrawingRadius(params->m_doc);
 
     // If chord consists partially of cue notes we may have to shift the noteheads
     int cueShift = 0;
@@ -891,10 +891,12 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
         assert(cueScaling > 0.0);
 
         if (this->GetDrawingCueSize()) {
-            cueShift = (1.0 / cueScaling - 1.0) * 2 * radius; // shift to the right
+            // Note is cue and chord is not
+            cueShift = (1.0 / cueScaling - 1.0) * diameter; // shift to the right
         }
         else {
-            cueShift = (cueScaling - 1.0) * 2 * radius; // shift to the left
+            // Chord is cue and note is not
+            cueShift = (cueScaling - 1.0) * diameter; // shift to the left
         }
     }
 
@@ -903,28 +905,30 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     bool flippedNotehead = false;
 
     // if the note is clustered, calculations are different
-    if (m_cluster && this->GetDrawingStemDir() == STEMDIRECTION_down) {
-        // stem down/even cluster = noteheads start on left (incorrect side)
-        if (m_cluster->size() % 2 == 0) {
-            flippedNotehead = (m_clusterPosition % 2 != 0);
+    if (m_cluster) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
+            // stem down/even cluster = noteheads start on left (incorrect side)
+            if (m_cluster->size() % 2 == 0) {
+                flippedNotehead = (m_clusterPosition % 2 != 0);
+            }
+            // else they start on normal side
+            else {
+                flippedNotehead = (m_clusterPosition % 2 == 0);
+            }
         }
-        // else they start on normal side
         else {
+            // flipped noteheads start on normal side no matter what
             flippedNotehead = (m_clusterPosition % 2 == 0);
         }
-    }
-    else {
-        // flipped noteheads start on normal side no matter what
-        flippedNotehead = (m_clusterPosition % 2 == 0);
     }
 
     // positions notehead
     if (flippedNotehead) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingXRel(2 * radius - params->m_doc->GetDrawingStemWidth(staffSize));
+            this->SetDrawingXRel(diameter - params->m_doc->GetDrawingStemWidth(staffSize));
         }
         else {
-            this->SetDrawingXRel(-2 * radius + params->m_doc->GetDrawingStemWidth(staffSize));
+            this->SetDrawingXRel(-diameter + params->m_doc->GetDrawingStemWidth(staffSize));
         }
     }
     this->SetDrawingXRel(this->GetDrawingXRel() + cueShift);
