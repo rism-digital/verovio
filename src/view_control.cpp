@@ -709,7 +709,7 @@ void View::DrawOctave(
             }
         }
 
-        // Add additional symbols for octave if corresponding option is provided. In that case, line shifted be shifted
+        // Add additional symbols for octave if corresponding option is provided. In that case, line should be shifted
         // further to the right to account for the width of the symbol
         if (m_doc->GetOptions()->m_alternativeOctaveSymbols.GetValue()) {
             std::wstring octaveSymbol;
