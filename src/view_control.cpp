@@ -2304,7 +2304,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == measure) x1 += measure->GetLeftBarLineXRel();
-        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
+        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel()
+            + endingEndBoundary->GetMeasure()->GetRightBarLineWidth(m_doc);
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
@@ -2315,7 +2316,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel()
+            + measure->GetRightBarLineWidth(m_doc);
         spanningType = SPANNING_START;
     }
     // We are in the system where the ending ends - draw it from the beginning of the system
@@ -2325,7 +2327,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
+        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel()
+            + endingEndBoundary->GetMeasure()->GetRightBarLineWidth(m_doc);
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -2339,7 +2342,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         // We need the last measure of the system for x2
         measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel() + measure->GetRightBarLineWidth(m_doc);
         spanningType = SPANNING_MIDDLE;
     }
 
