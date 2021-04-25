@@ -221,7 +221,7 @@ enum ClassId {
     SYL,
     SYLLABLE,
     TABGRP,
-    TABRHYTHM,
+    TABDURSYM,
     TIMESTAMP_ATTR,
     TUPLET,
     TUPLET_BRACKET,
