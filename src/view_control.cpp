@@ -648,22 +648,41 @@ void View::DrawOctave(
     else
         dc->StartGraphic(octave, "", octave->GetUuid(), false);
 
+    const bool altSymbols = m_doc->GetOptions()->m_alternativeOctaveSymbols.GetValue();
     int code = SMUFL_E511_ottavaAlta;
     if (disPlace == STAFFREL_basic_above) {
         switch (dis) {
             // here we could use other glyphs depending on the style
-            case OCTAVE_DIS_8: code = SMUFL_E510_ottava; break;
-            case OCTAVE_DIS_15: code = SMUFL_E514_quindicesima; break;
-            case OCTAVE_DIS_22: code = SMUFL_E517_ventiduesima; break;
+            case OCTAVE_DIS_8: {
+                code = altSymbols ? SMUFL_E511_ottavaAlta : SMUFL_E510_ottava;
+                break;
+            }
+            case OCTAVE_DIS_15: {
+                code = altSymbols ? SMUFL_E515_quindicesimaAlta : SMUFL_E514_quindicesima;
+                break;
+            }
+            case OCTAVE_DIS_22: {
+                code = altSymbols ? SMUFL_E518_ventiduesimaAlta : SMUFL_E517_ventiduesima;
+                break;
+            }
             default: break;
         }
     }
     else {
         switch (dis) {
             // ditto
-            case OCTAVE_DIS_8: code = SMUFL_E510_ottava; break;
-            case OCTAVE_DIS_15: code = SMUFL_E514_quindicesima; break;
-            case OCTAVE_DIS_22: code = SMUFL_E517_ventiduesima; break;
+            case OCTAVE_DIS_8: {
+                code = altSymbols ? SMUFL_E513_ottavaBassaBa : SMUFL_E510_ottava;
+                break;
+            }
+            case OCTAVE_DIS_15: {
+                code = altSymbols ? SMUFL_E516_quindicesimaBassa : SMUFL_E514_quindicesima;
+                break;
+            }
+            case OCTAVE_DIS_22: {
+                code = altSymbols ? SMUFL_E519_ventiduesimaBassa : SMUFL_E517_ventiduesima;
+                break;
+            }
             default: break;
         }
     }
@@ -695,51 +714,20 @@ void View::DrawOctave(
         TextExtend extend;
         dc->GetSmuflTextExtent(str, &extend);
         const int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
-        DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
+        const int octaveX = altSymbols ? x1 - extend.m_width / 2 : x1 - extend.m_width;
+        DrawSmuflCode(dc, octaveX, yCode, code, staff->m_drawingStaffSize, false);
         dc->ResetFont();
 
         if (octave->GetLendsym() != LINESTARTENDSYMBOL_none)
             y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
         // adjust is to avoid the figure to touch the line
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        if (altSymbols) x1 += extend.m_width / 2;
 
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
                 extend.m_height *= 0;
             }
-        }
-
-        // Add additional symbols for octave if corresponding option is provided. In that case, line should be shifted
-        // further to the right to account for the width of the symbol
-        if (m_doc->GetOptions()->m_alternativeOctaveSymbols.GetValue()) {
-            std::wstring octaveSymbol;
-            (disPlace == STAFFREL_basic_above) ? octaveSymbol.append(L"va") : octaveSymbol.append(L"vb");
-
-            Text text;
-            text.SetParent(octave);
-            text.SetText(octaveSymbol);
-
-            FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-            currentFont.SetStyle(FONTSTYLE_italic);
-            currentFont.SetWeight(FONTWEIGHT_bold);
-            currentFont.SetPointSize(0.75 * currentFont.GetPointSize());
-
-            dc->SetFont(&currentFont);
-            // Get extend for the additional octave symbol to adjust positioning of the octave line
-            TextExtend octaveSymbolExtend;
-            dc->GetTextExtent(octaveSymbol, &octaveSymbolExtend, false);
-            TextDrawingParams params;
-            params.m_x = x1;
-            params.m_y = yCode;
-            // shift symbol up to align with top side of the octave symbol and line
-            if (disPlace == STAFFREL_basic_above) params.m_y += extend.m_height - octaveSymbolExtend.m_height;
-
-            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
-            DrawTextElement(dc, &text, params);
-            dc->EndText();
-            dc->ResetFont();
-            // adjust starting position of the line based on the width of additional octave symbol
-            x1 += octaveSymbolExtend.m_width;
         }
 
         if (x1 < x2) {
