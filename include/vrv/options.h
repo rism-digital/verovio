@@ -59,6 +59,13 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
+enum option_MULTIRESTSTYLE {
+    MULTIRESTSTYLE_auto = 0,
+    MULTIRESTSTYLE_default,
+    MULTIRESTSTYLE_block,
+    MULTIRESTSTYLE_symbols
+};
+
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -117,6 +124,7 @@ public:
     static std::map<int, std::string> s_condense;
     static std::map<int, std::string> s_footer;
     static std::map<int, std::string> s_header;
+    static std::map<int, std::string> s_multiRestStyle;
     static std::map<int, std::string> s_systemDivider;
 
 protected:
@@ -616,6 +624,7 @@ public:
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionInt m_mnumInterval;
+    OptionIntMap m_multiRestStyle;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
