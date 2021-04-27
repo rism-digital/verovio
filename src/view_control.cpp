@@ -628,6 +628,8 @@ void View::DrawOctave(
 
     int y1 = octave->GetDrawingY();
     int y2 = y1;
+    int lineShift = 0;
+    int dotShift = 0;
 
     /********** adjust the start / end positions ***********/
 
@@ -672,7 +674,7 @@ void View::DrawOctave(
         switch (dis) {
             // ditto
             case OCTAVE_DIS_8: {
-                code = altSymbols ? SMUFL_E513_ottavaBassaBa : SMUFL_E510_ottava;
+                code = altSymbols ? SMUFL_E512_ottavaBassa : SMUFL_E510_ottava;
                 break;
             }
             case OCTAVE_DIS_15: {
@@ -688,6 +690,34 @@ void View::DrawOctave(
     }
     std::wstring str;
     str.push_back(code);
+
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    if (octave->HasLwidth()) {
+        if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
+            if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
+                lineWidth *= LINEWIDTHTERM_factor_narrow;
+            }
+            else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
+                lineWidth *= LINEWIDTHTERM_factor_medium;
+            }
+            else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
+                lineWidth *= LINEWIDTHTERM_factor_wide;
+            }
+        }
+        else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
+            if (octave->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
+                lineWidth = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+        }
+    }
+
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+    TextExtend extend;
+    dc->GetSmuflTextExtent(str, &extend);
+    const int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
+    const int octaveX = altSymbols ? x1 - extend.m_width / 2 : x1 - extend.m_width;
+    DrawSmuflCode(dc, octaveX, yCode, code, staff->m_drawingStaffSize, false);
+    dc->ResetFont();
 
     if (octave->GetExtender() != BOOLEAN_false) {
         int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -710,39 +740,41 @@ void View::DrawOctave(
                 }
             }
         }
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-        TextExtend extend;
-        dc->GetSmuflTextExtent(str, &extend);
-        const int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
-        const int octaveX = altSymbols ? x1 - extend.m_width / 2 : x1 - extend.m_width;
-        DrawSmuflCode(dc, octaveX, yCode, code, staff->m_drawingStaffSize, false);
-        dc->ResetFont();
 
-        if (octave->GetLendsym() != LINESTARTENDSYMBOL_none)
-            y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
         // adjust is to avoid the figure to touch the line
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         if (altSymbols) x1 += extend.m_width / 2;
+        y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+        lineShift = (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
 
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+        dc->SetBrush(m_currentColour, AxSOLID);
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
-                extend.m_height *= 0;
+                dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0);
+                dc->SetBrush(m_currentColour, AxSOLID);
+            }
+            else if (octave->GetLform() == LINEFORM_dotted) {
+                dc->SetPen(m_currentColour, lineWidth, AxDOT, lineWidth, 1);
+                dc->SetBrush(m_currentColour, AxSOLID);
+                dotShift = lineShift;
             }
         }
 
-        if (x1 < x2) {
-            dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
-            dc->SetBrush(m_currentColour, AxSOLID);
+        if (x1 > x2) {
+            // make sure we have a minimal extender line
+            x2 = x1 + extend.m_height / 4;
+        }
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1 + lineShift), ToDeviceContextX(x2),
+            ToDeviceContextY(y1 + lineShift));
 
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+        if (octave->GetLendsym() != LINESTARTENDSYMBOL_none) {
+            x2 += lineWidth / 2;
             // draw the ending vertical line if not the end of the system
             if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
-                dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
-                    ToDeviceContextY(y2 + lineWidth / 2));
+                dc->DrawLine(
+                    ToDeviceContextX(x2), ToDeviceContextY(y1 + dotShift), ToDeviceContextX(x2), ToDeviceContextY(y2));
             }
-
-            dc->ResetPen();
-            dc->ResetBrush();
         }
     }
 
@@ -1123,9 +1155,8 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         // nothing to adjust
     }
 
-    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instantiate a temporary
-    // object
-    // in order not to reset the Syl bounding box.
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instantiate a
+    // temporary object in order not to reset the Syl bounding box.
     F fConnector;
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
@@ -1195,9 +1226,8 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
-    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instantiate a temporary
-    // object
-    // in order not to reset the Syl bounding box.
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instantiate a
+    // temporary object in order not to reset the Syl bounding box.
     Syl sylConnector;
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
