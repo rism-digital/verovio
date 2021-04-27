@@ -193,6 +193,12 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(SYLLABLE)) {
         DrawSyllable(dc, element, layer, staff, measure);
     }
+    else if (element->Is(TABGRP)) {
+        DrawTabGrp(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(TABRHYTHM)) {
+        DrawTabRhythm(dc, element, layer, staff, measure);
+    }
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
@@ -615,7 +621,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     double clefSizeFactor = 1.0;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
         if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
-            // HARDCODED
             clefSizeFactor = m_options->m_clefChangeFactor.GetValue();
             // x -= m_doc->GetGlyphWidth(sym, clefSizeFactor * staff->m_drawingStaffSize, false) * 1.35;
         }
@@ -711,6 +716,10 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         fi->GetZone()->SetLrx(x + noteWidth);
         fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
     }
+
+    /************ Draw children (accidentals, etc) ************/
+    // Drawing the children should be done before ending the graphic. Otherwise the SVG tree will not match the MEI one
+    DrawLayerChildren(dc, custos, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -1271,6 +1280,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawMensuralNote(dc, element, layer, staff, measure);
         return;
     }
+    if (note->IsTabGrpNote()) {
+        DrawTabNote(dc, element, layer, staff, measure);
+        return;
+    }
 
     if (note->m_crossStaff) staff = note->m_crossStaff;
 
@@ -1383,7 +1396,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     /************ Draw children (dots) ************/
-
     DrawLayerChildren(dc, rest, layer, staff, measure);
 }
 

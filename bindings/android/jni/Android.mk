@@ -22,6 +22,7 @@ LOCAL_SRC_FILES := \
 	$(ROOT_PATH)/libmei/atts_gestural.cpp \
 	$(ROOT_PATH)/libmei/atts_externalsymbols.cpp \
 	$(ROOT_PATH)/libmei/atts_facsimile.cpp \
+	$(ROOT_PATH)/libmei/atts_frettab.cpp \
 	$(ROOT_PATH)/libmei/atts_mei.cpp \
 	$(ROOT_PATH)/libmei/atts_mensural.cpp \
 	$(ROOT_PATH)/libmei/atts_midi.cpp \

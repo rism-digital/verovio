@@ -59,8 +59,6 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
-enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
-
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -119,7 +117,6 @@ public:
     static std::map<int, std::string> s_condense;
     static std::map<int, std::string> s_footer;
     static std::map<int, std::string> s_header;
-    static std::map<int, std::string> s_measureNumber;
     static std::map<int, std::string> s_systemDivider;
 
 protected:
@@ -528,7 +525,7 @@ public:
     OptionBool m_standardOutput;
     OptionBool m_help;
     OptionBool m_allPpages;
-    OptionString m_inputFormat;
+    OptionString m_inputFrom;
     OptionString m_outfile;
     OptionInt m_page;
     OptionString m_resourcePath;
@@ -571,6 +568,7 @@ public:
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_shrinkToFit;
     OptionBool m_svgBoundingBoxes;
@@ -594,6 +592,7 @@ public:
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionDbl m_bracketThickness;
+    OptionDbl m_dynamDist;
     OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
     OptionString m_font;
@@ -602,6 +601,7 @@ public:
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
     OptionDbl m_hairpinThickness;
+    OptionDbl m_harmDist;
     OptionDbl m_justificationBraceGroup;
     OptionDbl m_justificationBracketGroup;
     OptionDbl m_justificationStaff;
@@ -615,7 +615,7 @@ public:
     OptionDbl m_lyricTopMinMargin;
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
-    OptionIntMap m_measureNumber;
+    OptionInt m_mnumInterval;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
@@ -687,6 +687,7 @@ public:
     OptionDbl m_leftMarginNote;
     OptionDbl m_leftMarginRest;
     OptionDbl m_leftMarginRightBarLine;
+    OptionDbl m_leftMarginTabRhythm;
     //
     OptionDbl m_rightMarginAccid;
     OptionDbl m_rightMarginBarLine;
@@ -704,6 +705,7 @@ public:
     OptionDbl m_rightMarginNote;
     OptionDbl m_rightMarginRest;
     OptionDbl m_rightMarginRightBarLine;
+    OptionDbl m_rightMarginTabRhythm;
     //
     OptionDbl m_topMarginArtic;
     OptionDbl m_topMarginHarm;

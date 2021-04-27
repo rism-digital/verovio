@@ -164,6 +164,12 @@ const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_renderToPAE(Toolkit *tk)
+{
+    tk->SetCString(tk->RenderToPAE());
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_renderToSVG(Toolkit *tk, int page_no, const char *c_options)
 {
     tk->SetCString(tk->RenderToSVG(page_no, false));

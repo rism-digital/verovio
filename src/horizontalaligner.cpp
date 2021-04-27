@@ -17,6 +17,7 @@
 #include "arpeg.h"
 #include "comparison.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "floatingobject.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -625,6 +626,27 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
     return reference;
 }
 
+std::pair<int, int> Alignment::GetAlignmentTopBottom()
+{
+    int max = VRV_UNSET, min = VRV_UNSET;
+    // Iterate over each element in each alignment reference and find max/min Y value - these will serve as top/bottom
+    // values for the Alignment
+    for (auto child : *GetChildren()) {
+        AlignmentReference *reference = dynamic_cast<AlignmentReference *>(child);
+        for (auto element : *reference->GetChildren()) {
+            const int top = element->GetSelfTop();
+            if ((VRV_UNSET == max) || (top > max)) {
+                max = top;
+            }
+            const int bottom = element->GetSelfBottom();
+            if ((VRV_UNSET == min) || (bottom < min)) {
+                min = bottom;
+            }
+        }
+    }
+    return {min, max};
+}
+
 void Alignment::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
@@ -721,6 +743,20 @@ void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int s
     for (auto child : *this->GetChildren()) {
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids);
     }
+}
+
+bool AlignmentReference::HasCrossStaffElements()
+{
+    ListOfObjects children;
+    ClassIdComparison classId(LAYER_ELEMENT);
+    FindAllDescendantByComparison(&children, &classId);
+
+    for (auto child : children) {
+        LayerElement *layerElement = vrv_cast<LayerElement *>(child);
+        if (layerElement && layerElement->m_crossStaff) return true;
+    }
+
+    return false;
 }
 
 //----------------------------------------------------------------------------
@@ -858,13 +894,30 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             continue;
         }
 
-        int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        const int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        const int drawingUnit = params->m_doc->GetDrawingUnit(100);
         // HARDCODED
-        overlap += params->m_doc->GetDrawingUnit(100) / 2 * 3;
+        int adjust = overlap + drawingUnit / 2 * 3;
         // LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
-        if (overlap > 0) {
-            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), overlap) };
+        if (adjust > 0) {
+            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), adjust) };
             params->m_measureAligner->AdjustProportionally(boundaries);
+            // After adjusting, make sure that arpeggio does not overlap with elements from the previous alignment
+            if (m_type == ALIGNMENT_CLEF) {
+                auto [currentMin, currentMax] = GetAlignmentTopBottom();
+                Note *topNote = NULL;
+                Note *bottomNote = NULL;
+                std::get<1>(*iter)->GetDrawingTopBottomNotes(topNote, bottomNote);
+                if (topNote && bottomNote) {
+                    const int arpegMax = topNote->GetDrawingY() + drawingUnit / 2;
+                    const int arpegMin = bottomNote->GetDrawingY() - drawingUnit / 2;
+                    // Make sure that there is vertical overlap, otherwise do not shift arpeggo
+                    if (((currentMin < arpegMin) && (currentMax > arpegMin))
+                        || ((currentMax > arpegMax) && (currentMin < arpegMax))) {
+                        std::get<0>(*iter)->SetXRel(std::get<0>(*iter)->GetXRel() + overlap + drawingUnit / 2);
+                    }
+                }
+            }
         }
 
         // We can remove it from the list
@@ -1001,6 +1054,31 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
     // Eventually we might want to have a more sophisticated pruning algorithm
     if (params->m_upcomingBoundingBoxes.empty()) return FUNCTOR_CONTINUE;
 
+    // Handle additional offsets that can happen when we have overlapping dots/flags. This should happen only for
+    // default alignments, so other ones should be ignored. If there are at least one bounding box that overlaps with
+    // dot/flag from the previous alignment - we need to consider additional offset for those elements. In such case,
+    // all current elements should have their XRel adjusted (as they would normally have) and increase minXPosition by
+    // the dot/flag offset
+    if (params->m_previousAlignment.m_overlappingBB && params->m_previousAlignment.m_alignment
+        && (params->m_previousAlignment.m_alignment->GetType() == ALIGNMENT_DEFAULT)) {
+        auto it = std::find_if(
+            params->m_upcomingBoundingBoxes.begin(), params->m_upcomingBoundingBoxes.end(), [params](BoundingBox *bb) {
+                if (params->m_previousAlignment.m_overlappingBB == bb) return false;
+                // check if elements actually overlap
+                return (bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
+                    && bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB));
+            });
+        if (it != params->m_upcomingBoundingBoxes.end()) {
+            params->m_currentAlignment.m_alignment->SetXRel(
+                params->m_currentAlignment.m_alignment->GetXRel() + params->m_previousAlignment.m_offset);
+            params->m_minPos += params->m_previousAlignment.m_offset;
+            params->m_cumulatedXShift += params->m_previousAlignment.m_offset;
+        }
+    }
+    params->m_previousAlignment = params->m_currentAlignment;
+    // Reset current alignment
+    params->m_currentAlignment.Reset();
+
     params->m_boundingBoxes = params->m_upcomingBoundingBoxes;
     params->m_upcomingBoundingBoxes.clear();
 
@@ -1016,6 +1094,61 @@ int Alignment::AdjustAccidX(FunctorParams *functorParams)
     for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
         iter->second->Process(params->m_functor, functorParams);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
+{
+    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
+    assert(params);
+
+    // process dots only if there is at least 1 dot (vertical group) in the alignment
+    if (!params->m_elements.empty() && !params->m_dots.empty()) {
+        // multimap of overlapping dots with other elements
+        std::multimap<LayerElement*, LayerElement*> overlapElements;
+        
+        // Try to find which dots can be groupped together. To achieve this, find layer elements that collide with these
+        // dots. Then find if their parents (note/chord) have dots - if they do then we can group these dots together,
+        // otherwise they should be kept separate
+        for (auto dot : params->m_dots) {
+            for (LayerElement *element : params->m_elements) {
+                if (dot->HorizontalSelfOverlap(element, 30) && dot->VerticalSelfOverlap(element, 60)) {
+                    if (element->Is({ CHORD, NOTE })) {
+                        if (dynamic_cast<AttAugmentDots *>(element)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, element);
+                    }
+                    else if (Object *chord = element->GetFirstAncestor(CHORD, UNLIMITED_DEPTH); chord) {
+                        if (vrv_cast<Chord *>(chord)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(chord));
+                    } 
+                    else if (Object *note = element->GetFirstAncestor(NOTE, UNLIMITED_DEPTH); note) {
+                        if (vrv_cast<Note *>(note)->GetDots() <= 0) continue;
+                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(note));
+                    }
+                }
+            }
+        }
+
+        // if at least one overlapping element has been found, make sure to adjust relative positioning of the dots in
+        // the group to the rightmost one
+        if (!overlapElements.empty()) {
+            for (auto dot : params->m_dots) {
+                auto pair = overlapElements.equal_range(dot);
+                int max = 0;
+                for (auto it = pair.first; it != pair.second; ++it) {
+                    const int diff
+                        = it->second->GetDrawingX() + it->first->GetDrawingXRel() - it->first->GetDrawingX();
+                    if (diff > max) max = diff;
+                }
+                if (max) dot->SetDrawingXRel(dot->GetDrawingXRel() + max);
+                vrv_cast<Dots *>(dot)->IsAdjusted(true);
+            }
+        }
+    }
+    
+    params->m_elements.clear();
+    params->m_dots.clear();
 
     return FUNCTOR_CONTINUE;
 }

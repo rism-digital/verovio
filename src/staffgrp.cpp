@@ -27,6 +27,8 @@ namespace vrv {
 // StaffGrp
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<StaffGrp> s_factory("staffGrp", STAFFGRP);
+
 StaffGrp::StaffGrp()
     : Object("staffgrp-")
     , ObjectListInterface()

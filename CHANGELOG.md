@@ -2,6 +2,17 @@
 
 ## [unreleased]
 * Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
+* Support for chords with cuesize notes (@eNote-GmbH)
+* Improved horizontal layout with dots and flags (@eNote-GmbH)
+* Improvement of the the positioning of mRest (@eNote-GmbH)
+* Improvement of alignment for dots in different voices (@eNote-GmbH)
+* Improvement of rendering of ties that collide with dots (@eNote-GmbH)
+* Improvement of barLine positioning (@eNote-GmbH)
+* Method renderToPAE added to the JS toolkit (@davidrizo)
+* Preliminary support for tablature (experimental work)
+* Option --preserve-analytical-markup to preserve analytical markup (default is now off) (@rettinghaus)
+* Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
+* Option --harm-dist to control the minimal distance of harm (@DavidBauer1984)
 
 ## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
@@ -16,7 +27,7 @@
 * Option --svg-format-raw for raw SVG output without indentation and line breaks
 * New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
 * Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
-* Fixes in the MusicXML importer (@eNote-GmBH)
+* Fixes in the MusicXML importer (@Enote-GmbH)
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)

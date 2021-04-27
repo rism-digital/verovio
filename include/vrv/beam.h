@@ -76,7 +76,7 @@ private:
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
-    void CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place);
 
     // Helper to calculate relative position of the beam to for each of the coordinates
     void CalcMixedBeamPlace(Staff *staff);
@@ -183,8 +183,8 @@ protected:
     virtual void FilterList(ArrayOfObjects *childList);
 
     /**
-     * Helper function to calculate overlap with layer elements that 
-     * are placed within the duration of the beam 
+     * Helper function to calculate overlap with layer elements that
+     * are placed within the duration of the beam
      */
     int CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2);
 

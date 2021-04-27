@@ -196,6 +196,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "rest256th", SMUFL_E4EB_rest256th },
     { "rest512th", SMUFL_E4EC_rest512th },
     { "rest1024th", SMUFL_E4ED_rest1024th },
+    { "restQuarterOld", SMUFL_E4F2_restQuarterOld },
+    { "restQuarterZ", SMUFL_E4F6_restQuarterZ },
     { "repeat1Bar", SMUFL_E500_repeat1Bar },
     { "repeat2Bars", SMUFL_E501_repeat2Bars },
     { "repeat4Bars", SMUFL_E502_repeat4Bars },
@@ -247,8 +249,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "ornamentTurnSlash", SMUFL_E569_ornamentTurnSlash },
     { "ornamentTurnUp", SMUFL_E56A_ornamentTurnUp },
     { "ornamentTurnUpS", SMUFL_E56B_ornamentTurnUpS },
-    { "ornamentMordent", SMUFL_E56C_ornamentMordent },
-    { "ornamentMordentInverted", SMUFL_E56D_ornamentMordentInverted },
+    { "ornamentShortTrill", SMUFL_E56C_ornamentShortTrill },
+    { "ornamentMordent", SMUFL_E56D_ornamentMordent },
     { "ornamentTremblement", SMUFL_E56E_ornamentTremblement },
     { "ornamentHaydn", SMUFL_E56F_ornamentHaydn },
     { "ornamentVerticalLine", SMUFL_E583_ornamentVerticalLine },
@@ -285,6 +287,11 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "stringsUpBow", SMUFL_E612_stringsUpBow },
     { "stringsUpBowTurned", SMUFL_E613_stringsUpBowTurned },
     { "stringsHarmonic", SMUFL_E614_stringsHarmonic },
+    { "pluckedSnapPizzicatoBelow", SMUFL_E630_pluckedSnapPizzicatoBelow },
+    { "pluckedSnapPizzicatoAbove", SMUFL_E631_pluckedSnapPizzicatoAbove },
+    { "pluckedBuzzPizzicato", SMUFL_E632_pluckedBuzzPizzicato },
+    { "pluckedLeftHandPizzicato", SMUFL_E633_pluckedLeftHandPizzicato },
+    { "pluckedDamp", SMUFL_E638_pluckedDamp },
     { "vocalSprechgesang", SMUFL_E645_vocalSprechgesang },
     { "keyboardPedalPed", SMUFL_E650_keyboardPedalPed },
     { "keyboardPedalP", SMUFL_E651_keyboardPedalP },
@@ -374,6 +381,19 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "luteDuration8th", SMUFL_EBAA_luteDuration8th },
     { "luteDuration16th", SMUFL_EBAB_luteDuration16th },
     { "luteDuration32nd", SMUFL_EBAC_luteDuration32nd },
+    { "luteFrenchFretA", SMUFL_EBC0_luteFrenchFretA },
+    { "luteFrenchFretB", SMUFL_EBC1_luteFrenchFretB },
+    { "luteFrenchFretC", SMUFL_EBC2_luteFrenchFretC },
+    { "luteFrenchFretD", SMUFL_EBC3_luteFrenchFretD },
+    { "luteFrenchFretE", SMUFL_EBC4_luteFrenchFretE },
+    { "luteFrenchFretF", SMUFL_EBC5_luteFrenchFretF },
+    { "luteFrenchFretG", SMUFL_EBC6_luteFrenchFretG },
+    { "luteFrenchFretH", SMUFL_EBC7_luteFrenchFretH },
+    { "luteFrenchFretI", SMUFL_EBC8_luteFrenchFretI },
+    { "luteFrenchFretK", SMUFL_EBC9_luteFrenchFretK },
+    { "luteFrenchFretL", SMUFL_EBCA_luteFrenchFretL },
+    { "luteFrenchFretM", SMUFL_EBCB_luteFrenchFretM },
+    { "luteFrenchFretN", SMUFL_EBCC_luteFrenchFretN },
     { "luteItalianFret0", SMUFL_EBE0_luteItalianFret0 },
     { "luteItalianFret1", SMUFL_EBE1_luteItalianFret1 },
     { "luteItalianFret2", SMUFL_EBE2_luteItalianFret2 },
@@ -387,6 +407,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 361
+// 381
 
 } // namespace vrv

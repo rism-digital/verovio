@@ -33,9 +33,6 @@ std::map<int, std::string> Option::s_footer
 std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_measureNumber
-    = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
-
 std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
     { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
@@ -718,12 +715,12 @@ Options::Options()
     m_allPpages.SetShortOption('a', true);
     m_baseOptions.AddOption(&m_allPpages);
 
-    m_inputFormat.SetInfo("Input from",
+    m_inputFrom.SetInfo("Input from",
         "Select input format from: \"abc\", \"darms\", \"humdrum\", \"mei\", \"pae\", \"xml\" (musicxml)");
-    m_inputFormat.Init("mei");
-    m_inputFormat.SetKey("inputFrom");
-    m_inputFormat.SetShortOption('f', true);
-    m_baseOptions.AddOption(&m_inputFormat);
+    m_inputFrom.Init("mei");
+    m_inputFrom.SetKey("inputFrom");
+    m_inputFrom.SetShortOption('f', false);
+    m_baseOptions.AddOption(&m_inputFrom);
 
     m_outfile.SetInfo("Output file", "Output file name (use \"-\" as file name for standard output)");
     m_outfile.Init("svg");
@@ -747,6 +744,7 @@ Options::Options()
     m_scale.Init(DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
     m_scale.SetKey("scale");
     m_scale.SetShortOption('s', false);
+    m_baseOptions.AddOption(&m_scale);
 
     m_outputTo.SetInfo("Output to", "Select output format to: \"mei\", \"pb-mei\", \"svg\", or \"midi\"");
     m_outputTo.Init("svg");
@@ -891,6 +889,10 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
+    m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
+    m_preserveAnalyticalMarkup.Init(false);
+    this->Register(&m_preserveAnalyticalMarkup, "preserveAnalyticalMarkup", &m_general);
+
     m_removeIds.SetInfo("Remove IDs in MEI", "Remove XML IDs in the MEI output that are not referenced");
     m_removeIds.Init(false);
     this->Register(&m_removeIds, "removeIds", &m_general);
@@ -969,6 +971,10 @@ Options::Options()
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
 
+    m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
+    m_dynamDist.Init(1.0, 0.5, 16.0);
+    this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
+
     m_engravingDefaults.SetInfo(
         "Engraving defaults", "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(engravingDefaults);
@@ -1001,6 +1007,10 @@ Options::Options()
     m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
+    
+    m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
+    m_harmDist.Init(1.0, 0.5, 16.0);
+    this->Register(&m_harmDist, "harmDist", &m_generalLayout);
 
     m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
     m_justificationStaff.Init(1., 0., 10.);
@@ -1057,9 +1067,9 @@ Options::Options()
     m_measureMinWidth.Init(15, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
 
-    m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
-    m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
-    this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
+    m_mnumInterval.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
+    m_mnumInterval.Init(0, 0, 64, false);
+    this->Register(&m_mnumInterval, "mnumInterval", &m_generalLayout);
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
@@ -1215,7 +1225,7 @@ Options::Options()
     m_transposeSelectedOnly.Init(false);
     this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
-    /********* The layout left margin by element *********/
+    /********* The layout margins by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");
     m_grps.push_back(&m_elementMargins);
@@ -1316,6 +1326,10 @@ Options::Options()
     m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginRightBarLine, "leftMarginRightBarLine", &m_elementMargins);
 
+    m_leftMarginTabRhythm.SetInfo("Left margin tabRhyhtm", "The margin for tabRhythm in MEI units");
+    m_leftMarginTabRhythm.Init(1.0, 0.0, 2.0);
+    this->Register(&m_leftMarginTabRhythm, "leftMarginTabRhythm", &m_elementMargins);
+
     /// custom right
 
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
@@ -1381,6 +1395,10 @@ Options::Options()
     m_rightMarginRightBarLine.SetInfo("Right margin right barLine", "The right margin for right barLine in MEI units");
     m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
+
+    m_rightMarginTabRhythm.SetInfo("Right margin tabRhyhtm", "The right margin for tabRhythm in MEI units");
+    m_rightMarginTabRhythm.Init(0.0, 0.0, 2.0);
+    this->Register(&m_rightMarginTabRhythm, "rightMarginTabRhythm", &m_elementMargins);
 
     /// custom top
 

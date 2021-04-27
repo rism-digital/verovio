@@ -24,8 +24,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Facsimile
 //----------------------------------------------------------------------------
+
+static ClassRegistrar<Facsimile> s_factory("facsimile", FACSIMILE);
+
 Facsimile::Facsimile() : Object("facsimile-") {}
+
 Facsimile::~Facsimile() {}
+
 void Facsimile::Reset() {}
 
 bool Facsimile::IsSupportedChild(Object *object)

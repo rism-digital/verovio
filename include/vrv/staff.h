@@ -21,6 +21,7 @@ class StaffAlignment;
 class StaffDef;
 class Syl;
 class TimeSpanningInterface;
+class Tuning;
 
 //----------------------------------------------------------------------------
 // Staff
@@ -91,6 +92,15 @@ public:
      * Looks for the parent system and its current drawing scoreDef
      */
     bool DrawingIsVisible();
+
+    /**
+     * @name Get notation type
+     */
+    ///@{
+    bool IsMensural();
+    bool IsNeume();
+    bool IsTablature();
+    ///@}
 
     /**
      * Return the index position of the staff in its measure parent
@@ -250,6 +260,8 @@ public:
     int m_yAbs;
 
     StaffDef *m_drawingStaffDef;
+
+    Tuning *m_drawingTuning;
 
 private:
     /**

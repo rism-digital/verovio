@@ -18,7 +18,11 @@ namespace vrv {
 // Artic
 //----------------------------------------------------------------------------
 
-class Artic : public LayerElement, public AttArticulation, public AttColor, public AttExtSym, public AttPlacement {
+class Artic : public LayerElement,
+              public AttArticulation,
+              public AttColor,
+              public AttExtSym,
+              public AttPlacementRelEvent {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

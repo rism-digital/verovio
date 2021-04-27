@@ -22,6 +22,8 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Trill> s_factory("trill", TRILL);
+
 Trill::Trill()
     : ControlElement("trill-")
     , TimeSpanningInterface()
@@ -31,7 +33,7 @@ Trill::Trill()
     , AttLineRend()
     , AttNNumberLike()
     , AttOrnamentAccid()
-    , AttPlacement()
+    , AttPlacementRelStaff()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -40,7 +42,7 @@ Trill::Trill()
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_ORNAMENTACCID);
-    RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
     Reset();
 }
@@ -57,7 +59,7 @@ void Trill::Reset()
     ResetLineRend();
     ResetNNumberLike();
     ResetOrnamentAccid();
-    ResetPlacement();
+    ResetPlacementRelStaff();
 }
 
 wchar_t Trill::GetTrillGlyph() const

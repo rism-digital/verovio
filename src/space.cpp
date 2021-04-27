@@ -23,6 +23,8 @@ namespace vrv {
 // Space
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Space> s_factory("space", SPACE);
+
 Space::Space() : LayerElement("space-"), DurationInterface()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
