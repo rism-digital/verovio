@@ -37,10 +37,10 @@ std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "no
     { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
-    = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
+    = "{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
       "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
       "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.1,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.075,'textEnclosureThickness':0.1}}";
+      "'bracketThickness':0.5,'repeatEndingLineThickness':0.075,'textEnclosureThickness':0.1}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -607,9 +607,14 @@ JsonSource OptionJson::GetSource() const
     return m_source;
 }
 
+jsonxx::Object OptionJson::GetValue(bool getDefault) const
+{
+    return getDefault ? m_defaultValues : m_values;
+}
+
 bool OptionJson::SetValue(const std::string &value)
 {
-    const bool ok = ReadJson(m_values, value);
+    bool ok = ReadJson(m_values, value);
     if (ok) {
         m_isSet = true;
     }
@@ -618,7 +623,13 @@ bool OptionJson::SetValue(const std::string &value)
             LogError("Input json is not valid or contains errors");
         }
         else {
-            LogError("Input file '%s' is not valid or contains errors", value.c_str());
+            // Input is file path
+            if (value.empty()) {
+                ok = true;
+            }
+            else {
+                LogError("Input file '%s' is not valid or contains errors", value.c_str());
+            }
         }
     }
     return ok;
@@ -626,16 +637,12 @@ bool OptionJson::SetValue(const std::string &value)
 
 std::string OptionJson::GetStrValue() const
 {
-    std::stringstream ss;
-    ss << m_values;
-    return ss.str();
+    return m_values.json();
 }
 
 std::string OptionJson::GetDefaultStrValue() const
 {
-    std::stringstream ss;
-    ss << m_defaultValues;
-    return ss.str();
+    return m_defaultValues.json();
 }
 
 bool OptionJson::ReadJson(jsonxx::Object &output, const std::string &input) const
@@ -1548,7 +1555,7 @@ void Options::Sync()
     for (const auto &pair : engravingDefaults) {
         if (pair.second->IsSet()) continue;
 
-        const std::vector<std::string> jsonNodePath = { "engravingDefaults", pair.first };
+        const std::vector<std::string> jsonNodePath = { pair.first };
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
             const double jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
             pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units

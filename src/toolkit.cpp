@@ -834,6 +834,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
         const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
         const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
+        const OptionJson *optJson = dynamic_cast<const OptionJson *>(iter->second);
 
         if (optDbl) {
             double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
@@ -857,6 +858,12 @@ std::string Toolkit::GetOptions(bool defaultValues) const
                 values << (*strIter);
             }
             o << iter->first << values;
+        }
+        else if (optJson) {
+            // Reading json from file is not supported in toolkit
+            if (optJson->GetSource() == JsonSource::String) {
+                o << iter->first << optJson->GetValue(defaultValues);
+            }
         }
         else {
             std::string stringValue
@@ -886,6 +893,10 @@ std::string Toolkit::GetAvailableOptions() const
         const std::vector<Option *> *options = optionGrp->GetOptions();
 
         for (auto const &option : *options) {
+            // Reading json from file is not supported in toolkit
+            const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
+            if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
+
             opts << option->GetKey() << option->ToJson();
         }
 
@@ -976,13 +987,9 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         }
         else if (json.has<jsonxx::Object>(iter->first)) {
             const OptionJson *optJson = dynamic_cast<OptionJson *>(opt);
-            if ((optJson != NULL) && (optJson->GetSource() == JsonSource::String)) {
-                // Pass reduced json to json-option
-                jsonxx::Object obj;
-                obj << iter->first << json.get<jsonxx::Object>(iter->first);
-                std::stringstream ss;
-                ss << obj.json();
-                opt->SetValue(ss.str());
+            if (optJson && (optJson->GetSource() == JsonSource::String)) {
+                const jsonxx::Object value = json.get<jsonxx::Object>(iter->first);
+                opt->SetValue(value.json());
             }
         }
         else {

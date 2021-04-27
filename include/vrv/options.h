@@ -443,7 +443,11 @@ public:
     void Init(JsonSource source, const std::string &defaultValue);
     ///@}
 
+    /**
+     * Member access
+     */
     JsonSource GetSource() const;
+    jsonxx::Object GetValue(bool getDefault = false) const;
 
     /**
      * Interface methods: accessing values as string
