@@ -691,26 +691,6 @@ void View::DrawOctave(
     std::wstring str;
     str.push_back(code);
 
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    if (octave->HasLwidth()) {
-        if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
-            if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
-                lineWidth *= LINEWIDTHTERM_factor_narrow;
-            }
-            else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
-                lineWidth *= LINEWIDTHTERM_factor_medium;
-            }
-            else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
-                lineWidth *= LINEWIDTHTERM_factor_wide;
-            }
-        }
-        else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
-            if (octave->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                lineWidth = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-        }
-    }
-
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     TextExtend extend;
     dc->GetSmuflTextExtent(str, &extend);
