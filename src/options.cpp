@@ -777,10 +777,6 @@ Options::Options()
     m_adjustPageWidth.Init(false);
     this->Register(&m_adjustPageWidth, "adjustPageWidth", &m_general);
 
-    m_alternativeOctaveSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
-    m_alternativeOctaveSymbols.Init(false);
-    this->Register(&m_alternativeOctaveSymbols, "alternativeOctaveSymbols", &m_general);
-
     m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
@@ -953,6 +949,10 @@ Options::Options()
 
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
+
+    m_alternativeOctaveSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
+    m_alternativeOctaveSymbols.Init(false);
+    this->Register(&m_alternativeOctaveSymbols, "alternativeOctaveSymbols", &m_generalLayout);
 
     m_barLineSeparation.SetInfo(
         "Barline separation", "The default distance between multiple barlines when locked together");
