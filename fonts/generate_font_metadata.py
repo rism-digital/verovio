@@ -68,6 +68,7 @@ except EnvironmentError:
     sys.exit(1)
 
 fontName = os.path.splitext(os.path.basename(fontFileName))[0]
+metadata = {'fontName': font.fontname, 'fontVersion': font.version}
 
 jsonComment = 'Automatically generated Metadata for the ' + font.fontname + \
     ' font. Most (but not all) of these metadata come from the SMuFL specifications.'

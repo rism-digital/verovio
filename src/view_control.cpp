@@ -674,15 +674,15 @@ void View::DrawOctave(
         switch (dis) {
             // ditto
             case OCTAVE_DIS_8: {
-                code = altSymbols ? SMUFL_E512_ottavaBassa : SMUFL_E510_ottava;
+                code = altSymbols ? SMUFL_E51C_ottavaBassaVb : SMUFL_E510_ottava;
                 break;
             }
             case OCTAVE_DIS_15: {
-                code = altSymbols ? SMUFL_E516_quindicesimaBassa : SMUFL_E514_quindicesima;
+                code = altSymbols ? SMUFL_E51D_quindicesimaBassaMb : SMUFL_E514_quindicesima;
                 break;
             }
             case OCTAVE_DIS_22: {
-                code = altSymbols ? SMUFL_E519_ventiduesimaBassa : SMUFL_E517_ventiduesima;
+                code = altSymbols ? SMUFL_E51E_ventiduesimaBassaMb : SMUFL_E517_ventiduesima;
                 break;
             }
             default: break;
