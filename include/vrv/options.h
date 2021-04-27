@@ -541,7 +541,6 @@ public:
 
     OptionBool m_adjustPageHeight;
     OptionBool m_adjustPageWidth;
-    OptionBool m_alternativeOctaveSymbols;
     OptionIntMap m_breaks;
     OptionDbl m_breaksSmartSb;
     OptionIntMap m_condense;
@@ -588,6 +587,7 @@ public:
      */
     OptionGrp m_generalLayout;
 
+    OptionBool m_alternativeOctaveSymbols;
     OptionDbl m_barLineSeparation;
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
@@ -617,6 +617,7 @@ public:
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionInt m_mnumInterval;
+    OptionDbl m_octaveLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;

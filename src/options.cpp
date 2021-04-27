@@ -38,9 +38,10 @@ std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "no
 
 constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
-      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
-      "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': 0.2}}";
+      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,'"
+      "hairpinThickness':0.1,'octaveLineThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'"
+      "subBracketThickness':0.5,'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': "
+      "0.2}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -1080,8 +1081,12 @@ Options::Options()
     m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
+    m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
+    m_octaveLineThickness.Init(0.20, 0.10, 1.00);
+    this->Register(&m_octaveLineThickness, "octaveLineThickness", &m_generalLayout);
+
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
-    m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
+    m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
 
     m_slurControlPoints.SetInfo(
@@ -1484,6 +1489,7 @@ void Options::Sync()
         { "bracketThickness", &m_bracketThickness }, //
         { "subBracketThickness", &m_subBracketThickness }, //
         { "hairpinThickness", &m_hairpinThickness }, //
+        { "octaveLineThickness", &m_octaveLineThickness }, //
         { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
         { "lyricLineThickness", &m_lyricLineThickness }, //
         { "tupletBracketThickness", &m_tupletBracketThickness }, //
