@@ -23,8 +23,8 @@
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
-#include "tabgrp.h"
 #include "tabdursym.h"
+#include "tabgrp.h"
 #include "text.h"
 #include "vrv.h"
 

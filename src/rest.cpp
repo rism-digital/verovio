@@ -304,7 +304,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     const int optimalLocation = isTopLayer
         ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
         : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
-    
+
     return optimalLocation;
 }
 
@@ -386,7 +386,7 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
         currentOptimalLocation = previousElementLoc;
     }
     else {
-        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2; 
+        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2;
     }
     const int marginLocation = isTopLayer ? 10 : -2;
     currentOptimalLocation = isTopLayer ? std::min(currentOptimalLocation, marginLocation)

@@ -305,7 +305,7 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
     const int right = HorizontalLeftOverlap(otherElement, doc, margin, 0);
     const int left = HorizontalRightOverlap(otherElement, doc, margin, 0);
     if (!right || !left) return 0;
-    
+
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     Flag *currentFlag = NULL;
     currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
@@ -321,7 +321,6 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
     else {
         return (-horizontalMargin - left);
     }
-
 }
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)

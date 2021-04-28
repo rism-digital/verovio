@@ -531,7 +531,6 @@ void View::DrawHairpin(
 
     hairpin->SetDrawingLength(x2 - x1);
 
-
     hairpinLog_FORM form = hairpin->GetForm();
 
     int startY = 0;
@@ -2316,8 +2315,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel()
-            + measure->GetRightBarLineWidth(m_doc);
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel() + measure->GetRightBarLineWidth(m_doc);
         spanningType = SPANNING_START;
     }
     // We are in the system where the ending ends - draw it from the beginning of the system
