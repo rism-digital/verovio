@@ -15,7 +15,7 @@
 
 #include "editorial.h"
 #include "note.h"
-#include "tabrhythm.h"
+#include "tabdursym.h"
 
 namespace vrv {
 
@@ -45,8 +45,8 @@ bool TabGrp::IsSupportedChild(Object *child)
     if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
-    else if (child->Is(TABRHYTHM)) {
-        assert(dynamic_cast<TabRhythm *>(child));
+    else if (child->Is(TABDURSYM)) {
+        assert(dynamic_cast<TabDurSym *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

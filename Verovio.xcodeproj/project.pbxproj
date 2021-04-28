@@ -226,13 +226,13 @@
 		4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F622A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F722A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
-		4D2073F822A3BCE000E0765F /* tabrhythm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabrhythm.cpp */; };
-		4D2073F922A3BCE000E0765F /* tabrhythm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabrhythm.cpp */; };
-		4D2073FA22A3BCE000E0765F /* tabrhythm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabrhythm.cpp */; };
+		4D2073F822A3BCE000E0765F /* tabdursym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabdursym.cpp */; };
+		4D2073F922A3BCE000E0765F /* tabdursym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabdursym.cpp */; };
+		4D2073FA22A3BCE000E0765F /* tabdursym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabdursym.cpp */; };
 		4D2073FB22A3BCE000E0765F /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2073FC22A3BCE000E0765F /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2073FD22A3BCE000E0765F /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
-		4D2073FE22A3BCEC00E0765F /* tabrhythm.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073EF22A3BCB700E0765F /* tabrhythm.h */; };
+		4D2073FE22A3BCEC00E0765F /* tabdursym.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073EF22A3BCB700E0765F /* tabdursym.h */; };
 		4D2073FF22A3BCEF00E0765F /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; };
 		4D20740022A3BCF200E0765F /* tuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F022A3BCB700E0765F /* tuning.h */; };
 		4D20740322A46BAA00E0765F /* atts_frettab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740122A46BA900E0765F /* atts_frettab.cpp */; };
@@ -257,8 +257,8 @@
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
 		4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2E758C22BC2B5B004C51F0 /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4D2E758D22BC2B5B004C51F0 /* tabrhythm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabrhythm.cpp */; };
-		4D2E758E22BC2B5B004C51F0 /* tabrhythm.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073EF22A3BCB700E0765F /* tabrhythm.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2E758D22BC2B5B004C51F0 /* tabdursym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* tabdursym.cpp */; };
+		4D2E758E22BC2B5B004C51F0 /* tabdursym.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073EF22A3BCB700E0765F /* tabdursym.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D2E758F22BC2B71004C51F0 /* course.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740922A4FDFA00E0765F /* course.cpp */; };
 		4D2E759022BC2B71004C51F0 /* course.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D20740722A4FDE800E0765F /* course.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D2E759122BC2B80004C51F0 /* tuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F022A3BCB700E0765F /* tuning.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1319,11 +1319,11 @@
 		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
-		4D2073EF22A3BCB700E0765F /* tabrhythm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabrhythm.h; path = include/vrv/tabrhythm.h; sourceTree = "<group>"; };
+		4D2073EF22A3BCB700E0765F /* tabdursym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabdursym.h; path = include/vrv/tabdursym.h; sourceTree = "<group>"; };
 		4D2073F022A3BCB700E0765F /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuning.h; path = include/vrv/tuning.h; sourceTree = "<group>"; };
 		4D2073F122A3BCB700E0765F /* tabgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabgrp.h; path = include/vrv/tabgrp.h; sourceTree = "<group>"; };
 		4D2073F222A3BCDF00E0765F /* tuning.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tuning.cpp; path = src/tuning.cpp; sourceTree = "<group>"; };
-		4D2073F322A3BCDF00E0765F /* tabrhythm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tabrhythm.cpp; path = src/tabrhythm.cpp; sourceTree = "<group>"; };
+		4D2073F322A3BCDF00E0765F /* tabdursym.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tabdursym.cpp; path = src/tabdursym.cpp; sourceTree = "<group>"; };
 		4D2073F422A3BCDF00E0765F /* tabgrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tabgrp.cpp; path = src/tabgrp.cpp; sourceTree = "<group>"; };
 		4D20740122A46BA900E0765F /* atts_frettab.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_frettab.cpp; path = libmei/atts_frettab.cpp; sourceTree = "<group>"; };
 		4D20740222A46BA900E0765F /* atts_frettab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_frettab.h; path = libmei/atts_frettab.h; sourceTree = "<group>"; };
@@ -2301,10 +2301,10 @@
 				4D9A9C1B199F576100028D93 /* syl.h */,
 				4D766EF620ACAD61006875D8 /* syllable.cpp */,
 				4D766EF220ACAD3F006875D8 /* syllable.h */,
+				4D2073F322A3BCDF00E0765F /* tabdursym.cpp */,
+				4D2073EF22A3BCB700E0765F /* tabdursym.h */,
 				4D2073F422A3BCDF00E0765F /* tabgrp.cpp */,
 				4D2073F122A3BCB700E0765F /* tabgrp.h */,
-				4D2073F322A3BCDF00E0765F /* tabrhythm.cpp */,
-				4D2073EF22A3BCB700E0765F /* tabrhythm.h */,
 				4DB0B0151C44129300DBDCC3 /* timestamp.cpp */,
 				4DB0B0181C4412A400DBDCC3 /* timestamp.h */,
 				8F086ED9188539540037FD8E /* tuplet.cpp */,
@@ -2447,7 +2447,7 @@
 				4DB3D8FE1F83D20100B5FC2B /* horizontalaligner.h in Headers */,
 				4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */,
 				4DB3D8F21F83D1B100B5FC2B /* svg.h in Headers */,
-				4D2073FE22A3BCEC00E0765F /* tabrhythm.h in Headers */,
+				4D2073FE22A3BCEC00E0765F /* tabdursym.h in Headers */,
 				4D723AF425E8DB0B0062E0A2 /* zip_file.hpp in Headers */,
 				4DEC4DDC21C8295700D1D273 /* choice.h in Headers */,
 				4D20740622A46BAA00E0765F /* atts_frettab.h in Headers */,
@@ -2708,7 +2708,7 @@
 				BB4C4B9A22A932E5001F6AF0 /* linkinginterface.h in Headers */,
 				BB4C4A8322A9321F001F6AF0 /* atts_shared.h in Headers */,
 				BB4C4B5E22A932D7001F6AF0 /* metersig.h in Headers */,
-				4D2E758E22BC2B5B004C51F0 /* tabrhythm.h in Headers */,
+				4D2E758E22BC2B5B004C51F0 /* tabdursym.h in Headers */,
 				BB4C4B3022A932CF001F6AF0 /* pedal.h in Headers */,
 				BB4C4B6E22A932D7001F6AF0 /* note.h in Headers */,
 				BB4C4BA422A932E5001F6AF0 /* textdirinterface.h in Headers */,
@@ -2957,7 +2957,7 @@
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
 				4DB3D8981F7C325C00B5FC2B /* lb.cpp in Sources */,
 				4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */,
-				4D2073F922A3BCE000E0765F /* tabrhythm.cpp in Sources */,
+				4D2073F922A3BCE000E0765F /* tabdursym.cpp in Sources */,
 				4D16940B1E3A44F300569BF4 /* keysig.cpp in Sources */,
 				4DE96E3C21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4D16940C1E3A44F300569BF4 /* atts_midi.cpp in Sources */,
@@ -3164,7 +3164,7 @@
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
 				4DFB3E8523ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
-				4D2073F822A3BCE000E0765F /* tabrhythm.cpp in Sources */,
+				4D2073F822A3BCE000E0765F /* tabdursym.cpp in Sources */,
 				4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */,
 				4DEC4D9A21C81E6600D1D273 /* lem.cpp in Sources */,
 				1579B3431B15033100B16F5C /* proport.cpp in Sources */,
@@ -3518,7 +3518,7 @@
 				4D2073FD22A3BCE000E0765F /* tabgrp.cpp in Sources */,
 				4D7927D220ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4DB3D8B91F83D0C600B5FC2B /* boundary.cpp in Sources */,
-				4D2073FA22A3BCE000E0765F /* tabrhythm.cpp in Sources */,
+				4D2073FA22A3BCE000E0765F /* tabdursym.cpp in Sources */,
 				4DEC4DB421C826E000D1D273 /* supplied.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3676,7 +3676,7 @@
 				BB4C4AB722A932A6001F6AF0 /* iomusxml.cpp in Sources */,
 				BB4C4BC322A9330D001F6AF0 /* pugixml.cpp in Sources */,
 				4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */,
-				4D2E758D22BC2B5B004C51F0 /* tabrhythm.cpp in Sources */,
+				4D2E758D22BC2B5B004C51F0 /* tabdursym.cpp in Sources */,
 				BB4C4BC022A932FC001F6AF0 /* MidiMessage.cpp in Sources */,
 				BB4C4AED22A932BC001F6AF0 /* expand.cpp in Sources */,
 				BB4C4B0F22A932C8001F6AF0 /* ending.cpp in Sources */,
