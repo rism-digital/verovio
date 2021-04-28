@@ -395,7 +395,7 @@ public:
      * @param jsonOptions A stringified JSON object with the output options
      * pageNo: integer; (1-based), all pages if none (or 0) specified;
      * scoreBased: true or false; true by default;
-     * noXmlIds: true or false; false by default - remove all @xml:id not used in the data;
+     * removeIds: true or false; false by default - remove all @xml:id not used in the data;
      */
     std::string GetMEI(const std::string &jsonOptions = "");
 
