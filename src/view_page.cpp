@@ -895,7 +895,7 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if (barLine->GetForm() == BARRENDITION_rptstart) {
-        DrawDot(dc, x2 - thickBarLineWidth / 2 , yBottom, staff->m_drawingStaffSize);
+        DrawDot(dc, x2 - thickBarLineWidth / 2, yBottom, staff->m_drawingStaffSize);
         DrawDot(dc, x2 - thickBarLineWidth / 2, yTop, staff->m_drawingStaffSize);
     }
     if (barLine->GetForm() == BARRENDITION_rptboth) {

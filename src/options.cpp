@@ -1002,7 +1002,7 @@ Options::Options()
     m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
-    
+
     m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
     m_harmDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_harmDist, "harmDist", &m_generalLayout);
@@ -1325,9 +1325,9 @@ Options::Options()
     m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginRightBarLine, "leftMarginRightBarLine", &m_elementMargins);
 
-    m_leftMarginTabRhythm.SetInfo("Left margin tabRhyhtm", "The margin for tabRhythm in MEI units");
-    m_leftMarginTabRhythm.Init(1.0, 0.0, 2.0);
-    this->Register(&m_leftMarginTabRhythm, "leftMarginTabRhythm", &m_elementMargins);
+    m_leftMarginTabDurSym.SetInfo("Left margin tabRhyhtm", "The margin for tabDurSym in MEI units");
+    m_leftMarginTabDurSym.Init(1.0, 0.0, 2.0);
+    this->Register(&m_leftMarginTabDurSym, "leftMarginTabDurSym", &m_elementMargins);
 
     /// custom right
 
@@ -1395,9 +1395,9 @@ Options::Options()
     m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
 
-    m_rightMarginTabRhythm.SetInfo("Right margin tabRhyhtm", "The right margin for tabRhythm in MEI units");
-    m_rightMarginTabRhythm.Init(0.0, 0.0, 2.0);
-    this->Register(&m_rightMarginTabRhythm, "rightMarginTabRhythm", &m_elementMargins);
+    m_rightMarginTabDurSym.SetInfo("Right margin tabRhyhtm", "The right margin for tabDurSym in MEI units");
+    m_rightMarginTabDurSym.Init(0.0, 0.0, 2.0);
+    this->Register(&m_rightMarginTabDurSym, "rightMarginTabDurSym", &m_elementMargins);
 
     /// custom top
 

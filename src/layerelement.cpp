@@ -1389,9 +1389,10 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison) 
+void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
 {
-    if (Is(NOTE) && GetParent()->Is(CHORD)) return;
+    if (Is(NOTE) && GetParent()->Is(CHORD))
+        return;
     else if (Is(STEM) && isUnison) {
         isUnison = false;
         return;
@@ -1411,7 +1412,6 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
     else {
         SetDrawingXRel(GetDrawingXRel() + margin);
     }
-
 }
 
 std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
@@ -1453,8 +1453,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
                     Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
                     data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
                     previousDuration = parentChord->GetDur();
-                    isEdgeElement
-                        = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
+                    isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
                         || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
                 }
                 // Reduce the margin to 0 for whole notes unisson
@@ -1482,8 +1481,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
                 horizontalMargin = 0;
             }
             else if ((previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() < 0)
-                && (previousNote->GetDrawingStemDir()
-                    != currentNote->GetDrawingStemDir()) /* && !isChordElement*/) {
+                && (previousNote->GetDrawingStemDir() != currentNote->GetDrawingStemDir()) /* && !isChordElement*/) {
                 if (previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() == -1) {
                     horizontalMargin *= -1;
                 }

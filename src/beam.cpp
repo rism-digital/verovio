@@ -1277,7 +1277,8 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    int stemLenInHalfUnits = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
+    int stemLenInHalfUnits
+        = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
         if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {
