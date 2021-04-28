@@ -5455,7 +5455,6 @@ bool MEIInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
     return ReadLayerChildren(vrvTabGrp, tabGrp, vrvTabGrp);
 }
 
-
 bool MEIInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
 {
     Tuplet *vrvTuplet = new Tuplet();

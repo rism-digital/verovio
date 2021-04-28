@@ -1606,7 +1606,8 @@ int PAEInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
             for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
                 // With abbreviation, repeat clefs but do not copy keySig, meterSig and mensur
-                if (measure->notes.back().clef) measure->notes.back().clef =  vrv_cast<Clef *>(measure->notes.back().clef->Clone());
+                if (measure->notes.back().clef)
+                    measure->notes.back().clef = vrv_cast<Clef *>(measure->notes.back().clef->Clone());
                 measure->notes.back().meter = NULL;
                 measure->notes.back().key = NULL;
                 measure->notes.back().mensur = NULL;
