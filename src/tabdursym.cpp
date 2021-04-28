@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        tabrhythm.cpp
+// Name:        tabdursym.cpp
 // Author:      Laurent Pugin
 // Created:     2019
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "tabrhythm.h"
+#include "tabdursym.h"
 
 //----------------------------------------------------------------------------
 
@@ -18,27 +18,27 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// TabRhythm
+// TabDurSym
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<TabRhythm> s_factory("tabRhythm", TABRHYTHM);
+static ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
 
-TabRhythm::TabRhythm() : LayerElement("tabrhythm-"), AttNNumberLike()
+TabDurSym::TabDurSym() : LayerElement("tabdursym-"), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
 
     Reset();
 }
 
-TabRhythm::~TabRhythm() {}
+TabDurSym::~TabDurSym() {}
 
-void TabRhythm::Reset()
+void TabDurSym::Reset()
 {
     LayerElement::Reset();
     ResetNNumberLike();
 }
 
-bool TabRhythm::IsSupportedChild(Object *child)
+bool TabDurSym::IsSupportedChild(Object *child)
 {
     return false;
 }

@@ -123,7 +123,7 @@
 #import <VerovioFramework/attdef.h>
 #import <VerovioFramework/unclear.h>
 #import <VerovioFramework/mnum.h>
-#import <VerovioFramework/tabrhythm.h>
+#import <VerovioFramework/tabdursym.h>
 #import <VerovioFramework/dot.h>
 #import <VerovioFramework/object.h>
 #import <VerovioFramework/orig.h>

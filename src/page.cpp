@@ -337,12 +337,12 @@ void Page::LayOutHorizontally()
     Functor adjustXPos(&Object::AdjustXPos);
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
     AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
-    adjustXPosParams.m_excludes.push_back(TABRHYTHM);
+    adjustXPosParams.m_excludes.push_back(TABDURSYM);
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust tabRhyhtm separately
     adjustXPosParams.m_excludes.clear();
-    adjustXPosParams.m_includes.push_back(TABRHYTHM);
+    adjustXPosParams.m_includes.push_back(TABDURSYM);
     adjustXPosParams.m_includes.push_back(BARLINE_ATTR_RIGHT);
     adjustXPosParams.m_includes.push_back(METERSIG);
     adjustXPosParams.m_includes.push_back(KEYSIG);
