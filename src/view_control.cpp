@@ -628,8 +628,6 @@ void View::DrawOctave(
 
     int y1 = octave->GetDrawingY();
     int y2 = y1;
-    int lineShift = 0;
-    int dotShift = 0;
 
     /********** adjust the start / end positions ***********/
 
@@ -725,10 +723,11 @@ void View::DrawOctave(
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         if (altSymbols) x1 += extend.m_width / 2;
         y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
-        lineShift = (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
+        int lineShift = (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
 
         dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
         dc->SetBrush(m_currentColour, AxSOLID);
+        int dotShift = 0;
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
                 dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0);
