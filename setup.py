@@ -8,9 +8,9 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as _build_ext
 from setuptools.command.sdist import sdist as _sdist
 from glob import glob
-import platform
+import git
 import os
-import subprocess
+import platform
 
 
 def get_commit():
@@ -55,15 +55,25 @@ def get_version():
         for line in lines:
             if line.startswith('Version:'):
                 return line[8:].strip()
-    if os.path.exists("./tools"):
-        print("Running tools/get_version.sh")
-        version = subprocess.getoutput("bash -c 'cd tools; ./get_version.sh'")
+    if os.path.exists("./include/vrv"):
+        with open("./include/vrv/vrvdef.h") as header_file:
+            defines = {}
+            for line in header_file.readlines():
+                if line.startswith("#define"):
+                    line.rstrip()
+                    definition = line[8:].split()
+                    try:
+                        defines[definition[0]] = definition[1]
+                    except IndexError:
+                        pass
+            version = '.'.join(
+                (defines['VERSION_MAJOR'], defines['VERSION_MINOR'], defines['VERSION_REVISION']))
+            if defines['VERSION_DEV'] == 'true':
+                version += '.dev'
     if version.endswith(".dev"):
-        init_sha = subprocess.getoutput(
-            "git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
-        count = subprocess.getoutput(
-            "git rev-list --count HEAD \"^{}\"".format(init_sha))
-        version += count
+        repo = git.Repo()
+        count = len(list(repo.iter_commits(rev='master..HEAD'))) - 1
+        version += str(count)
     print(version)
     return version
 
@@ -104,7 +114,8 @@ verovio_module = Extension('verovio._verovio',
                                './libmei/atts_shared.cpp',
                                './libmei/atts_visual.cpp',
                                './bindings/python/verovio.i'],
-                           swig_opts=['-c++', '-outdir', './bindings/python', '-py3'],
+                           swig_opts=['-c++', '-outdir',
+                                      './bindings/python', '-py3'],
                            include_dirs=['/usr/local/include',
                                          './include',
                                          './include/vrv',
@@ -160,4 +171,4 @@ setup(name='verovio',
           'Bug Reports': 'https://github.com/rism-digital/verovio/issues',
           'Source': 'https://github.com/rism-digital/verovio',
       },
-)
+      )
