@@ -2003,7 +2003,7 @@ void PAEInput::parseNote(pae::Note *note)
     }
 
     // note in a chord
-    if (note->chord) {
+    if (note->chord && element->Is(NOTE)) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         // first note?
