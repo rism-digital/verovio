@@ -715,6 +715,9 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         else if (strcmp(data_key, "data") == 0) {
             strcpy(incipit, data_value);
         }
+        else {
+            LogWarning("Unknown row '%s' in incipit data", data_line);
+        }
     }
 
     if (strlen(c_clef)) {
@@ -2137,6 +2140,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     // start storing the key value:
     while ((index < length) && (input[index] != SEPARATOR)) {
         if (isspace(input[index])) {
+            index++;
             continue;
         }
         ch = input[index];
