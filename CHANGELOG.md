@@ -13,6 +13,7 @@
 * Option --preserve-analytical-markup to preserve analytical markup (default is now off) (@rettinghaus)
 * Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
 * Option --harm-dist to control the minimal distance of harm (@DavidBauer1984)
+* Option --output-format-raw for raw MEI output without indentation and line breaks
 
 ## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
