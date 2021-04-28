@@ -1951,20 +1951,24 @@ void PAEInput::parseNote(pae::Note *note)
     // Does this note have a clef change? push it before everything else
     if (note->clef) {
         addLayerElement(note->clef);
+        note->clef = NULL;
     }
 
     // Same thing for time changes
     // You can find this sometimes
     if (note->meter) {
         addLayerElement(note->meter);
+        note->meter = NULL;
     }
     if (note->mensur) {
         addLayerElement(note->mensur);
+        note->mensur = NULL;
     }
 
     // Handle key change. Evil if done in a beam
     if (note->key) {
         addLayerElement(note->key);
+        note->key = NULL;
     }
 
     // Acciaccaturas are similar but do not get beamed (do they)
@@ -2020,11 +2024,11 @@ void PAEInput::parseNote(pae::Note *note)
 
     // Add the note to the current container
     addLayerElement(element);
+    element = NULL;
 
     // Add mensural dot
     if (m_is_mensural && note->dots > 0) {
-        Dot *dot = new Dot();
-        addLayerElement(dot);
+        addLayerElement(new Dot());
     }
 
     // the last note counts always '1'
@@ -2071,7 +2075,13 @@ void PAEInput::popContainer()
 void PAEInput::addLayerElement(LayerElement *element)
 {
     if (m_nested_objects.size() > 0) {
-        m_nested_objects.back()->AddChild(element);
+        if (!m_nested_objects.back()->IsSupportedChild(element)) {
+            delete element;
+            element = NULL;
+        }
+        else {
+            m_nested_objects.back()->AddChild(element);
+        }
     }
     else {
         m_layer->AddChild(element);
