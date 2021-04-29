@@ -775,14 +775,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     jsonxx::Object json;
 
-    // Read JSON options
-    if (!json.parse(jsonOptions)) {
-        LogWarning("Cannot parse JSON std::string. Using default options.");
-    }
-    else {
-        if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
-        if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
-        if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+            if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+            if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+        }
     }
 
     if (GetPageCount() == 0) {

@@ -859,6 +859,11 @@ Options::Options()
     m_outputIndent.Init(3, 1, 10);
     this->Register(&m_outputIndent, "outputIndent", &m_general);
 
+    m_outputFormatRaw.SetInfo(
+        "Raw formatting for MEI output", "Writes MEI out with no line indenting or non-content newlines.");
+    m_outputFormatRaw.Init(false);
+    this->Register(&m_outputFormatRaw, "outputFormatRaw", &m_general);
+
     m_outputIndentTab.SetInfo("Output indentation with tab", "Output indentation with tabulation for MEI and SVG");
     m_outputIndentTab.Init(false);
     this->Register(&m_outputIndentTab, "outputIndentTab", &m_general);
@@ -1333,9 +1338,9 @@ Options::Options()
     m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginRightBarLine, "leftMarginRightBarLine", &m_elementMargins);
 
-    m_leftMarginTabRhythm.SetInfo("Left margin tabRhyhtm", "The margin for tabRhythm in MEI units");
-    m_leftMarginTabRhythm.Init(1.0, 0.0, 2.0);
-    this->Register(&m_leftMarginTabRhythm, "leftMarginTabRhythm", &m_elementMargins);
+    m_leftMarginTabDurSym.SetInfo("Left margin tabRhyhtm", "The margin for tabDurSym in MEI units");
+    m_leftMarginTabDurSym.Init(1.0, 0.0, 2.0);
+    this->Register(&m_leftMarginTabDurSym, "leftMarginTabDurSym", &m_elementMargins);
 
     /// custom right
 
@@ -1403,9 +1408,9 @@ Options::Options()
     m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
 
-    m_rightMarginTabRhythm.SetInfo("Right margin tabRhyhtm", "The right margin for tabRhythm in MEI units");
-    m_rightMarginTabRhythm.Init(0.0, 0.0, 2.0);
-    this->Register(&m_rightMarginTabRhythm, "rightMarginTabRhythm", &m_elementMargins);
+    m_rightMarginTabDurSym.SetInfo("Right margin tabRhyhtm", "The right margin for tabDurSym in MEI units");
+    m_rightMarginTabDurSym.Init(0.0, 0.0, 2.0);
+    this->Register(&m_rightMarginTabDurSym, "rightMarginTabDurSym", &m_elementMargins);
 
     /// custom top
 

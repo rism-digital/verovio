@@ -88,6 +88,9 @@ bool PAEOutput::Export(std::string &output)
 
 bool PAEOutput::WriteObject(Object *object)
 {
+    if (object->Is(MDIV)) {
+        WriteMdiv(dynamic_cast<Mdiv *>(object));
+    }
     if (object->Is(SCOREDEF)) {
         WriteScoreDef(dynamic_cast<ScoreDef *>(object));
     }
@@ -181,6 +184,13 @@ bool PAEOutput::WriteObjectEnd(Object *object)
     return true;
 }
 
+void PAEOutput::WriteMdiv(Mdiv *mdiv)
+{
+    assert(mdiv);
+
+    m_streamStringOutput << "@data:";
+}
+
 void PAEOutput::WriteScoreDef(ScoreDef *scoreDef) {}
 
 void PAEOutput::WriteStaffDef(StaffDef *staffDef)
@@ -238,7 +248,6 @@ void PAEOutput::WriteLayer(Layer *layer)
 
     if (m_layerN == -1) {
         m_layerN = layer->GetN();
-        m_streamStringOutput << "@data:";
         m_skip = false;
         return;
     }
@@ -714,6 +723,9 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         }
         else if (strcmp(data_key, "data") == 0) {
             strcpy(incipit, data_value);
+        }
+        else {
+            LogWarning("Unknown row '%s' in incipit data", data_line);
         }
     }
 
@@ -1602,6 +1614,12 @@ int PAEInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
             i++;
             for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
+                // With abbreviation, repeat clefs but do not copy keySig, meterSig and mensur
+                if (measure->notes.back().clef)
+                    measure->notes.back().clef = vrv_cast<Clef *>(measure->notes.back().clef->Clone());
+                measure->notes.back().meter = NULL;
+                measure->notes.back().key = NULL;
+                measure->notes.back().mensur = NULL;
             }
         }
         measure->abbreviation_offset = -1;
@@ -1946,20 +1964,24 @@ void PAEInput::parseNote(pae::Note *note)
     // Does this note have a clef change? push it before everything else
     if (note->clef) {
         addLayerElement(note->clef);
+        note->clef = NULL;
     }
 
     // Same thing for time changes
     // You can find this sometimes
     if (note->meter) {
         addLayerElement(note->meter);
+        note->meter = NULL;
     }
     if (note->mensur) {
         addLayerElement(note->mensur);
+        note->mensur = NULL;
     }
 
     // Handle key change. Evil if done in a beam
     if (note->key) {
         addLayerElement(note->key);
+        note->key = NULL;
     }
 
     // Acciaccaturas are similar but do not get beamed (do they)
@@ -1998,7 +2020,7 @@ void PAEInput::parseNote(pae::Note *note)
     }
 
     // note in a chord
-    if (note->chord) {
+    if (note->chord && element->Is(NOTE)) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         // first note?
@@ -2015,11 +2037,11 @@ void PAEInput::parseNote(pae::Note *note)
 
     // Add the note to the current container
     addLayerElement(element);
+    element = NULL;
 
     // Add mensural dot
     if (m_is_mensural && note->dots > 0) {
-        Dot *dot = new Dot();
-        addLayerElement(dot);
+        addLayerElement(new Dot());
     }
 
     // the last note counts always '1'
@@ -2066,7 +2088,13 @@ void PAEInput::popContainer()
 void PAEInput::addLayerElement(LayerElement *element)
 {
     if (m_nested_objects.size() > 0) {
-        m_nested_objects.back()->AddChild(element);
+        if (!m_nested_objects.back()->IsSupportedChild(element)) {
+            delete element;
+            element = NULL;
+        }
+        else {
+            m_nested_objects.back()->AddChild(element);
+        }
     }
     else {
         m_layer->AddChild(element);
@@ -2122,6 +2150,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     // start storing the key value:
     while ((index < length) && (input[index] != SEPARATOR)) {
         if (isspace(input[index])) {
+            index++;
             continue;
         }
         ch = input[index];

@@ -330,7 +330,8 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     if (horizOverlapingBBox == NULL) {
         // Apply element margin and enforce minimal staff distance
         int staffIndex = staffAlignment->GetStaff()->GetN();
-        int minStaffDistance = doc->GetStaffDistance(this->m_object->GetClassId(), staffIndex, this->m_place) * doc->GetDrawingUnit(staffSize);
+        int minStaffDistance = doc->GetStaffDistance(this->m_object->GetClassId(), staffIndex, this->m_place)
+            * doc->GetDrawingUnit(staffSize);
         if (this->m_place == STAFFREL_above) {
             yRel = GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);

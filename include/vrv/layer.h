@@ -179,7 +179,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::ConvertMarkupArtic
      */

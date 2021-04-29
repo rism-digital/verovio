@@ -193,11 +193,11 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(SYLLABLE)) {
         DrawSyllable(dc, element, layer, staff, measure);
     }
+    else if (element->Is(TABDURSYM)) {
+        DrawTabDurSym(dc, element, layer, staff, measure);
+    }
     else if (element->Is(TABGRP)) {
         DrawTabGrp(dc, element, layer, staff, measure);
-    }
-    else if (element->Is(TABRHYTHM)) {
-        DrawTabRhythm(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
