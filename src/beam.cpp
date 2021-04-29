@@ -332,6 +332,15 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     const int staffBottom
         = staffTop - doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 
+    if (beamInterface->m_crossStaffContent) {
+        data_BEAMPLACE place = m_beamElementCoordRefs.at(0)->m_beamRelativePlace;
+        auto iter = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [&place](BeamElementCoord *coord) { return coord->m_beamRelativePlace != place; });
+        if (iter == m_beamElementCoordRefs.end()) {
+            beamInterface->m_drawingPlace = place;
+            return true;
+        }
+    }
     if (!DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset, beamInterface->m_crossStaffContent)) {
         return false;
     }
@@ -798,18 +807,10 @@ void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int ste
         return;
     }
 
-    int highestPoint = VRV_UNSET;
-    int lowestPoint = VRV_UNSET;
-    if (m_nbNotesOrChords > 2) {
-        std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-            if (coord->m_beamRelativePlace == BEAMPLACE_above) {
-                if ((highestPoint == VRV_UNSET) || (coord->m_yBeam > highestPoint)) highestPoint = coord->m_yBeam;
-            };
-            if (coord->m_beamRelativePlace == BEAMPLACE_below) {
-                if ((lowestPoint == VRV_UNSET) || (coord->m_yBeam < lowestPoint)) lowestPoint = coord->m_yBeam;
-            };
-        });
-    }
+    auto [aboveMax, aboveMin] = CalcBeamRelativeMinMax(BEAMPLACE_above);
+    auto [belowMax, belowMin] = CalcBeamRelativeMinMax(BEAMPLACE_below);
+    const int highestPoint = (aboveMax != VRV_UNSET) ? aboveMax : belowMax;
+    const int lowestPoint = (belowMin != VRV_UNSET) ? belowMin : aboveMin;
 
     // This helps with general beams but breaks trems
     auto [up, down] = GetAdditionalBeamCount(beamInterface);
@@ -1181,6 +1182,23 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
             }
         }
     }
+}
+
+std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) const
+{
+    int highestPoint = VRV_UNSET;
+    int lowestPoint = VRV_UNSET;
+    std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
+        if (coord->m_beamRelativePlace == place) {
+            if ((highestPoint == VRV_UNSET) || (coord->m_yBeam > highestPoint))
+                highestPoint = coord->m_yBeam;
+            if ((lowestPoint == VRV_UNSET) || (coord->m_yBeam < lowestPoint)) {
+                lowestPoint = coord->m_yBeam;
+            }
+        }
+    });
+
+    return { highestPoint, lowestPoint };
 }
 
 void BeamSegment::CalcHorizontalBeam(BeamDrawingInterface* beamInterface) {

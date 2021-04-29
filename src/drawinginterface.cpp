@@ -341,9 +341,11 @@ bool BeamDrawingInterface::IsHorizontal()
 
 bool BeamDrawingInterface::IsHorizontal(const std::vector<int>& items, const std::vector<data_BEAMPLACE>& directions) const
 {
-    // items and directions should be of the same size, otherwise something is not wrong
+    // items and directions should be of the same size, otherwise something is wrong
     if (items.size() != directions.size()) return false;
-    if ((items.size() == 3) && (directions.front() == directions.back()) && m_crossStaffContent) return true;
+    if ((items.size() == 3) && m_crossStaffContent) {
+        if ((directions.at(0) == directions.at(2)) && (directions.at(0) != directions.at(1))) return true;        
+    }
 
     // calculate how many times stem direction is changed withing the beam
     int directionChanges = 0;

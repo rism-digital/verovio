@@ -122,6 +122,9 @@ private:
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
     void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
 
+    // Helper to calculate max/min beam points for the relative beam place
+    std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
+
     // Calculate positioning for the horizontal beams
     void CalcHorizontalBeam(BeamDrawingInterface *beamInterface);
 
