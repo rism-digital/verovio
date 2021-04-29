@@ -851,6 +851,11 @@ Options::Options()
     m_outputIndent.Init(3, 1, 10);
     this->Register(&m_outputIndent, "outputIndent", &m_general);
 
+    m_outputFormatRaw.SetInfo(
+        "Raw formatting for MEI output", "Writes MEI out with no line indenting or non-content newlines.");
+    m_outputFormatRaw.Init(false);
+    this->Register(&m_outputFormatRaw, "outputFormatRaw", &m_general);
+
     m_outputIndentTab.SetInfo("Output indentation with tab", "Output indentation with tabulation for MEI and SVG");
     m_outputIndentTab.Init(false);
     this->Register(&m_outputIndentTab, "outputIndentTab", &m_general);

@@ -395,9 +395,9 @@ public:
      * @param jsonOptions A stringified JSON object with the output options
      * pageNo: integer; (1-based), all pages if none (or 0) specified;
      * scoreBased: true or false; true by default;
-     * noXmlIds: true or false; false by default - remove all @xml:id not used in the data;
+     * removeIds: true or false; false by default - remove all @xml:id not used in the data;
      */
-    std::string GetMEI(const std::string &jsonOptions);
+    std::string GetMEI(const std::string &jsonOptions = "");
 
     /**
      * Get the MEI and save it to the file
@@ -408,7 +408,7 @@ public:
      * @param jsonOptions A stringified JSON object with the output options
      * @return True if the file was successfully written
      */
-    bool SaveFile(const std::string &filename, const std::string &jsonOptions);
+    bool SaveFile(const std::string &filename, const std::string &jsonOptions = "");
 
     ///@}
 

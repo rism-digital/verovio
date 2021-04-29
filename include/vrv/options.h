@@ -558,6 +558,7 @@ public:
     OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
+    OptionBool m_outputFormatRaw;
     OptionInt m_outputIndent;
     OptionBool m_outputIndentTab;
     OptionBool m_outputSmuflXmlEntities;
