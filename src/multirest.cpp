@@ -58,8 +58,8 @@ bool MultiRest::UseBlockStyle(Doc *doc) const
             }
             break;
         case MULTIRESTSTYLE_default: useBlock = (GetNum() > 4); break;
-        case MULTIRESTSTYLE_block: useBlock = true; break;
-        case MULTIRESTSTYLE_symbols: useBlock = false; break;
+        case MULTIRESTSTYLE_block: useBlock = (GetNum() > 1); break;
+        case MULTIRESTSTYLE_symbols: useBlock = (GetNum() > 30); break;
         default: // should not arrive here
             break;
     }
