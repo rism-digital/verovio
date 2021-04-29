@@ -1421,17 +1421,18 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     int leftMargin = 0, rightMargin = 0;
 
     Beam *beam = vrv_cast<Beam *>(params->m_beam);
+    const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(GetDrawingX()) - DUR_8;
     if (params->m_directionBias > 0) {
         leftMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1
-            + (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
+            + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
         rightMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2
-            + (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
+            + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
     }
     else {
         leftMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1
-            - (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
+            - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
         rightMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2
-            - (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
+            - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
     }
 
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);

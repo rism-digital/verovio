@@ -1019,6 +1019,19 @@ void BeamSegment::CalcSetValues()
     }
 }
 
+int BeamSegment::GetAdjacentElementsDuration(int elementX) const
+{
+    if ((elementX < m_beamElementCoordRefs.front()->m_x) || (elementX > m_beamElementCoordRefs.back()->m_x)) {
+        return DUR_8;
+    }
+    for (int i = 0; i < m_beamElementCoordRefs.size() - 1; ++i) {
+        if ((m_beamElementCoordRefs.at(i)->m_x < elementX) && (m_beamElementCoordRefs.at(i + 1)->m_x > elementX)) {
+            return std::min(m_beamElementCoordRefs.at(i)->m_dur, m_beamElementCoordRefs.at(i + 1)->m_dur);
+        }
+    }
+    return DUR_8;
+}
+
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
