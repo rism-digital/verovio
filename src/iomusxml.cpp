@@ -2338,11 +2338,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
             harmText = harmText + ConvertKindToText(GetContent(kind));
         }
     }
-    pugi::xml_node degree = node.child("degree");
-    if (degree) {
-        harmText += ConvertAlterToSymbol(degree.child("degree-alter").text().as_string())
-            + degree.child("degree-value").text().as_string();
-    }
+    harmText += ConvertDegreeToText(node);
     pugi::xml_node bass = node.child("bass");
     if (bass) {
         harmText += "/";
@@ -3912,6 +3908,50 @@ std::string MusicXmlInput::ConvertKindToText(const std::string &value)
     }
 
     return std::string();
+}
+
+std::string MusicXmlInput::ConvertDegreeToText(pugi::xml_node harmony)
+{
+    std::string degreeText = "";
+
+    for (pugi::xml_node degree : harmony.children("degree")) {
+        // Add parentheses to get "A(b9)". "Ab9" would mean something different.
+        if (degreeText == "") {
+            degreeText = "(";
+        }
+
+        pugi::xml_node typeNode = degree.child("degree-type");
+        const std::string type = typeNode.text().as_string();
+        const std::string degreeValue = degree.child("degree-value").text().as_string();
+
+        if (typeNode.attribute("text")) {
+            degreeText += typeNode.attribute("text").as_string();
+        } else if (type == "subtract") {
+            degreeText += "omit";
+        } else {
+            const std::string alter = degree.child("degree-alter").text().as_string();
+            // degree-alter value of 0 is not rendered as natural, it's omitted.
+            if (alter != "0") {
+                degreeText += ConvertAlterToSymbol(alter);
+            }
+            // Values 9, 11 and 13 are special. If they are part of a dominant
+            // chord, they should usually be encoded by the <kind> element (e.g.
+            // <kind>dominant-13th</kind>, implying that 7th and 9th are also
+            // included). When encoded with <degree>, we assume that 7th and 9th
+            // are not implied and therefore prepend "add".
+            if (type == "add" && (degreeValue == "9" || degreeValue == "11" || degreeValue == "13")) {
+                degreeText += "add";
+            }
+        }
+
+        degreeText += degreeValue;
+    }
+
+    if (degreeText != "") {
+        degreeText += ")";
+    }
+
+    return degreeText;
 }
 
 std::string MusicXmlInput::ConvertFigureGlyph(const std::string &value)

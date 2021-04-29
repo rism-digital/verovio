@@ -375,6 +375,7 @@ private:
     static std::string ConvertAlterToSymbol(const std::string &value);
     static std::string ConvertKindToSymbol(const std::string &value);
     static std::string ConvertKindToText(const std::string &value);
+    static std::string ConvertDegreeToText(const pugi::xml_node harmony);
     static std::string ConvertFigureGlyph(const std::string &value);
     ///@}
 
