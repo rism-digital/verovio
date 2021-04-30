@@ -83,7 +83,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: joerick/cibuildwheel@v1.9.0
+        uses: joerick/cibuildwheel@f3dae81e82da2a2a36338269e32f3adb7b42dc8c
         with:
           output-dir: wheelhouse
         env:
