@@ -228,6 +228,9 @@ bool MEIOutput::Export()
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
             output_flags |= pugi::format_no_escapes;
         }
+        if (m_doc->GetOptions()->m_outputFormatRaw.GetValue()) {
+            output_flags |= pugi::format_raw;
+        }
 
         std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
         meiDoc.save(m_streamStringOutput, indent.c_str(), output_flags);

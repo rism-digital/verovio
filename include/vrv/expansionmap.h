@@ -55,7 +55,7 @@ private:
 
 public:
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
-    std::map<std::string, std::vector<std::string> > m_map;
+    std::map<std::string, std::vector<std::string>> m_map;
 
 private:
 };

@@ -43,6 +43,11 @@ public:
     virtual ClassId GetClassId() const { return MULTIREST; }
     ///@}
 
+    /**
+     * True if block style rendering applies
+     */
+    bool UseBlockStyle(Doc *doc) const;
+
 private:
     //
 public:

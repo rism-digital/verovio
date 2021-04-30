@@ -88,6 +88,9 @@ bool PAEOutput::Export(std::string &output)
 
 bool PAEOutput::WriteObject(Object *object)
 {
+    if (object->Is(MDIV)) {
+        WriteMdiv(dynamic_cast<Mdiv *>(object));
+    }
     if (object->Is(SCOREDEF)) {
         WriteScoreDef(dynamic_cast<ScoreDef *>(object));
     }
@@ -181,6 +184,13 @@ bool PAEOutput::WriteObjectEnd(Object *object)
     return true;
 }
 
+void PAEOutput::WriteMdiv(Mdiv *mdiv)
+{
+    assert(mdiv);
+
+    m_streamStringOutput << "@data:";
+}
+
 void PAEOutput::WriteScoreDef(ScoreDef *scoreDef) {}
 
 void PAEOutput::WriteStaffDef(StaffDef *staffDef)
@@ -238,7 +248,6 @@ void PAEOutput::WriteLayer(Layer *layer)
 
     if (m_layerN == -1) {
         m_layerN = layer->GetN();
-        m_streamStringOutput << "@data:";
         m_skip = false;
         return;
     }

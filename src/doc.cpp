@@ -415,8 +415,8 @@ bool Doc::ExportTimemap(std::string &output)
 }
 
 void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
-    std::map<double, std::vector<std::string> > &realTimeToOnElements,
-    std::map<double, std::vector<std::string> > &realTimeToOffElements, std::map<double, int> &realTimeToTempo)
+    std::map<double, std::vector<std::string>> &realTimeToOnElements,
+    std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, int> &realTimeToTempo)
 {
 
     int currentTempo = -1000;

@@ -8,11 +8,16 @@
 * Improvement of alignment for dots in different voices (@eNote-GmbH)
 * Improvement of rendering of ties that collide with dots (@eNote-GmbH)
 * Improvement of barLine positioning (@eNote-GmbH)
+* Improvement of MusicXML import of chord symbol `<degree>` (@th-we)
+* Improvement of input format auto-detection (@JRegimbal)
 * Method renderToPAE added to the JS toolkit (@davidrizo)
 * Preliminary support for tablature (experimental work)
 * Option --preserve-analytical-markup to preserve analytical markup (default is now off) (@rettinghaus)
 * Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
 * Option --harm-dist to control the minimal distance of harm (@DavidBauer1984)
+* Option --output-format-raw for raw MEI output without indentation and line breaks
+* Option --multi-rest-style for better control over the rendering style of multiple measure rest (@eNote-GmbH) 
+* Option --octave-alternative-symbols to switch to alternate SMuFL glyphs (@eNote-GmbH)
 
 ## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`

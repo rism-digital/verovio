@@ -213,6 +213,9 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "ventiduesimaBassa", SMUFL_E519_ventiduesimaBassa },
     { "octaveParensLeft", SMUFL_E51A_octaveParensLeft },
     { "octaveParensRight", SMUFL_E51B_octaveParensRight },
+    { "ottavaBassaVb", SMUFL_E51C_ottavaBassaVb },
+    { "quindicesimaBassaMb", SMUFL_E51D_quindicesimaBassaMb },
+    { "ventiduesimaBassaMb", SMUFL_E51E_ventiduesimaBassaMb },
     { "dynamicPiano", SMUFL_E520_dynamicPiano },
     { "dynamicMezzo", SMUFL_E521_dynamicMezzo },
     { "dynamicForte", SMUFL_E522_dynamicForte },
@@ -407,6 +410,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 381
+// 384
 
 } // namespace vrv
