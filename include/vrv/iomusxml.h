@@ -372,7 +372,7 @@ private:
     static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
     static tupletVis_NUMFORMAT ConvertTupletNumberValue(const std::string &value);
     static std::wstring ConvertTypeToVerovioText(const std::string &value);
-    static std::string ConvertAlterToSymbol(const std::string &value);
+    static std::string ConvertAlterToSymbol(const std::string &value, bool plusMinus = false);
     static std::string ConvertKindToSymbol(const std::string &value);
     static std::string ConvertKindToText(const std::string &value);
     static std::string ConvertDegreeToText(const pugi::xml_node harmony);

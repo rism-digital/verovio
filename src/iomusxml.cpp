@@ -3810,7 +3810,7 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(const std::string &v
     return tupletVis_NUMFORMAT_NONE;
 }
 
-std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value)
+std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value, bool plusMinus)
 {
     static const std::map<std::string, std::string> Alter2Symbol{
         { "-2", "𝄫" }, //
@@ -3820,9 +3820,24 @@ std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value)
         { "2", "𝄪" } //
     };
 
-    const auto result = Alter2Symbol.find(value);
-    if (result != Alter2Symbol.end()) {
-        return result->second;
+    static const std::map<std::string, std::string> Alter2PlusMinus{
+        { "-2", "--" }, //
+        { "-1", "-" }, //
+        { "0", "" }, //
+        { "1", "+" }, //
+        { "2", "++" } //
+    };
+
+    if (plusMinus) {
+        const auto result = Alter2PlusMinus.find(value);
+        if (result != Alter2PlusMinus.end()) {
+            return result->second;
+        }
+    } else {
+        const auto result = Alter2Symbol.find(value);
+        if (result != Alter2Symbol.end()) {
+            return result->second;
+        }
     }
 
     return std::string();
@@ -3979,11 +3994,13 @@ std::string MusicXmlInput::ConvertDegreeToText(pugi::xml_node harmony)
             }
         }
 
-        const std::string alter = degree.child("degree-alter").text().as_string();
+        pugi::xml_node alterNode = degree.child("degree-alter");
+        const std::string alter = alterNode.text().as_string();
         // degree-alter value of 0 is not rendered as natural, it's omitted.
         // (<degree-alter> is a required element, so assume it's there.)
         if (alter != "0") {
-            degreeText += ConvertAlterToSymbol(alter);
+            const std::string plusMinus = alterNode.attribute("plus-minus").as_string();
+            degreeText += ConvertAlterToSymbol(alter, plusMinus == "yes");
         }
         degreeText += degreeValue;
     }
