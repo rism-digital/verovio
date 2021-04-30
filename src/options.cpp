@@ -951,10 +951,6 @@ Options::Options()
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
 
-    m_alternativeOctaveSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
-    m_alternativeOctaveSymbols.Init(false);
-    this->Register(&m_alternativeOctaveSymbols, "alternativeOctaveSymbols", &m_generalLayout);
-
     m_barLineSeparation.SetInfo(
         "Barline separation", "The default distance between multiple barlines when locked together");
     m_barLineSeparation.Init(0.8, 0.5, 2.0);
@@ -1080,6 +1076,10 @@ Options::Options()
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
     m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
+
+    m_octaveAlternativeSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
+    m_octaveAlternativeSymbols.Init(false);
+    this->Register(&m_octaveAlternativeSymbols, "alternativeOctaveSymbols", &m_generalLayout);
 
     m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
     m_octaveLineThickness.Init(0.20, 0.10, 1.00);

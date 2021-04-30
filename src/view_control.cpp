@@ -648,7 +648,7 @@ void View::DrawOctave(
     else
         dc->StartGraphic(octave, "", octave->GetUuid(), false);
 
-    const bool altSymbols = m_doc->GetOptions()->m_alternativeOctaveSymbols.GetValue();
+    const bool altSymbols = m_doc->GetOptions()->m_octaveAlternativeSymbols.GetValue();
     int code = SMUFL_E511_ottavaAlta;
     if (disPlace == STAFFREL_basic_above) {
         switch (dis) {
