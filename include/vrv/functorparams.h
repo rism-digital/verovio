@@ -1172,7 +1172,7 @@ public:
 class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
-    std::vector<std::pair<Object *, Artic *> > m_articPairsToConvert;
+    std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
 };
 
 //----------------------------------------------------------------------------
@@ -1516,8 +1516,8 @@ public:
         m_functor = functor;
     }
     std::map<double, double> realTimeToScoreTime;
-    std::map<double, std::vector<std::string> > realTimeToOnElements;
-    std::map<double, std::vector<std::string> > realTimeToOffElements;
+    std::map<double, std::vector<std::string>> realTimeToOnElements;
+    std::map<double, std::vector<std::string>> realTimeToOffElements;
     std::map<double, int> realTimeToTempo;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;

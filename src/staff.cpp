@@ -343,7 +343,7 @@ void LedgerLine::AddDash(int left, int right)
 {
     assert(left < right);
 
-    std::list<std::pair<int, int> >::iterator iter;
+    std::list<std::pair<int, int>>::iterator iter;
 
     // First add the dash
     for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
@@ -352,7 +352,7 @@ void LedgerLine::AddDash(int left, int right)
     m_dashes.insert(iter, std::make_pair(left, right));
 
     // Merge overlapping dashes
-    std::list<std::pair<int, int> >::iterator previous = m_dashes.begin();
+    std::list<std::pair<int, int>>::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {

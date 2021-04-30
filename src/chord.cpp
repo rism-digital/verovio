@@ -735,7 +735,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetBottomNote());
 
     // Get note locations first
-    std::map<Staff *, std::set<int> > noteLocations;
+    std::map<Staff *, std::set<int>> noteLocations;
     for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
         Note *note = vrv_cast<Note *>(*rit);
         assert(note);

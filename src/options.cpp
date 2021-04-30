@@ -1485,7 +1485,7 @@ void Options::Sync()
 {
     if (!m_engravingDefaults.IsSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = {
+    std::list<std::pair<std::string, OptionDbl *>> engravingDefaults = {
         { "staffLineThickness", &m_staffLineWidth }, //
         { "stemThickness", &m_stemWidth }, //
         { "legerLineThickness", &m_ledgerLineThickness }, //

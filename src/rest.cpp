@@ -29,7 +29,7 @@
 namespace vrv {
 
 typedef std::map<RestLayer,
-    std::map<RestAccidental, std::map<RestLayerPlace, std::map<RestNotePlace, std::map<int, int> > > > >
+    std::map<RestAccidental, std::map<RestLayerPlace, std::map<RestNotePlace, std::map<int, int>>>>>
     RestOffsets;
 
 RestOffsets g_defaultRests{
@@ -453,7 +453,7 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
             (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
     if (object->Is(FTREM)) {
-        std::vector<std::pair<int, RestAccidental> > btremElements;
+        std::vector<std::pair<int, RestAccidental>> btremElements;
         for (int i = 0; i < object->GetChildCount(); ++i) {
             btremElements.emplace_back(GetElementLocation(object->GetChild(i), layer, isTopLayer));
         }
