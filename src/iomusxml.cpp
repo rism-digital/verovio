@@ -3975,7 +3975,13 @@ std::string MusicXmlInput::ConvertDegreeToText(pugi::xml_node harmony)
 
         pugi::xml_node typeNode = degree.child("degree-type");
         const std::string type = typeNode.text().as_string();
-        const std::string degreeValue = degree.child("degree-value").text().as_string();
+        pugi::xml_node valueNode = degree.child("degree-value");
+        if (!valueNode) {
+            // <degree-value> is required. Signal something is missing.
+            degreeText += "?";
+            continue;
+        }
+        const std::string degreeValue = valueNode.text().as_string();
 
         if (typeNode.attribute("text")) {
             degreeText += typeNode.attribute("text").as_string();
