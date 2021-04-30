@@ -1342,7 +1342,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         m_bracketStack.clear();
     }
     if (!m_clefChangeStack.empty()) {
-        for (musicxml::ClefChange iter : m_clefChangeStack) {
+        for (const musicxml::ClefChange &iter : m_clefChangeStack) {
             if (iter.isFirst)
                 LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
                     iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
@@ -1487,7 +1487,23 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
             Layer *emptyLayer = new Layer();
-            emptyLayer->AddChild(new MSpace());
+            // If staff is empty but there are unprocessed clefs for it - try to insert clefs alongside the spaces
+            if (!m_clefChangeStack.empty()) {
+                m_elementStackMap[emptyLayer] = {};
+                int processedDuration = 0;
+                for (auto &clefChange : m_clefChangeStack) {
+                    if (clefChange.isFirst && (clefChange.m_measureNum == measureNum) && (clefChange.m_staff == staff)
+                        && (clefChange.m_scoreOnset != m_durTotal)) {
+                        FillSpace(emptyLayer, clefChange.m_scoreOnset - processedDuration);
+                        emptyLayer->AddChild(clefChange.m_clef);
+                        processedDuration = clefChange.m_scoreOnset;
+                        clefChange.isFirst = false;
+                    }
+                }
+            }
+            else {
+                emptyLayer->AddChild(new MSpace());
+            }
             staff->AddChild(emptyLayer);
         }
         // add clef changes that might occur just before a bar line and remove inserted clefs from stack
@@ -2338,11 +2354,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
             harmText = harmText + ConvertKindToText(GetContent(kind));
         }
     }
-    pugi::xml_node degree = node.child("degree");
-    if (degree) {
-        harmText += ConvertAlterToSymbol(degree.child("degree-alter").text().as_string())
-            + degree.child("degree-value").text().as_string();
-    }
+    harmText += ConvertDegreeToText(node);
     pugi::xml_node bass = node.child("bass");
     if (bass) {
         harmText += "/";
@@ -3814,7 +3826,7 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(const std::string &v
     return tupletVis_NUMFORMAT_NONE;
 }
 
-std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value)
+std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value, bool plusMinus)
 {
     static const std::map<std::string, std::string> Alter2Symbol{
         { "-2", "𝄫" }, //
@@ -3824,9 +3836,25 @@ std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value)
         { "2", "𝄪" } //
     };
 
-    const auto result = Alter2Symbol.find(value);
-    if (result != Alter2Symbol.end()) {
-        return result->second;
+    static const std::map<std::string, std::string> Alter2PlusMinus{
+        { "-2", "--" }, //
+        { "-1", "-" }, //
+        { "0", "" }, //
+        { "1", "+" }, //
+        { "2", "++" } //
+    };
+
+    if (plusMinus) {
+        const auto result = Alter2PlusMinus.find(value);
+        if (result != Alter2PlusMinus.end()) {
+            return result->second;
+        }
+    }
+    else {
+        const auto result = Alter2Symbol.find(value);
+        if (result != Alter2Symbol.end()) {
+            return result->second;
+        }
     }
 
     return std::string();
@@ -3912,6 +3940,101 @@ std::string MusicXmlInput::ConvertKindToText(const std::string &value)
     }
 
     return std::string();
+}
+
+std::string MusicXmlInput::ConvertDegreeToText(pugi::xml_node harmony)
+{
+    // Maps <kind> values to the first interval that can get an "add" prefix
+    static const std::map<std::string, int> Kind2FirstAddable{
+        { "major", 9 }, //
+        { "minor", 9 }, //
+        { "augmented", 9 }, //
+        { "diminished", 9 }, //
+        { "dominant", 11 }, //
+        { "major-seventh", 11 }, //
+        { "minor-seventh", 11 }, //
+        { "diminished-seventh", 11 }, //
+        { "augmented-seventh", 11 }, //
+        { "half-diminished", 11 }, //
+        { "major-minor", 11 }, //
+        { "major-sixth", 11 }, //
+        { "minor-sixth", 11 },
+
+        // Skipping "dominant-ninth", "major-ninth" and "minor-ninth". An
+        // additional 13 would not get an "add", implying to omit the 11, as the
+        // 11 is regularly omitted anyway. Compare:
+        //   https://music.stackexchange.com/questions/3732/
+
+        // Skipping "dominant-11th", "major-11th" and "minor-11th".
+        // 13 would no longer get an "add".
+
+        // Skipping "dominant-13th", "major-13th" and "minor-13th". Nothing to
+        // add anyway.
+
+        { "suspended-second", 11 }, //
+        { "suspended-fourth", 9 }, //
+
+        // Skipping "functional sixths": Neapolitan, Italian, French, German.
+        // Skipping pedal (pedal-point bass)
+
+        { "power", 7 } //
+
+        // Skipping Tristan
+    };
+
+    std::string degreeText = "";
+
+    for (pugi::xml_node degree : harmony.children("degree")) {
+        if (degreeText == "") {
+            degreeText = "(";
+        }
+
+        pugi::xml_node typeNode = degree.child("degree-type");
+        const std::string type = typeNode.text().as_string();
+        pugi::xml_node valueNode = degree.child("degree-value");
+        if (!valueNode) {
+            // <degree-value> is required. Signal something is missing.
+            degreeText += "?";
+            continue;
+        }
+        const std::string degreeValue = valueNode.text().as_string();
+
+        if (typeNode.attribute("text")) {
+            degreeText += typeNode.attribute("text").as_string();
+        }
+        else {
+            if (type == "subtract") {
+                degreeText += "no";
+            }
+            else if (type == "add") {
+                const std::string kind = harmony.child("kind").text().as_string();
+                const auto result = Kind2FirstAddable.find(kind);
+
+                if (result != Kind2FirstAddable.end()) {
+                    int firstAddable = result->second;
+                    if (std::stoi(degreeValue) >= firstAddable) {
+                        degreeText += "add";
+                    }
+                }
+            }
+        }
+
+        pugi::xml_node alterNode = degree.child("degree-alter");
+        const std::string alter = alterNode.text().as_string();
+        // degree-alter value of 0 is not rendered as natural, it's omitted.
+        // (<degree-alter> is a required element, so assume it's there.)
+        if (alter != "0") {
+            const std::string plusMinus = alterNode.attribute("plus-minus").as_string();
+            degreeText += ConvertAlterToSymbol(alter, plusMinus == "yes");
+        }
+        degreeText += degreeValue;
+    }
+
+    if (degreeText != "") {
+        degreeText += ")";
+    }
+
+    return degreeText;
 }
 
 std::string MusicXmlInput::ConvertFigureGlyph(const std::string &value)

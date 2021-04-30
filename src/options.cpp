@@ -33,6 +33,9 @@ std::map<int, std::string> Option::s_footer
 std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
+std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
+    { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
+
 std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
     { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
@@ -857,6 +860,11 @@ Options::Options()
     m_outputIndent.Init(3, 1, 10);
     this->Register(&m_outputIndent, "outputIndent", &m_general);
 
+    m_outputFormatRaw.SetInfo(
+        "Raw formatting for MEI output", "Writes MEI out with no line indenting or non-content newlines.");
+    m_outputFormatRaw.Init(false);
+    this->Register(&m_outputFormatRaw, "outputFormatRaw", &m_general);
+
     m_outputIndentTab.SetInfo("Output indentation with tab", "Output indentation with tabulation for MEI and SVG");
     m_outputIndentTab.Init(false);
     this->Register(&m_outputIndentTab, "outputIndentTab", &m_general);
@@ -1071,6 +1079,10 @@ Options::Options()
     m_mnumInterval.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
     m_mnumInterval.Init(0, 0, 64, false);
     this->Register(&m_mnumInterval, "mnumInterval", &m_generalLayout);
+
+    m_multiRestStyle.SetInfo("Multi rest style", "Rendering style of multiple measure rests");
+    m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
+    this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
