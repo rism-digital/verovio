@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -224,53 +225,13 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
 
-        if (initial.find("<mei ") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s\\n>]"))) {
             return MEI;
         }
-        if (initial.find("<mei>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<score-partwise>") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-
-        std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
+        LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
     }
     if (initial.find("\n!!") != std::string::npos) {
