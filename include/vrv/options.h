@@ -435,7 +435,7 @@ private:
  */
 
 class OptionJson : public Option {
-    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
+    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value>>;
 
 public:
     //

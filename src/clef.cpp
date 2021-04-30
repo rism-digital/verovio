@@ -173,7 +173,7 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
 
 int Clef::AdjustBeams(FunctorParams *functorParams)
 {
-    const std::map<data_CLEFSHAPE, std::pair<wchar_t, double> > topToMiddleProportions
+    const std::map<data_CLEFSHAPE, std::pair<wchar_t, double>> topToMiddleProportions
         = { { CLEFSHAPE_G, { SMUFL_E050_gClef, 0.6 } }, { CLEFSHAPE_C, { SMUFL_E05C_cClef, 0.5 } },
               { CLEFSHAPE_F, { SMUFL_E062_fClef, 0.35 } } };
 
