@@ -3833,7 +3833,8 @@ std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value, bool p
         if (result != Alter2PlusMinus.end()) {
             return result->second;
         }
-    } else {
+    }
+    else {
         const auto result = Alter2Symbol.find(value);
         if (result != Alter2Symbol.end()) {
             return result->second;
@@ -3929,18 +3930,18 @@ std::string MusicXmlInput::ConvertDegreeToText(pugi::xml_node harmony)
 {
     // Maps <kind> values to the first interval that can get an "add" prefix
     static const std::map<std::string, int> Kind2FirstAddable{
-        { "major", 9 },
-        { "minor", 9 },
-        { "augmented", 9 },
-        { "diminished", 9 },
-        { "dominant", 11 },
-        { "major-seventh", 11 },
-        { "minor-seventh", 11 },
-        { "diminished-seventh", 11 },
-        { "augmented-seventh", 11 },
-        { "half-diminished", 11 },
-        { "major-minor", 11 },
-        { "major-sixth", 11 },
+        { "major", 9 }, //
+        { "minor", 9 }, //
+        { "augmented", 9 }, //
+        { "diminished", 9 }, //
+        { "dominant", 11 }, //
+        { "major-seventh", 11 }, //
+        { "minor-seventh", 11 }, //
+        { "diminished-seventh", 11 }, //
+        { "augmented-seventh", 11 }, //
+        { "half-diminished", 11 }, //
+        { "major-minor", 11 }, //
+        { "major-sixth", 11 }, //
         { "minor-sixth", 11 },
 
         // Skipping "dominant-ninth", "major-ninth" and "minor-ninth". An
@@ -3954,8 +3955,8 @@ std::string MusicXmlInput::ConvertDegreeToText(pugi::xml_node harmony)
         // Skipping "dominant-13th", "major-13th" and "minor-13th". Nothing to
         // add anyway.
 
-        { "suspended-second", 11 },
-        { "suspended-fourth", 9 },
+        { "suspended-second", 11 }, //
+        { "suspended-fourth", 9 }, //
 
         // Skipping "functional sixths": Neapolitan, Italian, French, German.
         // Skipping pedal (pedal-point bass)
@@ -3978,10 +3979,12 @@ std::string MusicXmlInput::ConvertDegreeToText(pugi::xml_node harmony)
 
         if (typeNode.attribute("text")) {
             degreeText += typeNode.attribute("text").as_string();
-        } else {
+        }
+        else {
             if (type == "subtract") {
                 degreeText += "no";
-            } else if (type == "add") {
+            }
+            else if (type == "add") {
                 const std::string kind = harmony.child("kind").text().as_string();
                 const auto result = Kind2FirstAddable.find(kind);
 
