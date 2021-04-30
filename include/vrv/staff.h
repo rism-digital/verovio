@@ -315,7 +315,7 @@ public:
     /**
      * A list of dashes relative to the staff position.
      */
-    std::list<std::pair<int, int> > m_dashes;
+    std::list<std::pair<int, int>> m_dashes;
 
 protected:
     //
