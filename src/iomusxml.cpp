@@ -1342,7 +1342,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         m_bracketStack.clear();
     }
     if (!m_clefChangeStack.empty()) {
-        for (musicxml::ClefChange iter : m_clefChangeStack) {
+        for (const musicxml::ClefChange &iter : m_clefChangeStack) {
             if (iter.isFirst)
                 LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
                     iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
@@ -1487,7 +1487,23 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
             Layer *emptyLayer = new Layer();
-            emptyLayer->AddChild(new MSpace());
+            // If staff is empty but there are unprocessed clefs for it - try to insert clefs alongside the spaces
+            if (!m_clefChangeStack.empty()) {
+                m_elementStackMap[emptyLayer] = {};
+                int processedDuration = 0;
+                for (auto &clefChange : m_clefChangeStack) {
+                    if (clefChange.isFirst && (clefChange.m_measureNum == measureNum) && (clefChange.m_staff == staff)
+                        && (clefChange.m_scoreOnset != m_durTotal)) {
+                        FillSpace(emptyLayer, clefChange.m_scoreOnset - processedDuration);
+                        emptyLayer->AddChild(clefChange.m_clef);
+                        processedDuration = clefChange.m_scoreOnset;
+                        clefChange.isFirst = false;
+                    }
+                }
+            }
+            else {
+                emptyLayer->AddChild(new MSpace());
+            }
             staff->AddChild(emptyLayer);
         }
         // add clef changes that might occur just before a bar line and remove inserted clefs from stack
