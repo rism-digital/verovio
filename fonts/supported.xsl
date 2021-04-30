@@ -1226,6 +1226,10 @@
             <glyph glyph-code="E519" smufl-name="ventiduesimaBassa"/>
             <glyph glyph-code="E51A" smufl-name="octaveParensLeft"/>
             <glyph glyph-code="E51B" smufl-name="octaveParensRight"/>
+            <glyph glyph-code="E51C" smufl-name="ottavaBassaVb"/>
+            <glyph glyph-code="E51D" smufl-name="quindicesimaBassaMb"/>
+            <glyph glyph-code="E51E" smufl-name="ventiduesimaBassaMb"/>
+            <!--<glyph glyph-code="E51F" smufl-name="octaveParensRight"/>-->
             <range_end>U+E51F</range_end>
             <range_start>U+E510</range_start>
         </octaves>

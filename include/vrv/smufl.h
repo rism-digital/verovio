@@ -212,6 +212,9 @@ enum {
     SMUFL_E519_ventiduesimaBassa = 0xE519,
     SMUFL_E51A_octaveParensLeft = 0xE51A,
     SMUFL_E51B_octaveParensRight = 0xE51B,
+    SMUFL_E51C_ottavaBassaVb = 0xE51C,
+    SMUFL_E51D_quindicesimaBassaMb = 0xE51D,
+    SMUFL_E51E_ventiduesimaBassaMb = 0xE51E,
     SMUFL_E520_dynamicPiano = 0xE520,
     SMUFL_E521_dynamicMezzo = 0xE521,
     SMUFL_E522_dynamicForte = 0xE522,
@@ -406,7 +409,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 381
+#define SMUFL_COUNT 384
 
 } // namespace vrv
 
