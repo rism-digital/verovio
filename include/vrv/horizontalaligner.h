@@ -63,7 +63,7 @@ enum AlignmentType {
 //----------------------------------------------------------------------------
 
 /**
- * This class stores an alignement position elements will point to
+ * This class stores an alignment position elements will point to
  */
 class Alignment : public Object {
 public:
@@ -152,6 +152,11 @@ public:
     AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
 
     /**
+     * Return pair of max and min Y value within alignment. Elements will be counted by alignment references.
+     */
+    std::pair<int, int> GetAlignmentTopBottom();
+
+    /**
      * Add an accidental to the accidSpace of the AlignmentReference holding it.
      * The Alignment has to have a AlignmentReference holding it.
      */
@@ -227,6 +232,11 @@ public:
      */
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
+    /**
+     * See Object::AdjustDotsEnd
+     */
+    virtual int AdjustDotsEnd(FunctorParams *);
+
 private:
     /**
      * Retrieve the AlignmentReference with staffN.
@@ -270,7 +280,7 @@ private:
 
 /**
  * This class stores a references of LayerElements for a staff.
- * The staff identification (@n) is given by the attCommon and takes into accound
+ * The staff identification (@n) is given by the attCommon and takes into account
  * cross-staff situations.
  * Its children of the alignment are references.
  */
@@ -312,6 +322,11 @@ public:
      * Return true if the reference has elements from multiple layers.
      */
     bool HasMultipleLayer() const { return (m_layerCount > 1); }
+
+    /**
+     * Return true if the reference has elements from cross-staff.
+     */
+    bool HasCrossStaffElements();
 
     //----------//
     // Functors //

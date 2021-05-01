@@ -24,6 +24,8 @@ namespace vrv {
 // Gliss
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Gliss> s_factory("gliss", GLISS);
+
 Gliss::Gliss()
     : ControlElement("gliss-"), TimeSpanningInterface(), AttColor(), AttLineRend(), AttLineRendBase(), AttNNumberLike()
 {

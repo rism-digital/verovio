@@ -326,13 +326,13 @@ void View::DrawThickBezierCurve(
     // Actually draw it
     if (penStyle == AxSOLID) {
         // Solid Thick Bezier Curves are made of two beziers, filled in.
-        dc->SetPen(m_currentColour, std::max(1, penWidth), penStyle);
-        dc->DrawComplexBezierPath(bez1, bez2);
+        dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
+        dc->DrawCubicBezierPathFilled(bez1, bez2);
     }
     else {
         // Dashed or Dotted Thick Bezier Curves have a uniform line width.
-        dc->SetPen(m_currentColour, (thickness + penWidth) / 2, penStyle);
-        dc->DrawSimpleBezierPath(bez1);
+        dc->SetPen(m_currentColour, thickness, penStyle);
+        dc->DrawCubicBezierPath(bez1);
     }
     dc->ResetPen();
 }

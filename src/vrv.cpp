@@ -80,7 +80,7 @@ bool Resources::InitFonts()
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
 
     if (s_font.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMUFL glyphs but could load only %d.", SMUFL_COUNT, s_font.size());
+        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, s_font.size());
         return false;
     }
 
@@ -331,12 +331,14 @@ void LogDebug(const char *fmt, ...)
 {
     if (!logging) return;
 
+#if defined(DEBUG)
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
     LogString(s, CONSOLE_DEBUG);
     va_end(args);
+#endif
 }
 
 void LogError(const char *fmt, ...)

@@ -14,6 +14,7 @@
 
 #include "accid.h"
 #include "atts_externalsymbols.h"
+#include "atts_frettab.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
@@ -28,12 +29,12 @@ namespace vrv {
 
 class Accid;
 class Chord;
+class Note;
 class Slur;
+class TabGrp;
 class Tie;
 class TransPitch;
 class Verse;
-class Note;
-typedef std::vector<Note *> ChordCluster;
 
 //----------------------------------------------------------------------------
 // Note
@@ -53,6 +54,7 @@ class Note : public LayerElement,
              public AttExtSym,
              public AttGraced,
              public AttMidiVelocity,
+             public AttNoteGesTab,
              public AttNoteHeads,
              public AttNoteVisMensural,
              public AttStems,
@@ -136,6 +138,18 @@ public:
     ///@}
 
     /**
+     * Return the parent TabGrp is the note is part of one.
+     */
+    TabGrp *IsTabGrpNote() const;
+
+    /**
+     * @name Return the smufl string to use for a note give the notation type
+     */
+    ///@{
+    std::wstring GetTabFretString(data_NOTATIONTYPE notationType);
+    ///@}
+
+    /**
      * Return true if the note is a unisson.
      * If ignoreAccid is set to true then only @pname and @oct are compared.
      */
@@ -147,7 +161,7 @@ public:
     ///@{
     void SetCluster(ChordCluster *cluster, int position);
     ChordCluster *GetCluster() const { return m_cluster; }
-    ///}
+    ///@}
 
     /**
      * @name Setter and getter for the flipped note head flag
@@ -155,7 +169,7 @@ public:
     ///@{
     void SetFlippedNotehead(bool flippedNotehead) { m_flippedNotehead = flippedNotehead; }
     bool GetFlippedNotehead() const { return m_flippedNotehead; }
-    ///}
+    ///@}
 
     /**
      * Returns a single integer representing pitch and octave.
@@ -169,7 +183,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
-    virtual int CalcStemLenInThirdUnits(Staff *staff);
+    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir);
     ///@}
 
     /**
@@ -188,11 +202,9 @@ public:
     bool IsVisible();
 
     /**
-     * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
-     * element if it's in unison with it
+     * Correct dots placement depending on other dots present in the current alignment
      */
-    std::pair<int, bool> CalcNoteHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
-        bool isChordElement, bool isLowerElement = false, bool unison = true);
+    int CorrectDotsPlacement(Staff *staff, int NoteLoc, int dotLoc, bool isDotShifted);
 
     /**
      * MIDI timing information
@@ -213,11 +225,6 @@ public:
     char GetMIDIPitch();
     ///@}
 
-    /**
-     * Helper to adjust overlaping layers for notes
-     */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
-
 public:
     //----------//
     // Functors //
@@ -232,11 +239,6 @@ public:
      * See Object::ConvertMarkupAnalytical
      */
     virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
-
-    /**
-     * See Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
 
     /**
      * See Object::CalcArtic

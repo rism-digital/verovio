@@ -25,6 +25,8 @@ namespace vrv {
 // GrpSym
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<GrpSym> s_factory("grpSym", GRPSYM);
+
 GrpSym::GrpSym() : Object("grpsym-"), AttColor(), AttGrpSymLog(), AttStaffGroupingSym(), AttStartId(), AttStartEndId()
 {
     RegisterAttClass(ATT_COLOR);

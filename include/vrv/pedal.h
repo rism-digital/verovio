@@ -29,7 +29,7 @@ class Pedal : public ControlElement,
               public AttExtSym,
               public AttPedalLog,
               public AttPedalVis,
-              public AttPlacement,
+              public AttPlacementRelStaff,
               public AttVerticalGroup {
 public:
     /**

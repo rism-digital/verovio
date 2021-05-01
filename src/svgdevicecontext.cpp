@@ -51,6 +51,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_svgViewBox = false;
     m_html5 = false;
     m_formatRaw = false;
+    m_removeXlink = false;
     m_facsimile = false;
     m_indent = 2;
 
@@ -68,6 +69,8 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_currentNode = m_svgNode;
 
     m_outdata.clear();
+
+    m_glyphPostfixId = Object::GenerateRandUuid();
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}
@@ -129,6 +132,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
+                std::string id = StringFormat("%s-%s", child.attribute("id").value(), m_glyphPostfixId.c_str());
+                child.attribute("id").set_value(id.c_str());
                 defs.append_copy(child);
             }
         }
@@ -394,7 +399,7 @@ void SvgDeviceContext::StartPage()
                        //"g.page-margin{background: pink;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                       "g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                       "g.ending, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
                        "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
     }
@@ -482,7 +487,27 @@ pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
 }
 
 // Drawing methods
-void SvgDeviceContext::DrawSimpleBezierPath(Point bezier[4])
+void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
+{
+    pugi::xml_node pathChild = AppendChild("path");
+    pathChild.append_attribute("d") = StringFormat("M%d,%d Q%d,%d %d,%d", // Base string
+        bezier[0].x, bezier[0].y, // M Command
+        bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
+                                          .c_str();
+    pathChild.append_attribute("fill") = "none";
+    pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
+    pathChild.append_attribute("stroke-linecap") = "round";
+    pathChild.append_attribute("stroke-linejoin") = "round";
+    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
+    if (m_penStack.top().GetDashLength() > 0) {
+        // Since we have stroke-linecap=round, change the dash length to be the percieved length.
+        int dashOn = std::max(m_penStack.top().GetDashLength() - m_penStack.top().GetWidth(), 0);
+        int dashOff = m_penStack.top().GetDashLength() + m_penStack.top().GetWidth();
+        pathChild.append_attribute("stroke-dasharray") = StringFormat("%d, %d", dashOn, dashOff).c_str();
+    }
+}
+
+void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
 {
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d", // Base string
@@ -502,7 +527,8 @@ void SvgDeviceContext::DrawSimpleBezierPath(Point bezier[4])
         pathChild.append_attribute("stroke-dasharray") = StringFormat("%d, %d", dashOn, dashOff).c_str();
     }
 }
-void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
+
+void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d")
@@ -857,6 +883,12 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
 
     int w, h, gx, gy;
 
+    // remove the `xlink:` prefix for backwards compatibility with older SVG viewers.
+    std::string hrefAttrib = "href";
+    if (!m_removeXlink) {
+        hrefAttrib.insert(0, "xlink:");
+    }
+
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); ++i) {
         wchar_t c = text.at(i);
@@ -872,7 +904,8 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
 
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
-        useChild.append_attribute("xlink:href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
+        useChild.append_attribute(hrefAttrib.c_str())
+            = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();

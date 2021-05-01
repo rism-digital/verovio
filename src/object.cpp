@@ -47,6 +47,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
+#include "tuning.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -584,12 +585,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
-
-    m_uuid = m_classid + std::string(str);
+    m_uuid = m_classid + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -921,6 +917,16 @@ void Object::SeedUuid(unsigned int seed)
     }
 }
 
+std::string Object::GenerateRandUuid()
+{
+    int nr = std::rand();
+    char str[17];
+    // I do not want to use a stream for doing this!
+    snprintf(str, 17, "%016d", nr);
+
+    return std::string(str);
+}
+
 bool Object::sortByUlx(Object *a, Object *b)
 {
     FacsimileInterface *fa = NULL, *fb = NULL;
@@ -1161,6 +1167,50 @@ void Functor::Call(Object *ptr, FunctorParams *functorParams)
 {
     // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
     m_returnCode = (*ptr.*obj_fpt)(functorParams);
+}
+
+//----------------------------------------------------------------------------
+// ObjectFactory methods
+//----------------------------------------------------------------------------
+
+ObjectFactory *ObjectFactory::GetInstance()
+{
+    static ObjectFactory factory;
+    return &factory;
+}
+
+Object *ObjectFactory::Create(std::string name)
+{
+    Object *object = NULL;
+
+    MapOfStrConstructors::iterator it = s_ctorsRegistry.find(name);
+    if (it != s_ctorsRegistry.end()) object = it->second();
+
+    if (object) {
+        return object;
+    }
+    else {
+        LogError("Factory for '%s' not found", name.c_str());
+        return NULL;
+    }
+}
+
+void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
+{
+    for (auto str : classStrings) {
+        if (s_classIdsRegistry.count(str) > 0) {
+            classIds.push_back(s_classIdsRegistry.at(str));
+        }
+        else {
+            LogDebug("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+}
+
+void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
+{
+    s_ctorsRegistry[name] = function;
+    s_classIdsRegistry[name] = classId;
 }
 
 //----------------------------------------------------------------------------
@@ -1519,10 +1569,16 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
+        assert(staff->m_drawingTuning == NULL);
+        staff->m_drawingTuning = dynamic_cast<Tuning *>(params->m_currentStaffDef->FindDescendantByType(TUNING));
         staff->m_drawingLines = params->m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
+        staff->m_drawingStaffSize = 100;
         if (params->m_currentStaffDef->HasScale()) {
             staff->m_drawingStaffSize = params->m_currentStaffDef->GetScale();
+        }
+        if (staff->IsTablature()) {
+            staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
         }
         return FUNCTOR_CONTINUE;
     }

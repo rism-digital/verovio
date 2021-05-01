@@ -52,6 +52,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          
+      - uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: 'latest'
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -79,7 +83,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: joerick/cibuildwheel@v1.9.0
+        uses: joerick/cibuildwheel@f3dae81e82da2a2a36338269e32f3adb7b42dc8c
         with:
           output-dir: wheelhouse
         env:
@@ -90,7 +94,7 @@ jobs:
           CIBW_MANYLINUX_I686_IMAGE: quay.io/pypa/manylinux2014_i686:2021-02-17-8d1372a
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
-          CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python ./bindings/python/verovio.i
+          CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python -py3 ./bindings/python/verovio.i
 
       #===============================================#
       # Check build

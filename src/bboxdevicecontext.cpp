@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 
 //----------------------------------------------------------------------------
@@ -119,7 +120,30 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 }
 
 // calculated better
-void BBoxDeviceContext::DrawSimpleBezierPath(Point bezier[4])
+void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
+{
+    Point pMin = bezier[0].min(bezier[2]);
+    Point pMax = bezier[0].max(bezier[2]);
+
+    // From https://iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
+    if ((bezier[1].x < pMin.x) || (bezier[1].x > pMax.x) || (bezier[1].y < pMin.y) || (bezier[1].y > pMax.y)) {
+        // vec2 t = clamp((p0-p1)/(p0-2.0*p1+p2),0.0,1.0);
+        int tx = std::clamp((bezier[0].x - bezier[1].x) / (bezier[0].x - 2.0 * bezier[1].x + bezier[2].x), 0.0, 1.0);
+        int ty = std::clamp((bezier[0].y - bezier[1].y) / (bezier[0].y - 2.0 * bezier[1].y + bezier[2].y), 0.0, 1.0);
+        // vec2 s = 1.0 - t;
+        int sx = 1.0 - tx;
+        int sy = 1.0 - ty;
+        // vec2 q = s*s*p0 + 2.0*s*t*p1 + t*t*p2;
+        int qx = sx * sx * bezier[0].x + 2.0 * sx * tx * bezier[1].x + tx * tx * bezier[2].x;
+        int qy = sy * sy * bezier[0].y + 2.0 * sy * ty * bezier[1].y + ty * ty * bezier[2].y;
+        pMin = pMin.min(Point(qx, qy));
+        pMax = pMax.max(Point(qx, qy));
+    }
+
+    UpdateBB(pMin.x, pMin.y, pMax.x, pMax.y);
+}
+
+void BBoxDeviceContext::DrawCubicBezierPath(Point bezier[4])
 {
     Point pos;
     int width, height;
@@ -129,7 +153,8 @@ void BBoxDeviceContext::DrawSimpleBezierPath(Point bezier[4])
     // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
     UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
-void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
+
+void BBoxDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4])
 {
     Point pos;
     int width, height;
@@ -180,7 +205,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
-    // however, we expect the actualy width to be shifted on the left/top
+    // however, we expect the actually width to be shifted on the left/top
     // e.g. with 7, 4 on the left and 3 on the right
     if (penWidth % 2) {
         p1++;
@@ -273,7 +298,7 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
 void BBoxDeviceContext::MoveTextVerticallyTo(int y)
 {
     assert(m_drawingText);
-    // Because this is used only for smaller sup-script / supercript it seems
+    // Because this is used only for smaller subscript / superscript it seems
     // better not to change the y position for the BBoxDeviceContext because
     // otherwise it moves the full bounding box - to be improve / double checked
     // m_textY = y;
@@ -383,8 +408,8 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
     // the array may not be empty
     assert(!m_objects.empty());
 
-    // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View
-    // object)
+    // we need to store logical coordinates in the objects, we need to convert them back
+    // (this is why we need a View object)
     if (!m_isDeactivatedX) {
         (m_objects.back())->UpdateSelfBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
         if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top()->GetPointSize());

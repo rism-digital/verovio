@@ -11,13 +11,13 @@ on:
 # globals
 env:
   # general settings
-  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
+  MAIN_REPO_OWNER: rism-digital # Main repo owner (default: rism-digital; should not be changed)
 
   # build artifacts
   TOOLKIT_BUILD: toolkit-build
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
   GH_PAGES_BRANCH: gh-pages
 
   # directories

@@ -193,6 +193,12 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(SYLLABLE)) {
         DrawSyllable(dc, element, layer, staff, measure);
     }
+    else if (element->Is(TABDURSYM)) {
+        DrawTabDurSym(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(TABGRP)) {
+        DrawTabGrp(dc, element, layer, staff, measure);
+    }
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
@@ -526,7 +532,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += (stemDir == STEMDIRECTION_down) ? beamStep : -beamStep;
     }
 
-    // by default draw 3 slashes (e.g., for a temolo on a whole note)
+    // by default draw 3 slashes (e.g., for a tremolo on a whole note)
     if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
     if (stemMod == STEMMODIFIER_z) {
         if (stemDir == STEMDIRECTION_down) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -588,74 +594,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         y = staff->GetDrawingY();
         x = element->GetDrawingX();
     }
-    int sym = 0;
-    bool isMensural = Att::IsMensuralType(staff->m_drawingNotationType);
-    bool isNeume = staff->m_drawingNotationType == NOTATIONTYPE_neume;
 
-    // cmn clefs
-    int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
-    // G clef
-    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-        sym = SMUFL_E050_gClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-        sym = SMUFL_E052_gClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
-        sym = SMUFL_E051_gClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
-        sym = SMUFL_E053_gClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
-        sym = SMUFL_E054_gClef15ma;
-    // C clef
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-        sym = SMUFL_E05C_cClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-        sym = SMUFL_E05D_cClef8vb;
-    else if (clef->GetShape() == CLEFSHAPE_C)
-        sym = SMUFL_E05C_cClef;
-    // F clef
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-        sym = SMUFL_E062_fClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-        sym = SMUFL_E064_fClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
-        sym = SMUFL_E063_fClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
-        sym = SMUFL_E065_fClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
-        sym = SMUFL_E066_fClef15ma;
-    else if (clef->GetShape() == CLEFSHAPE_F)
-        sym = SMUFL_E062_fClef;
-    // Perc clef
-    else if (clef->GetShape() == CLEFSHAPE_perc)
-        sym = SMUFL_E069_unpitchedPercussionClef1;
-
-    // mensural clefs
-    if (isMensural) {
-        if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
-            if (sym == SMUFL_E050_gClef)
-                // G clef doesn't exist in black notation, so should never get here, but just in case.
-                sym = SMUFL_E901_mensuralGclefPetrucci;
-            else if (sym == SMUFL_E05C_cClef)
-                sym = SMUFL_E906_chantCclef;
-            else if (sym == SMUFL_E062_fClef)
-                sym = SMUFL_E902_chantFclef;
-        }
-        else {
-            if (sym == SMUFL_E050_gClef)
-                sym = SMUFL_E901_mensuralGclefPetrucci;
-            else if (sym == SMUFL_E05C_cClef)
-                sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
-            else if (sym == SMUFL_E062_fClef)
-                sym = SMUFL_E904_mensuralFclefPetrucci;
-        }
-    }
-    // neume clefs
-    else if (isNeume) {
-        if (clef->GetShape() == CLEFSHAPE_C)
-            sym = SMUFL_E906_chantCclef;
-        else if (clef->GetShape() == CLEFSHAPE_F)
-            sym = SMUFL_E902_chantFclef;
-    }
+    wchar_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
 
     if (sym == 0) {
         clef->SetEmptyBB();
@@ -681,7 +621,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     double clefSizeFactor = 1.0;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
         if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
-            // HARDCODED
             clefSizeFactor = m_options->m_clefChangeFactor.GetValue();
             // x -= m_doc->GetGlyphWidth(sym, clefSizeFactor * staff->m_drawingStaffSize, false) * 1.35;
         }
@@ -777,6 +716,10 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         fi->GetZone()->SetLrx(x + noteWidth);
         fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
     }
+
+    /************ Draw children (accidentals, etc) ************/
+    // Drawing the children should be done before ending the graphic. Otherwise the SVG tree will not match the MEI one
+    DrawLayerChildren(dc, custos, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -1232,7 +1175,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
     int y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    if (((num > 4) && !multiRest->HasBlock()) || (num > 15) || (multiRest->GetBlock() == BOOLEAN_true)) {
+    if (multiRest->UseBlockStyle(m_doc)) {
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         if (multiRest->HasWidth()) {
@@ -1335,6 +1278,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (note->IsMensuralDur()) {
         DrawMensuralNote(dc, element, layer, staff, measure);
+        return;
+    }
+    if (note->IsTabGrpNote()) {
+        DrawTabNote(dc, element, layer, staff, measure);
         return;
     }
 
@@ -1449,7 +1396,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     /************ Draw children (dots) ************/
-
     DrawLayerChildren(dc, rest, layer, staff, measure);
 }
 

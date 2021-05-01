@@ -33,7 +33,40 @@ enum data_ACCIDENTAL_GESTURAL {
     ACCIDENTAL_GESTURAL_sd,
     ACCIDENTAL_GESTURAL_fu,
     ACCIDENTAL_GESTURAL_fd,
+    ACCIDENTAL_GESTURAL_bms,
+    ACCIDENTAL_GESTURAL_kms,
+    ACCIDENTAL_GESTURAL_bs,
+    ACCIDENTAL_GESTURAL_ks,
+    ACCIDENTAL_GESTURAL_kf,
+    ACCIDENTAL_GESTURAL_bf,
+    ACCIDENTAL_GESTURAL_kmf,
+    ACCIDENTAL_GESTURAL_bmf,
     ACCIDENTAL_GESTURAL_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.GESTURAL.basic
+ */
+enum data_ACCIDENTAL_GESTURAL_basic {
+    ACCIDENTAL_GESTURAL_basic_NONE = 0,
+    ACCIDENTAL_GESTURAL_basic_s,
+    ACCIDENTAL_GESTURAL_basic_f,
+    ACCIDENTAL_GESTURAL_basic_ss,
+    ACCIDENTAL_GESTURAL_basic_ff,
+    ACCIDENTAL_GESTURAL_basic_n,
+    ACCIDENTAL_GESTURAL_basic_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.GESTURAL.extended
+ */
+enum data_ACCIDENTAL_GESTURAL_extended {
+    ACCIDENTAL_GESTURAL_extended_NONE = 0,
+    ACCIDENTAL_GESTURAL_extended_su,
+    ACCIDENTAL_GESTURAL_extended_sd,
+    ACCIDENTAL_GESTURAL_extended_fu,
+    ACCIDENTAL_GESTURAL_extended_fd,
+    ACCIDENTAL_GESTURAL_extended_MAX
 };
 
 /**
@@ -75,22 +108,6 @@ enum data_ACCIDENTAL_WRITTEN {
 };
 
 /**
- * MEI data.ACCIDENTAL.WRITTEN.aeu
- */
-enum data_ACCIDENTAL_WRITTEN_aeu {
-    ACCIDENTAL_WRITTEN_aeu_NONE = 0,
-    ACCIDENTAL_WRITTEN_aeu_bms,
-    ACCIDENTAL_WRITTEN_aeu_kms,
-    ACCIDENTAL_WRITTEN_aeu_bs,
-    ACCIDENTAL_WRITTEN_aeu_ks,
-    ACCIDENTAL_WRITTEN_aeu_kf,
-    ACCIDENTAL_WRITTEN_aeu_bf,
-    ACCIDENTAL_WRITTEN_aeu_kmf,
-    ACCIDENTAL_WRITTEN_aeu_bmf,
-    ACCIDENTAL_WRITTEN_aeu_MAX
-};
-
-/**
  * MEI data.ACCIDENTAL.WRITTEN.basic
  */
 enum data_ACCIDENTAL_WRITTEN_basic {
@@ -126,6 +143,22 @@ enum data_ACCIDENTAL_WRITTEN_extended {
     ACCIDENTAL_WRITTEN_extended_1qs,
     ACCIDENTAL_WRITTEN_extended_3qs,
     ACCIDENTAL_WRITTEN_extended_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.aeu
+ */
+enum data_ACCIDENTAL_aeu {
+    ACCIDENTAL_aeu_NONE = 0,
+    ACCIDENTAL_aeu_bms,
+    ACCIDENTAL_aeu_kms,
+    ACCIDENTAL_aeu_bs,
+    ACCIDENTAL_aeu_ks,
+    ACCIDENTAL_aeu_kf,
+    ACCIDENTAL_aeu_bf,
+    ACCIDENTAL_aeu_kmf,
+    ACCIDENTAL_aeu_bmf,
+    ACCIDENTAL_aeu_MAX
 };
 
 /**
@@ -472,6 +505,16 @@ enum data_COMPASSDIRECTION_extended {
     COMPASSDIRECTION_extended_se,
     COMPASSDIRECTION_extended_sw,
     COMPASSDIRECTION_extended_MAX
+};
+
+/**
+ * MEI data.COURSETUNING
+ */
+enum data_COURSETUNING {
+    COURSETUNING_NONE = 0,
+    COURSETUNING_guitar_drop_D,
+    COURSETUNING_lute_renaissance_6,
+    COURSETUNING_MAX
 };
 
 /**
@@ -948,6 +991,7 @@ enum data_METERSIGN {
     METERSIGN_NONE = 0,
     METERSIGN_common,
     METERSIGN_cut,
+    METERSIGN_open,
     METERSIGN_MAX
 };
 
@@ -1257,6 +1301,10 @@ enum data_NOTATIONTYPE {
     NOTATIONTYPE_mensural,
     NOTATIONTYPE_mensural_black,
     NOTATIONTYPE_mensural_white,
+    NOTATIONTYPE_tab_lute_french,
+    NOTATIONTYPE_tab_lute_italian,
+    NOTATIONTYPE_tab_lute_german,
+    NOTATIONTYPE_tab_guitar,
     NOTATIONTYPE_neume,
     NOTATIONTYPE_tab,
     NOTATIONTYPE_MAX
@@ -2075,8 +2123,7 @@ enum measurement_UNIT {
  */
 enum meiVersion_MEIVERSION {
     meiVersion_MEIVERSION_NONE = 0,
-    meiVersion_MEIVERSION_4_0_0,
-    meiVersion_MEIVERSION_4_0_1,
+    meiVersion_MEIVERSION_5_0_0_dev,
     meiVersion_MEIVERSION_MAX
 };
 

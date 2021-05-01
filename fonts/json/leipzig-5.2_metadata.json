@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.50",
+    "fontVersion": "5.2.51",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -940,6 +940,106 @@
             "bBoxSW": [
                 -0.0,
                 -1.796
+            ]
+        },
+        "fingering0": {
+            "bBoxNE": [
+                0.96,
+                0.984
+            ],
+            "bBoxSW": [
+                0.08,
+                0.0
+            ]
+        },
+        "fingering1": {
+            "bBoxNE": [
+                0.68,
+                0.984
+            ],
+            "bBoxSW": [
+                0.084,
+                -0.004
+            ]
+        },
+        "fingering2": {
+            "bBoxNE": [
+                0.744,
+                0.984
+            ],
+            "bBoxSW": [
+                0.0762,
+                0.0
+            ]
+        },
+        "fingering3": {
+            "bBoxNE": [
+                0.744,
+                0.984
+            ],
+            "bBoxSW": [
+                0.08,
+                0.0
+            ]
+        },
+        "fingering4": {
+            "bBoxNE": [
+                0.872,
+                0.984
+            ],
+            "bBoxSW": [
+                0.076,
+                0.0
+            ]
+        },
+        "fingering5": {
+            "bBoxNE": [
+                0.676,
+                1.004
+            ],
+            "bBoxSW": [
+                0.08,
+                0.0
+            ]
+        },
+        "fingering6": {
+            "bBoxNE": [
+                0.784,
+                0.984
+            ],
+            "bBoxSW": [
+                0.08,
+                0.0
+            ]
+        },
+        "fingering7": {
+            "bBoxNE": [
+                0.728,
+                0.984
+            ],
+            "bBoxSW": [
+                0.08,
+                0.0
+            ]
+        },
+        "fingering8": {
+            "bBoxNE": [
+                0.832,
+                0.984
+            ],
+            "bBoxSW": [
+                0.08,
+                0.0
+            ]
+        },
+        "fingering9": {
+            "bBoxNE": [
+                0.796,
+                0.984
+            ],
+            "bBoxSW": [
+                0.08,
+                -0.0006
             ]
         },
         "flag1024thDown": {
@@ -2252,6 +2352,36 @@
                 0.0
             ]
         },
+        "pluckedBuzzPizzicato": {
+            "bBoxNE": [
+                1.064,
+                0.824
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedLeftHandPizzicato": {
+            "bBoxNE": [
+                1.32,
+                1.32
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedSnapPizzicatoAbove": {
+            "bBoxNE": [
+                0.824,
+                1.064
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "quindicesima": {
             "bBoxNE": [
                 1.704,
@@ -2330,6 +2460,26 @@
             "bBoxSW": [
                 0.0,
                 -1.0
+            ]
+        },
+        "restQuarterOld": {
+            "bBoxNE": [
+                1.104,
+                0.732
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "restQuarterZ": {
+            "bBoxNE": [
+                1.216,
+                0.732
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.04
             ]
         },
         "segnoSerpent2": {
@@ -3446,6 +3596,26 @@
             "bBoxNE": [
                 0.824,
                 0.824
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE630": {
+            "bBoxNE": [
+                0.824,
+                1.064
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE638": {
+            "bBoxNE": [
+                1.32,
+                1.32
             ],
             "bBoxSW": [
                 0.0,

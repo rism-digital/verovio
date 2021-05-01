@@ -30,6 +30,8 @@ namespace vrv {
 // Section
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Section> s_factory("section", SECTION);
+
 Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);

@@ -29,6 +29,8 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
+
 BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
     RegisterAttClass(ATT_BARLINELOG);

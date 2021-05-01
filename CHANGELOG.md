@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.4.0] - 2021-05-01
+* Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
+* Support for chords with cuesize notes (@eNote-GmbH)
+* Improved horizontal layout with dots and flags (@eNote-GmbH)
+* Improvement of the the positioning of mRest (@eNote-GmbH)
+* Improvement of alignment for dots in different voices (@eNote-GmbH)
+* Improvement of rendering of ties that collide with dots (@eNote-GmbH)
+* Improvement of barLine positioning (@eNote-GmbH)
+* Improvement of MusicXML import of chord symbol `<degree>` (@th-we)
+* Improvement of input format auto-detection (@JRegimbal)
+* Method renderToPAE added to the JS toolkit (@davidrizo)
+* Preliminary support for tablature (experimental work)
+* Option --preserve-analytical-markup to preserve analytical markup (default is now off) (@rettinghaus)
+* Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
+* Option --harm-dist to control the minimal distance of harm (@DavidBauer1984)
+* Option --output-format-raw for raw MEI output without indentation and line breaks
+* Option --multi-rest-style for better control over the rendering style of multiple measure rest (@eNote-GmbH) 
+* Option --octave-alternative-symbols to switch to alternate SMuFL glyphs (@eNote-GmbH)
+
 ## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
 * Support for `accid@glyph.num` and `@glyph.name`
@@ -323,17 +342,17 @@
 * Several bug fixes and code refactoring enhancement
 
 ## [Pre-release versions]
-- [0.9.13](https://github.com/rism-ch/verovio/releases/tag/version-0.9.13)
-- [0.9.12](https://github.com/rism-ch/verovio/releases/tag/version-0.9.12)
-- [0.9.11](https://github.com/rism-ch/verovio/releases/tag/version-0.9.11)
-- [0.9.10](https://github.com/rism-ch/verovio/releases/tag/version-0.9.10)
-- [0.9.9](https://github.com/rism-ch/verovio/releases/tag/version-0.9.9)
-- [0.9.8](https://github.com/rism-ch/verovio/releases/tag/version-0.9.8)
-- [0.9.7](https://github.com/rism-ch/verovio/releases/tag/version-0.9.7)
-- [0.9.6](https://github.com/rism-ch/verovio/releases/tag/version-0.9.6)
-- [0.9.5](https://github.com/rism-ch/verovio/releases/tag/version-0.9.5)
-- [0.9.4](https://github.com/rism-ch/verovio/releases/tag/version-0.9.4)
-- [0.9.3](https://github.com/rism-ch/verovio/releases/tag/version-0.9.3)
-- [0.9.2](https://github.com/rism-ch/verovio/releases/tag/version-0.9.2)
-- [0.9.1](https://github.com/rism-ch/verovio/releases/tag/version-0.9.1)
-- [0.9.0](https://github.com/rism-ch/verovio/releases/tag/version-0.9.0)
+- [0.9.13](https://github.com/rism-digital/verovio/releases/tag/version-0.9.13)
+- [0.9.12](https://github.com/rism-digital/verovio/releases/tag/version-0.9.12)
+- [0.9.11](https://github.com/rism-digital/verovio/releases/tag/version-0.9.11)
+- [0.9.10](https://github.com/rism-digital/verovio/releases/tag/version-0.9.10)
+- [0.9.9](https://github.com/rism-digital/verovio/releases/tag/version-0.9.9)
+- [0.9.8](https://github.com/rism-digital/verovio/releases/tag/version-0.9.8)
+- [0.9.7](https://github.com/rism-digital/verovio/releases/tag/version-0.9.7)
+- [0.9.6](https://github.com/rism-digital/verovio/releases/tag/version-0.9.6)
+- [0.9.5](https://github.com/rism-digital/verovio/releases/tag/version-0.9.5)
+- [0.9.4](https://github.com/rism-digital/verovio/releases/tag/version-0.9.4)
+- [0.9.3](https://github.com/rism-digital/verovio/releases/tag/version-0.9.3)
+- [0.9.2](https://github.com/rism-digital/verovio/releases/tag/version-0.9.2)
+- [0.9.1](https://github.com/rism-digital/verovio/releases/tag/version-0.9.1)
+- [0.9.0](https://github.com/rism-digital/verovio/releases/tag/version-0.9.0)

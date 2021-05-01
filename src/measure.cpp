@@ -43,6 +43,8 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Measure> s_factory("measure", MEASURE);
+
 Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object("measure-")
     , AttBarring()
@@ -252,6 +254,38 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
+int Measure::GetRightBarLineWidth(Doc *doc)
+{
+    const BarLine *barline = GetRightBarLine();
+    if (!barline) return 0;
+
+    const int staffSize = 100;
+    const int barLineWidth = doc->GetDrawingBarLineWidth(staffSize);
+    const int barLineThickWidth
+        = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_thickBarlineThickness.GetValue();
+    const int barLineSeparation = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_barLineSeparation.GetValue();
+
+    int width = 0;
+    switch (barline->GetForm()) {
+        case BARRENDITION_dbl:
+        case BARRENDITION_dbldashed: {
+            width = barLineSeparation + barLineWidth / 2;
+            break;
+        }
+        case BARRENDITION_rptend:
+        case BARRENDITION_end: {
+            width = barLineSeparation + barLineWidth + barLineThickWidth / 2;
+            break;
+        }
+        case BARRENDITION_rptboth: {
+            width = 2 * barLineSeparation + barLineWidth / 2 + barLineThickWidth;
+            break;
+        }
+        default: break;
+    }
+    return width;
+}
+
 int Measure::GetRightBarLineLeft() const
 {
     int x = GetRightBarLineXRel();
@@ -458,7 +492,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
         }
     }
     else {
-        // with a scoredef inbetween always set it to what we have in the encoding
+        // with a scoredef in-between always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
@@ -738,6 +772,31 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Measure::AdjustDots(FunctorParams *functorParams)
+{
+    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
+    assert(params);
+
+    if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
+
+    std::vector<int>::iterator iter;
+    ArrayOfComparisons filters;
+    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
+        filters.clear();
+        // Create ad comparison object for each type / @n
+        std::vector<int> ns;
+        // -1 for barline attributes that need to be taken into account each time
+        ns.push_back(BARLINE_REFERENCES);
+        ns.push_back(*iter);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
+        filters.push_back(&matchStaff);
+
+        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Measure::AdjustAccidX(FunctorParams *functorParams)
 {
     AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
@@ -843,7 +902,7 @@ int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 
-    // Ajust the postion of the alignment according to what we have collected for this harm gpr
+    // Adjust the postion of the alignment according to what we have collected for this harm gpr
     m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
     params->m_overlapingHarm.clear();
 
@@ -858,7 +917,7 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 
-    // Ajust the postion of the alignment according to what we have collected for this verse
+    // Adjust the postion of the alignment according to what we have collected for this verse
     m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
     params->m_overlapingSyl.clear();
 
@@ -932,7 +991,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    // Check if the measure has some overlfowing control elements
+    // Check if the measure has some overflowing control elements
     int overflow = this->GetDrawingOverflow();
 
     if (params->m_currentSystem->GetChildCount() > 0) {

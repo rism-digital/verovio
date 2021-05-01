@@ -73,8 +73,9 @@ public:
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawSimpleBezierPath(Point bezier[4]);
-    virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]);
+    virtual void DrawQuadBezierPath(Point bezier[3]);
+    virtual void DrawCubicBezierPath(Point bezier[4]);
+    virtual void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]);
     virtual void DrawCircle(int x, int y, int radius);
     virtual void DrawEllipse(int x, int y, int width, int height);
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
@@ -204,6 +205,11 @@ public:
      */
     void SetFormatRaw(bool rawFormat) { m_formatRaw = rawFormat; }
 
+    /**
+     * Removes the xlink: prefex on href attributes, necessary for some newer browsers.
+     */
+    void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -279,8 +285,12 @@ private:
     bool m_html5;
     // format output as raw, stripping extraneous whitespace and non-content newlines
     bool m_formatRaw;
+    // remove xlink from href attributes
+    bool m_removeXlink;
     // indentation value (-1 for tabs)
     int m_indent;
+    // prefix to be added to font glyphs
+    std::string m_glyphPostfixId;
 };
 
 } // namespace vrv

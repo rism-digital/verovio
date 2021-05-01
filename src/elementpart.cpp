@@ -43,6 +43,7 @@ void Dots::Reset()
     LayerElement::Reset();
     ResetAugmentDots();
 
+    m_isAdjusted = false;
     m_dotLocsByStaff.clear();
 }
 
@@ -295,38 +296,30 @@ bool Stem::IsSupportedChild(Object *child)
     return true;
 }
 
-void Stem::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin)
 {
-    if (isUnison) {
-        isUnison = false;
-        return;
-    }
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
-    // check if there is an overlap on the left or on the right and displace stem's parent correspondigly
-    for (auto element : otherElements) {
-        int right = HorizontalLeftOverlap(element, doc, 0, 0);
-        int left = HorizontalRightOverlap(element, doc, 0, 0);
-        if (!right || !left) continue;
 
-        LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
-        assert(parent);
-        int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-        Flag *currentFlag = NULL;
-        currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
-        if (currentFlag) {
-            wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
-            const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
-            horizontalMargin += flagWidth;
-        }
+    // check if there is an overlap on the left or on the right and displace stem's parent correspondingly
+    const int right = HorizontalLeftOverlap(otherElement, doc, margin, 0);
+    const int left = HorizontalRightOverlap(otherElement, doc, margin, 0);
+    if (!right || !left) return 0;
 
-        if (right < left) {
-            parent->SetDrawingXRel(parent->GetDrawingXRel() + right + horizontalMargin);
-        }
-        else {
-            parent->SetDrawingXRel(parent->GetDrawingXRel() - horizontalMargin - left);
-        }
-        return;
+    int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    Flag *currentFlag = NULL;
+    currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
+    if (currentFlag && currentFlag->m_drawingNbFlags) {
+        wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
+        const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
+        horizontalMargin += flagWidth;
+    }
+
+    if (right < left) {
+        return right + horizontalMargin;
+    }
+    else {
+        return (-horizontalMargin - left);
     }
 }
 
@@ -397,6 +390,7 @@ int Dots::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
 
     m_dotLocsByStaff.clear();
+    m_isAdjusted = false;
 
     return FUNCTOR_CONTINUE;
 }
@@ -488,7 +482,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
     else {
         int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
-        baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff) * thirdUnit);
+        const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
+        baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
