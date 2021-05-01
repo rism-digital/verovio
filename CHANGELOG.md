@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.4.0] - 2021-05-01
 * Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
 * Support for chords with cuesize notes (@eNote-GmbH)
 * Improved horizontal layout with dots and flags (@eNote-GmbH)
@@ -32,7 +34,7 @@
 * Option --svg-format-raw for raw SVG output without indentation and line breaks
 * New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
 * Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
-* Fixes in the MusicXML importer (@Enote-GmbH)
+* Fixes in the MusicXML importer (@eNote-GmBH)
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
