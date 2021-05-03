@@ -50,6 +50,7 @@ jobs:
           repository: ${{ env.GH_PAGES_REPO }}
           ref: ${{ env.GH_PAGES_BRANCH }}
           path: ${{ env.GH_PAGES_DIR }}
+          submodules: recursive
 
       - name: Create directories and install packages
         working-directory: ${{ github.workspace }}
