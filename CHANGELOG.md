@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Fix option --octave-alternative-symbols
 
 ## [3.4.1] - 2021-05-03
 * Fix bug in font names in the Python distribution
