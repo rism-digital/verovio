@@ -78,25 +78,26 @@ if __name__ == "__main__":
             # reset the options
             options = {**defaultOptions, **testOptions}
 
-            # filenames (input MEI and output SVG)
-            meiFile = os.path.join(path1, item1, item2)
-            print(meiFile)
+            # filenames (input MEI/XML and output SVG)
+            inputFile = os.path.join(path1, item1, item2)
+            print(inputFile)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
 
             # parse the MEI file
-            tree = ET.parse(meiFile)
-            root = tree.getroot()
-            # try to get the extMeta tag and load the options if existing
-            meta = root.findtext(".//mei:meiHead/mei:extMeta", namespaces=ns)
-            if (meta != None and meta != ''):
-                print(meta)
-                metaOptions = json.loads(meta)
-                options = {**options, **metaOptions}
+            if ext == '.mei':
+                tree = ET.parse(inputFile)
+                root = tree.getroot()
+                # try to get the extMeta tag and load the options if existing
+                meta = root.findtext(".//mei:meiHead/mei:extMeta", namespaces=ns)
+                if (meta != None and meta != ''):
+                    print(meta)
+                    metaOptions = json.loads(meta)
+                    options = {**options, **metaOptions}
 
             tk.setOptions(json.dumps(options))
-            tk.loadFile(meiFile)
+            tk.loadFile(inputFile)
             svgString = tk.renderToSVG(1)
             svgString = svgString.replace(
                 "overflow=\"inherit\"", "overflow=\"visible\"")
