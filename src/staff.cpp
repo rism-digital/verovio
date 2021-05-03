@@ -637,4 +637,14 @@ int Staff::AdjustSylSpacing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Staff::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    params->m_expandedNotes.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

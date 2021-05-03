@@ -41,8 +41,21 @@ public:
      */
     virtual bool IsSupportedChild(Object *object);
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
-    //
+    /**
+     * Calculate the duration of an individual note in a measured tremolo
+     */
+    data_DURATION CalcIndividualNoteDuration();
+
 public:
     //
 private:

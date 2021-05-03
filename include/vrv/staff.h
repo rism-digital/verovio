@@ -226,6 +226,11 @@ public:
      */
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.
