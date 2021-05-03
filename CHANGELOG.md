@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.4.1] - 2021-05-03
+* Fix bug in font names in the Python distribution
+
 ## [3.4.0] - 2021-05-01
 * Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
 * Support for chords with cuesize notes (@eNote-GmbH)
