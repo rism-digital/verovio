@@ -7,10 +7,10 @@ verovio_root="$(pwd)/../.."
 
 if [[ "$@" == "clean" ]]
 then
-	rm -r $verovio_root/tools/build-library
-	rm $verovio_root/tools/libverovio.so
-	rm -r $verovio_root/bindings/qt/build-library
-	rm -r $verovio_root/bindings/qt/build-demo
+	rm -r "$verovio_root/tools/build-library"
+	rm "$verovio_root/tools/libverovio.so"
+	rm -r "$verovio_root/bindings/qt/build-library"
+	rm -r $"verovio_root/bindings/qt/build-demo"
 	exit 0
 fi
 
@@ -37,13 +37,13 @@ ln -s "$(pwd)/libverovio.so" ..
 # build verovio Qt lib
 mkdir "$verovio_root/bindings/qt/build-library"
 cd "$verovio_root/bindings/qt/build-library"
-$qmake ../lib
+"$qmake" ../lib
 make -j8
 
 # build verovio Qt demo
 mkdir "$verovio_root/bindings/qt/build-demo"
 cd "$verovio_root/bindings/qt/build-demo"
-$qmake ../demo
+"$qmake" ../demo
 make -j8
 
 # To start the Qt demo add the directories for the CPP and Qt libraries to LD_LIBRARY_PATH
