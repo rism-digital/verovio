@@ -1086,7 +1086,7 @@ Options::Options()
 
     m_octaveAlternativeSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
     m_octaveAlternativeSymbols.Init(false);
-    this->Register(&m_octaveAlternativeSymbols, "alternativeOctaveSymbols", &m_generalLayout);
+    this->Register(&m_octaveAlternativeSymbols, "octaveAlternativeSymbols", &m_generalLayout);
 
     m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
     m_octaveLineThickness.Init(0.20, 0.10, 1.00);

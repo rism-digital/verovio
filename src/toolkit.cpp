@@ -44,7 +44,10 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
+
+#ifndef NO_MXL_SUPPORT
 #include "zip_file.hpp"
+#endif /* NO_MXL_SUPPORT */
 
 namespace vrv {
 
@@ -366,6 +369,7 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
+#ifndef NO_MXL_SUPPORT
     miniz_cpp::zip_file file(bytes);
 
     std::string filename;
@@ -391,6 +395,10 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
         LogError("No file to load found in the archive");
         return false;
     }
+#else
+    LogError("MXL import is not supported in this build.");
+    return false;
+#endif
 }
 
 bool Toolkit::LoadZipDataBase64(const std::string &data)

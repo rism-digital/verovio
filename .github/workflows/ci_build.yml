@@ -37,7 +37,7 @@ env:
 
   # doxygen
   DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-digital and from forks
-  DOXYGEN_BRANCH: master
+  DOXYGEN_BRANCH: develop
 
   # emscripten
   EM_VERSION: latest
