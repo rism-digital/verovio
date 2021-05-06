@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
 * Fix option --octave-alternative-symbols
 
 ## [3.4.1] - 2021-05-03
