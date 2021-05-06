@@ -59,6 +59,13 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
+enum option_MULTIRESTSTYLE {
+    MULTIRESTSTYLE_auto = 0,
+    MULTIRESTSTYLE_default,
+    MULTIRESTSTYLE_block,
+    MULTIRESTSTYLE_symbols
+};
+
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -117,6 +124,7 @@ public:
     static std::map<int, std::string> s_condense;
     static std::map<int, std::string> s_footer;
     static std::map<int, std::string> s_header;
+    static std::map<int, std::string> s_multiRestStyle;
     static std::map<int, std::string> s_systemDivider;
 
 protected:
@@ -427,7 +435,7 @@ private:
  */
 
 class OptionJson : public Option {
-    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
+    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value>>;
 
 public:
     //
@@ -559,6 +567,7 @@ public:
     OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
+    OptionBool m_outputFormatRaw;
     OptionInt m_outputIndent;
     OptionBool m_outputIndentTab;
     OptionBool m_outputSmuflXmlEntities;
@@ -568,6 +577,7 @@ public:
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_shrinkToFit;
     OptionBool m_svgBoundingBoxes;
@@ -591,6 +601,7 @@ public:
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionDbl m_bracketThickness;
+    OptionDbl m_dynamDist;
     OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
     OptionString m_font;
@@ -599,6 +610,7 @@ public:
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
     OptionDbl m_hairpinThickness;
+    OptionDbl m_harmDist;
     OptionDbl m_justificationBraceGroup;
     OptionDbl m_justificationBracketGroup;
     OptionDbl m_justificationStaff;
@@ -613,6 +625,9 @@ public:
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionInt m_mnumInterval;
+    OptionIntMap m_multiRestStyle;
+    OptionBool m_octaveAlternativeSymbols;
+    OptionDbl m_octaveLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
@@ -684,6 +699,7 @@ public:
     OptionDbl m_leftMarginNote;
     OptionDbl m_leftMarginRest;
     OptionDbl m_leftMarginRightBarLine;
+    OptionDbl m_leftMarginTabDurSym;
     //
     OptionDbl m_rightMarginAccid;
     OptionDbl m_rightMarginBarLine;
@@ -701,6 +717,7 @@ public:
     OptionDbl m_rightMarginNote;
     OptionDbl m_rightMarginRest;
     OptionDbl m_rightMarginRightBarLine;
+    OptionDbl m_rightMarginTabDurSym;
     //
     OptionDbl m_topMarginArtic;
     OptionDbl m_topMarginHarm;

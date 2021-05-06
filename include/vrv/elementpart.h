@@ -45,6 +45,9 @@ public:
 
     const MapOfDotLocs *GetMapOfDotLocs() const { return &m_dotLocsByStaff; }
 
+    void IsAdjusted(bool isAdjusted) { m_isAdjusted = isAdjusted; }
+    bool IsAdjusted() const { return m_isAdjusted; }
+
     //----------//
     // Functors //
     //----------//
@@ -81,6 +84,8 @@ private:
      * A map of dot locations
      */
     MapOfDotLocs m_dotLocsByStaff;
+
+    bool m_isAdjusted;
 };
 
 //----------------------------------------------------------------------------
@@ -355,7 +360,7 @@ public:
     /**
      * Helper to adjust overlaping layers for stems
      */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+    int CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin);
 
     //----------//
     // Functors //

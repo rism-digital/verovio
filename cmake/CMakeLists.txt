@@ -14,6 +14,7 @@ option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        O
 option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
+option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
 option(BUILD_AS_LIBRARY         "Build verovio as library"                     OFF)
@@ -114,6 +115,10 @@ if(NO_PAE_SUPPORT)
     add_definitions(-DNO_PAE_SUPPORT)
 endif()
 
+if(NO_MXL_SUPPORT)
+    add_definitions(-DNO_MXL_SUPPORT)
+endif()
+
 if(NO_HUMDRUM_SUPPORT)
     add_definitions(-DNO_HUMDRUM_SUPPORT)
 else()
@@ -144,6 +149,7 @@ set(all_SRC
     ../libmei/atts_gestural.cpp
     ../libmei/atts_externalsymbols.cpp
     ../libmei/atts_facsimile.cpp
+    ../libmei/atts_frettab.cpp
     ../libmei/atts_mei.cpp
     ../libmei/atts_mensural.cpp
     ../libmei/atts_midi.cpp

@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -43,17 +44,16 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
+
+#ifndef NO_MXL_SUPPORT
 #include "zip_file.hpp"
+#endif /* NO_MXL_SUPPORT */
 
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
-
-std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
-    = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
-          { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
 
 void SetDefaultResourcePath(const std::string &path)
 {
@@ -228,53 +228,13 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
 
-        if (initial.find("<mei ") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s\\n>]"))) {
             return MEI;
         }
-        if (initial.find("<mei>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<score-partwise>") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-
-        std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
+        LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
     }
     if (initial.find("\n!!") != std::string::npos) {
@@ -409,6 +369,7 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
+#ifndef NO_MXL_SUPPORT
     miniz_cpp::zip_file file(bytes);
 
     std::string filename;
@@ -434,6 +395,10 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
         LogError("No file to load found in the archive");
         return false;
     }
+#else
+    LogError("MXL import is not supported in this build.");
+    return false;
+#endif
 }
 
 bool Toolkit::LoadZipDataBase64(const std::string &data)
@@ -446,33 +411,6 @@ bool Toolkit::LoadZipDataBuffer(const unsigned char *data, int length)
 {
     std::vector<unsigned char> bytes(data, data + length);
     return LoadZipData(bytes);
-}
-
-void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
-{
-    // one we use magic_enum.hpp we can do :
-    /*
-    for (auto str : classStrings) {
-        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-        auto classId = magic_enum::enum_cast<ClassId>(str);
-        if (classId.has_value()) {
-            classIds.push_back(classId.value());
-          // color.value() -> Color::GREEN
-        }
-        else {
-            LogError("Class name '%s' could not be matched", str.c_str());
-        }
-    }
-    */
-    // For now, map a few by hand... - there must be a better way to do this
-    for (auto str : classStrings) {
-        if (Toolkit::s_MEItoClassIdMap.count(str) > 0) {
-            classIds.push_back(Toolkit::s_MEItoClassIdMap.at(str));
-        }
-        else {
-            LogDebug("Class name '%s' could not be matched", str.c_str());
-        }
-    }
 }
 
 bool Toolkit::LoadData(const std::string &data)
@@ -806,14 +744,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     jsonxx::Object json;
 
-    // Read JSON options
-    if (!json.parse(jsonOptions)) {
-        LogWarning("Cannot parse JSON std::string. Using default options.");
-    }
-    else {
-        if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
-        if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
-        if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+            if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+            if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+        }
     }
 
     if (GetPageCount() == 0) {
@@ -1096,11 +1036,11 @@ std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
     return a.json();
 }
 
-bool Toolkit::Edit(const std::string &json_editorAction)
+bool Toolkit::Edit(const std::string &editorAction)
 {
     this->ResetLogBuffer();
 
-    return m_editorToolkit->ParseEditorAction(json_editorAction);
+    return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
 std::string Toolkit::EditInfo()
@@ -1208,7 +1148,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     return true;
 }
 
-std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
+std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 {
     this->ResetLogBuffer();
 
@@ -1244,7 +1184,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     // render the page
     RenderToDeviceContext(pageNo, &svg);
 
-    std::string out_str = svg.GetStringSVG(xml_declaration);
+    std::string out_str = svg.GetStringSVG(xmlDeclaration);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }

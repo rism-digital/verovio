@@ -68,17 +68,7 @@ except EnvironmentError:
     sys.exit(1)
 
 fontName = os.path.splitext(os.path.basename(fontFileName))[0]
-
-# generating OpenType font:
-print("Generating OpenType font")
-font.generate( font.fontname+'.otf', '', 'opentype' )
 metadata = {'fontName': font.fontname, 'fontVersion': font.version}
-
-# extracting font log
-print("Extracting font log")
-fontlog = open('FONTLOG.txt', 'w+')
-n=fontlog.write(font.fontlog)
-fontlog.close()
 
 jsonComment = 'Automatically generated Metadata for the ' + font.fontname + \
     ' font. Most (but not all) of these metadata come from the SMuFL specifications.'

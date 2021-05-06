@@ -32,6 +32,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "corr.h"
+#include "course.h"
 #include "custos.h"
 #include "damage.h"
 #include "del.h"
@@ -92,6 +93,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "phrase.h"
+#include "pitchinflection.h"
 #include "plica.h"
 #include "proport.h"
 #include "rdg.h"
@@ -117,10 +119,13 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
+#include "tabdursym.h"
+#include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
 #include "trill.h"
+#include "tuning.h"
 #include "tuplet.h"
 #include "turn.h"
 #include "unclear.h"
@@ -222,6 +227,9 @@ bool MEIOutput::Export()
         unsigned int output_flags = pugi::format_default;
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
             output_flags |= pugi::format_no_escapes;
+        }
+        if (m_doc->GetOptions()->m_outputFormatRaw.GetValue()) {
+            output_flags |= pugi::format_raw;
         }
 
         std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
@@ -362,6 +370,14 @@ bool MEIOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("staffDef");
         WriteStaffDef(m_currentNode, dynamic_cast<StaffDef *>(object));
     }
+    else if (object->Is(TUNING)) {
+        m_currentNode = m_currentNode.append_child("tuning");
+        WriteTuning(m_currentNode, dynamic_cast<Tuning *>(object));
+    }
+    else if (object->Is(COURSE)) {
+        m_currentNode = m_currentNode.append_child("course");
+        WriteCourse(m_currentNode, dynamic_cast<Course *>(object));
+    }
     else if (object->Is(MEASURE)) {
         m_currentNode = m_currentNode.append_child("measure");
         WriteMeasure(m_currentNode, dynamic_cast<Measure *>(object));
@@ -376,7 +392,7 @@ bool MEIOutput::WriteObject(Object *object)
     }
 
     // Measure elements
-    else if (object->Is(ANCHORED_TEXT)) {
+    else if (object->Is(ANCHOREDTEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
     }
@@ -439,6 +455,10 @@ bool MEIOutput::WriteObject(Object *object)
         WritePhrase(m_currentNode, dynamic_cast<Phrase *>(object));
     }
 
+    else if (object->Is(PITCHINFLECTION)) {
+        m_currentNode = m_currentNode.append_child("pitchInfection");
+        WritePitchInflection(m_currentNode, dynamic_cast<PitchInflection *>(object));
+    }
     else if (object->Is(REH)) {
         m_currentNode = m_currentNode.append_child("reh");
         WriteReh(m_currentNode, dynamic_cast<Reh *>(object));
@@ -604,6 +624,14 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(SYLLABLE)) {
         m_currentNode = m_currentNode.append_child("syllable");
         WriteSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
+    }
+    else if (object->Is(TABDURSYM)) {
+        m_currentNode = m_currentNode.append_child("tabDurSym");
+        WriteTabDurSym(m_currentNode, dynamic_cast<TabDurSym *>(object));
+    }
+    else if (object->Is(TABGRP)) {
+        m_currentNode = m_currentNode.append_child("tabGrp");
+        WriteTabGrp(m_currentNode, dynamic_cast<TabGrp *>(object));
     }
     else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
@@ -1140,6 +1168,22 @@ void MEIOutput::WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr)
     WriteXmlId(currentNode, labelAbbr);
 }
 
+void MEIOutput::WriteTuning(pugi::xml_node currentNode, Tuning *tuning)
+{
+    assert(tuning);
+
+    WriteXmlId(currentNode, tuning);
+    tuning->WriteCourseLog(currentNode);
+}
+
+void MEIOutput::WriteCourse(pugi::xml_node currentNode, Course *course)
+{
+    assert(course);
+
+    WriteXmlId(currentNode, course);
+    course->WriteNNumberLike(currentNode);
+}
+
 void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
 {
     assert(measure);
@@ -1213,7 +1257,7 @@ void MEIOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
     WriteControlElement(currentNode, breath);
     WriteTimePointInterface(currentNode, breath);
     breath->WriteColor(currentNode);
-    breath->WritePlacement(currentNode);
+    breath->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
@@ -1252,7 +1296,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WriteColor(currentNode);
     fermata->WriteExtSym(currentNode);
     fermata->WriteFermataVis(currentNode);
-    fermata->WritePlacement(currentNode);
+    fermata->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
@@ -1286,7 +1330,7 @@ void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WriteHairpinVis(currentNode);
-    hairpin->WritePlacement(currentNode);
+    hairpin->WritePlacementRelStaff(currentNode);
     hairpin->WriteVerticalGroup(currentNode);
 }
 
@@ -1322,7 +1366,7 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
     mordent->WriteColor(currentNode);
     mordent->WriteExtSym(currentNode);
     mordent->WriteOrnamentAccid(currentNode);
-    mordent->WritePlacement(currentNode);
+    mordent->WritePlacementRelStaff(currentNode);
     mordent->WriteMordentLog(currentNode);
 }
 
@@ -1350,7 +1394,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteExtSym(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
-    pedal->WritePlacement(currentNode);
+    pedal->WritePlacementRelStaff(currentNode);
     pedal->WriteVerticalGroup(currentNode);
 }
 
@@ -1359,6 +1403,14 @@ void MEIOutput::WritePhrase(pugi::xml_node currentNode, Phrase *phrase)
     assert(phrase);
 
     WriteSlur(currentNode, phrase);
+}
+
+void MEIOutput::WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection)
+{
+    assert(pitchInflection);
+
+    WriteControlElement(currentNode, pitchInflection);
+    WriteTimeSpanningInterface(currentNode, pitchInflection);
 }
 
 void MEIOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
@@ -1435,7 +1487,7 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     trill->WriteLineRend(currentNode);
     trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
-    trill->WritePlacement(currentNode);
+    trill->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
@@ -1447,7 +1499,7 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     turn->WriteColor(currentNode);
     turn->WriteExtSym(currentNode);
     turn->WriteOrnamentAccid(currentNode);
-    turn->WritePlacement(currentNode);
+    turn->WritePlacementRelStaff(currentNode);
     turn->WriteTurnLog(currentNode);
 }
 
@@ -1509,7 +1561,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     artic->WriteArticulation(currentNode);
     artic->WriteColor(currentNode);
     artic->WriteExtSym(currentNode);
-    artic->WritePlacement(currentNode);
+    artic->WritePlacementRelEvent(currentNode);
 }
 
 void MEIOutput::WriteBarLine(pugi::xml_node currentNode, BarLine *barLine)
@@ -1840,6 +1892,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteExtSym(currentNode);
     note->WriteGraced(currentNode);
     note->WriteMidiVelocity(currentNode);
+    note->WriteNoteGesTab(currentNode);
     note->WriteNoteHeads(currentNode);
     note->WriteNoteVisMensural(currentNode);
     note->WriteStems(currentNode);
@@ -1857,6 +1910,7 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
     rest->WriteCue(currentNode);
+    rest->WriteExtSym(currentNode);
     rest->WriteRestVisMensural(currentNode);
 }
 
@@ -1881,6 +1935,22 @@ void MEIOutput::WriteSpace(pugi::xml_node currentNode, Space *space)
 
     WriteLayerElement(currentNode, space);
     WriteDurationInterface(currentNode, space);
+}
+
+void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
+{
+    assert(tabDurSym);
+
+    WriteLayerElement(currentNode, tabDurSym);
+    tabDurSym->WriteNNumberLike(currentNode);
+}
+
+void MEIOutput::WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp)
+{
+    assert(tabGrp);
+
+    WriteLayerElement(currentNode, tabGrp);
+    WriteDurationInterface(currentNode, tabGrp);
 }
 
 void MEIOutput::WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
@@ -2123,7 +2193,7 @@ void MEIOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *
 {
     assert(interface);
 
-    interface->WritePlacement(element);
+    interface->WritePlacementRelStaff(element);
 }
 
 void MEIOutput::WriteTimePointInterface(pugi::xml_node element, TimePointInterface *interface)
@@ -2737,6 +2807,18 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for tabGrp
+    else if (filterParent->Is(TABGRP)) {
+        if (element == "tabDurSym") {
+            return true;
+        }
+        if (element == "note") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for tuplet
     else if (filterParent->Is(TUPLET)) {
         if (element == "beam") {
@@ -2764,6 +2846,15 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "tuplet") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for tunning
+    else if (filterParent->Is(TUNING)) {
+        if (element == "course") {
             return true;
         }
         else {
@@ -2925,7 +3016,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
-        m_doc->ConvertMarkupDoc();
+        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
     }
 
     if (success && !m_hasScoreDef) {
@@ -3892,15 +3983,66 @@ bool MEIInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "labelAbbr") {
             success = ReadLabelAbbr(parent, current);
         }
+        else if (std::string(current.name()) == "tuning") {
+            success = ReadTuning(parent, current);
+        }
         // xml comment
         else if (std::string(current.name()) == "") {
             success = ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staffDef>", current.name());
+            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
         }
     }
     return success;
+}
+
+bool MEIInput::ReadTuning(Object *parent, pugi::xml_node tuning)
+{
+    assert(dynamic_cast<StaffDef *>(parent) || dynamic_cast<EditorialElement *>(parent));
+
+    Tuning *vrvTuning = new Tuning();
+    SetMeiUuid(tuning, vrvTuning);
+
+    parent->AddChild(vrvTuning);
+    vrvTuning->ReadCourseLog(tuning);
+
+    ReadUnsupportedAttr(tuning, vrvTuning);
+    return ReadTuningChildren(vrvTuning, tuning);
+}
+
+bool MEIInput::ReadTuningChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<Tuning *>(parent) || dynamic_cast<EditorialElement *>(parent));
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // content
+        else if (std::string(current.name()) == "course") {
+            success = ReadCourse(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
+        }
+    }
+    return success;
+}
+
+bool MEIInput::ReadCourse(Object *parent, pugi::xml_node course)
+{
+    assert(dynamic_cast<Tuning *>(parent) || dynamic_cast<EditorialElement *>(parent));
+
+    Course *vrvCourse = new Course();
+    SetMeiUuid(course, vrvCourse);
+
+    parent->AddChild(vrvCourse);
+    vrvCourse->ReadNNumberLike(course);
+
+    ReadUnsupportedAttr(course, vrvCourse);
+
+    return true;
 }
 
 bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
@@ -4038,6 +4180,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "phrase") {
             success = ReadPhrase(parent, current);
         }
+        else if (std::string(current.name()) == "pitchInflection") {
+            success = ReadPitchInflection(parent, current);
+        }
         else if (std::string(current.name()) == "reh") {
             success = ReadReh(parent, current);
         }
@@ -4136,7 +4281,7 @@ bool MEIInput::ReadBreath(Object *parent, pugi::xml_node breath)
 
     ReadTimePointInterface(breath, vrvBreath);
     vrvBreath->ReadColor(breath);
-    vrvBreath->ReadPlacement(breath);
+    vrvBreath->ReadPlacementRelStaff(breath);
 
     parent->AddChild(vrvBreath);
     ReadUnsupportedAttr(breath, vrvBreath);
@@ -4187,7 +4332,7 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     vrvFermata->ReadColor(fermata);
     vrvFermata->ReadExtSym(fermata);
     vrvFermata->ReadFermataVis(fermata);
-    vrvFermata->ReadPlacement(fermata);
+    vrvFermata->ReadPlacementRelStaff(fermata);
 
     parent->AddChild(vrvFermata);
     ReadUnsupportedAttr(fermata, vrvFermata);
@@ -4233,7 +4378,7 @@ bool MEIInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadHairpinVis(hairpin);
-    vrvHairpin->ReadPlacement(hairpin);
+    vrvHairpin->ReadPlacementRelStaff(hairpin);
     vrvHairpin->ReadVerticalGroup(hairpin);
 
     parent->AddChild(vrvHairpin);
@@ -4284,7 +4429,7 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     vrvMordent->ReadColor(mordent);
     vrvMordent->ReadExtSym(mordent);
     vrvMordent->ReadOrnamentAccid(mordent);
-    vrvMordent->ReadPlacement(mordent);
+    vrvMordent->ReadPlacementRelStaff(mordent);
     vrvMordent->ReadMordentLog(mordent);
 
     parent->AddChild(vrvMordent);
@@ -4320,7 +4465,7 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     vrvPedal->ReadExtSym(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPedalVis(pedal);
-    vrvPedal->ReadPlacement(pedal);
+    vrvPedal->ReadPlacementRelStaff(pedal);
     vrvPedal->ReadVerticalGroup(pedal);
 
     parent->AddChild(vrvPedal);
@@ -4340,6 +4485,18 @@ bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
 
     parent->AddChild(vrvPhrase);
     ReadUnsupportedAttr(phrase, vrvPhrase);
+    return true;
+}
+
+bool MEIInput::ReadPitchInflection(Object *parent, pugi::xml_node pitchInflection)
+{
+    PitchInflection *vrvPitchInflection = new PitchInflection();
+    ReadControlElement(pitchInflection, vrvPitchInflection);
+
+    ReadTimeSpanningInterface(pitchInflection, vrvPitchInflection);
+
+    parent->AddChild(vrvPitchInflection);
+    ReadUnsupportedAttr(pitchInflection, vrvPitchInflection);
     return true;
 }
 
@@ -4417,7 +4574,7 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     vrvTrill->ReadLineRend(trill);
     vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
-    vrvTrill->ReadPlacement(trill);
+    vrvTrill->ReadPlacementRelStaff(trill);
 
     parent->AddChild(vrvTrill);
     ReadUnsupportedAttr(trill, vrvTrill);
@@ -4437,7 +4594,7 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
     vrvTurn->ReadColor(turn);
     vrvTurn->ReadExtSym(turn);
     vrvTurn->ReadOrnamentAccid(turn);
-    vrvTurn->ReadPlacement(turn);
+    vrvTurn->ReadPlacementRelStaff(turn);
     vrvTurn->ReadTurnLog(turn);
 
     parent->AddChild(vrvTurn);
@@ -4682,6 +4839,12 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "syllable") {
             success = ReadSyllable(parent, xmlElement);
         }
+        else if (elementName == "tabDurSym") {
+            success = ReadTabDurSym(parent, xmlElement);
+        }
+        else if (elementName == "tabGrp") {
+            success = ReadTabGrp(parent, xmlElement);
+        }
         else if (elementName == "tuplet") {
             success = ReadTuplet(parent, xmlElement);
         }
@@ -4741,7 +4904,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadColor(artic);
     vrvArtic->ReadExtSym(artic);
-    vrvArtic->ReadPlacement(artic);
+    vrvArtic->ReadPlacementRelEvent(artic);
 
     if (vrvArtic->GetArtic().size() > 1) {
         m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);
@@ -4861,6 +5024,21 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     return true;
 }
 
+void MEIInput::ReadAccidAttr(pugi::xml_node node, Object *object)
+{
+    AttAccidental accidental;
+    accidental.ReadAccidental(node);
+    AttAccidentalGestural accidentalGestural;
+    accidentalGestural.ReadAccidentalGestural(node);
+    if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
+        Accid *vrvAccid = new Accid();
+        vrvAccid->IsAttribute(true);
+        vrvAccid->SetAccid(accidental.GetAccid());
+        vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
+        object->AddChild(vrvAccid);
+    }
+}
+
 bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
 {
     Custos *vrvCustos = new Custos();
@@ -4870,6 +5048,8 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
+
+    ReadAccidAttr(custos, vrvCustos);
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
@@ -5142,6 +5322,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadExtSym(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadMidiVelocity(note);
+    vrvNote->ReadNoteGesTab(note);
     vrvNote->ReadNoteHeads(note);
     vrvNote->ReadNoteVisMensural(note);
     vrvNote->ReadStems(note);
@@ -5161,17 +5342,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         vrvNote->AddChild(vrvArtic);
     }
 
-    AttAccidental accidental;
-    accidental.ReadAccidental(note);
-    AttAccidentalGestural accidentalGestural;
-    accidentalGestural.ReadAccidentalGestural(note);
-    if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
-        Accid *vrvAccid = new Accid();
-        vrvAccid->IsAttribute(true);
-        vrvAccid->SetAccid(accidental.GetAccid());
-        vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
-        vrvNote->AddChild(vrvAccid);
-    }
+    ReadAccidAttr(note, vrvNote);
 
     if (vrvNote->HasTie()) {
         m_doc->SetMarkup(MARKUP_ANALYTICAL_TIE);
@@ -5191,6 +5362,7 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
     vrvRest->ReadCue(rest);
+    vrvRest->ReadExtSym(rest);
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
@@ -5260,6 +5432,30 @@ bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 
     parent->AddChild(vrvSyllable);
     return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
+}
+
+bool MEIInput::ReadTabDurSym(Object *parent, pugi::xml_node tabRhyhtm)
+{
+    TabDurSym *vrvTabDurSym = new TabDurSym();
+    ReadLayerElement(tabRhyhtm, vrvTabDurSym);
+
+    vrvTabDurSym->ReadNNumberLike(tabRhyhtm);
+
+    parent->AddChild(vrvTabDurSym);
+    ReadUnsupportedAttr(tabRhyhtm, vrvTabDurSym);
+    return true;
+}
+
+bool MEIInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
+{
+    TabGrp *vrvTabGrp = new TabGrp();
+    ReadLayerElement(tabGrp, vrvTabGrp);
+
+    ReadDurationInterface(tabGrp, vrvTabGrp);
+
+    parent->AddChild(vrvTabGrp);
+    ReadUnsupportedAttr(tabGrp, vrvTabGrp);
+    return ReadLayerChildren(vrvTabGrp, tabGrp, vrvTabGrp);
 }
 
 bool MEIInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
@@ -5535,7 +5731,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
 
 bool MEIInput::ReadTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
 {
-    interface->ReadPlacement(element);
+    interface->ReadPlacementRelStaff(element);
     return true;
 }
 

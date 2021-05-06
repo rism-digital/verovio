@@ -306,7 +306,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
 
-    if (object->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, PHRASE, OCTAVE, SLUR, SYL, TIE })) {
+    if (object->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, SYL, TIE })) {
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {

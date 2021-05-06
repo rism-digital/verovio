@@ -25,6 +25,8 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Accid> s_factory("accid", ACCID);
+
 Accid::Accid()
     : LayerElement("accid-")
     , PositionInterface()

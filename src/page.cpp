@@ -310,9 +310,22 @@ void Page::LayOutHorizontally()
 
     // Adjust the x position of the LayerElement where multiple layer collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
+    // For the first iteration align elements without taking dots into consideration
     Functor adjustLayers(&Object::AdjustLayers);
     AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustLayers, &adjustLayersParams);
+
+    // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
+    // otherwise keep their relative positioning
+    Functor adjustDots(&Object::AdjustDots);
+    Functor adjustDotsEnd(&Object::AdjustDotsEnd);
+    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->m_mdivScoreDef.GetStaffNs());
+    this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
+
+    // adjust Layers again, this time including dots positioning
+    AdjustLayersParams newAdjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
+    newAdjustLayersParams.m_ignoreDots = false;
+    this->Process(&adjustLayers, &newAdjustLayersParams);
 
     // Adjust the X position of the accidentals, including in chords
     Functor adjustAccidX(&Object::AdjustAccidX);
@@ -324,6 +337,15 @@ void Page::LayOutHorizontally()
     Functor adjustXPos(&Object::AdjustXPos);
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
     AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
+    adjustXPosParams.m_excludes.push_back(TABDURSYM);
+    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
+
+    // Adjust tabRhyhtm separately
+    adjustXPosParams.m_excludes.clear();
+    adjustXPosParams.m_includes.push_back(TABDURSYM);
+    adjustXPosParams.m_includes.push_back(BARLINE_ATTR_RIGHT);
+    adjustXPosParams.m_includes.push_back(METERSIG);
+    adjustXPosParams.m_includes.push_back(KEYSIG);
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes

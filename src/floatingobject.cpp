@@ -27,6 +27,7 @@
 #include "mordent.h"
 #include "octave.h"
 #include "pedal.h"
+#include "pitchinflection.h"
 #include "reh.h"
 #include "slur.h"
 #include "staff.h"
@@ -214,6 +215,13 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_above : STAFFREL_below;
     }
+    else if (object->Is(PITCHINFLECTION)) {
+        // PitchInflection *pitchInflection = vrv_cast<PitchInflection *>(object);
+        // assert(pitchInflection);
+        // pitchInflection above by default;
+        // m_place = (pitchInflection->GetPlace() != STAFFREL_NONE) ? pitchInflection->GetPlace() : STAFFREL_above;
+        m_place = STAFFREL_above;
+    }
     else if (object->Is(PEDAL)) {
         Pedal *pedal = vrv_cast<Pedal *>(object);
         assert(pedal);
@@ -320,15 +328,21 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     int yRel;
 
     if (horizOverlapingBBox == NULL) {
+        // Apply element margin and enforce minimal staff distance
+        int staffIndex = staffAlignment->GetStaff()->GetN();
+        int minStaffDistance = doc->GetStaffDistance(this->m_object->GetClassId(), staffIndex, this->m_place)
+            * doc->GetDrawingUnit(staffSize);
         if (this->m_place == STAFFREL_above) {
             yRel = GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
+            this->SetDrawingYRel(-minStaffDistance);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + GetContentY2();
             yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
+            this->SetDrawingYRel(minStaffDistance + staffAlignment->GetStaffHeight());
         }
     }
     else {

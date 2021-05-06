@@ -33,14 +33,18 @@ std::map<int, std::string> Option::s_footer
 std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
+std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
+    { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
+
 std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
     { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
     = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
-      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
-      "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': 0.2}}";
+      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,'"
+      "hairpinThickness':0.1,'octaveLineThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'"
+      "subBracketThickness':0.5,'bracketThickness':0.5,'repeatEndingLineThickness':0.15, 'textEnclosureThickness': "
+      "0.2}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -856,6 +860,11 @@ Options::Options()
     m_outputIndent.Init(3, 1, 10);
     this->Register(&m_outputIndent, "outputIndent", &m_general);
 
+    m_outputFormatRaw.SetInfo(
+        "Raw formatting for MEI output", "Writes MEI out with no line indenting or non-content newlines.");
+    m_outputFormatRaw.Init(false);
+    this->Register(&m_outputFormatRaw, "outputFormatRaw", &m_general);
+
     m_outputIndentTab.SetInfo("Output indentation with tab", "Output indentation with tabulation for MEI and SVG");
     m_outputIndentTab.Init(false);
     this->Register(&m_outputIndentTab, "outputIndentTab", &m_general);
@@ -888,6 +897,10 @@ Options::Options()
     m_pageWidth.SetInfo("Page width", "The page width");
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
+
+    m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
+    m_preserveAnalyticalMarkup.Init(false);
+    this->Register(&m_preserveAnalyticalMarkup, "preserveAnalyticalMarkup", &m_general);
 
     m_removeIds.SetInfo("Remove IDs in MEI", "Remove XML IDs in the MEI output that are not referenced");
     m_removeIds.Init(false);
@@ -967,6 +980,10 @@ Options::Options()
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
 
+    m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
+    m_dynamDist.Init(1.0, 0.5, 16.0);
+    this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
+
     m_engravingDefaults.SetInfo(
         "Engraving defaults", "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(engravingDefaults);
@@ -999,6 +1016,10 @@ Options::Options()
     m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
+
+    m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
+    m_harmDist.Init(1.0, 0.5, 16.0);
+    this->Register(&m_harmDist, "harmDist", &m_generalLayout);
 
     m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
     m_justificationStaff.Init(1., 0., 10.);
@@ -1059,13 +1080,25 @@ Options::Options()
     m_mnumInterval.Init(0, 0, 64, false);
     this->Register(&m_mnumInterval, "mnumInterval", &m_generalLayout);
 
+    m_multiRestStyle.SetInfo("Multi rest style", "Rendering style of multiple measure rests");
+    m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
+    this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
+
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
     m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
+    m_octaveAlternativeSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
+    m_octaveAlternativeSymbols.Init(false);
+    this->Register(&m_octaveAlternativeSymbols, "octaveAlternativeSymbols", &m_generalLayout);
+
+    m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
+    m_octaveLineThickness.Init(0.20, 0.10, 1.00);
+    this->Register(&m_octaveLineThickness, "octaveLineThickness", &m_generalLayout);
+
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
-    m_repeatEndingLineThickness.Init(0.15, 0.1, 2.0);
+    m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
 
     m_slurControlPoints.SetInfo(
@@ -1213,7 +1246,7 @@ Options::Options()
     m_transposeSelectedOnly.Init(false);
     this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
-    /********* The layout left margin by element *********/
+    /********* The layout margins by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");
     m_grps.push_back(&m_elementMargins);
@@ -1314,6 +1347,10 @@ Options::Options()
     m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginRightBarLine, "leftMarginRightBarLine", &m_elementMargins);
 
+    m_leftMarginTabDurSym.SetInfo("Left margin tabRhyhtm", "The margin for tabDurSym in MEI units");
+    m_leftMarginTabDurSym.Init(1.0, 0.0, 2.0);
+    this->Register(&m_leftMarginTabDurSym, "leftMarginTabDurSym", &m_elementMargins);
+
     /// custom right
 
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
@@ -1380,6 +1417,10 @@ Options::Options()
     m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
 
+    m_rightMarginTabDurSym.SetInfo("Right margin tabRhyhtm", "The right margin for tabDurSym in MEI units");
+    m_rightMarginTabDurSym.Init(0.0, 0.0, 2.0);
+    this->Register(&m_rightMarginTabDurSym, "rightMarginTabDurSym", &m_elementMargins);
+
     /// custom top
 
     m_topMarginArtic.SetInfo("Top margin artic", "The margin for artic in MEI units");
@@ -1444,7 +1485,7 @@ void Options::Sync()
 {
     if (!m_engravingDefaults.IsSet()) return;
     // override default or passed engravingDefaults with explicitly set values
-    std::list<std::pair<std::string, OptionDbl *> > engravingDefaults = {
+    std::list<std::pair<std::string, OptionDbl *>> engravingDefaults = {
         { "staffLineThickness", &m_staffLineWidth }, //
         { "stemThickness", &m_stemWidth }, //
         { "legerLineThickness", &m_ledgerLineThickness }, //
@@ -1460,6 +1501,7 @@ void Options::Sync()
         { "bracketThickness", &m_bracketThickness }, //
         { "subBracketThickness", &m_subBracketThickness }, //
         { "hairpinThickness", &m_hairpinThickness }, //
+        { "octaveLineThickness", &m_octaveLineThickness }, //
         { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
         { "lyricLineThickness", &m_lyricLineThickness }, //
         { "tupletBracketThickness", &m_tupletBracketThickness }, //

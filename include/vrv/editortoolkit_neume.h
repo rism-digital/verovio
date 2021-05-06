@@ -40,7 +40,7 @@ public:
     bool Chain(jsonxx::Array actions);
     bool Drag(std::string elementId, int x, int y);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
-        std::vector<std::pair<std::string, std::string> > attributes);
+        std::vector<std::pair<std::string, std::string>> attributes);
     bool Merge(std::vector<std::string> elementIds);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool SetText(std::string elementId, std::string text);
@@ -62,7 +62,7 @@ protected:
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
-        int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes);
+        int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);

@@ -18,6 +18,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "staffgrp.h"
+#include "tuning.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -25,6 +26,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // StaffDef
 //----------------------------------------------------------------------------
+
+static ClassRegistrar<StaffDef> s_factory("staffDef", STAFFDEF);
 
 StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
@@ -92,6 +95,9 @@ bool StaffDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(METERSIG)) {
         assert(dynamic_cast<MeterSig *>(child));
+    }
+    else if (child->Is(TUNING)) {
+        assert(dynamic_cast<Tuning *>(child));
     }
     else {
         return false;

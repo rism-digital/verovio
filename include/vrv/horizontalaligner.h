@@ -152,6 +152,11 @@ public:
     AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
 
     /**
+     * Return pair of max and min Y value within alignment. Elements will be counted by alignment references.
+     */
+    std::pair<int, int> GetAlignmentTopBottom();
+
+    /**
      * Add an accidental to the accidSpace of the AlignmentReference holding it.
      * The Alignment has to have a AlignmentReference holding it.
      */
@@ -226,6 +231,11 @@ public:
      * See Object::AjustAccidX
      */
     virtual int AdjustAccidX(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustDotsEnd
+     */
+    virtual int AdjustDotsEnd(FunctorParams *);
 
 private:
     /**
@@ -312,6 +322,11 @@ public:
      * Return true if the reference has elements from multiple layers.
      */
     bool HasMultipleLayer() const { return (m_layerCount > 1); }
+
+    /**
+     * Return true if the reference has elements from cross-staff.
+     */
+    bool HasCrossStaffElements();
 
     //----------//
     // Functors //
