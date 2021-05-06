@@ -1675,7 +1675,11 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             measure->SetLeft(barRendition);
         }
         else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s.", measure->GetN().c_str());
+            BarLine *barLine = new BarLine();
+            barLine->SetColor(node.child("bar-style").attribute("color").as_string());
+            barLine->SetForm(barRendition);
+            Layer *layer = SelectLayer(node, measure);
+            AddLayerElement(layer, barLine);
         }
         else {
             measure->SetRight(barRendition);
