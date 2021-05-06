@@ -274,17 +274,21 @@ bool Slur::AdjustSlurPosition(
     if (curve->IsCrossStaff() && !isNotAdjustable) {
         if ((maxShiftLeft > bezierCurve.GetLeftControlHeight())
             || (maxShiftRight > bezierCurve.GetRightControlHeight())) {
-            angle = 0.0;
-            bezierCurve.SetLeftControlPointOffset(bezierCurve.GetLeftControlPointOffset() / 2);
-            bezierCurve.SetRightControlPointOffset(bezierCurve.GetRightControlPointOffset() / 2);
-            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + maxShiftLeft);
-            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + maxShiftRight);
+            if ((bezierCurve.c1.x < bezierCurve.p1.x) || (bezierCurve.c2.x > bezierCurve.p2.x)) return true;
+            bezierCurve.SetLeftControlPointOffset(0.5 * bezierCurve.GetLeftControlPointOffset());
+            bezierCurve.SetRightControlPointOffset(0.5 * bezierCurve.GetRightControlPointOffset());
+            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftLeft);
+            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftRight);
             const int shiftDifference = std::abs(maxShiftLeft - maxShiftRight);
-            if (maxShiftLeft > maxShiftRight) {
-                bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+            if ((maxShiftLeft > maxShiftRight) && !maxShiftRight) {
+                bezierCurve.SetLeftControlHeight(1.5 * bezierCurve.GetLeftControlHeight());
+                bezierCurve.SetRightControlPointOffset(2 * bezierCurve.GetRightControlPointOffset());
+                bezierCurve.SetRightControlHeight(0.5 * bezierCurve.GetRightControlHeight());
             }
-            else {
-                bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? shiftDifference : -shiftDifference;
+            else if ((maxShiftRight > maxShiftLeft) && !maxShiftLeft) {
+                bezierCurve.SetRightControlHeight(1.5 * bezierCurve.GetRightControlHeight());
+                bezierCurve.SetLeftControlPointOffset(2 * bezierCurve.GetLeftControlPointOffset());
+                bezierCurve.SetLeftControlHeight(0.5 * bezierCurve.GetLeftControlHeight());
             }
             return true;
         }
