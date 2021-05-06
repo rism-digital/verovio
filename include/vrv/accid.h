@@ -75,7 +75,7 @@ public:
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSymbolStr() const;
+    std::wstring GetSymbolStr(data_NOTATIONTYPE) const;
 
     /**
      * Adjust X position of accid in relation to other element

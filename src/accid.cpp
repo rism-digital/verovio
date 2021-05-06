@@ -66,7 +66,7 @@ void Accid::Reset()
     m_drawingUnison = NULL;
 }
 
-std::wstring Accid::GetSymbolStr() const
+std::wstring Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
 {
     if (!this->HasAccid()) return L"";
 
@@ -82,10 +82,20 @@ std::wstring Accid::GetSymbolStr() const
         wchar_t code = Resources::GetGlyphCode(GetGlyphName());
         if (NULL == Resources::GetGlyph(code)) code = 0;
     }
+    else {
+        switch (notationType) {
+            case NOTATIONTYPE_mensural:
+            case NOTATIONTYPE_mensural_black:
+            case NOTATIONTYPE_mensural_white:
+                code = (GetAccid() == ACCIDENTAL_WRITTEN_f)? SMUFL_E9E0_medRenFlatSoftB : SMUFL_E9E3_medRenSharpCroix;
+                break;
+                
+            default:
+                code = GetAccidGlyph(GetAccid()); break;
+        }
+    }
 
-    if (code == 0) code = GetAccidGlyph(this->GetAccid());
     std::wstring symbolStr;
-
     if (this->HasEnclose()) {
         if (this->GetEnclose() == ENCLOSURE_brack) {
             symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
@@ -199,41 +209,40 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
 wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 {
-    int symc = SMUFL_E261_accidentalNatural;
     switch (accid) {
-        case ACCIDENTAL_WRITTEN_s: symc = SMUFL_E262_accidentalSharp; break;
-        case ACCIDENTAL_WRITTEN_f: symc = SMUFL_E260_accidentalFlat; break;
-        case ACCIDENTAL_WRITTEN_ss: symc = SMUFL_E269_accidentalSharpSharp; break;
-        case ACCIDENTAL_WRITTEN_x: symc = SMUFL_E263_accidentalDoubleSharp; break;
-        case ACCIDENTAL_WRITTEN_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
-        case ACCIDENTAL_WRITTEN_sx: symc = SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
-        case ACCIDENTAL_WRITTEN_xs: symc = SMUFL_E265_accidentalTripleSharp; break;
-        case ACCIDENTAL_WRITTEN_ts: symc = SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
-        case ACCIDENTAL_WRITTEN_tf: symc = SMUFL_E266_accidentalTripleFlat; break;
-        case ACCIDENTAL_WRITTEN_n: symc = SMUFL_E261_accidentalNatural; break;
-        case ACCIDENTAL_WRITTEN_nf: symc = SMUFL_E267_accidentalNaturalFlat; break;
-        case ACCIDENTAL_WRITTEN_ns: symc = SMUFL_E268_accidentalNaturalSharp; break;
-        case ACCIDENTAL_WRITTEN_su: symc = SMUFL_E274_accidentalThreeQuarterTonesSharpArrowUp; break;
-        case ACCIDENTAL_WRITTEN_sd: symc = SMUFL_E275_accidentalQuarterToneSharpArrowDown; break;
-        case ACCIDENTAL_WRITTEN_fu: symc = SMUFL_E270_accidentalQuarterToneFlatArrowUp; break;
-        case ACCIDENTAL_WRITTEN_fd: symc = SMUFL_E271_accidentalThreeQuarterTonesFlatArrowDown; break;
-        case ACCIDENTAL_WRITTEN_nu: symc = SMUFL_E272_accidentalQuarterToneSharpNaturalArrowUp; break;
-        case ACCIDENTAL_WRITTEN_nd: symc = SMUFL_E273_accidentalQuarterToneFlatNaturalArrowDown; break;
-        case ACCIDENTAL_WRITTEN_1qf: symc = SMUFL_E280_accidentalQuarterToneFlatStein; break;
-        case ACCIDENTAL_WRITTEN_3qf: symc = SMUFL_E281_accidentalThreeQuarterTonesFlatZimmermann; break;
-        case ACCIDENTAL_WRITTEN_1qs: symc = SMUFL_E282_accidentalQuarterToneSharpStein; break;
-        case ACCIDENTAL_WRITTEN_3qs: symc = SMUFL_E283_accidentalThreeQuarterTonesSharpStein; break;
-        case ACCIDENTAL_WRITTEN_bms: symc = SMUFL_E447_accidentalBuyukMucennebSharp; break;
-        case ACCIDENTAL_WRITTEN_kms: symc = SMUFL_E446_accidentalKucukMucennebSharp; break;
-        case ACCIDENTAL_WRITTEN_bs: symc = SMUFL_E445_accidentalBakiyeSharp; break;
-        case ACCIDENTAL_WRITTEN_ks: symc = SMUFL_E444_accidentalKomaSharp; break;
-        case ACCIDENTAL_WRITTEN_kf: symc = SMUFL_E443_accidentalKomaFlat; break;
-        case ACCIDENTAL_WRITTEN_bf: symc = SMUFL_E442_accidentalBakiyeFlat; break;
-        case ACCIDENTAL_WRITTEN_kmf: symc = SMUFL_E441_accidentalKucukMucennebFlat; break;
-        case ACCIDENTAL_WRITTEN_bmf: symc = SMUFL_E440_accidentalBuyukMucennebFlat; break;
+        case ACCIDENTAL_WRITTEN_s: return SMUFL_E262_accidentalSharp; break;
+        case ACCIDENTAL_WRITTEN_f: return SMUFL_E260_accidentalFlat; break;
+        case ACCIDENTAL_WRITTEN_ss: return SMUFL_E269_accidentalSharpSharp; break;
+        case ACCIDENTAL_WRITTEN_x: return SMUFL_E263_accidentalDoubleSharp; break;
+        case ACCIDENTAL_WRITTEN_ff: return SMUFL_E264_accidentalDoubleFlat; break;
+        case ACCIDENTAL_WRITTEN_sx: return SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
+        case ACCIDENTAL_WRITTEN_xs: return SMUFL_E265_accidentalTripleSharp; break;
+        case ACCIDENTAL_WRITTEN_ts: return SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
+        case ACCIDENTAL_WRITTEN_tf: return SMUFL_E266_accidentalTripleFlat; break;
+        case ACCIDENTAL_WRITTEN_n: return SMUFL_E261_accidentalNatural; break;
+        case ACCIDENTAL_WRITTEN_nf: return SMUFL_E267_accidentalNaturalFlat; break;
+        case ACCIDENTAL_WRITTEN_ns: return SMUFL_E268_accidentalNaturalSharp; break;
+        case ACCIDENTAL_WRITTEN_su: return SMUFL_E274_accidentalThreeQuarterTonesSharpArrowUp; break;
+        case ACCIDENTAL_WRITTEN_sd: return SMUFL_E275_accidentalQuarterToneSharpArrowDown; break;
+        case ACCIDENTAL_WRITTEN_fu: return SMUFL_E270_accidentalQuarterToneFlatArrowUp; break;
+        case ACCIDENTAL_WRITTEN_fd: return SMUFL_E271_accidentalThreeQuarterTonesFlatArrowDown; break;
+        case ACCIDENTAL_WRITTEN_nu: return SMUFL_E272_accidentalQuarterToneSharpNaturalArrowUp; break;
+        case ACCIDENTAL_WRITTEN_nd: return SMUFL_E273_accidentalQuarterToneFlatNaturalArrowDown; break;
+        case ACCIDENTAL_WRITTEN_1qf: return SMUFL_E280_accidentalQuarterToneFlatStein; break;
+        case ACCIDENTAL_WRITTEN_3qf: return SMUFL_E281_accidentalThreeQuarterTonesFlatZimmermann; break;
+        case ACCIDENTAL_WRITTEN_1qs: return SMUFL_E282_accidentalQuarterToneSharpStein; break;
+        case ACCIDENTAL_WRITTEN_3qs: return SMUFL_E283_accidentalThreeQuarterTonesSharpStein; break;
+        case ACCIDENTAL_WRITTEN_bms: return SMUFL_E447_accidentalBuyukMucennebSharp; break;
+        case ACCIDENTAL_WRITTEN_kms: return SMUFL_E446_accidentalKucukMucennebSharp; break;
+        case ACCIDENTAL_WRITTEN_bs: return SMUFL_E445_accidentalBakiyeSharp; break;
+        case ACCIDENTAL_WRITTEN_ks: return SMUFL_E444_accidentalKomaSharp; break;
+        case ACCIDENTAL_WRITTEN_kf: return SMUFL_E443_accidentalKomaFlat; break;
+        case ACCIDENTAL_WRITTEN_bf: return SMUFL_E442_accidentalBakiyeFlat; break;
+        case ACCIDENTAL_WRITTEN_kmf: return SMUFL_E441_accidentalKucukMucennebFlat; break;
+        case ACCIDENTAL_WRITTEN_bmf: return SMUFL_E440_accidentalBuyukMucennebFlat; break;
         default: break;
     }
-    return symc;
+    return 0;
 }
 
 //----------------------------------------------------------------------------
