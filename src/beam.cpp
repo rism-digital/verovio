@@ -1008,8 +1008,8 @@ void BeamSegment::CalcPartialFlagPlace()
 
 void BeamSegment::CalcSetValues()
 {
-    this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
-    this->m_startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
+    this->m_startingX = m_firstNoteOrChord->m_x;
+    this->m_startingY = m_firstNoteOrChord->m_yBeam;
 
     for (auto coord : m_beamElementCoordRefs) {
         coord->m_yBeam = this->m_startingY + this->m_beamSlope * (coord->m_x - this->m_startingX);
