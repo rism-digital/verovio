@@ -70,6 +70,7 @@ def read_svg_file():
    font_faces = get_svg_elements(root, "font-face")
    if (len(font_faces) != 1):
       print("Error: the file %s should have a unique font-face element!" % font_file_name)
+      print("Please check that the svg has correct namespace %s" % svg_ns)
       os.sys.exit(1)
    font_family = font_faces[0].get("font-family")
    units_per_em = font_faces[0].get("units-per-em")
