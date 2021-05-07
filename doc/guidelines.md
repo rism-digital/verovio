@@ -4,12 +4,12 @@ This document describes the coding style for the Verovio project.
 
 ## Table of Contents
 
-* [General remarks](#general-remarks)
-* [Includes and forward declarations](#includes-and-forward-declarations)
-* [Null and boolean](#null-and-boolean)
-* [Class, method and member names](#class-method-and-member-names)
-* [Comments](#comments)
-* [LibMEI](#libmei)
+*   [General remarks](#general-remarks)
+*   [Includes and forward declarations](#includes-and-forward-declarations)
+*   [Null and boolean](#null-and-boolean)
+*   [Class, method and member names](#class-method-and-member-names)
+*   [Comments](#comments)
+*   [LibMEI](#libmei)
 
 ## General remarks
 
