@@ -637,7 +637,21 @@ void View::DrawOctave(
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         if (octave->HasEndid()) {
-            x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+            int offset = 0;
+            if (!octave->GetEnd()->Is({ CHORD, NOTE, REST })) {
+                offset = m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2;
+            }
+            else {
+                offset = octave->GetEnd()->GetDrawingRadius(m_doc);
+                if (DurationInterface *durationInterface = octave->GetEnd()->GetDurationInterface();
+                    (durationInterface != NULL) && durationInterface->HasDots()) {
+                    const int drawingUnit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                    const int dotDiameter = std::max(ToDeviceContextX(0.8 * drawingUnit), 4);
+                    const int dotCount = durationInterface->GetDots();
+                    offset += dotCount * (dotDiameter + drawingUnit) - drawingUnit;
+                }
+            }
+            x2 += offset;
         }
     }
 
