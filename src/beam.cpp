@@ -1196,7 +1196,7 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(staff);
     assert(doc);
     assert(interface);
-    
+
     int stemLen = segment->m_uniformStemLength;
     if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
         if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
@@ -1205,7 +1205,7 @@ void BeamElementCoord::SetDrawingStemDir(
     }
     this->m_centered = segment->m_uniformStemLength % 2;
 
-    if (m_element->Is(REST)) {
+    if (m_element->Is({ REST, SPACE })) {
         this->m_x += m_element->GetDrawingRadius(doc);
         this->m_yBeam = this->m_element->GetDrawingY();
         this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
