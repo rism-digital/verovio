@@ -15,8 +15,7 @@ echo "Generating metadata for Leipzig..."
 fontforge generate_font_metadata.py Leipzig-5.2.sfd
 
 echo "Generating C++ header and implementation file ..."
-python3 generate-h.py > ../include/vrv/smufl.h
-python3 generate-cpp.py > ../src/smufl.cpp
+python3 generate-smufl-code.py
 
 echo "Generating Bravura files ..."
 python3 extract-glyphs.py Bravura.svg > tmp/Bravura-bounding-boxes.svg
