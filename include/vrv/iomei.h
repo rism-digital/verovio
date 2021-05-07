@@ -136,8 +136,8 @@ class Syl;
 class Syllable;
 class System;
 class SystemElement;
+class TabDurSym;
 class TabGrp;
-class TabRhythm;
 class Tempo;
 class Text;
 class TextDirInterface;
@@ -296,8 +296,8 @@ private:
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
     void WriteSyllable(pugi::xml_node currentNode, Syllable *syllable);
+    void WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym);
     void WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp);
-    void WriteTabRhythm(pugi::xml_node currentNode, TabRhythm *tabRhythm);
     void WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
 
@@ -558,8 +558,8 @@ private:
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
+    bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
     bool ReadTabGrp(Object *parent, pugi::xml_node tabGrp);
-    bool ReadTabRhythm(Object *parent, pugi::xml_node tabRhythm);
     bool ReadTuplet(Object *parent, pugi::xml_node tuplet);
     bool ReadVerse(Object *parent, pugi::xml_node verse);
     ///@}

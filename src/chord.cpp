@@ -368,19 +368,22 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-int Chord::CalcStemLenInThirdUnits(Staff *staff)
+int Chord::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 {
     assert(staff);
 
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+    if (stemDir == STEMDIRECTION_up) {
         Note *topNote = this->GetTopNote();
         assert(topNote);
-        return topNote->CalcStemLenInThirdUnits(staff);
+        return topNote->CalcStemLenInThirdUnits(staff, stemDir);
     }
-    else {
+    else if (stemDir == STEMDIRECTION_down) {
         Note *bottomNote = this->GetBottomNote();
         assert(bottomNote);
-        return bottomNote->CalcStemLenInThirdUnits(staff);
+        return bottomNote->CalcStemLenInThirdUnits(staff, stemDir);
+    }
+    else {
+        return 0;
     }
 }
 
@@ -732,7 +735,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetBottomNote());
 
     // Get note locations first
-    std::map<Staff *, std::set<int> > noteLocations;
+    std::map<Staff *, std::set<int>> noteLocations;
     for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
         Note *note = vrv_cast<Note *>(*rit);
         assert(note);

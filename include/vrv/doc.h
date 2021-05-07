@@ -149,6 +149,7 @@ public:
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
     int GetCueSize(int value) const;
+    double GetCueScaling() const;
     ///@}
 
     Point ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const;
@@ -186,13 +187,13 @@ public:
     double GetBottomMargin(const ClassId classId) const;
     double GetTopMargin(const ClassId classId) const;
     ///@}
-    
+
     /**
      * Get the default distance from the staff for the object
      * The distance is given in x * MEI UNIT
      */
     double GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
-    
+
     /**
      * Prepare the MIDI timemap for MIDI and timemap file export.
      * Run trough all the layers and fill the score-time and performance timing variables.
@@ -218,8 +219,8 @@ public:
      */
     bool ExportTimemap(std::string &output);
     void PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
-        std::map<double, std::vector<std::string> > &realTimeToOnElements,
-        std::map<double, std::vector<std::string> > &realTimeToOffElements, std::map<double, int> &realTimeToTempo);
+        std::map<double, std::vector<std::string>> &realTimeToOnElements,
+        std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, int> &realTimeToTempo);
 
     /**
      * Set the initial scoreDef of each page.

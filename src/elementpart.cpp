@@ -305,7 +305,7 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
     const int right = HorizontalLeftOverlap(otherElement, doc, margin, 0);
     const int left = HorizontalRightOverlap(otherElement, doc, margin, 0);
     if (!right || !left) return 0;
-    
+
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     Flag *currentFlag = NULL;
     currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
@@ -321,7 +321,6 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
     else {
         return (-horizontalMargin - left);
     }
-
 }
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
@@ -483,7 +482,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
     else {
         int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
-        baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff) * thirdUnit);
+        const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
+        baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)

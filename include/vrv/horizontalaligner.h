@@ -152,6 +152,11 @@ public:
     AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
 
     /**
+     * Return pair of max and min Y value within alignment. Elements will be counted by alignment references.
+     */
+    std::pair<int, int> GetAlignmentTopBottom();
+
+    /**
      * Add an accidental to the accidSpace of the AlignmentReference holding it.
      * The Alignment has to have a AlignmentReference holding it.
      */

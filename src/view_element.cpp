@@ -193,11 +193,11 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(SYLLABLE)) {
         DrawSyllable(dc, element, layer, staff, measure);
     }
+    else if (element->Is(TABDURSYM)) {
+        DrawTabDurSym(dc, element, layer, staff, measure);
+    }
     else if (element->Is(TABGRP)) {
         DrawTabGrp(dc, element, layer, staff, measure);
-    }
-    else if (element->Is(TABRHYTHM)) {
-        DrawTabRhythm(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
@@ -1175,7 +1175,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
     int y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    if (((num > 4) && !multiRest->HasBlock()) || (num > 15) || (multiRest->GetBlock() == BOOLEAN_true)) {
+    if (multiRest->UseBlockStyle(m_doc)) {
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         if (multiRest->HasWidth()) {

@@ -81,7 +81,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
         int ulx = 0, uly = 0, lrx = 0, lry = 0;
-        std::vector<std::pair<std::string, std::string> > attributes;
+        std::vector<std::pair<std::string, std::string>> attributes;
         if (this->ParseInsertAction(
                 json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &lrx, &lry, &attributes)) {
             return this->Insert(elementType, staffId, ulx, uly, lrx, lry, attributes);
@@ -571,7 +571,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 }
 
 bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
-    std::vector<std::pair<std::string, std::string> > attributes)
+    std::vector<std::pair<std::string, std::string>> attributes)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
@@ -1076,7 +1076,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 {
     std::string status = "OK", message = "";
     std::wstring wtext;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     wtext = conv.from_bytes(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
@@ -1262,7 +1262,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     int newUly = staff->GetZone()->GetUly()
         - ((x - staff->GetZone()->GetUlx()) * tan(staff->GetZone()->GetRotate() * M_PI / 180.0));
     int newLry = staff->GetZone()->GetLry(); // don't need to maintain height since we're setting rotate manually
-    std::vector<std::pair<std::string, std::string> > v;
+    std::vector<std::pair<std::string, std::string>> v;
 
     if (!this->Insert("staff", "auto", newUlx, newUly, newLrx, newLry, v)) {
         LogError("Failed to create a second staff.");
@@ -2565,7 +2565,7 @@ bool EditorToolkitNeume::ParseInsertAction(
 }
 
 bool EditorToolkitNeume::ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId,
-    int *ulx, int *uly, int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes)
+    int *ulx, int *uly, int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
     (*elementType) = param.get<jsonxx::String>("elementType");

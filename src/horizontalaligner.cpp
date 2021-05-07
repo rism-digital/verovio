@@ -626,6 +626,27 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
     return reference;
 }
 
+std::pair<int, int> Alignment::GetAlignmentTopBottom()
+{
+    int max = VRV_UNSET, min = VRV_UNSET;
+    // Iterate over each element in each alignment reference and find max/min Y value - these will serve as top/bottom
+    // values for the Alignment
+    for (auto child : *GetChildren()) {
+        AlignmentReference *reference = dynamic_cast<AlignmentReference *>(child);
+        for (auto element : *reference->GetChildren()) {
+            const int top = element->GetSelfTop();
+            if ((VRV_UNSET == max) || (top > max)) {
+                max = top;
+            }
+            const int bottom = element->GetSelfBottom();
+            if ((VRV_UNSET == min) || (bottom < min)) {
+                min = bottom;
+            }
+        }
+    }
+    return { min, max };
+}
+
 void Alignment::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
@@ -873,13 +894,30 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             continue;
         }
 
-        int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        const int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        const int drawingUnit = params->m_doc->GetDrawingUnit(100);
         // HARDCODED
-        overlap += params->m_doc->GetDrawingUnit(100) / 2 * 3;
+        int adjust = overlap + drawingUnit / 2 * 3;
         // LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
-        if (overlap > 0) {
-            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), overlap) };
+        if (adjust > 0) {
+            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), adjust) };
             params->m_measureAligner->AdjustProportionally(boundaries);
+            // After adjusting, make sure that arpeggio does not overlap with elements from the previous alignment
+            if (m_type == ALIGNMENT_CLEF) {
+                auto [currentMin, currentMax] = GetAlignmentTopBottom();
+                Note *topNote = NULL;
+                Note *bottomNote = NULL;
+                std::get<1>(*iter)->GetDrawingTopBottomNotes(topNote, bottomNote);
+                if (topNote && bottomNote) {
+                    const int arpegMax = topNote->GetDrawingY() + drawingUnit / 2;
+                    const int arpegMin = bottomNote->GetDrawingY() - drawingUnit / 2;
+                    // Make sure that there is vertical overlap, otherwise do not shift arpeggo
+                    if (((currentMin < arpegMin) && (currentMax > arpegMin))
+                        || ((currentMax > arpegMax) && (currentMin < arpegMax))) {
+                        std::get<0>(*iter)->SetXRel(std::get<0>(*iter)->GetXRel() + overlap + drawingUnit / 2);
+                    }
+                }
+            }
         }
 
         // We can remove it from the list
@@ -1068,8 +1106,8 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
     // process dots only if there is at least 1 dot (vertical group) in the alignment
     if (!params->m_elements.empty() && !params->m_dots.empty()) {
         // multimap of overlapping dots with other elements
-        std::multimap<LayerElement*, LayerElement*> overlapElements;
-        
+        std::multimap<LayerElement *, LayerElement *> overlapElements;
+
         // Try to find which dots can be groupped together. To achieve this, find layer elements that collide with these
         // dots. Then find if their parents (note/chord) have dots - if they do then we can group these dots together,
         // otherwise they should be kept separate
@@ -1083,7 +1121,7 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
                     else if (Object *chord = element->GetFirstAncestor(CHORD, UNLIMITED_DEPTH); chord) {
                         if (vrv_cast<Chord *>(chord)->GetDots() <= 0) continue;
                         overlapElements.emplace(dot, vrv_cast<LayerElement *>(chord));
-                    } 
+                    }
                     else if (Object *note = element->GetFirstAncestor(NOTE, UNLIMITED_DEPTH); note) {
                         if (vrv_cast<Note *>(note)->GetDots() <= 0) continue;
                         overlapElements.emplace(dot, vrv_cast<LayerElement *>(note));
@@ -1099,8 +1137,7 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
                 auto pair = overlapElements.equal_range(dot);
                 int max = 0;
                 for (auto it = pair.first; it != pair.second; ++it) {
-                    const int diff
-                        = it->second->GetDrawingX() + it->first->GetDrawingXRel() - it->first->GetDrawingX();
+                    const int diff = it->second->GetDrawingX() + it->first->GetDrawingXRel() - it->first->GetDrawingX();
                     if (diff > max) max = diff;
                 }
                 if (max) dot->SetDrawingXRel(dot->GetDrawingXRel() + max);
@@ -1108,7 +1145,7 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
             }
         }
     }
-    
+
     params->m_elements.clear();
     params->m_dots.clear();
 
