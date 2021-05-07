@@ -343,6 +343,10 @@ void BeamSegment::CalcBeamInit(
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
 
+    // somebody might want to have a beam with only rest of space elements...
+    m_firstNoteOrChord = NULL;
+    m_lastNoteOrChord = NULL;
+
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
