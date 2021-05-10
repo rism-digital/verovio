@@ -1422,14 +1422,14 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
 
     // process highest-level beam
     if (!params->m_beam) {
-        params->m_beam = this;
-        params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
-        params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
-        params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
-        if (m_drawingPlace != BEAMPLACE_mixed)
+        if (m_drawingPlace != BEAMPLACE_mixed) {
+            params->m_beam = this;
+            params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
+            params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
+            params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
             params->m_overlapMargin
                 = CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
-
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -1452,6 +1452,8 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_beam != this) return FUNCTOR_CONTINUE;
+
+    if (m_drawingPlace == BEAMPLACE_mixed) return FUNCTOR_CONTINUE;
 
     Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (parentLayer) {
