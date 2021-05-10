@@ -92,3 +92,5 @@ Release/
 
 # Fonts
 fonts/tmp/
+/venv/
+.idea/
