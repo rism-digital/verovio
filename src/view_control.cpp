@@ -651,7 +651,7 @@ void View::DrawOctave(
                     offset += dotCount * (dotDiameter + drawingUnit) - drawingUnit;
                 }
             }
-            x2 += offset;
+            x2 += offset + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
     }
 
