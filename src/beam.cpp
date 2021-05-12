@@ -229,8 +229,8 @@ void BeamSegment::CalcBeam(
                     stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
                 }
                 // handle cross-staff fTrem cases
-                if (FTrem *fTrem = vrv_cast<FTrem *>(beamInterface);
-                    fTrem->Is(FTREM) && (coord->GetStemDir() == STEMDIRECTION_down)) {
+                if (FTrem *fTrem = dynamic_cast<FTrem *>(beamInterface);
+                    fTrem && (coord->GetStemDir() == STEMDIRECTION_down)) {
                     const int beamsCount = fTrem->GetBeams();
                     stemOffset = (beamsCount - 1) * beamInterface->m_beamWidth;
                 }
@@ -274,14 +274,14 @@ void BeamSegment::CalcBeam(
 bool BeamSegment::DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff)
 {
     // find if current beam fits within the staff
-    auto withinBounds
+    auto outsideBounds
         = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
               if ((coord->m_yBeam > staffTop - topOffset) || (coord->m_yBeam < staffBottom + bottomOffset)) {
                   return true;
               }
               return false;
           });
-    if (!isCrossStaff && (withinBounds != m_beamElementCoordRefs.end())) return true;
+    if (!isCrossStaff && (outsideBounds != m_beamElementCoordRefs.end())) return true;
     auto overlapping
         = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
               assert(coord->m_element);
@@ -301,8 +301,7 @@ bool BeamSegment::DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, 
 std::pair<int, int> BeamSegment::GetAdditionalBeamCount(BeamDrawingInterface *beamInterface)
 {
     // In case we're dealing with fTrem - take @beams attribute into consideration
-    FTrem *fTrem = vrv_cast<FTrem *>(beamInterface);
-    if (fTrem->Is(FTREM)) {
+    if (FTrem *fTrem = dynamic_cast<FTrem *>(beamInterface); fTrem) {
         return { fTrem->GetBeams() / 2, 0 };
     }
 
