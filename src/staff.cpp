@@ -343,7 +343,7 @@ void LedgerLine::AddDash(int left, int right)
 {
     assert(left < right);
 
-    std::list<std::pair<int, int> >::iterator iter;
+    std::list<std::pair<int, int>>::iterator iter;
 
     // First add the dash
     for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
@@ -352,7 +352,7 @@ void LedgerLine::AddDash(int left, int right)
     m_dashes.insert(iter, std::make_pair(left, right));
 
     // Merge overlapping dashes
-    std::list<std::pair<int, int> >::iterator previous = m_dashes.begin();
+    std::list<std::pair<int, int>>::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
@@ -633,6 +633,16 @@ int Staff::AdjustSylSpacing(FunctorParams *functorParams)
 
     // Set the staff size for this pass
     params->m_staffSize = this->m_drawingStaffSize;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    params->m_expandedNotes.clear();
 
     return FUNCTOR_CONTINUE;
 }

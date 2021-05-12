@@ -343,6 +343,10 @@ void BeamSegment::CalcBeamInit(
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
 
+    // somebody might want to have a beam with only rest of space elements...
+    m_firstNoteOrChord = NULL;
+    m_lastNoteOrChord = NULL;
+
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
@@ -1197,8 +1201,18 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(doc);
     assert(interface);
 
-    if (m_element->Is(REST)) {
+    int stemLen = segment->m_uniformStemLength;
+    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
+        if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
+            stemLen *= -1;
+        }
+    }
+    this->m_centered = segment->m_uniformStemLength % 2;
+
+    if (m_element->Is({ REST, SPACE })) {
         this->m_x += m_element->GetDrawingRadius(doc);
+        this->m_yBeam = this->m_element->GetDrawingY();
+        this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
         return;
     }
 
@@ -1229,13 +1243,6 @@ void BeamElementCoord::SetDrawingStemDir(
         m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
     }
 
-    int stemLen = segment->m_uniformStemLength;
-    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
-        if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
-            stemLen *= -1;
-        }
-    }
-    this->m_centered = segment->m_uniformStemLength % 2;
     this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
     const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
@@ -1276,7 +1283,8 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    int stemLenInHalfUnits = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
+    int stemLenInHalfUnits
+        = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
         if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {

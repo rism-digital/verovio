@@ -20,14 +20,14 @@ Building and use instructions by environment
 
 See the [wiki](https://github.com/rism-digital/verovio/wiki/Building-instructions), with instructions for:
 
-* [Command-line tool](https://github.com/rism-digital/verovio/wiki/Building-instructions#command-line-tool)
-* [XCode](https://github.com/rism-digital/verovio/wiki/Building-instructions#xcode)
-* [Visual Studio](https://github.com/rism-digital/verovio/wiki/Building-instructions#visual-studio)
-* [JavaScript](https://github.com/rism-digital/verovio/wiki/Building-instructions#javascript-toolkit)
-* [NPM](https://github.com/rism-digital/verovio/wiki/Building-instructions#npm)
-* [Python](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-python-toolkit)
-* [Java](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-java-toolkit)
-* [CocoaPods](https://github.com/rism-digital/verovio/wiki/Building-instructions#cocoapods)
+*   [Command-line tool](https://github.com/rism-digital/verovio/wiki/Building-instructions#command-line-tool)
+*   [XCode](https://github.com/rism-digital/verovio/wiki/Building-instructions#xcode)
+*   [Visual Studio](https://github.com/rism-digital/verovio/wiki/Building-instructions#visual-studio)
+*   [JavaScript](https://github.com/rism-digital/verovio/wiki/Building-instructions#javascript-toolkit)
+*   [NPM](https://github.com/rism-digital/verovio/wiki/Building-instructions#npm)
+*   [Python](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-python-toolkit)
+*   [Java](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-java-toolkit)
+*   [CocoaPods](https://github.com/rism-digital/verovio/wiki/Building-instructions#cocoapods)
 
 
 LibMEI
@@ -36,9 +36,9 @@ LibMEI
 The code for the attribute classes of Verovio are generated from the MEI schema using a modified version of LibMEI available [here](https://github.com/rism-digital/libmei). The code generated is included in the Verovio repository and the LibMEI repository does not need to be cloned for building Verovio.
 
 Major releases of Verovio and MEI versions:
-* Verovio 1.x.x ⇔ MEI 3.0
-* Verovio 2.x.x ⇔ MEI 4.0
-* Verovio 3.x.x ⇔ Development of MEI since 4.0
+*   Verovio 1.x.x ⇔ MEI 3.0
+*   Verovio 2.x.x ⇔ MEI 4.0
+*   Verovio 3.x.x ⇔ Development of MEI since 4.0
 
 From Verovio 2.x.x, the plan is to have even version numbers for Verovio releases using a stable version of MEI, and odd version numbers for releases using a development version of MEI. It means that once MEI 5.0 will be released, Verovio will move to version 4.x.x. Older versions of MEI are still supported by newer versions of Verovio. MEI files are internally upgraded when loaded into Verovio. This applies only to the features supported by Verovio. We will try to maintain this in the future.
 
@@ -91,7 +91,7 @@ Here is a list of digital score repositories on Github that can be displayed wit
 
 | link | encoding | description |
 | ---- | -------- | ----------- | 
-|  [MEI complete examples](https://github.com/music-encoding/sample-encodings/tree/master/MEI_4.0/Music/Complete_examples) | MEI | 86 various works encoded in MEI |
+| [MEI complete examples](https://github.com/music-encoding/sample-encodings/tree/master/MEI_4.0/Music/Complete_examples) | MEI | 86 various works encoded in MEI |
 | [Mozart Piano Sonatas](https://github.com/craigsapp/mozart-piano-sonatas) | Humdrum | 17 Piano sonatas by W.A. Mozart from the Alte Mozart-Ausgabe ([in VHV](http://verovio.humdrum.org/?file=mozart/sonatas&k=e)) |
 | [Beethoven Piano Sonatas](https://github.com/craigsapp/beethoven-piano-sonatas) | Humdrum | 32 Piano sonatas by L. van Beethoven, edited by Paul Dukas ([in VHV](http://verovio.humdrum.org/?file=beethoven/sonatas&k=e)) |
 | [Josquin Research Project](https://github.com/josquin-research-project/jrp-scores) | Humdrum | Over 1000 scores of early Renaissance music in modern editions ([website](https://josquin.stanford.edu)) |

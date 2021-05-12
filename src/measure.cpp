@@ -254,14 +254,15 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::GetRightBarLineWidth(Doc* doc)
+int Measure::GetRightBarLineWidth(Doc *doc)
 {
     const BarLine *barline = GetRightBarLine();
     if (!barline) return 0;
 
     const int staffSize = 100;
     const int barLineWidth = doc->GetDrawingBarLineWidth(staffSize);
-    const int barLineThickWidth = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_thickBarlineThickness.GetValue();
+    const int barLineThickWidth
+        = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_barLineSeparation.GetValue();
 
     int width = 0;

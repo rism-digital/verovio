@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        tabrhythm.h
+// Name:        tabdursym.h
 // Author:      Laurent Pugin
 // Created:     2019
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_TABRHYTHM_H__
-#define __VRV_TABRHYTHM_H__
+#ifndef __VRV_TABDURSYM_H__
+#define __VRV_TABDURSYM_H__
 
 #include "atts_shared.h"
 #include "layerelement.h"
@@ -14,24 +14,24 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// TabRhythm
+// TabDurSym
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <tabRhythm> element.
+ * This class models the MEI <tabDurSym> element.
  */
-class TabRhythm : public LayerElement, public AttNNumberLike {
+class TabDurSym : public LayerElement, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    TabRhythm();
-    virtual ~TabRhythm();
+    TabDurSym();
+    virtual ~TabDurSym();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "TabRhythm"; };
-    virtual ClassId GetClassId() const { return TABRHYTHM; };
+    virtual std::string GetClassName() const { return "TabDurSym"; };
+    virtual ClassId GetClassId() const { return TABDURSYM; };
     ///@}
 
     /** Override the method since alignment is required */

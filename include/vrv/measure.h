@@ -321,7 +321,7 @@ public:
      * See Object::AdjustClefChanges
      */
     virtual int AdjustClefChanges(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustDots
      */

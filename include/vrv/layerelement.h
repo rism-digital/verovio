@@ -227,7 +227,7 @@ public:
      * Helper to adjust overlaping layers for notes, chords, stems, etc.
      */
     virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
-    
+
     /**
      * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
      * element if it's in unison with it
@@ -243,7 +243,7 @@ public:
      * See Object::AdjustBeams
      */
     virtual int AdjustBeams(FunctorParams *);
-    
+
     /**
      * See Object::AdjustDots
      */

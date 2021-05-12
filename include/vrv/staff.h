@@ -226,6 +226,11 @@ public:
      */
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.
@@ -315,7 +320,7 @@ public:
     /**
      * A list of dashes relative to the staff position.
      */
-    std::list<std::pair<int, int> > m_dashes;
+    std::list<std::pair<int, int>> m_dashes;
 
 protected:
     //

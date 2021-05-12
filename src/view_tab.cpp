@@ -23,8 +23,8 @@
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
+#include "tabdursym.h"
 #include "tabgrp.h"
-#include "tabrhythm.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -122,20 +122,20 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     dc->EndGraphic(note, this);
 }
 
-void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
     assert(layer);
     assert(staff);
 
-    TabRhythm *tabRhythm = dynamic_cast<TabRhythm *>(element);
-    assert(tabRhythm);
+    TabDurSym *tabDurSym = dynamic_cast<TabDurSym *>(element);
+    assert(tabDurSym);
 
-    TabGrp *tabGrp = dynamic_cast<TabGrp *>(tabRhythm->GetFirstAncestor(TABGRP));
+    TabGrp *tabGrp = dynamic_cast<TabGrp *>(tabDurSym->GetFirstAncestor(TABGRP));
     assert(tabGrp);
 
-    dc->StartGraphic(tabRhythm, "", tabRhythm->GetUuid());
+    dc->StartGraphic(tabDurSym, "", tabDurSym->GetUuid());
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -169,9 +169,9 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     // Draw children (nothing yet)
-    DrawLayerChildren(dc, tabRhythm, layer, staff, measure);
+    DrawLayerChildren(dc, tabDurSym, layer, staff, measure);
 
-    dc->EndGraphic(tabRhythm, this);
+    dc->EndGraphic(tabDurSym, this);
 }
 
 } // namespace vrv

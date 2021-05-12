@@ -215,7 +215,7 @@ public:
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
-    void SetMIDIPitch(char pitch);
+    void CalcMIDIPitch(int shift);
     double GetScoreTimeOnset();
     double GetRealTimeOnsetMilliseconds();
     double GetScoreTimeOffset();

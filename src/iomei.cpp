@@ -119,8 +119,8 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
+#include "tabdursym.h"
 #include "tabgrp.h"
-#include "tabrhythm.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
@@ -227,6 +227,9 @@ bool MEIOutput::Export()
         unsigned int output_flags = pugi::format_default;
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
             output_flags |= pugi::format_no_escapes;
+        }
+        if (m_doc->GetOptions()->m_outputFormatRaw.GetValue()) {
+            output_flags |= pugi::format_raw;
         }
 
         std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
@@ -622,13 +625,13 @@ bool MEIOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("syllable");
         WriteSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
     }
+    else if (object->Is(TABDURSYM)) {
+        m_currentNode = m_currentNode.append_child("tabDurSym");
+        WriteTabDurSym(m_currentNode, dynamic_cast<TabDurSym *>(object));
+    }
     else if (object->Is(TABGRP)) {
         m_currentNode = m_currentNode.append_child("tabGrp");
         WriteTabGrp(m_currentNode, dynamic_cast<TabGrp *>(object));
-    }
-    else if (object->Is(TABRHYTHM)) {
-        m_currentNode = m_currentNode.append_child("tabRhythm");
-        WriteTabRhythm(m_currentNode, dynamic_cast<TabRhythm *>(object));
     }
     else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
@@ -1934,20 +1937,20 @@ void MEIOutput::WriteSpace(pugi::xml_node currentNode, Space *space)
     WriteDurationInterface(currentNode, space);
 }
 
+void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
+{
+    assert(tabDurSym);
+
+    WriteLayerElement(currentNode, tabDurSym);
+    tabDurSym->WriteNNumberLike(currentNode);
+}
+
 void MEIOutput::WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp)
 {
     assert(tabGrp);
 
     WriteLayerElement(currentNode, tabGrp);
     WriteDurationInterface(currentNode, tabGrp);
-}
-
-void MEIOutput::WriteTabRhythm(pugi::xml_node currentNode, TabRhythm *tabRhythm)
-{
-    assert(tabRhythm);
-
-    WriteLayerElement(currentNode, tabRhythm);
-    tabRhythm->WriteNNumberLike(currentNode);
 }
 
 void MEIOutput::WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
@@ -2806,7 +2809,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for tabGrp
     else if (filterParent->Is(TABGRP)) {
-        if (element == "tabRhythm") {
+        if (element == "tabDurSym") {
             return true;
         }
         if (element == "note") {
@@ -4836,11 +4839,11 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "syllable") {
             success = ReadSyllable(parent, xmlElement);
         }
+        else if (elementName == "tabDurSym") {
+            success = ReadTabDurSym(parent, xmlElement);
+        }
         else if (elementName == "tabGrp") {
             success = ReadTabGrp(parent, xmlElement);
-        }
-        else if (elementName == "tabRhythm") {
-            success = ReadTabRhythm(parent, xmlElement);
         }
         else if (elementName == "tuplet") {
             success = ReadTuplet(parent, xmlElement);
@@ -5431,6 +5434,18 @@ bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
 
+bool MEIInput::ReadTabDurSym(Object *parent, pugi::xml_node tabRhyhtm)
+{
+    TabDurSym *vrvTabDurSym = new TabDurSym();
+    ReadLayerElement(tabRhyhtm, vrvTabDurSym);
+
+    vrvTabDurSym->ReadNNumberLike(tabRhyhtm);
+
+    parent->AddChild(vrvTabDurSym);
+    ReadUnsupportedAttr(tabRhyhtm, vrvTabDurSym);
+    return true;
+}
+
 bool MEIInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
 {
     TabGrp *vrvTabGrp = new TabGrp();
@@ -5441,18 +5456,6 @@ bool MEIInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
     parent->AddChild(vrvTabGrp);
     ReadUnsupportedAttr(tabGrp, vrvTabGrp);
     return ReadLayerChildren(vrvTabGrp, tabGrp, vrvTabGrp);
-}
-
-bool MEIInput::ReadTabRhythm(Object *parent, pugi::xml_node tabRhyhtm)
-{
-    TabRhythm *vrvTabRhythm = new TabRhythm();
-    ReadLayerElement(tabRhyhtm, vrvTabRhythm);
-
-    vrvTabRhythm->ReadNNumberLike(tabRhyhtm);
-
-    parent->AddChild(vrvTabRhythm);
-    ReadUnsupportedAttr(tabRhyhtm, vrvTabRhythm);
-    return true;
 }
 
 bool MEIInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)

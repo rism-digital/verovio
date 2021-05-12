@@ -911,7 +911,7 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if (barLine->GetForm() == BARRENDITION_rptstart) {
-        DrawDot(dc, x2 - thickBarLineWidth / 2 , yBottom, staff->m_drawingStaffSize);
+        DrawDot(dc, x2 - thickBarLineWidth / 2, yBottom, staff->m_drawingStaffSize);
         DrawDot(dc, x2 - thickBarLineWidth / 2, yTop, staff->m_drawingStaffSize);
     }
     if (barLine->GetForm() == BARRENDITION_rptboth) {
@@ -1193,7 +1193,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->SetBrush(m_currentColour, AxSOLID);
 
     ArrayOfLedgerLines::iterator iter;
-    std::list<std::pair<int, int> >::iterator iterDashes;
+    std::list<std::pair<int, int>>::iterator iterDashes;
 
     // First add the dash
     for (iter = lines->begin(); iter != lines->end(); ++iter) {

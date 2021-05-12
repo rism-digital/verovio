@@ -1500,7 +1500,7 @@ void HumdrumInput::createHeader()
 {
     hum::HumdrumFile &infile = m_infiles[0];
     std::vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
-    std::vector<std::vector<string> > respPeople;
+    std::vector<std::vector<string>> respPeople;
     getRespPeople(respPeople, references);
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
@@ -1727,7 +1727,7 @@ string HumdrumInput::getDateString()
 //     This is for MEI 3.0 and no longer used, so should eventually be deleted.
 //
 
-void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<string> > &respPeople)
+void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<string>> &respPeople)
 {
     if (respPeople.size() == 0) {
         return;
@@ -1758,7 +1758,7 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::ve
 //   [3] = Line number for xml:id creation
 //
 
-void HumdrumInput::insertPeople(pugi::xml_node &work, std::vector<std::vector<string> > &respPeople)
+void HumdrumInput::insertPeople(pugi::xml_node &work, std::vector<std::vector<string>> &respPeople)
 {
     if (respPeople.size() == 0) {
         return;
@@ -1815,7 +1815,7 @@ void HumdrumInput::insertPeople(pugi::xml_node &work, std::vector<std::vector<st
 //
 
 void HumdrumInput::getRespPeople(
-    std::vector<std::vector<string> > &respPeople, std::vector<hum::HumdrumLine *> &references)
+    std::vector<std::vector<string>> &respPeople, std::vector<hum::HumdrumLine *> &references)
 {
 
     // precalculate a reference map here to make more O(N) rather than O(N^2)
@@ -1843,7 +1843,7 @@ void HumdrumInput::getRespPeople(
 // HumdrumInput::addPerson --
 //
 
-void HumdrumInput::addPerson(std::vector<std::vector<string> > &respPeople, std::vector<hum::HumdrumLine *> &references,
+void HumdrumInput::addPerson(std::vector<std::vector<string>> &respPeople, std::vector<hum::HumdrumLine *> &references,
     const std::string &key, const std::string &role)
 {
     for (int i = 0; i < (int)references.size(); ++i) {
@@ -2446,9 +2446,9 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
     // enumeration in the decoration is not monotonic covering every staff
     // in the score, then the results may have problems.
 
-    map<std::string, vector<int> > classToStaffMapping;
-    map<int, vector<int> > groupToStaffMapping;
-    map<int, vector<int> > partToStaffMapping;
+    map<std::string, vector<int>> classToStaffMapping;
+    map<int, vector<int>> groupToStaffMapping;
+    map<int, vector<int>> partToStaffMapping;
     map<int, int> trackToSpineMapping;
     map<int, int> staffToSpineMapping;
     map<int, int> staffToGroupMapping;
@@ -2619,7 +2619,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
     }
 
     // Now pair (), <> {}, and [] parentheses in the d string.
-    vector<pair<int, char> > stack;
+    vector<pair<int, char>> stack;
     pair<int, char> item;
     vector<int> pairing(d.size(), -1);
     for (int i = 0; i < (int)d.size(); ++i) {
@@ -2753,7 +2753,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
     vector<bool> barstart; // true if bar group starts at staff.
     vector<bool> barend; // true if bar group stops at staff.
 
-    vector<vector<int> > bargroups;
+    vector<vector<int>> bargroups;
     vector<string> groupstyle;
 
     groupstyle.resize(1);
@@ -2943,7 +2943,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
     }
 
     // Pull out all non-zero staff groups:
-    vector<vector<int> > newgroups;
+    vector<vector<int>> newgroups;
     vector<string> newstyles;
     for (int i = 0; i < (int)bargroups.size(); ++i) {
         if (bargroups[i].empty()) {
@@ -3218,7 +3218,7 @@ vector<int> HumdrumInput::getStaffNumbers(string &deco)
 void HumdrumInput::prepareHeaderFooter()
 {
     hum::HumdrumFile &infile = m_infiles[0];
-    std::vector<std::pair<std::string, std::string> > biblist;
+    std::vector<std::pair<std::string, std::string>> biblist;
 
     hum::HumRegex hre;
     std::vector<hum::HumdrumLine *> records = infile.getReferenceRecords();
@@ -3405,7 +3405,7 @@ std::string HumdrumInput::processTemplateOperator(const std::string &value, cons
 //
 
 std::string HumdrumInput::processReferenceTemplate(const std::string &input,
-    std::vector<std::pair<string, std::string> > &biblist, std::map<std::string, std::string> &refmap)
+    std::vector<std::pair<string, std::string>> &biblist, std::map<std::string, std::string> &refmap)
 {
     std::string text = input;
     hum::HumRegex hre;
@@ -3440,7 +3440,7 @@ std::string HumdrumInput::processReferenceTemplate(const std::string &input,
 //
 
 bool HumdrumInput::prepareFooter(
-    std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap)
+    std::vector<std::pair<std::string, std::string>> &biblist, std::map<std::string, std::string> &refmap)
 {
 
     std::string footleft;
@@ -3615,7 +3615,7 @@ bool HumdrumInput::prepareFooter(
 //
 
 bool HumdrumInput::prepareHeader(
-    std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap)
+    std::vector<std::pair<std::string, std::string>> &biblist, std::map<std::string, std::string> &refmap)
 {
     std::string headleft;
     std::string headcenter;
@@ -3763,7 +3763,7 @@ bool HumdrumInput::prepareHeader(
 //     an editor, then show on the top left automatically.
 //
 
-std::string HumdrumInput::automaticHeaderLeft(std::vector<std::pair<std::string, std::string> > &biblist,
+std::string HumdrumInput::automaticHeaderLeft(std::vector<std::pair<std::string, std::string>> &biblist,
     std::map<std::string, std::string> &refmap, int linecount)
 {
     std::string output;
@@ -3843,7 +3843,7 @@ std::string HumdrumInput::automaticHeaderLeft(std::vector<std::pair<std::string,
 //     on whether or not the composer's date are displayed.
 //
 
-std::string HumdrumInput::automaticHeaderRight(std::vector<std::pair<std::string, std::string> > &biblist,
+std::string HumdrumInput::automaticHeaderRight(std::vector<std::pair<std::string, std::string>> &biblist,
     std::map<std::string, std::string> &refmap, int &linecount)
 {
 
@@ -3890,7 +3890,7 @@ std::string HumdrumInput::automaticHeaderRight(std::vector<std::pair<std::string
 //
 
 std::string HumdrumInput::automaticHeaderCenter(
-    std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap)
+    std::vector<std::pair<std::string, std::string>> &biblist, std::map<std::string, std::string> &refmap)
 {
     std::string output;
     std::string title;
@@ -6040,7 +6040,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     hum::HumdrumFile &infile = m_infiles[0];
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     const std::vector<int> &rkern = m_rkern;
-    std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
+    std::vector<std::vector<std::vector<hum::HTp>>> &lt = m_layertokens;
 
     lt.clear();
     lt.resize(staffstarts.size());
@@ -7848,7 +7848,7 @@ bool HumdrumInput::checkForTremolo(
 
     hum::HumNum duration = notes[0]->getDuration();
     hum::HumNum testdur = duration;
-    std::vector<std::vector<int> > pitches(notes.size());
+    std::vector<std::vector<int>> pitches(notes.size());
     // std::vector<HumNum> durations(notes.size());
 
     bool firstHasTie = false;
@@ -7969,7 +7969,7 @@ bool HumdrumInput::checkForTremolo(
     }
 
     // Group separate tremolo groups within a single beam.
-    std::vector<std::vector<hum::HTp> > groupings;
+    std::vector<std::vector<hum::HTp>> groupings;
     if (hasInternalTrem) {
         groupings.reserve(16);
         groupings.resize(1);
@@ -13727,7 +13727,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
     // slurstarts: indexed by slur end number (NB: 0 position not used).
     // pair contains the slur start enumeration and the start token.
-    std::vector<pair<int, hum::HTp> > slurstartlist;
+    std::vector<pair<int, hum::HTp>> slurstartlist;
     slurstartlist.resize(slurendcount + 1);
     for (int i = 1; i <= slurendcount; ++i) {
         slurstartlist[i].first = slurend->getSlurStartNumber(i);
@@ -13940,7 +13940,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
     // phraseindex contains a list of the indexes into phrasestarts,
     // with all identical phrase starts placed on the first
     // position that the note/chord is found in the phrasestarts list.
-    std::vector<std::vector<int> > phraseindex;
+    std::vector<std::vector<int>> phraseindex;
     phraseindex.resize(phrasestarts.size());
     for (int i = 0; i < (int)phrasestarts.size(); ++i) {
         for (int j = 0; j <= i; j++) {
@@ -13953,7 +13953,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
 
     std::vector<bool> indexused(32, false);
 
-    std::vector<pair<int, bool> > phraseendnoteinfo;
+    std::vector<pair<int, bool>> phraseendnoteinfo;
     extractPhraseNoteAttachmentInformation(phraseendnoteinfo, phraseend, '}');
 
     int endsubtokcount = phraseend->getSubtokenCount();
@@ -13967,7 +13967,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
             endpitches.push_back(hum::Convert::kernToBase7(subtok));
         }
     }
-    std::vector<pair<int, int> > endchordsorted;
+    std::vector<pair<int, int>> endchordsorted;
     endchordsorted.reserve(endsubtokcount);
     pair<int, int> v;
     for (int i = 0; i < endsubtokcount; ++i) {
@@ -13981,7 +13981,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
     std::vector<int> startpitches;
 
     for (int i = 0; i < (int)phraseindex.size(); ++i) {
-        std::vector<pair<int, bool> > phrasestartnoteinfo;
+        std::vector<pair<int, bool>> phrasestartnoteinfo;
         extractPhraseNoteAttachmentInformation(phrasestartnoteinfo, phrasestarts.at(i), '{');
 
         startsubtokcount = phrasestarts[i]->getSubtokenCount();
@@ -13995,7 +13995,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
                 startpitches.push_back(hum::Convert::kernToBase7(subtok));
             }
         }
-        std::vector<std::pair<int, int> > startchordsorted;
+        std::vector<std::pair<int, int>> startchordsorted;
         startchordsorted.reserve(startsubtokcount);
 
         pair<int, int> v;
@@ -14012,7 +14012,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
             }
             hum::HTp phrasestart = phrasestarts[phraseindex[i][j]];
 
-            std::vector<pair<int, bool> > phrasestartnoteinfo;
+            std::vector<pair<int, bool>> phrasestartnoteinfo;
             extractPhraseNoteAttachmentInformation(phrasestartnoteinfo, phrasestart, '{');
             if (!phrasestart) {
                 // should never occur...
@@ -14126,9 +14126,9 @@ bool HumdrumInput::phraseIsInvisible(hum::HTp token, int pindex)
 
 template <class ELEMENT>
 void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp phraseend, Measure *startmeasure,
-    std::vector<pair<int, int> > &endchordsorted, std::vector<std::pair<int, int> > &startchordsorted,
-    std::vector<pair<int, bool> > &phrasestartnoteinfo, std::vector<pair<int, bool> > &phraseendnoteinfo, int ndex,
-    std::vector<std::vector<int> > &phraseindex, int i, int j, std::vector<int> &startpitches,
+    std::vector<pair<int, int>> &endchordsorted, std::vector<std::pair<int, int>> &startchordsorted,
+    std::vector<pair<int, bool>> &phrasestartnoteinfo, std::vector<pair<int, bool>> &phraseendnoteinfo, int ndex,
+    std::vector<std::vector<int>> &phraseindex, int i, int j, std::vector<int> &startpitches,
     std::vector<int> &endpitches, std::vector<bool> &indexused)
 {
 
@@ -14351,7 +14351,7 @@ void HumdrumInput::addTieLineStyle(Tie *element, hum::HTp token, int noteindex)
 //
 
 void HumdrumInput::extractSlurNoteAttachmentInformation(
-    std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype)
+    std::vector<std::pair<int, bool>> &data, hum::HTp token, char slurtype)
 {
     // slurtype == '(' for slur start
     // slurtype == ')' for slur end
@@ -14389,7 +14389,7 @@ void HumdrumInput::extractSlurNoteAttachmentInformation(
 //
 
 void HumdrumInput::extractPhraseNoteAttachmentInformation(
-    std::vector<std::pair<int, bool> > &data, hum::HTp token, char phrasetype)
+    std::vector<std::pair<int, bool>> &data, hum::HTp token, char phrasetype)
 {
     // phrasetype == '{' for phrase start
     // phrasetype == '}' for phrase end
@@ -14456,7 +14456,7 @@ bool HumdrumInput::getNoteStatePhrase(hum::HTp token, int phrasenumber)
 // HumdrumInput::calculateNoteIdForSlur --
 //
 
-void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index)
+void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int>> &sortednotes, int index)
 {
     int notecount = (int)sortednotes.size();
     hum::HumRegex hre;
@@ -15291,7 +15291,7 @@ void HumdrumInput::storeBreaksec(
     std::vector<int> &beamstate, std::vector<int> &beamnum, const std::vector<hum::HTp> &layerdata, bool grace)
 {
 
-    std::vector<std::vector<int> > beamednotes;
+    std::vector<std::vector<int>> beamednotes;
     int bnum = 0;
     for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (!beamnum[i]) {
@@ -16199,7 +16199,7 @@ void HumdrumInput::assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet
     }
 
     // tggroups is a list of only durational items, removing things like clefs and barlines.
-    vector<vector<humaux::HumdrumBeamAndTuplet *> > tggroups(maxgroup + 1);
+    vector<vector<humaux::HumdrumBeamAndTuplet *>> tggroups(maxgroup + 1);
     for (int i = 0; i < (int)tg.size(); ++i) {
         int group = tg[i].group;
         if (group <= 0) {
@@ -21243,7 +21243,7 @@ int HumdrumInput::characterCountInSubtoken(hum::HTp token, char symbol)
 
 void HumdrumInput::printMeasureTokens()
 {
-    std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
+    std::vector<std::vector<std::vector<hum::HTp>>> &lt = m_layertokens;
     int i, j, k;
     cerr << endl;
     for (i = 0; i < (int)lt.size(); ++i) {
@@ -21421,7 +21421,7 @@ Tie *HumdrumInput::tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum m
 
 std::vector<int> HumdrumInput::getStaffLayerCounts()
 {
-    std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
+    std::vector<std::vector<std::vector<hum::HTp>>> &lt = m_layertokens;
     std::vector<int> output(lt.size(), 0);
 
     int i;

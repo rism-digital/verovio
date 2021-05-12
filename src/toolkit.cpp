@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -43,7 +44,10 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
+
+#ifndef NO_MXL_SUPPORT
 #include "zip_file.hpp"
+#endif /* NO_MXL_SUPPORT */
 
 namespace vrv {
 
@@ -224,53 +228,13 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
 
-        if (initial.find("<mei ") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s\\n>]"))) {
             return MEI;
         }
-        if (initial.find("<mei>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<score-partwise>") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-
-        std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
+        LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
     }
     if (initial.find("\n!!") != std::string::npos) {
@@ -405,6 +369,7 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
+#ifndef NO_MXL_SUPPORT
     miniz_cpp::zip_file file(bytes);
 
     std::string filename;
@@ -430,6 +395,10 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
         LogError("No file to load found in the archive");
         return false;
     }
+#else
+    LogError("MXL import is not supported in this build.");
+    return false;
+#endif
 }
 
 bool Toolkit::LoadZipDataBase64(const std::string &data)
@@ -775,14 +744,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     jsonxx::Object json;
 
-    // Read JSON options
-    if (!json.parse(jsonOptions)) {
-        LogWarning("Cannot parse JSON std::string. Using default options.");
-    }
-    else {
-        if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
-        if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
-        if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+            if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+            if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+        }
     }
 
     if (GetPageCount() == 0) {
@@ -834,6 +805,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
         const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
         const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
+        const OptionJson *optJson = dynamic_cast<const OptionJson *>(iter->second);
 
         if (optDbl) {
             double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
@@ -857,6 +829,12 @@ std::string Toolkit::GetOptions(bool defaultValues) const
                 values << (*strIter);
             }
             o << iter->first << values;
+        }
+        else if (optJson) {
+            // Reading json from file is not supported in toolkit
+            if (optJson->GetSource() == JsonSource::String) {
+                o << iter->first << optJson->GetValue(defaultValues);
+            }
         }
         else {
             std::string stringValue
@@ -886,6 +864,10 @@ std::string Toolkit::GetAvailableOptions() const
         const std::vector<Option *> *options = optionGrp->GetOptions();
 
         for (auto const &option : *options) {
+            // Reading json from file is not supported in toolkit
+            const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
+            if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
+
             opts << option->GetKey() << option->ToJson();
         }
 
@@ -974,10 +956,19 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
             opt->SetValueArray(strValues);
         }
+        else if (json.has<jsonxx::Object>(iter->first)) {
+            const OptionJson *optJson = dynamic_cast<OptionJson *>(opt);
+            if (optJson && (optJson->GetSource() == JsonSource::String)) {
+                const jsonxx::Object value = json.get<jsonxx::Object>(iter->first);
+                opt->SetValue(value.json());
+            }
+        }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());
         }
     }
+
+    m_options->Sync();
 
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed

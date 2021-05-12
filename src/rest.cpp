@@ -29,7 +29,7 @@
 namespace vrv {
 
 typedef std::map<RestLayer,
-    std::map<RestAccidental, std::map<RestLayerPlace, std::map<RestNotePlace, std::map<int, int> > > > >
+    std::map<RestAccidental, std::map<RestLayerPlace, std::map<RestNotePlace, std::map<int, int>>>>>
     RestOffsets;
 
 RestOffsets g_defaultRests{
@@ -304,7 +304,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     const int optimalLocation = isTopLayer
         ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
         : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
-    
+
     return optimalLocation;
 }
 
@@ -386,7 +386,7 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
         currentOptimalLocation = previousElementLoc;
     }
     else {
-        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2; 
+        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2;
     }
     const int marginLocation = isTopLayer ? 10 : -2;
     currentOptimalLocation = isTopLayer ? std::min(currentOptimalLocation, marginLocation)
@@ -453,7 +453,7 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
             (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
     if (object->Is(FTREM)) {
-        std::vector<std::pair<int, RestAccidental> > btremElements;
+        std::vector<std::pair<int, RestAccidental>> btremElements;
         for (int i = 0; i < object->GetChildCount(); ++i) {
             btremElements.emplace_back(GetElementLocation(object->GetChild(i), layer, isTopLayer));
         }
