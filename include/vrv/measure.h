@@ -143,7 +143,8 @@ public:
      * Create mapping of original barline values to staves in the measure that are neighbored by invisible staves. This
      * will allow to draw proper barline when invisible staff hides overlaping barline
      */
-    void SetInvisibleStaffBarlines(Measure *previous, ListOfObjects &currentInvisble, ListOfObjects &previoustInvisble);
+    void SetInvisibleStaffBarlines(
+        Measure *previous, ListOfObjects &currentInvisible, ListOfObjects &previousInvisible, int barlineDrawingFlags);
 
     /**
      * @name Set and get the barlines.
@@ -518,7 +519,7 @@ private:
     std::vector<double> m_realTimeOffsetMilliseconds;
     int m_currentTempo;
 
-    std::map<int, std::pair<data_BARRENDITION, data_BARRENDITION> > m_invisibleStaffBarlines;
+    std::map<int, BarlineRenditionPair> m_invisibleStaffBarlines;
 };
 
 } // namespace vrv

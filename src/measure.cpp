@@ -578,7 +578,8 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
     }
     else {
         if ((barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS)
-            && !(barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)) {
+            && !(barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+            && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT)) {
             if (this->GetLeft() == BARRENDITION_NONE) {
                 this->SetLeft(BARRENDITION_single);
             }
@@ -590,12 +591,12 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
 }
 
 void Measure::SetInvisibleStaffBarlines(
-    Measure *previous, ListOfObjects &currentInvisble, ListOfObjects &previoustInvisble)
+    Measure *previous, ListOfObjects &currentInvisible, ListOfObjects &previousInvisible, int barlineDrawingFlags)
 {
     if (!previous) return;
 
     // Process invisible staves in the current measure and set right barline values for previous measure
-    for (const auto object : currentInvisble) {
+    for (const auto object : currentInvisible) {
         Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
         data_BARRENDITION right = previous->GetRight();
@@ -605,11 +606,12 @@ void Measure::SetInvisibleStaffBarlines(
         if (!result) iter->second.second = right;
     }
     // Then process invisible staves in the previous measure and set left barline values in the current measure
-    for (const auto object : previoustInvisble) {
+    for (const auto object : previousInvisible) {
         Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
         data_BARRENDITION left = GetLeft();
-        if (left == BARRENDITION_NONE) left = BARRENDITION_single;
+        if ((left == BARRENDITION_NONE) && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT))
+            left = BARRENDITION_single;
         auto [iter, result] = m_invisibleStaffBarlines.insert({ staff->GetN(), { left, BARRENDITION_NONE } });
         if (!result) iter->second.first = left;
     }

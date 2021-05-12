@@ -1559,7 +1559,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
                 drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
         }
 
-        measure->SetInvisibleStaffBarlines(params->m_previousMeasure, currentObjects, previousObjects);
+        measure->SetInvisibleStaffBarlines(params->m_previousMeasure, currentObjects, previousObjects, drawingFlags);
         measure->SetDrawingBarLines(params->m_previousMeasure, drawingFlags);
         
         params->m_previousMeasure = measure;
@@ -1572,8 +1572,9 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
-        if (scoreDef->HasClefInfo() || scoreDef->HasKeySigInfo() || scoreDef->HasMensurInfo()
-            || scoreDef->HasMeterSigInfo()) {
+        if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
+            || scoreDef->HasMensurInfo(UNLIMITED_DEPTH)
+            || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
             params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
             params->m_upcomingScoreDef->m_insertScoreDef = true;
         }
