@@ -562,9 +562,37 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-void Note::SetMIDIPitch(char pitch)
+void Note::CalcMIDIPitch(int shift)
 {
-    m_MIDIPitch = pitch;
+    if (this->HasPnum()) {
+        m_MIDIPitch = this->GetPnum();
+    }
+    else {
+        int midiBase = 0;
+        data_PITCHNAME pname = this->GetPname();
+        if (this->HasPnameGes()) pname = this->GetPnameGes();
+        switch (pname) {
+            case PITCHNAME_c: midiBase = 0; break;
+            case PITCHNAME_d: midiBase = 2; break;
+            case PITCHNAME_e: midiBase = 4; break;
+            case PITCHNAME_f: midiBase = 5; break;
+            case PITCHNAME_g: midiBase = 7; break;
+            case PITCHNAME_a: midiBase = 9; break;
+            case PITCHNAME_b: midiBase = 11; break;
+            default: break;
+        }
+
+        // Check for accidentals
+        midiBase += this->GetChromaticAlteration();
+
+        // Apply shift, i.e. from transposition instruments
+        midiBase += shift;
+
+        int oct = this->GetOct();
+        if (this->HasOctGes()) oct = this->GetOctGes();
+
+        m_MIDIPitch = midiBase + (oct + 1) * 12;
+    }
 }
 
 double Note::GetScoreTimeOnset()
@@ -1239,63 +1267,50 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
-    assert(note);
+    // Skip linked notes
+    if (this->HasSameasLink()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     // If the note is a secondary tied note, then ignore it
-    if (note->GetScoreTimeTiedDuration() < 0.0) {
+    if (this->GetScoreTimeTiedDuration() < 0.0) {
         return FUNCTOR_SIBLINGS;
     }
 
     // For now just ignore grace notes
-    if (note->IsGraceNote()) {
+    if (this->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
     }
 
-    int pitch = 0;
-    if (note->HasPnum()) {
-        pitch = note->GetPnum();
-    }
-    else {
-        // calc pitch
-        int midiBase = 0;
-        data_PITCHNAME pname = note->GetPname();
-        if (note->HasPnameGes()) pname = note->GetPnameGes();
-        switch (pname) {
-            case PITCHNAME_c: midiBase = 0; break;
-            case PITCHNAME_d: midiBase = 2; break;
-            case PITCHNAME_e: midiBase = 4; break;
-            case PITCHNAME_f: midiBase = 5; break;
-            case PITCHNAME_g: midiBase = 7; break;
-            case PITCHNAME_a: midiBase = 9; break;
-            case PITCHNAME_b: midiBase = 11; break;
-            case PITCHNAME_NONE: break;
-        }
-        int oct = note->GetOct();
-        if (note->HasOctGes()) oct = note->GetOctGes();
-
-        // Check for accidentals
-        midiBase += note->GetChromaticAlteration();
-
-        // Adjustment for transposition intruments
-        midiBase += params->m_transSemi;
-
-        pitch = midiBase + (oct + 1) * 12;
-    }
-
-    // We do store the MIDIPitch in the note even with a sameas
-    this->SetMIDIPitch(pitch);
     int channel = params->m_midiChannel;
     int velocity = MIDI_VELOCITY;
-    if (note->HasVel()) velocity = note->GetVel();
+    if (this->HasVel()) velocity = this->GetVel();
 
-    double starttime = params->m_totalTime + note->GetScoreTimeOnset();
-    double stoptime = params->m_totalTime + note->GetScoreTimeOffset() + note->GetScoreTimeTiedDuration();
+    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
 
     int tpq = params->m_midiFile->getTPQ();
 
-    params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
-    params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+    // Check if note was expanded into sequence of short notes due to trills/tremolandi
+    // Play either the expanded note sequence or a single note
+    if (params->m_expandedNotes.find(this) != params->m_expandedNotes.end()) {
+        for (const auto &midiNote : params->m_expandedNotes[this]) {
+            double stoptime = starttime + midiNote.duration;
+
+            params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, midiNote.pitch, velocity);
+            params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, midiNote.pitch);
+
+            starttime = stoptime;
+        }
+    }
+    else {
+        double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
+
+        this->CalcMIDIPitch(params->m_transSemi);
+        char pitch = this->GetMIDIPitch();
+
+        params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
+        params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+    }
 
     return FUNCTOR_SIBLINGS;
 }
