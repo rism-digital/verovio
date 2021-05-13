@@ -701,7 +701,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                     yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 }
-                DrawBarLine(dc, yTop, yBottom, barLine, form/*form*/);
+                DrawBarLine(dc, yTop, yBottom, barLine, form);
                 if (barLine->HasRepetitionDots()) {
                     DrawBarLineDots(dc, staff, barLine);
                 }
