@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
+* Improved rendering of octave brackets ending (@eNote-GmbH)
 * Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
 * Fix option --octave-alternative-symbols
 
