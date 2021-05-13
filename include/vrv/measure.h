@@ -39,7 +39,8 @@ class Measure : public Object,
                 public AttNNumberLike,
                 public AttPointing,
                 public AttTyped {
-
+private:
+    using BarlineRenditionPair = std::pair<data_BARRENDITION, data_BARRENDITION>;
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -117,13 +118,33 @@ public:
     void SetDrawingLeftBarLine(data_BARRENDITION type) { m_leftBarLine.SetForm(type); }
     data_BARRENDITION GetDrawingRightBarLine() const { return m_rightBarLine.GetForm(); }
     void SetDrawingRightBarLine(data_BARRENDITION type) { m_rightBarLine.SetForm(type); }
+    data_BARRENDITION GetDrawingLeftBarLineByStaffN(int staffN) const;
+    data_BARRENDITION GetDrawingRightBarLineByStaffN(int staffN) const;
     ///@}
+
+    /**
+     * Return whether there is mapping of barline values to invisible staves present in measure
+     */
+    bool HasInvisibleStaffBarlines() const { return !m_invisibleStaffBarlines.empty();}
+
+    /**
+     * Select drawing barlines based on the previous right and current left barlines (to avoid duplicated doubles or
+     * singles). In certain cases drawn barlines would be simplified if they can be overlapped, e.g. single with dbl
+     */
+    BarlineRenditionPair SelectDrawingBarLines(Measure *previous);
 
     /**
      * Set the drawing barlines for the measure.
      * Also adjust the right barline of the previous measure and the left one if necessary.
      */
-    void SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert);
+    void SetDrawingBarLines(Measure *previous, int barlineDrawingFlags);
+
+    /**
+     * Create mapping of original barline values to staves in the measure that are neighbored by invisible staves. This
+     * will allow to draw proper barline when invisible staff hides overlaping barline
+     */
+    void SetInvisibleStaffBarlines(
+        Measure *previous, ListOfObjects &currentInvisible, ListOfObjects &previousInvisible, int barlineDrawingFlags);
 
     /**
      * @name Set and get the barlines.
@@ -431,6 +452,13 @@ public:
     virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
 
 public:
+    // flags for drawing measure barline based on visibility or other conditions
+    enum BarlineDrawingFlags {
+        SYSTEM_BREAK = 0x1,
+        SCORE_DEF_INSERT = 0x2,
+        INVISIBLE_MEASURE_CURRENT = 0x4,
+        INVISIBLE_MEASURE_PREVIOUS = 0x8
+    };
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.
      * This is the left and right position of the measure.
@@ -490,6 +518,8 @@ private:
     std::vector<double> m_scoreTimeOffset;
     std::vector<double> m_realTimeOffsetMilliseconds;
     int m_currentTempo;
+
+    std::map<int, BarlineRenditionPair> m_invisibleStaffBarlines;
 };
 
 } // namespace vrv
