@@ -15017,10 +15017,9 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         setAllKeySig = true;
     }
     if (hasTimeSig && allSameTimeSig) {
-        // int track = metersig[0]->getTrack();
-        // int staffindex = m_rkern.at(track);
-        setTimeSig(scoreDef, timesigtok[0], metersigtok[0], -1);
-        setAllTimeSig = true;
+        // Disable system-level time signatures for now.
+        // setTimeSig(scoreDef, timesigtok[0], metersigtok[0], -1);
+        // setAllTimeSig = true;
     }
 
     // Need to add individual staffDefs for changes that do not affect all staves.
