@@ -600,6 +600,8 @@ bool HumdrumInput::convertHumdrum()
 
     hum::HumdrumFile &infile = m_infiles[0];
 
+    // Check if a mensural music score should be produced (and ignore **kerns,
+    // since only mens or kern can be rendered by verovio at a time).
     m_mens = checkForMens(infile);
 
     bool hasScordatura = checkForScordatura(infile);
@@ -736,8 +738,8 @@ bool HumdrumInput::convertHumdrum()
     std::fill(m_transpose.begin(), m_transpose.end(), 0);
 
     prepareVerses();
+    // ggg problem here: mens calculation after this point or before?
     prepareSections();
-
     prepareHeaderFooter();
     prepareStaffGroups(top, bot);
 
@@ -2175,7 +2177,9 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
         // m_staffgroup->AddChild(m_staffdef.back());
-        fillPartInfo(staffstarts[i], i + 1, (int)staffstarts.size());
+        int staffnumber = i + 1;
+        int staffcount = (int)staffstarts.size();
+        fillStaffInfo(staffstarts[i], staffnumber, staffcount);
     }
 
     std::string decoration = getSystemDecoration("system-decoration");
@@ -4256,17 +4260,18 @@ void HumdrumInput::addDefaultTempo(ScoreDef &m_scoreDef)
 
 //////////////////////////////
 //
-// HumdrumInput::fillPartInfo -- Should use regular expressions
+// HumdrumInput::fillStaffInfo -- Should use regular expressions
 //    in the future.
 //
 
-void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcount)
+void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staffcount)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     std::string primarymensuration;
 
-    int group = getGroupNumberLabel(partstart);
+    int group = getGroupNumberLabel(staffstart);
+    int staffindex = staffnumber - 1;
 
     // bool hasglabel = false;
     std::string glabel;
@@ -4302,9 +4307,8 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     int bot = 0;
 
     hum::HumRegex hre;
-    hum::HTp part = partstart;
+    hum::HTp part = staffstart;
     while (part && !part->getLine()->isData()) {
-
         if (part->compare(0, 5, "*clef") == 0) {
             if (cleftok) {
                 if (clef == *part) {
@@ -4332,7 +4336,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 6, "*oclef") == 0) {
             if (hre.search(part, 6, "\\d")) {
-                m_oclef.emplace_back(partnumber, part);
+                m_oclef.emplace_back(staffnumber, part);
             }
         }
         else if (part->compare(0, 5, "*part") == 0) {
@@ -4346,14 +4350,14 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             striatok = part;
         }
         else if (part->compare(0, 5, "*omet") == 0) {
-            m_omet.emplace_back(partnumber, part);
+            m_omet.emplace_back(staffnumber, part);
         }
         else if (part->compare(0, 3, "*k[") == 0) {
             keysigtok = part;
             keysig = *keysigtok;
         }
         else if (part->compare(0, 4, "*ok[") == 0) {
-            m_okey.emplace_back(partnumber, part);
+            m_okey.emplace_back(staffnumber, part);
         }
         else if (hre.search(part, "^\\*[a-gA-G][#-]*:([a-z]{3})?$")) {
             keytok = part;
@@ -4371,7 +4375,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             itranspose = *part;
         }
         else if (part->compare(0, 4, "*I''") == 0) {
-            if (partcount > 1) {
+            if (staffcount > 1) {
                 // Avoid encoding the part group abbreviation when there is only one
                 // part in order to suppress the display of the abbreviation.
                 gabbreviation = part->substr(4);
@@ -4383,7 +4387,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             }
         }
         else if (part->compare(0, 3, "*I'") == 0) {
-            if (partcount > 1) {
+            if (staffcount > 1) {
                 // Avoid encoding the part abbreviation when there is only one
                 // part in order to suppress the display of the abbreviation.
                 abbreviation = part->substr(3);
@@ -4422,18 +4426,18 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
             timesig = *part;
             timetok = part;
-            ss[partnumber - 1].meter_bottom = bot;
-            ss[partnumber - 1].meter_top = top;
+            ss[staffindex].meter_bottom = bot;
+            ss[staffindex].meter_top = top;
             if (bot == 0) {
-                ss[partnumber - 1].meter_bottom = 1;
-                ss[partnumber - 1].meter_top *= 2;
+                ss[staffindex].meter_bottom = 1;
+                ss[staffindex].meter_top *= 2;
             }
         }
         else if (part->find("acclev") != std::string::npos) {
-            storeAcclev(*part, partnumber - 1);
+            storeAcclev(*part, staffindex);
         }
         else if (part->compare(0, 5, "*stem") == 0) {
-            storeStemInterpretation(*part, partnumber - 1, 1);
+            storeStemInterpretation(*part, staffindex, 1);
         }
 
         hum::HumdrumFile *hf = part->getOwner()->getOwner();
@@ -4467,22 +4471,22 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     // short-circuit *clef with *oclef for **mens data
-    if (partstart->isMens()) {
-        if ((!m_oclef.empty()) && (partnumber == m_oclef.back().first)) {
+    if (staffstart->isMens()) {
+        if ((!m_oclef.empty()) && (staffnumber == m_oclef.back().first)) {
             clef = *m_oclef.back().second;
             cleftok = m_oclef.back().second;
         }
     }
 
     // short-circuit *met with *omet for **mens data
-    if (partstart->isMens()) {
-        if ((!m_omet.empty()) && (partnumber == m_omet.back().first)) {
+    if (staffstart->isMens()) {
+        if ((!m_omet.empty()) && (staffnumber == m_omet.back().first)) {
             metersig = *m_omet.back().second;
             metertok = m_omet.back().second;
         }
     }
 
-    m_staffdef.back()->SetN(partnumber);
+    m_staffdef.back()->SetN(staffnumber);
 
     if (stafftok) {
         // search for a **dynam before the next **kern spine, and set the
@@ -4495,9 +4499,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
                 if (dynamspine->find('/') != std::string::npos) {
                     // the dynamics should be placed between
                     // staves: the current one and the one below it.
-                    ss.at(partnumber - 1).m_dynampos = 0;
-                    ss.at(partnumber - 1).m_dynamstaffadj = 0;
-                    ss.at(partnumber - 1).m_dynamposdefined = true;
+                    ss.at(staffindex).m_dynampos = 0;
+                    ss.at(staffindex).m_dynamstaffadj = 0;
+                    ss.at(staffindex).m_dynamposdefined = true;
                 }
             }
         }
@@ -4529,9 +4533,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         if (lpartnum > 0) {
             if ((lpartnum == partnum) && (dpartnum == partnum)) {
-                ss.at(partnumber - 1).m_dynampos = 0;
-                ss.at(partnumber - 1).m_dynamstaffadj = 0;
-                ss.at(partnumber - 1).m_dynamposdefined = true;
+                ss.at(staffindex).m_dynampos = 0;
+                ss.at(staffindex).m_dynamstaffadj = 0;
+                ss.at(staffindex).m_dynamposdefined = true;
             }
         }
     }
@@ -4570,12 +4574,12 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
     if (clef.size() > 0) {
         setClef(m_staffdef.back(), clef, cleftok, striatok);
-        ss.at(partnumber - 1).last_clef = clef;
+        ss.at(staffindex).last_clef = clef;
     }
     else {
-        std::string autoclef = getAutoClef(partstart, partnumber);
+        std::string autoclef = getAutoClef(staffstart, staffnumber);
         setClef(m_staffdef.back(), autoclef, NULL);
-        ss.at(partnumber - 1).last_clef = clef;
+        ss.at(staffindex).last_clef = clef;
     }
 
     if (transpose.size() > 0) {
@@ -4584,7 +4588,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
     if (itranspose.size() > 0) {
         // This has to be above setKeySig():
-        setDynamicTransposition(partnumber - 1, m_staffdef.back(), itranspose);
+        setDynamicTransposition(staffindex, m_staffdef.back(), itranspose);
     }
 
     if (abbreviation.size() > 0) {
@@ -4602,54 +4606,54 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             setInstrumentName(m_staffdef.back(), label, labeltok);
         }
     }
-    else if (partnumber == 1) {
-        if (hasIndent(partstart)) {
+    else if (staffnumber == 1) {
+        if (hasIndent(staffstart)) {
             setInstrumentName(m_staffdef.back(), "   ");
         }
         // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;");
         // setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
     }
-    else if (hasIndent(partstart)) {
+    else if (hasIndent(staffstart)) {
         setInstrumentName(m_staffdef.back(), "   ");
     }
 
     if (keysig.size() > 0) {
-        setKeySig(partnumber - 1, m_staffdef.back(), keysig, keysigtok, keytok, false);
+        setKeySig(staffindex, m_staffdef.back(), keysig, keysigtok, keytok, false);
     }
 
     if (primarymensuration.empty()) {
         if (timesig.size() > 0) {
-            setTimeSig(m_staffdef.back(), timesig, metersig, partstart, timetok);
+            setTimeSig(m_staffdef.back(), timesig, metersig, staffstart, timetok);
         }
         if (!m_mens && (metersig.size() > 0)) {
-            setMeterSymbol(m_staffdef.back(), metersig, partstart, metertok);
+            setMeterSymbol(m_staffdef.back(), metersig, staffindex, staffstart, metertok);
         }
     }
     else {
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
-            setTimeSig(m_staffdef.back(), "*M2/1", metersig, partstart);
-            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart, metertok);
+            setTimeSig(m_staffdef.back(), "*M2/1", metersig, staffstart);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart, metertok);
         }
         else if ((primarymensuration == "C") || (primarymensuration == "c")) {
-            setTimeSig(m_staffdef.back(), "*M4/1", metersig, partstart, metertok);
-            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
+            setTimeSig(m_staffdef.back(), "*M4/1", metersig, staffstart, metertok);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart);
         }
         else if ((primarymensuration == "O") || (primarymensuration == "o")) {
-            setTimeSig(m_staffdef.back(), "*M3/1", metersig, partstart, metertok);
-            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
+            setTimeSig(m_staffdef.back(), "*M3/1", metersig, staffstart, metertok);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart);
         }
     }
 
-    addInstrumentDefinition(m_staffdef.back(), partstart);
+    addInstrumentDefinition(m_staffdef.back(), staffstart);
 
-    if (partstart->isMens()) {
-        if (isBlackNotation(partstart)) {
+    if (staffstart->isMens()) {
+        if (isBlackNotation(staffstart)) {
             m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_black);
-            ss.at(partnumber - 1).mensuration_type = 1;
+            ss.at(staffindex).mensuration_type = 1;
         }
         else {
             m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_white);
-            ss.at(partnumber - 1).mensuration_type = 0;
+            ss.at(staffindex).mensuration_type = 0;
         }
     }
 }
@@ -5098,20 +5102,21 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 //
 
 template <class ELEMENT>
-void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart, hum::HTp metertok)
+void HumdrumInput::setMeterSymbol(
+    ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp partstart, hum::HTp metertok)
 {
     if ((partstart != NULL) && partstart->isMens()) {
-        setMensurationSymbol(element, metersig, metertok);
+        setMensurationSymbol(element, metersig, staffindex, metertok);
         return;
     }
 
     // handle mensuration displays:
     if (metersig.find("C") != std::string::npos) {
-        setMensurationSymbol(element, metersig, metertok);
+        setMensurationSymbol(element, metersig, staffindex, metertok);
         return;
     }
     if (metersig.find("O") != std::string::npos) {
-        setMensurationSymbol(element, metersig, metertok);
+        setMensurationSymbol(element, metersig, staffindex, metertok);
         return;
     }
 
@@ -5156,9 +5161,9 @@ void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig,
 //
 
 template <class ELEMENT>
-void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok)
+void HumdrumInput::setMensurationSymbol(
+    ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp mensurtok)
 {
-
     int maximodus = 0;
     int modus = 0;
     int tempus = 0;
@@ -5303,7 +5308,7 @@ void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &met
     else if (hre.search(metersig, "/(\\d+)")) {
         vrvmensur->SetNumbase(hre.getMatchInt(1));
     }
-    else if (hre.search(metersig, "(\\d+)")) {
+    else if (hre.search(metersig, "(\\d+).*\\)")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
     }
 
@@ -5314,7 +5319,7 @@ void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &met
     // Y = how many semibreves in one breve
     // Z = how many minims in one semibreve
     // 0 can be used to specify and undefined value.
-    if (hre.search(mensurtok, "_(\\d?)(\\d?)(\\d?)(\\d?)")) {
+    if (mensurtok && hre.search(mensurtok, "_(\\d?)(\\d?)(\\d?)(\\d?)")) {
         std::string num1 = hre.getMatch(1);
         std::string num2 = hre.getMatch(2);
         std::string num3 = hre.getMatch(3);
@@ -5360,11 +5365,21 @@ void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &met
     }
 
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
-    int staffindex = m_currentstaff - 1;
-    ss[staffindex].maximodus = maximodus;
-    ss[staffindex].modus = modus;
-    ss[staffindex].tempus = tempus;
-    ss[staffindex].prolatio = prolatio;
+
+    if (staffindex < 0) {
+        cerr << "Initialization problem, not setting mensuration information" << endl;
+        cerr << "STAFF INDEX = " << staffindex << endl;
+        return;
+    }
+    if (staffindex >= (int)ss.size()) {
+        cerr << "Problem with staff indexing in mensuration processing" << endl;
+        return;
+    }
+
+    ss.at(staffindex).maximodus = maximodus;
+    ss.at(staffindex).modus = modus;
+    ss.at(staffindex).tempus = tempus;
+    ss.at(staffindex).prolatio = prolatio;
 }
 
 //////////////////////////////
@@ -5951,7 +5966,8 @@ void HumdrumInput::checkForLayoutBreak(int line)
     group = token->getLayoutParameter("PB", "g");
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
-        Pb *pb = new Pb;
+        // Pb *pb = new Pb;
+        Sb *pb = new Sb;
         this->m_hasLayoutInformation = true;
         if (m_currentending) {
             m_currentending->AddChild(pb);
@@ -6036,6 +6052,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (key == "OMD") {
             index = i;
             value = infile[i].getReferenceValue();
+            break;
         }
     }
 
@@ -8386,6 +8403,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return false;
     }
     std::vector<hum::HTp> &layerdata = m_layertokens[staffindex][layerindex];
+
     Layer *&layer = m_layer;
 
     if (layerdata.size() == 0) {
@@ -8455,6 +8473,13 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     pointers.push_back((void *)layer);
 
     if ((layerdata.size() == 2) && layerdata[0]->isBarline() && layerdata[1]->isBarline()) {
+        fillEmptyLayer(staffindex, layerindex, elements, pointers);
+        return true;
+    }
+
+    // Check for cases where there are only null interpretations in the measure
+    // and insert a space in the measure (related to tied notes across barlines).
+    if (layerOnlyContainsNullStuff(layerdata)) {
         fillEmptyLayer(staffindex, layerindex, elements, pointers);
         return true;
     }
@@ -8637,12 +8662,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 if (m_mens) {
                     if (layerdata[i]->isMensurationSymbol()) {
                         // add mensuration change to layer.
-                        setMensurationSymbol(m_layer, *layerdata[i], layerdata[i]);
+                        setMensurationSymbol(m_layer, *layerdata[i], staffindex, layerdata[i]);
                     }
                 }
                 else if (layerdata[i]->isMensurationSymbol() && (layerdata[i]->getDurationFromStart() > 0)) {
                     // add mensuration change to layer.
-                    setMensurationSymbol(m_layer, *layerdata[i], layerdata[i]);
+                    setMensurationSymbol(m_layer, *layerdata[i], staffindex, layerdata[i]);
                 }
             }
             else if (forceClefChange || (layerdata[i]->getDurationFromStart() != 0)) {
@@ -9205,6 +9230,25 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         processDirections(layerdata.back(), staffindex);
     }
 
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::layerOnlyContainsNullStuff -- layerdata only contains
+//   barlines (at the endpoints) and null tokens ".", "!", or "*".
+//
+
+bool HumdrumInput::layerOnlyContainsNullStuff(std::vector<hum::HTp> &data)
+{
+    for (int i = 0; i < (int)data.size(); i++) {
+        if (data[i]->isBarline()) {
+            continue;
+        }
+        if (!data[i]->isNull()) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -11795,9 +11839,10 @@ double HumdrumInput::getMmTempoForward(hum::HTp token)
     if (current && current->isData()) {
         current = current->getNextToken();
     }
-    while (current->getSpineInfo() == "") {
-        int line = token->getLineIndex() + 1;
-        current = token->getOwner()->getOwner()->token(line, 0);
+    int line = 0;
+    while (current && current->getSpineInfo() == "") {
+        line = current->getLineIndex() + 1;
+        current = current->getOwner()->getOwner()->token(line, 0);
     }
     while (current && !current->isData()) {
         if (current->isInterpretation()) {
@@ -13690,6 +13735,7 @@ void HumdrumInput::addTextElement(
         }
 
         if (!pretext.empty()) {
+            pretext = unescapeHtmlEntities(pretext);
             hre.replaceDestructive(pretext, "[", "&#91;", "g");
             hre.replaceDestructive(pretext, "]", "&#93;", "g");
             Rend *rend = new Rend;
@@ -14971,6 +15017,8 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         setAllKeySig = true;
     }
     if (hasTimeSig && allSameTimeSig) {
+        // int track = metersig[0]->getTrack();
+        // int staffindex = m_rkern.at(track);
         setTimeSig(scoreDef, timesigtok[0], metersigtok[0], -1);
         setAllTimeSig = true;
     }
@@ -15107,7 +15155,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             auto ploc = metersigtok->rfind(")");
             if (ploc != std::string::npos) {
                 std::string mstring = metersigtok->substr(5, ploc - 5);
-                setMeterSymbol(element, mstring);
+                setMeterSymbol(element, mstring, staffindex, NULL, metersigtok);
             }
         }
     }
@@ -15339,9 +15387,21 @@ Clef *HumdrumInput::insertClefElement(
         clef->SetLine(1);
     }
 
-    if (token->find("v") != std::string::npos) {
+    if (token->find("vv") != std::string::npos) {
+        clef->SetDis(OCTAVE_DIS_15);
+        clef->SetDisPlace(STAFFREL_basic_below);
+    }
+    else if (token->find("v") != std::string::npos) {
         clef->SetDis(OCTAVE_DIS_8);
         clef->SetDisPlace(STAFFREL_basic_below);
+    }
+    else if (token->find("^^") != std::string::npos) {
+        clef->SetDis(OCTAVE_DIS_15);
+        clef->SetDisPlace(STAFFREL_basic_above);
+    }
+    else if (token->find("^") != std::string::npos) {
+        clef->SetDis(OCTAVE_DIS_8);
+        clef->SetDisPlace(STAFFREL_basic_above);
     }
 
     return clef;
@@ -22094,6 +22154,7 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
         // modern and original clef/key/mensuration).
         return;
     }
+    int staffindex = m_currentstaff - 1;
     if (m_oclef.empty() && m_omet.empty() && m_okey.empty()) {
         return;
     }
@@ -22139,7 +22200,7 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
                 if (m_omet[j].first != m_oclef[i].first) {
                     continue;
                 }
-                setMeterSymbol(staffdef, *m_omet[j].second);
+                setMeterSymbol(staffdef, *m_omet[j].second, staffindex);
             }
             for (int j = 0; j < (int)m_okey.size(); ++j) {
                 if (m_okey[j].first != m_oclef[i].first) {
@@ -22155,7 +22216,7 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
         for (int i = 0; i < (int)m_oclef.size(); ++i) {
             StaffDef *staffdef = new StaffDef;
             staffgrp->AddChild(staffdef);
-            setMeterSymbol(staffdef, *m_omet[i].second);
+            setMeterSymbol(staffdef, *m_omet[i].second, staffindex);
             staffdef->SetN(m_omet[i].first);
             for (int j = 0; j < (int)m_okey.size(); ++j) {
                 if (m_okey[j].first != m_omet[i].first) {

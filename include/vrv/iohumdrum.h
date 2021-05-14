@@ -422,7 +422,7 @@ protected:
     void setTransposition(StaffDef *staffDef, const std::string &transpose);
     void setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig = "",
         hum::HTp partstart = NULL, hum::HTp timetok = NULL);
-    void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
+    void fillStaffInfo(hum::HTp staffstart, int staffnumber, int staffcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
     void prepareTimeSigDur(int &top, int &bot);
@@ -719,6 +719,7 @@ protected:
     bool isLastStaffTempo(hum::HTp token);
     void addMensuralQuality(Note *note, hum::HTp token);
     bool checkForMens(hum::HumdrumFile &infile);
+    bool layerOnlyContainsNullStuff(std::vector<hum::HTp> &data);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -772,10 +773,10 @@ protected:
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place, bool showplace);
     template <class ELEMENT>
-    void setMeterSymbol(
-        ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL, hum::HTp metertok = NULL);
+    void setMeterSymbol(ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp partstart = NULL,
+        hum::HTp metertok = NULL);
     template <class ELEMENT>
-    void setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok = NULL);
+    void setMensurationSymbol(ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp mensurtok = NULL);
     template <class ELEMENT>
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
