@@ -1115,6 +1115,9 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     // Check if the measure has some overflowing control elements
     int overflow = this->GetDrawingOverflow();
 
+    Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
+    const bool fitLastMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_fitLastMeasure.GetValue()
+        && (params->m_doc->GetOptions()->m_breaks.GetValue() != BREAKS_encoded));
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
         if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
@@ -1126,8 +1129,8 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
-            > params->m_systemWidth) {
+        else if ((m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift > params->m_systemWidth)
+            && !fitLastMeasure) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
             params->m_shift = m_drawingXRel;
