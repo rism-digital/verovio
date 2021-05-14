@@ -584,17 +584,17 @@ protected:
     bool hasCenterParameter(hum::HTp token, const std::string &category, int &output);
     void prepareHeaderFooter();
     bool prepareHeader(
-        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
+        std::vector<std::pair<std::string, std::string>> &biblist, std::map<std::string, std::string> &refmap);
     bool prepareFooter(
-        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
+        std::vector<std::pair<std::string, std::string>> &biblist, std::map<std::string, std::string> &refmap);
     std::string processReferenceTemplate(const std::string &input,
-        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
+        std::vector<std::pair<std::string, std::string>> &biblist, std::map<std::string, std::string> &refmap);
     std::string processTemplateOperator(const std::string &value, const std::string &op);
-    std::string automaticHeaderLeft(std::vector<std::pair<std::string, std::string> > &biblist,
+    std::string automaticHeaderLeft(std::vector<std::pair<std::string, std::string>> &biblist,
         std::map<std::string, std::string> &refmap, int linecount);
     std::string automaticHeaderCenter(
-        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
-    std::string automaticHeaderRight(std::vector<std::pair<std::string, std::string> > &biblist,
+        std::vector<std::pair<std::string, std::string>> &biblist, std::map<std::string, std::string> &refmap);
+    std::string automaticHeaderRight(std::vector<std::pair<std::string, std::string>> &biblist,
         std::map<std::string, std::string> &refmap, int &linecount);
     void convertMensuralToken(
         std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
@@ -602,7 +602,7 @@ protected:
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
     int getStaffAdjustment(hum::HTp token);
-    void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
+    void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int>> &sortednotes, int index);
     void promoteInstrumentNamesToGroup();
     void promoteInstrumentsForStaffGroup(StaffGrp *group);
     void promoteInstrumentAbbreviationsToGroup();
@@ -617,9 +617,9 @@ protected:
     void prepareInitialOttavas(hum::HTp measure);
     void linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex);
     bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
-    void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype);
+    void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool>> &data, hum::HTp token, char slurtype);
     void extractPhraseNoteAttachmentInformation(
-        std::vector<std::pair<int, bool> > &data, hum::HTp token, char phrasetype);
+        std::vector<std::pair<int, bool>> &data, hum::HTp token, char phrasetype);
     bool getNoteStateSlur(hum::HTp token, int slurnumber);
     bool getNoteStatePhrase(hum::HTp token, int phrasenumber);
     void assignVerticalGroup(Pedal *ped, hum::HTp token);
@@ -725,11 +725,11 @@ protected:
     void createHeader();
     void insertTitle(pugi::xml_node &titleStmt, const std::vector<hum::HumdrumLine *> &references);
     void insertExtMeta(std::vector<hum::HumdrumLine *> &references);
-    void addPerson(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references,
+    void addPerson(std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references,
         const std::string &key, const std::string &role);
-    void getRespPeople(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references);
-    void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
-    void insertPeople(pugi::xml_node &work, std::vector<std::vector<std::string> > &respPeople);
+    void getRespPeople(std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references);
+    void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string>> &respPeople);
+    void insertPeople(pugi::xml_node &work, std::vector<std::vector<std::string>> &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
@@ -753,9 +753,9 @@ protected:
     template <class ELEMENT> Mensur *getMensur(ELEMENT element, hum::HTp token = NULL);
     template <class ELEMENT>
     void insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp phraseend, Measure *startmeasure,
-        std::vector<pair<int, int> > &endchordsorted, std::vector<std::pair<int, int> > &startchordsorted,
-        std::vector<pair<int, bool> > &phrasestartnoteinfo, std::vector<pair<int, bool> > &phraseendnoteinfo, int ndex,
-        std::vector<std::vector<int> > &phraseindex, int i, int j, std::vector<int> &startpitches,
+        std::vector<pair<int, int>> &endchordsorted, std::vector<std::pair<int, int>> &startchordsorted,
+        std::vector<pair<int, bool>> &phrasestartnoteinfo, std::vector<pair<int, bool>> &phraseendnoteinfo, int ndex,
+        std::vector<std::vector<int>> &phraseindex, int i, int j, std::vector<int> &startpitches,
         std::vector<int> &endpitches, std::vector<bool> &indexused);
     template <class ELEMENT> void convertVerses(ELEMENT element, hum::HTp token);
     template <class ELEMENT>
@@ -771,7 +771,8 @@ protected:
     template <class ELEMENT> void addVerovioTextElement(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
-    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place, bool showplace);
+    template <class ELEMENT> void setPlaceRelStaff(ELEMENT *element, const std::string &place, bool showplace);
+    template <class ELEMENT> void setPlaceRelEvent(ELEMENT *element, const std::string &place, bool showplace);
     template <class ELEMENT>
     void setMeterSymbol(ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp partstart = NULL,
         hum::HTp metertok = NULL);
@@ -867,7 +868,7 @@ private:
 
     // m_layertokens == Humdrum **kern tokens for each staff/layer to be
     // converted.
-    std::vector<std::vector<std::vector<hum::HTp> > > m_layertokens;
+    std::vector<std::vector<std::vector<hum::HTp>>> m_layertokens;
 
     // m_staffstarts == list of tracks in Humdrum file being parsed which
     // contain **kern, **mens data or whatever other data types
@@ -890,13 +891,13 @@ private:
     hum::HumNum m_omd = -1;
 
     // m_oclef == temporary variable for printing "original-clef" <app>
-    std::vector<std::pair<int, hum::HTp> > m_oclef;
+    std::vector<std::pair<int, hum::HTp>> m_oclef;
 
     // m_omet == temporary variable for printing "original-mensuration" <app>
-    std::vector<std::pair<int, hum::HTp> > m_omet;
+    std::vector<std::pair<int, hum::HTp>> m_omet;
 
     // m_okey == temporary variable for printing "original-key" <app>
-    std::vector<std::pair<int, hum::HTp> > m_okey;
+    std::vector<std::pair<int, hum::HTp>> m_okey;
 
     // m_staffstates == state variables for each staff.
     std::vector<humaux::StaffStateVariables> m_staffstates;
@@ -977,7 +978,7 @@ private:
 
     // m_spine_color == list of colors to apply to spine data
     // first dimension is the spine/track (staff), and second is subspine/subtrack (layer).
-    std::vector<std::vector<std::string> > m_spine_color;
+    std::vector<std::vector<std::string>> m_spine_color;
 
     // m_traspose == transposition to go from sounding to written pitch.
     std::vector<int> m_transpose;
@@ -1033,7 +1034,7 @@ private:
     std::vector<bool> m_ignore;
 
     // m_clef_buffer == used to identify clefs that should not be printed.
-    std::vector<std::tuple<bool, hum::HumNum, Clef *> > m_clef_buffer;
+    std::vector<std::tuple<bool, hum::HumNum, Clef *>> m_clef_buffer;
 
     // m_ftrem_slurs == used to store ftrem-generated slurs for later insertion
     // into measure element.

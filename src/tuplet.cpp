@@ -34,6 +34,8 @@ namespace vrv {
 // Tuplet
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Tuplet> s_factory("tuplet", TUPLET);
+
 Tuplet::Tuplet()
     : LayerElement("tuplet-")
     , ObjectListInterface()
@@ -473,7 +475,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 = (m_drawingBracketPos == STAFFREL_basic_above) ? 0 : -params->m_doc->GetDrawingStaffSize(staffSize);
 
             // Check for overlap with content
-            // Possible issue with beam above the tuplet - not sure this will be noticable
+            // Possible issue with beam above the tuplet - not sure this will be noticeable
             ListOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllDescendantByComparison(&descendants, &comparison);
@@ -532,7 +534,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 tupletNum->SetDrawingYRel(yRel);
             }
 
-            // Find if there is a mix of cross-staf and non-cross-staff elements in the tuplet
+            // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
             ListOfObjects descendants;
             ClassIdsComparison comparison({ CHORD, NOTE, REST });
             this->FindAllDescendantByComparison(&descendants, &comparison);

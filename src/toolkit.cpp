@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -44,14 +45,15 @@
 #include "jsonxx.h"
 #include "unchecked.h"
 
+#ifndef NO_MXL_SUPPORT
+#include "zip_file.hpp"
+#endif /* NO_MXL_SUPPORT */
+
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
-
-std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
-    = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
-          { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
+const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
 
 void SetDefaultResourcePath(const std::string &path)
 {
@@ -66,7 +68,6 @@ char *Toolkit::m_humdrumBuffer = NULL;
 
 Toolkit::Toolkit(bool initFont)
 {
-    m_scale = DEFAULT_SCALE;
     m_inputFrom = AUTO;
 
     m_humdrumBuffer = NULL;
@@ -105,13 +106,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
 
 bool Toolkit::SetScale(int scale)
 {
-    if (scale < MIN_SCALE || scale > MAX_SCALE) {
-        LogError("Scale out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE,
-            MAX_SCALE);
-        return false;
-    }
-    m_scale = scale;
-    return true;
+    return m_options->m_scale.SetValue(scale);
 }
 
 bool Toolkit::SetOutputTo(std::string const &outputTo)
@@ -135,7 +130,7 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
         m_outputTo = PAE;
     }
     else if (outputTo != "svg") {
-        LogError("Output format can only be: mei, pb-mei, humdrum, midi, timemap or svg");
+        LogError("Output format '%s' is not supported", outputTo.c_str());
         return false;
     }
     return true;
@@ -183,7 +178,7 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
         m_inputFrom = AUTO;
     }
     else {
-        LogError("Input format can only be: mei, humdrum, pae, abc, musicxml or darms");
+        LogError("Input format '%s' is not supported", inputFrom.c_str());
         return false;
     }
     return true;
@@ -233,53 +228,13 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
 
-        if (initial.find("<mei ") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s\\n>]"))) {
             return MEI;
         }
-        if (initial.find("<mei>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<music ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages>") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<pages ") != std::string::npos) {
-            return MEI;
-        }
-        if (initial.find("<score-partwise>") != std::string::npos) {
+        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus>") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
-            return musicxmlDefault;
-        }
-
-        std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
+        LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
     }
     if (initial.find("\n!!") != std::string::npos) {
@@ -298,6 +253,9 @@ bool Toolkit::LoadFile(const std::string &filename)
 {
     if (IsUTF16(filename)) {
         return LoadUTF16File(filename);
+    }
+    if (IsZip(filename)) {
+        return LoadZipFile(filename);
     }
 
     std::ifstream in(filename.c_str());
@@ -369,31 +327,90 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     return LoadData(utf8line);
 }
 
-void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
+bool Toolkit::IsZip(const std::string &filename)
 {
-    // one we use magic_enum.hpp we can do :
-    /*
-    for (auto str : classStrings) {
-        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-        auto classId = magic_enum::enum_cast<ClassId>(str);
-        if (classId.has_value()) {
-            classIds.push_back(classId.value());
-          // color.value() -> Color::GREEN
-        }
-        else {
-            LogError("Class name '%s' could not be matched", str.c_str());
+    std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!fin.is_open()) {
+        return false;
+    }
+
+    char data[4];
+    memset(data, 0, 4);
+    fin.read(data, 4);
+    fin.close();
+
+    if (memcmp(data, ZIP_SIGNATURE, 4) == 0) return true;
+
+    return false;
+}
+
+bool Toolkit::LoadZipFile(const std::string &filename)
+{
+    std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!fin.is_open()) {
+        return false;
+    }
+
+    fin.seekg(0, std::ios::end);
+    std::streamsize fileSize = (std::streamsize)fin.tellg();
+    fin.clear();
+    fin.seekg(0, std::wios::beg);
+
+    std::vector<unsigned char> bytes;
+    bytes.reserve(fileSize + 1);
+
+    unsigned char buffer;
+    while (fin.read((char *)&buffer, sizeof(unsigned char))) {
+        bytes.push_back(buffer);
+    }
+
+    return LoadZipData(bytes);
+}
+
+bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
+{
+#ifndef NO_MXL_SUPPORT
+    miniz_cpp::zip_file file(bytes);
+
+    std::string filename;
+    // Look for the meta file in the zip
+    for (auto &member : file.infolist()) {
+        if (member.filename == "META-INF/container.xml") {
+            std::string container = file.read(member.filename);
+            // Find the file name with an xpath query
+            pugi::xml_document doc;
+            doc.load_buffer(container.c_str(), container.size());
+            pugi::xml_node root = doc.first_child();
+            pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
+            filename = rootfile.attribute("full-path").value();
+            break;
         }
     }
-    */
-    // For now, map a few by hand... - there must be a better way to do this
-    for (auto str : classStrings) {
-        if (Toolkit::s_MEItoClassIdMap.count(str) > 0) {
-            classIds.push_back(Toolkit::s_MEItoClassIdMap.at(str));
-        }
-        else {
-            LogDebug("Class name '%s' could not be matched", str.c_str());
-        }
+
+    if (!filename.empty()) {
+        LogMessage("Loading file '%s' in the archive", filename.c_str());
+        return LoadData(file.read(filename));
     }
+    else {
+        LogError("No file to load found in the archive");
+        return false;
+    }
+#else
+    LogError("MXL import is not supported in this build.");
+    return false;
+#endif
+}
+
+bool Toolkit::LoadZipDataBase64(const std::string &data)
+{
+    std::vector<unsigned char> bytes = Base64Decode(data);
+    return LoadZipData(bytes);
+}
+
+bool Toolkit::LoadZipDataBuffer(const unsigned char *data, int length)
+{
+    std::vector<unsigned char> bytes(data, data + length);
+    return LoadZipData(bytes);
 }
 
 bool Toolkit::LoadData(const std::string &data)
@@ -723,18 +740,20 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
     int pageNo = 0;
-    bool removeIds = false;
+    bool removeIds = m_options->m_removeIds.GetValue();
 
     jsonxx::Object json;
 
-    // Read JSON options
-    if (!json.parse(jsonOptions)) {
-        LogWarning("Cannot parse JSON std::string. Using default options.");
-    }
-    else {
-        if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
-        if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
-        if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+            if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+            if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+        }
     }
 
     if (GetPageCount() == 0) {
@@ -786,6 +805,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
         const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
         const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
+        const OptionJson *optJson = dynamic_cast<const OptionJson *>(iter->second);
 
         if (optDbl) {
             double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
@@ -810,6 +830,12 @@ std::string Toolkit::GetOptions(bool defaultValues) const
             }
             o << iter->first << values;
         }
+        else if (optJson) {
+            // Reading json from file is not supported in toolkit
+            if (optJson->GetSource() == JsonSource::String) {
+                o << iter->first << optJson->GetValue(defaultValues);
+            }
+        }
         else {
             std::string stringValue
                 = (defaultValues) ? iter->second->GetDefaultStrValue() : iter->second->GetStrValue();
@@ -825,91 +851,28 @@ std::string Toolkit::GetAvailableOptions() const
     jsonxx::Object o;
     jsonxx::Object grps;
 
-    std::vector<OptionGrp *> *grp = m_options->GetGrps();
-    std::vector<OptionGrp *>::iterator grpIter;
+    grps << "0-base" << m_options->GetBaseOptGrp();
 
-    for (grpIter = grp->begin(); grpIter != grp->end(); ++grpIter) {
+    std::vector<OptionGrp *> *optionGrps = m_options->GetGrps();
+    for (auto const &optionGrp : *optionGrps) {
 
         jsonxx::Object grp;
-        grp << "name" << (*grpIter)->GetLabel();
+        grp << "name" << optionGrp->GetLabel();
 
         jsonxx::Object opts;
 
-        const std::vector<Option *> *options = (*grpIter)->GetOptions();
-        std::vector<Option *>::const_iterator iter;
+        const std::vector<Option *> *options = optionGrp->GetOptions();
 
-        for (iter = options->begin(); iter != options->end(); ++iter) {
+        for (auto const &option : *options) {
+            // Reading json from file is not supported in toolkit
+            const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
+            if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
 
-            jsonxx::Object opt;
-            opt << "title" << (*iter)->GetTitle();
-            opt << "description" << (*iter)->GetDescription();
-
-            const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
-            const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
-            const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(*iter);
-            const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
-            const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
-            const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
-
-            if (optBool) {
-                opt << "type"
-                    << "bool";
-                opt << "default" << optBool->GetDefault();
-            }
-            else if (optDbl) {
-                opt << "type"
-                    << "double";
-                jsonxx::Value value(optDbl->GetDefault());
-                value.precision_ = 2;
-                opt << "default" << value;
-                value = optDbl->GetMin();
-                value.precision_ = 2;
-                opt << "min" << value;
-                value = optDbl->GetMax();
-                value.precision_ = 2;
-                opt << "max" << value;
-            }
-            else if (optInt) {
-                opt << "type"
-                    << "int";
-                opt << "default" << optInt->GetDefault();
-                opt << "min" << optInt->GetMin();
-                opt << "max" << optInt->GetMax();
-            }
-            else if (optString) {
-                opt << "type"
-                    << "std::string";
-                opt << "default" << optString->GetDefault();
-            }
-            else if (optArray) {
-                opt << "type"
-                    << "array";
-                std::vector<std::string> strValues = optArray->GetDefault();
-                std::vector<std::string>::iterator strIter;
-                jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-                    values << (*strIter);
-                }
-                opt << "default" << values;
-            }
-            else if (optIntMap) {
-                opt << "type"
-                    << "std::string-list";
-                opt << "default" << optIntMap->GetDefaultStrValue();
-                std::vector<std::string> strValues = optIntMap->GetStrValues(false);
-                std::vector<std::string>::iterator strIter;
-                jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-                    values << (*strIter);
-                }
-                opt << "values" << values;
-            }
-
-            opts << (*iter)->GetKey() << opt;
+            opts << option->GetKey() << option->ToJson();
         }
 
         grp << "options" << opts;
-        grps << (*grpIter)->GetId() << grp;
+        grps << optionGrp->GetId() << grp;
     }
 
     o << "groups" << grps;
@@ -932,15 +895,9 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "format") {
-                LogWarning("Option format is deprecated; use from instead");
-                if (json.has<jsonxx::String>("format")) {
-                    SetInputFrom(json.get<jsonxx::String>("format"));
-                }
-            }
-            if (iter->first == "from") {
-                if (json.has<jsonxx::String>("from")) {
-                    SetInputFrom(json.get<jsonxx::String>("from"));
+            if (iter->first == "inputFrom") {
+                if (json.has<jsonxx::String>("inputFrom")) {
+                    SetInputFrom(json.get<jsonxx::String>("inputFrom"));
                 }
             }
             else if (iter->first == "scale") {
@@ -954,136 +911,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                 }
             }
             // Deprecated option
-            else if (iter->first == "appXPathQueries") {
-                LogWarning("Option appXPathQueries is deprecated; use appXPathQuery with an array instead");
-                jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
-                std::vector<std::string> queries;
-                Option *opt = m_options->GetItems()->at("appXPathQuery");
-                assert(opt);
-                int i;
-                for (i = 0; i < (int)values.size(); ++i) {
-                    if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
-                }
-                opt->SetValueArray(queries);
-            }
-            else if (iter->first == "border") {
-                LogWarning("Option border is deprecated; use pageMarginBottom, pageMarginLeft, pageMarginRight and "
-                           "pageMarginTop instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("border")) {
-                    double border = json.get<jsonxx::Number>("border");
-                    opt = m_options->GetItems()->at("pageMarginBottom");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginLeft");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginRight");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageMarginTop");
-                    assert(opt);
-                    opt->SetValueDbl(border);
-                }
-            }
-            else if (iter->first == "choiceXPathQueries") {
-                LogWarning("Option choiceXPathQueries is deprecated; use choiceXPathQuery with an array instead");
-                jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
-                std::vector<std::string> queries;
-                Option *opt = m_options->GetItems()->at("choiceXPathQuery");
-                assert(opt);
-                int i;
-                for (i = 0; i < (int)values.size(); ++i) {
-                    if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
-                }
-                opt->SetValueArray(queries);
-            }
-            else if (iter->first == "condenseEncoded") {
-                LogWarning("Option condenseEncoded is deprecated; use condense \"encoded\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("condense");
-                assert(opt);
-                if (json.has<jsonxx::Number>("condenseEncoded")) {
-                    if ((int)json.get<jsonxx::Number>("condenseEncoded") == 1) {
-                        opt->SetValue("encoded");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "ignoreLayout") {
-                LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("breaks");
-                assert(opt);
-                if (json.has<jsonxx::Number>("ignoreLayout")) {
-                    if ((int)json.get<jsonxx::Number>("ignoreLayout") == 1) {
-                        opt->SetValue("auto");
-                    }
-                    else {
-                        opt->SetValue("encoded");
-                    }
-                }
-            }
-            else if (iter->first == "inputFormat") {
-                LogWarning("Option inputFormat is deprecated; use from instead");
-                if (json.has<jsonxx::String>("inputFormat")) {
-                    SetInputFrom(json.get<jsonxx::String>("inputFormat"));
-                }
-            }
-            else if (iter->first == "noFooter") {
-                LogWarning("Option noFooter is deprecated; use footer: \"auto\"|\"encoded\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("footer");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noFooter")) {
-                    if ((int)json.get<jsonxx::Number>("noFooter") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "noLayout") {
-                LogWarning("Option noLayout is deprecated; use breaks: \"auto\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("breaks");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noLayout")) {
-                    if ((int)json.get<jsonxx::Number>("noLayout") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "noHeader") {
-                LogWarning("Option noHeader is deprecated; use header: \"auto\"|\"encoded\"|\"none\" instead");
-                Option *opt = NULL;
-                opt = m_options->GetItems()->at("header");
-                assert(opt);
-                if (json.has<jsonxx::Number>("noHeader")) {
-                    if ((int)json.get<jsonxx::Number>("noHeader") == 1) {
-                        opt->SetValue("none");
-                    }
-                    else {
-                        opt->SetValue("auto");
-                    }
-                }
-            }
-            else if (iter->first == "slurThickness") {
-                LogWarning("Option slurThickness is deprecated; use slurMidpointThickness instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("slurThickness")) {
-                    double thickness = json.get<jsonxx::Number>("slurThickness");
-                    opt = m_options->GetItems()->at("slurMidpointThickness");
-                    assert(opt);
-                    opt->SetValueDbl(thickness);
-                }
-            }
+            /*
             else if (iter->first == "tieThickness") {
                 vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
                 Option *opt = NULL;
@@ -1094,6 +922,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     opt->SetValueDbl(thickness);
                 }
             }
+            */
             else {
                 LogError("Unsupported option '%s'", iter->first.c_str());
             }
@@ -1127,10 +956,19 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
             opt->SetValueArray(strValues);
         }
+        else if (json.has<jsonxx::Object>(iter->first)) {
+            const OptionJson *optJson = dynamic_cast<OptionJson *>(opt);
+            if (optJson && (optJson->GetSource() == JsonSource::String)) {
+                const jsonxx::Object value = json.get<jsonxx::Object>(iter->first);
+                opt->SetValue(value.json());
+            }
+        }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());
         }
     }
+
+    m_options->Sync();
 
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed
@@ -1218,9 +1056,11 @@ std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
     return a.json();
 }
 
-bool Toolkit::Edit(const std::string &json_editorAction)
+bool Toolkit::Edit(const std::string &editorAction)
 {
-    return m_editorToolkit->ParseEditorAction(json_editorAction);
+    this->ResetLogBuffer();
+
+    return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
 std::string Toolkit::EditInfo()
@@ -1230,17 +1070,12 @@ std::string Toolkit::EditInfo()
 
 std::string Toolkit::GetLog()
 {
-#ifdef USE_EMSCRIPTEN
     std::string str;
     std::vector<std::string>::iterator iter;
     for (iter = logBuffer.begin(); iter != logBuffer.end(); ++iter) {
         str += (*iter);
     }
     return str;
-#else
-    // The non-js version of the app should not use this function.
-    return "";
-#endif
 }
 
 std::string Toolkit::GetVersion()
@@ -1250,13 +1085,13 @@ std::string Toolkit::GetVersion()
 
 void Toolkit::ResetLogBuffer()
 {
-#ifdef USE_EMSCRIPTEN
-    vrv::logBuffer.clear();
-#endif
+    logBuffer.clear();
 }
 
 void Toolkit::RedoLayout()
 {
+    this->ResetLogBuffer();
+
     if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
         LogWarning("No data to re-layout");
         return;
@@ -1276,6 +1111,8 @@ void Toolkit::RedoLayout()
 
 void Toolkit::RedoPagePitchPosLayout()
 {
+    this->ResetLogBuffer();
+
     Page *page = m_doc.GetDrawingPage();
 
     if (!page) {
@@ -1317,7 +1154,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // set dimensions
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
-    double userScale = m_view.GetPPUFactor() * m_scale / 100;
+    double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
     if (m_doc.GetType() == Facs) {
@@ -1331,8 +1168,10 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     return true;
 }
 
-std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
+std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 {
+    this->ResetLogBuffer();
+
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
@@ -1359,17 +1198,21 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     }
 
     svg.SetHtml5(m_options->m_svgHtml5.GetValue());
+    svg.SetFormatRaw(m_options->m_svgFormatRaw.GetValue());
+    svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
 
     // render the page
     RenderToDeviceContext(pageNo, &svg);
 
-    std::string out_str = svg.GetStringSVG(xml_declaration);
+    std::string out_str = svg.GetStringSVG(xmlDeclaration);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }
 
 bool Toolkit::RenderToSVGFile(const std::string &filename, int pageNo)
 {
+    this->ResetLogBuffer();
+
     std::string output = RenderToSVG(pageNo, true);
 
     std::ofstream outfile;
@@ -1412,6 +1255,8 @@ void Toolkit::GetHumdrum(std::ostream &output)
 
 std::string Toolkit::RenderToMIDI()
 {
+    this->ResetLogBuffer();
+
     smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
@@ -1427,6 +1272,8 @@ std::string Toolkit::RenderToMIDI()
 
 std::string Toolkit::RenderToPAE()
 {
+    this->ResetLogBuffer();
+
     if (GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
@@ -1442,6 +1289,8 @@ std::string Toolkit::RenderToPAE()
 
 bool Toolkit::RenderToPAEFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     std::string outputString = this->RenderToPAE();
 
     std::ofstream output(filename.c_str());
@@ -1455,6 +1304,8 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
 
 std::string Toolkit::RenderToTimemap()
 {
+    this->ResetLogBuffer();
+
     std::string output;
     m_doc.ExportTimemap(output);
     return output;
@@ -1462,6 +1313,8 @@ std::string Toolkit::RenderToTimemap()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
+    this->ResetLogBuffer();
+
     jsonxx::Object o;
     jsonxx::Array a;
 
@@ -1504,6 +1357,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
@@ -1515,6 +1370,8 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
 
 bool Toolkit::RenderToTimemapFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     std::string outputString;
     m_doc.ExportTimemap(outputString);
 
@@ -1547,6 +1404,8 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {
@@ -1576,6 +1435,8 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 
 std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
     jsonxx::Object o;
 
@@ -1627,6 +1488,8 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
+    this->ResetLogBuffer();
+
     Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {

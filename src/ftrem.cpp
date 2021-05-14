@@ -32,6 +32,8 @@ namespace vrv {
 // FTrem
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<FTrem> s_factory("fTrem", FTREM);
+
 FTrem::FTrem() : LayerElement("ftrem-"), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {
     RegisterAttClass(ATT_FTREMVIS);
@@ -83,7 +85,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
 
     while (iter != childList->end()) {
         if (!(*iter)->Is(NOTE) && !(*iter)->Is(CHORD)) {
-            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc.)
             iter = childList->erase(iter);
             continue;
         }
@@ -175,7 +177,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
     if (GetElementCoords()->size() != 2) {
         LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
-        return FUNCTOR_STOP;
+        return FUNCTOR_CONTINUE;
     }
 
     this->m_beamSegment.InitCoordRefs(this->GetElementCoords());

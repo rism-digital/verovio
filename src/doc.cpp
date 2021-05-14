@@ -251,7 +251,7 @@ void Doc::CalculateMidiTimemap()
 {
     m_MIDITimemapTempo = 0.0;
 
-    // This happens if the document was never cast off (layout none option in the toolkit)
+    // This happens if the document was never cast off (breaks none option in the toolkit)
     if (!m_drawingPage && GetPageCount() == 1) {
         Page *page = this->SetDrawingPage(0);
         if (!page) {
@@ -317,7 +317,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
-    // The tree is used to process each staff/layer/verse separatly
+    // The tree is used to process each staff/layer/verse separately
     // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
@@ -415,8 +415,8 @@ bool Doc::ExportTimemap(std::string &output)
 }
 
 void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
-    std::map<double, std::vector<std::string> > &realTimeToOnElements,
-    std::map<double, std::vector<std::string> > &realTimeToOffElements, std::map<double, int> &realTimeToTempo)
+    std::map<double, std::vector<std::string>> &realTimeToOnElements,
+    std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, int> &realTimeToTempo)
 {
 
     int currentTempo = -1000;
@@ -822,7 +822,7 @@ void Doc::ScoreDefOptimizeDoc()
 
 void Doc::ScoreDefSetGrpSymDoc()
 {
-    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attirbutes that determine
+    // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attributes that determine
     // their positioning
     Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
     // m_mdivScoreDef.Process(&scoreDefSetGrpSym, NULL);
@@ -976,7 +976,7 @@ void Doc::UnCastOffDoc()
 
     pages->AddChild(contentPage);
 
-    // LogDebug("ContinousLayout: %d pages", this->GetChildCount());
+    // LogDebug("ContinuousLayout: %d pages", this->GetChildCount());
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
@@ -1064,7 +1064,7 @@ void Doc::ConvertToCastOffMensuralDoc()
     // Do not convert facs files
     if (this->GetType() == Facs) return;
 
-    // We are converting to measure music in a definitiv way
+    // We are converting to measure music in a definite way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
         m_isMensuralMusicOnly = false;
     }
@@ -1586,7 +1586,12 @@ int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
 
 int Doc::GetCueSize(int value) const
 {
-    return value * this->m_options->m_graceFactor.GetValue();
+    return value * this->GetCueScaling();
+}
+
+double Doc::GetCueScaling() const
+{
+    return m_options->m_graceFactor.GetValue();
 }
 
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
@@ -1622,6 +1627,7 @@ double Doc::GetLeftMargin(const ClassId classId) const
     if (classId == MULTIRPT) return m_options->m_leftMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_leftMarginNote.GetValue();
     if (classId == REST) return m_options->m_leftMarginRest.GetValue();
+    if (classId == TABDURSYM) return m_options->m_leftMarginTabDurSym.GetValue();
     return m_options->m_defaultLeftMargin.GetValue();
 }
 
@@ -1643,37 +1649,68 @@ double Doc::GetRightMargin(const ClassId classId) const
     if (classId == MULTIRPT) return m_options->m_rightMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_rightMarginNote.GetValue();
     if (classId == REST) return m_options->m_rightMarginRest.GetValue();
+    if (classId == TABDURSYM) return m_options->m_rightMarginTabDurSym.GetValue();
     return m_options->m_defaultRightMargin.GetValue();
 }
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
     if (classId == ARTIC) return m_options->m_bottomMarginArtic.GetValue();
-    // For these we also need to look at the scoreDef
-    double margin = m_options->m_defaultBottomMargin.GetValue();
-    if (classId == DYNAM) {
-        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
-    }
-    else if (classId == HARM) {
-        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
-                                                    : m_options->m_bottomMarginHarm.GetValue();
-    }
-    return margin;
+    if (classId == HARM) return m_options->m_bottomMarginHarm.GetValue();
+    return m_options->m_defaultBottomMargin.GetValue();
 }
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
     if (classId == ARTIC) return m_options->m_topMarginArtic.GetValue();
-    // For these we also need to look at the scoreDef
-    double margin = m_options->m_defaultTopMargin.GetValue();
-    if (classId == DYNAM) {
-        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
+    if (classId == HARM) return m_options->m_topMarginHarm.GetValue();
+    return m_options->m_defaultTopMargin.GetValue();
+}
+
+double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition)
+{
+    double distance = 0.0;
+    if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
+        if (classId == DYNAM) {
+            distance = m_options->m_dynamDist.GetDefault();
+
+            // Inspect the scoreDef attribute
+            if (m_mdivScoreDef.HasDynamDist()) {
+                distance = m_mdivScoreDef.GetDynamDist();
+            }
+
+            // Inspect the staffDef attributes
+            const StaffDef *staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
+            if (staffDef != NULL && staffDef->HasDynamDist()) {
+                distance = staffDef->GetDynamDist();
+            }
+
+            // Apply CLI option if set
+            if (m_options->m_dynamDist.IsSet()) {
+                distance = m_options->m_dynamDist.GetValue();
+            }
+        }
+        else if (classId == HARM) {
+            distance = m_options->m_harmDist.GetDefault();
+
+            // Inspect the scoreDef attribute
+            if (m_mdivScoreDef.HasHarmDist()) {
+                distance = m_mdivScoreDef.GetHarmDist();
+            }
+
+            // Inspect the staffDef attributes
+            const StaffDef *staffDef = m_mdivScoreDef.GetStaffDef(staffIndex);
+            if (staffDef != NULL && staffDef->HasHarmDist()) {
+                distance = staffDef->GetHarmDist();
+            }
+
+            // Apply CLI option if set
+            if (m_options->m_harmDist.IsSet()) {
+                distance = m_options->m_harmDist.GetValue();
+            }
+        }
     }
-    else if (classId == HARM) {
-        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
-                                                    : m_options->m_topMarginHarm.GetValue();
-    }
-    return margin;
+    return distance;
 }
 
 Page *Doc::SetDrawingPage(int pageIdx)
@@ -1732,7 +1769,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPageContentWidth = m_drawingPageWidth - m_drawingPageMarginLeft - m_drawingPageMarginRight;
 
     // From here we could check if values have changed
-    // Since  m_options->m_interlDefin stays the same, it's useless to do it
+    // Since m_options->m_interlDefin stays the same, it's useless to do it
     // every time for now.
 
     m_drawingBeamMaxSlope = this->m_options->m_beamMaxSlope.GetValue();

@@ -27,9 +27,11 @@ FILES="$SRCFILES \
  ../../libmei/atts_cmn.cpp \
  ../../libmei/atts_cmnornaments.cpp \
  ../../libmei/atts_critapp.cpp \
+ ../../libmei/atts_frettab.cpp \
  ../../libmei/atts_gestural.cpp \
  ../../libmei/atts_externalsymbols.cpp \
  ../../libmei/atts_facsimile.cpp \
+  ../../libmei/atts_frettab.cpp \
  ../../libmei/atts_mei.cpp \
  ../../libmei/atts_mensural.cpp \
  ../../libmei/atts_midi.cpp \
@@ -38,7 +40,7 @@ FILES="$SRCFILES \
  ../../libmei/atts_shared.cpp \
  ../../libmei/atts_visual.cpp"
 
-CXXOPTS="-g -fpic -std=c++17 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/midi -I../../include/pugi -I../../include/utf8 -I../../libmei -I/opt/local/include/ "
+CXXOPTS="-g -fpic -std=c++17 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/midi -I../../include/pugi -I../../include/utf8 -I../../include/zip -I../../libmei -I/opt/local/include/ "
 
 PATHS=""
 unamestr=$(uname)

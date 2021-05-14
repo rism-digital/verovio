@@ -38,6 +38,8 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Layer> s_factory("layer", LAYER);
+
 Layer::Layer()
     : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
@@ -325,15 +327,39 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
     return (int)layerCountInTimeSpanParams.m_layers.size();
 }
 
-ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
+ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool excludeCurrent)
 {
     assert(element);
 
     Measure *measure = static_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
+    double time = 0.0;
+    double duration = 0.0;
     Alignment *alignment = element->GetAlignment();
-    assert(alignment);
+    // Get duration and time if element has alignment
+    if (alignment) {
+        time = alignment->GetTime();
+        duration = element->GetAlignmentDuration();
+    }
+    // If it is Beam, try to get alignments for first and last elements and calculate
+    // the duration of the beam based on those
+    else if (!alignment && element->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(element);
+        const ArrayOfObjects *beamChildren = beam->GetList(beam);
+
+        LayerElement *first = vrv_cast<LayerElement *>(beamChildren->front());
+        LayerElement *last = vrv_cast<LayerElement *>(beamChildren->back());
+
+        if (!first || !last) return {};
+
+        time = first->GetAlignment()->GetTime();
+        double lastTime = last->GetAlignment()->GetTime();
+        duration = lastTime - time + last->GetAlignmentDuration();
+    }
+    else {
+        return {};
+    }
 
     Layer *layer = NULL;
     Staff *staff = element->GetCrossStaff(layer);
@@ -343,10 +369,11 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
     // At this stage we have the parent or the cross-staff
     assert(staff);
 
-    return GetLayerElementsInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+    return GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
 }
 
-ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff)
+ListOfObjects Layer::GetLayerElementsInTimeSpan(
+    double time, double duration, Measure *measure, int staff, bool excludeCurrent)
 {
     assert(measure);
 
@@ -354,6 +381,7 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Me
     LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(GetCurrentMeterSig(), GetCurrentMensur(), this);
     layerElementsInTimeSpanParams.m_time = time;
     layerElementsInTimeSpanParams.m_duration = duration;
+    layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
 
     ArrayOfComparisons filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
@@ -461,6 +489,19 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
+
+int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &[parent, artic] : params->m_articPairsToConvert) {
+        artic->SplitMultival(parent);
+    }
+    params->m_articPairsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
 {

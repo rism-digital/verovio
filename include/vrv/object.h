@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <functional>
 #include <iterator>
 #include <map>
 #include <string>
@@ -504,6 +505,11 @@ public:
     bool HasEditorialContent();
 
     /**
+     * Return true if the object contains anything that is not editorial content
+     */
+    bool HasNonEditorialContent();
+
+    /**
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
@@ -531,15 +537,19 @@ public:
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
+     * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
+        bool skipFirst = false);
 
     //----------------//
     // Static methods //
     //----------------//
 
     static void SeedUuid(unsigned int seed = 0);
+
+    static std::string GenerateRandUuid();
 
     static bool sortByUlx(Object *a, Object *b);
 
@@ -734,6 +744,14 @@ public:
      * Adjust the spacing for clef changes.
      */
     virtual int AdjustClefChanges(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position of the dots for multiple layers
+     */
+    ///@{
+    virtual int AdjustDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustDotsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Adjust the position the outside articulations.
@@ -1517,6 +1535,53 @@ public:
     //
 private:
     ClassId m_classId;
+};
+
+//----------------------------------------------------------------------------
+// ObjectFactory
+//----------------------------------------------------------------------------
+
+class ObjectFactory {
+
+public:
+    /**
+     * A static method returning a static object in order to guarantee initialisation
+     */
+    static ObjectFactory *GetInstance();
+
+    /**
+     * Create the object from the MEI element string name by making a lookup in the register
+     */
+    Object *Create(std::string name);
+
+    /**
+     * Add the name / constructor map entry to the static register
+     */
+    void Register(std::string name, ClassId classId, std::function<Object *(void)> function);
+
+    /**
+     * Get the correspondings ClassIds from the vector of MEI element string names
+     */
+    void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
+
+public:
+    MapOfStrConstructors s_ctorsRegistry;
+    MapOfStrClassIds s_classIdsRegistry;
+};
+
+//----------------------------------------------------------------------------
+// ClassRegistrar
+//----------------------------------------------------------------------------
+
+template <class T> class ClassRegistrar {
+public:
+    /**
+     * The contructor registering the name / constructor map
+     */
+    ClassRegistrar(std::string name, ClassId classId)
+    {
+        ObjectFactory::GetInstance()->Register(name, classId, [](void) -> Object * { return new T(); });
+    }
 };
 
 } // namespace vrv

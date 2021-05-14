@@ -99,11 +99,11 @@ void BeamSegment::CalcBeam(
 
     bool horizontal = beamInterface->IsHorizontal();
 
-    // Beam@place has precedence - however, in some cases, CalcBeam is called recusively because we need to change the
+    // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change the
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
 
-    CalcBeamStemLength(staff, beamInterface->m_drawingPlace == BEAMPLACE_below ? STEMDIRECTION_down : STEMDIRECTION_up);
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace);
 
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         CalcMixedBeamPlace(staff);
@@ -115,6 +115,7 @@ void BeamSegment::CalcBeam(
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (!beamInterface->m_crossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
             CalcBeamInit(layer, staff, doc, beamInterface, place);
+            CalcBeamStemLength(staff, beamInterface->m_drawingPlace);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
     }
@@ -341,6 +342,10 @@ void BeamSegment::CalcBeamInit(
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
+
+    // somebody might want to have a beam with only rest of space elements...
+    m_firstNoteOrChord = NULL;
+    m_lastNoteOrChord = NULL;
 
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
@@ -908,8 +913,9 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     // if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
-void BeamSegment::CalcBeamStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
 {
+    const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     for (auto coord : m_beamElementCoordRefs) {
         coord->SetClosestNote(stemDir);
@@ -1017,6 +1023,8 @@ void BeamSegment::CalcSetValues()
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
+
+static ClassRegistrar<Beam> s_factory("beam", BEAM);
 
 Beam::Beam() : LayerElement("beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
@@ -1193,8 +1201,18 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(doc);
     assert(interface);
 
-    if (m_element->Is(REST)) {
+    int stemLen = segment->m_uniformStemLength;
+    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
+        if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
+            stemLen *= -1;
+        }
+    }
+    this->m_centered = segment->m_uniformStemLength % 2;
+
+    if (m_element->Is({ REST, SPACE })) {
         this->m_x += m_element->GetDrawingRadius(doc);
+        this->m_yBeam = this->m_element->GetDrawingY();
+        this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
         return;
     }
 
@@ -1225,13 +1243,6 @@ void BeamElementCoord::SetDrawingStemDir(
         m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
     }
 
-    int stemLen = segment->m_uniformStemLength;
-    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
-        if (((STEMDIRECTION_up == stemDir) && (stemLen < 0)) || ((STEMDIRECTION_down == stemDir) && (stemLen > 0))) {
-            stemLen *= -1;
-        }
-    }
-    this->m_centered = segment->m_uniformStemLength % 2;
     this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
     const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
@@ -1267,14 +1278,18 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
 {
     if (!m_closestNote) return 0;
 
-    const bool onStaffLine = m_closestNote->GetDrawingLoc() % 2;
-    bool extend = onStaffLine;
+    const bool onStaffSpace = m_closestNote->GetDrawingLoc() % 2;
+    bool extend = onStaffSpace;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    const int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
+    int stemLenInHalfUnits
+        = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
+        if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {
+            stemLenInHalfUnits = standardStemLen - m_maxShortening;
+        }
         this->m_shortened = true;
         extend = false;
     }
@@ -1287,7 +1302,7 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
             stemLen *= stemLenInHalfUnits;
         }
         else {
-            stemLen *= (onStaffLine) ? 14 : 13;
+            stemLen *= (onStaffSpace) ? 14 : 13;
         }
     }
     else {
@@ -1340,6 +1355,58 @@ void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
     }
 }
 
+int Beam::CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2)
+{
+    Layer *parentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
+    if (!parentLayer) return 0;
+    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
+    // here, there's nothing to be done
+    auto collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    if (collidingElementsList.empty()) return 0;
+
+    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+    assert(staff);
+
+    int leftMargin = 0;
+    int rightMargin = 0;
+    std::vector<int> elementOverlaps;
+    for (auto object : collidingElementsList) {
+        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+        if (directionBias > 0) {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
+                && (layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y2))
+                continue;
+            leftMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        else {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y1)
+                && (layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y2))
+                continue;
+            leftMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        elementOverlaps.emplace_back(std::max(leftMargin * directionBias, rightMargin * directionBias));
+    }
+    if (elementOverlaps.empty()) return 0;
+
+    const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
+    int overlap = 0;
+    if (*maxOverlap >= 0) {
+        overlap = ((*maxOverlap == 0) ? staffOffset : *maxOverlap) * directionBias;
+    }
+    else {
+        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / staffOffset) * 2;
+        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
+        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+            [maxShorteningInHalfUnits](BeamElementCoord *coord) { coord->m_maxShortening = maxShorteningInHalfUnits; });
+    }
+    return overlap;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -1359,10 +1426,12 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
         params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
         params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
         params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+        if (m_drawingPlace != BEAMPLACE_mixed)
+            params->m_overlapMargin
+                = CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
+
         return FUNCTOR_CONTINUE;
     }
-
-    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
 
     const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
     const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
@@ -1383,6 +1452,20 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_beam != this) return FUNCTOR_CONTINUE;
+
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    if (parentLayer) {
+        // find elements on the other layers for the duration of the current beam
+        auto otherLayersElements = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+        if (!otherLayersElements.empty()) {
+            // call AdjustBeams separately for each element to find possible overlaps
+            params->m_isOtherLayer = true;
+            for (auto element : otherLayersElements) {
+                element->AdjustBeams(params);
+            }
+            params->m_isOtherLayer = false;
+        }
+    }
 
     // set overlap margin for each coord in the beam
     if (params->m_overlapMargin) {

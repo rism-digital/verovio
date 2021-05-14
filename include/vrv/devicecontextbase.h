@@ -25,6 +25,8 @@ namespace vrv {
 #define AxGREEN 255 << 8
 #define AxCYAN 255 << 8 | 255
 #define AxLIGHT_GREY 127 << 16 | 127 << 8 | 127
+#undef max
+#undef min
 
 /*  Polygon filling mode */
 enum { AxODDEVEN_RULE = 1, AxWINDING_RULE };
@@ -184,6 +186,20 @@ public:
     }
 
     Point operator-() const { return Point(-x, -y); }
+
+    Point min(const Point &p) const
+    {
+        int x = std::min(this->x, p.x);
+        int y = std::min(this->y, p.y);
+        return Point(x, y);
+    }
+
+    Point max(const Point &p) const
+    {
+        int x = std::max(this->x, p.x);
+        int y = std::max(this->y, p.y);
+        return Point(x, y);
+    }
 };
 
 // ---------------------------------------------------------------------------

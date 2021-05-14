@@ -80,7 +80,7 @@ bool Resources::InitFonts()
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
 
     if (s_font.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMUFL glyphs but could load only %d.", SMUFL_COUNT, s_font.size());
+        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, s_font.size());
         return false;
     }
 
@@ -303,12 +303,14 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
 
 /** Global for LogElapsedTimeXXX functions (debugging purposes) */
 struct timeval start;
-/** For disabling log */
-bool noLog = false;
 
-#ifdef __EMSCRIPTEN__
+/** For disabling log */
+bool logging = true;
+
+/** By default log to stderr or JS console */
+bool loggingToBuffer = false;
+
 std::vector<std::string> logBuffer;
-#endif
 
 void LogElapsedTimeStart()
 {
@@ -327,92 +329,85 @@ void LogElapsedTimeEnd(const char *msg)
 
 void LogDebug(const char *fmt, ...)
 {
-    if (noLog) return;
+    if (!logging) return;
+
 #if defined(DEBUG)
-#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_DEBUG);
+    LogString(s, CONSOLE_DEBUG);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Debug] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
 #endif
 }
 
 void LogError(const char *fmt, ...)
 {
-    if (noLog) return;
-#ifdef __EMSCRIPTEN__
+    if (!logging) return;
+
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_ERROR);
+    LogString(s, CONSOLE_ERROR);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Error] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
 }
 
 void LogMessage(const char *fmt, ...)
 {
-    if (noLog) return;
-#ifdef __EMSCRIPTEN__
+    if (!logging) return;
+
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_INFO);
+    LogString(s, CONSOLE_INFO);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Message] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
 }
 
 void LogWarning(const char *fmt, ...)
 {
-    if (noLog) return;
-#ifdef __EMSCRIPTEN__
+    if (!logging) return;
+
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_WARN);
+    LogString(s, CONSOLE_WARN);
     va_end(args);
-#else
-    va_list args;
-    va_start(args, fmt);
-    fprintf(stderr, "[Warning] ");
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-#endif
 }
 
-void DisableLog()
+void EnableLog(bool value)
 {
-    noLog = true;
+    logging = value;
 }
 
+void EnableLogToBuffer(bool value)
+{
+    loggingToBuffer = value;
+}
+
+void LogString(std::string message, consoleLogLevel level)
+{
+    if (loggingToBuffer) {
+        if (LogBufferContains(message)) return;
+        logBuffer.push_back(message);
+    }
+    else {
 #ifdef __EMSCRIPTEN__
+        switch (level) {
+            case CONSOLE_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
+            case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
+            case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
+            case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
+            default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
+        }
+#else
+        fputs(message.c_str(), stderr);
+#endif
+    }
+}
+
 bool LogBufferContains(const std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
@@ -422,22 +417,6 @@ bool LogBufferContains(const std::string &s)
     }
     return false;
 }
-
-void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level)
-{
-    switch (level) {
-        case CONSOLE_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
-        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
-        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
-        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
-        default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
-    }
-
-    if (checkDuplicate && LogBufferContains(message)) return;
-    logBuffer.push_back(message);
-}
-
-#endif
 
 bool Check(Object *object)
 {
@@ -559,9 +538,16 @@ std::string GetVersion()
 
  */
 
+// See also https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
+
 static const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                        "abcdefghijklmnopqrstuvwxyz"
                                        "0123456789+/";
+
+static inline bool isBase64(unsigned char c)
+{
+    return (isalnum(c) || (c == '+') || (c == '/'));
+}
 
 std::string Base64Encode(unsigned char const *bytesToEncode, unsigned int inLen)
 {
@@ -594,6 +580,53 @@ std::string Base64Encode(unsigned char const *bytesToEncode, unsigned int inLen)
         for (int j = 0; (j < i + 1); j++) ret += base64Chars[charArray4[j]];
 
         while ((i++ < 3)) ret += '=';
+    }
+
+    return ret;
+}
+
+std::vector<unsigned char> Base64Decode(std::string const &encodedString)
+{
+    int inLen = (int)encodedString.size();
+    int i = 0;
+    int j = 0;
+    int in_ = 0;
+    unsigned char charArray4[4], charArray3[3];
+    std::vector<unsigned char> ret;
+
+    while (inLen-- && (encodedString[in_] != '=') && isBase64(encodedString[in_])) {
+        charArray4[i++] = encodedString[in_];
+        in_++;
+        if (i == 4) {
+            for (i = 0; i < 4; i++) {
+                charArray4[i] = base64Chars.find(charArray4[i]);
+            }
+
+            charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
+            charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
+            charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+
+            for (i = 0; (i < 3); i++) {
+                ret.push_back(charArray3[i]);
+            }
+            i = 0;
+        }
+    }
+
+    if (i) {
+        for (j = i; j < 4; j++) {
+            charArray4[j] = 0;
+        }
+
+        for (j = 0; j < 4; j++) {
+            charArray4[j] = base64Chars.find(charArray4[j]);
+        }
+
+        charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
+        charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
+        charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+
+        for (j = 0; (j < i - 1); j++) ret.push_back(charArray3[j]);
     }
 
     return ret;

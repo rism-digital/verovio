@@ -47,6 +47,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
+#include "tuning.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -496,7 +497,7 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
     Functor findByUuid(&Object::FindByUuid);
     FindByUuidParams findbyUuidParams;
     findbyUuidParams.m_uuid = uuid;
-    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction);
+    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction, true);
     return findbyUuidParams.m_element;
 }
 
@@ -510,7 +511,7 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 {
     Functor findByComparison(&Object::FindByComparison);
     FindByComparisonParams findByComparisonParams(comparison);
-    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction, true);
     return findByComparisonParams.m_element;
 }
 
@@ -518,7 +519,7 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 {
     Functor findExtremeByComparison(&Object::FindExtremeByComparison);
     FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
-    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction, true);
     return findExtremeByComparisonParams.m_element;
 }
 
@@ -530,7 +531,7 @@ void Object::FindAllDescendantByComparison(
 
     Functor findAllByComparison(&Object::FindAllByComparison);
     FindAllByComparisonParams findAllByComparisonParams(comparison, objects);
-    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction);
+    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
 }
 
 void Object::FindAllDescendantBetween(
@@ -541,7 +542,7 @@ void Object::FindAllDescendantBetween(
 
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllBetween, &findAllBetweenParams);
+    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx) const
@@ -584,12 +585,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
-
-    m_uuid = m_classid + std::string(str);
+    m_uuid = m_classid + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -760,8 +756,17 @@ bool Object::HasEditorialContent()
     return (!editorial.empty());
 }
 
+bool Object::HasNonEditorialContent()
+{
+    ListOfObjects nonEditorial;
+    IsEditorialElementComparison editorialComparison;
+    editorialComparison.ReverseComparison();
+    this->FindAllDescendantByComparison(&nonEditorial, &editorialComparison);
+    return (!nonEditorial.empty());
+}
+
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
-    int deepness, bool direction)
+    int deepness, bool direction, bool skipFirst)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -792,7 +797,9 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
-    functor->Call(this, functorParams);
+    if (!skipFirst) {
+        functor->Call(this, functorParams);
+    }
 
     // do not go any deeper in this case
     if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
@@ -852,9 +859,11 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
-    if (endFunctor) {
+    if (endFunctor && !skipFirst) {
         endFunctor->Call(this, functorParams);
     }
+
+    skipFirst = false;
 }
 
 int Object::Save(Output *output)
@@ -906,6 +915,16 @@ void Object::SeedUuid(unsigned int seed)
     else {
         std::srand(seed);
     }
+}
+
+std::string Object::GenerateRandUuid()
+{
+    int nr = std::rand();
+    char str[17];
+    // I do not want to use a stream for doing this!
+    snprintf(str, 17, "%016d", nr);
+
+    return std::string(str);
 }
 
 bool Object::sortByUlx(Object *a, Object *b)
@@ -1148,6 +1167,50 @@ void Functor::Call(Object *ptr, FunctorParams *functorParams)
 {
     // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
     m_returnCode = (*ptr.*obj_fpt)(functorParams);
+}
+
+//----------------------------------------------------------------------------
+// ObjectFactory methods
+//----------------------------------------------------------------------------
+
+ObjectFactory *ObjectFactory::GetInstance()
+{
+    static ObjectFactory factory;
+    return &factory;
+}
+
+Object *ObjectFactory::Create(std::string name)
+{
+    Object *object = NULL;
+
+    MapOfStrConstructors::iterator it = s_ctorsRegistry.find(name);
+    if (it != s_ctorsRegistry.end()) object = it->second();
+
+    if (object) {
+        return object;
+    }
+    else {
+        LogError("Factory for '%s' not found", name.c_str());
+        return NULL;
+    }
+}
+
+void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
+{
+    for (auto str : classStrings) {
+        if (s_classIdsRegistry.count(str) > 0) {
+            classIds.push_back(s_classIdsRegistry.at(str));
+        }
+        else {
+            LogDebug("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+}
+
+void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
+{
+    s_ctorsRegistry[name] = function;
+    s_classIdsRegistry[name] = classId;
 }
 
 //----------------------------------------------------------------------------
@@ -1448,11 +1511,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(MEASURE)) {
         Measure *measure = vrv_cast<Measure *>(this);
         assert(measure);
-        bool systemBreak = false;
-        bool scoreDefInsert = false;
+        int drawingFlags = 0;
         // This is the first measure of the system - more to do...
         if (params->m_currentSystem) {
-            systemBreak = true;
+            drawingFlags |= Measure::BarlineDrawingFlags::SYSTEM_BREAK;
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
@@ -1471,13 +1533,35 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             params->m_drawLabels = false;
         }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
-            scoreDefInsert = true;
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
-        measure->SetDrawingBarLines(params->m_previousMeasure, systemBreak, scoreDefInsert);
+
+        // set other flags based on score def change
+        if (params->m_upcomingScoreDef->m_insertScoreDef) {
+            drawingFlags |= Measure::BarlineDrawingFlags::SCORE_DEF_INSERT;
+            params->m_upcomingScoreDef->m_insertScoreDef = false;
+        }
+
+        // check if we need to draw barlines for current/previous measures (in cases when all staves are invisible in
+        // them)
+        ListOfObjects currentObjects, previousObjects;
+        AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
+        measure->FindAllDescendantByComparison(&currentObjects, &comparison);
+        if (currentObjects.size() == measure->GetChildCount(STAFF)) {
+            drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
+        }
+        if (params->m_previousMeasure) {
+            params->m_previousMeasure->FindAllDescendantByComparison(&previousObjects, &comparison);
+            if (previousObjects.size() == params->m_previousMeasure->GetChildCount(STAFF))
+                drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
+        }
+
+        measure->SetInvisibleStaffBarlines(params->m_previousMeasure, currentObjects, previousObjects, drawingFlags);
+        measure->SetDrawingBarLines(params->m_previousMeasure, drawingFlags);
+        
         params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }
@@ -1488,7 +1572,12 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
-        params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
+        if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
+            || scoreDef->HasMensurInfo(UNLIMITED_DEPTH)
+            || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
+            params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
+            params->m_upcomingScoreDef->m_insertScoreDef = true;
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -1506,10 +1595,16 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
+        assert(staff->m_drawingTuning == NULL);
+        staff->m_drawingTuning = dynamic_cast<Tuning *>(params->m_currentStaffDef->FindDescendantByType(TUNING));
         staff->m_drawingLines = params->m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
+        staff->m_drawingStaffSize = 100;
         if (params->m_currentStaffDef->HasScale()) {
             staff->m_drawingStaffSize = params->m_currentStaffDef->GetScale();
+        }
+        if (staff->IsTablature()) {
+            staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
         }
         return FUNCTOR_CONTINUE;
     }

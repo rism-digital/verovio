@@ -59,6 +59,7 @@ class PgFoot;
 class PgFoot;
 class PgHead;
 class PgHead2;
+class PitchInflection;
 class Reh;
 class Rend;
 class RunningElement;
@@ -200,7 +201,8 @@ protected:
     void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
-    void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, bool eraseIntersections = false);
+    void DrawBarLine(
+        DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, data_BARRENDITION form, bool eraseIntersections = false);
     void DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine);
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
@@ -422,6 +424,8 @@ protected:
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawPedalLine(
         DeviceContext *dc, Pedal *pedal, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflection, int x1, int x2, Staff *staff,
+        char spanningType, Object *graphic = NULL);
     void DrawSlur(
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
@@ -462,6 +466,7 @@ protected:
     void DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    ///@}
 
     /**
      * @name Methods for drawing parts of mensural LayerElement child classes.
@@ -473,6 +478,19 @@ protected:
     void DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
+    ///@}
+
+    /**
+     * @name Methods for drawing tab LayerElement child classes.
+     * They are base drawing methods that are called directly from DrawLayerElement.
+     * Because some elements draw their children recursively (e.g., Note) they must all
+     * have the same parameters.
+     * Defined in view_tab.cpp
+     */
+    ///@{
+    void DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawTabGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
 
     /**

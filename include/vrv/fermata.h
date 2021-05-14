@@ -30,7 +30,7 @@ class Fermata : public ControlElement,
                 public AttColor,
                 public AttExtSym,
                 public AttFermataVis,
-                public AttPlacement {
+                public AttPlacementRelStaff {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

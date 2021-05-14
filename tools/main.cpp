@@ -24,6 +24,12 @@
 #include "toolkit.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "jsonxx.h"
+
+#define HELP_TABS 32
+
 // Some redundant code to get basenames
 // and remove extensions
 // possible that it is not in std??
@@ -82,6 +88,74 @@ bool dir_exists(std::string dir)
     }
 }
 
+void display_option(vrv::Option *option)
+{
+    std::string option_str = " ";
+
+    if (option->GetShortOption()) {
+        option_str.append("-");
+        option_str.push_back(option->GetShortOption());
+        option_str.append(", ");
+    }
+
+    if (!option->GetKey().empty()) {
+        option_str.append("--");
+        option_str.append(fromCamelCase(option->GetKey()));
+    }
+
+    const vrv::OptionDbl *optDbl = dynamic_cast<const vrv::OptionDbl *>(option);
+    const vrv::OptionInt *optInt = dynamic_cast<const vrv::OptionInt *>(option);
+    const vrv::OptionIntMap *optIntMap = dynamic_cast<const vrv::OptionIntMap *>(option);
+    const vrv::OptionString *optString = dynamic_cast<const vrv::OptionString *>(option);
+    const vrv::OptionArray *optArray = dynamic_cast<const vrv::OptionArray *>(option);
+    const vrv::OptionBool *optBool = dynamic_cast<const vrv::OptionBool *>(option);
+
+    if (optDbl) {
+        option_str.append(" <f>");
+    }
+    else if (optInt) {
+        option_str.append(" <i>");
+    }
+    else if (optString) {
+        option_str.append(" <s>");
+    }
+    else if (optArray) {
+        option_str.append("* <s>");
+    }
+    else if (!optBool) {
+        option_str.append(" <s>");
+    }
+
+    if (option_str.size() < HELP_TABS) {
+        option_str.insert(option_str.end(), HELP_TABS - option_str.size(), ' ');
+    }
+    else {
+        option_str.append("\t");
+    }
+
+    std::cout << option_str << option->GetDescription();
+
+    if (optInt && (optInt->GetDefault() != optInt->GetMin()) && (optInt->GetDefault() != optInt->GetMax())) {
+        std::cout << " (default: " << optInt->GetDefault();
+        std::cout << "; min: " << optInt->GetMin();
+        std::cout << "; max: " << optInt->GetMax() << ")";
+    }
+    if (optDbl && (optDbl->GetDefault() != optDbl->GetMin()) && (optDbl->GetDefault() != optDbl->GetMax())) {
+        std::cout << std::fixed << " (default: " << optDbl->GetDefault();
+        std::cout << std::fixed << "; min: " << optDbl->GetMin();
+        std::cout << std::fixed << "; max: " << optDbl->GetMax() << ")";
+    }
+    if (optString) {
+        std::cout << " (default: \"" << optString->GetDefault() << "\")";
+    }
+    if (optIntMap) {
+        std::cout << " (default: \"" << optIntMap->GetDefaultStrValue()
+                  << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
+    }
+    std::cout << std::endl;
+    
+}
+
 void display_version()
 {
     std::cout << "Verovio " << vrv::GetVersion() << std::endl;
@@ -93,98 +167,34 @@ void display_usage()
 
     display_version();
     std::cout << std::endl << "Example usage:" << std::endl << std::endl;
-    std::cout << " verovio [-s scale] [-t type] [-r resources] [-o outfile] infile" << std::endl << std::endl;
+    std::cout << " verovio [-s scale] [-r resource-path] [-o outfile] infile" << std::endl << std::endl;
 
     // These need to be kept in alphabetical order:
     // -options with both short and long forms first
     // -then options with long forms only
     // -then debugging options
 
-    vrv::Options style;
-
     // Options with both short and long forms
-    std::cout << "Options (marked as * are repeatable)" << std::endl;
-
-    std::cout << " -                     Use \"-\" as input file for reading from the standard input" << std::endl;
-    std::cout << " -h, --help            Display this message" << std::endl;
-    std::cout << " -a, --all-pages       Output all pages" << std::endl;
-    std::cout << " -f, --format <s>      Select input format: abc, darms, humdrum, mei, pae, xml (MusicXML) (default is mei)" << std::endl;
-    std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
-    std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
-    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
-    std::cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << std::endl;
-    std::cout << " -t, --to <s>          Select output format: mei, pb-mei, svg, or midi (default is svg)" << std::endl;
-    std::cout << " -v, --version         Display the version number" << std::endl;
-    std::cout << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << std::endl;
-    
-    std::cout << std::endl << "Additional long options" << std::endl;
-    std::cout << "--remove-ids           Remove in the MEI output XML IDs that are not referenced " << std::endl;
-
     vrv::Options options;
-    std::vector<vrv::OptionGrp *> *grp = options.GetGrps();
-    std::vector<vrv::OptionGrp *>::iterator grpIter;
+    
+    std::cout << "Options (marked as * are repeatable)" << std::endl;
+    const std::vector<vrv::Option *> *baseOptions = options.GetBaseOptions();
+    
+    // All other option groups
+    for (auto const &option : *baseOptions) {
+        display_option(option);
+    }
+    
+    std::vector<vrv::OptionGrp *> *grps = options.GetGrps();
 
-    for (grpIter = grp->begin(); grpIter != grp->end(); ++grpIter) {
+    for (auto const &grp : *grps) {
 
         // Options with long forms only
-        std::cout << std::endl << (*grpIter)->GetLabel() << std::endl;
-        const std::vector<vrv::Option *> *options = (*grpIter)->GetOptions();
-        std::vector<vrv::Option *>::const_iterator iter;
+        std::cout << std::endl << grp->GetLabel() << std::endl;
+        const std::vector<vrv::Option *> *options = grp->GetOptions();
 
-        for (iter = options->begin(); iter != options->end(); ++iter) {
-
-            std::string option = fromCamelCase((*iter)->GetKey());
-
-            const vrv::OptionDbl *optDbl = dynamic_cast<const vrv::OptionDbl *>(*iter);
-            const vrv::OptionInt *optInt = dynamic_cast<const vrv::OptionInt *>(*iter);
-            const vrv::OptionIntMap *optIntMap = dynamic_cast<const vrv::OptionIntMap *>(*iter);
-            const vrv::OptionString *optString = dynamic_cast<const vrv::OptionString *>(*iter);
-            const vrv::OptionArray *optArray = dynamic_cast<const vrv::OptionArray *>(*iter);
-            const vrv::OptionBool *optBool = dynamic_cast<const vrv::OptionBool *>(*iter);
-
-            if (optDbl) {
-                option.append(" <f>");
-            }
-            else if (optInt) {
-                option.append(" <i>");
-            }
-            else if (optString) {
-                option.append(" <s>");
-            }
-            else if (optArray) {
-                option.append("* <s>");
-            }
-            else if (!optBool) {
-                option.append(" <s>");
-            }
-
-            if (option.size() < 32) {
-                option.insert(option.end(), 32 - option.size(), ' ');
-            }
-            else {
-                option.append("\t");
-            }
-
-            std::cout << " --" << option << (*iter)->GetDescription();
-
-            if (optInt) {
-                std::cout << " (default: " << optInt->GetDefault();
-                std::cout << "; min: " << optInt->GetMin();
-                std::cout << "; max: " << optInt->GetMax() << ")";
-            }
-            if (optDbl) {
-                std::cout << std::fixed << " (default: " << optDbl->GetDefault();
-                std::cout << std::fixed << "; min: " << optDbl->GetMin();
-                std::cout << std::fixed << "; max: " << optDbl->GetMax() << ")";
-            }
-            if (optString) {
-                std::cout << " (default: \"" << optString->GetDefault() << "\")";
-            }
-            if (optIntMap) {
-                std::cout << " (default: \"" << optIntMap->GetDefaultStrValue()
-                          << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
-            }
-            std::cout << std::endl;
+        for (auto const &option : *options) {
+            display_option(option);
         }
     }
 }
@@ -196,7 +206,6 @@ int main(int argc, char **argv)
     std::string outfile;
     std::string outformat = "svg";
     bool std_output = false;
-    bool remove_ids = false;
 
     int all_pages = 0;
     int page = 1;
@@ -225,8 +234,8 @@ int main(int argc, char **argv)
             { "to", required_argument, 0, 't' },
             { "version", no_argument, 0, 'v' },
             { "xml-id-seed", required_argument, 0, 'x' },
-            // mei output - long options only
-            { "remove-ids", no_argument, 0, 'm' },
+            // standard input - long options only or - as filename
+            { "stdin", no_argument, 0, 'z' },
             { 0, 0, 0, 0 }
         };
 
@@ -272,7 +281,7 @@ int main(int argc, char **argv)
     int option_index = 0;
     vrv::Option *opt = NULL;
     vrv::OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "ab:f:hmo:p:r:s:t:vx:", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "ab:f:ho:p:r:s:t:vx:z", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
@@ -280,21 +289,13 @@ int main(int argc, char **argv)
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
                 
                 // Handle deprecated options
+                /*
                 if (key == "condense-encoded") {
                     vrv::LogWarning("Option --condense-encoded is deprecated; use --condense encoded instead");
                     options->m_condense.SetValue("encoded");
                     break;
                 }
-                if (key == "slur-thickness") {
-                    vrv::LogWarning("Option --slur-thickness is deprecated; use --slur-midpoint-thickness instead");
-                    options->m_slurMidpointThickness.SetValue(optarg);
-                    break;
-                }
-                else if (key == "tie-thickness") {
-                    vrv::LogWarning("Option --tie-thickness is deprecated; use --tie-midpoint-thickness instead");
-                    options->m_tieMidpointThickness.SetValue(optarg);
-                    break;
-                }
+                */
 
                 if (optBool) {
                     optBool->SetValue(true);
@@ -313,26 +314,10 @@ int main(int argc, char **argv)
 
             case 'a': all_pages = 1; break;
 
-            case 'b':
-                vrv::LogWarning("Option -b and --border is deprecated; use --page-margin-bottom, --page-margin-left, "
-                                "--page-margin-right and "
-                                "--page-margin-top instead");
-                options->m_pageMarginBottom.SetValue(optarg);
-                options->m_pageMarginLeft.SetValue(optarg);
-                options->m_pageMarginRight.SetValue(optarg);
-                options->m_pageMarginTop.SetValue(optarg);
-                break;
-
             case 'f':
                 if (!toolkit.SetInputFrom(std::string(optarg))) {
                     exit(1);
                 };
-                break;
-                
-            case 'm':
-                if (!strcmp(long_options[option_index].name, "remove-ids")) {
-                    remove_ids = true;
-                }
                 break;
 
             case 'o': outfile = std::string(optarg); break;
@@ -355,6 +340,12 @@ int main(int argc, char **argv)
             case 'v': show_version = 1; break;
 
             case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
+                
+            case 'z':
+                if (!strcmp(long_options[option_index].name, "stdin")) {
+                    infile = "-";
+                }
+                break;
 
             case 'h': display_usage(); exit(0); break;
 
@@ -375,10 +366,11 @@ int main(int argc, char **argv)
         exit(0);
     }
 
+    std::cerr << infile;
     if (optind <= argc - 1) {
         infile = std::string(argv[optind]);
     }
-    else {
+    else if (infile != "-") {
         std::cerr << "Incorrect number of arguments: expected one input file but found none." << std::endl << std::endl;
         display_usage();
         exit(1);
@@ -422,7 +414,7 @@ int main(int argc, char **argv)
         outfile = removeExtension(infile);
     }
     else if (outfile == "-") {
-        // DisableLog();
+        //vrv::EnableLog(false);
         std_output = true;
     }
     else {
@@ -546,7 +538,7 @@ int main(int argc, char **argv)
     }
     else {
         const char *scoreBased = (outformat == "mei") ? "true" : "false";
-        const char *removeIds = (remove_ids) ? "true" : "false";
+        const char *removeIds = (options->m_removeIds.GetValue()) ? "true" : "false";
         outfile += ".mei";
         if (all_pages) {
             std::string params = vrv::StringFormat("{'scoreBased': %s, 'removeIds': %s}", scoreBased, removeIds);

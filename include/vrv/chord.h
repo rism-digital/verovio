@@ -15,6 +15,7 @@
 
 namespace vrv {
 
+class Dots;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
@@ -132,7 +133,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
-    virtual int CalcStemLenInThirdUnits(Staff *staff);
+    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir);
     ///@}
 
     /**
@@ -163,11 +164,6 @@ public:
      * See Object::AdjustArtic
      */
     virtual int AdjustArtic(FunctorParams *functorParams);
-
-    /**
-     * See Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertMarkupAnalytical
@@ -208,6 +204,11 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
+    /**
+     * Helper function for calculation of optimal locations for dots
+     */
+    void CaltOptimalDots(Dots *dots, Staff *staff, const std::set<int> &noteLocations);
+
     /**
      * Clear the m_clusters vector and delete all the objects.
      */

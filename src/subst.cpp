@@ -23,6 +23,8 @@ namespace vrv {
 // Subst
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Subst> s_factory("subst", SUBST);
+
 Subst::Subst() : EditorialElement("subst-")
 {
     m_level = EDITORIAL_UNDEFINED;

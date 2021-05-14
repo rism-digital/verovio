@@ -28,6 +28,7 @@ class GraceGrp;
 class KeyAccid;
 class Layer;
 class LayerElement;
+class Mdiv;
 class Measure;
 class MeterSig;
 class Mensur;
@@ -283,6 +284,7 @@ private:
      * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
+    void WriteMdiv(Mdiv *mDiv);
     void WriteScoreDef(ScoreDef *scoreDef);
     void WriteStaffDef(StaffDef *staffDef);
     void WriteMeasure(Measure *measure);

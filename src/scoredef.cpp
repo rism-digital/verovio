@@ -53,24 +53,24 @@ void ScoreDefElement::Reset()
     ResetTyped();
 }
 
-bool ScoreDefElement::HasClefInfo()
+bool ScoreDefElement::HasClefInfo(int depth)
 {
-    return (this->FindDescendantByType(CLEF, 1));
+    return (this->FindDescendantByType(CLEF, depth));
 }
 
-bool ScoreDefElement::HasKeySigInfo()
+bool ScoreDefElement::HasKeySigInfo(int depth)
 {
-    return (this->FindDescendantByType(KEYSIG, 1));
+    return (this->FindDescendantByType(KEYSIG, depth));
 }
 
-bool ScoreDefElement::HasMensurInfo()
+bool ScoreDefElement::HasMensurInfo(int depth)
 {
-    return (this->FindDescendantByType(MENSUR, 1));
+    return (this->FindDescendantByType(MENSUR, depth));
 }
 
-bool ScoreDefElement::HasMeterSigInfo()
+bool ScoreDefElement::HasMeterSigInfo(int depth)
 {
-    return (this->FindDescendantByType(METERSIG, 1));
+    return (this->FindDescendantByType(METERSIG, depth));
 }
 
 Clef *ScoreDefElement::GetClef()
@@ -145,12 +145,20 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
 // ScoreDef
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
+
 ScoreDef::ScoreDef()
-    : ScoreDefElement("scoredef-"), ObjectListInterface(), AttDistances(), AttEndings(), AttOptimization()
+    : ScoreDefElement("scoredef-")
+    , ObjectListInterface()
+    , AttDistances()
+    , AttEndings()
+    , AttOptimization()
+    , AttTimeBase()
 {
     RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_ENDINGS);
     RegisterAttClass(ATT_OPTIMIZATION);
+    RegisterAttClass(ATT_TIMEBASE);
 
     Reset();
 }
@@ -205,6 +213,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
 {
     assert(newScoreDef);
 
+    m_insertScoreDef = false;
     m_setAsDrawing = true;
 
     bool drawClef = false;

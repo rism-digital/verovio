@@ -63,6 +63,12 @@ verovio.vrvToolkit.getVersion = Module.cwrap( 'vrvToolkit_getVersion', 'string',
 // bool loadData(Toolkit *ic, const char *data)
 verovio.vrvToolkit.loadData = Module.cwrap( 'vrvToolkit_loadData', 'number', ['number', 'string'] );
 
+// bool loadZipDataBase64(Toolkit *ic, const char *data)
+verovio.vrvToolkit.loadZipDataBase64 = Module.cwrap( 'vrvToolkit_loadZipDataBase64', 'number', ['number', 'string'] );
+
+// bool loadZipDataBuffer(Toolkit *ic, const unsigned char *data, int length)
+verovio.vrvToolkit.loadZipDataBuffer = Module.cwrap( 'vrvToolkit_loadZipDataBuffer', 'number', ['number', 'number', 'number'] );
+
 // void redoLayout(Toolkit *ic)
 verovio.vrvToolkit.redoLayout = Module.cwrap( 'vrvToolkit_redoLayout', null, ['number'] );
 
@@ -74,6 +80,9 @@ verovio.vrvToolkit.renderData = Module.cwrap( 'vrvToolkit_renderData', 'string',
 
 // char *renderToMidi(Toolkit *ic, const char *rendering_options)
 verovio.vrvToolkit.renderToMIDI = Module.cwrap( 'vrvToolkit_renderToMIDI', 'string', ['number', 'string'] );
+
+// char *renderToPAE(Toolkit *ic)
+verovio.vrvToolkit.renderToPAE = Module.cwrap( 'vrvToolkit_renderToPAE', 'string' );
 
 // char *renderToSvg(Toolkit *ic, int pageNo, const char *rendering_options)
 verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string', ['number', 'number', 'string'] );
@@ -206,6 +215,27 @@ verovio.toolkit.prototype.loadData = function ( data )
     return verovio.vrvToolkit.loadData( this.ptr, data );
 };
 
+verovio.toolkit.prototype.loadZipDataBase64 = function ( data )
+{
+    return verovio.vrvToolkit.loadZipDataBase64( this.ptr, data );
+};
+
+verovio.toolkit.prototype.loadZipDataBuffer = function ( data )
+{
+    if ( !(data instanceof ArrayBuffer ) )
+    {
+        console.error( "Parameter for loadZipDataBuffer has to be of type ArrayBuffer" );
+        return false;
+    }
+    var dataArray = new Uint8Array( data ); 
+    var dataSize = dataArray.length * dataArray.BYTES_PER_ELEMENT;
+    var dataPtr = Module._malloc( dataSize );
+    Module.HEAPU8.set( dataArray, dataPtr );
+    var res = verovio.vrvToolkit.loadZipDataBuffer( this.ptr, dataPtr, dataSize );
+    Module._free( dataPtr );
+    return res;
+};
+
 verovio.toolkit.prototype.redoLayout = function ()
 {
     verovio.vrvToolkit.redoLayout( this.ptr );
@@ -236,6 +266,11 @@ verovio.toolkit.prototype.renderToMidi = function ( options )
 {
     console.warn( "Method renderToMidi is deprecated; use renderToMIDI instead" );
     return verovio.vrvToolkit.renderToMIDI( this.ptr, JSON.stringify( options ) );
+};
+
+verovio.toolkit.prototype.renderToPAE = function ()
+{
+    return verovio.vrvToolkit.renderToPAE( this.ptr );
 };
 
 verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )

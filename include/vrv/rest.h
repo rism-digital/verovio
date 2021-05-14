@@ -8,6 +8,7 @@
 #ifndef __VRV_REST_H__
 #define __VRV_REST_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_mensural.h"
 #include "durationinterface.h"
 #include "layerelement.h"
@@ -37,6 +38,7 @@ class Rest : public LayerElement,
              public PositionInterface,
              public AttColor,
              public AttCue,
+             public AttExtSym,
              public AttRestVisMensural {
 public:
     /**
@@ -83,6 +85,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::AdjustBeams
+     */
+    virtual int AdjustBeams(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertMarkupAnalytical

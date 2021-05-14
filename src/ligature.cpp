@@ -28,6 +28,8 @@ namespace vrv {
 // Ligature
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Ligature> s_factory("ligature", LIGATURE);
+
 Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureVis()
 {
     RegisterAttClass(ATT_LIGATUREVIS);
@@ -158,7 +160,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
         if (previousNote->GetLig() == LIGATUREFORM_obliqua) oblique = true;
         int dur1 = previousNote->GetActualDur();
         int dur2 = note->GetActualDur();
-        // Same treatment for Mx and LG execpt for positionning, which is done above
+        // Same treatment for Mx and LG execpt for positioning, which is done above
         // We still need to avoid oblique, so keep a flag.
         bool isMaxima = false;
         if (dur1 == DUR_MX) {
@@ -253,7 +255,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             }
         }
 
-        // Blindly set the oblique shape wihout trying to deal with encoding problems
+        // Blindly set the oblique shape without trying to deal with encoding problems
         if (oblique) {
             m_drawingShapes.at(n1) += LIGATURE_OBLIQUE;
             if (n1 > 0) {
@@ -261,7 +263,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             }
         }
 
-        // With mensural back notation, stack longa going up
+        // With mensural black notation, stack longa going up
         if (isLastNote && isMensuralBlack && (dur2 == DUR_LG) && up) {
             // Stack only if a least a third
             int stackThreshold = 1;
