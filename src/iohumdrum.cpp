@@ -1412,11 +1412,20 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
             // in the global group, so process always:
             value = infile[i].getReferenceValue();
 
-            if (!hre.search(value, "\\s*([^\\s]+)\\s+(.*)\\s*$")) {
+            std::string pkey;
+            std::string pvalue;
+            if (hre.search(value, "^\\s*([^\\s]+)\\s+(.*)\\s*$")) {
+                pkey = hre.getMatch(1);
+                pvalue = hre.getMatch(2);
+            }
+            else if (hre.search(value, "^\\s*([^\\s]+)\\s*$")) {
+                // Empty value which will be interpreted as boolean true.
+                pkey = hre.getMatch(1);
+                pvalue = "";
+            }
+            else {
                 continue;
             }
-            std::string pkey = hre.getMatch(1);
-            std::string pvalue = hre.getMatch(2);
             if (value.empty()) {
                 cerr << "Warning: value is empty for parameter " << key << endl;
                 continue;
@@ -1453,8 +1462,21 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
             cerr << "Warning: option " << inputoption.first << " is not recognized" << endl;
             continue;
         }
-        // cerr << "SETTING OPTION " << inputoption.first << " TO " << inputoption.second << endl;
-        entry->second->SetValue(inputoption.second);
+
+        if (hre.search(inputoption.second, "^([+-]?\\d+\\.?\\d*)$")) {
+            double value = hre.getMatchDouble(1);
+            entry->second->SetValueDbl(value);
+        }
+        else if (hre.search(inputoption.second, "^([+-]?\\.\\d+)$")) {
+            double value = hre.getMatchDouble(1);
+            entry->second->SetValueDbl(value);
+        }
+        else if (hre.search(inputoption.second, "^\\s*$")) {
+            entry->second->SetValueBool(true);
+        }
+        else {
+            entry->second->SetValue(inputoption.second);
+        }
     }
 }
 
@@ -10298,73 +10320,19 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             setLocationId(artic, token, i + 1);
         }
         else {
-            artic = new Artic;
-            appendElement(element, artic);
-            artic->SetArtic(artics);
-        }
-        if (positions.at(0) > 0) {
-            setPlaceRelEvent(artic, "above", showingpositions.at(0));
-        }
-        else if (positions.at(0) < 0) {
-            setPlaceRelEvent(artic, "below", showingpositions.at(0));
-        }
-        setLocationId(artic, token);
-        return;
-    }
-
-    if (artic == NULL) {
-        artic = new Artic;
-        appendElement(element, artic);
-    }
-
-    // Handle gestural articulations below when there are multiple articulations.
-
-    // more than one articulation, so categorize them by placement.
-
-    std::vector<data_ARTICULATION> articsabove;
-    std::vector<data_ARTICULATION> articsbelow;
-    std::vector<data_ARTICULATION> articsdefault; // no placment parameter
-    std::vector<bool> showposabove;
-    std::vector<bool> showposbelow;
-
-    for (int i = 0; i < (int)artics.size(); ++i) {
-        if (positions[i] > 0) {
-            articsabove.push_back(artics[i]);
-            showposabove.push_back(showingpositions.at(i));
+            setLocationId(artic, token);
         }
         std::vector<data_ARTICULATION> oneartic;
         oneartic.clear();
         oneartic.push_back(artics.at(i));
         artic->SetArtic(oneartic);
         if (positions.at(i) > 0) {
-            setPlace(artic, "above", positions.at(i));
+            setPlaceRelEvent(artic, "above", positions.at(i));
         }
         else if (positions.at(i) < 0) {
-            setPlace(artic, "below", positions.at(i));
+            setPlaceRelEvent(artic, "below", positions.at(i));
         }
-    }
-
-    if (!articsabove.empty()) {
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(articsabove);
-        setPlaceRelEvent(artic, "above", showposabove.at(0));
-        artic->SetUuid(getLocationId(element, token, 0) + "-above");
-    }
-
-    if (!articsbelow.empty()) {
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(articsbelow);
-        setPlaceRelEvent(artic, "below", showposbelow.at(0));
-        artic->SetUuid(getLocationId(element, token, 0) + "-below");
-    }
-
-    if (!articsdefault.empty()) {
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(articsdefault);
-        setLocationId(artic, token);
+        // add gestural articulation info
     }
 }
 
