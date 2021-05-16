@@ -931,7 +931,7 @@ Options::Options()
     this->Register(&m_outputIndentTab, "outputIndentTab", &m_general);
 
     m_outputSmuflXmlEntities.SetInfo(
-        "Output SMuFL XML entities", "Output SMuFL charachters as XML entities instead of byte codes");
+        "Output SMuFL XML entities", "Output SMuFL characters as XML entities instead of hex byte codes ");
     m_outputSmuflXmlEntities.Init(false);
     this->Register(&m_outputSmuflXmlEntities, "outputSmuflXmlEntities", &m_general);
 
@@ -1100,7 +1100,7 @@ Options::Options()
     this->Register(&m_justificationBracketGroup, "justificationBracketGroup", &m_generalLayout);
 
     m_justificationBraceGroup.SetInfo(
-        "Spacing brace group justification", "Space between staves inside a braced group ijustification");
+        "Spacing brace group justification", "Space between staves inside a braced group justification");
     m_justificationBraceGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
 
