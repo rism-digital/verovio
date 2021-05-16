@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 13 09:43:37 PDT 2021
+// Last Modified: Fri May 14 11:50:20 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -57043,10 +57043,10 @@ void Tool_composite::markTogether(HumdrumFile& infile, int direction) {
 		}
 		// the two notes are attacking at the same time to add marker
 		string text = groupA->getText();
-		text += "|z";
+		text += "|";
 		groupA->setText(text);
 		text = groupB->getText();
-		text += "|z";
+		text += "|";
 		groupB->setText(text);
 	}
 
@@ -57502,6 +57502,9 @@ void Tool_composite::markCoincidencesMusic(HumdrumFile& infile) {
 		}
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
 			if (token->isNull()) {
 				continue;
 			}
