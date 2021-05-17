@@ -68,7 +68,7 @@ def read_svg_file():
       os.sys.exit(1)
    root = etree.fromstring(bytes(font_svg_content, encoding='utf-8'))
    font_faces = get_svg_elements(root, "font-face")
-   if (len(font_faces) != 1):
+   if len(font_faces) != 1:
       print("Error: the file %s should have a unique font-face element!" % font_file_name)
       print("Please check that the svg has correct namespace: %s" % svg_ns)
       os.sys.exit(1)
@@ -89,7 +89,7 @@ supported_glyph_codes = get_supported_glyph_codes()
 for glyph in glyphs:
    name = glyph.attrib["glyph-name"]
    id = name.split("uni")[-1]
-   if (id in supported_glyph_codes):
+   if id in supported_glyph_codes:
       root = etree.Element("symbol")
       root.set("id", id)
       root.set("viewBox", f"0 0 {units_per_em} {units_per_em}")
@@ -110,7 +110,7 @@ fontface.set("units-per-em", units_per_em)
 for glyph in glyphs:
    name = glyph.attrib["glyph-name"]
    id = name.split("uni")[-1]
-   if (id in supported_glyph_codes):
+   if id in supported_glyph_codes:
       path = etree.SubElement(root, "path")
       path.set("name", supported_glyph_codes[id])
       path.set("id", id)
