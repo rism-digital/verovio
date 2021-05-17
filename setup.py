@@ -61,10 +61,9 @@ def get_version():
             if not line.startswith("#define"):
                 continue
             definition = line.strip().split()
-            if len(definition) > 2:
-                defines[definition[1]] = definition[2]
-            else:
+            if len(definition) < 3:
                 continue
+            defines[definition[1]] = definition[2]
             # as long as we don't need all defines
             if 'vrv_cast' in defines:
                 break 
