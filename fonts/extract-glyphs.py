@@ -99,7 +99,7 @@ for glyph in glyphs:
       if "d" in glyph.attrib:
          path.set("d", glyph.attrib["d"])
       file_path = f"../data/{font_family}/{glyph_id}-{supported_glyph_codes[glyph_id]}.xml"
-      xml = etree.tostring(root, pretty_print=True, encoding='unicode')
+      xml = etree.tostring(root, encoding='unicode')
       write_file_content(file_path, xml)
 
 # (3) Output bounding box svg
@@ -121,4 +121,4 @@ for glyph in glyphs:
       path.set("transform", "scale(1,-1)")
       if "d" in glyph.attrib:
          path.set("d", glyph.attrib["d"])
-print(etree.tostring(root, pretty_print=True, encoding='unicode'))
+print(etree.tostring(root, encoding='unicode'))
