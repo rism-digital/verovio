@@ -12,16 +12,16 @@ svg_ns = 'http://www.w3.org/2000/svg'
 
 def get_file_content(filepath):
    """Open file in same directory as script and retrieve its content."""
-   __location__ = os.path.realpath(os.path.dirname(__file__))
-   file = open(os.path.join(__location__, filepath), 'r')
+   location = os.path.realpath(os.path.dirname(__file__))
+   file = open(os.path.join(location, filepath), 'r')
    content = file.read()
    file.close()
    return content
 
 def write_file_content(filepath, content):
    """Write content to file with path relative to the script directory."""
-   __location__ = os.path.realpath(os.path.dirname(__file__))
-   file = open(os.path.join(__location__, filepath), 'w')
+   location = os.path.realpath(os.path.dirname(__file__))
+   file = open(os.path.join(location, filepath), 'w')
    file.write(content)
    file.close()
 
