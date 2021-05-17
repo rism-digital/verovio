@@ -65,13 +65,13 @@ def read_svg_file():
       font_svg_content = get_file_content(font_file_name)
    except EnvironmentError:
       print("Error opening font file %s!" % font_file_name)
-      os.sys.exit(1)
+      sys.exit(1)
    root = etree.fromstring(bytes(font_svg_content, encoding='utf-8'))
    font_faces = get_svg_elements(root, "font-face")
    if len(font_faces) != 1:
       print("Error: the file %s should have a unique font-face element!" % font_file_name)
       print("Please check that the svg has correct namespace: %s" % svg_ns)
-      os.sys.exit(1)
+      sys.exit(1)
    font_family = font_faces[0].get("font-family")
    units_per_em = font_faces[0].get("units-per-em")
    glyphs = get_svg_elements(root, "glyph")
