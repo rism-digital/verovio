@@ -44,7 +44,7 @@ def get_supported_glyph_codes():
    glyphs = get_elements(xml, 'glyph')
    dict = {}
    for glyph in glyphs:
-      dict[glyph.attrib["glyph-code"]] = glyph.attrib["smufl-name"]
+      dict[glyph.attrib['glyph-code']] = glyph.attrib['smufl-name']
    return dict
 
 ########################
@@ -80,40 +80,38 @@ supported_glyph_codes = get_supported_glyph_codes()
 
 # (2) Create xml file for each glyph
 for glyph in glyphs:
-   name = glyph.attrib["glyph-name"]
-   glyph_id = name.split("uni")[-1]
+   name = glyph.attrib['glyph-name']
+   glyph_id = name.split('uni')[-1]
    if glyph_id in supported_glyph_codes:
-      root = ET.Element("symbol")
-      root.set("id", glyph_id)
-      root.set("viewBox", f"0 0 {units_per_em} {units_per_em}")
-      root.set("overflow", "inherit")
-      path = ET.SubElement(root, "path")
-      path.set("transform", "scale(1,-1)")
-      if "d" in glyph.attrib:
-         path.set("d", glyph.attrib["d"])
+      root = ET.Element('symbol')
+      root.set('id', glyph_id)
+      root.set('viewBox', f"0 0 {units_per_em} {units_per_em}")
+      root.set('overflow', 'inherit')
+      path = ET.SubElement(root, 'path')
+      path.set('transform', 'scale(1,-1)')
+      if 'd' in glyph.attrib:
+         path.set('d', glyph.attrib['d'])
       file_path = f"../data/{font_family}/{glyph_id}-{supported_glyph_codes[glyph_id]}.xml"
       xml = ET.tostring(root, encoding='unicode')
       write_file_content(file_path, xml)
 
 # (3) Output bounding box svg
-root = ET.Element("svg")
-root.set("xmlns", svg_ns)
-root.set("version", "1.1")
-root.set("font-family", font_family)
-fontface = ET.SubElement(root, "font-face")
-fontface.set("units-per-em", units_per_em)
+root = ET.Element('svg')
+root.set('xmlns', svg_ns)
+root.set('version', '1.1')
+root.set('font-family', font_family)
+fontface = ET.SubElement(root, 'font-face')
+fontface.set('units-per-em', units_per_em)
 for glyph in glyphs:
-   name = glyph.attrib["glyph-name"]
-   glyph_id = name.split("uni")[-1]
+   name = glyph.attrib['glyph-name']
+   glyph_id = name.split('uni')[-1]
    if glyph_id in supported_glyph_codes:
-      path = ET.SubElement(root, "path")
-      path.set("name", supported_glyph_codes[glyph_id])
-      path.set("id", glyph_id)
-      horiz_adv_x = ""
-      if "horiz-adv-x" in glyph.attrib:
-         horiz_adv_x = glyph.attrib["horiz-adv-x"]
-      path.set("horiz-adv-x", horiz_adv_x)
-      path.set("transform", "scale(1,-1)")
-      if "d" in glyph.attrib:
-         path.set("d", glyph.attrib["d"])
+      path = ET.SubElement(root, 'path')
+      path.set('name', supported_glyph_codes[glyph_id])
+      path.set('id', glyph_id)
+      horiz_adv_x = glyph.attrib['horiz-adv-x'] if 'horiz-adv-x' in glyph.attrib else ''
+      path.set('horiz-adv-x', horiz_adv_x)
+      path.set('transform', 'scale(1,-1)')
+      if 'd' in glyph.attrib:
+         path.set('d', glyph.attrib['d'])
 print(ET.tostring(root, encoding='unicode'))
