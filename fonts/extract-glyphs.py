@@ -88,17 +88,17 @@ supported_glyph_codes = get_supported_glyph_codes()
 # (2) Create xml file for each glyph
 for glyph in glyphs:
    name = glyph.attrib["glyph-name"]
-   id = name.split("uni")[-1]
-   if id in supported_glyph_codes:
+   glyph_id = name.split("uni")[-1]
+   if glyph_id in supported_glyph_codes:
       root = etree.Element("symbol")
-      root.set("id", id)
+      root.set("id", glyph_id)
       root.set("viewBox", f"0 0 {units_per_em} {units_per_em}")
       root.set("overflow", "inherit")
       path = etree.SubElement(root, "path")
       path.set("transform", "scale(1,-1)")
       if "d" in glyph.attrib:
          path.set("d", glyph.attrib["d"])
-      file_path = f"../data/{font_family}/{id}-{supported_glyph_codes[id]}.xml"
+      file_path = f"../data/{font_family}/{glyph_id}-{supported_glyph_codes[glyph_id]}.xml"
       xml = etree.tostring(root, pretty_print=True, encoding='unicode')
       write_file_content(file_path, xml)
 
@@ -109,11 +109,11 @@ fontface = etree.SubElement(root, "font-face")
 fontface.set("units-per-em", units_per_em)
 for glyph in glyphs:
    name = glyph.attrib["glyph-name"]
-   id = name.split("uni")[-1]
-   if id in supported_glyph_codes:
+   glyph_id = name.split("uni")[-1]
+   if glyph_id in supported_glyph_codes:
       path = etree.SubElement(root, "path")
-      path.set("name", supported_glyph_codes[id])
-      path.set("id", id)
+      path.set("name", supported_glyph_codes[glyph_id])
+      path.set("id", glyph_id)
       horiz_adv_x = ""
       if "horiz-adv-x" in glyph.attrib:
          horiz_adv_x = glyph.attrib["horiz-adv-x"]
