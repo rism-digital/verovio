@@ -1,10 +1,10 @@
 #! /usr/bin/env python3
 
 import os
-from lxml import etree
+import xml.etree.ElementTree as ET
 
 # Define svg namespace
-svg_ns = "http://www.w3.org/2000/svg"
+svg_ns = 'http://www.w3.org/2000/svg'
 
 ######################
 #  Helper Functions  #
@@ -27,16 +27,16 @@ def write_file_content(filepath, content):
 
 # Retrieve all elements with given tag name from xml
 def get_elements(xml, tag):
-   root = etree.fromstring(bytes(xml, encoding='utf-8'))
+   root = ET.fromstring(bytes(xml, encoding='utf-8'))
    return root.findall('.//' + tag)  # XPath, recursive
 
 # Retrieve all elements with given tag name from svg
 def get_svg_elements(root, tag):
-   return root.findall('.//{' + svg_ns + '}' + tag)  # XPath, recursive
+   return root.findall('.//svg:' + tag, {'svg': svg_ns})  # XPath, recursive
 
 # Create standard svg root node
 def create_svg_root():
-   root = etree.Element("svg")
+   root = ET.Element("svg")
    root.set("xmlns", svg_ns)
    root.set("version", "1.1")
    return root
@@ -64,13 +64,13 @@ def read_svg_file():
    try:
       font_svg_content = get_file_content(font_file_name)
    except EnvironmentError:
-      print("Error opening font file %s!" % font_file_name)
+      print(f"Error opening font file {font_file_name}!")
       sys.exit(1)
-   root = etree.fromstring(bytes(font_svg_content, encoding='utf-8'))
+   root = ET.fromstring(bytes(font_svg_content, encoding='utf-8'))
    font_faces = get_svg_elements(root, "font-face")
    if len(font_faces) != 1:
-      print("Error: the file %s should have a unique font-face element!" % font_file_name)
-      print("Please check that the svg has correct namespace: %s" % svg_ns)
+      print(f"Error: the file {font_file_name} should have a unique font-face element!")
+      print(f"Please check that the svg has correct namespace: {svg_ns}")
       sys.exit(1)
    font_family = font_faces[0].get("font-family")
    units_per_em = font_faces[0].get("units-per-em")
@@ -90,28 +90,28 @@ for glyph in glyphs:
    name = glyph.attrib["glyph-name"]
    glyph_id = name.split("uni")[-1]
    if glyph_id in supported_glyph_codes:
-      root = etree.Element("symbol")
+      root = ET.Element("symbol")
       root.set("id", glyph_id)
       root.set("viewBox", f"0 0 {units_per_em} {units_per_em}")
       root.set("overflow", "inherit")
-      path = etree.SubElement(root, "path")
+      path = ET.SubElement(root, "path")
       path.set("transform", "scale(1,-1)")
       if "d" in glyph.attrib:
          path.set("d", glyph.attrib["d"])
       file_path = f"../data/{font_family}/{glyph_id}-{supported_glyph_codes[glyph_id]}.xml"
-      xml = etree.tostring(root, encoding='unicode')
+      xml = ET.tostring(root, encoding='unicode')
       write_file_content(file_path, xml)
 
 # (3) Output bounding box svg
 root = create_svg_root()
 root.set("font-family", font_family)
-fontface = etree.SubElement(root, "font-face")
+fontface = ET.SubElement(root, "font-face")
 fontface.set("units-per-em", units_per_em)
 for glyph in glyphs:
    name = glyph.attrib["glyph-name"]
    glyph_id = name.split("uni")[-1]
    if glyph_id in supported_glyph_codes:
-      path = etree.SubElement(root, "path")
+      path = ET.SubElement(root, "path")
       path.set("name", supported_glyph_codes[glyph_id])
       path.set("id", glyph_id)
       horiz_adv_x = ""
@@ -121,4 +121,4 @@ for glyph in glyphs:
       path.set("transform", "scale(1,-1)")
       if "d" in glyph.attrib:
          path.set("d", glyph.attrib["d"])
-print(etree.tostring(root, encoding='unicode'))
+print(ET.tostring(root, encoding='unicode'))
