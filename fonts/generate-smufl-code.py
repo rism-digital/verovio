@@ -48,27 +48,28 @@ def get_supported_glyph_codes():
 #  Main program  #
 ##################
 
-smufl_names = get_supported_glyph_codes()
+if __name__ == '__main__':
+   smufl_names = get_supported_glyph_codes()
 
-# (1) Create header file
-smufl_h_content = get_file_content('smufl.h.inc') + '\n'
-smufl_h_content += 'enum {\n'
-for id in smufl_names:
-   smufl_h_content += ' ' * 4 + f"SMUFL_{id}_{smufl_names[id]} = 0x{id}," + '\n'  # SMUFL_E000_brace = 0xE000,
-smufl_h_content += '};\n\n'
-smufl_h_content += '/** The number of glyphs for verification **/\n'
-smufl_h_content += f"#define SMUFL_COUNT {len(smufl_names)}" + '\n\n'
-smufl_h_content += '} // namespace vrv\n\n'
-smufl_h_content += '#endif\n'
-write_file_content(smufl_h_path, smufl_h_content)
+   # (1) Create header file
+   smufl_h_content = get_file_content('smufl.h.inc') + '\n'
+   smufl_h_content += 'enum {\n'
+   for id in smufl_names:
+      smufl_h_content += ' ' * 4 + f"SMUFL_{id}_{smufl_names[id]} = 0x{id}," + '\n'  # SMUFL_E000_brace = 0xE000,
+   smufl_h_content += '};\n\n'
+   smufl_h_content += '/** The number of glyphs for verification **/\n'
+   smufl_h_content += f"#define SMUFL_COUNT {len(smufl_names)}" + '\n\n'
+   smufl_h_content += '} // namespace vrv\n\n'
+   smufl_h_content += '#endif\n'
+   write_file_content(smufl_h_path, smufl_h_content)
 
-# (2) Create cpp file
-smufl_cpp_content = get_file_content('smufl.cpp.inc') + '\n'
-smufl_cpp_content += 'const std::map<std::string, wchar_t> Resources::s_smuflNames = {\n'
-for id in smufl_names:
-   smufl_cpp_content += ' ' * 4 + f"{{ \"{smufl_names[id]}\", SMUFL_{id}_{smufl_names[id]} }}," + '\n'  # { "brace", SMUFL_E000_brace },
-smufl_cpp_content += '};\n\n'
-smufl_cpp_content += '/** The number of glyphs for verification **/\n'
-smufl_cpp_content += f"// {len(smufl_names)}" + '\n\n'
-smufl_cpp_content += '} // namespace vrv\n'
-write_file_content(smufl_cpp_path, smufl_cpp_content)
+   # (2) Create cpp file
+   smufl_cpp_content = get_file_content('smufl.cpp.inc') + '\n'
+   smufl_cpp_content += 'const std::map<std::string, wchar_t> Resources::s_smuflNames = {\n'
+   for id in smufl_names:
+      smufl_cpp_content += ' ' * 4 + f"{{ \"{smufl_names[id]}\", SMUFL_{id}_{smufl_names[id]} }}," + '\n'  # { "brace", SMUFL_E000_brace },
+   smufl_cpp_content += '};\n\n'
+   smufl_cpp_content += '/** The number of glyphs for verification **/\n'
+   smufl_cpp_content += f"// {len(smufl_names)}" + '\n\n'
+   smufl_cpp_content += '} // namespace vrv\n'
+   write_file_content(smufl_cpp_path, smufl_cpp_content)
