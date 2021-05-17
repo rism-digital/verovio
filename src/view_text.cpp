@@ -229,10 +229,14 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, s
         dc->ResetFont();
     }
 
-    // This should only be called in facsimile mode where a zone is specified but there is
-    // no text. This draws the bounds of the zone but leaves the space blank.
-    if (!wroteText && params) {
-        dc->DrawText("", L"", params->m_x, params->m_y, params->m_width, params->m_height);
+    // Handle empty text
+    if (!wroteText) {
+        if (params) {
+            dc->DrawText("", L"", params->m_x, params->m_y, params->m_width, params->m_height);
+        }
+        else {
+            dc->DrawText("", L"");
+        }
     }
 }
 

@@ -5419,7 +5419,17 @@ bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 
     parent->AddChild(vrvSyl);
     ReadUnsupportedAttr(syl, vrvSyl);
-    return ReadTextChildren(vrvSyl, syl, vrvSyl);
+
+    bool ok = ReadTextChildren(vrvSyl, syl, vrvSyl);
+
+    // Ensure that there is one text child
+    if (ok && (vrvSyl->GetChildCount(TEXT) == 0)) {
+        Text *vrvText = new Text();
+        vrvText->SetText(L"");
+        vrvSyl->AddChild(vrvText);
+    }
+
+    return ok;
 }
 
 bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
