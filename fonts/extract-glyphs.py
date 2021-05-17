@@ -10,36 +10,36 @@ svg_ns = 'http://www.w3.org/2000/svg'
 #  Helper Functions  #
 ######################
 
-# Open file in same directory as script and retrieve its content
 def get_file_content(filepath):
+   """Open file in same directory as script and retrieve its content."""
    __location__ = os.path.realpath(os.path.dirname(__file__))
    file = open(os.path.join(__location__, filepath), 'r')
    content = file.read()
    file.close()
    return content
 
-# Write content to file with path relative to the script directory
 def write_file_content(filepath, content):
+   """Write content to file with path relative to the script directory."""
    __location__ = os.path.realpath(os.path.dirname(__file__))
    file = open(os.path.join(__location__, filepath), 'w')
    file.write(content)
    file.close()
 
-# Retrieve all elements with given tag name from xml
 def get_elements(xml, tag):
+   """Retrieve all elements with given tag name from xml."""
    root = ET.fromstring(bytes(xml, encoding='utf-8'))
    return root.findall('.//' + tag)  # XPath, recursive
 
-# Retrieve all elements with given tag name from svg
 def get_svg_elements(root, tag):
+   """Retrieve all elements with given tag name from svg."""
    return root.findall('.//svg:' + tag, {'svg': svg_ns})  # XPath, recursive
 
 #########################
 #  Parse supported.xsl  #
 #########################
 
-# Retrieve dictionary mapping glyph code to smufl name
 def get_supported_glyph_codes():
+   """Retrieve dictionary mapping glyph code to SMuFL name."""
    xml = get_file_content('supported.xsl')
    glyphs = get_elements(xml, 'glyph')
    dict = {}
@@ -51,8 +51,8 @@ def get_supported_glyph_codes():
 #  Parse Fontname.svg  #
 ########################
 
-# Read svg file which is passed as argument and retrieve information
 def read_svg_file():
+   """Read svg file which is passed as argument and retrieve information."""
    font_file_name = os.sys.argv[1]
    try:
       font_svg_content = get_file_content(font_file_name)
