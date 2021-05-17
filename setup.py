@@ -60,12 +60,11 @@ def get_version():
         for line in header_file:
             if not line.startswith("#define"):
                 continue
-            try:
-                definition = line.strip().split()
+            definition = line.strip().split()
+            if len(definition) > 2:
                 defines[definition[1]] = definition[2]
-            except IndexError:
-                print('#define not well-formed')
-                pass
+            else:
+                continue
             # as long as we don't need all defines
             if 'vrv_cast' in defines:
                 break 
