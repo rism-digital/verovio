@@ -59,13 +59,14 @@ def get_version():
         with open("./include/vrv/vrvdef.h") as header_file:
             defines = {}
             for line in header_file.readlines():
-                if line.startswith("#define"):
-                    line.rstrip()
-                    definition = line[8:].split()
-                    try:
-                        defines[definition[0]] = definition[1]
-                    except IndexError:
-                        pass
+                if not line.startswith("#define"):
+                    continue
+                line.rstrip()
+                definition = line[8:].split()
+                try:
+                    defines[definition[0]] = definition[1]
+                except IndexError:
+                    pass
             version = '.'.join(
                 (defines['VERSION_MAJOR'], defines['VERSION_MINOR'], defines['VERSION_REVISION']))
             if defines['VERSION_DEV'] == 'true':
