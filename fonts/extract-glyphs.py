@@ -34,13 +34,6 @@ def get_elements(xml, tag):
 def get_svg_elements(root, tag):
    return root.findall('.//svg:' + tag, {'svg': svg_ns})  # XPath, recursive
 
-# Create standard svg root node
-def create_svg_root():
-   root = ET.Element("svg")
-   root.set("xmlns", svg_ns)
-   root.set("version", "1.1")
-   return root
-
 #########################
 #  Parse supported.xsl  #
 #########################
@@ -103,7 +96,9 @@ for glyph in glyphs:
       write_file_content(file_path, xml)
 
 # (3) Output bounding box svg
-root = create_svg_root()
+root = ET.Element("svg")
+root.set("xmlns", svg_ns)
+root.set("version", "1.1")
 root.set("font-family", font_family)
 fontface = ET.SubElement(root, "font-face")
 fontface.set("units-per-em", units_per_em)
