@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 import os
-from lxml import etree
+import xml.etree.ElementTree as ET
 
 # Define file output paths
 smufl_h_path = '../include/vrv/smufl.h'
@@ -28,7 +28,7 @@ def write_file_content(filepath, content):
 
 # Retrieve all elements with given tag name from xml
 def get_elements(xml, tag):
-   root = etree.fromstring(bytes(xml, encoding='utf-8'))
+   root = ET.fromstring(bytes(xml, encoding='utf-8'))
    return root.findall('.//' + tag)  # XPath, recursive
 
 #########################
