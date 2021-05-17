@@ -55,22 +55,21 @@ def get_version():
         for line in lines:
             if line.startswith('Version:'):
                 return line[8:].strip()
-    if os.path.exists("./include/vrv"):
-        with open("./include/vrv/vrvdef.h") as header_file:
-            defines = {}
-            for line in header_file.readlines():
-                if not line.startswith("#define"):
-                    continue
-                line.rstrip()
-                definition = line[8:].split()
-                try:
-                    defines[definition[0]] = definition[1]
-                except IndexError:
-                    pass
-            version = '.'.join(
-                (defines['VERSION_MAJOR'], defines['VERSION_MINOR'], defines['VERSION_REVISION']))
-            if defines['VERSION_DEV'] == 'true':
-                version += '.dev'
+    with open("./include/vrv/vrvdef.h") as header_file:
+        defines = {}
+        for line in header_file:
+            if not line.startswith("#define"):
+                continue
+            try:
+                definition = line.strip().split()
+                defines[definition[1]] = definition[2]
+            except IndexError:
+                print('#define not well-formed')
+                pass
+        version = '.'.join(
+            (defines['VERSION_MAJOR'], defines['VERSION_MINOR'], defines['VERSION_REVISION']))
+        if defines['VERSION_DEV'] == 'true':
+            version += '.dev'
     if version.endswith(".dev"):
         init_sha = subprocess.getoutput(
             "git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
