@@ -66,6 +66,9 @@ def get_version():
             except IndexError:
                 print('#define not well-formed')
                 pass
+            # as long as we don't need all defines
+            if 'vrv_cast' in defines:
+                break 
         version = '.'.join(
             (defines['VERSION_MAJOR'], defines['VERSION_MINOR'], defines['VERSION_REVISION']))
         if defines['VERSION_DEV'] == 'true':
