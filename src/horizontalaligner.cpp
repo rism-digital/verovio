@@ -134,7 +134,7 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
             // This typically occurs when a tstamp event occurs after the last note of a measure
             int rightBarlineIdx = m_rightBarLineAlignment->GetIdx();
             assert(rightBarlineIdx != -1);
-            idx = rightBarlineIdx - 1;
+            idx = rightBarlineIdx;
             this->SetMaxTime(time);
         }
         else {
@@ -1224,8 +1224,8 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         params->m_timestamps.clear();
     }
 
-    // Do not use clef change alignment as reference since these are not aligned at this stage
-    if (this->GetType() != ALIGNMENT_CLEF) params->m_lastNonTimestamp = this;
+    // Do not use clef change and grancenote alignment as reference since these are not aligned at this stage
+    if (!this->IsOfType({ ALIGNMENT_CLEF, ALIGNMENT_GRACENOTE })) params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }
