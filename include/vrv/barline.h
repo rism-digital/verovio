@@ -87,9 +87,10 @@ public:
     virtual ~BarLineAttr();
     virtual Object *Clone() const { return new BarLineAttr(*this); }
     virtual std::string GetClassName() const { return "BarLineAttr"; }
-    virtual ClassId GetClassId() const { 
+    virtual ClassId GetClassId() const
+    {
         if (m_noAttr) return BARLINE;
-        return m_isLeft? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT; 
+        return m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT;
     }
     ///@}
 

@@ -461,7 +461,7 @@ Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
 {
     // Barlines are stored in the map in the following format:
     // previous measure right -> current measure left -> expected barlines (previous, current)
-    static std::map<data_BARRENDITION, std::map<data_BARRENDITION, BarlineRenditionPair> > drawingLines = {
+    static std::map<data_BARRENDITION, std::map<data_BARRENDITION, BarlineRenditionPair>> drawingLines = {
         // previous right barline is dotted
         { BARRENDITION_dotted,
             { { BARRENDITION_dotted, { BARRENDITION_dotted, BARRENDITION_NONE } },
@@ -544,8 +544,8 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
         }
     }
     else if (!((barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT)
-        || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
-        || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS))) {
+                 || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+                 || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS))) {
         // we have rptboth split in the two measures, make them one rptboth
         if ((previous->GetRight() == BARRENDITION_rptend) && (this->GetLeft() == BARRENDITION_rptstart)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
