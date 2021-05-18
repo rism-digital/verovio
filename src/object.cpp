@@ -1550,12 +1550,12 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         ListOfObjects currentObjects, previousObjects;
         AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
         measure->FindAllDescendantByComparison(&currentObjects, &comparison);
-        if (currentObjects.size() == measure->GetChildCount(STAFF)) {
+        if ((int)currentObjects.size() == measure->GetChildCount(STAFF)) {
             drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
         }
         if (params->m_previousMeasure) {
             params->m_previousMeasure->FindAllDescendantByComparison(&previousObjects, &comparison);
-            if (previousObjects.size() == params->m_previousMeasure->GetChildCount(STAFF))
+            if ((int)previousObjects.size() == params->m_previousMeasure->GetChildCount(STAFF))
                 drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
         }
 
