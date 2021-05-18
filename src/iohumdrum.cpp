@@ -11418,6 +11418,13 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     // justification == 1 means right justified
     int justification = 0;
 
+    if (token->isBarline()) {
+        hum::HumNum enddur = token->getDurationToEnd();
+        if (enddur == 0) {
+            justification = 1;
+        }
+    }
+
     std::string color;
     if (sicQ) {
         // default color for sic text directions (set to black if not wanted)
