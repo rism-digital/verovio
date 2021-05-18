@@ -11111,7 +11111,7 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     }
     else if (zparam) {
         Z = hline->getValueInt("LO", "TX", "Z");
-        if (Z > 0) {
+        if (Z >= 0) {
             placement = "above";
             showplace = true;
         }
@@ -11122,7 +11122,7 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     }
     else if (yparam) {
         Y = hline->getValueInt("LO", "TX", "Y");
-        if (Y > 0) {
+        if (Y >= 0) {
             placement = "below";
             showplace = true;
         }
@@ -11317,7 +11317,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
 
     else if (zparam) {
         Z = token->getValueInt("LO", "TX", "Z");
-        if (Z > 0) {
+        if (Z >= 0) {
             placement = "above";
         }
         else {
@@ -11326,7 +11326,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
     }
     else if (yparam) {
         Y = token->getValueInt("LO", "TX", "Y");
-        if (Y > 0) {
+        if (Y >= 0) {
             placement = "below";
         }
         else {
@@ -11539,7 +11539,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
     else if (zparam) {
         Z = token->getValueInt("LO", "TX", "Z");
-        if (Z > 0) {
+        if (Z >= 0) {
             placement = "above";
             showplace = true;
         }
@@ -11550,7 +11550,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
     else if (yparam) {
         Y = token->getValueInt("LO", "TX", "Y");
-        if (Y > 0) {
+        if (Y >= 0) {
             placement = "below";
             showplace = true;
         }
