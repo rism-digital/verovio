@@ -20106,7 +20106,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
 void HumdrumInput::addBreath(hum::HTp token, Object *parent)
 {
     int layer = m_currentlayer;
-    int staff = m_currentstaff;
+    int staff = getNoteStaff(token, m_currentstaff);
 
     if (token->find(",") == std::string::npos) {
         return;
@@ -20677,7 +20677,7 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
         addTurn(object, token);
     }
 
-    addOrnamentMarkers(token);
+    // addOrnamentMarkers(token);
 }
 
 //////////////////////////////
@@ -20744,7 +20744,7 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
-    int staff = m_currentstaff;
+    int staff = getNoteStaff(token, m_currentstaff);
     int staffindex = staff - 1;
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
@@ -21036,7 +21036,7 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
-    int staff = m_currentstaff;
+    int staff = getNoteStaff(token, m_currentstaff);
     Mordent *mordent = new Mordent;
     appendElement(m_measure, mordent);
     setStaff(mordent, staff);
@@ -21152,6 +21152,33 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 
 //////////////////////////////
 //
+// HumdrumInput::getNoteStaff -- Adjust the staff based on above/below
+//   modifier on notes.
+//
+
+int HumdrumInput::getNoteStaff(hum::HTp token, int homestaff)
+{
+    hum::HumRegex hre;
+    if (m_signifiers.above) {
+        std::string sstring = "[a-g]+[-#n]*";
+        sstring += m_signifiers.above;
+        if (hre.search(token, sstring)) {
+            return homestaff - 1;
+        }
+    }
+    if (m_signifiers.below) {
+        std::string sstring = "[a-g]+[-#n]*";
+        sstring += m_signifiers.below;
+        if (hre.search(token, sstring)) {
+            return homestaff + 1;
+        }
+    }
+
+    return homestaff;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::addTrill -- Add trill for note.
 //
 
@@ -21194,7 +21221,8 @@ void HumdrumInput::addTrill(hum::HTp token)
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
-    int staff = m_currentstaff;
+    int staff = getNoteStaff(token, m_currentstaff);
+
     Trill *trill = new Trill;
     appendElement(m_measure, trill);
     setStaff(trill, staff);
@@ -21213,6 +21241,7 @@ void HumdrumInput::addTrill(hum::HTp token)
     // trill->SetTstamp(tstamp.getFloat());
 
     setLocationId(trill, token, subtok);
+
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {

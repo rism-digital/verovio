@@ -720,6 +720,7 @@ protected:
     void addMensuralQuality(Note *note, hum::HTp token);
     bool checkForMens(hum::HumdrumFile &infile);
     bool layerOnlyContainsNullStuff(std::vector<hum::HTp> &data);
+    int getNoteStaff(hum::HTp token, int homestaff);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
