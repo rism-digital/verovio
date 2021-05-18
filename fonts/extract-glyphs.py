@@ -42,10 +42,10 @@ def get_supported_glyph_codes():
    """Retrieve dictionary mapping glyph code to SMuFL name."""
    xml = get_file_content('supported.xsl')
    glyphs = get_elements(xml, 'glyph')
-   dict = {}
+   result = {}
    for glyph in glyphs:
-      dict[glyph.attrib['glyph-code']] = glyph.attrib['smufl-name']
-   return dict
+      result[glyph.attrib['glyph-code']] = glyph.attrib['smufl-name']
+   return result
 
 ########################
 #  Parse Fontname.svg  #
@@ -56,7 +56,7 @@ def read_svg_file():
    font_file_name = os.sys.argv[1]
    try:
       font_svg_content = get_file_content(font_file_name)
-   except EnvironmentError:
+   except OSError:
       print(f"Error opening font file {font_file_name}!")
       sys.exit(1)
    root = ET.fromstring(bytes(font_svg_content, encoding='utf-8'))
@@ -74,44 +74,45 @@ def read_svg_file():
 #  Main program  #
 ##################
 
-# (1) Parse files
-supported_glyph_codes = get_supported_glyph_codes()
-(font_family, units_per_em, glyphs) = read_svg_file()
+if __name__ == '__main__':
+    # (1) Parse files
+    supported_glyph_codes = get_supported_glyph_codes()
+    (font_family, units_per_em, glyphs) = read_svg_file()
 
-# (2) Create xml file for each glyph
-for glyph in glyphs:
-   name = glyph.attrib['glyph-name']
-   glyph_id = name.split('uni')[-1]
-   if glyph_id in supported_glyph_codes:
-      root = ET.Element('symbol')
-      root.set('id', glyph_id)
-      root.set('viewBox', f"0 0 {units_per_em} {units_per_em}")
-      root.set('overflow', 'inherit')
-      path = ET.SubElement(root, 'path')
-      path.set('transform', 'scale(1,-1)')
-      if 'd' in glyph.attrib:
-         path.set('d', glyph.attrib['d'])
-      file_path = f"../data/{font_family}/{glyph_id}-{supported_glyph_codes[glyph_id]}.xml"
-      xml = ET.tostring(root, encoding='unicode')
-      write_file_content(file_path, xml)
+    # (2) Create xml file for each glyph
+    for glyph in glyphs:
+       name = glyph.attrib['glyph-name']
+       glyph_id = name.split('uni')[-1]
+       if glyph_id in supported_glyph_codes:
+          root = ET.Element('symbol')
+          root.set('id', glyph_id)
+          root.set('viewBox', f"0 0 {units_per_em} {units_per_em}")
+          root.set('overflow', 'inherit')
+          path = ET.SubElement(root, 'path')
+          path.set('transform', 'scale(1,-1)')
+          if 'd' in glyph.attrib:
+             path.set('d', glyph.attrib['d'])
+          file_path = f"../data/{font_family}/{glyph_id}-{supported_glyph_codes[glyph_id]}.xml"
+          xml = ET.tostring(root, encoding='unicode')
+          write_file_content(file_path, xml)
 
-# (3) Output bounding box svg
-root = ET.Element('svg')
-root.set('xmlns', svg_ns)
-root.set('version', '1.1')
-root.set('font-family', font_family)
-fontface = ET.SubElement(root, 'font-face')
-fontface.set('units-per-em', units_per_em)
-for glyph in glyphs:
-   name = glyph.attrib['glyph-name']
-   glyph_id = name.split('uni')[-1]
-   if glyph_id in supported_glyph_codes:
-      path = ET.SubElement(root, 'path')
-      path.set('name', supported_glyph_codes[glyph_id])
-      path.set('id', glyph_id)
-      horiz_adv_x = glyph.attrib['horiz-adv-x'] if 'horiz-adv-x' in glyph.attrib else ''
-      path.set('horiz-adv-x', horiz_adv_x)
-      path.set('transform', 'scale(1,-1)')
-      if 'd' in glyph.attrib:
-         path.set('d', glyph.attrib['d'])
-print(ET.tostring(root, encoding='unicode'))
+    # (3) Output bounding box svg
+    root = ET.Element('svg')
+    root.set('xmlns', svg_ns)
+    root.set('version', '1.1')
+    root.set('font-family', font_family)
+    fontface = ET.SubElement(root, 'font-face')
+    fontface.set('units-per-em', units_per_em)
+    for glyph in glyphs:
+       name = glyph.attrib['glyph-name']
+       glyph_id = name.split('uni')[-1]
+       if glyph_id in supported_glyph_codes:
+          path = ET.SubElement(root, 'path')
+          path.set('name', supported_glyph_codes[glyph_id])
+          path.set('id', glyph_id)
+          horiz_adv_x = glyph.attrib['horiz-adv-x'] if 'horiz-adv-x' in glyph.attrib else ''
+          path.set('horiz-adv-x', horiz_adv_x)
+          path.set('transform', 'scale(1,-1)')
+          if 'd' in glyph.attrib:
+             path.set('d', glyph.attrib['d'])
+    print(ET.tostring(root, encoding='unicode'))
