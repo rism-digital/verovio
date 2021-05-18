@@ -41,6 +41,7 @@ class Measure : public Object,
                 public AttTyped {
 private:
     using BarlineRenditionPair = std::pair<data_BARRENDITION, data_BARRENDITION>;
+
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -125,7 +126,7 @@ public:
     /**
      * Return whether there is mapping of barline values to invisible staves present in measure
      */
-    bool HasInvisibleStaffBarlines() const { return !m_invisibleStaffBarlines.empty();}
+    bool HasInvisibleStaffBarlines() const { return !m_invisibleStaffBarlines.empty(); }
 
     /**
      * Select drawing barlines based on the previous right and current left barlines (to avoid duplicated doubles or

@@ -6,7 +6,7 @@
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
-Verovio is written in standard 2017 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](http://www.verovio.org/tutorial.xhtml) for web integration and user interaction.
+Verovio is written in standard 2017 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](https://book.verovio.org/first-steps/) for web integration and user interaction.
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/movies/reflow.gif)
 
@@ -18,17 +18,7 @@ The project page is http://www.verovio.org. Verovio is available under the LGPL 
 Building and use instructions by environment
 --------------------------------------------
 
-See the [wiki](https://github.com/rism-digital/verovio/wiki/Building-instructions), with instructions for:
-
-*   [Command-line tool](https://github.com/rism-digital/verovio/wiki/Building-instructions#command-line-tool)
-*   [XCode](https://github.com/rism-digital/verovio/wiki/Building-instructions#xcode)
-*   [Visual Studio](https://github.com/rism-digital/verovio/wiki/Building-instructions#visual-studio)
-*   [JavaScript](https://github.com/rism-digital/verovio/wiki/Building-instructions#javascript-toolkit)
-*   [NPM](https://github.com/rism-digital/verovio/wiki/Building-instructions#npm)
-*   [Python](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-python-toolkit)
-*   [Java](https://github.com/rism-digital/verovio/wiki/Building-instructions#building-the-java-toolkit)
-*   [CocoaPods](https://github.com/rism-digital/verovio/wiki/Building-instructions#cocoapods)
-
+See the [Reference book](https://book.verovio.org/installing-or-building-from-sources/command-line.html)
 
 LibMEI
 ------
@@ -59,7 +49,7 @@ The following libraries are embedded in Verovio:
 Contributing
 ------------
 
-If you are interested in contributing to Verovio, please read the [contribution](doc/contributing.md) and [coding style](doc/guidelines.md) guidelines.
+See the [Reference book](https://book.verovio.org/contributing/guidelines.html)
 
 Example output
 --------------

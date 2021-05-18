@@ -675,7 +675,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 if (staff->GetVisible() == BOOLEAN_false) {
                     continue;
                 }
-                // Get current form. If neighboring invisible staff make sure that at least some kind of barline is drawn
+                // Get current form. If neighboring invisible staff make sure that at least some kind of barline is
+                // drawn
                 data_BARRENDITION form = barLine->GetForm();
                 if (measure->HasInvisibleStaffBarlines()) {
                     data_BARRENDITION barlineRend = barLine->Is(BARLINE_ATTR_RIGHT)

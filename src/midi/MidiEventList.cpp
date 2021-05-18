@@ -18,7 +18,7 @@
 #include <iterator>
 #include <utility>
 
-#include "stdlib.h"
+#include <stdlib.h>
 
 namespace smf {
 
@@ -292,8 +292,7 @@ int MidiEventList::linkNotePairs(void) {
 	// dimension 3: List of active note-ons or note-offs.
 	std::vector<std::vector<std::vector<MidiEvent*>>> noteons;
 	noteons.resize(16);
-	int i;
-	for (i=0; i<(int)noteons.size(); i++) {
+	for (int i=0; i<(int)noteons.size(); i++) {
 		noteons[i].resize(128);
 	}
 
@@ -368,7 +367,7 @@ int MidiEventList::linkNotePairs(void) {
 	int counter = 0;
 	MidiEvent* mev;
 	MidiEvent* noteon;
-	for (i=0; i<getSize(); i++) {
+	for (int i=0; i<getSize(); i++) {
 		mev = &getEvent(i);
 		mev->unlinkEvent();
 		if (mev->isNoteOn()) {
