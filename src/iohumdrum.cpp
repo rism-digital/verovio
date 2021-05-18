@@ -11419,8 +11419,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     int justification = 0;
 
     if (token->isBarline()) {
-        hum::HumNum enddur = token->getDurationToEnd();
-        if (enddur == 0) {
+        hum::HumNum startdur = token->getDurationFromStart();
+        hum::HumdrumFile *hfile = token->getOwner()->getOwner();
+        hum::HumNum totaldur = (*hfile)[hfile->getLineCount() - 1].getDurationFromStart();
+        if (startdur == totaldur) {
             justification = 1;
         }
     }
