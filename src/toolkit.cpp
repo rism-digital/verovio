@@ -544,7 +544,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     else if (inputFormat == MEIHUM) {
-        // This is the indirect converter from MusicXML to MEI using iohumdrum:
+        // This is the indirect converter from MEI to MEI using iohumdrum:
         hum::Tool_mei2hum converter;
         pugi::xml_document xmlfile;
         xmlfile.load_string(data.c_str());
