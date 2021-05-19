@@ -1034,10 +1034,10 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         }
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetTotalCount(), 0, staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetTotalCount(), meterSig->GetUnit(), staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
 
     dc->EndGraphic(element, this);
@@ -1650,12 +1650,17 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
 }
 
-void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff)
+void View::DrawMeterSigFigures(
+    DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff)
 {
     assert(dc);
     assert(staff);
 
-    std::wstring timeSigCombNumerator = IntToTimeSigFigures(num), timeSigCombDenominator;
+    std::wstring timeSigCombNumerator, timeSigCombDenominator;
+    for (int summand : numSummands) {
+        if (!timeSigCombNumerator.empty()) timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall;
+        timeSigCombNumerator += IntToTimeSigFigures(summand);
+    }
     if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
