@@ -1034,10 +1034,10 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         }
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetTotalCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetTotalCount(), meterSig->GetUnit(), staff);
     }
 
     dc->EndGraphic(element, this);

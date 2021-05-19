@@ -655,7 +655,7 @@ double LayerElement::GetAlignmentDuration(
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
-        if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
+        if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetTotalCount();
 
         if (this->Is(HALFMRPT)) {
             return (DUR_MAX / meterUnit * meterCount) / 2;
