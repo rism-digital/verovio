@@ -865,6 +865,12 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
         return;
     }
 
+    // force pagebreaks to linkebreaks for now (see https://github.com/rism-digital/verovio/issues/2034)
+    if (pagebreaki > 0) {
+        linebreaki = pagebreaki;
+        pagebreaki = -1;
+    }
+
     if (linebreaki > 0) {
         hum::HTp token = infile[linebreaki].token(0);
         Sb *sb = new Sb;
