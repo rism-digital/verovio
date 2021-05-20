@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 20 07:05:08 PDT 2021
+// Last Modified: Thu May 20 08:29:58 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -28494,16 +28494,16 @@ bool HumdrumLine::isGlobalReference(void) const {
 	if (this->at(3) == '!') {
 		return false;
 	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
+	size_t spaceloc = this->find(" ");
+	size_t tabloc = this->find("\t");
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
 		return false;
 	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
+	if ((spaceloc != string::npos) && (spaceloc < colloc)) {
 		return false;
 	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
+	if ((tabloc != string::npos) && (tabloc < colloc)) {
 		return false;
 	}
 	return true;
@@ -28528,16 +28528,16 @@ bool HumdrumLine::isUniversalReference(void) const {
 	if ((*this)[4] == '!') {
 		return false;
 	}
-	int spaceloc = (int)this->find(" ");
-	int tabloc = (int)this->find("\t");
-	int colloc = (int)this->find(":");
-	if (colloc == (int)string::npos) {
+	size_t spaceloc = this->find(" ");
+	size_t tabloc = this->find("\t");
+	size_t colloc = this->find(":");
+	if (colloc == string::npos) {
 		return false;
 	}
-	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
+	if ((spaceloc != string::npos) && (spaceloc < colloc)) {
 		return false;
 	}
-	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
+	if ((tabloc != string::npos) && (tabloc < colloc)) {
 		return false;
 	}
 	return true;
@@ -28729,7 +28729,7 @@ string HumdrumLine::getGlobalReferenceKey(void) const {
 	if (index >= (int)colloc) {
 		return "";
 	}
-	int length = colloc - index;
+	int length = (int)colloc - index;
 	string output = this->substr(index, length);
 	for (int i=(int)output.size()-1; i>=0; i--) {
 		if (isspace(output.at(i))) {
@@ -28774,7 +28774,7 @@ string HumdrumLine::getUniversalReferenceKey(void) const {
 	if (index >= (int)colloc) {
 		return "";
 	}
-	int length = colloc - index;
+	int length = (int)colloc - index;
 	string output = this->substr(index, length);
 	for (int i=(int)output.size()-1; i>=0; i--) {
 		if (isspace(output.at(i))) {
@@ -37587,7 +37587,7 @@ int MuseRecord::getFootnoteFlag(void) {
 	if (recordInfo[0] == ' ') {
 		output = -1;
 	} else {
-		output = std::strtol(recordInfo.c_str(), NULL, 36);
+		output = (int)strtol(recordInfo.c_str(), NULL, 36);
 	}
 	return output;
 }
@@ -37644,7 +37644,7 @@ int MuseRecord::getLevel(void) {
 	if (recordInfo[0] == ' ') {
 		output = 1;
 	} else {
-		output = std::strtol(recordInfo.c_str(), NULL, 36);
+		output = (int)strtol(recordInfo.c_str(), NULL, 36);
 	}
 	return output;
 }
@@ -37711,7 +37711,7 @@ int MuseRecord::getTrack(void) {
 	if (recordInfo[0] == ' ') {
 		output = 0;
 	} else {
-		output = std::strtol(recordInfo.c_str(), NULL, 36);
+		output = (int)strtol(recordInfo.c_str(), NULL, 36);
 	}
 	return output;
 }
@@ -38184,7 +38184,7 @@ int MuseRecord::getTimeModificationLeft(void) {
 	if (recordInfo[0] == ' ') {
 		output = 0;
 	} else {
-		output = std::strtol(recordInfo.c_str(), NULL, 36);
+		output = (int)strtol(recordInfo.c_str(), NULL, 36);
 	}
 	return output;
 }
@@ -38233,7 +38233,7 @@ int MuseRecord::getTimeModificationRight(void) {
 		output = 0;
 	} else {
 		string temp = recordInfo.substr(2);
-		output = std::strtol(temp.c_str(), NULL, 36);
+		output = (int)strtol(temp.c_str(), NULL, 36);
 	}
 	return output;
 }
@@ -38410,7 +38410,7 @@ int MuseRecord::getStaff(void) {
 	if (recordInfo[0] == ' ') {
 		output = 1;
 	} else {
-		output = std::strtol(recordInfo.c_str(), NULL, 36);
+		output = (int)strtol(recordInfo.c_str(), NULL, 36);
 	}
 	return output;
 }
@@ -38799,7 +38799,7 @@ repeating:
 		goto repeating;
 	} else if (addString[index] == '&') {
 		number = addString[index+1];
-		output = std::strtol(number.c_str(), NULL, 36);
+		output = (int)strtol(number.c_str(), NULL, 36);
 	}
 
 	return output;
@@ -39902,7 +39902,7 @@ string MuseRecord::getFigureCountString(void) {
 int MuseRecord::getFigureCount(void) {
 	allowFigurationOnly("getFigureCount");
 	string temp = getFigureCountString();
-	int output = std::strtol(temp.c_str(), NULL, 36);
+	int output = (int)strtol(temp.c_str(), NULL, 36);
 	return output;
 }
 
@@ -48680,7 +48680,6 @@ PixelColor PixelColor::operator/(int number) {
 
 PixelColor PixelColor::getColor(const string& colorstring) {
 	PixelColor output;
-	int i = 0;
 	int start = 0;
 	int hasdigit  = 0;
 	int length = (int)colorstring.size();
@@ -48696,7 +48695,7 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	} else if (length == 6) {
 		int allxdigit = 1;
 		start = 0;
-		for (i=start; i<length; i++) {
+		for (int i=start; i<length; i++) {
 			allxdigit = allxdigit && isxdigit(colorstring[i]);
 		}
 		if (allxdigit) {
@@ -48744,9 +48743,9 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 		strcpy(rv, piece1.c_str());
 		strcpy(gv, piece1.c_str());
 		strcpy(bv, piece1.c_str());
-		int rval = strtol(rv, NULL, 16);
-		int gval = strtol(gv, NULL, 16);
-		int bval = strtol(bv, NULL, 16);
+		int rval = (int)strtol(rv, NULL, 16);
+		int gval = (int)strtol(gv, NULL, 16);
+		int bval = (int)strtol(bv, NULL, 16);
 		output.setColor(rval, gval, bval);
 		return output;
 	}
@@ -48754,8 +48753,8 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	// color string
 	char buffer[128] = {0};
 	strncpy(buffer, colorstring.c_str(), 100);
-	length = strlen(buffer);
-	for (i=0; i<length; i++) {
+	length = (int)strlen(buffer);
+	for (int i=0; i<length; i++) {
 		buffer[i] = std::tolower(buffer[i]);
 	}
 	output.setColor(0,0,0);
