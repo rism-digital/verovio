@@ -45,7 +45,7 @@ void MeterSig::Reset()
 
 int MeterSig::GetTotalCount() const
 {
-    const auto &summands = this->GetCount();
+    const data_SUMMAND_List &summands = this->GetCount();
     return std::accumulate(summands.cbegin(), summands.cend(), 0);
 }
 
