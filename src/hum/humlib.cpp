@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue May 18 16:33:41 PDT 2021
+// Last Modified: Thu May 20 07:05:08 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -50262,8 +50262,7 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 	// Now identify notes that should be beamed together
 	// (using lazy beaming for now).
 	HumNum eighthnote(1, 2);
-	int beat1;
-	int beat2;
+	int beat1 = 0;
 	#define INVALID -1000000
 	int beamstart = INVALID;
 	for (int i=0; i<(int)measure.size(); i++) {
@@ -50286,10 +50285,10 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 			continue;
 		}
 
-		beat2 = (int)beatpos[i].getFloat();
+		int beat2 = (int)beatpos[i].getFloat();
 		if (beat1 == beat2) {
 			// note should be added to current beam, but could
-			// be beams to notes after it, so continue on to next note.
+			// be beamed to notes after it, so continue on to next note.
 			continue;
 		} else {
 			// check if previous beam should be ended.
