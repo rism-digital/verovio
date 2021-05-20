@@ -19994,8 +19994,8 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         std::string visualdur = token->getValue("auto", "N", "vis");
         dur = hum::Convert::recipToDurationNoDots(visualdur);
         dur /= 4; // convert duration to whole-note units
-        int logicaldurdots = std::count(logicaldur.begin(), logicaldur.end(), '.');
-        int visualdurdots = std::count(visualdur.begin(), visualdur.end(), '.');
+        int logicaldurdots = (int)std::count(logicaldur.begin(), logicaldur.end(), '.');
+        int visualdurdots = (int)std::count(visualdur.begin(), visualdur.end(), '.');
         if (visualdurdots != logicaldurdots) {
             element->SetDotsGes(logicaldurdots);
             element->SetType("overfill");
