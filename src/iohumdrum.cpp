@@ -20122,7 +20122,7 @@ hum::HTp HumdrumInput::getRightmostStaffArpeggio(hum::HTp token)
     }
     int track = token->getTrack();
     token = token->getNextFieldToken();
-    int ntrack;
+    int ntrack = 0;
     if (token) {
         ntrack = token->getTrack();
     }
@@ -20154,7 +20154,7 @@ bool HumdrumInput::leftmostStaffArpeggio(hum::HTp token)
 {
     int track = token->getTrack();
     token = token->getPreviousFieldToken();
-    int ntrack;
+    int ntrack = 0;
     if (token) {
         ntrack = token->getTrack();
     }
