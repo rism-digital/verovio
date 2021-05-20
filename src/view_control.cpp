@@ -1173,21 +1173,13 @@ void View::DrawSylConnector(
 
     // Invalid bounding boxes might occur for empty syllables without text child
     if (!syl->HasContentHorizontalBB()) return;
-
-    // Define lambda returning the next syllable with valid bounding box
-    auto nextValidSyl = [](Syl *syl) {
-        Syl *next = syl->m_nextWordSyl;
-        while (next && !next->HasContentHorizontalBB()) {
-            next = next->m_nextWordSyl;
-        }
-        return next;
-    };
+    if (syl->m_nextWordSyl && !syl->m_nextWordSyl->HasContentHorizontalBB()) return;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
         x1 = syl->GetContentRight();
-        if (Syl *nextSyl = nextValidSyl(syl); nextSyl) {
-            x2 = nextSyl->GetContentLeft();
+        if (syl->m_nextWordSyl) {
+            x2 = syl->m_nextWordSyl->GetContentLeft();
         }
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
@@ -1208,8 +1200,8 @@ void View::DrawSylConnector(
             }
         }
         // Otherwise just adjust x2
-        if (Syl *nextSyl = nextValidSyl(syl); nextSyl) {
-            x2 = nextSyl->GetContentLeft();
+        if (syl->m_nextWordSyl) {
+            x2 = syl->m_nextWordSyl->GetContentLeft();
         }
         x1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
