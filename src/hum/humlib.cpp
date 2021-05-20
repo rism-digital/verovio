@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri May 14 11:50:20 PDT 2021
+// Last Modified: Tue May 18 16:33:41 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -57826,6 +57826,10 @@ bool Tool_composite::isAttackInBothGroups(HumdrumFile& infile, int line) {
 			continue;
 		}
 		if (!token->isNoteAttack()) {
+			continue;
+		}
+		string value = token->getValue("auto", "ignoreTremoloNote");
+		if (value == "1") {
 			continue;
 		}
 		string group = token->getValue("auto", "group");
