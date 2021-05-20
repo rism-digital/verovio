@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 20 08:29:58 PDT 2021
+// Last Modified: Thu May 20 08:48:54 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -41074,7 +41074,7 @@ void MuseRecordBasic::append(const char* format, ...) {
 
 	HumNum rn;
 
-	int len = strlen(format);
+	int len = (int)strlen(format);
 	for (i=0; i<len; i++) {
 		switch (format[i]) {   // Type to expect.
 			case 'i':
