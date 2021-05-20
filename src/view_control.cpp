@@ -1170,7 +1170,10 @@ void View::DrawSylConnector(
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
     int y = staff->GetDrawingY() + GetSylYRel(syl->m_drawingVerse, staff);
-    TextExtend extend;
+
+    // Invalid bounding boxes might occur for empty syllables without text child
+    if (!syl->HasContentHorizontalBB()) return;
+    if (syl->m_nextWordSyl && !syl->m_nextWordSyl->HasContentHorizontalBB()) return;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
