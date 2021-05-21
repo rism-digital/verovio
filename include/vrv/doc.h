@@ -77,8 +77,8 @@ public:
      * @name Access the abort flag
      */
     ///@{
-    void ScheduleAbort(bool value) { m_abort = value; };
-    bool AbortRequested() { return m_abort; };
+    void SetAbortMode(bool value) { m_abort = value; };
+    bool AbortRequested() const { return m_abort; };
     ///@}
 
     /**
