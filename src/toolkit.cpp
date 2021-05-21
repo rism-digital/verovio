@@ -1105,6 +1105,16 @@ void Toolkit::ResetXmlIdSeed(int seed)
     Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
 }
 
+void Toolkit::Cancel()
+{
+    m_doc.ScheduleAbort(true);
+}
+
+void Toolkit::Continue()
+{
+    m_doc.ScheduleAbort(false);
+}
+
 void Toolkit::ResetLogBuffer()
 {
     logBuffer.clear();

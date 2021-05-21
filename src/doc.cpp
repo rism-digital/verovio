@@ -75,6 +75,8 @@ Doc::Doc() : Object(DOC, "doc-")
 {
     m_options = new Options();
 
+    m_abort = false;
+
     Reset();
 }
 
