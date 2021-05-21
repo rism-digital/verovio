@@ -906,6 +906,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     std::list<Score *> scores = this->GetScores();
     assert(!scores.empty());
 
+    if (this->AbortRequested()) {
+        return;
+    }
+
     this->ScoreDefSetCurrentDoc();
 
     Page *unCastOffPage = this->SetDrawingPage(0);
@@ -946,6 +950,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
             optimize = true;
             break;
         }
+    }
+
+    if (this->AbortRequested()) {
+        return;
     }
 
     // Reset the scoreDef at the beginning of each system
