@@ -1302,8 +1302,8 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     // We cannot draw without a top and bottom note
     if (!topNote || !bottomNote) return;
 
-    int top = topNote->GetDrawingY();
-    int bottom = bottomNote->GetDrawingY();
+    const int top = topNote->GetDrawingY();
+    const int bottom = bottomNote->GetDrawingY();
 
     // We arbitrarily look at the top note
     Staff *staff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
@@ -1321,7 +1321,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
     length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int x = arpeg->GetDrawingX();
+    const int x = arpeg->GetDrawingX();
     const int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int angle = -90;
 
@@ -1330,7 +1330,6 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
     if (arpeg->GetOrder() == arpegLog_ORDER_down) {
-        x -= m_doc->GetGlyphWidth(SMUFL_EAAA_wiggleArpeggiatoDown, staff->m_drawingStaffSize, drawingCueSize) / 2;
         startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
         fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
         endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
