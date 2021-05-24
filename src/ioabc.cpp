@@ -366,6 +366,19 @@ void ABCInput::AddArticulation(LayerElement *element)
     m_artic.clear();
 }
 
+void ABCInput::AddChordSymbol(LayerElement *element)
+{
+    assert(element);
+
+    // there should always only be one element in the harmony stack
+    if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
+        m_harmStack.back()->SetStartid("#" + element->GetUuid());
+        m_harmStack.clear();
+    }
+
+    m_dynam.clear();
+}
+
 void ABCInput::AddDynamic(LayerElement *element)
 {
     assert(element);
@@ -1107,6 +1120,11 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 AddArticulation(chord);
             }
 
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(chord);
+            }
+
             // add dynamics
             if (!m_dynam.empty()) {
                 AddDynamic(chord);
@@ -1257,6 +1275,11 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 AddArticulation(note);
             }
 
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(note);
+            }
+
             // add dynamics
             if (!m_dynam.empty()) {
                 AddDynamic(note);
@@ -1301,11 +1324,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 else
                     m_noteStack.push_back(note);
             }
-            // there should always only be one element in the harmony stack
-            if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
-                m_harmStack.back()->SetStartid("#" + m_ID);
-                m_harmStack.clear();
-            }
+
             if (!m_tieStack.empty()) {
                 m_tieStack.back()->SetEndid("#" + m_ID);
                 m_tieStack.clear();
@@ -1321,6 +1340,11 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         else if (musicCode.at(i) == 'x') {
             Space *space = new Space();
             m_ID = space->GetUuid();
+
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(space);
+            }
 
             // set duration
             std::string numStr, numbaseStr;
@@ -1389,7 +1413,12 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             Rest *rest = new Rest();
             m_ID = rest->GetUuid();
 
-            // add Fermata
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(rest);
+            }
+
+            // add fermata
             if (m_fermata != STAFFREL_NONE) {
                 AddFermata(rest);
             }

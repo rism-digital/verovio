@@ -80,6 +80,7 @@ private:
     // decoration functions
     void parseDecoration(const std::string &decorationString);
     void AddArticulation(LayerElement *element);
+    void AddChordSymbol(LayerElement *element);
     void AddDynamic(LayerElement *element);
     void AddFermata(LayerElement *element);
     void AddOrnaments(LayerElement *element);
