@@ -921,6 +921,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     unCastOffPage->LayOutHorizontally();
 
     Page *castOffSinglePage = new Page();
+    if (this->AbortRequested()) {
+        return;
+    }
+
 
     System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
