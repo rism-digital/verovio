@@ -201,8 +201,8 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                     if (previousStaff == NULL) {
                         AddLayerElement(layer, iter->m_clef);
                     }
-                    AttNIntegerComparison comparisonLayer(LAYER, layer->GetN());
-                    Object *prevLayer = previousStaff->FindDescendantByComparison(&comparisonLayer);
+                    // adding the clef to the last layer is sufficient
+                    Object *prevLayer = previousStaff->FindDescendantByType(LAYER, UNLIMITED_DEPTH, BACKWARD);
                     if (prevLayer == NULL) {
                         AddLayerElement(layer, iter->m_clef);
                     }
@@ -2333,7 +2333,13 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, c
     assert(node);
     assert(measure);
 
-    m_durTotal += node.child("duration").text().as_int();
+    if (!node.next_sibling()) {
+        // fill the layer, if forward element is last sibling
+        FillSpace(SelectLayer(node, measure), node.child("duration").text().as_int());
+    }
+    else {
+        m_durTotal += node.child("duration").text().as_int();
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, const std::string &measureNum)
