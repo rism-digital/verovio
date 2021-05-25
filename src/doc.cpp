@@ -513,6 +513,10 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &real
 
 void Doc::PrepareDrawing()
 {
+    if (this->AbortRequested()) {
+        return;
+    }
+
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
         this->Process(&resetDrawing, NULL);

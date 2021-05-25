@@ -1418,6 +1418,9 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
 
     int i = 0;
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
+        if (m_doc->AbortRequested()) {
+            break;
+        }
         pugi::xpath_node xmlMeasure = *it;
         if (!IsMultirestMeasure(i)) {
             Measure *measure = new Measure();
