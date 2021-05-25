@@ -2812,12 +2812,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Captures the number of beats in a measure, that is, the top number of the meter
-     * signature.
-     * Usually there is a single summand representing the number of beats.
-     * Multiple summands represent an additive expression such as 2+3.
-     **/
+    /** Indicates the number of performers. **/
     data_SUMMAND_List m_count;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
@@ -2871,8 +2866,8 @@ private:
     /**
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
-     * Usually there is a single summand representing the number of beats.
-     * Multiple summands represent an additive expression such as 2+3.
+     * It must contain a decimal number or an additive expression that evaluates to a
+     * decimal number, such as 2+3.
      **/
     data_SUMMAND_List m_meterCount;
     /**
