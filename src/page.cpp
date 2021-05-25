@@ -290,6 +290,10 @@ void Page::LayOutHorizontally()
         this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);
     }
 
+    if (doc->AbortRequested()) {
+        return;
+    }
+
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);
     this->Process(&calcStem, &calcStemParams);
@@ -314,6 +318,10 @@ void Page::LayOutHorizontally()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    if (doc->AbortRequested()) {
+        return;
+    }
 
     // Adjust the position of outside articulations
     AdjustArticParams adjustArticParams(doc);
@@ -454,6 +462,10 @@ void Page::LayOutVertically()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    if (doc->AbortRequested()) {
+        return;
+    }
+
     // Adjust the position of outside articulations with slurs end and start positions
     FunctorDocParams adjustArticWithSlursParams(doc);
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
@@ -490,6 +502,10 @@ void Page::LayOutVertically()
     Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
     Functor setOverflowBBoxesEnd(&Object::SetOverflowBBoxesEnd);
     this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
+
+    if (doc->AbortRequested()) {
+        return;
+    }
 
     // Adjust the positioners of floating elements (slurs, hairpin, dynam, etc)
     Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
