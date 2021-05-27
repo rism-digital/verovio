@@ -2912,7 +2912,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         }
     }
     else {
-        // default to MEI 4
+        // default to MEI 5
         LogWarning("No meiversion found, falling back to MEI5 (dev)");
         m_version = MEI_5_0_0_dev;
     }
