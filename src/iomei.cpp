@@ -2913,8 +2913,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
     else {
         // default to MEI 4
-        LogWarning("No meiversion found, falling back to MEI4");
-        m_version = MEI_4_0_0;
+        LogWarning("No meiversion found, falling back to MEI5 (dev)");
+        m_version = MEI_5_0_0_dev;
     }
 
     // only try to handle meiHead if we have a full MEI document
