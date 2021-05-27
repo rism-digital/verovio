@@ -292,7 +292,7 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
 void ABCInput::CalcUnitNoteLength()
 {
     MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_mdivScoreDef.FindDescendantByType(METERSIG));
-    if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
+    if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
         // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
@@ -753,12 +753,12 @@ void ABCInput::parseMeter(const std::string &meterString)
     if (meterString.find('C') != std::string::npos) {
         if (meterString[meterString.find('C') + 1] == '|') {
             m_meter->SetSym(METERSIGN_cut);
-            m_meter->SetCount(2);
+            m_meter->SetCount({ 2 });
             m_meter->SetUnit(2);
         }
         else {
             m_meter->SetSym(METERSIGN_common);
-            m_meter->SetCount(4);
+            m_meter->SetCount({ 4 });
             m_meter->SetUnit(4);
         }
     }
@@ -767,7 +767,7 @@ void ABCInput::parseMeter(const std::string &meterString)
         if (meterCount.front() == '(' && meterCount.back() == ')')
             meterCount = meterCount.substr(1, meterCount.length() - 1);
         // this is a little "hack", until libMEI is fixed
-        m_meter->SetCount(atoi(meterCount.c_str()));
+        m_meter->SetCount({ atoi(meterCount.c_str()) });
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
         m_meter->IsAttribute(true);
     }

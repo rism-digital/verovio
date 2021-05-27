@@ -5449,7 +5449,7 @@ void HumdrumInput::setTimeSig(
                 // hide time signature
                 vrvmeter->SetForm(METERFORM_invis);
             }
-            vrvmeter->SetCount(top * 2);
+            vrvmeter->SetCount({ top * 2 });
             vrvmeter->SetUnit(1);
         }
         else {
@@ -5458,7 +5458,7 @@ void HumdrumInput::setTimeSig(
                 // a time signature will be shown.
                 vrvmeter->SetForm(METERFORM_invis);
             }
-            vrvmeter->SetCount(top);
+            vrvmeter->SetCount({ top });
             vrvmeter->SetUnit(bot);
         }
     }
@@ -14764,7 +14764,7 @@ void HumdrumInput::insertMeterSigElement(
         setLocationId(msig, tsig);
     }
     appendElement(elements, pointers, msig);
-    msig->SetCount(count);
+    msig->SetCount({ count });
     if (unit > 0) {
         msig->SetUnit(unit);
     }
@@ -15166,7 +15166,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             count = stoi(matches[1]);
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount(count);
+            vrvmetersig->SetCount({ count });
             vrvmetersig->SetUnit(unit);
         }
         else if (metersigtok && (metersigtok->find('C') == std::string::npos)
@@ -15176,7 +15176,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             count = stoi(matches[1]);
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount(count);
+            vrvmetersig->SetCount({ count });
             vrvmetersig->SetUnit(unit);
         }
         else {
@@ -15186,7 +15186,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetForm(METERFORM_invis);
-            vrvmetersig->SetCount(count);
+            vrvmetersig->SetCount({ count });
             vrvmetersig->SetUnit(unit);
         }
         if (metersigtok) {

@@ -393,7 +393,7 @@ private:
     /* measure time */
     int m_durFb = 0;
     /* meter signature */
-    int m_meterCount = 4;
+    std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
     /* part information */
     Label *m_label = NULL;

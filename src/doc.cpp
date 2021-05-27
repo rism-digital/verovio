@@ -368,7 +368,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             // set MIDI time signature
             MeterSig *meterSig = dynamic_cast<MeterSig *>(this->m_mdivScoreDef.FindDescendantByType(METERSIG));
             if (meterSig && meterSig->HasCount()) {
-                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetCount(), meterSig->GetUnit());
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
         }
 

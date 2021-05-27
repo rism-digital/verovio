@@ -627,6 +627,27 @@ data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
     return PROLATIO_NONE;
 }
 
+std::string Att::SummandListToStr(data_SUMMAND_List data) const
+{
+    std::ostringstream ss;
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (i != 0) ss << "+";
+        ss << data[i];
+    }
+    return ss.str();
+}
+
+data_SUMMAND_List Att::StrToSummandList(std::string value) const
+{
+    data_SUMMAND_List list;
+    std::istringstream iss(value);
+    std::string token;
+    while (std::getline(iss, token, '+')) {
+        list.push_back(atoi(token.c_str()));
+    }
+    return list;
+}
+
 std::string Att::TempusToStr(data_TEMPUS data) const
 {
     std::string value;

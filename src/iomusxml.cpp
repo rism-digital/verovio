@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <numeric>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -1231,14 +1232,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 pugi::xpath_node beats = time.node().select_node("beats");
                 if (beats.node().text()) {
-                    m_meterCount = beats.node().text().as_int();
-                    // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
-                    // this is a little "hack", until libMEI is fixed
-                    std::string compound = beats.node().text().as_string();
-                    if (compound.find("+") != std::string::npos) {
-                        m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
-                        LogWarning("MusicXML import: Compound time is not supported");
-                    }
+                    m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
                     meterSig->SetCount(m_meterCount);
                 }
                 pugi::xml_node beatType = time.node().child("beat-type");
@@ -1604,14 +1598,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             pugi::xpath_node beats = time.select_node("beats");
             if (beats.node().text()) {
                 if (!meterSig) meterSig = new MeterSig();
-                m_meterCount = beats.node().text().as_int();
-                // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
-                // this is a little "hack", until libMEI is fixed
-                std::string compound = beats.node().text().as_string();
-                if (compound.find("+") != std::string::npos) {
-                    m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
-                    LogWarning("MusicXML import: Compound time is not supported");
-                }
+                m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
                 meterSig->SetCount(m_meterCount);
             }
             pugi::xpath_node beatType = time.select_node("beat-type");
@@ -2504,7 +2491,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // we assume /note without /type or with duration of an entire bar to be mRest
         else if (typeStr.empty() || rest.attribute("measure").as_bool()) {
             if (m_slash) {
-                for (int i = m_meterCount; i > 0; --i) {
+                const int totalCount = std::accumulate(m_meterCount.cbegin(), m_meterCount.cend(), 0);
+                for (int i = totalCount; i > 0; --i) {
                     BeatRpt *slash = new BeatRpt;
                     AddLayerElement(layer, slash, duration);
                 }
