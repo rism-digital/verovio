@@ -2895,16 +2895,21 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (root.attribute("meiversion")) {
         std::string version = std::string(root.attribute("meiversion").value());
-        if (version == "5.0.0-dev")
+        if (version == "5.0.0-dev") {
             m_version = MEI_5_0_0_dev;
-        else if (version == "4.0.1")
+        }
+        else if (version == "4.0.1") {
             m_version = MEI_4_0_1;
-        else if (version == "4.0.0")
+        }
+        else if (version == "4.0.0") {
             m_version = MEI_4_0_0;
-        else if (version == "3.0.0")
+        }
+        else if (version == "3.0.0") {
             m_version = MEI_3_0_0;
-        else if (version == "2013")
+        }
+        else if (version == "2013") {
             m_version = MEI_2013;
+        }
     }
     else {
         // default to MEI 4
