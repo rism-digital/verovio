@@ -287,6 +287,12 @@ namespace humaux {
         // meter_top == The top number of the time signature (meter.count).
         int meter_top = 4;
 
+        // Active **mens rhythmic level divisions:
+        int maximodus = 0; // how many longs in a maxima
+        int modus = 0; // how many breves in a long
+        int tempus = 0; // how many semibreves in a breve
+        int prolatio = 0; // how many minims in a semibreve
+
         // ties == Keep track of ties for each staff/layer/pitch
         // and allow for cross-layer ties (no cross staff ties, but that
         // could be easy to implement.
@@ -347,7 +353,7 @@ public:
     std::string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
     std::string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
 
-    // coloring of notes
+    // Coloring of notes/rests in **kern:
     // !!!RDF**kern: i = marked note, color="#553325"
     // !!!RDF**kern: i = matched note, color=red
     // !!!RDF**kern: i = color="blue"
@@ -358,10 +364,19 @@ public:
     std::vector<std::string> mcolor;
     std::vector<std::string> markdir;
 
+    // Coloring of **mens notes (not for coloration).
+    // default color is hotpink, since red is used for
+    // colored notes in black notation.
+    std::vector<char> mens_mark;
+    std::vector<std::string> mens_mcolor;
+    std::vector<std::string> mens_markdir;
+
+    // Coloring of **text:
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
 
     char hairpinAccent = '\0'; // For <> accent on a note.
+    char verticalStroke = '\0'; // For horizontal stroke ornament
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -407,7 +422,7 @@ protected:
     void setTransposition(StaffDef *staffDef, const std::string &transpose);
     void setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig = "",
         hum::HTp partstart = NULL, hum::HTp timetok = NULL);
-    void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
+    void fillStaffInfo(hum::HTp staffstart, int staffnumber, int staffcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
     void prepareTimeSigDur(int &top, int &bot);
@@ -702,6 +717,10 @@ protected:
     bool hasTempoTextAfter(hum::HTp token);
     bool isTempoishText(hum::HTp token);
     bool isLastStaffTempo(hum::HTp token);
+    void addMensuralQuality(Note *note, hum::HTp token);
+    bool checkForMens(hum::HumdrumFile &infile);
+    bool layerOnlyContainsNullStuff(std::vector<hum::HTp> &data);
+    int getNoteStaff(hum::HTp token, int homestaff);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -756,10 +775,10 @@ protected:
     template <class ELEMENT> void setPlaceRelStaff(ELEMENT *element, const std::string &place, bool showplace);
     template <class ELEMENT> void setPlaceRelEvent(ELEMENT *element, const std::string &place, bool showplace);
     template <class ELEMENT>
-    void setMeterSymbol(
-        ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL, hum::HTp metertok = NULL);
+    void setMeterSymbol(ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp partstart = NULL,
+        hum::HTp metertok = NULL);
     template <class ELEMENT>
-    void setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok = NULL);
+    void setMensurationSymbol(ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp mensurtok = NULL);
     template <class ELEMENT>
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
@@ -770,6 +789,8 @@ protected:
     template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
     template <class ELEMENT> void addFermata(ELEMENT *rest, const std::string &tstring);
     template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
+    template <class ELEMENT> void setWrittenAccidentalUpper(ELEMENT element, const string &value);
+    template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const string &value);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

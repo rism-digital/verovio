@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <numeric>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -201,8 +202,8 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                     if (previousStaff == NULL) {
                         AddLayerElement(layer, iter->m_clef);
                     }
-                    AttNIntegerComparison comparisonLayer(LAYER, layer->GetN());
-                    Object *prevLayer = previousStaff->FindDescendantByComparison(&comparisonLayer);
+                    // adding the clef to the last layer is sufficient
+                    Object *prevLayer = previousStaff->FindDescendantByType(LAYER, UNLIMITED_DEPTH, BACKWARD);
                     if (prevLayer == NULL) {
                         AddLayerElement(layer, iter->m_clef);
                     }
@@ -1231,14 +1232,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 pugi::xpath_node beats = time.node().select_node("beats");
                 if (beats.node().text()) {
-                    m_meterCount = beats.node().text().as_int();
-                    // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
-                    // this is a little "hack", until libMEI is fixed
-                    std::string compound = beats.node().text().as_string();
-                    if (compound.find("+") != std::string::npos) {
-                        m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
-                        LogWarning("MusicXML import: Compound time is not supported");
-                    }
+                    m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
                     meterSig->SetCount(m_meterCount);
                 }
                 pugi::xml_node beatType = time.node().child("beat-type");
@@ -1604,14 +1598,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             pugi::xpath_node beats = time.select_node("beats");
             if (beats.node().text()) {
                 if (!meterSig) meterSig = new MeterSig();
-                m_meterCount = beats.node().text().as_int();
-                // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
-                // this is a little "hack", until libMEI is fixed
-                std::string compound = beats.node().text().as_string();
-                if (compound.find("+") != std::string::npos) {
-                    m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
-                    LogWarning("MusicXML import: Compound time is not supported");
-                }
+                m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
                 meterSig->SetCount(m_meterCount);
             }
             pugi::xpath_node beatType = time.select_node("beat-type");
@@ -2333,7 +2320,13 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, c
     assert(node);
     assert(measure);
 
-    m_durTotal += node.child("duration").text().as_int();
+    if (!node.next_sibling()) {
+        // fill the layer, if forward element is last sibling
+        FillSpace(SelectLayer(node, measure), node.child("duration").text().as_int());
+    }
+    else {
+        m_durTotal += node.child("duration").text().as_int();
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, const std::string &measureNum)
@@ -2498,7 +2491,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // we assume /note without /type or with duration of an entire bar to be mRest
         else if (typeStr.empty() || rest.attribute("measure").as_bool()) {
             if (m_slash) {
-                for (int i = m_meterCount; i > 0; --i) {
+                const int totalCount = std::accumulate(m_meterCount.cbegin(), m_meterCount.cend(), 0);
+                for (int i = totalCount; i > 0; --i) {
                     BeatRpt *slash = new BeatRpt;
                     AddLayerElement(layer, slash, duration);
                 }

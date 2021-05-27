@@ -2798,8 +2798,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCount(int count_) { m_count = count_; }
-    int GetCount() const { return m_count; }
+    void SetCount(data_SUMMAND_List count_) { m_count = count_; }
+    data_SUMMAND_List GetCount() const { return m_count; }
     bool HasCount() const;
     //
     void SetSym(data_METERSIGN sym_) { m_sym = sym_; }
@@ -2813,7 +2813,7 @@ public:
 
 private:
     /** Indicates the number of performers. **/
-    int m_count;
+    data_SUMMAND_List m_count;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
@@ -2849,8 +2849,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterCount(int meterCount_) { m_meterCount = meterCount_; }
-    int GetMeterCount() const { return m_meterCount; }
+    void SetMeterCount(data_SUMMAND_List meterCount_) { m_meterCount = meterCount_; }
+    data_SUMMAND_List GetMeterCount() const { return m_meterCount; }
     bool HasMeterCount() const;
     //
     void SetMeterUnit(int meterUnit_) { m_meterUnit = meterUnit_; }
@@ -2869,7 +2869,7 @@ private:
      * It must contain a decimal number or an additive expression that evaluates to a
      * decimal number, such as 2+3.
      **/
-    int m_meterCount;
+    data_SUMMAND_List m_meterCount;
     /**
      * Contains the number indicating the beat unit, that is, the bottom number of the
      * meter signature.

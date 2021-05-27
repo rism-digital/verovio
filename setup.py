@@ -55,9 +55,22 @@ def get_version():
         for line in lines:
             if line.startswith('Version:'):
                 return line[8:].strip()
-    if os.path.exists("./tools"):
-        print("Running tools/get_version.sh")
-        version = subprocess.getoutput("bash -c 'cd tools; ./get_version.sh'")
+    with open("./include/vrv/vrvdef.h") as header_file:
+        defines = {}
+        for line in header_file:
+            if not line.startswith("#define"):
+                continue
+            definition = line.strip().split()
+            if len(definition) < 3:
+                continue
+            defines[definition[1]] = definition[2]
+            # as long as we don't need all defines
+            if 'vrv_cast' in defines:
+                break 
+        version = '.'.join(
+            (defines['VERSION_MAJOR'], defines['VERSION_MINOR'], defines['VERSION_REVISION']))
+        if defines['VERSION_DEV'] == 'true':
+            version += '.dev'
     if version.endswith(".dev"):
         init_sha = subprocess.getoutput(
             "git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
@@ -104,7 +117,8 @@ verovio_module = Extension('verovio._verovio',
                                './libmei/atts_shared.cpp',
                                './libmei/atts_visual.cpp',
                                './bindings/python/verovio.i'],
-                           swig_opts=['-c++', '-outdir', './bindings/python', '-py3'],
+                           swig_opts=['-c++', '-outdir',
+                                      './bindings/python', '-py3'],
                            include_dirs=['/usr/local/include',
                                          './include',
                                          './include/vrv',
@@ -160,4 +174,4 @@ setup(name='verovio',
           'Bug Reports': 'https://github.com/rism-digital/verovio/issues',
           'Source': 'https://github.com/rism-digital/verovio',
       },
-)
+      )

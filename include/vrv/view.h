@@ -324,7 +324,8 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
-    void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff);
+    void DrawMeterSigFigures(
+        DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 
