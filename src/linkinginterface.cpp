@@ -67,7 +67,7 @@ void LinkingInterface::SetUuidStr()
 Measure *LinkingInterface::GetNextMeasure()
 {
     if (!m_next) return NULL;
-    return dynamic_cast<Measure *>(this->m_next->GetFirstAncestor(MEASURE));
+    return dynamic_cast<Measure *>(m_next->GetFirstAncestor(MEASURE));
 }
 
 //----------------------------------------------------------------------------

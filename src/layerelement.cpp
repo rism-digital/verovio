@@ -395,7 +395,7 @@ int LayerElement::GetDrawingY() const
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
-    Object *object = this->m_crossStaff; // GetCrossStaff();
+    Object *object = m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff
     // (e.g. artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -451,7 +451,7 @@ void LayerElement::SetDrawingYRel(int drawingYRel)
 
 void LayerElement::CenterDrawingX()
 {
-    if (this->m_xAbs != VRV_UNSET) return;
+    if (m_xAbs != VRV_UNSET) return;
 
     SetDrawingXRel(0);
 
@@ -1708,7 +1708,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
 int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
-    if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
+    if (m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
@@ -1887,8 +1887,8 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
             }
         }
         if (crossStaff) {
-            this->m_crossStaff = crossStaff;
-            this->m_crossLayer = crossLayer;
+            m_crossStaff = crossStaff;
+            m_crossLayer = crossLayer;
         }
     }
 

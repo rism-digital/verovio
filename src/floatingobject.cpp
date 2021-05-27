@@ -330,17 +330,17 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     if (horizOverlapingBBox == NULL) {
         // Apply element margin and enforce minimal staff distance
         int staffIndex = staffAlignment->GetStaff()->GetN();
-        int minStaffDistance = doc->GetStaffDistance(this->m_object->GetClassId(), staffIndex, this->m_place)
-            * doc->GetDrawingUnit(staffSize);
-        if (this->m_place == STAFFREL_above) {
+        int minStaffDistance
+            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
+        if (m_place == STAFFREL_above) {
             yRel = GetContentY1();
-            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+            yRel -= doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(-minStaffDistance);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + GetContentY2();
-            yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+            yRel += doc->GetTopMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(minStaffDistance + staffAlignment->GetStaffHeight());
         }
@@ -350,9 +350,9 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
-        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+        int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
-        if (this->m_place == STAFFREL_above) {
+        if (m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
                 int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
@@ -399,7 +399,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 
 int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
-    if (this->m_place != STAFFREL_between) return VRV_UNSET;
+    if (m_place != STAFFREL_between) return VRV_UNSET;
 
     int staffSize = staffAlignment->GetStaffSize();
 
@@ -407,7 +407,7 @@ int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, 
     if (curve) {
         assert(curve->m_object);
     }
-    int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+    int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
     if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
         // For now ignore curves

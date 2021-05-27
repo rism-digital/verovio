@@ -1169,12 +1169,12 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     assert(params);
 
     // Do not set an x pos for anything before the barline (including it)
-    if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
     double intervalTime = (m_time - params->m_previousTime);
 
-    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+    if (m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
     }
 
@@ -1240,20 +1240,19 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
-        SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-            + params->m_leftBarLineX));
+        SetXRel(ceil(
+            (((double)m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio) + params->m_leftBarLineX));
     }
     else {
         //  Now more the right barline and all right scoreDef elements
-        int shift = this->m_xRel - params->m_rightBarLineX;
-        this->m_xRel
-            = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+        int shift = m_xRel - params->m_rightBarLineX;
+        m_xRel = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
             + params->m_leftBarLineX + shift;
     }
 
     // Finally, when reaching the end of the measure, update the measureXRel for the next measure
     if (m_type == ALIGNMENT_MEASURE_END) {
-        params->m_measureXRel += this->m_xRel;
+        params->m_measureXRel += m_xRel;
     }
 
     return FUNCTOR_CONTINUE;

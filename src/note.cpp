@@ -231,7 +231,7 @@ int Note::GetDrawingDur() const
 
 bool Note::IsClusterExtreme() const
 {
-    ChordCluster *cluster = this->m_cluster;
+    ChordCluster *cluster = m_cluster;
     if (this == cluster->at(0)) return true;
     if (this == cluster->at(cluster->size() - 1))
         return true;
@@ -785,11 +785,11 @@ int Note::CalcArtic(FunctorParams *functorParams)
     params->m_crossStaffAbove = false;
     params->m_crossStaffBelow = false;
 
-    if (this->m_crossStaff) {
-        params->m_staffAbove = this->m_crossStaff;
-        params->m_staffBelow = this->m_crossStaff;
-        params->m_layerAbove = this->m_crossLayer;
-        params->m_layerBelow = this->m_crossLayer;
+    if (m_crossStaff) {
+        params->m_staffAbove = m_crossStaff;
+        params->m_staffBelow = m_crossStaff;
+        params->m_layerAbove = m_crossLayer;
+        params->m_layerBelow = m_crossLayer;
         params->m_crossStaffAbove = true;
         params->m_crossStaffBelow = true;
     }
@@ -847,9 +847,9 @@ int Note::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
+        layer = m_crossLayer;
     }
 
     // Cache the in params to avoid further lookup
@@ -982,7 +982,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
@@ -1109,7 +1109,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
