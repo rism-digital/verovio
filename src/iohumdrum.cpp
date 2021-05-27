@@ -24155,8 +24155,6 @@ void HumdrumInput::importVerovioOptions(Doc *doc)
 
 void HumdrumInput::finalizeDocument(Doc *doc)
 {
-
-    doc->ConvertScoreDefMarkupDoc();
     doc->ExpandExpansions();
     doc->ConvertToPageBasedDoc();
     doc->ConvertMarkupDoc();

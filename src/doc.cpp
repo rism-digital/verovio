@@ -1176,15 +1176,6 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     this->ScoreDefSetCurrentDoc(true);
 }
 
-void Doc::ConvertScoreDefMarkupDoc(bool permanent)
-{
-    ConvertScoreDefMarkupParams convertScoreDefMarkupParams(permanent);
-    Functor convertScoreDefMarkup(&Object::ConvertScoreDefMarkup);
-
-    m_mdivScoreDef.Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
-    this->Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
-}
-
 void Doc::ConvertMarkupDoc(bool permanent)
 {
     if (m_markup == MARKUP_DEFAULT) return;

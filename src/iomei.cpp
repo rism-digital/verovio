@@ -3007,10 +3007,6 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     success = ReadMdivChildren(m_doc, body, false);
 
     if (success) {
-        m_doc->ConvertScoreDefMarkupDoc();
-    }
-
-    if (success) {
         m_doc->ExpandExpansions();
     }
 
