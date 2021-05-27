@@ -364,18 +364,21 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         staff = m_crossStaff;
     }
 
+    Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
         yIn = std::max(
             params->m_parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
             staffYBottom);
+        //if (beam && beam->m_crossStaffContent) yIn += beam->m_beamWidth;
         yOut = std::max(yIn, 0);
     }
     else {
         yIn = std::min(
             params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
             0);
+        if (beam && beam->m_crossStaffContent) yIn -= beam->m_beamWidth;
         yOut = std::min(yIn, staffYBottom);
     }
 
