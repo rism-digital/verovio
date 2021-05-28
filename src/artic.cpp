@@ -371,7 +371,6 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         yIn = std::max(
             params->m_parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
             staffYBottom);
-        //if (beam && beam->m_crossStaffContent) yIn += beam->m_beamWidth;
         yOut = std::max(yIn, 0);
     }
     else {
