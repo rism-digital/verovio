@@ -59,14 +59,14 @@ void Artic::Reset()
     m_drawingPlace = STAFFREL_NONE;
 }
 
-bool Artic::IsInsideArtic()
+bool Artic::IsInsideArtic() const
 {
     auto end = Artic::s_outStaffArtic.end();
     auto i = std::find(Artic::s_outStaffArtic.begin(), end, this->GetArticFirst());
     return (i == end);
 }
 
-data_ARTICULATION Artic::GetArticFirst()
+data_ARTICULATION Artic::GetArticFirst() const
 {
     std::vector<data_ARTICULATION> articList = this->GetArtic();
     if (articList.empty()) return ARTICULATION_NONE;

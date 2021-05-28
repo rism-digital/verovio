@@ -114,8 +114,8 @@ public:
 
     wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
 
-    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
-    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
+    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
+    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
 
     //----------//
     // Functors //

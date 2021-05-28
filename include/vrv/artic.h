@@ -43,7 +43,7 @@ public:
     /** Override the method since it is align to the staff */
     virtual bool IsRelativeToStaff() const { return true; }
 
-    data_ARTICULATION GetArticFirst();
+    data_ARTICULATION GetArticFirst() const;
 
     /**
      * Split the multi-valued artic attributes into distinct artic elements.
@@ -64,8 +64,8 @@ public:
      * Return the inside and outside part of an artic if any (NULL otherwiser)
      */
     ///@{
-    bool IsInsideArtic();
-    bool IsOutsideArtic() { return !IsInsideArtic(); };
+    bool IsInsideArtic() const;
+    bool IsOutsideArtic() const { return !IsInsideArtic(); };
     ///@}
 
     /**

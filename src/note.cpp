@@ -244,7 +244,7 @@ TabGrp *Note::IsTabGrpNote() const
     return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
+std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 {
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::wstring fretStr;
@@ -521,14 +521,14 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
     return SMUFL_E0A4_noteheadBlack;
 }
 
-bool Note::IsVisible()
+bool Note::IsVisible() const
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
-    else if (GetParent() && GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(GetParent());
+    else if (this->GetParent() && this->GetParent()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this->GetParent());
         assert(chord);
         return chord->IsVisible();
     }
@@ -595,37 +595,37 @@ void Note::CalcMIDIPitch(int shift)
     }
 }
 
-double Note::GetScoreTimeOnset()
+double Note::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }
 
-double Note::GetRealTimeOnsetMilliseconds()
+double Note::GetRealTimeOnsetMilliseconds() const
 {
     return m_realTimeOnsetMilliseconds;
 }
 
-double Note::GetScoreTimeOffset()
+double Note::GetScoreTimeOffset() const
 {
     return m_scoreTimeOffset;
 }
 
-double Note::GetRealTimeOffsetMilliseconds()
+double Note::GetRealTimeOffsetMilliseconds() const
 {
     return m_realTimeOffsetMilliseconds;
 }
 
-double Note::GetScoreTimeTiedDuration()
+double Note::GetScoreTimeTiedDuration() const
 {
     return m_scoreTimeTiedDuration;
 }
 
-double Note::GetScoreTimeDuration()
+double Note::GetScoreTimeDuration() const
 {
-    return GetScoreTimeOffset() - GetScoreTimeOnset();
+    return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
 }
 
-char Note::GetMIDIPitch()
+char Note::GetMIDIPitch() const
 {
     return m_MIDIPitch;
 }
@@ -685,7 +685,7 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
 
 bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted)
 {
-    Object *stem = GetFirst(STEM);
+    Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
     Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
@@ -694,10 +694,10 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
     wchar_t flagGlyph = SMUFL_E242_flag16thUp;
     data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(GetDrawingStemDir());
-    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
+    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(this->GetDrawingStemDir());
+    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
 
-    const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
+    const int dotMargin = flag->GetDrawingY() - this->GetDrawingY() - flagHeight - this->GetDrawingRadius(doc) / 2
         - (isDotShifted ? doc->GetDrawingUnit(staffSize) : 0);
 
     return dotMargin < 0;
