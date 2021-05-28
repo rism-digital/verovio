@@ -435,7 +435,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     return VRV_UNSET;
 }
 
-std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer)
+std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer) const
 {
     if (object->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(object);
@@ -578,7 +578,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;

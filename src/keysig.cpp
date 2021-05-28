@@ -220,7 +220,7 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     return symbolStr;
 }
 
-int KeySig::GetFifthsInt()
+int KeySig::GetFifthsInt() const
 {
     if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
         return -1 * this->GetSig().first;

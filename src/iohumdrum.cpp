@@ -868,7 +868,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     if (linebreaki > 0) {
         hum::HTp token = infile[linebreaki].token(0);
         Sb *sb = new Sb;
-        this->m_hasLayoutInformation = true;
+        m_hasLayoutInformation = true;
         setLocationId(sb, token);
         m_sections.back()->AddChild(sb);
         // Maybe allow other types of line breaks here, but
@@ -880,7 +880,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     else if (pagebreaki > 0) {
         hum::HTp token = infile[pagebreaki].token(0);
         Pb *pb = new Pb;
-        this->m_hasLayoutInformation = true;
+        m_hasLayoutInformation = true;
         setLocationId(pb, token);
         m_sections.back()->AddChild(pb);
         // Maybe allow other types of line breaks here, but
@@ -5973,7 +5973,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
-        this->m_hasLayoutInformation = true;
+        m_hasLayoutInformation = true;
         if (m_currentending) {
             m_currentending->AddChild(sb);
         }
@@ -5990,7 +5990,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
         std::string tstring = removeCommas(group);
         // Pb *pb = new Pb;
         Sb *pb = new Sb;
-        this->m_hasLayoutInformation = true;
+        m_hasLayoutInformation = true;
         if (m_currentending) {
             m_currentending->AddChild(pb);
         }
@@ -22478,7 +22478,7 @@ void HumdrumInput::setupMeiDocument()
         // breaks encoded in the file to be activated, so adding a
         // dummy page break here:
         Pb *pb = new Pb;
-        this->m_hasLayoutInformation = true;
+        m_hasLayoutInformation = true;
         section->AddChild(pb);
     }
 }
@@ -24155,8 +24155,6 @@ void HumdrumInput::importVerovioOptions(Doc *doc)
 
 void HumdrumInput::finalizeDocument(Doc *doc)
 {
-
-    doc->ConvertScoreDefMarkupDoc();
     doc->ExpandExpansions();
     doc->ConvertToPageBasedDoc();
     doc->ConvertMarkupDoc();

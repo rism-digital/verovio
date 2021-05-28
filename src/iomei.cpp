@@ -3007,10 +3007,6 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     success = ReadMdivChildren(m_doc, body, false);
 
     if (success) {
-        m_doc->ConvertScoreDefMarkupDoc();
-    }
-
-    if (success) {
         m_doc->ExpandExpansions();
     }
 
@@ -3104,7 +3100,7 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
     }
 
     // This is a page-based MEI file
-    this->m_hasLayoutInformation = true;
+    m_hasLayoutInformation = true;
 
     bool success = true;
     // We require to have s <scoreDef> as first child of <score>
@@ -3155,7 +3151,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     parent->AddChild(vrvScore);
 
     // This is a score-based MEI file
-    this->m_readingScoreBased = true;
+    m_readingScoreBased = true;
 
     // We require to have s <scoreDef> as first child of <score>
     pugi::xml_node scoreDef = score.first_child();
@@ -3324,7 +3320,7 @@ bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 
 bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
 {
-    this->m_hasLayoutInformation = true;
+    m_hasLayoutInformation = true;
 
     Pb *vrvPb = new Pb();
     ReadSystemElement(pb, vrvPb);
@@ -3454,7 +3450,7 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_systemRightMar = atoi(system.attribute("system.rightmar").value());
         system.remove_attribute("system.rightmar");
     }
-    if (system.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
+    if (system.attribute("uly") && (m_doc->GetType() == Transcription)) {
         vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITION_FACTOR;
         system.remove_attribute("uly");
     }
@@ -4102,7 +4098,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if (measure.attribute("ulx") && measure.attribute("lrx") && (this->m_doc->GetType() == Transcription)) {
+    if (measure.attribute("ulx") && measure.attribute("lrx") && (m_doc->GetType() == Transcription)) {
         vrvMeasure->m_xAbs = atoi(measure.attribute("ulx").value()) * DEFINITION_FACTOR;
         vrvMeasure->m_xAbs2 = atoi(measure.attribute("lrx").value()) * DEFINITION_FACTOR;
         measure.remove_attribute("ulx");
@@ -4649,7 +4645,7 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if (staff.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
+    if (staff.attribute("uly") && (m_doc->GetType() == Transcription)) {
         vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
         staff.remove_attribute("uly");
     }
@@ -4865,7 +4861,7 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 
 bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
-    if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
+    if (element.attribute("ulx") && (m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
     }

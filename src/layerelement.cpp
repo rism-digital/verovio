@@ -170,7 +170,7 @@ bool LayerElement::IsGraceNote()
     return false;
 }
 
-bool LayerElement::GetDrawingCueSize()
+bool LayerElement::GetDrawingCueSize() const
 {
     return m_drawingCueSize;
 }
@@ -395,7 +395,7 @@ int LayerElement::GetDrawingY() const
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
-    Object *object = this->m_crossStaff; // GetCrossStaff();
+    Object *object = m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff
     // (e.g. artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -451,7 +451,7 @@ void LayerElement::SetDrawingYRel(int drawingYRel)
 
 void LayerElement::CenterDrawingX()
 {
-    if (this->m_xAbs != VRV_UNSET) return;
+    if (m_xAbs != VRV_UNSET) return;
 
     SetDrawingXRel(0);
 
@@ -464,7 +464,7 @@ void LayerElement::CenterDrawingX()
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
     if (this->Is({ NOTE, CHORD }) && withArtic) {
-        int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
+        int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
         if (articY != VRV_UNSET) return articY;
     }
 
@@ -502,7 +502,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticTy
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
     if (this->Is({ NOTE, CHORD }) && withArtic) {
-        int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
+        int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
         if (articY != -VRV_UNSET) return articY;
     }
 
@@ -670,7 +670,7 @@ double LayerElement::GetAlignmentDuration(
 }
 
 double LayerElement::GetSameAsContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -683,7 +683,7 @@ double LayerElement::GetSameAsContentAlignmentDuration(
 }
 
 double LayerElement::GetContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -1708,7 +1708,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
 int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
-    if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
+    if (m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
@@ -1887,8 +1887,8 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
             }
         }
         if (crossStaff) {
-            this->m_crossStaff = crossStaff;
-            this->m_crossLayer = crossLayer;
+            m_crossStaff = crossStaff;
+            m_crossLayer = crossLayer;
         }
     }
 

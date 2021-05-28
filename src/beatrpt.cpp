@@ -62,7 +62,7 @@ void BeatRpt::SetScoreTimeOnset(double scoreTime)
     m_scoreTimeOnset = scoreTime;
 }
 
-double BeatRpt::GetScoreTimeOnset()
+double BeatRpt::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }

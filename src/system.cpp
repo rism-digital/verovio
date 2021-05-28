@@ -600,7 +600,7 @@ int System::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    SetDrawingXRel(this->m_systemLeftMar + this->GetDrawingLabelsWidth());
+    SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
     params->m_shift = 0;
     params->m_justifiableWidth = 0;
 
@@ -657,7 +657,7 @@ int System::JustifyX(FunctorParams *functorParams)
     Object *parent = GetParent();
 
     params->m_measureXRel = 0;
-    int margins = this->m_systemLeftMar + this->m_systemRightMar;
+    int margins = m_systemLeftMar + m_systemRightMar;
     int nonJustifiableWidth
         = margins + (m_drawingTotalWidth - m_drawingJustifiableWidth); // m_drawingTotalWidth includes the labels
     params->m_justifiableRatio
@@ -879,13 +879,13 @@ int System::CastOffPages(FunctorParams *functorParams)
     const int systemMaxPerPage = params->m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
     const int childCount = params->m_currentPage->GetChildCount();
     if ((systemMaxPerPage && systemMaxPerPage == childCount)
-        || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
+        || (childCount > 0 && (m_drawingYRel - this->GetHeight() - currentShift < 0))) {
         params->m_currentPage = new Page();
         // Use VRV_UNSET value as a flag
         params->m_pgHeadHeight = VRV_UNSET;
         assert(params->m_doc->GetPages());
         params->m_doc->GetPages()->AddChild(params->m_currentPage);
-        params->m_shift = this->m_drawingYRel - params->m_pageHeight;
+        params->m_shift = m_drawingYRel - params->m_pageHeight;
     }
 
     // Special case where we use the Relinquish method.
