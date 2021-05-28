@@ -1129,8 +1129,8 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if ((m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
-                     > params->m_systemWidth)) {
+        else if (m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+            > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
             params->m_shift = this->m_drawingXRel;
