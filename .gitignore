@@ -41,6 +41,8 @@ bindings/python/verovio.pyc
 bindings/python/verovio.py
 bindings/python/_verovio*.so
 bindings/python/__pycache__/*
+bindings/python/CMakeCache.txt
+bindings/python/CMakeFiles/
 verovio.egg-info
 
 # java build
