@@ -1164,14 +1164,20 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             std::string xpath = StringFormat("clef[@number='%d']", i + 1);
             pugi::xpath_node clef = it->select_node(xpath.c_str());
             // if not, look at a common one
-            if (!clef) clef = it->select_node("clef[not(@number)]");
+            if (!clef) {
+                clef = it->select_node("clef[not(@number)]");
+                if (nbStaves > 1) clef.node().remove_attribute("id");
+            }
             Clef *meiClef = ConvertClef(clef.node());
             if (meiClef) staffDef->AddChild(meiClef);
 
             // key sig
             xpath = StringFormat("key[@number='%d']", i + 1);
             pugi::xpath_node key = it->select_node(xpath.c_str());
-            if (!key) key = it->select_node("key[not(@number)]");
+            if (!key) {
+                key = it->select_node("key[not(@number)]");
+                if (nbStaves > 1) key.node().remove_attribute("id");
+            }
             if (key) {
                 KeySig *meiKey = ConvertKey(key.node());
                 staffDef->AddChild(meiKey);
@@ -1207,6 +1213,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             time = it->select_node(xpath.c_str());
             if (!time) {
                 time = it->select_node("time[not(@number)]");
+                if (nbStaves > 1) time.node().remove_attribute("id");
             }
             if (time) {
                 if (!meterSig) meterSig = new MeterSig();
