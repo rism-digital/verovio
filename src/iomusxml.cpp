@@ -1211,6 +1211,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (time) {
                 if (!meterSig) meterSig = new MeterSig();
                 std::string symbol = time.node().attribute("symbol").as_string();
+                if (time.node().attribute("id")) {
+                    meterSig->SetUuid(time.node().attribute("id").as_string());
+                }
                 if (!symbol.empty()) {
                     if (symbol == "cut" || symbol == "common")
                         meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
@@ -1578,6 +1581,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         if (time) {
             MeterSig *meterSig = NULL;
             std::string symbol = time.attribute("symbol").as_string();
+            if (time.attribute("id")) {
+                meterSig->SetUuid(time.attribute("id").as_string());
+            }
             if (!symbol.empty()) {
                 if (!meterSig) meterSig = new MeterSig();
                 if (symbol == "cut" || symbol == "common")
