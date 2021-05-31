@@ -406,12 +406,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
 void MusicXmlInput::GenerateUuid(pugi::xml_node node)
 {
-    int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
-
-    std::string uuid = StringFormat("%s-%s", node.name(), str).c_str();
+    std::string uuid = StringFormat("%s-%s", node.name(), Object::GenerateRandUuid().c_str()).c_str();
     std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower);
     node.append_attribute("xml:id").set_value(uuid.c_str());
 }
