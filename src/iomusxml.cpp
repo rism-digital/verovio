@@ -406,12 +406,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
 void MusicXmlInput::GenerateUuid(pugi::xml_node node)
 {
-    int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
-
-    std::string uuid = StringFormat("%s-%s", node.name(), str).c_str();
+    std::string uuid = StringFormat("%s-%s", node.name(), Object::GenerateRandUuid().c_str()).c_str();
     std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower);
     node.append_attribute("xml:id").set_value(uuid.c_str());
 }
@@ -1169,14 +1164,20 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             std::string xpath = StringFormat("clef[@number='%d']", i + 1);
             pugi::xpath_node clef = it->select_node(xpath.c_str());
             // if not, look at a common one
-            if (!clef) clef = it->select_node("clef");
+            if (!clef) {
+                clef = it->select_node("clef[not(@number)]");
+                if (nbStaves > 1) clef.node().remove_attribute("id");
+            }
             Clef *meiClef = ConvertClef(clef.node());
             if (meiClef) staffDef->AddChild(meiClef);
 
             // key sig
             xpath = StringFormat("key[@number='%d']", i + 1);
             pugi::xpath_node key = it->select_node(xpath.c_str());
-            if (!key) key = it->select_node("key");
+            if (!key) {
+                key = it->select_node("key[not(@number)]");
+                if (nbStaves > 1) key.node().remove_attribute("id");
+            }
             if (key) {
                 KeySig *meiKey = ConvertKey(key.node());
                 staffDef->AddChild(meiKey);
@@ -1211,11 +1212,15 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             xpath = StringFormat("time[@number='%d']", i + 1);
             time = it->select_node(xpath.c_str());
             if (!time) {
-                time = it->select_node("time");
+                time = it->select_node("time[not(@number)]");
+                if (nbStaves > 1) time.node().remove_attribute("id");
             }
             if (time) {
                 if (!meterSig) meterSig = new MeterSig();
                 std::string symbol = time.node().attribute("symbol").as_string();
+                if (time.node().attribute("id")) {
+                    meterSig->SetUuid(time.node().attribute("id").as_string());
+                }
                 if (!symbol.empty()) {
                     if (symbol == "cut" || symbol == "common")
                         meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
@@ -1583,6 +1588,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         if (time) {
             MeterSig *meterSig = NULL;
             std::string symbol = time.attribute("symbol").as_string();
+            if (time.attribute("id")) {
+                meterSig->SetUuid(time.attribute("id").as_string());
+            }
             if (!symbol.empty()) {
                 if (!meterSig) meterSig = new MeterSig();
                 if (symbol == "cut" || symbol == "common")
