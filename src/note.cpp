@@ -1149,9 +1149,9 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
-    int staffSize = staff->m_drawingStaffSize;
-    int staffX = staff->GetDrawingX();
-    int radius = GetDrawingRadius(params->m_doc);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int staffX = staff->GetDrawingX();
+    const int radius = GetDrawingRadius(params->m_doc);
 
     /************** Ledger lines: **************/
 
@@ -1167,6 +1167,8 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         right += 2 * radius;
     }
 
+    if (left > right) return FUNCTOR_CONTINUE;
+    
     if (linesAbove > 0) {
         staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
     }
