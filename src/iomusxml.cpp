@@ -201,6 +201,8 @@ void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, co
                     Object *previousStaff = previousMeasure->FindDescendantByComparison(&comparisonStaff);
                     if (previousStaff == NULL) {
                         InsertClefToLayer(staff, layer, iter->m_clef);
+                        iter->isFirst = false;
+                        continue;
                     }
                     // adding the clef to the last layer is sufficient
                     Object *prevLayer = previousStaff->FindDescendantByType(LAYER, UNLIMITED_DEPTH, BACKWARD);
