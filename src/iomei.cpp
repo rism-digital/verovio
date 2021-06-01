@@ -2893,26 +2893,40 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         return false;
     }
 
-    current = root.child("meiHead");
-    if (current.empty()) {
-        LogWarning("No header found in the MEI data, trying to proceed...");
+    if (root.attribute("meiversion")) {
+        std::string version = std::string(root.attribute("meiversion").value());
+        if (version == "5.0.0-dev") {
+            m_version = MEI_5_0_0_dev;
+        }
+        else if (version == "4.0.1") {
+            m_version = MEI_4_0_1;
+        }
+        else if (version == "4.0.0") {
+            m_version = MEI_4_0_0;
+        }
+        else if (version == "3.0.0") {
+            m_version = MEI_3_0_0;
+        }
+        else if (version == "2013") {
+            m_version = MEI_2013;
+        }
     }
     else {
-        m_doc->m_header.reset();
-        // copy the complete header into the master document
-        m_doc->m_header.append_copy(current);
-        if (root.attribute("meiversion")) {
-            std::string version = std::string(root.attribute("meiversion").value());
-            if (version == "5.0.0-dev")
-                m_version = MEI_5_0_0_dev;
-            else if (version == "4.0.1")
-                m_version = MEI_4_0_1;
-            else if (version == "4.0.0")
-                m_version = MEI_4_0_0;
-            else if (version == "3.0.0")
-                m_version = MEI_3_0_0;
-            else if (version == "2013")
-                m_version = MEI_2013;
+        // default to MEI 5
+        LogWarning("No meiversion found, falling back to MEI5 (dev)");
+        m_version = MEI_5_0_0_dev;
+    }
+
+    // only try to handle meiHead if we have a full MEI document
+    if (std::string(root.name()) == "mei") {
+        current = root.child("meiHead");
+        if (current.empty()) {
+            LogWarning("No header found in the MEI data, trying to proceed...");
+        }
+        else {
+            m_doc->m_header.reset();
+            // copy the complete header into the master document
+            m_doc->m_header.append_copy(current);
         }
     }
 
