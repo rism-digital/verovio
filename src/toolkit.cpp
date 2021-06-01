@@ -1105,12 +1105,12 @@ void Toolkit::ResetXmlIdSeed(int seed)
     Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
 }
 
-void Toolkit::Cancel()
+void Toolkit::CancelLayout()
 {
     m_doc.SetAbortMode(true);
 }
 
-void Toolkit::Continue()
+void Toolkit::ContinueLayout()
 {
     m_doc.SetAbortMode(false);
 }
