@@ -8,6 +8,7 @@
 #ifndef __VRV_IOMUSXML_H__
 #define __VRV_IOMUSXML_H__
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -206,10 +207,15 @@ private:
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     ///@}
 
-    /*
+    /**
      * Add clef changes to all layers of a given measure, staff, and time stamp
      */
     void AddClef(Section *section, Measure *measure, Staff *staff, const std::string &measureNum);
+    
+    /**
+     * Add clef as layer element to specified layer and #sameas clefs to previous layers, if needed
+     */
+    void InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef);
 
     /*
      * Add a Measure to the section.
@@ -405,6 +411,7 @@ private:
     std::map<Layer *, std::vector<LayerElement *>> m_elementStackMap;
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
+    std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */
