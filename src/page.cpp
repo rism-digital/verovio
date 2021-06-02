@@ -130,13 +130,19 @@ void Page::LayOut(bool force)
         return;
     }
 
-    this->LayOutHorizontally();
-    this->JustifyHorizontally();
-    this->LayOutVertically();
-    this->JustifyVertically();
-
     Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
+
+    this->LayOutHorizontally();
+    if (doc->AbortRequested()) return;
+
+    this->JustifyHorizontally();
+
+    this->LayOutVertically();
+    if (doc->AbortRequested()) return;
+
+    this->JustifyVertically();
+
     if (doc->GetOptions()->m_svgBoundingBoxes.GetValue()) {
         View view;
         view.SetDoc(doc);
