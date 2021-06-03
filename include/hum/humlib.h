@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 20 08:48:54 PDT 2021
+// Last Modified: Thu Jun  3 07:32:35 PDT 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4469,19 +4469,20 @@ class HumGrid : public std::vector<GridMeasure*> {
 		HumGrid(void);
 		~HumGrid();
 		void enableRecipSpine           (void);
-		bool transferTokens             (HumdrumFile& outfile, int startbarnum = 0);
+		bool transferTokens             (HumdrumFile& outfile, int startbarnum = 0, const string& interp = "**kern");
 		int  getHarmonyCount            (int partindex);
 		int  getDynamicsCount           (int partindex);
 		int  getFiguredBassCount        (int partindex);
+		int  getXmlidCount              (int partindex);
 		int  getVerseCount              (int partindex, int staffindex);
-		int  getXmlidCount              (int partindex, int staffindex);
 		bool hasDynamics                (int partindex);
+		bool hasXmlids                  (int partindex);
 		bool hasFiguredBass             (int partindex);
 		void setDynamicsPresent         (int partindex);
+		void setXmlidsPresent           (int partindex);
 		void setFiguredBassPresent      (int partindex);
 		void setHarmonyPresent          (int partindex);
 		void setVerseCount              (int partindex, int staffindex, int count);
-		void setXmlidCount              (int partindex, int staffindex, int count);
 		void reportVerseCount           (int partindex, int staffindex, int count);
 		void reportXmlidCount           (int partindex, int staffindex, int count);
 		void setHarmonyCount            (int partindex, int count);
@@ -4506,7 +4507,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 
 	protected:
 		void calculateGridDurations        (void);
-		void insertExclusiveInterpretationLine (HumdrumFile& outfile);
+		void insertExclusiveInterpretationLine (HumdrumFile& outfile, const string& interp);
 		void insertDataTerminationLine     (HumdrumFile& outfile);
 		void appendMeasureLine             (HumdrumFile& outfile,
 		                                    GridSlice& slice);
@@ -4570,10 +4571,10 @@ class HumGrid : public std::vector<GridMeasure*> {
 	private:
 		std::vector<GridSlice*>       m_allslices;
 		std::vector<std::vector<int>> m_verseCount;
-		std::vector<std::vector<int>> m_xmlidCount;
 		std::vector<int>              m_harmonyCount;
 		bool                          m_pickup;
 		std::vector<bool>             m_dynamics;
+		std::vector<bool>             m_xmlids;
 		std::vector<bool>             m_figured_bass;
 		std::vector<bool>             m_harmony;
 
@@ -5825,7 +5826,6 @@ class Tool_composite : public HumTool {
 		void        analyzeLineGroups    (HumdrumFile& infile);
 		void        analyzeLineGroup     (HumdrumFile& infile, int line, const std::string& target);
 		void        printGroupAssignments(HumdrumFile& infile);
-		std::string getGroup             (std::vector<std::vector<std::string>>& current, int spine, int subspine);
 		int         getGroupNoteType     (HumdrumFile& infile, int line, const std::string& group);
 		void        getGroupDurations    (std::vector<std::vector<HumNum>>& groupdurs,
 		                                  std::vector<std::vector<int>>& groupstates, HumdrumFile& infile);
@@ -5881,6 +5881,7 @@ class Tool_composite : public HumTool {
 		bool        m_suppressCMarkQ = false; // used with -c option when -M -m -N and -n not present
 		std::string m_togetherInScore;    // used with -n option
 		std::string m_together;           // used with -m option
+		bool        m_coincideDisplayQ = true; // used with m_together and m_togetherInScore
 
 };
 
@@ -6934,6 +6935,7 @@ class Tool_mei2hum : public HumTool {
 		bool           m_stemsQ = false;
 		bool           m_recipQ = false;
 		bool           m_placeQ = false;
+		bool           m_xmlidQ = false;
 
 		mei_scoreDef   m_scoreDef;    // for keeping track of key/meter/clef etc.
 		int            m_staffcount;  // number of staves in score.
@@ -6956,11 +6958,13 @@ class Tool_mei2hum : public HumTool {
 		vector<HumNum> m_measureDuration;
 		vector<bool>   m_hasDynamics;
 		vector<bool>   m_hasHarm;
+		vector<bool>   m_hasXmlids;
 		const int      m_maxstaff = 1000;
 
 		bool           m_fermata = false;     // set priority of note/fermata over note@fermata
 		vector<grace_info> m_gracenotes;      // buffer for storing grace notes
 		HumNum			m_gracetime = 0;       // performance time of buffered grace notes
+		bool           m_mensuralQ = false;
 
 		vector<hairpin_info> m_hairpins;
 
@@ -8242,6 +8246,7 @@ class Tool_satb2gs : public HumTool {
 		void    printHeaderLine    (HumdrumFile& infile, int line,
 		                            std::vector<std::vector<int>>& tracks);
 		bool    validateHeader     (HumdrumFile& infile);
+		vector<HTp> getClefs       (HumdrumFile& infile, int line);
 
 };
 
