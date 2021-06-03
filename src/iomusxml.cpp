@@ -171,113 +171,134 @@ std::string MusicXmlInput::GetContentOfChild(const pugi::xml_node node, const st
     return "";
 }
 
-void MusicXmlInput::AddClef(Section *section, Measure *measure, Staff *staff, const std::string &measureNum)
+void MusicXmlInput::ProcessClefChangeQueue(Section *section)
 {
-    Layer *layer = m_currentLayer;
-    assert(layer);
-    for (auto iter = m_clefChangeStack.begin(); iter != m_clefChangeStack.end(); ++iter) {
-        if ((iter->m_measureNum == measureNum) && (iter->m_scoreOnset <= m_durTotal) && (iter->m_staff == staff)) {
-            if (iter->isFirst) { // add clef when first in staff
-                // if afterBarline is false at beginning of measure, move before barline
-                if (!iter->m_afterBarline && m_durTotal == 0) {
-                    Object *previousMeasure = NULL;
-                    // First try to check whether current measure already exists in the section. Since *measure might
-                    // not match with the one in the section, comparison search should be done
-                    AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
-                    Object *sectionCurrentMeasure = section->FindDescendantByComparison(&comparisonMeasure);
-                    previousMeasure = section->GetPrevious(sectionCurrentMeasure, MEASURE);
-                    // if current measure is being processed for the first time - get last measure in the section. This
-                    // should happen only for the first staff in the multi-stave score
-                    if (!previousMeasure && (0 != section->GetDescendantIndex(sectionCurrentMeasure, MEASURE, 1))) {
-                        previousMeasure = section->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD);
-                    }
-                    // otherwise this is first measure, so add element as is
-                    if (!previousMeasure) {
-                        InsertClefToLayer(staff, layer, iter->m_clef);
-                        iter->isFirst = false;
-                        continue;
-                    }
-                    AttNIntegerComparison comparisonStaff(STAFF, iter->m_staff->GetN());
-                    Object *previousStaff = previousMeasure->FindDescendantByComparison(&comparisonStaff);
-                    if (previousStaff == NULL) {
-                        InsertClefToLayer(staff, layer, iter->m_clef);
-                        iter->isFirst = false;
-                        continue;
-                    }
-                    // adding the clef to the last layer is sufficient
-                    Object *prevLayer = previousStaff->FindDescendantByType(LAYER, UNLIMITED_DEPTH, BACKWARD);
-                    if (prevLayer == NULL) {
-                        InsertClefToLayer(staff, layer, iter->m_clef);
-                    }
-                    else {
-                        prevLayer->AddChild(iter->m_clef);
-                    }
-                }
-                else {
-                    InsertClefToLayer(staff, layer, iter->m_clef);
-                }
-                iter->isFirst = false;
+    while (!m_clefChangeQueue.empty()) {
+        musicxml::ClefChange clefChange = m_clefChangeQueue.front();
+        m_clefChangeQueue.pop_front();
+        AttNNumberLikeComparison comparisonMeasure(MEASURE, clefChange.m_measureNum);
+        Measure *currentMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure));
+        if (!currentMeasure) {
+            LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
+                clefChange.m_measureNum.c_str(), clefChange.m_staff->GetN(), clefChange.m_scoreOnset);
+        }
+        if (!clefChange.m_scoreOnset && !clefChange.m_afterBarline) {
+            Measure *previousMeasure = NULL;
+            // First try to check whether current measure already exists in the section. Since *measure might
+            // not match with the one in the section, comparison search should be done
+            previousMeasure = vrv_cast<Measure *>(section->GetPrevious(currentMeasure, MEASURE));
+            if (!previousMeasure) {
+                AddClefs(currentMeasure, clefChange);
+                continue;
             }
-            else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
-                bool addSameas = true;
-                ListOfObjects objects, measureObjects;
-                ClassIdComparison matchClassId(CLEF);
-                measure->FindAllDescendantByComparison(&measureObjects, &matchClassId);
-                auto it = std::find_if(measureObjects.begin(), measureObjects.end(),
-                    [&iter](Object *obj) { return obj->GetUuid() == iter->m_clef->GetUuid(); });
-                if (it == measureObjects.end()) continue;
+            AttNIntegerComparison comparisonStaff(STAFF, clefChange.m_staff->GetN());
+            Staff *previousStaff = vrv_cast<Staff *>(previousMeasure->FindDescendantByComparison(&comparisonStaff));
+            if (previousStaff == NULL) {
+                AddClefs(currentMeasure, clefChange);
+                continue;
+            }
+            Layer *previousLayer
+                = vrv_cast<Layer *>(previousStaff->FindDescendantByType(LAYER, UNLIMITED_DEPTH, BACKWARD));
+            if (previousLayer == NULL) {
+                AddClefs(currentMeasure, clefChange);
+            }
+            else {
+                // For previous measure we need to make sure that clef is set at the end, so pass high duration value
+                // (since it won't matter there) and set measureNum to empty, since it doesn't matter as well
+                const int endDuration = 1024;
+                musicxml::ClefChange previousClefChange(
+                    std::string(""), previousStaff, previousLayer, clefChange.m_clef, endDuration, false);
+                AddClefs(previousMeasure, previousClefChange);
+            }
+        }
+        else {
+            AddClefs(currentMeasure, clefChange);
+        }
+    }
+}
 
-                layer->FindAllDescendantByComparison(&objects, &matchClassId);
-                for (auto o : objects) {
-                    Clef *clef = dynamic_cast<Clef *>(o);
-                    if (strcmp(clef->GetSameas().c_str(), ("#" + iter->m_clef->GetUuid()).c_str()) == 0) {
-                        addSameas = false;
-                        break;
-                    }
-                    if (strcmp(o->GetUuid().c_str(), iter->m_clef->GetUuid().c_str()) == 0) {
-                        addSameas = false;
-                        break;
-                    }
+void MusicXmlInput::AddClefs(Measure *measure, const musicxml::ClefChange &clefChange)
+{
+    // For both measure and staff make sure that corresponding staff/layer is actually a child of it
+    int idx = measure->GetChildIndex(clefChange.m_staff);
+    if (idx != -1) {
+        idx = clefChange.m_staff->GetChildIndex(clefChange.m_layer);
+        if (!clefChange.m_layer) {
+            Layer *firstLayer = vrv_cast<Layer *>(clefChange.m_staff->GetChild(0, LAYER));
+            if (firstLayer) {
+                InsertClefToLayer(clefChange.m_staff, firstLayer, clefChange.m_clef, clefChange.m_scoreOnset);
+            }
+        }
+        else if (idx != -1) {
+            InsertClefToLayer(clefChange.m_staff, clefChange.m_layer, clefChange.m_clef, clefChange.m_scoreOnset);
+        }
+        else {
+            // If staff doesn't have fitting layer for the clef but has layer with mSpace - this should be a case with
+            // cross-staff clef. Remove mSpace in this case and add clef to it instead, filling space if required
+            Object *mSpace = clefChange.m_staff->FindDescendantByType(MSPACE);
+            if (mSpace) {
+                Layer *parentLayer = vrv_cast<Layer *>(mSpace->GetParent());
+                if (mSpace && parentLayer) {
+                    int index = mSpace->GetIdx();
+                    Object *mSpace = parentLayer->Relinquish(index);
+                    parentLayer->ClearRelinquishedChildren();
+                    m_elementStackMap[parentLayer] = {};
+                    FillSpace(parentLayer, clefChange.m_scoreOnset);
+                    parentLayer->AddChild(clefChange.m_clef);
                 }
-                if (addSameas) {
-                    Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
-                    sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
-                    AddLayerElement(layer, sameasClef);
+            }
+            else {
+                Layer *firstLayer = vrv_cast<Layer *>(clefChange.m_staff->GetChild(0, LAYER));
+                if (firstLayer) {
+                    InsertClefToLayer(clefChange.m_staff, firstLayer, clefChange.m_clef, clefChange.m_scoreOnset);
                 }
             }
         }
     }
 }
 
-void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef)
+void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, int scoreOnset)
 {
-    AddLayerElement(layer, clef);
     // Since AddClef handles #sameas clef only for the future layers, we need to check any previous existing layers for
     // the same staff to see if we need to insert #sameas clef to them.
     ListOfObjects staffLayers;
     ClassIdComparison cmp(LAYER);
     staff->FindAllDescendantByComparison(&staffLayers, &cmp);
-    if (staffLayers.size() > 1) {
-        for (const auto listLayer : staffLayers) {
-            Layer *otherLayer = vrv_cast<Layer *>(listLayer);
-            if ((listLayer == layer) || m_layerTimes.find(otherLayer) == m_layerTimes.end()) continue;
-            // Check all elements for the current duration total
-            const auto start = m_layerTimes[otherLayer].lower_bound(m_durTotal);
-            const auto end = m_layerTimes[otherLayer].upper_bound(m_durTotal);
-            const auto it = std::find_if(
-                start, end, [](const std::pair<int, LayerElement *> &element) { return element.second->Is(CLEF); });
-            if (it != end) continue;
+    for (const auto listLayer : staffLayers) {
+        Layer *otherLayer = vrv_cast<Layer *>(listLayer);
+        if (m_layerTimes.find(otherLayer) == m_layerTimes.end()) continue;
+        // Get first element for the same (or higher if same is not present) duration
+        const auto start = m_layerTimes[otherLayer].lower_bound(scoreOnset);
+        // Add either clef or #sameas, depending on the layer we're adding to
+        Clef *clefToAdd = NULL;
+        if (listLayer == layer) {
+            clefToAdd = clef;
+        }
+        else {
+            clefToAdd = new Clef();
+            clefToAdd->SetSameas("#" + clef->GetUuid());
+        }
 
-            // If there are elements with same duration total on other layers and clef is not present there, add one
-            Clef *sameasClef = new Clef();
-            sameasClef->SetSameas("#" + clef->GetUuid());
-            if (!m_durTotal) {
-                otherLayer->InsertBefore(start->second, sameasClef);
+        // In case scoreOnset is 0 - add clef before the first element
+        if (!scoreOnset) {
+             otherLayer->InsertBefore(start->second, clefToAdd);
+            m_layerTimes[otherLayer].emplace(scoreOnset, clefToAdd);
+        }
+        else {
+            // If corresponding time couldn't be found (i.e. it's higher than any other duration in the layer) - add
+            // clef to the end of the layer
+            if (start == m_layerTimes[otherLayer].end()) {
+                otherLayer->AddChild(clefToAdd);
+                m_layerTimes[otherLayer].emplace(std::prev(m_layerTimes[otherLayer].end())->first, clefToAdd);
             }
             else {
-                otherLayer->InsertAfter(start->second, sameasClef);
+                // Always try to add clefs at the end of current duration, to honor their order in the musicxml
+                const int actualScoreOnSet = start->first;
+                auto end = m_layerTimes[otherLayer].upper_bound(actualScoreOnSet);
+                LayerElement *layerElement = (--end)->second;
+                otherLayer->InsertAfter(layerElement, clefToAdd);
+                m_layerTimes[otherLayer].emplace(actualScoreOnSet, clefToAdd);
             }
-            m_layerTimes[otherLayer].emplace(m_durTotal, sameasClef);
         }
     }
 }
@@ -436,6 +457,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
             layer->AddChild(space);
         else
             m_elementStackMap.at(layer).back()->AddChild(space);
+        m_layerTimes[layer].emplace(dur, space);
         dur -= m_ppq * quarters;
     }
 }
@@ -959,6 +981,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
     // here we could check that there is only one staffGrp left in m_staffGrpStack
 
+    ProcessClefChangeQueue(section);
+
     Measure *measure = NULL;
     std::vector<std::pair<std::string, ControlElement *>>::iterator iter;
     for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
@@ -1371,14 +1395,6 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         }
         m_bracketStack.clear();
     }
-    if (!m_clefChangeStack.empty()) {
-        for (const musicxml::ClefChange &iter : m_clefChangeStack) {
-            if (iter.isFirst)
-                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
-                    iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
-        }
-        m_clefChangeStack.clear();
-    }
     if (!m_hairpinStack.empty() || !m_hairpinStopStack.empty()) {
         LogWarning(
             "MusicXML import: There are %d hairpins left open", m_hairpinStack.size() + m_hairpinStopStack.size());
@@ -1517,45 +1533,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
             Layer *emptyLayer = new Layer();
-            // If staff is empty but there are unprocessed clefs for it - try to insert clefs alongside the spaces
-            if (!m_clefChangeStack.empty()) {
-                m_elementStackMap[emptyLayer] = {};
-                int processedDuration = 0;
-                for (auto &clefChange : m_clefChangeStack) {
-                    if (clefChange.isFirst && (clefChange.m_measureNum == measureNum) && (clefChange.m_staff == staff)
-                        && (clefChange.m_scoreOnset != m_durTotal)) {
-                        FillSpace(emptyLayer, clefChange.m_scoreOnset - processedDuration);
-                        emptyLayer->AddChild(clefChange.m_clef);
-                        processedDuration = clefChange.m_scoreOnset;
-                        clefChange.isFirst = false;
-                    }
-                }
-            }
-            else {
-                emptyLayer->AddChild(new MSpace());
-            }
+            emptyLayer->AddChild(new MSpace());
             staff->AddChild(emptyLayer);
-        }
-        // add clef changes that might occur just before a bar line and remove inserted clefs from stack
-        if (!m_clefChangeStack.empty()) {
-            for (auto layer : *staff->GetChildren()) {
-                assert(layer);
-                std::vector<musicxml::ClefChange>::iterator iter;
-                for (iter = m_clefChangeStack.begin(); iter != m_clefChangeStack.end(); ++iter) {
-                    if (iter->m_measureNum == measureNum && iter->m_staff == staff
-                        && iter->m_scoreOnset == m_durTotal) {
-                        if (iter->isFirst) { // add clef when first in staff
-                            layer->AddChild(iter->m_clef);
-                            iter->isFirst = false;
-                        }
-                        else {
-                            Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
-                            sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
-                            layer->AddChild(sameasClef);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -1599,7 +1578,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         Clef *meiClef = ConvertClef(clef);
         if (meiClef) {
             const bool afterBarline = clef.attribute("after-barline").as_bool();
-            m_clefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
+            m_clefChangeQueue.push_back(
+                musicxml::ClefChange(measureNum, staff, m_currentLayer, meiClef, m_durTotal, afterBarline));
         }
     }
 
@@ -2424,8 +2404,6 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // reset figured bass offset
     m_durFb = 0;
-
-    if (!m_clefChangeStack.empty() && !isChord) AddClef(section, measure, staff, measureNum);
 
     LayerElement *element = NULL;
 
