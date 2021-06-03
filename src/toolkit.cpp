@@ -1532,7 +1532,22 @@ const char *Toolkit::GetHumdrumBuffer()
         return m_humdrumBuffer;
     }
     else {
-        return "[empty]";
+        // Convert MEI data to Humdrum
+        MEIOutput meioutput(&m_doc);
+        meioutput.SetScoreBasedMEI(true);
+        std::string meidata = meioutput.GetOutput();
+        pugi::xml_document infile;
+        infile.load_string(meidata.c_str());
+        stringstream out;
+        hum::Tool_mei2hum converter;
+        converter.convert(out, infile);
+        SetHumdrumBuffer(out.str().c_str());
+        if (m_humdrumBuffer) {
+            return m_humdrumBuffer;
+        }
+        else {
+            return "[empty]";
+        }
     }
 }
 
