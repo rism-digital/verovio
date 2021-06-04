@@ -4062,8 +4062,8 @@ bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 
     if (m_version < MEI_4_0_0) {
         if (instrDef.attribute("midi.volume")) {
-            const std::string midiVol = instrDef.attribute("midi.volume").as_string();
-            instrDef.attribute("midi.volume").set_value((midiVol + "%").c_str());
+            const float midiValue = instrDef.attribute("midi.volume").as_float();
+            instrDef.attribute("midi.volume").set_value(StringFormat("%.2f%%", midiValue / 127 * 100).c_str());
         }
     }
 
