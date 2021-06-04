@@ -2067,19 +2067,22 @@ void HumdrumInput::prepareVerses()
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     // ss[*].verse should already be set to false.
 
-    std::vector<hum::HTp> &kern = m_staffstarts;
+    std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
-    if (kern.size() == 0) {
+    if (staffstarts.size() == 0) {
         return;
     }
 
-    hum::HumdrumLine &line = *kern[0]->getLine();
+    hum::HumdrumLine &line = *staffstarts[0]->getLine();
     int field;
 
-    for (i = 0; i < (int)kern.size(); ++i) {
-        field = kern[i]->getFieldIndex();
+    for (i = 0; i < (int)staffstarts.size(); ++i) {
+        field = staffstarts[i]->getFieldIndex();
         for (j = field + 1; j < line.getFieldCount(); ++j) {
             if (line.token(j)->isKern()) {
+                break;
+            }
+            if (line.token(j)->isMens()) {
                 break;
             }
             else if (line.token(j)->isDataType("**text")) {
