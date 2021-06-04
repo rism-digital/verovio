@@ -19404,7 +19404,15 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
     int startfield = token->getFieldIndex() + 1;
     for (int i = startfield; i < line.getFieldCount(); ++i) {
         std::string exinterp = line.token(i)->getDataType();
+
         if (line.token(i)->isKern() || (exinterp.find("kern") != std::string::npos)) {
+            ttrack = line.token(i)->getTrack();
+            if (ttrack != track) {
+                break;
+            }
+        }
+
+        if (line.token(i)->isMens() || (exinterp.find("mens") != std::string::npos)) {
             ttrack = line.token(i)->getTrack();
             if (ttrack != track) {
                 break;
