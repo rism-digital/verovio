@@ -1054,6 +1054,11 @@ Options::Options()
     m_engravingDefaultsFile.Init(JsonSource::FilePath, "");
     this->Register(&m_engravingDefaultsFile, "engravingDefaultsFile", &m_generalLayout);
 
+    m_breaksNoWidow.SetInfo(
+        "Breaks no widow", "Prevent single measures on the last page by fitting it into previous system");
+    m_breaksNoWidow.Init(false);
+    this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
+
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);

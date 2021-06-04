@@ -879,13 +879,24 @@ int System::CastOffPages(FunctorParams *functorParams)
     const int systemMaxPerPage = params->m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
     const int childCount = params->m_currentPage->GetChildCount();
     if ((systemMaxPerPage && systemMaxPerPage == childCount)
-        || (childCount > 0 && (m_drawingYRel - this->GetHeight() - currentShift < 0))) {
-        params->m_currentPage = new Page();
-        // Use VRV_UNSET value as a flag
-        params->m_pgHeadHeight = VRV_UNSET;
-        assert(params->m_doc->GetPages());
-        params->m_doc->GetPages()->AddChild(params->m_currentPage);
-        params->m_shift = m_drawingYRel - params->m_pageHeight;
+        || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
+        // If this is last system in the list, it doesn't fit the page and it's leftover system (has just one last
+        // measure) - get measure out of that system and try adding it to the previous system
+        Object *nextSystem = params->m_contentPage->GetNext(this, SYSTEM);
+        if ((NULL == nextSystem) && (this == params->m_leftoverSystem)) {
+            Measure *measure = dynamic_cast<Measure *>(Relinquish(GetFirst(MEASURE)->GetIdx()));
+            System *lastSystem = dynamic_cast<System *>(params->m_currentPage->GetLast());
+            if (measure && lastSystem) lastSystem->AddChild(measure);
+            return FUNCTOR_SIBLINGS;
+        }
+        else {
+            params->m_currentPage = new Page();
+            // Use VRV_UNSET value as a flag
+            params->m_pgHeadHeight = VRV_UNSET;
+            assert(params->m_doc->GetPages());
+            params->m_doc->GetPages()->AddChild(params->m_currentPage);
+            params->m_shift = this->m_drawingYRel - params->m_pageHeight;
+        }
     }
 
     // Special case where we use the Relinquish method.
