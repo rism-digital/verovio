@@ -2721,6 +2721,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     // std::string textColor = textNode.attribute("color").as_string();
                     std::string textStyle = textNode.attribute("font-style").as_string();
                     std::string textWeight = textNode.attribute("font-weight").as_string();
+                    int lineThrough = textNode.attribute("line-through").as_int();
                     std::string lang = textNode.attribute("xml:lang").as_string();
                     std::string textStr = textNode.text().as_string();
                     Syl *syl = new Syl();
