@@ -634,7 +634,7 @@ public:
     OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
-    OptionBool m_fitLastMeasure;
+    OptionBool m_breaksNoWidow;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;

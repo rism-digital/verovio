@@ -1116,7 +1116,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     int overflow = this->GetDrawingOverflow();
 
     Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
-    const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_fitLastMeasure.GetValue()
+    const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
         && (params->m_doc->GetOptions()->m_breaks.GetValue() != BREAKS_encoded));
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
