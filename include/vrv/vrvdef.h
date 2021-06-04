@@ -12,6 +12,7 @@
 #include <functional>
 #include <list>
 #include <map>
+#include <set>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -335,7 +336,7 @@ typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
 typedef std::vector<TextElement *> ArrayOfTextElements;
 
-typedef std::map<Staff *, std::list<int>> MapOfDotLocs;
+typedef std::map<Staff *, std::set<int>> MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
 

@@ -521,9 +521,11 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
         if (GetDots() > 0) {
             Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
             if (dots) {
-                std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-                const auto iter = std::find(dotLocs->begin(), dotLocs->end(), oldLoc);
-                if (iter != dotLocs->end()) *iter = newLoc;
+                std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
+                if (std::find(dotLocs.cbegin(), dotLocs.cend(), oldLoc) != dotLocs.cend()) {
+                    dotLocs.erase(oldLoc);
+                    dotLocs.insert(newLoc);
+                }
             }
         }
     }
@@ -597,7 +599,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
-    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
     int loc = this->GetDrawingLoc();
 
     // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
@@ -618,7 +620,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
         default: break;
     }
 
-    dotLocs->push_back(loc);
+    dotLocs.insert(loc);
 
     // HARDCODED
     int xRel = params->m_doc->GetDrawingUnit(staffSize) * 2.5;

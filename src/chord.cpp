@@ -697,8 +697,7 @@ void Chord::CaltOptimalDots(Dots *dots, Staff *staff, const std::set<int> &noteL
     const int secondDiff = std::accumulate(secondElem.begin(), secondElem.end(), 0);
     std::set<int> dotLocations = (secondDiff < firstDiff) ? *secondRef : *firstRef;
 
-    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-    dotLocs->insert(dotLocs->end(), dotLocations.begin(), dotLocations.end());
+    dots->ModifyDotLocsForStaff(staff) = dotLocations;
 }
 
 int Chord::CalcDots(FunctorParams *functorParams)

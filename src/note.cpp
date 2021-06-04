@@ -1016,7 +1016,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
 
-        std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+        std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
         int loc = this->GetDrawingLoc();
 
         // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
@@ -1030,7 +1030,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         }
 
         loc = CorrectDotsPlacement(staff, GetDrawingLoc(), loc, isDotShifted);
-        dotLocs->push_back(loc);
+        dotLocs.insert(loc);
 
         // Stem up, shorter than 4th and not in beam
         if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
@@ -1060,9 +1060,9 @@ int Note::CorrectDotsPlacement(Staff *staff, int noteLoc, int dotLoc, bool isDot
     std::vector<Note *> otherNotes;
     for (const auto element : objects) {
         if (element->Is(DOTS)) {
-            std::list<int> *dotLocs = vrv_cast<Dots *>(element)->GetDotLocsForStaff(staff);
-            if (dotLocs->empty()) continue;
-            std::copy(dotLocs->begin(), dotLocs->end(), std::inserter(dotLocations, dotLocations.begin()));
+            const std::set<int> dotLocs = vrv_cast<Dots *>(element)->GetDotLocsForStaff(staff);
+            if (dotLocs.empty()) continue;
+            std::copy(dotLocs.cbegin(), dotLocs.cend(), std::inserter(dotLocations, dotLocations.begin()));
         }
         else {
             if (this == element) continue;
