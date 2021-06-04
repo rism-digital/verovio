@@ -789,6 +789,42 @@ int LayerElement::CountElementsInUnison(
     return (int)intersection.size();
 }
 
+MapOfDotLocs LayerElement::CalcOptimalDotLocations()
+{
+    if (!this->Is({ NOTE, CHORD })) {
+        return {};
+    }
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    const int layerCount = staff->GetChildCount(LAYER);
+
+    // Calculate note locations as well as primary/secondary dot locations
+    const MapOfNoteLocs noteLocs = this->CalcNoteLocations();
+    MapOfDotLocs dotLocs1 = this->CalcDotLocations(layerCount, true);
+    MapOfDotLocs dotLocs2 = this->CalcDotLocations(layerCount, false);
+
+    // Use total displacement to decide which set of dots is used
+    const bool usePrimary = (GetDotDisplacement(noteLocs, dotLocs1) <= GetDotDisplacement(noteLocs, dotLocs2));
+    return usePrimary ? dotLocs1 : dotLocs2;
+}
+
+int LayerElement::GetDotDisplacement(const MapOfNoteLocs &noteLocations, const MapOfDotLocs &dotLocations)
+{
+    int displacement = 0;
+    for (const auto &mapEntry : noteLocations) {
+        assert(dotLocations.find(mapEntry.first) != dotLocations.end());
+        for (int noteLoc : mapEntry.second) {
+            // For each note find the closest dot and add the distance
+            int distance = 100;
+            for (int dotLoc : dotLocations.at(mapEntry.first)) {
+                distance = std::min(distance, abs(noteLoc - dotLoc));
+            }
+            displacement += distance;
+        }
+    }
+    return displacement;
+}
+
 //----------------------------------------------------------------------------
 // LayerElement functors methods
 //----------------------------------------------------------------------------

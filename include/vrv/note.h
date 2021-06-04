@@ -202,11 +202,6 @@ public:
     bool IsVisible() const;
 
     /**
-     * Correct dots placement depending on other dots present in the current alignment
-     */
-    int CorrectDotsPlacement(Staff *staff, int NoteLoc, int dotLoc, bool isDotShifted);
-
-    /**
      * MIDI timing information
      */
     ///@{
@@ -299,6 +294,19 @@ public:
      * See Object::Transpose
      */
     virtual int Transpose(FunctorParams *);
+
+protected:
+    /**
+     * The note locations w.r.t. each staff
+     */
+    virtual MapOfNoteLocs CalcNoteLocations();
+
+    /**
+     * The dot locations w.r.t. each staff
+     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
+     * secondary
+     */
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary);
 
 private:
     /**

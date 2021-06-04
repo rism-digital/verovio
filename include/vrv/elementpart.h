@@ -45,6 +45,7 @@ public:
     std::set<int> &ModifyDotLocsForStaff(Staff *staff);
 
     const MapOfDotLocs &GetMapOfDotLocs() const { return m_dotLocsByStaff; }
+    void SetMapOfDotLocs(const MapOfDotLocs &dotLocs) { m_dotLocsByStaff = dotLocs; };
 
     void IsAdjusted(bool isAdjusted) { m_isAdjusted = isAdjusted; }
     bool IsAdjusted() const { return m_isAdjusted; }

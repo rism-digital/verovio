@@ -966,6 +966,33 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+MapOfNoteLocs Note::CalcNoteLocations()
+{
+    Layer *layer = NULL;
+    Staff *staff = this->GetCrossStaff(layer);
+    if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    MapOfNoteLocs noteLocations;
+    noteLocations[staff] = { this->GetDrawingLoc() };
+    return noteLocations;
+}
+
+MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
+{
+    const bool isUpwardDirection = (GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
+    const bool shiftUpwards = (isUpwardDirection && primary) || (!isUpwardDirection && !primary);
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations();
+    assert(noteLocs.size() == 1);
+
+    MapOfDotLocs dotLocs;
+    Staff *staff = noteLocs.cbegin()->first;
+    int loc = *noteLocs.cbegin()->second.cbegin();
+    if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
+    dotLocs[staff] = { loc };
+    return dotLocs;
+}
+
 int Note::CalcDots(FunctorParams *functorParams)
 {
     CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
@@ -1016,21 +1043,8 @@ int Note::CalcDots(FunctorParams *functorParams)
         dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
 
-        std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
-        int loc = this->GetDrawingLoc();
-
-        // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-        const bool isDotShifted(loc % 2 == 0);
-        if (isDotShifted) {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            if ((GetDrawingStemDir() == STEMDIRECTION_up) || (staff->GetChildCount(LAYER) == 1))
-                ++loc;
-            else
-                --loc;
-        }
-
-        loc = CorrectDotsPlacement(staff, GetDrawingLoc(), loc, isDotShifted);
-        dotLocs.insert(loc);
+        dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
+        const bool isDotShifted = (this->GetDrawingLoc() % 2 == 0);
 
         // Stem up, shorter than 4th and not in beam
         if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
@@ -1044,53 +1058,6 @@ int Note::CalcDots(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Note::CorrectDotsPlacement(Staff *staff, int noteLoc, int dotLoc, bool isDotShifted)
-{
-    if (staff->GetChildCount(LAYER) > 2) return dotLoc;
-
-    ListOfObjects objects;
-    ClassIdsComparison cmp({ DOTS, NOTE });
-    Alignment *alignment = GetAlignment();
-    alignment->FindAllDescendantByComparison(&objects, &cmp, 2);
-
-    // process all dots and notes in the alignment and save them separately - notes as vector and dot locations as set
-    std::set<int> dotLocations;
-    std::vector<Note *> otherNotes;
-    for (const auto element : objects) {
-        if (element->Is(DOTS)) {
-            const std::set<int> dotLocs = vrv_cast<Dots *>(element)->GetDotLocsForStaff(staff);
-            if (dotLocs.empty()) continue;
-            std::copy(dotLocs.cbegin(), dotLocs.cend(), std::inserter(dotLocations, dotLocations.begin()));
-        }
-        else {
-            if (this == element) continue;
-            Note *note = vrv_cast<Note *>(element);
-            otherNotes.push_back(note);
-        }
-    }
-
-    int newLocation = dotLoc;
-    for (Note *note : otherNotes) {
-        if (IsUnissonWith(note)) {
-            if (note->HasDots()) {
-                return isDotShifted ? noteLoc + 1 : dotLoc;
-            }
-            continue;
-        }
-        if (note->GetDrawingLoc() == newLocation) {
-            // mirror dot location (if it was placed above - try placing it below now)
-            newLocation = 2 * noteLoc - dotLoc;
-        }
-    }
-
-    // if there already exists a dot on the preferred location
-    if (dotLocations.find(newLocation) != dotLocations.end()) {
-        newLocation = 2 * noteLoc - dotLoc;
-    }
-
-    return newLocation;
 }
 
 int Note::CalcLedgerLines(FunctorParams *functorParams)

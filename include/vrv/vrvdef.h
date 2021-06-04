@@ -336,6 +336,8 @@ typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
 typedef std::vector<TextElement *> ArrayOfTextElements;
 
+typedef std::map<Staff *, std::set<int>> MapOfNoteLocs;
+
 typedef std::map<Staff *, std::set<int>> MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;

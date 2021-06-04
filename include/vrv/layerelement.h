@@ -427,6 +427,30 @@ protected:
     virtual int CountElementsInUnison(
         const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
 
+    /**
+     * The note locations w.r.t. each staff, implemented for note and chord
+     */
+    virtual MapOfNoteLocs CalcNoteLocations() { return {}; };
+
+    /**
+     * The dot locations w.r.t. each staff, implemented for note and chord
+     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
+     * secondary
+     */
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; };
+
+    /**
+     * Calculate the optimal dot location for a note or chord
+     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
+     */
+    MapOfDotLocs CalcOptimalDotLocations();
+
+    /**
+     * Helper to calculate the total displacement of a set of dots generated from a set of notes
+     * This can be used as an indicator to choose between different sets of dots
+     */
+    static int GetDotDisplacement(const MapOfNoteLocs &noteLocations, const MapOfDotLocs &dotLocations);
+
 private:
     /**
      * Indicates whether it is a ScoreDef or StaffDef attribute

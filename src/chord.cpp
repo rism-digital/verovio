@@ -657,47 +657,39 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-void Chord::CaltOptimalDots(Dots *dots, Staff *staff, const std::set<int> &noteLocations)
+MapOfNoteLocs Chord::CalcNoteLocations()
 {
-    // calculate optimal dot locations both in normal and reverse orders
-    std::set<int> forwardLocations = CalculateDotLocations(noteLocations.begin(), noteLocations.end(), false);
-    std::set<int> backwardLocations = CalculateDotLocations(noteLocations.rbegin(), noteLocations.rend(), true);
-    //
-    std::vector<int> firstElem, secondElem;
-    const std::set<int> *firstRef, *secondRef;
-    Staff *currentStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    const bool isUpwardDirection
-        = (GetDrawingStemDir() == STEMDIRECTION_up) || (currentStaff->GetChildCount(LAYER) == 1);
-    // On upper layer normal order positioning is prioritized, hence assign positions in the same order as they were
-    // calculated. This way, if differences in positioning are the same for both normal/reverse orders, normal is going
-    // to be selected
-    if (isUpwardDirection) {
-        firstElem.assign(forwardLocations.begin(), forwardLocations.end());
-        secondElem.assign(backwardLocations.begin(), backwardLocations.end());
-        firstRef = &forwardLocations;
-        secondRef = &backwardLocations;
-    }
-    // ... and vice versa for the bottom layer, where reverse ordering is in priority
-    else {
-        firstElem.assign(backwardLocations.begin(), backwardLocations.end());
-        secondElem.assign(forwardLocations.begin(), forwardLocations.end());
-        firstRef = &backwardLocations;
-        secondRef = &forwardLocations;
-    }
+    const ArrayOfObjects *notes = this->GetList(this);
+    assert(notes);
 
-    // substract note and dot positions and calculate difference between all locations. This way, better positioning can
-    // be determined by taking order, where difference between dot and note positions is the smallest
-    std::transform(firstElem.begin(), firstElem.end(), noteLocations.begin(), firstElem.begin(), std::minus<int>());
-    std::transform(secondElem.begin(), secondElem.end(), noteLocations.begin(), secondElem.begin(), std::minus<int>());
-    // apply std::abs to elements in the vectors and then calculate sum of the elements. Can be achieved with
-    // std::transform_reduce, but gcc needs to support it
-    std::transform(firstElem.begin(), firstElem.end(), firstElem.begin(), static_cast<float (*)(float)>(&std::abs));
-    std::transform(secondElem.begin(), secondElem.end(), secondElem.begin(), static_cast<float (*)(float)>(&std::abs));
-    const int firstDiff = std::accumulate(firstElem.begin(), firstElem.end(), 0);
-    const int secondDiff = std::accumulate(secondElem.begin(), secondElem.end(), 0);
-    std::set<int> dotLocations = (secondDiff < firstDiff) ? *secondRef : *firstRef;
+    MapOfNoteLocs noteLocations;
+    for (Object *obj : *notes) {
+        Note *note = vrv_cast<Note *>(obj);
+        assert(note);
 
-    dots->ModifyDotLocsForStaff(staff) = dotLocations;
+        Layer *layer = NULL;
+        Staff *staff = note->GetCrossStaff(layer);
+        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+
+        noteLocations[staff].insert(note->GetDrawingLoc());
+    }
+    return noteLocations;
+}
+
+MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary)
+{
+    const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
+    const bool useReverseOrder = (isUpwardDirection && !primary) || (!isUpwardDirection && primary);
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations();
+    MapOfDotLocs dotLocs;
+    for (const auto &mapEntry : noteLocs) {
+        if (useReverseOrder)
+            dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.rbegin(), mapEntry.second.rend(), true);
+        else
+            dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.begin(), mapEntry.second.end(), false);
+    }
+    return dotLocs;
 }
 
 int Chord::CalcDots(FunctorParams *functorParams)
@@ -726,33 +718,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     params->m_chordDrawingX = this->GetDrawingX();
     params->m_chordStemDir = this->GetDrawingStemDir();
 
-    ArrayOfObjects::const_reverse_iterator rit;
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
-
-    assert(this->GetTopNote());
-    assert(this->GetBottomNote());
-
-    // Get note locations first
-    std::map<Staff *, std::set<int>> noteLocations;
-    for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
-        Note *note = vrv_cast<Note *>(*rit);
-        assert(note);
-        if (note->GetDots() == 0) {
-            continue;
-        }
-
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-        if (noteLocations.end() == noteLocations.find(staff)) {
-            noteLocations[staff] = {};
-        }
-        noteLocations[staff].insert(note->GetDrawingLoc());
-    }
-
-    for (const auto &loc : noteLocations) {
-        CaltOptimalDots(dots, loc.first, loc.second);
-    }
+    dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
 
     return FUNCTOR_CONTINUE;
 }
