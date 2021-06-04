@@ -510,20 +510,28 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
     if (overlapMargin < 0) {
         Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
         assert(staff);
-        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
-        const int oldLoc = GetDrawingLoc();
-        const int newLoc = oldLoc + locAdjust - locAdjust % 2;
-        SetDrawingLoc(newLoc);
-        SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
-        // If there are dots, adjust their location as well
-        if (GetDots() > 0) {
-            Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
-            if (dots) {
-                std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-                const auto iter = std::find(dotLocs->begin(), dotLocs->end(), oldLoc);
-                if (iter != dotLocs->end()) *iter = newLoc;
+        if (!HasPloc() && !HasOloc()) {
+            const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
+            const int oldLoc = GetDrawingLoc();
+            const int newLoc = oldLoc + locAdjust - locAdjust % 2;
+            SetDrawingLoc(newLoc);
+            SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
+            // If there are dots, adjust their location as well
+            if (GetDots() > 0) {
+                Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
+                if (dots) {
+                    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+                    const auto iter = std::find(dotLocs->begin(), dotLocs->end(), oldLoc);
+                    if (iter != dotLocs->end()) *iter = newLoc;
+                }
             }
+        }
+        else {
+            const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            params->m_overlapMargin
+                = (((overlapMargin * params->m_directionBias + staffOffset - 1) / staffOffset + 1.5) * staffOffset)
+                * params->m_directionBias;
         }
     }
 
