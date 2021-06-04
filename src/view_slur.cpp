@@ -212,12 +212,12 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
     }
-    // This is the case when the tie is split over two system of two pages.
+    // This is the case when the slur is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if (spanningType == SPANNING_START) {
         stemDir = startStemDir;
     }
-    // Now this is the case when the tie is split but we are drawing the end of it
+    // Now this is the case when the slur is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
         stemDir = endStemDir;
     }
@@ -420,6 +420,10 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         else {
             y2 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
         }
+        // At the end of a system, the slur finishes just short of the last barline
+        x2 -= (m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize)
+                  + m_doc->GetDrawingUnit(staff->m_drawingStaffSize))
+            / 2;
     }
     if (end->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above) {
