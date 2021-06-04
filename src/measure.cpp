@@ -317,7 +317,7 @@ int Measure::GetWidth() const
         }
     }
 
-    if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+    if (m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -1102,7 +1102,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
 
 int Measure::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_timestampAligner.Reset();
+    m_timestampAligner.Reset();
     m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
 }
@@ -1126,11 +1126,11 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+        else if (m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
             > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = this->m_drawingXRel;
+            params->m_shift = m_drawingXRel;
             for (Object *oneOfPendingObjects : params->m_pendingObjects) {
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
@@ -1218,7 +1218,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
 
     if (params->m_currentEnding) {
         // Set the ending to each measure in between
-        this->m_drawingEnding = params->m_currentEnding;
+        m_drawingEnding = params->m_currentEnding;
     }
 
     // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)

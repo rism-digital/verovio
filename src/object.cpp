@@ -238,7 +238,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
             idx++;
         }
         else {
-            this->m_children.push_back(child);
+            m_children.push_back(child);
         }
     }
 }
@@ -840,7 +840,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         };
 
         // We need a pointer to the array for the option to work on a reversed copy
-        ArrayOfObjects *children = &this->m_children;
+        ArrayOfObjects *children = &m_children;
         if (direction == BACKWARD) {
             for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
@@ -1001,7 +1001,7 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
 {
     // actually nothing to do, we just don't want the list to be copied
     if (this != &interface) {
-        this->m_list.clear();
+        m_list.clear();
     }
     return *this;
 }
@@ -1364,7 +1364,7 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 
     assert(m_parent);
     // We want to move only the children of the layer of any type (notes, editorial elements, etc)
-    if (this->m_parent->Is(LAYER)) {
+    if (m_parent->Is(LAYER)) {
         assert(params->m_targetLayer);
         this->MoveItselfTo(params->m_targetLayer);
         // Do not precess children because we move the full sub-tree
@@ -1826,7 +1826,7 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
         }
     }
 
-    std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
+    std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
     this->Modify();
     return FUNCTOR_CONTINUE;
 }

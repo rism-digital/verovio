@@ -205,7 +205,7 @@ int DurationInterface::GetNoteOrChordDur(LayerElement *element)
     return this->GetActualDur();
 }
 
-bool DurationInterface::IsMensuralDur()
+bool DurationInterface::IsMensuralDur() const
 {
     // maxima (-1) is a mensural only value
     if (this->GetDur() == DURATION_maxima) return true;

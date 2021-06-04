@@ -92,7 +92,7 @@ public:
     /**
      * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
      */
-    bool IsMensuralDur();
+    bool IsMensuralDur() const;
 
     /**
      * Interface comparison operator.

@@ -226,21 +226,21 @@ int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
 
     for (auto &dynam : params->m_dynams) {
         if ((dynam->GetStart() == this->GetStart()) && (dynam->GetStaff() == this->GetStaff())) {
-            if (!this->m_leftLink) this->SetLeftLink(dynam);
+            if (!m_leftLink) this->SetLeftLink(dynam);
         }
         else if ((dynam->GetStart() == this->GetEnd()) && (dynam->GetStaff() == this->GetStaff())) {
-            if (!this->m_rightLink) this->SetRightLink(dynam);
+            if (!m_rightLink) this->SetRightLink(dynam);
         }
     }
 
     for (auto &hairpin : params->m_hairpins) {
         if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!this->m_leftLink) this->SetLeftLink(hairpin);
+            if (!m_leftLink) this->SetLeftLink(hairpin);
             if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
         }
         if ((hairpin->GetStart() == this->GetEnd()) && (hairpin->GetStaff() == this->GetStaff())) {
             if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(this);
-            if (!this->m_rightLink) this->SetRightLink(hairpin);
+            if (!m_rightLink) this->SetRightLink(hairpin);
         }
     }
 

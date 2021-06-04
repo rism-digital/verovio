@@ -239,10 +239,10 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
         return STEMDIRECTION_NONE;
     }
     else {
-        if (this->m_crossStaffFromBelow) {
+        if (m_crossStaffFromBelow) {
             return (element->m_crossStaff) ? STEMDIRECTION_down : STEMDIRECTION_up;
         }
-        else if (this->m_crossStaffFromAbove) {
+        else if (m_crossStaffFromAbove) {
             return (element->m_crossStaff) ? STEMDIRECTION_up : STEMDIRECTION_down;
         }
         else {
@@ -431,20 +431,20 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     this->ResetStaffDefObjects();
 
     if (currentStaffDef->DrawClef()) {
-        this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-        this->m_staffDefClef->SetParent(this);
+        m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        m_staffDefClef->SetParent(this);
     }
     if (currentStaffDef->DrawKeySig()) {
-        this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-        this->m_staffDefKeySig->SetParent(this);
+        m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        m_staffDefKeySig->SetParent(this);
     }
     if (currentStaffDef->DrawMensur()) {
-        this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-        this->m_staffDefMensur->SetParent(this);
+        m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        m_staffDefMensur->SetParent(this);
     }
     if (currentStaffDef->DrawMeterSig()) {
-        this->m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
-        this->m_staffDefMeterSig->SetParent(this);
+        m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        m_staffDefMeterSig->SetParent(this);
     }
 
     // Don't draw on the next one
@@ -462,21 +462,21 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     }
 
     if (currentStaffDef->DrawClef()) {
-        this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-        this->m_cautionStaffDefClef->SetParent(this);
+        m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        m_cautionStaffDefClef->SetParent(this);
     }
     // special case - see above
     if (currentStaffDef->DrawKeySig()) {
-        this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-        this->m_cautionStaffDefKeySig->SetParent(this);
+        m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        m_cautionStaffDefKeySig->SetParent(this);
     }
     if (currentStaffDef->DrawMensur()) {
-        this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-        this->m_cautionStaffDefMensur->SetParent(this);
+        m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        m_cautionStaffDefMensur->SetParent(this);
     }
     if (currentStaffDef->DrawMeterSig()) {
-        this->m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
-        this->m_cautionStaffDefMeterSig->SetParent(this);
+        m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        m_cautionStaffDefMeterSig->SetParent(this);
     }
 
     // Don't draw on the next one
@@ -700,8 +700,8 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 
 int Layer::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_crossStaffFromBelow = false;
-    this->m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
+    m_crossStaffFromAbove = false;
     return FUNCTOR_CONTINUE;
 }
 

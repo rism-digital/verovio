@@ -59,14 +59,14 @@ void Artic::Reset()
     m_drawingPlace = STAFFREL_NONE;
 }
 
-bool Artic::IsInsideArtic()
+bool Artic::IsInsideArtic() const
 {
     auto end = Artic::s_outStaffArtic.end();
     auto i = std::find(Artic::s_outStaffArtic.begin(), end, this->GetArticFirst());
     return (i == end);
 }
 
-data_ARTICULATION Artic::GetArticFirst()
+data_ARTICULATION Artic::GetArticFirst() const
 {
     std::vector<data_ARTICULATION> articList = this->GetArtic();
     if (articList.empty()) return ARTICULATION_NONE;
@@ -165,7 +165,7 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
     }
 }
 
-wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
+wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
 {
     // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
@@ -337,22 +337,22 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     // Exception for artic because they are relative to the staff - we set m_crossStaff and m_crossLayer
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
-        this->m_crossStaff = params->m_staffAbove;
-        this->m_crossLayer = params->m_layerAbove;
+        m_crossStaff = params->m_staffAbove;
+        m_crossLayer = params->m_layerAbove;
         // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the
         // parent where the beam is
         if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_below) {
-            this->m_crossStaff = NULL;
-            this->m_crossLayer = NULL;
+            m_crossStaff = NULL;
+            m_crossLayer = NULL;
         }
     }
     else if (this->GetDrawingPlace() == STAFFREL_below && params->m_crossStaffBelow) {
-        this->m_crossStaff = params->m_staffBelow;
-        this->m_crossLayer = params->m_layerBelow;
+        m_crossStaff = params->m_staffBelow;
+        m_crossLayer = params->m_layerBelow;
         // Exception - opposite as above
         if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_above) {
-            this->m_crossStaff = NULL;
-            this->m_crossLayer = NULL;
+            m_crossStaff = NULL;
+            m_crossLayer = NULL;
         }
     }
 
@@ -373,8 +373,8 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
     }
 
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);

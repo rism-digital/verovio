@@ -146,7 +146,7 @@ public:
      * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    std::wstring GetTabFretString(data_NOTATIONTYPE notationType);
+    std::wstring GetTabFretString(data_NOTATIONTYPE notationType) const;
     ///@}
 
     /**
@@ -189,7 +189,7 @@ public:
     /**
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */
-    wchar_t GetMensuralNoteheadGlyph();
+    wchar_t GetMensuralNoteheadGlyph() const;
 
     /**
      * Return a SMuFL code for the notehead
@@ -199,7 +199,7 @@ public:
     /**
      * Check if a note or its parent chord are visible
      */
-    bool IsVisible();
+    bool IsVisible() const;
 
     /**
      * Correct dots placement depending on other dots present in the current alignment
@@ -216,13 +216,13 @@ public:
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
     void CalcMIDIPitch(int shift);
-    double GetScoreTimeOnset();
-    double GetRealTimeOnsetMilliseconds();
-    double GetScoreTimeOffset();
-    double GetScoreTimeTiedDuration();
-    double GetRealTimeOffsetMilliseconds();
-    double GetScoreTimeDuration();
-    char GetMIDIPitch();
+    double GetScoreTimeOnset() const;
+    double GetRealTimeOnsetMilliseconds() const;
+    double GetScoreTimeOffset() const;
+    double GetScoreTimeTiedDuration() const;
+    double GetRealTimeOffsetMilliseconds() const;
+    double GetScoreTimeDuration() const;
+    char GetMIDIPitch() const;
     ///@}
 
 public:
