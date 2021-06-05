@@ -2757,7 +2757,14 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     Text *text = new Text();
                     text->SetText(UTF8to16(textStr));
-                    syl->AddChild(text);
+                    if (lineThrough){
+                        Rend *rend = new Rend();
+                        rend->AddChild(text);
+                        rend->SetRend(TEXTRENDITION_line_through);
+                        syl->AddChild(rend);
+                    } else {
+                        syl->AddChild(text);
+                    }
                     verse->AddChild(syl);
                 }
             }
