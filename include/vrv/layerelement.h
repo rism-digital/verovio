@@ -446,10 +446,10 @@ protected:
     MapOfDotLocs CalcOptimalDotLocations();
 
     /**
-     * Helper to calculate the total displacement of a set of dots generated from a set of notes
+     * Helper to count the number of dots
      * This can be used as an indicator to choose between different sets of dots
      */
-    static int GetDotDisplacement(const MapOfNoteLocs &noteLocations, const MapOfDotLocs &dotLocations);
+    static int GetDotCount(const MapOfDotLocs &dotLocations);
 
 private:
     /**

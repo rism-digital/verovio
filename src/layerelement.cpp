@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <climits>
 #include <math.h>
+#include <numeric>
 
 //----------------------------------------------------------------------------
 
@@ -803,26 +804,15 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     MapOfDotLocs dotLocs1 = this->CalcDotLocations(layerCount, true);
     MapOfDotLocs dotLocs2 = this->CalcDotLocations(layerCount, false);
 
-    // Use total displacement to decide which set of dots is used
-    const bool usePrimary = (GetDotDisplacement(noteLocs, dotLocs1) <= GetDotDisplacement(noteLocs, dotLocs2));
+    // Count dots to decide which set is used
+    const bool usePrimary = (GetDotCount(dotLocs1) >= GetDotCount(dotLocs2));
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
-int LayerElement::GetDotDisplacement(const MapOfNoteLocs &noteLocations, const MapOfDotLocs &dotLocations)
+int LayerElement::GetDotCount(const MapOfDotLocs &dotLocations)
 {
-    int displacement = 0;
-    for (const auto &mapEntry : noteLocations) {
-        assert(dotLocations.find(mapEntry.first) != dotLocations.end());
-        for (int noteLoc : mapEntry.second) {
-            // For each note find the closest dot and add the distance
-            int distance = 100;
-            for (int dotLoc : dotLocations.at(mapEntry.first)) {
-                distance = std::min(distance, abs(noteLoc - dotLoc));
-            }
-            displacement += distance;
-        }
-    }
-    return displacement;
+    return std::accumulate(dotLocations.cbegin(), dotLocations.cend(), 0,
+        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + mapEntry.second.size(); });
 }
 
 //----------------------------------------------------------------------------
