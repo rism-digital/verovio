@@ -1229,21 +1229,24 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     else
                         meterSig->SetForm(METERFORM_norm);
                 }
-                if (time.node().child("senza-misura")) {
-                    meterSig->SetForm(METERFORM_invis);
-                }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
                 }
-                pugi::xpath_node beats = time.node().select_node("beats");
-                if (beats.node().text()) {
-                    m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
-                    meterSig->SetCount(m_meterCount);
-                }
+                pugi::xml_node beats = time.node().child("beats");
                 pugi::xml_node beatType = time.node().child("beat-type");
-                if (beatType.text()) {
+                if (beats) {
+                    m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
+                    meterSig->SetCount(m_meterCount);
                     m_meterUnit = beatType.text().as_int();
                     meterSig->SetUnit(m_meterUnit);
+                }
+                else if (time.node().child("senza-misura")) {
+                    if (time.node().child("senza-misura").text()) {
+                        meterSig->SetSym(METERSIGN_open);
+                    }
+                    else {
+                        meterSig->SetForm(METERFORM_invis);
+                    }
                 }
             }
             // add it if necessary
@@ -1586,13 +1589,12 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
 
         if (time) {
-            MeterSig *meterSig = NULL;
-            std::string symbol = time.attribute("symbol").as_string();
+            MeterSig *meterSig = new MeterSig();
             if (time.attribute("id")) {
                 meterSig->SetUuid(time.attribute("id").as_string());
             }
+            std::string symbol = time.attribute("symbol").as_string();
             if (!symbol.empty()) {
-                if (!meterSig) meterSig = new MeterSig();
                 if (symbol == "cut" || symbol == "common")
                     meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
@@ -1600,20 +1602,24 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meterSig->SetForm(METERFORM_norm);
             }
-            if (time.select_nodes("beats").size() > 1) {
-                LogWarning("MusicXML import: Compound meter signatures are not supported");
-            }
-            pugi::xpath_node beats = time.select_node("beats");
-            if (beats.node().text()) {
-                if (!meterSig) meterSig = new MeterSig();
-                m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
+            pugi::xml_node beats = time.child("beats");
+            pugi::xml_node beatType = time.child("beat-type");
+            if (beats) {
+                m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
                 meterSig->SetCount(m_meterCount);
-            }
-            pugi::xpath_node beatType = time.select_node("beat-type");
-            if (beatType.node().text()) {
-                if (!meterSig) meterSig = new MeterSig();
-                m_meterUnit = beatType.node().text().as_int();
+                m_meterUnit = beatType.text().as_int();
                 meterSig->SetUnit(m_meterUnit);
+                if (time.select_nodes("beats").size() > 1) {
+                    LogWarning("MusicXML import: Compound meter signatures are not supported");
+                }
+            }
+            else if (time.child("senza-misura")) {
+                if (time.child("senza-misura").text()) {
+                    meterSig->SetSym(METERSIGN_open);
+                }
+                else {
+                    meterSig->SetForm(METERFORM_invis);
+                }
             }
             // add it if necessary
             if (meterSig) {
