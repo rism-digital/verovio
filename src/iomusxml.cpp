@@ -2728,13 +2728,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::string textStr = textNode.text().as_string();
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
-                    if (textNode.next_sibling("elision")) {
-                        syl->SetCon(sylLog_CON_b);
-                    }
-                    else if (lyric.child("extend")) {
-                        syl->SetCon(sylLog_CON_u);
-                    }
-                    else if (GetContentOfChild(lyric, "syllabic") == "single") {
+                    if (GetContentOfChild(lyric, "syllabic") == "single") {
                         syl->SetWordpos(sylLog_WORDPOS_s);
                         syl->SetCon(sylLog_CON_s);
                     }
@@ -2748,11 +2742,17 @@ void MusicXmlInput::ReadMusicXmlNote(
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
-                        // Do not set @con when the syllable has an ellision
-                        if (syl->GetCon() != sylLog_CON_b) {
-                            syl->SetCon(sylLog_CON_s);
-                        }
+                        syl->SetCon(sylLog_CON_s);
                     }
+
+                    // override @con if we have elisions or extensions
+                    if (textNode.next_sibling("elision")) {
+                        syl->SetCon(sylLog_CON_b);
+                    }
+                    else if (lyric.child("extend")) {
+                        syl->SetCon(sylLog_CON_u);
+                    }
+
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
                     if (!textWeight.empty())
                         syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
