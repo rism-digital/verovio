@@ -1621,10 +1621,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     meterSig->SetForm(METERFORM_invis);
                 }
             }
-            // add it if necessary
-            if (meterSig) {
-                scoreDef->AddChild(meterSig);
-            }
+            scoreDef->AddChild(meterSig);
         }
 
         if (divisions) {
