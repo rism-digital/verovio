@@ -451,6 +451,11 @@ protected:
      */
     static int GetDotCount(const MapOfDotLocs &dotLocations);
 
+    /**
+     * Helper to count the collisions between to sets of dots
+     */
+    static int GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2);
+
 private:
     /**
      * Indicates whether it is a ScoreDef or StaffDef attribute

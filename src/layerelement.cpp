@@ -799,10 +799,59 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     const int layerCount = staff->GetChildCount(LAYER);
 
-    // Calculate note locations as well as primary/secondary dot locations
-    const MapOfNoteLocs noteLocs = this->CalcNoteLocations();
-    MapOfDotLocs dotLocs1 = this->CalcDotLocations(layerCount, true);
-    MapOfDotLocs dotLocs2 = this->CalcDotLocations(layerCount, false);
+    // Calculate primary/secondary dot locations
+    const MapOfDotLocs dotLocs1 = this->CalcDotLocations(layerCount, true);
+    const MapOfDotLocs dotLocs2 = this->CalcDotLocations(layerCount, false);
+
+    // Special treatment for two layers
+    if (layerCount == 2) {
+        // Find the first note on the other layer
+        LayerElement *other = NULL;
+        Alignment *alignment = this->GetAlignment();
+        const int currentLayer = abs(this->GetAlignmentLayerN());
+        ListOfObjects notes;
+        ClassIdComparison noteCmp(NOTE);
+        alignment->FindAllDescendantByComparison(&notes, &noteCmp, 2);
+        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayer](Object *obj) {
+            const int otherLayer = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
+            return (currentLayer != otherLayer);
+        });
+
+        if (noteIt != notes.cend()) {
+            // Prefer the note's chord if it has one
+            other = vrv_cast<Note *>(*noteIt);
+            if (Chord *chord = vrv_cast<Note *>(*noteIt)->IsChordTone(); chord) {
+                other = chord;
+            }
+            assert(other);
+            const int otherLayer = abs(other->GetAlignmentLayerN());
+
+            // Calculate the primary/secondary dot locations
+            const MapOfDotLocs otherDotLocs1 = other->CalcDotLocations(layerCount, true);
+            const MapOfDotLocs otherDotLocs2 = other->CalcDotLocations(layerCount, false);
+
+            // Count collisions between each pair of dot choices
+            const int collisions11 = GetCollisionCount(dotLocs1, otherDotLocs1);
+            const int collisions12 = GetCollisionCount(dotLocs1, otherDotLocs2);
+            const int collisions21 = GetCollisionCount(dotLocs2, otherDotLocs1);
+            const int collisions22 = GetCollisionCount(dotLocs2, otherDotLocs2);
+            const int maxCollisions = std::max({ collisions11, collisions12, collisions21, collisions22 });
+
+            if (maxCollisions > 0) {
+                // Collisions might occur => choose dots which minimize the number of collisions
+                const int minCollisions = std::min({ collisions11, collisions12, collisions21, collisions22 });
+                if (collisions11 == minCollisions) return dotLocs1;
+                if (collisions12 == minCollisions) {
+                    if (collisions21 == minCollisions) {
+                        // Symmetric case: choose primary dot location on lower layer
+                        return (currentLayer > otherLayer) ? dotLocs1 : dotLocs2;
+                    }
+                    return dotLocs1;
+                }
+                return dotLocs2;
+            }
+        }
+    }
 
     // Count dots to decide which set is used
     const bool usePrimary = (GetDotCount(dotLocs1) >= GetDotCount(dotLocs2));
@@ -813,6 +862,21 @@ int LayerElement::GetDotCount(const MapOfDotLocs &dotLocations)
 {
     return std::accumulate(dotLocations.cbegin(), dotLocations.cend(), 0,
         [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + mapEntry.second.size(); });
+}
+
+int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2)
+{
+    int count = 0;
+    for (const auto &mapEntry : dotLocs1) {
+        if (dotLocs2.find(mapEntry.first) != dotLocs2.cend()) {
+            std::set<int> commonElements;
+            std::set_intersection(mapEntry.second.cbegin(), mapEntry.second.cend(),
+                dotLocs2.at(mapEntry.first).cbegin(), dotLocs2.at(mapEntry.first).cend(),
+                std::inserter(commonElements, commonElements.begin()));
+            count += commonElements.size();
+        }
+    }
+    return count;
 }
 
 //----------------------------------------------------------------------------
