@@ -8,10 +8,10 @@
 #ifndef __VRV_IOMUSXML_H__
 #define __VRV_IOMUSXML_H__
 
-#include <deque>
 #include <map>
 #include <string>
 #include <vector>
+#include <queue>
 
 //----------------------------------------------------------------------------
 
@@ -457,7 +457,7 @@ private:
      */
     std::vector<std::pair<std::string, ControlElement *>> m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
-    std::deque<musicxml::ClefChange> m_clefChangeQueue;
+    std::queue<musicxml::ClefChange> m_clefChangeQueue;
     /* stack of new arpeggios that get more notes added. */
     std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio>> m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */

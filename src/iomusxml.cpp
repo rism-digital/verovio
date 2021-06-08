@@ -175,7 +175,7 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
 {
     while (!m_clefChangeQueue.empty()) {
         musicxml::ClefChange clefChange = m_clefChangeQueue.front();
-        m_clefChangeQueue.pop_front();
+        m_clefChangeQueue.pop();
         AttNNumberLikeComparison comparisonMeasure(MEASURE, clefChange.m_measureNum);
         Measure *currentMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure));
         if (!currentMeasure) {
@@ -237,11 +237,10 @@ void MusicXmlInput::AddClefs(Measure *measure, const musicxml::ClefChange &clefC
             // cross-staff clef. Remove mSpace in this case and add clef to it instead, filling space if required
             Object *mSpace = clefChange.m_staff->FindDescendantByType(MSPACE);
             if (mSpace) {
-                Layer *parentLayer = vrv_cast<Layer *>(mSpace->GetParent());
+                Layer *parentLayer = dynamic_cast<Layer *>(mSpace->GetParent());
                 if (mSpace && parentLayer) {
                     int index = mSpace->GetIdx();
-                    Object *mSpace = parentLayer->Relinquish(index);
-                    parentLayer->ClearRelinquishedChildren();
+                    parentLayer->DetachChild(index);
                     m_elementStackMap[parentLayer] = {};
                     FillSpace(parentLayer, clefChange.m_scoreOnset);
                     parentLayer->AddChild(clefChange.m_clef);
@@ -1578,7 +1577,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         Clef *meiClef = ConvertClef(clef);
         if (meiClef) {
             const bool afterBarline = clef.attribute("after-barline").as_bool();
-            m_clefChangeQueue.push_back(
+            m_clefChangeQueue.push(
                 musicxml::ClefChange(measureNum, staff, m_currentLayer, meiClef, m_durTotal, afterBarline));
         }
     }
