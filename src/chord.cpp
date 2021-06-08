@@ -421,7 +421,8 @@ bool Chord::HasNoteWithDots()
     return false;
 }
 
-void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+void Chord::AdjustOverlappingLayers(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
 {
     int margin = 0;
     // get positions of other elements
@@ -452,7 +453,7 @@ void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
         auto [overlap, isInUnison] = note->CalcElementHorizontalOverlap(
-            doc, otherElements, true, isLowerPosition, expectedElementsInUnison > 0);
+            doc, otherElements, areDotsAdjusted, true, isLowerPosition, expectedElementsInUnison > 0);
         if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
             margin = overlap;
         }

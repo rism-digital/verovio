@@ -1474,12 +1474,13 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
 
-    AdjustOverlappingLayers(params->m_doc, params->m_previous, params->m_unison);
+    AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
 
     return FUNCTOR_SIBLINGS;
 }
 
-void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+void LayerElement::AdjustOverlappingLayers(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
 {
     if (Is(NOTE) && GetParent()->Is(CHORD))
         return;
@@ -1488,7 +1489,7 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
         return;
     }
 
-    auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, false);
+    auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, areDotsAdjusted, false);
     if (Is(NOTE)) {
         isUnison = isInUnison;
         if (isUnison) return;
@@ -1504,8 +1505,9 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
     }
 }
 
-std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool isLowerElement, bool unison)
+std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
+    const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool isChordElement, bool isLowerElement,
+    bool unison)
 {
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
@@ -1586,17 +1588,14 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
                 }
             }
         }
-        // handle dot/stem collision
-        else if (Is(DOTS) && !otherElements.at(i)->Is(DOTS)) {
+        // handle dot collisions
+        else if (Is(DOTS) && !otherElements.at(i)->Is(DOTS) && areDotsAdjusted) {
             // No need for shift if dot is adjusted
             Dots *dot = vrv_cast<Dots *>(this);
             if (dot->IsAdjusted() || !HorizontalSelfOverlap(otherElements.at(i), horizontalMargin)) continue;
 
-            if (otherElements.at(i)->Is(STEM)) {
-                Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
-                const int right = stem->HorizontalLeftOverlap(this, doc, 0, 0);
-                shift += -right - horizontalMargin / 2;
-                break;
+            if (otherElements.at(i)->Is({ NOTE, STEM })) {
+                shift -= otherElements.at(i)->HorizontalLeftOverlap(this, doc, shift + horizontalMargin / 2, 0);
             }
             else {
                 shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);

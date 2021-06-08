@@ -224,16 +224,17 @@ public:
     bool GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry);
 
     /**
-     * Helper to adjust overlaping layers for notes, chords, stems, etc.
+     * Helper to adjust overlapping layers for notes, chords, stems, etc.
      */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+    virtual void AdjustOverlappingLayers(
+        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
 
     /**
      * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
      * element if it's in unison with it
      */
     std::pair<int, bool> CalcElementHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
-        bool isChordElement, bool isLowerElement = false, bool unison = true);
+        bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     //----------//
     // Functors //
