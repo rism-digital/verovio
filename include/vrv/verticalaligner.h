@@ -281,6 +281,14 @@ public:
     void ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
         const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
 
+    /**
+     * @name Set/get for the beam adjust
+     */
+    ///@{
+    void SetBeamAdjust(int beamAdjust) { m_beamAdjust = beamAdjust; }
+    int GetBeamAdjust() const { return m_beamAdjust; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -373,6 +381,9 @@ private:
     BoundingBox *m_overflowBBoxAbove;
     BoundingBox *m_overflowBBoxBelow;
     ///@}
+
+    // Value to store required beam adjustment for cross-staff beams
+    int m_beamAdjust;
 
     /**
      * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)

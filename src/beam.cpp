@@ -380,21 +380,47 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
                 [offset](BeamElementCoord *coord) { coord->m_yBeam += offset; });
         }
         if (!DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
+
+        // If none of the positions work - there's no space for us to draw a mixed beam (or there is space but it would
+        // overlap with ledger line). Adjust beam placement based on the most frequent stem direction
+        const int stemUpCount = (int)std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_up; });
+        const int stemDownCount = (int)std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_down; });
+        data_STEMDIRECTION newDirection = (stemUpCount >= stemDownCount) ? STEMDIRECTION_up : STEMDIRECTION_down;
+        beamInterface->m_drawingPlace = (newDirection == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
+        if ((newDirection == STEMDIRECTION_down) && (m_uniformStemLength > 0)) m_uniformStemLength *= -1;
+
+        LogWarning("Insufficient space to draw mixed beam, starting at '%s'. Drawing '%s' instead.",
+            m_beamElementCoordRefs.at(0)->m_element->GetUuid().c_str(),
+            (beamInterface->m_drawingPlace == BEAMPLACE_above) ? "above" : "below");
     }
-
-    // If none of the positions work - there's no space for us to draw a mixed beam (or there is space but it would
-    // overlap with ledger line). Adjust beam placement based on the most frequent stem direction
-    const int stemUpCount = (int)std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
-        [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_up; });
-    const int stemDownCount = (int)std::count_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
-        [](BeamElementCoord *coord) { return coord->GetStemDir() == STEMDIRECTION_down; });
-    data_STEMDIRECTION newDirection = (stemUpCount >= stemDownCount) ? STEMDIRECTION_up : STEMDIRECTION_down;
-    beamInterface->m_drawingPlace = (newDirection == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
-    if ((newDirection == STEMDIRECTION_down) && (m_uniformStemLength > 0)) m_uniformStemLength *= -1;
-
-    LogWarning("Insufficient space to draw mixed beam, starting at '%s'. Drawing '%s' instead.",
-        m_beamElementCoordRefs.at(0)->m_element->GetUuid().c_str(),
-        (beamInterface->m_drawingPlace == BEAMPLACE_above) ? "above" : "below");
+    else {
+        int adjust = 0;
+        std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
+            if (!coord->m_element && !coord->m_element->Is({ NOTE, CHORD })) return;
+            int elemY = coord->m_element->GetDrawingY();
+            const int diff = std::abs(elemY - coord->m_yBeam);
+            if (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_down) {
+                if (elemY <= coord->m_yBeam + topOffset) {
+                    if (diff > adjust) adjust = diff + topOffset;
+                }
+            }
+            else if (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_up) {
+                if (elemY >= coord->m_yBeam - bottomOffset) {
+                    if (diff > adjust) adjust = diff + bottomOffset;
+                }
+            }
+        });
+        // Set adjustment for the staf here
+        if (beamInterface->m_crossStaffContent->GetN() < staff->GetN()) {
+            beamInterface->m_crossStaffContent->SetAlignmentBeamAdjustment(adjust);
+        }
+        else {
+            staff->SetAlignmentBeamAdjustment(adjust);
+        }
+        return false;
+    }
 
     return true;
 }
