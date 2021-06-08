@@ -312,7 +312,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
     }
 }
 
-bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
+bool Note::IsUnisonWith(Note *note, bool ignoreAccid)
 {
     if (!ignoreAccid) {
         Accid *accid = this->GetDrawingAccid();

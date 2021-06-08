@@ -830,6 +830,15 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
             const MapOfDotLocs otherDotLocs1 = other->CalcDotLocations(layerCount, true);
             const MapOfDotLocs otherDotLocs2 = other->CalcDotLocations(layerCount, false);
 
+            // Handling of unisons
+            if (this->Is(NOTE) && other->Is(NOTE)) {
+                Note *note = vrv_cast<Note *>(this);
+                Note *otherNote = vrv_cast<Note *>(other);
+                if (note->IsUnisonWith(otherNote)) {
+                    return (currentLayer < otherLayer) ? dotLocs1 : dotLocs2;
+                }
+            }
+
             // Count collisions between each pair of dot choices
             const int collisions11 = GetCollisionCount(dotLocs1, otherDotLocs1);
             const int collisions12 = GetCollisionCount(dotLocs1, otherDotLocs2);
@@ -843,8 +852,8 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
                 if (collisions11 == minCollisions) return dotLocs1;
                 if (collisions12 == minCollisions) {
                     if (collisions21 == minCollisions) {
-                        // Symmetric case: choose primary dot location on lower layer
-                        return (currentLayer > otherLayer) ? dotLocs1 : dotLocs2;
+                        // Symmetric case: choose primary dot location on upper layer
+                        return (currentLayer < otherLayer) ? dotLocs1 : dotLocs2;
                     }
                     return dotLocs1;
                 }
@@ -1535,9 +1544,9 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             Note *currentNote = vrv_cast<Note *>(this);
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
-            isUnisonElement = currentNote->IsUnissonWith(previousNote, true);
+            isUnisonElement = currentNote->IsUnisonWith(previousNote, true);
             // Unisson, look at the duration for the note heads
-            if (unison && currentNote->IsUnissonWith(previousNote, false)) {
+            if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
                 const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
