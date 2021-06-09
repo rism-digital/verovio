@@ -136,6 +136,55 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
+void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int staffHeight)
+{
+    TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
+    if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
+    // The num is within a bracket
+    if (tupletNum->GetAlignedBracket()) {
+        // yRel is not used for drawing but we need to adjust it for the bounding box to follow the changes
+        tupletNum->SetDrawingYRel(tupletNum->GetAlignedBracket()->GetDrawingYRel());
+        return;
+    }
+
+    // The num is on its own
+    const int numVerticalMargin = (m_drawingNumPos == STAFFREL_basic_above) ? verticalMargin : -verticalMargin;
+    // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
+    ListOfObjects descendants;
+    ClassIdsComparison comparison({ CHORD, NOTE, REST });
+    this->FindAllDescendantByComparison(&descendants, &comparison);
+
+    auto it = std::find_if(descendants.begin(), descendants.end(), [](Object *object) {
+        LayerElement *element = vrv_cast<LayerElement *>(object);
+        if (!element) return false;
+        return !element->m_crossStaff;
+    });
+
+    // Calculate relative Y for the tupletNum
+    AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
+    adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
+    adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
+    adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
+    Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
+    this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
+    int yRel = adjustTupletNumOverlapParams.m_yRel - yReference + numVerticalMargin;
+
+    // If we have a beam, see if we can move it to more appropriate postion
+    Beam *beam = this->GetNumAlignedBeam();
+    if (beam && !m_crossStaff) {
+        const int xMid = tupletNum->GetDrawingXMid(doc);
+        const int yMid = beam->m_beamSegment.m_startingY
+            + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
+        int beamYRel = yMid - yReference + numVerticalMargin;
+        if (((m_drawingNumPos == STAFFREL_basic_above) && (beamYRel > yReference))
+            || ((m_drawingNumPos == STAFFREL_basic_below) && (beamYRel < yReference - staffHeight))) {
+            yRel = beamYRel;
+        }
+    }
+
+    tupletNum->SetDrawingYRel(yRel);
+}
+
 void Tuplet::FilterList(ArrayOfObjects *childList)
 {
     // We want to keep only notes and rests
@@ -427,8 +476,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 
-    int verticalLine = params->m_doc->GetDrawingUnit(staffSize);
-    int verticalMargin = 2 * verticalLine;
+    const int verticalMargin = params->m_doc->GetDrawingDoubleUnit(staffSize);
     const int yReference = m_crossStaff ? m_crossStaff->GetDrawingY() : staff->GetDrawingY();
 
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
@@ -504,60 +552,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         }
     }
 
-    TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM));
-    if (tupletNum && (this->GetNumVisible() != BOOLEAN_false)) {
-        // The num is within a bracket
-        if (tupletNum->GetAlignedBracket()) {
-            // yRel is not used for drawing but we need to adjust it for the bounding box to follow the changes
-            tupletNum->SetDrawingYRel(tupletNum->GetAlignedBracket()->GetDrawingYRel());
-        }
-        // The num is on its own
-        else {
-            int numVerticalMargin = verticalMargin;
-            numVerticalMargin *= (m_drawingNumPos == STAFFREL_basic_above) ? 1 : -1;
-
-            Beam *beam = this->GetNumAlignedBeam();
-            // If we have a beam first move it to the appropriate postion
-            if (beam) {
-
-                int xMid = tupletNum->GetDrawingXMid(params->m_doc);
-                int yMid = beam->m_beamSegment.m_startingY
-                    + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
-                int yMidRel = yMid - yReference;
-
-                tupletNum->SetDrawingYRel(tupletNum->GetDrawingYRel() + yMidRel);
-            }
-            else {
-                int yRel = (m_drawingBracketPos == STAFFREL_basic_above)
-                    ? 0
-                    : -params->m_doc->GetDrawingStaffSize(staffSize);
-                tupletNum->SetDrawingYRel(yRel);
-            }
-
-            // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
-            ListOfObjects descendants;
-            ClassIdsComparison comparison({ CHORD, NOTE, REST });
-            this->FindAllDescendantByComparison(&descendants, &comparison);
-
-            auto it = std::find_if(descendants.begin(), descendants.end(), [](Object *object) {
-                LayerElement *element = vrv_cast<LayerElement *>(object);
-                if (!element) return false;
-                return !element->m_crossStaff;
-            });
-
-            // Calculate relative Y for the tupletNum
-            AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
-            adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
-            adjustTupletNumOverlapParams.m_ignoreCrossStaff = false;
-            adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
-            adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
-            Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
-            this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
-
-            const int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
-            tupletNum->SetDrawingYRel(yRel + numVerticalMargin);
-        }
-    }
+    AdjustTupletNumY(params->m_doc, verticalMargin, yReference, params->m_doc->GetDrawingStaffSize(staffSize));
 
     return FUNCTOR_SIBLINGS;
 }
