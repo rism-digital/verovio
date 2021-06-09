@@ -806,25 +806,24 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     // Special treatment for two layers
     if (layerCount == 2) {
         // Find the first note on the other layer
-        LayerElement *other = NULL;
         Alignment *alignment = this->GetAlignment();
-        const int currentLayer = abs(this->GetAlignmentLayerN());
+        const int currentLayerN = abs(this->GetAlignmentLayerN());
         ListOfObjects notes;
         ClassIdComparison noteCmp(NOTE);
         alignment->FindAllDescendantByComparison(&notes, &noteCmp, 2);
-        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayer](Object *obj) {
-            const int otherLayer = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
-            return (currentLayer != otherLayer);
+        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN](Object *obj) {
+            const int otherLayerN = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
+            return (currentLayerN != otherLayerN);
         });
 
         if (noteIt != notes.cend()) {
             // Prefer the note's chord if it has one
-            other = vrv_cast<Note *>(*noteIt);
+            LayerElement *other = vrv_cast<Note *>(*noteIt);
             if (Chord *chord = vrv_cast<Note *>(*noteIt)->IsChordTone(); chord) {
                 other = chord;
             }
             assert(other);
-            const int otherLayer = abs(other->GetAlignmentLayerN());
+            const int otherLayerN = abs(other->GetAlignmentLayerN());
 
             // Calculate the primary/secondary dot locations
             const MapOfDotLocs otherDotLocs1 = other->CalcDotLocations(layerCount, true);
@@ -835,7 +834,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
                 Note *note = vrv_cast<Note *>(this);
                 Note *otherNote = vrv_cast<Note *>(other);
                 if (note->IsUnisonWith(otherNote)) {
-                    return (currentLayer < otherLayer) ? dotLocs1 : dotLocs2;
+                    return (currentLayerN < otherLayerN) ? dotLocs1 : dotLocs2;
                 }
             }
 
@@ -853,7 +852,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
                 if (collisions12 == minCollisions) {
                     if (collisions21 == minCollisions) {
                         // Symmetric case: choose primary dot location on upper layer
-                        return (currentLayer < otherLayer) ? dotLocs1 : dotLocs2;
+                        return (currentLayerN < otherLayerN) ? dotLocs1 : dotLocs2;
                     }
                     return dotLocs1;
                 }

@@ -453,7 +453,7 @@ protected:
     static int GetDotCount(const MapOfDotLocs &dotLocations);
 
     /**
-     * Helper to count the collisions between to sets of dots
+     * Helper to count the collisions between two sets of dots
      */
     static int GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2);
 
