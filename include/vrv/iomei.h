@@ -574,6 +574,7 @@ private:
     bool ReadArpeg(Object *parent, pugi::xml_node arpeg);
     bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
+    bool ReadCaesura(Object *parent, pugi::xml_node caesura);
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
