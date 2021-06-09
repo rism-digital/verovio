@@ -28,6 +28,7 @@
 #include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
+#include "caesura.h"
 #include "choice.h"
 #include "chord.h"
 #include "clef.h"
@@ -407,6 +408,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
         WriteBreath(m_currentNode, dynamic_cast<Breath *>(object));
+    }
+    else if (object->Is(CAESURA)) {
+        m_currentNode = m_currentNode.append_child("caesura");
+        WriteCaesura(m_currentNode, dynamic_cast<Caesura *>(object));
     }
     else if (object->Is(DIR)) {
         m_currentNode = m_currentNode.append_child("dir");
@@ -1258,6 +1263,16 @@ void MEIOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
     WriteTimePointInterface(currentNode, breath);
     breath->WriteColor(currentNode);
     breath->WritePlacementRelStaff(currentNode);
+}
+
+void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
+{
+    assert(caesura);
+
+    WriteControlElement(currentNode, caesura);
+    WriteTimePointInterface(currentNode, caesura);
+    caesura->WriteColor(currentNode);
+    caesura->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
@@ -4154,6 +4169,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "breath") {
             success = ReadBreath(parent, current);
         }
+        else if (std::string(current.name()) == "caesura") {
+            success = ReadCaesura(parent, current);
+        }
         else if (std::string(current.name()) == "dir") {
             success = ReadDir(parent, current);
         }
@@ -4295,6 +4313,20 @@ bool MEIInput::ReadBreath(Object *parent, pugi::xml_node breath)
 
     parent->AddChild(vrvBreath);
     ReadUnsupportedAttr(breath, vrvBreath);
+    return true;
+}
+
+bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
+{
+    Caesura *vrvCaesura = new Caesura();
+    ReadControlElement(caesura, vrvCaesura);
+
+    ReadTimePointInterface(caesura, vrvCaesura);
+    vrvCaesura->ReadColor(caesura);
+    vrvCaesura->ReadPlacementRelStaff(caesura);
+
+    parent->AddChild(vrvCaesura);
+    ReadUnsupportedAttr(caesura, vrvCaesura);
     return true;
 }
 

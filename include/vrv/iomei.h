@@ -37,6 +37,7 @@ class BoundaryEnd;
 class BracketSpan;
 class Breath;
 class BTrem;
+class Caesura;
 class Choice;
 class Chord;
 class Clef;
@@ -309,6 +310,7 @@ private:
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
     void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
+    void WriteCaesura(pugi::xml_node currentNode, Caesura *caesura);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
