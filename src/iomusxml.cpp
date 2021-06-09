@@ -295,8 +295,16 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
                 const int actualScoreOnSet = start->first;
                 auto end = m_layerTimes[otherLayer].upper_bound(actualScoreOnSet);
                 LayerElement *layerElement = (--end)->second;
-                otherLayer->InsertAfter(layerElement, clefToAdd);
-                m_layerTimes[otherLayer].emplace(actualScoreOnSet, clefToAdd);
+                if (layerElement->GetParent()->Is(LAYER)) {
+                    otherLayer->InsertAfter(layerElement, clefToAdd);
+                    m_layerTimes[otherLayer].emplace(actualScoreOnSet, clefToAdd);
+                }
+                else if (layerElement->GetParent()->Is(BEAM)) {
+                    layerElement->GetParent()->InsertAfter(layerElement, clefToAdd);
+                }
+                else if (layerElement->GetParent()->Is({ CHORD, FTREM })) {
+                    otherLayer->InsertAfter(layerElement->GetParent(), clefToAdd);
+                }
             }
         }
     }
