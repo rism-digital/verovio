@@ -344,7 +344,7 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool e
     }
     // If it is Beam, try to get alignments for first and last elements and calculate
     // the duration of the beam based on those
-    else if (!alignment && element->Is(BEAM)) {
+    else if (element->Is(BEAM)) {
         Beam *beam = vrv_cast<Beam *>(element);
         const ArrayOfObjects *beamChildren = beam->GetList(beam);
 
