@@ -1410,7 +1410,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         return false;
     }
     // Check if this leaves any containers empty and delete them
-    if (isNc && result) {
+    if (isNc) {
         assert(parent->Is(NEUME));
         obj = parent;
         parent = parent->GetParent();
@@ -1427,7 +1427,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             }
         }
     }
-    if (isNeumeOrNc && result) {
+    if (isNeumeOrNc) {
         assert(parent->Is(SYLLABLE));
         obj = parent;
         parent = parent->GetParent();
