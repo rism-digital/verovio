@@ -160,6 +160,7 @@ enum ClassId {
     ARPEG,
     BRACKETSPAN,
     BREATH,
+    CAESURA,
     DIR,
     DYNAM,
     FERMATA,
