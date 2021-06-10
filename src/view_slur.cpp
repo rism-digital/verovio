@@ -300,7 +300,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             }
             // d(^)
             else {
-                // put it on the side, move it left, but not if we have a @stamp
+                // put it on the side, move it left, but not if we have a @tstamp
                 if (!start->Is(TIMESTAMP_ATTR) && (startStemLen != 0))
                     x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
                 if (startChord || startParentChord)
@@ -400,7 +400,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             }
             // (_)P
             else {
-                // put it on the side, move it right, but not if we have a @stamp2
+                // put it on the side, move it right, but not if we have a @tstamp2
                 if (!end->Is(TIMESTAMP_ATTR)) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (endChord || endParentChord) {
                     y2 = yChordMin - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
