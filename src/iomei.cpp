@@ -5021,6 +5021,13 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     Chord *vrvChord = new Chord();
     ReadLayerElement(chord, vrvChord);
 
+    if (m_version < MEI_4_0_0) {
+        if (chord.attribute("size")) {
+            chord.remove_attribute("size");
+            chord.append_attribute("cue").set_value("true");
+        }
+    }
+
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadColor(chord);
     vrvChord->ReadCue(chord);
@@ -5204,6 +5211,13 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     Mensur *vrvMensur = new Mensur();
     ReadLayerElement(mensur, vrvMensur);
 
+    if (m_version < MEI_4_0_0) {
+        if (mensur.attribute("size")) {
+            mensur.remove_attribute("size");
+            mensur.append_attribute("cue").set_value("true");
+        }
+    }
+
     vrvMensur->ReadColor(mensur);
     vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
@@ -5239,6 +5253,13 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     MRest *vrvMRest = new MRest();
     ReadLayerElement(mRest, vrvMRest);
     ReadPositionInterface(mRest, vrvMRest);
+
+    if (m_version < MEI_4_0_0) {
+        if (mRest.attribute("size")) {
+            mRest.remove_attribute("size");
+            mRest.append_attribute("cue").set_value("true");
+        }
+    }
 
     vrvMRest->ReadColor(mRest);
     vrvMRest->ReadCue(mRest);
@@ -5355,6 +5376,13 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     Note *vrvNote = new Note();
     ReadLayerElement(note, vrvNote);
 
+    if (m_version < MEI_4_0_0) {
+        if (note.attribute("size")) {
+            note.remove_attribute("size");
+            note.append_attribute("cue").set_value("true");
+        }
+    }
+
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
     ReadPositionInterface(note, vrvNote);
@@ -5399,6 +5427,13 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
 {
     Rest *vrvRest = new Rest();
     ReadLayerElement(rest, vrvRest);
+
+    if (m_version < MEI_4_0_0) {
+        if (rest.attribute("size")) {
+            rest.remove_attribute("size");
+            rest.append_attribute("cue").set_value("true");
+        }
+    }
 
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
