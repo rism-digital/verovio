@@ -2943,6 +2943,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (xmlDynam.attribute("id")) dynam->SetUuid(xmlDynam.attribute("id").as_string());
         // place
         dynam->SetPlace(dynam->AttPlacementRelStaff::StrToStaffrel(xmlDynam.attribute("placement").as_string()));
+        int defaultY = xmlDynam.attribute("default-y").as_int();
+        defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+        dynam->SetVgrp(defaultY);
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : xmlDynam.children()) {
             if (std::string(xmlDynamPart.name()) == "other-dynamics") {
