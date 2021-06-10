@@ -554,29 +554,27 @@ float View::CalcInitialSlur(
     
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
-    std::set<int> measureNumbers;
-    measureNumbers.emplace(staff->GetN());
+    std::set<int> staffNumbers;
+    staffNumbers.emplace(staff->GetN());
     Staff *startStaff = slur->GetStart()->m_crossStaff ? slur->GetStart()->m_crossStaff
                                                        : vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF));
     Staff *endStaff = slur->GetEnd()->m_crossStaff ? slur->GetEnd()->m_crossStaff
                                                      : vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF));
     if (startStaff && (startStaff != staff)) {
-        measureNumbers.emplace(startStaff->GetN());
+        staffNumbers.emplace(startStaff->GetN());
     }
     else if (endStaff && (endStaff != staff)) {
-        measureNumbers.emplace(endStaff->GetN());
+        staffNumbers.emplace(endStaff->GetN());
     }
-    // AttNIntegerComparison matchLayer(LAYER, layerN);
-    //filters.push_back(&matchLayer);
 
     // With the way FindSpannedLayerElements is implemented it's not currently possible to use AttNIntegerAnyComparison
     // for the filter, since processing goes staff by staff and process stops as soon as maxPos is reached. To
     // circumvent that, we're going to process each staff separately and add all overlapping elements together in the
     // end
     std::vector<LayerElement *> elements;
-    for (auto measureNum : measureNumbers) {
+    for (const auto staffNumber : staffNumbers) {
         ArrayOfComparisons filters;
-        AttNIntegerComparison matchStaff(STAFF, measureNum);
+        AttNIntegerComparison matchStaff(STAFF, staffNumber);
         filters.push_back(&matchStaff);
         Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
         system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
@@ -594,16 +592,8 @@ float View::CalcInitialSlur(
         Point pRotated;
         Point pLeft;
         pLeft.x = element->GetSelfLeft();
-        // if ((pLeft.x > p1->x) && (pLeft.x < bezier.p2->x)) {
-        //    pLeft.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
-        //    spannedElements->push_back(spannedElement);
-        //}
         Point pRight;
         pRight.x = element->GetSelfRight();
-        // if ((pRight.x > p1->x) && (pRight.x < bezier.p2->x)) {
-        //    pRight.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
-        //    spannedElements->push_back(spannedElement);
-        //}
         if (((pLeft.x > bezier.p1.x) && (pLeft.x < bezier.p2.x))
             || ((pRight.x > bezier.p1.x) && (pRight.x < bezier.p2.x))) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement;
@@ -630,6 +620,7 @@ float View::CalcInitialSlur(
     if ((bezier.p2.x - bezier.p1.x) != 0 && curve->IsCrossStaff()) {
         dontAdjustAngle = std::abs((bezier.p2.y - bezier.p1.y) / (bezier.p2.x - bezier.p1.x)) < 4;
     }
+
     const float slurAngle = dontAdjustAngle
         ? atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x)
         : slur->GetAdjustedSlurAngle(m_doc, bezier.p1, bezier.p2, curveDir, (spannedElements->size() > 0));

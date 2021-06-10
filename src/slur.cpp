@@ -281,13 +281,12 @@ bool Slur::AdjustSlurPosition(
             bezierCurve.SetRightControlPointOffset(0.5 * bezierCurve.GetRightControlPointOffset());
             bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftLeft);
             bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftRight);
-            const int shiftDifference = std::abs(maxShiftLeft - maxShiftRight);
-            if ((maxShiftLeft > maxShiftRight) && !maxShiftRight) {
+            if ((maxShiftLeft > maxShiftRight) && (maxShiftRight == 0)) {
                 bezierCurve.SetLeftControlHeight(1.5 * bezierCurve.GetLeftControlHeight());
                 bezierCurve.SetRightControlPointOffset(2 * bezierCurve.GetRightControlPointOffset());
                 bezierCurve.SetRightControlHeight(0.5 * bezierCurve.GetRightControlHeight());
             }
-            else if ((maxShiftRight > maxShiftLeft) && !maxShiftLeft) {
+            else if ((maxShiftRight > maxShiftLeft) && (maxShiftLeft == 0)) {
                 bezierCurve.SetRightControlHeight(1.5 * bezierCurve.GetRightControlHeight());
                 bezierCurve.SetLeftControlPointOffset(2 * bezierCurve.GetLeftControlPointOffset());
                 bezierCurve.SetLeftControlHeight(0.5 * bezierCurve.GetLeftControlHeight());
@@ -341,27 +340,25 @@ bool Slur::AdjustSlurPosition(
         // their ends just hanging over the staff (since we lift both ends of slur), so by doing following adjustment
         // it's possible to make those slurs look slightly better
         if (isNotAdjustable) {
-            if ((std::abs(maxShiftLeft) > std::abs(maxShiftRight)) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+            if (std::abs(maxShiftLeft) > std::abs(maxShiftRight)) {
                 maxShiftRight /= 4;
             }
-            else if ((std::abs(maxShiftLeft) < std::abs(maxShiftRight))
-                && (curve->GetDir() == curvature_CURVEDIR_above)) {
+            else if (std::abs(maxShiftLeft) < std::abs(maxShiftRight)) {
                 maxShiftLeft /= 4;
-            }                 
+            }
         }
         bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
         bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
 
         angle = GetAdjustedSlurAngle(
             doc, bezierCurve.p1, bezierCurve.p2, curve->GetDir(), !curve->IsCrossStaff() && !isNotAdjustable);
-        //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
         return false;
     }
 }
 
 
 std::pair<int, int> Slur::CalculateAdjustedSlurShift(
-    FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int margin, bool forceBothSides, bool &isNotAdjustable)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin, bool forceBothSides, bool &isNotAdjustable)
 {
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
@@ -379,11 +376,11 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(
         [dir = curve->GetDir(), &extremeY](CurveSpannedElement *element) {
             if (dir == curvature_CURVEDIR_above) {
                 const int y = element->m_boundingBox->GetSelfTop();
-                extremeY = std::max(y, extremeY);
+                extremeY = (extremeY == VRV_UNSET)? y : std::max(y, extremeY);
             }
             else {
                 const int y = element->m_boundingBox->GetSelfBottom();
-                extremeY = std::min(y, extremeY);
+                extremeY = (extremeY == VRV_UNSET) ? y : std::min(y, extremeY);
             }
         });
     const int leftPointMaxHeight = extremeY - bezierCurve.p1.y;

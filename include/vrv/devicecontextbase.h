@@ -220,7 +220,7 @@ public:
     // no copy ctor or assignment operator - the defaults are ok
 
     BezierCurve() {}
-    BezierCurve(Point &p1, Point &c1, Point &c2, Point &p2) : p1(p1), c1(c1), c2(c2), p2(p2) {}
+    BezierCurve(const Point &p1, const Point &c1, const Point &c2, const Point &p2) : p1(p1), c1(c1), c2(c2), p2(p2) {}
 
     // Helper to rotate all points within bezier curve around @rotationPoint by @angle
     void Rotate(float angle, const Point &rotationPoint);

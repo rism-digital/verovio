@@ -69,7 +69,7 @@ public:
     /**
      * Calculate slur left/right maximum shifts required for slur not to overlap with other objects
      */
-    std::pair<int, int> CalculateAdjustedSlurShift(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int margin,
+    std::pair<int, int> CalculateAdjustedSlurShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin,
         bool forceBothSides, bool &isNotAdjustable);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);

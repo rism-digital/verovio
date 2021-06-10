@@ -889,21 +889,21 @@ std::pair<double, int> BoundingBox::ApproximateBezierExtrema(
     // Implementing Cardano's algorithm should give us proper time points for the min/max extremities on the cubic
     // curve. However, we do not require such precision at this point, so these time points can be approximate simply by
     // calculating Y point for T time with certain step
-    std::map<double, int> yCoodinatesAtTime;
+    std::map<double, int> yCoordinatesAtTime;
     const double step = 1.0 / approximationSteps;
     for (int i = 0; i < approximationSteps + 1; ++i) {
         const double currentTime = i * step;
-        yCoodinatesAtTime.emplace(std::make_pair(currentTime, CalcPointAtBezier(bezier, currentTime).y));
+        yCoordinatesAtTime.emplace(std::make_pair(currentTime, CalcPointAtBezier(bezier, currentTime).y));
     }
 
     if (isMaxExtrema) {
-        return *std::max_element(yCoodinatesAtTime.begin(), yCoodinatesAtTime.end(),
+        return *std::max_element(yCoordinatesAtTime.begin(), yCoordinatesAtTime.end(),
             [](const std::pair<double, int> &left, const std::pair<double, int> &right) {
                 return left.second < right.second;
             });
     }
     else {
-        return *std::min_element(yCoodinatesAtTime.begin(), yCoodinatesAtTime.end(),
+        return *std::min_element(yCoordinatesAtTime.begin(), yCoordinatesAtTime.end(),
             [](const std::pair<double, int> &left, const std::pair<double, int> &right) {
                 return left.second < right.second;
             });
