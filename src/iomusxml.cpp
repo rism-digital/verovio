@@ -2221,10 +2221,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (rehearsal) {
         Reh *reh = new Reh();
         reh->SetPlace(reh->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-        std::string halign = rehearsal.attribute("halign").as_string();
-        std::string lang = rehearsal.attribute("xml:lang").as_string();
-        if (lang.empty()) lang = "it";
-        std::string textStr = GetContent(rehearsal);
+        const std::string halign = rehearsal.attribute("halign").as_string();
+        const std::string lang = rehearsal.attribute("xml:lang") ? rehearsal.attribute("xml:lang").as_string() : "it";
+        const std::string textStr = GetContent(rehearsal);
         reh->SetColor(rehearsal.attribute("color").as_string());
         reh->SetTstamp(timeStamp);
         int staffNum = staffNode.text().as_int() + staffOffset;
@@ -2722,12 +2721,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             verse->SetN(lyricNumber);
             for (pugi::xml_node textNode : lyric.children("text")) {
                 if (!HasAttributeWithValue(lyric, "print-object", "no")) {
-                    // std::string textColor = textNode.attribute("color").as_string();
-                    std::string textStyle = textNode.attribute("font-style").as_string();
-                    std::string textWeight = textNode.attribute("font-weight").as_string();
+                    // const std::string textColor = textNode.attribute("color").as_string();
+                    const std::string textStyle = textNode.attribute("font-style").as_string();
+                    const std::string textWeight = textNode.attribute("font-weight").as_string();
                     int lineThrough = textNode.attribute("line-through").as_int();
-                    std::string lang = textNode.attribute("xml:lang").as_string();
-                    std::string textStr = textNode.text().as_string();
+                    const std::string lang = textNode.attribute("xml:lang").as_string();
+                    const std::string textStr = textNode.text().as_string();
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
                     if (GetContentOfChild(lyric, "syllabic") == "single") {
@@ -2974,7 +2973,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // fingering
     auto xmlFing = notations.node().select_node("technical/fingering");
     if (xmlFing) {
-        std::string fingText = GetContent(xmlFing.node());
+        const std::string fingText = xmlFing.node().text().as_string();
         Fing *fing = new Fing();
         Text *text = new Text();
         text->SetText(UTF8to16(fingText));
