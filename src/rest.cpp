@@ -504,8 +504,8 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
         rightMargin = GetSelfBottom() - params->m_y2 - beams * beamWidth;
     }
 
-    // Adjust drawing location for the rest based on the overlap with beams. Adjustmend should be an even number, so
-    // that rest is positioned properly
+    // Adjust drawing location for the rest based on the overlap with beams.
+    // Adjustment should be an even number, so that the rest is positioned properly
     const int overlapMargin = std::min(leftMargin, rightMargin);
     if (overlapMargin < 0) {
         Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
