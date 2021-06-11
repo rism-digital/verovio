@@ -510,7 +510,7 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
     if (overlapMargin < 0) {
         Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
         assert(staff);
-        if (!HasPloc() && !HasOloc()) {
+        if ((!HasOloc() || !HasPloc()) && !HasLoc()) {
             const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
             const int oldLoc = GetDrawingLoc();
