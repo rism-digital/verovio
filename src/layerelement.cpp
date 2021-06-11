@@ -1171,7 +1171,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             if ((rest->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
 
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
-            if (Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1)); beam) {
+            Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
+            if (beam) {
                 beam->ResetList(beam);
 
                 const ArrayOfObjects *beamList = beam->GetList(beam);
