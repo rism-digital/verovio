@@ -2267,7 +2267,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (containsTempo) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
-            tempo->SetLang(words.first().node().attribute("xml:lang").as_string());
+            const std::string lang = words.first().node().attribute("xml:lang")
+                ? words.first().node().attribute("xml:lang").as_string()
+                : "it";
+            tempo->SetLang(lang);
         }
         tempo->SetPlace(tempo->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
         if (words.size() != 0) TextRendition(words, tempo);
