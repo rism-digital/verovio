@@ -450,7 +450,7 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints)
 {
-    float slurAngle = atan2(p2.y - p1.y, p2.x - p1.x);
+    float slurAngle = (p1 == p2) ? 0 : atan2(p2.y - p1.y, p2.x - p1.x);
     float maxSlope = (float)doc->GetOptions()->m_slurMaxSlope.GetValue() * M_PI / 180.0;
 
     // For slurs without spanning points allow for double angle
@@ -481,7 +481,7 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVE
 
 void Slur::GetControlPoints(BezierCurve &bezier, curvature_CURVEDIR curveDir, bool ignoreAngle)
 {
-    float slurAngle = atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x);
+    const float slurAngle = (bezier.p2 == bezier.p1) ? 0 : atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x);
     if ((slurAngle != 0.0) && !ignoreAngle) {
         bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
         // It should not be the case but we do need to avoid recursive calls whatever the effect in the resutls
