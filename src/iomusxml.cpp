@@ -2727,6 +2727,18 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::string textWeight = textNode.attribute("font-weight").as_string();
                     std::string lang = textNode.attribute("xml:lang").as_string();
                     std::string textStr = textNode.text().as_string();
+                    
+                    // convert verse numbers to labels
+                    if (!textStr.empty() && textStr.find_first_not_of("0123456789.") == std::string::npos && textNode.next_sibling("elision")) {
+                        Label *label = new Label();
+                        
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(textStr));
+                        label->AddChild(text);
+                        verse->AddChild(label);
+                        continue;
+                    }
+                    
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
                     if (GetContentOfChild(lyric, "syllabic") == "single") {
