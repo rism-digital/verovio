@@ -120,12 +120,12 @@ public:
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */
-    static std::map<int, std::string> s_breaks;
-    static std::map<int, std::string> s_condense;
-    static std::map<int, std::string> s_footer;
-    static std::map<int, std::string> s_header;
-    static std::map<int, std::string> s_multiRestStyle;
-    static std::map<int, std::string> s_systemDivider;
+    static thread_local std::map<int, std::string> s_breaks;
+    static thread_local std::map<int, std::string> s_condense;
+    static thread_local std::map<int, std::string> s_footer;
+    static thread_local std::map<int, std::string> s_header;
+    static thread_local std::map<int, std::string> s_multiRestStyle;
+    static thread_local std::map<int, std::string> s_systemDivider;
 
 protected:
     std::string m_title;

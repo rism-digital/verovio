@@ -44,7 +44,7 @@ namespace vrv {
 // Static members
 //----------------------------------------------------------------------------
 
-std::vector<void *> FloatingObject::s_drawingObjectIds;
+thread_local std::vector<void *> FloatingObject::s_drawingObjectIds;
 
 //----------------------------------------------------------------------------
 // FloatingObject

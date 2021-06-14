@@ -170,12 +170,12 @@ private:
     //----------------//
 
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
-    static std::string s_path;
+    static thread_local std::string s_path;
     /** The loaded SMuFL font */
-    static GlyphMap s_font;
+    static thread_local GlyphMap s_font;
     /** A text font used for bounding box calculations */
-    static GlyphTextMap s_textFont;
-    static StyleAttributes s_currentStyle;
+    static thread_local GlyphTextMap s_textFont;
+    static thread_local StyleAttributes s_currentStyle;
     static const StyleAttributes k_defaultStyle;
     /**
      * A map of glyph name / code

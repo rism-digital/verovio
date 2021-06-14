@@ -629,8 +629,8 @@ private:
 
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
-    static int s_drawingLigX[2], s_drawingLigY[2];
-    static bool s_drawingLigObliqua;
+    static thread_local int s_drawingLigX[2], s_drawingLigY[2];
+    static thread_local bool s_drawingLigObliqua;
     ///@}
 };
 

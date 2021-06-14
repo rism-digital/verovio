@@ -57,7 +57,7 @@ namespace vrv {
 // Object
 //----------------------------------------------------------------------------
 
-unsigned long Object::s_objectCounter = 0;
+thread_local unsigned long Object::s_objectCounter = 0;
 
 Object::Object() : BoundingBox()
 {

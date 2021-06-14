@@ -28,12 +28,12 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-data_PITCHNAME KeySig::s_pnameForFlats[]
+thread_local data_PITCHNAME KeySig::s_pnameForFlats[]
     = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-data_PITCHNAME KeySig::s_pnameForSharps[]
+thread_local data_PITCHNAME KeySig::s_pnameForSharps[]
     = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
 
-int KeySig::octave_map[2][9][7] = {
+const int KeySig::octave_map[2][9][7] = {
     {
         // flats
         // C,  D,  E,  F,  G,  A,  B

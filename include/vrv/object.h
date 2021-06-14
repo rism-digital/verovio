@@ -1349,7 +1349,7 @@ private:
     /**
      * A static counter for uuid generation.
      */
-    static unsigned long s_objectCounter;
+    static thread_local unsigned long s_objectCounter;
 };
 
 //----------------------------------------------------------------------------

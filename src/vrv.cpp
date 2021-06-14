@@ -60,10 +60,10 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-std::string Resources::s_path = "/usr/local/share/verovio";
-Resources::GlyphTextMap Resources::s_textFont;
-Resources::GlyphMap Resources::s_font;
-Resources::StyleAttributes Resources::s_currentStyle;
+thread_local std::string Resources::s_path = "/usr/local/share/verovio";
+thread_local Resources::GlyphTextMap Resources::s_textFont;
+thread_local Resources::GlyphMap Resources::s_font;
+thread_local Resources::StyleAttributes Resources::s_currentStyle;
 const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
     data_FONTSTYLE::FONTSTYLE_normal };
 

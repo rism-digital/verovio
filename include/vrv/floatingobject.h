@@ -135,7 +135,7 @@ private:
      * The ids of the group is then the position in the vector + GRPS_BASE_ID.
      * Groups coded in MEI have negative ids (-@vgrp value)
      */
-    static std::vector<void *> s_drawingObjectIds;
+    static thread_local std::vector<void *> s_drawingObjectIds;
 };
 
 //----------------------------------------------------------------------------

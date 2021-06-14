@@ -141,11 +141,11 @@ public:
     /**
      * A static array for storing the articulation that have to be placed outside the staff
      */
-    static std::vector<data_ARTICULATION> s_outStaffArtic;
+    static const std::vector<data_ARTICULATION> s_outStaffArtic;
     /**
      * A static array for storing the articulation that have to be place above the staff is possible
      */
-    static std::vector<data_ARTICULATION> s_aboveStaffArtic;
+    static const std::vector<data_ARTICULATION> s_aboveStaffArtic;
 
 private:
     //

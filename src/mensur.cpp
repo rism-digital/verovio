@@ -20,8 +20,8 @@
 
 namespace vrv {
 
-int Mensur::s_num = 3;
-int Mensur::s_numBase = 2;
+const int Mensur::s_num = 3;
+const int Mensur::s_numBase = 2;
 
 //----------------------------------------------------------------------------
 // Mensur

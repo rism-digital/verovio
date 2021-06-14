@@ -21,23 +21,23 @@
 
 namespace vrv {
 
-std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
+thread_local std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
     { BREAKS_line, "line" }, { BREAKS_smart, "smart" }, { BREAKS_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_condense
+thread_local std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_footer
+thread_local std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
-std::map<int, std::string> Option::s_header
+thread_local std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
+thread_local std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
-std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
-    { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+thread_local std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
+    { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
     = "{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
