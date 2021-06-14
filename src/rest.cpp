@@ -522,7 +522,8 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
                 Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
                 if (dots) {
                     std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-                    const auto iter = std::find(dotLocs->begin(), dotLocs->end(), oldLoc);
+                    const int dotLoc = (oldLoc % 2)? oldLoc : oldLoc + 1;
+                    const auto iter = std::find(dotLocs->begin(), dotLocs->end(), dotLoc);
                     if (iter != dotLocs->end()) *iter = newLoc;
                 }
             }
