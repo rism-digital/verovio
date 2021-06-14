@@ -60,6 +60,7 @@ FloatingObject::FloatingObject(const std::string &classid) : Object(classid)
     Reset();
 
     m_currentPositioner = NULL;
+    m_maxDrawingYRel = 0;
 }
 
 FloatingObject::~FloatingObject() {}
@@ -367,9 +368,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            if (m_object->Is({ DIR, DYNAM })) {
+                if (m_object->GetMaxDrawingYRel() > yRel) m_object->SetMaxDrawingYRel(yRel);
+                SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
+            }
             // With LayerElement always move them up
-            if (object && object->IsLayerElement()) {
+            else if (object && object->IsLayerElement()) {
                 if (yRel < 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if the is a vertical overlap
@@ -388,9 +394,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + GetContentY2() + margin;
+            
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            if (m_object->Is({ DIR, DYNAM })) {
+                if (m_object->GetMaxDrawingYRel() < yRel) m_object->SetMaxDrawingYRel(yRel);
+                SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
+            }
             // With LayerElement always move them down
-            if (object && object->IsLayerElement()) {
+            else if (object && object->IsLayerElement()) {
                 if (yRel > 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if the is a vertical overlap

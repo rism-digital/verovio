@@ -70,6 +70,9 @@ public:
     void SetDrawingGrpId(int drawingGrpId) { m_drawingGrpId = drawingGrpId; }
     int SetDrawingGrpObject(void *drawingGrpObject);
     ///@}
+    
+    void SetMaxDrawingYRel(int maxDrawingYRel) { m_maxDrawingYRel = maxDrawingYRel; };
+    int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
 
     //----------//
     // Functors //
@@ -124,6 +127,8 @@ private:
 
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
+    
+    int m_maxDrawingYRel;
 
     //----------------//
     // Static members //
