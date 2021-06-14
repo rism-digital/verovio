@@ -21,6 +21,7 @@
 #include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
+#include "caesura.h"
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
@@ -1229,21 +1230,24 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     else
                         meterSig->SetForm(METERFORM_norm);
                 }
-                if (time.node().child("senza-misura")) {
-                    meterSig->SetForm(METERFORM_invis);
-                }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
                 }
-                pugi::xpath_node beats = time.node().select_node("beats");
-                if (beats.node().text()) {
-                    m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
-                    meterSig->SetCount(m_meterCount);
-                }
+                pugi::xml_node beats = time.node().child("beats");
                 pugi::xml_node beatType = time.node().child("beat-type");
-                if (beatType.text()) {
+                if (beats) {
+                    m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
+                    meterSig->SetCount(m_meterCount);
                     m_meterUnit = beatType.text().as_int();
                     meterSig->SetUnit(m_meterUnit);
+                }
+                else if (time.node().child("senza-misura")) {
+                    if (time.node().child("senza-misura").text()) {
+                        meterSig->SetSym(METERSIGN_open);
+                    }
+                    else {
+                        meterSig->SetForm(METERFORM_invis);
+                    }
                 }
             }
             // add it if necessary
@@ -1586,13 +1590,12 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
 
         if (time) {
-            MeterSig *meterSig = NULL;
-            std::string symbol = time.attribute("symbol").as_string();
+            MeterSig *meterSig = new MeterSig();
             if (time.attribute("id")) {
                 meterSig->SetUuid(time.attribute("id").as_string());
             }
+            std::string symbol = time.attribute("symbol").as_string();
             if (!symbol.empty()) {
-                if (!meterSig) meterSig = new MeterSig();
                 if (symbol == "cut" || symbol == "common")
                     meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
@@ -1600,25 +1603,26 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meterSig->SetForm(METERFORM_norm);
             }
-            if (time.select_nodes("beats").size() > 1) {
-                LogWarning("MusicXML import: Compound meter signatures are not supported");
-            }
-            pugi::xpath_node beats = time.select_node("beats");
-            if (beats.node().text()) {
-                if (!meterSig) meterSig = new MeterSig();
-                m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.node().text().as_string());
+            pugi::xml_node beats = time.child("beats");
+            pugi::xml_node beatType = time.child("beat-type");
+            if (beats) {
+                m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
                 meterSig->SetCount(m_meterCount);
-            }
-            pugi::xpath_node beatType = time.select_node("beat-type");
-            if (beatType.node().text()) {
-                if (!meterSig) meterSig = new MeterSig();
-                m_meterUnit = beatType.node().text().as_int();
+                m_meterUnit = beatType.text().as_int();
                 meterSig->SetUnit(m_meterUnit);
+                if (time.select_nodes("beats").size() > 1) {
+                    LogWarning("MusicXML import: Compound meter signatures are not supported");
+                }
             }
-            // add it if necessary
-            if (meterSig) {
-                scoreDef->AddChild(meterSig);
+            else if (time.child("senza-misura")) {
+                if (time.child("senza-misura").text()) {
+                    meterSig->SetSym(METERSIGN_open);
+                }
+                else {
+                    meterSig->SetForm(METERFORM_invis);
+                }
             }
+            scoreDef->AddChild(meterSig);
         }
 
         if (divisions) {
@@ -2721,17 +2725,12 @@ void MusicXmlInput::ReadMusicXmlNote(
                     // std::string textColor = textNode.attribute("color").as_string();
                     std::string textStyle = textNode.attribute("font-style").as_string();
                     std::string textWeight = textNode.attribute("font-weight").as_string();
+                    int lineThrough = textNode.attribute("line-through").as_int();
                     std::string lang = textNode.attribute("xml:lang").as_string();
                     std::string textStr = textNode.text().as_string();
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
-                    if (textNode.next_sibling("elision")) {
-                        syl->SetCon(sylLog_CON_b);
-                    }
-                    else if (lyric.child("extend")) {
-                        syl->SetCon(sylLog_CON_u);
-                    }
-                    else if (GetContentOfChild(lyric, "syllabic") == "single") {
+                    if (GetContentOfChild(lyric, "syllabic") == "single") {
                         syl->SetWordpos(sylLog_WORDPOS_s);
                         syl->SetCon(sylLog_CON_s);
                     }
@@ -2745,18 +2744,31 @@ void MusicXmlInput::ReadMusicXmlNote(
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
-                        // Do not set @con when the syllable has an ellision
-                        if (syl->GetCon() != sylLog_CON_b) {
-                            syl->SetCon(sylLog_CON_s);
-                        }
+                        syl->SetCon(sylLog_CON_s);
                     }
+
+                    // override @con if we have elisions or extensions
+                    if (textNode.next_sibling("elision")) {
+                        syl->SetCon(sylLog_CON_b);
+                    }
+                    else if (lyric.child("extend")) {
+                        syl->SetCon(sylLog_CON_u);
+                    }
+
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
                     if (!textWeight.empty())
                         syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
 
                     Text *text = new Text();
                     text->SetText(UTF8to16(textStr));
-                    syl->AddChild(text);
+                    if (lineThrough){
+                        Rend *rend = new Rend();
+                        rend->AddChild(text);
+                        rend->SetRend(TEXTRENDITION_line_through);
+                        syl->AddChild(rend);
+                    } else {
+                        syl->AddChild(text);
+                    }
                     verse->AddChild(syl);
                 }
             }
@@ -2907,6 +2919,18 @@ void MusicXmlInput::ReadMusicXmlNote(
             breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
         breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+    }
+
+    // caesura
+    pugi::xpath_node xmlCaesura = notations.node().select_node("articulations/caesura");
+    if (xmlCaesura) {
+        Caesura *caesura = new Caesura();
+        m_controlElements.push_back(std::make_pair(measureNum, caesura));
+        caesura->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        caesura->SetPlace(
+            caesura->AttPlacementRelStaff::StrToStaffrel(xmlCaesura.node().attribute("placement").as_string()));
+        caesura->SetColor(xmlCaesura.node().attribute("color").as_string());
+        caesura->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     }
 
     // dynamics

@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-# Requires phantomjs and python3 with package lxml
+# Requires phantomjs and python
 
 if [ ! -e tmp ]; then
     mkdir tmp

@@ -28,6 +28,7 @@
 #include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
+#include "caesura.h"
 #include "choice.h"
 #include "chord.h"
 #include "clef.h"
@@ -407,6 +408,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
         WriteBreath(m_currentNode, dynamic_cast<Breath *>(object));
+    }
+    else if (object->Is(CAESURA)) {
+        m_currentNode = m_currentNode.append_child("caesura");
+        WriteCaesura(m_currentNode, dynamic_cast<Caesura *>(object));
     }
     else if (object->Is(DIR)) {
         m_currentNode = m_currentNode.append_child("dir");
@@ -1258,6 +1263,16 @@ void MEIOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
     WriteTimePointInterface(currentNode, breath);
     breath->WriteColor(currentNode);
     breath->WritePlacementRelStaff(currentNode);
+}
+
+void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
+{
+    assert(caesura);
+
+    WriteControlElement(currentNode, caesura);
+    WriteTimePointInterface(currentNode, caesura);
+    caesura->WriteColor(currentNode);
+    caesura->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
@@ -4062,8 +4077,8 @@ bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 
     if (m_version < MEI_4_0_0) {
         if (instrDef.attribute("midi.volume")) {
-            const std::string midiVol = instrDef.attribute("midi.volume").as_string();
-            instrDef.attribute("midi.volume").set_value((midiVol + "%").c_str());
+            const float midiValue = instrDef.attribute("midi.volume").as_float();
+            instrDef.attribute("midi.volume").set_value(StringFormat("%.2f%%", midiValue / 127 * 100).c_str());
         }
     }
 
@@ -4153,6 +4168,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "breath") {
             success = ReadBreath(parent, current);
+        }
+        else if (std::string(current.name()) == "caesura") {
+            success = ReadCaesura(parent, current);
         }
         else if (std::string(current.name()) == "dir") {
             success = ReadDir(parent, current);
@@ -4295,6 +4313,20 @@ bool MEIInput::ReadBreath(Object *parent, pugi::xml_node breath)
 
     parent->AddChild(vrvBreath);
     ReadUnsupportedAttr(breath, vrvBreath);
+    return true;
+}
+
+bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
+{
+    Caesura *vrvCaesura = new Caesura();
+    ReadControlElement(caesura, vrvCaesura);
+
+    ReadTimePointInterface(caesura, vrvCaesura);
+    vrvCaesura->ReadColor(caesura);
+    vrvCaesura->ReadPlacementRelStaff(caesura);
+
+    parent->AddChild(vrvCaesura);
+    ReadUnsupportedAttr(caesura, vrvCaesura);
     return true;
 }
 
@@ -4989,6 +5021,13 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     Chord *vrvChord = new Chord();
     ReadLayerElement(chord, vrvChord);
 
+    if (m_version < MEI_4_0_0) {
+        if (chord.attribute("size")) {
+            chord.remove_attribute("size");
+            chord.append_attribute("cue").set_value("true");
+        }
+    }
+
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadColor(chord);
     vrvChord->ReadCue(chord);
@@ -5172,6 +5211,13 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     Mensur *vrvMensur = new Mensur();
     ReadLayerElement(mensur, vrvMensur);
 
+    if (m_version < MEI_4_0_0) {
+        if (mensur.attribute("size")) {
+            mensur.remove_attribute("size");
+            mensur.append_attribute("cue").set_value("true");
+        }
+    }
+
     vrvMensur->ReadColor(mensur);
     vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
@@ -5207,6 +5253,13 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     MRest *vrvMRest = new MRest();
     ReadLayerElement(mRest, vrvMRest);
     ReadPositionInterface(mRest, vrvMRest);
+
+    if (m_version < MEI_4_0_0) {
+        if (mRest.attribute("size")) {
+            mRest.remove_attribute("size");
+            mRest.append_attribute("cue").set_value("true");
+        }
+    }
 
     vrvMRest->ReadColor(mRest);
     vrvMRest->ReadCue(mRest);
@@ -5323,6 +5376,13 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     Note *vrvNote = new Note();
     ReadLayerElement(note, vrvNote);
 
+    if (m_version < MEI_4_0_0) {
+        if (note.attribute("size")) {
+            note.remove_attribute("size");
+            note.append_attribute("cue").set_value("true");
+        }
+    }
+
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
     ReadPositionInterface(note, vrvNote);
@@ -5367,6 +5427,13 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
 {
     Rest *vrvRest = new Rest();
     ReadLayerElement(rest, vrvRest);
+
+    if (m_version < MEI_4_0_0) {
+        if (rest.attribute("size")) {
+            rest.remove_attribute("size");
+            rest.append_attribute("cue").set_value("true");
+        }
+    }
 
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
