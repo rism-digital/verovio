@@ -597,8 +597,8 @@ int Rest::CalcDots(FunctorParams *functorParams)
 
     if (m_crossStaff) staff = m_crossStaff;
 
-    bool drawingCueSize = this->GetDrawingCueSize();
-    int staffSize = staff->m_drawingStaffSize;
+    const bool drawingCueSize = this->GetDrawingCueSize();
+    const int staffSize = staff->m_drawingStaffSize;
 
     // For single rests we need here to set the dot loc
     Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
@@ -613,15 +613,12 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     switch (this->GetActualDur()) {
-        case DUR_1: loc += 0; break;
-        case DUR_2: loc += 0; break;
-        case DUR_4: loc += 0; break;
-        case DUR_8: loc += 0; break;
-        case DUR_16: loc += 0; break;
-        case DUR_32: loc += 2; break;
+        case DUR_32:
         case DUR_64: loc += 2; break;
-        case DUR_128: loc += 4; break;
+        case DUR_128:
         case DUR_256: loc += 4; break;
+        case DUR_512: loc += 6; break;
+        case DUR_1024: loc += 8; break;
         default: break;
     }
 
