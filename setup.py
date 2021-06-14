@@ -12,6 +12,7 @@ import subprocess
 
 
 class build_ext(_build_ext):
+
     """Override build_ext and sdist commands to generate the git version header file."""
 
     def run(self):
@@ -21,6 +22,7 @@ class build_ext(_build_ext):
 
 
 class sdist(_sdist):
+
     """Override build_sdist and sdist commands to generate the git version header file."""
 
     def run(self):
