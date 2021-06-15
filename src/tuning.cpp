@@ -22,7 +22,7 @@ namespace vrv {
 // Tuning
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Tuning> s_factory("tuning", TUNING);
+// static ClassRegistrar<Tuning> s_factory("tuning", TUNING);
 
 Tuning::Tuning() : Object("tuning-"), AttCourseLog()
 {

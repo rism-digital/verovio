@@ -145,7 +145,7 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
 // ScoreDef
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
+// static ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
 
 ScoreDef::ScoreDef()
     : ScoreDefElement("scoredef-")

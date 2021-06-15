@@ -26,7 +26,7 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Rend> s_factory("rend", REND);
+// static ClassRegistrar<Rend> s_factory("rend", REND);
 
 Rend::Rend()
     : TextElement("rend-")

@@ -24,7 +24,7 @@ namespace vrv {
 // PgHead
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<PgHead> s_factory("pgHead", PGHEAD);
+// static ClassRegistrar<PgHead> s_factory("pgHead", PGHEAD);
 
 PgHead::PgHead() : RunningElement("pghead-")
 {

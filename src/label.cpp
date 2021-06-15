@@ -23,7 +23,7 @@ namespace vrv {
 // Label
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Label> s_factory("label", LABEL);
+// static ClassRegistrar<Label> s_factory("label", LABEL);
 
 Label::Label() : Object("label-"), TextListInterface()
 {

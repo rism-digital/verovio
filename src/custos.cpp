@@ -21,7 +21,7 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Custos> s_factory("custos", CUSTOS);
+// static ClassRegistrar<Custos> s_factory("custos", CUSTOS);
 
 Custos::Custos() : LayerElement("custos-"), PitchInterface(), PositionInterface(), AttColor()
 {

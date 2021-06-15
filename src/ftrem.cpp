@@ -32,7 +32,7 @@ namespace vrv {
 // FTrem
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<FTrem> s_factory("fTrem", FTREM);
+// static ClassRegistrar<FTrem> s_factory("fTrem", FTREM);
 
 FTrem::FTrem() : LayerElement("ftrem-"), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {

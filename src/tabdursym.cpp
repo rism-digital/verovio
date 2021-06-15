@@ -21,7 +21,7 @@ namespace vrv {
 // TabDurSym
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
+// static ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
 
 TabDurSym::TabDurSym() : LayerElement("tabdursym-"), AttNNumberLike()
 {

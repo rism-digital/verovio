@@ -21,7 +21,7 @@ namespace vrv {
 // Caesura
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
+// static ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
 
 Caesura::Caesura() : ControlElement("caesura-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
 {

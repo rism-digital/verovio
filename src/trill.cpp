@@ -22,7 +22,7 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Trill> s_factory("trill", TRILL);
+// static ClassRegistrar<Trill> s_factory("trill", TRILL);
 
 Trill::Trill()
     : ControlElement("trill-")

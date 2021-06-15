@@ -21,7 +21,7 @@ namespace vrv {
 // Abbr
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Abbr> s_factory("abbr", ABBR);
+// static ClassRegistrar<Abbr> s_factory("abbr", ABBR);
 
 Abbr::Abbr() : EditorialElement("abbr-"), AttSource()
 {

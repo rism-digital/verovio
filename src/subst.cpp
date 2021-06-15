@@ -23,7 +23,7 @@ namespace vrv {
 // Subst
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Subst> s_factory("subst", SUBST);
+// static ClassRegistrar<Subst> s_factory("subst", SUBST);
 
 Subst::Subst() : EditorialElement("subst-")
 {

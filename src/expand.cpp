@@ -21,7 +21,7 @@ namespace vrv {
 // Expan
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Expan> s_factory("expan", EXPAN);
+// static ClassRegistrar<Expan> s_factory("expan", EXPAN);
 
 Expan::Expan() : EditorialElement("expan-"), AttSource()
 {

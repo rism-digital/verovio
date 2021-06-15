@@ -20,7 +20,7 @@ namespace vrv {
 // Fing
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Fing> s_factory("fing", FING);
+// static ClassRegistrar<Fing> s_factory("fing", FING);
 
 Fing::Fing() : ControlElement("fing-"), TimePointInterface(), TextDirInterface(), AttNNumberLike()
 {

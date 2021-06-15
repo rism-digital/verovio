@@ -19,7 +19,7 @@ namespace vrv {
 // PgFoot2
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<PgFoot2> s_factory("pgFoot2", PGFOOT2);
+// static ClassRegistrar<PgFoot2> s_factory("pgFoot2", PGFOOT2);
 
 PgFoot2::PgFoot2() : RunningElement("pgfoot2-")
 {
