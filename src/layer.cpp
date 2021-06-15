@@ -287,7 +287,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     }
 }
 
-int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
+std::set<int> Layer::GetLayersNForTimeSpanOf(LayerElement *element)
 {
     assert(element);
 
@@ -305,10 +305,15 @@ int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
     // At this stage we have the parent or the cross-staff
     assert(staff);
 
-    return this->GetLayerCountInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+    return this->GetLayersNInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
 }
 
-int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff)
+int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
+{
+    return static_cast<int>(this->GetLayersNForTimeSpanOf(element).size());
+}
+
+std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, Measure *measure, int staff)
 {
     assert(measure);
 
@@ -324,7 +329,12 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
 
     measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
-    return (int)layerCountInTimeSpanParams.m_layers.size();
+    return layerCountInTimeSpanParams.m_layers;
+}
+
+int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff)
+{
+    return static_cast<int>(this->GetLayersNInTimeSpan(time, duration, measure, staff).size());
 }
 
 ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool excludeCurrent)

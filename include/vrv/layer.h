@@ -104,16 +104,22 @@ public:
     ///@}
 
     /**
-     * Get the number of layer used for the duration of an element.
-     * Takes into account cross-staff situations.
+     * @name Get the layers used for the duration of an element.
+     * Takes into account cross-staff situations: cross staff layers have negative N.
      */
+    ///@{
+    std::set<int> GetLayersNForTimeSpanOf(LayerElement *element);
     int GetLayerCountForTimeSpanOf(LayerElement *element);
+    ///@}
 
     /**
-     * Get the number of layer used within a time span.
-     * Takes into account cross-staff situations.
+     * @name Get the layers used within a time span.
+     * Takes into account cross-staff situations: cross staff layers have negative N.
      */
+    ///@{
+    std::set<int> GetLayersNInTimeSpan(double time, double duration, Measure *measure, int staff);
     int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
+    ///@}
 
     /**
      * Get the list of the layer elements for the duration of an element

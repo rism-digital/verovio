@@ -264,19 +264,18 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 {
     Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!layer) return defaultLocation;
-    const int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+    const std::set<int> layersN = parentLayer->GetLayersNForTimeSpanOf(this);
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
-    if (layerCount != 2) return defaultLocation;
+    if (layersN.size() != 2) return defaultLocation;
 
+    const bool isTopLayer
+        = m_crossStaff ? (staff->GetN() < m_crossStaff->GetN()) : (layer->GetN() == *layersN.cbegin());
+
+    // find best rest location relative to elements on other layers
     Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
-
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     realStaff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer((m_crossStaff && (staff->GetN() < m_crossStaff->GetN()))
-        || (!m_crossStaff && vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN()));
-
-    // find best rest location relative to elements on other layers
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer, isTopLayer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first

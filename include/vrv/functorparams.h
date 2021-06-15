@@ -1667,7 +1667,7 @@ public:
     }
     double m_time;
     double m_duration;
-    std::vector<int> m_layers;
+    std::set<int> m_layers;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;

@@ -2222,10 +2222,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (rehearsal) {
         Reh *reh = new Reh();
         reh->SetPlace(reh->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-        std::string halign = rehearsal.attribute("halign").as_string();
-        std::string lang = rehearsal.attribute("xml:lang").as_string();
-        if (lang.empty()) lang = "it";
-        std::string textStr = GetContent(rehearsal);
+        const std::string halign = rehearsal.attribute("halign").as_string();
+        const std::string lang = rehearsal.attribute("xml:lang") ? rehearsal.attribute("xml:lang").as_string() : "it";
+        const std::string textStr = GetContent(rehearsal);
         reh->SetColor(rehearsal.attribute("color").as_string());
         reh->SetTstamp(timeStamp);
         int staffNum = staffNode.text().as_int() + staffOffset;
@@ -2269,7 +2268,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (containsTempo) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
-            tempo->SetLang(words.first().node().attribute("xml:lang").as_string());
+            const std::string lang = words.first().node().attribute("xml:lang")
+                ? words.first().node().attribute("xml:lang").as_string()
+                : "it";
+            tempo->SetLang(lang);
         }
         tempo->SetPlace(tempo->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
         if (words.size() != 0) TextRendition(words, tempo);
@@ -2723,11 +2725,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             verse->SetN(lyricNumber);
             for (pugi::xml_node textNode : lyric.children("text")) {
                 if (!HasAttributeWithValue(lyric, "print-object", "no")) {
-                    // std::string textColor = textNode.attribute("color").as_string();
-                    std::string textStyle = textNode.attribute("font-style").as_string();
-                    std::string textWeight = textNode.attribute("font-weight").as_string();
-                    std::string lang = textNode.attribute("xml:lang").as_string();
-                    std::string textStr = textNode.text().as_string();
+                    // const std::string textColor = textNode.attribute("color").as_string();
+                    const std::string textStyle = textNode.attribute("font-style").as_string();
+                    const std::string textWeight = textNode.attribute("font-weight").as_string();
+                    int lineThrough = textNode.attribute("line-through").as_int();
+                    const std::string lang = textNode.attribute("xml:lang").as_string();
+                    const std::string textStr = textNode.text().as_string();
 
                     // convert verse numbers to labels
                     std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
@@ -2795,7 +2798,15 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     Text *text = new Text();
                     text->SetText(UTF8to16(textStr));
-                    syl->AddChild(text);
+                    if (lineThrough) {
+                        Rend *rend = new Rend();
+                        rend->AddChild(text);
+                        rend->SetRend(TEXTRENDITION_line_through);
+                        syl->AddChild(rend);
+                    }
+                    else {
+                        syl->AddChild(text);
+                    }
                     verse->AddChild(syl);
                 }
             }
@@ -2970,6 +2981,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (xmlDynam.attribute("id")) dynam->SetUuid(xmlDynam.attribute("id").as_string());
         // place
         dynam->SetPlace(dynam->AttPlacementRelStaff::StrToStaffrel(xmlDynam.attribute("placement").as_string()));
+        int defaultY = xmlDynam.attribute("default-y").as_int();
+        defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+        dynam->SetVgrp(defaultY);
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : xmlDynam.children()) {
             if (std::string(xmlDynamPart.name()) == "other-dynamics") {
@@ -2998,7 +3012,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // fingering
     auto xmlFing = notations.node().select_node("technical/fingering");
     if (xmlFing) {
-        std::string fingText = GetContent(xmlFing.node());
+        const std::string fingText = xmlFing.node().text().as_string();
         Fing *fing = new Fing();
         Text *text = new Text();
         text->SetText(UTF8to16(fingText));
@@ -3724,7 +3738,7 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
         return result->second;
     }
 
-    return TEXTRENDITION_none;
+    return TEXTRENDITION_NONE;
 }
 
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
