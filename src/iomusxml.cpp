@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <numeric>
+#include <regex>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -2729,7 +2730,41 @@ void MusicXmlInput::ReadMusicXmlNote(
                     const std::string textWeight = textNode.attribute("font-weight").as_string();
                     int lineThrough = textNode.attribute("line-through").as_int();
                     const std::string lang = textNode.attribute("xml:lang").as_string();
-                    const std::string textStr = textNode.text().as_string();
+                    std::string textStr = textNode.text().as_string();
+
+                    // convert verse numbers to labels
+                    std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
+                    std::smatch labelSearchMatches;
+                    std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
+                    std::smatch labelPrefixSearchMatches;
+                    if (!textStr.empty() && std::regex_search(textStr, labelSearchMatches, labelSearch)
+                        && labelSearchMatches.ready() && textNode.next_sibling("elision")) {
+                        // entire textStr is a label (MusicXML from Finale)
+
+                        Label *label = new Label();
+
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(labelSearchMatches[0]));
+                        label->AddChild(text);
+                        verse->AddChild(label);
+
+                        continue;
+                    }
+                    else if (!textStr.empty() && std::regex_search(textStr, labelPrefixSearchMatches, labelPrefixSearch)
+                        && labelPrefixSearchMatches.ready()) {
+                        // first part of textStr is a label (MusicXML from Sibelius, MuseScore)
+
+                        Label *label = new Label();
+
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(labelPrefixSearchMatches[0].str().erase(
+                            labelPrefixSearchMatches[0].str().find_last_not_of(" \f\n\r\t\v\u00A0") + 1)));
+                        label->AddChild(text);
+                        verse->AddChild(label);
+
+                        textStr = textStr.erase(0, labelPrefixSearchMatches[0].length());
+                    }
+
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
                     if (GetContentOfChild(lyric, "syllabic") == "single") {
@@ -2763,12 +2798,13 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     Text *text = new Text();
                     text->SetText(UTF8to16(textStr));
-                    if (lineThrough){
+                    if (lineThrough) {
                         Rend *rend = new Rend();
                         rend->AddChild(text);
                         rend->SetRend(TEXTRENDITION_line_through);
                         syl->AddChild(rend);
-                    } else {
+                    }
+                    else {
                         syl->AddChild(text);
                     }
                     verse->AddChild(syl);
