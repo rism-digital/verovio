@@ -377,7 +377,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         yIn = std::min(
             params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
             0);
-        if (beam && beam->m_crossStaffContent) yIn -= beam->m_beamWidth;
+        if (beam && beam->m_crossStaffContent && beam->m_drawingPlace == BEAMPLACE_mixed) yIn -= beam->m_beamWidth;
         yOut = std::min(yIn, staffYBottom);
     }
 
