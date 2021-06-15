@@ -2730,7 +2730,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     const std::string textWeight = textNode.attribute("font-weight").as_string();
                     int lineThrough = textNode.attribute("line-through").as_int();
                     const std::string lang = textNode.attribute("xml:lang").as_string();
-                    const std::string textStr = textNode.text().as_string();
+                    std::string textStr = textNode.text().as_string();
 
                     // convert verse numbers to labels
                     std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
