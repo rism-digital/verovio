@@ -262,14 +262,19 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     else {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
-        assert(existingMeasure);
-        for (auto current : *measure->GetChildren()) {
-            if (!current->Is(STAFF)) {
-                continue;
+        if (existingMeasure) {
+            for (auto current : *measure->GetChildren()) {
+                if (!current->Is(STAFF)) {
+                    continue;
+                }
+                Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
+                assert(staff);
+                existingMeasure->AddChild(staff);
             }
-            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
-            assert(staff);
-            existingMeasure->AddChild(staff);
+        }
+        else {
+            LogWarning("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
+            delete measure;
         }
     }
 
@@ -928,7 +933,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             measure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
-            LogWarning("MusicXML import: Element '%s' could not be added to measure '%s'",
+            LogWarning("MusicXML import: Element '%s' could not be added to measure %s",
                 iter->second->GetClassName().c_str(), iter->first.c_str());
             delete iter->second;
             continue;
