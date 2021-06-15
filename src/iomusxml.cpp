@@ -273,7 +273,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
             }
         }
         else {
-            LogWarning("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
+            LogError("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
             delete measure;
         }
     }
