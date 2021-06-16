@@ -504,26 +504,35 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
         rightMargin = GetSelfBottom() - params->m_y2 - beams * beamWidth;
     }
 
-    // Adjust drawing location for the rest based on the overlap with beams. Adjustmend should be an even number, so
-    // that rest is positioned properly
+    // Adjust drawing location for the rest based on the overlap with beams.
+    // Adjustment should be an even number, so that the rest is positioned properly
     const int overlapMargin = std::min(leftMargin, rightMargin);
     if (overlapMargin < 0) {
         Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
         assert(staff);
-        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
-        const int oldLoc = GetDrawingLoc();
-        const int newLoc = oldLoc + locAdjust - locAdjust % 2;
-        SetDrawingLoc(newLoc);
-        SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
-        // If there are dots, adjust their location as well
-        if (GetDots() > 0) {
-            Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
-            if (dots) {
-                std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-                const auto iter = std::find(dotLocs->begin(), dotLocs->end(), oldLoc);
-                if (iter != dotLocs->end()) *iter = newLoc;
+        if ((!HasOloc() || !HasPloc()) && !HasLoc()) {
+            const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
+            const int oldLoc = GetDrawingLoc();
+            const int newLoc = oldLoc + locAdjust - locAdjust % 2;
+            SetDrawingLoc(newLoc);
+            SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
+            // If there are dots, adjust their location as well
+            if (GetDots() > 0) {
+                Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
+                if (dots) {
+                    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+                    const int dotLoc = (oldLoc % 2)? oldLoc : oldLoc + 1;
+                    const auto iter = std::find(dotLocs->begin(), dotLocs->end(), dotLoc);
+                    if (iter != dotLocs->end()) *iter = newLoc;
+                }
             }
+        }
+        else {
+            const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            params->m_overlapMargin
+                = (((overlapMargin * params->m_directionBias + staffOffset - 1) / staffOffset + 1.5) * staffOffset)
+                * params->m_directionBias;
         }
     }
 
@@ -589,8 +598,8 @@ int Rest::CalcDots(FunctorParams *functorParams)
 
     if (m_crossStaff) staff = m_crossStaff;
 
-    bool drawingCueSize = this->GetDrawingCueSize();
-    int staffSize = staff->m_drawingStaffSize;
+    const bool drawingCueSize = this->GetDrawingCueSize();
+    const int staffSize = staff->m_drawingStaffSize;
 
     // For single rests we need here to set the dot loc
     Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
@@ -605,15 +614,12 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     switch (this->GetActualDur()) {
-        case DUR_1: loc += 0; break;
-        case DUR_2: loc += 0; break;
-        case DUR_4: loc += 0; break;
-        case DUR_8: loc += 0; break;
-        case DUR_16: loc += 0; break;
-        case DUR_32: loc += 2; break;
+        case DUR_32:
         case DUR_64: loc += 2; break;
-        case DUR_128: loc += 4; break;
+        case DUR_128:
         case DUR_256: loc += 4; break;
+        case DUR_512: loc += 6; break;
+        case DUR_1024: loc += 8; break;
         default: break;
     }
 
