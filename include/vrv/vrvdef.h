@@ -101,6 +101,7 @@ enum ClassId {
     MDIV,
     MEASURE,
     MEASURE_ALIGNER,
+    METERSIGGRP,
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
