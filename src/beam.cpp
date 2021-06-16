@@ -1354,7 +1354,7 @@ void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
     }
 }
 
-int Beam::CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2)
+int Beam::CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2)
 {
     Layer *parentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
     if (!parentLayer) return 0;
@@ -1371,6 +1371,7 @@ int Beam::CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2)
     std::vector<int> elementOverlaps;
     for (auto object : collidingElementsList) {
         LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+        if (!beam->HorizontalContentOverlap(object)) continue;
         if (directionBias > 0) {
             // make sure that there's actual overlap first
             if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
@@ -1427,7 +1428,7 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
             params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
             params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
             params->m_overlapMargin
-                = CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
+                = CalcLayerOverlap(params->m_doc, params->m_beam, params->m_directionBias, params->m_y1, params->m_y2);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -1461,7 +1462,8 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
         if (!otherLayersElements.empty()) {
             // call AdjustBeams separately for each element to find possible overlaps
             params->m_isOtherLayer = true;
-            for (auto element : otherLayersElements) {
+            for (const auto element : otherLayersElements) {
+                if (!params->m_beam->HorizontalContentOverlap(element)) continue;
                 element->AdjustBeams(params);
             }
             params->m_isOtherLayer = false;
