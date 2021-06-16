@@ -71,6 +71,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "metersiggrp.h"
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
@@ -3728,6 +3729,9 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "meterSig") {
             success = ReadMeterSig(parent, current);
         }
+        else if (std::string(current.name()) == "meterSigGrp") {
+            success = ReadMeterSigGrp(parent, current);
+        }
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
             success = ReadPgFoot(parent, current);
@@ -3998,6 +4002,9 @@ bool MEIInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "meterSig") {
             success = ReadMeterSig(parent, current);
         }
+        else if (std::string(current.name()) == "meterSigGrp") {
+            success = ReadMeterSigGrp(parent, current);
+        }
         // content
         else if (std::string(current.name()) == "instrDef") {
             success = ReadInstrDef(parent, current);
@@ -4243,6 +4250,46 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else {
             LogWarning("Unsupported '<%s>' within <measure>", current.name());
+        }
+    }
+    return success;
+}
+
+bool MEIInput::ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp)
+{
+    assert(dynamic_cast<ScoreDef *>(parent) || dynamic_cast<StaffDef *>(parent) || dynamic_cast<Layer *>(parent));
+
+    MeterSigGrp *vrvMeterSigGrp = new MeterSigGrp();
+    SetMeiUuid(meterSigGrp, vrvMeterSigGrp);
+    ReadLinkingInterface(meterSigGrp, vrvMeterSigGrp);
+    vrvMeterSigGrp->ReadBasic(meterSigGrp);
+    vrvMeterSigGrp->ReadLabelled(meterSigGrp);
+    vrvMeterSigGrp->ReadMeterSigGrpLog(meterSigGrp);
+    vrvMeterSigGrp->ReadTyped(meterSigGrp);
+
+    parent->AddChild(vrvMeterSigGrp);
+    ReadUnsupportedAttr(meterSigGrp, vrvMeterSigGrp);
+    return ReadMeterSigGrpChildren(vrvMeterSigGrp, meterSigGrp);
+}
+
+bool MEIInput::ReadMeterSigGrpChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<MeterSigGrp *>(parent));
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // content
+        else if (std::string(current.name()) == "meterSig") {
+            success = ReadMeterSig(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <meterSig>", current.name());
         }
     }
     return success;
@@ -4835,6 +4882,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "meterSig") {
             success = ReadMeterSig(parent, xmlElement);
+        }
+        else if (elementName == "meterSigGrp") {
+            success = ReadMeterSigGrp(parent, xmlElement);
         }
         else if (elementName == "nc") {
             success = ReadNc(parent, xmlElement);

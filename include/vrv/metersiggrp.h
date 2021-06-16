@@ -29,8 +29,8 @@ class MeterSigGrp : public Object,
                     public LinkingInterface,
                     public AttBasic,
                     public AttLabelled,
-                    public AttTyped,
-                    public AttMeterSigGrpLog {
+                    public AttMeterSigGrpLog,
+                    public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -64,7 +64,11 @@ public:
     //----------//
 
 protected:
-    //
+    /**
+     * Filter the flat list and keep only StaffDef elements.
+     */
+    virtual void FilterList(ArrayOfObjects *childList);
+
 private:
     //
 }; // MeterSigGrp

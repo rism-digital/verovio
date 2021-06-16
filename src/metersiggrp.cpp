@@ -28,14 +28,14 @@ MeterSigGrp::MeterSigGrp()
     , LinkingInterface()
     , AttBasic()
     , AttLabelled()
-    , AttTyped()
     , AttMeterSigGrpLog()
+    , AttTyped()
 {
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_BASIC);
     RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_METERSIGGRPLOG);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -62,4 +62,13 @@ bool MeterSigGrp::IsSupportedChild(Object *child)
     }
     return true;
 }
+
+void MeterSigGrp::FilterList(ArrayOfObjects *childList)
+{
+    // We want to keep only MeterSig
+    childList->erase(std::remove_if(childList->begin(), childList->end(),
+                         [&](const Object *object) -> bool { return !object->Is(METERSIG); }),
+        childList->end());
+}
+
 } // namespace vrv

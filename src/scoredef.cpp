@@ -21,6 +21,7 @@
 #include "label.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "metersiggrp.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -196,6 +197,9 @@ bool ScoreDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(METERSIG)) {
         assert(dynamic_cast<MeterSig *>(child));
+    }
+    else if (child->Is(METERSIGGRP)) {
+        assert(dynamic_cast<MeterSigGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

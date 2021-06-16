@@ -26,6 +26,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "metersiggrp.h"
 #include "mrpt.h"
 #include "note.h"
 #include "staff.h"
@@ -147,6 +148,9 @@ bool Layer::IsSupportedChild(Object *child)
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->Is(METERSIGGRP)) {
+        assert(dynamic_cast<MeterSigGrp *>(child));
     }
     else {
         return false;

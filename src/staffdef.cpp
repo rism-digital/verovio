@@ -17,6 +17,7 @@
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
+#include "metersiggrp.h"
 #include "staffgrp.h"
 #include "tuning.h"
 #include "vrv.h"
@@ -95,6 +96,9 @@ bool StaffDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(METERSIG)) {
         assert(dynamic_cast<MeterSig *>(child));
+    }
+    else if (child->Is(METERSIGGRP)) {
+        assert(dynamic_cast<MeterSigGrp *>(child));
     }
     else if (child->Is(TUNING)) {
         assert(dynamic_cast<Tuning *>(child));
