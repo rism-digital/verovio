@@ -450,7 +450,7 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
         }
     }
     // create new slur otherwise
-    musicxml::OpenSlur openSlur(number);
+    musicxml::OpenSlur openSlur(measure->GetN(), number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
 }
 
@@ -991,7 +991,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     if (!m_slurStack.empty()) { // There are slurs left open
         std::vector<std::pair<Slur *, musicxml::OpenSlur>>::iterator iter;
         for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: slur '%s' could not be ended", iter->first->GetUuid().c_str());
+            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number, iter->second.m_measureNum.c_str());
         }
         m_slurStack.clear();
     }
@@ -3408,7 +3408,7 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
 
         if (beamEndIterator == currentMeasureNodes.end()) {
             std::string measureName = (currentMeasure.node().attribute("id"))? currentMeasure.node().attribute("id").as_string() : currentMeasure.node().attribute("number").as_string();
-            LogError("MusicXML import: Beam end could not be found in measure %s", measureName.c_str());
+            LogError("MusicXML import: Beam without end in measure %s", measureName.c_str());
             return;
         }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
