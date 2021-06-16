@@ -344,6 +344,10 @@ bool MEIOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("labelAbbr");
         WriteLabelAbbr(m_currentNode, dynamic_cast<LabelAbbr *>(object));
     }
+    else if (object->Is(METERSIGGRP)) {
+        m_currentNode = m_currentNode.append_child("meterSigGrp");
+        WriteMeterSigGrp(m_currentNode, dynamic_cast<MeterSigGrp *>(object));
+    }
     else if (object->Is(SCOREDEF)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
@@ -1205,6 +1209,18 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
         currentNode.append_attribute("ulx") = StringFormat("%d", measure->m_xAbs / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("lrx") = StringFormat("%d", measure->m_xAbs2 / DEFINITION_FACTOR).c_str();
     }
+}
+
+void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp)
+{
+    assert(meterSigGrp);
+
+    WriteXmlId(currentNode, meterSigGrp);
+    WriteLinkingInterface(currentNode, meterSigGrp);
+    meterSigGrp->WriteBasic(currentNode);
+    meterSigGrp->WriteLabelled(currentNode);
+    meterSigGrp->WriteMeterSigGrpLog(currentNode);
+    meterSigGrp->WriteTyped(currentNode);
 }
 
 void MEIOutput::WriteFb(pugi::xml_node currentNode, Fb *fb)
