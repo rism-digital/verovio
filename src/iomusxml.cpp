@@ -262,14 +262,19 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     else {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
-        assert(existingMeasure);
-        for (auto current : *measure->GetChildren()) {
-            if (!current->Is(STAFF)) {
-                continue;
+        if (existingMeasure) {
+            for (auto current : *measure->GetChildren()) {
+                if (!current->Is(STAFF)) {
+                    continue;
+                }
+                Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
+                assert(staff);
+                existingMeasure->AddChild(staff);
             }
-            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
-            assert(staff);
-            existingMeasure->AddChild(staff);
+        }
+        else {
+            LogError("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
+            delete measure;
         }
     }
 
@@ -445,7 +450,7 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
         }
     }
     // create new slur otherwise
-    musicxml::OpenSlur openSlur(number);
+    musicxml::OpenSlur openSlur(measure->GetN(), number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
 }
 
@@ -928,7 +933,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             measure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
-            LogWarning("MusicXML import: Element '%s' could not be added to measure '%s'",
+            LogWarning("MusicXML import: Element '%s' could not be added to measure %s",
                 iter->second->GetClassName().c_str(), iter->first.c_str());
             delete iter->second;
             continue;
@@ -986,7 +991,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     if (!m_slurStack.empty()) { // There are slurs left open
         std::vector<std::pair<Slur *, musicxml::OpenSlur>>::iterator iter;
         for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: slur '%s' could not be ended", iter->first->GetUuid().c_str());
+            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number, iter->second.m_measureNum.c_str());
         }
         m_slurStack.clear();
     }
@@ -3363,17 +3368,18 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 
 void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
 {
-    pugi::xpath_node beamStart = node.select_node("beam[@number='1'][text()='begin']");
+    pugi::xpath_node beamStart = node.select_node("beam[@number='1' and text()='begin']");
     pugi::xpath_node tupletStart = node.select_node("notations/tuplet[@type='start']");
+    pugi::xpath_node currentMeasure = node.select_node("ancestor::measure");
 
-    const auto measureNodeChildren = node.select_node("../.").node().children();
+    pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1' and text()='end']]").node();
+    pugi::xml_node tupletEnd
+        = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+
+    const auto measureNodeChildren = currentMeasure.node().children();
     std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
     // in case note is a start of both beam and tuplet - need to figure which one is longer
     if (beamStart && tupletStart) {
-        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
-        pugi::xml_node tupletEnd
-            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
-
         const auto beamEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), beamEnd);
         const auto tupletEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), tupletEnd);
 
@@ -3392,19 +3398,17 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of
     // the whole duration of this beam
     else if (beamStart) {
-        pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
         // find whether there is a tuplet that starts during the span of the beam
         pugi::xpath_node nextTupletStart
             = node.select_node("./following-sibling::note[notations[tuplet[@type='start']]]").node();
-        pugi::xml_node tupletEnd
-            = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
         // find start and end of the beam
         const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
         const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
 
         if (beamEndIterator == currentMeasureNodes.end()) {
-            LogError("MusicXML import: Beam ending point has not been found for <'%s'>", layer->GetUuid().c_str());
+            std::string measureName = (currentMeasure.node().attribute("id"))? currentMeasure.node().attribute("id").as_string() : currentMeasure.node().attribute("number").as_string();
+            LogError("MusicXML import: Beam without end in measure %s", measureName.c_str());
             return;
         }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
