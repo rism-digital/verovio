@@ -220,7 +220,7 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
     return;
 }
 
-void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc)
+void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc) const
 {
     assert(m_drawingLeft);
     assert(m_drawingRight);

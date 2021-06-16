@@ -3645,7 +3645,7 @@ AttMeterSigLog::~AttMeterSigLog()
 
 void AttMeterSigLog::ResetMeterSigLog()
 {
-    m_count = 0;
+    m_count = std::vector<int>();
     m_sym = METERSIGN_NONE;
     m_unit = 0;
 }
@@ -3654,7 +3654,7 @@ bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("count")) {
-        this->SetCount(StrToInt(element.attribute("count").value()));
+        this->SetCount(StrToSummandList(element.attribute("count").value()));
         element.remove_attribute("count");
         hasAttribute = true;
     }
@@ -3675,7 +3675,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasCount()) {
-        element.append_attribute("count") = IntToStr(this->GetCount()).c_str();
+        element.append_attribute("count") = SummandListToStr(this->GetCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSym()) {
@@ -3691,7 +3691,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 
 bool AttMeterSigLog::HasCount() const
 {
-    return (m_count != 0);
+    return (m_count != std::vector<int>());
 }
 
 bool AttMeterSigLog::HasSym() const
@@ -3721,7 +3721,7 @@ AttMeterSigDefaultLog::~AttMeterSigDefaultLog()
 
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
-    m_meterCount = 0;
+    m_meterCount = std::vector<int>();
     m_meterUnit = 0;
     m_meterSym = METERSIGN_NONE;
 }
@@ -3730,7 +3730,7 @@ bool AttMeterSigDefaultLog::ReadMeterSigDefaultLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("meter.count")) {
-        this->SetMeterCount(StrToInt(element.attribute("meter.count").value()));
+        this->SetMeterCount(StrToSummandList(element.attribute("meter.count").value()));
         element.remove_attribute("meter.count");
         hasAttribute = true;
     }
@@ -3751,7 +3751,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMeterCount()) {
-        element.append_attribute("meter.count") = IntToStr(this->GetMeterCount()).c_str();
+        element.append_attribute("meter.count") = SummandListToStr(this->GetMeterCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMeterUnit()) {
@@ -3767,7 +3767,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 
 bool AttMeterSigDefaultLog::HasMeterCount() const
 {
-    return (m_meterCount != 0);
+    return (m_meterCount != std::vector<int>());
 }
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
@@ -8733,7 +8733,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigLog *att = dynamic_cast<AttMeterSigLog *>(element);
         assert(att);
         if (attrType == "count") {
-            att->SetCount(att->StrToInt(attrValue));
+            att->SetCount(att->StrToSummandList(attrValue));
             return true;
         }
         if (attrType == "sym") {
@@ -8749,7 +8749,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog *>(element);
         assert(att);
         if (attrType == "meter.count") {
-            att->SetMeterCount(att->StrToInt(attrValue));
+            att->SetMeterCount(att->StrToSummandList(attrValue));
             return true;
         }
         if (attrType == "meter.unit") {
@@ -10179,7 +10179,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMeterSigLog *att = dynamic_cast<const AttMeterSigLog *>(element);
         assert(att);
         if (att->HasCount()) {
-            attributes->push_back(std::make_pair("count", att->IntToStr(att->GetCount())));
+            attributes->push_back(std::make_pair("count", att->SummandListToStr(att->GetCount())));
         }
         if (att->HasSym()) {
             attributes->push_back(std::make_pair("sym", att->MetersignToStr(att->GetSym())));
@@ -10192,7 +10192,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMeterSigDefaultLog *att = dynamic_cast<const AttMeterSigDefaultLog *>(element);
         assert(att);
         if (att->HasMeterCount()) {
-            attributes->push_back(std::make_pair("meter.count", att->IntToStr(att->GetMeterCount())));
+            attributes->push_back(std::make_pair("meter.count", att->SummandListToStr(att->GetMeterCount())));
         }
         if (att->HasMeterUnit()) {
             attributes->push_back(std::make_pair("meter.unit", att->IntToStr(att->GetMeterUnit())));

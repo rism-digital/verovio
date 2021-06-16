@@ -363,7 +363,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
 
-    DrawBarLine(dc, yTop + offset, yBottom - offset, barLine);
+    DrawBarLine(dc, yTop + offset, yBottom - offset, barLine, barLine->GetForm());
     if (barLine->HasRepetitionDots()) {
         DrawBarLineDots(dc, staff, barLine);
     }
@@ -1650,12 +1650,17 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
 }
 
-void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff)
+void View::DrawMeterSigFigures(
+    DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff)
 {
     assert(dc);
     assert(staff);
 
-    std::wstring timeSigCombNumerator = IntToTimeSigFigures(num), timeSigCombDenominator;
+    std::wstring timeSigCombNumerator, timeSigCombDenominator;
+    for (int summand : numSummands) {
+        if (!timeSigCombNumerator.empty()) timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall;
+        timeSigCombNumerator += IntToTimeSigFigures(summand);
+    }
     if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));

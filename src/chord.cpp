@@ -546,11 +546,11 @@ int Chord::CalcArtic(FunctorParams *functorParams)
     params->m_crossStaffAbove = false;
     params->m_crossStaffBelow = false;
 
-    if (this->m_crossStaff) {
-        params->m_staffAbove = this->m_crossStaff;
-        params->m_staffBelow = this->m_crossStaff;
-        params->m_layerAbove = this->m_crossLayer;
-        params->m_layerBelow = this->m_crossLayer;
+    if (m_crossStaff) {
+        params->m_staffAbove = m_crossStaff;
+        params->m_staffBelow = m_crossStaff;
+        params->m_layerAbove = m_crossLayer;
+        params->m_layerBelow = m_crossLayer;
         params->m_crossStaffAbove = true;
         params->m_crossStaffBelow = true;
     }
@@ -610,9 +610,9 @@ int Chord::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
+        layer = m_crossLayer;
     }
 
     // Cache the in params to avoid further lookup
@@ -691,8 +691,8 @@ void Chord::CaltOptimalDots(Dots *dots, Staff *staff, const std::set<int> &noteL
     std::transform(secondElem.begin(), secondElem.end(), noteLocations.begin(), secondElem.begin(), std::minus<int>());
     // apply std::abs to elements in the vectors and then calculate sum of the elements. Can be achieved with
     // std::transform_reduce, but gcc needs to support it
-    std::transform(firstElem.begin(), firstElem.end(), firstElem.begin(), static_cast<float (*)(float)>(&std::abs));
-    std::transform(secondElem.begin(), secondElem.end(), secondElem.begin(), static_cast<float (*)(float)>(&std::abs));
+    std::transform(firstElem.begin(), firstElem.end(), firstElem.begin(), static_cast<int (*)(int)>(&std::abs));
+    std::transform(secondElem.begin(), secondElem.end(), secondElem.begin(), static_cast<int (*)(int)>(&std::abs));
     const int firstDiff = std::accumulate(firstElem.begin(), firstElem.end(), 0);
     const int secondDiff = std::accumulate(secondElem.begin(), secondElem.end(), 0);
     std::set<int> dotLocations = (secondDiff < firstDiff) ? *secondRef : *firstRef;

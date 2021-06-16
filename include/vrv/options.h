@@ -430,6 +430,9 @@ private:
 // OptionJson
 //----------------------------------------------------------------------------
 
+/// Distinguish whether Json is passed directly or should be read from file
+enum class JsonSource { String, FilePath };
+
 /**
  * This class is for Json input params
  */
@@ -438,23 +441,49 @@ class OptionJson : public Option {
     using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value>>;
 
 public:
-    //
+    /**
+     * @name Constructor, destructor and initialization
+     */
+    ///@{
     OptionJson() = default;
     virtual ~OptionJson() = default;
-    virtual void Init(const std::string &defaultValue);
+    void CopyTo(Option *option) override;
+    void Init(JsonSource source, const std::string &defaultValue);
+    ///@}
 
-    virtual bool SetValue(const std::string &jsonFilePath);
-    // virtual std::string GetStrValue() const;
+    /**
+     * Member access
+     */
+    JsonSource GetSource() const;
+    jsonxx::Object GetValue(bool getDefault = false) const;
 
+    /**
+     * Interface methods: accessing values as string
+     */
+    ///@{
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
+    ///@}
+
+    /**
+     * Accessing values as json node path
+     */
+    ///@{
+    bool HasValue(const std::vector<std::string> &jsonNodePath) const;
     int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
-    //
     bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
-    //
+    ///@}
 protected:
     JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
-    //
+
+    /// Read json from string or file
+    bool ReadJson(jsonxx::Object &output, const std::string &input) const;
+
 private:
+    JsonSource m_source = JsonSource::String;
+
     jsonxx::Object m_values;
     jsonxx::Object m_defaultValues;
 };
@@ -604,6 +633,8 @@ public:
     OptionDbl m_dynamDist;
     OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
+    OptionJson m_engravingDefaultsFile;
+    OptionBool m_breaksNoWidow;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;

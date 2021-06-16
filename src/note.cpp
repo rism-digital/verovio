@@ -231,7 +231,7 @@ int Note::GetDrawingDur() const
 
 bool Note::IsClusterExtreme() const
 {
-    ChordCluster *cluster = this->m_cluster;
+    ChordCluster *cluster = m_cluster;
     if (this == cluster->at(0)) return true;
     if (this == cluster->at(cluster->size() - 1))
         return true;
@@ -244,7 +244,7 @@ TabGrp *Note::IsTabGrpNote() const
     return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
+std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 {
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::wstring fretStr;
@@ -434,7 +434,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
     return baseStem;
 }
 
-wchar_t Note::GetMensuralNoteheadGlyph()
+wchar_t Note::GetMensuralNoteheadGlyph() const
 {
     assert(this->IsMensuralDur());
 
@@ -521,14 +521,14 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
     return SMUFL_E0A4_noteheadBlack;
 }
 
-bool Note::IsVisible()
+bool Note::IsVisible() const
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
-    else if (GetParent() && GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(GetParent());
+    else if (this->GetParent() && this->GetParent()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this->GetParent());
         assert(chord);
         return chord->IsVisible();
     }
@@ -562,42 +562,70 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-void Note::SetMIDIPitch(char pitch)
+void Note::CalcMIDIPitch(int shift)
 {
-    m_MIDIPitch = pitch;
+    if (this->HasPnum()) {
+        m_MIDIPitch = this->GetPnum();
+    }
+    else {
+        int midiBase = 0;
+        data_PITCHNAME pname = this->GetPname();
+        if (this->HasPnameGes()) pname = this->GetPnameGes();
+        switch (pname) {
+            case PITCHNAME_c: midiBase = 0; break;
+            case PITCHNAME_d: midiBase = 2; break;
+            case PITCHNAME_e: midiBase = 4; break;
+            case PITCHNAME_f: midiBase = 5; break;
+            case PITCHNAME_g: midiBase = 7; break;
+            case PITCHNAME_a: midiBase = 9; break;
+            case PITCHNAME_b: midiBase = 11; break;
+            default: break;
+        }
+
+        // Check for accidentals
+        midiBase += this->GetChromaticAlteration();
+
+        // Apply shift, i.e. from transposition instruments
+        midiBase += shift;
+
+        int oct = this->GetOct();
+        if (this->HasOctGes()) oct = this->GetOctGes();
+
+        m_MIDIPitch = midiBase + (oct + 1) * 12;
+    }
 }
 
-double Note::GetScoreTimeOnset()
+double Note::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }
 
-double Note::GetRealTimeOnsetMilliseconds()
+double Note::GetRealTimeOnsetMilliseconds() const
 {
     return m_realTimeOnsetMilliseconds;
 }
 
-double Note::GetScoreTimeOffset()
+double Note::GetScoreTimeOffset() const
 {
     return m_scoreTimeOffset;
 }
 
-double Note::GetRealTimeOffsetMilliseconds()
+double Note::GetRealTimeOffsetMilliseconds() const
 {
     return m_realTimeOffsetMilliseconds;
 }
 
-double Note::GetScoreTimeTiedDuration()
+double Note::GetScoreTimeTiedDuration() const
 {
     return m_scoreTimeTiedDuration;
 }
 
-double Note::GetScoreTimeDuration()
+double Note::GetScoreTimeDuration() const
 {
-    return GetScoreTimeOffset() - GetScoreTimeOnset();
+    return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
 }
 
-char Note::GetMIDIPitch()
+char Note::GetMIDIPitch() const
 {
     return m_MIDIPitch;
 }
@@ -657,7 +685,7 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
 
 bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted)
 {
-    Object *stem = GetFirst(STEM);
+    Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
     Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
@@ -666,10 +694,10 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
     wchar_t flagGlyph = SMUFL_E242_flag16thUp;
     data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(GetDrawingStemDir());
-    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
+    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(this->GetDrawingStemDir());
+    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
 
-    const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
+    const int dotMargin = flag->GetDrawingY() - this->GetDrawingY() - flagHeight - this->GetDrawingRadius(doc) / 2
         - (isDotShifted ? doc->GetDrawingUnit(staffSize) : 0);
 
     return dotMargin < 0;
@@ -757,11 +785,11 @@ int Note::CalcArtic(FunctorParams *functorParams)
     params->m_crossStaffAbove = false;
     params->m_crossStaffBelow = false;
 
-    if (this->m_crossStaff) {
-        params->m_staffAbove = this->m_crossStaff;
-        params->m_staffBelow = this->m_crossStaff;
-        params->m_layerAbove = this->m_crossLayer;
-        params->m_layerBelow = this->m_crossLayer;
+    if (m_crossStaff) {
+        params->m_staffAbove = m_crossStaff;
+        params->m_staffBelow = m_crossStaff;
+        params->m_layerAbove = m_crossLayer;
+        params->m_layerBelow = m_crossLayer;
         params->m_crossStaffAbove = true;
         params->m_crossStaffBelow = true;
     }
@@ -819,9 +847,9 @@ int Note::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
+        layer = m_crossLayer;
     }
 
     // Cache the in params to avoid further lookup
@@ -954,7 +982,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
@@ -1081,7 +1109,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
@@ -1239,63 +1267,50 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
-    assert(note);
+    // Skip linked notes
+    if (this->HasSameasLink()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     // If the note is a secondary tied note, then ignore it
-    if (note->GetScoreTimeTiedDuration() < 0.0) {
+    if (this->GetScoreTimeTiedDuration() < 0.0) {
         return FUNCTOR_SIBLINGS;
     }
 
     // For now just ignore grace notes
-    if (note->IsGraceNote()) {
+    if (this->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
     }
 
-    int pitch = 0;
-    if (note->HasPnum()) {
-        pitch = note->GetPnum();
-    }
-    else {
-        // calc pitch
-        int midiBase = 0;
-        data_PITCHNAME pname = note->GetPname();
-        if (note->HasPnameGes()) pname = note->GetPnameGes();
-        switch (pname) {
-            case PITCHNAME_c: midiBase = 0; break;
-            case PITCHNAME_d: midiBase = 2; break;
-            case PITCHNAME_e: midiBase = 4; break;
-            case PITCHNAME_f: midiBase = 5; break;
-            case PITCHNAME_g: midiBase = 7; break;
-            case PITCHNAME_a: midiBase = 9; break;
-            case PITCHNAME_b: midiBase = 11; break;
-            case PITCHNAME_NONE: break;
-        }
-        int oct = note->GetOct();
-        if (note->HasOctGes()) oct = note->GetOctGes();
-
-        // Check for accidentals
-        midiBase += note->GetChromaticAlteration();
-
-        // Adjustment for transposition intruments
-        midiBase += params->m_transSemi;
-
-        pitch = midiBase + (oct + 1) * 12;
-    }
-
-    // We do store the MIDIPitch in the note even with a sameas
-    this->SetMIDIPitch(pitch);
     int channel = params->m_midiChannel;
     int velocity = MIDI_VELOCITY;
-    if (note->HasVel()) velocity = note->GetVel();
+    if (this->HasVel()) velocity = this->GetVel();
 
-    double starttime = params->m_totalTime + note->GetScoreTimeOnset();
-    double stoptime = params->m_totalTime + note->GetScoreTimeOffset() + note->GetScoreTimeTiedDuration();
+    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
 
     int tpq = params->m_midiFile->getTPQ();
 
-    params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
-    params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+    // Check if note was expanded into sequence of short notes due to trills/tremolandi
+    // Play either the expanded note sequence or a single note
+    if (params->m_expandedNotes.find(this) != params->m_expandedNotes.end()) {
+        for (const auto &midiNote : params->m_expandedNotes[this]) {
+            double stoptime = starttime + midiNote.duration;
+
+            params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, midiNote.pitch, velocity);
+            params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, midiNote.pitch);
+
+            starttime = stoptime;
+        }
+    }
+    else {
+        double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
+
+        this->CalcMIDIPitch(params->m_transSemi);
+        char pitch = this->GetMIDIPitch();
+
+        params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
+        params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+    }
 
     return FUNCTOR_SIBLINGS;
 }

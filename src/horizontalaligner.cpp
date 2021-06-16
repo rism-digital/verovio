@@ -134,7 +134,7 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
             // This typically occurs when a tstamp event occurs after the last note of a measure
             int rightBarlineIdx = m_rightBarLineAlignment->GetIdx();
             assert(rightBarlineIdx != -1);
-            idx = rightBarlineIdx - 1;
+            idx = rightBarlineIdx;
             this->SetMaxTime(time);
         }
         else {
@@ -544,7 +544,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
             }
             // staffN and layerN remain unused for barLine attributes and timestamps
             else {
-                assert(element->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR }));
+                assert(element->Is({ BARLINE, BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR }));
             }
         }
     }
@@ -1169,12 +1169,12 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     assert(params);
 
     // Do not set an x pos for anything before the barline (including it)
-    if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
     double intervalTime = (m_time - params->m_previousTime);
 
-    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+    if (m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
     }
 
@@ -1224,8 +1224,8 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         params->m_timestamps.clear();
     }
 
-    // Do not use clef change alignment as reference since these are not aligned at this stage
-    if (this->GetType() != ALIGNMENT_CLEF) params->m_lastNonTimestamp = this;
+    // Do not use clef change and grancenote alignment as reference since these are not aligned at this stage
+    if (!this->IsOfType({ ALIGNMENT_CLEF, ALIGNMENT_GRACENOTE })) params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1240,20 +1240,19 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
-        SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-            + params->m_leftBarLineX));
+        SetXRel(ceil(
+            (((double)m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio) + params->m_leftBarLineX));
     }
     else {
         //  Now more the right barline and all right scoreDef elements
-        int shift = this->m_xRel - params->m_rightBarLineX;
-        this->m_xRel
-            = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+        int shift = m_xRel - params->m_rightBarLineX;
+        m_xRel = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
             + params->m_leftBarLineX + shift;
     }
 
     // Finally, when reaching the end of the measure, update the measureXRel for the next measure
     if (m_type == ALIGNMENT_MEASURE_END) {
-        params->m_measureXRel += this->m_xRel;
+        params->m_measureXRel += m_xRel;
     }
 
     return FUNCTOR_CONTINUE;

@@ -28,6 +28,7 @@
 #include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
+#include "caesura.h"
 #include "choice.h"
 #include "chord.h"
 #include "clef.h"
@@ -407,6 +408,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
         WriteBreath(m_currentNode, dynamic_cast<Breath *>(object));
+    }
+    else if (object->Is(CAESURA)) {
+        m_currentNode = m_currentNode.append_child("caesura");
+        WriteCaesura(m_currentNode, dynamic_cast<Caesura *>(object));
     }
     else if (object->Is(DIR)) {
         m_currentNode = m_currentNode.append_child("dir");
@@ -1258,6 +1263,16 @@ void MEIOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
     WriteTimePointInterface(currentNode, breath);
     breath->WriteColor(currentNode);
     breath->WritePlacementRelStaff(currentNode);
+}
+
+void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
+{
+    assert(caesura);
+
+    WriteControlElement(currentNode, caesura);
+    WriteTimePointInterface(currentNode, caesura);
+    caesura->WriteColor(currentNode);
+    caesura->WritePlacementRelStaff(currentNode);
 }
 
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
@@ -2893,26 +2908,40 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         return false;
     }
 
-    current = root.child("meiHead");
-    if (current.empty()) {
-        LogWarning("No header found in the MEI data, trying to proceed...");
+    if (root.attribute("meiversion")) {
+        std::string version = std::string(root.attribute("meiversion").value());
+        if (version == "5.0.0-dev") {
+            m_version = MEI_5_0_0_dev;
+        }
+        else if (version == "4.0.1") {
+            m_version = MEI_4_0_1;
+        }
+        else if (version == "4.0.0") {
+            m_version = MEI_4_0_0;
+        }
+        else if (version == "3.0.0") {
+            m_version = MEI_3_0_0;
+        }
+        else if (version == "2013") {
+            m_version = MEI_2013;
+        }
     }
     else {
-        m_doc->m_header.reset();
-        // copy the complete header into the master document
-        m_doc->m_header.append_copy(current);
-        if (root.attribute("meiversion")) {
-            std::string version = std::string(root.attribute("meiversion").value());
-            if (version == "5.0.0-dev")
-                m_version = MEI_5_0_0_dev;
-            else if (version == "4.0.1")
-                m_version = MEI_4_0_1;
-            else if (version == "4.0.0")
-                m_version = MEI_4_0_0;
-            else if (version == "3.0.0")
-                m_version = MEI_3_0_0;
-            else if (version == "2013")
-                m_version = MEI_2013;
+        // default to MEI 5
+        LogWarning("No meiversion found, falling back to MEI5 (dev)");
+        m_version = MEI_5_0_0_dev;
+    }
+
+    // only try to handle meiHead if we have a full MEI document
+    if (std::string(root.name()) == "mei") {
+        current = root.child("meiHead");
+        if (current.empty()) {
+            LogWarning("No header found in the MEI data, trying to proceed...");
+        }
+        else {
+            m_doc->m_header.reset();
+            // copy the complete header into the master document
+            m_doc->m_header.append_copy(current);
         }
     }
 
@@ -3005,10 +3034,6 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     success = ReadMdivChildren(m_doc, body, false);
-
-    if (success) {
-        m_doc->ConvertScoreDefMarkupDoc();
-    }
 
     if (success) {
         m_doc->ExpandExpansions();
@@ -3104,7 +3129,7 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
     }
 
     // This is a page-based MEI file
-    this->m_hasLayoutInformation = true;
+    m_hasLayoutInformation = true;
 
     bool success = true;
     // We require to have s <scoreDef> as first child of <score>
@@ -3155,7 +3180,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     parent->AddChild(vrvScore);
 
     // This is a score-based MEI file
-    this->m_readingScoreBased = true;
+    m_readingScoreBased = true;
 
     // We require to have s <scoreDef> as first child of <score>
     pugi::xml_node scoreDef = score.first_child();
@@ -3324,7 +3349,7 @@ bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 
 bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
 {
-    this->m_hasLayoutInformation = true;
+    m_hasLayoutInformation = true;
 
     Pb *vrvPb = new Pb();
     ReadSystemElement(pb, vrvPb);
@@ -3454,7 +3479,7 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_systemRightMar = atoi(system.attribute("system.rightmar").value());
         system.remove_attribute("system.rightmar");
     }
-    if (system.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
+    if (system.attribute("uly") && (m_doc->GetType() == Transcription)) {
         vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITION_FACTOR;
         system.remove_attribute("uly");
     }
@@ -4052,8 +4077,8 @@ bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 
     if (m_version < MEI_4_0_0) {
         if (instrDef.attribute("midi.volume")) {
-            const std::string midiVol = instrDef.attribute("midi.volume").as_string();
-            instrDef.attribute("midi.volume").set_value((midiVol + "%").c_str());
+            const float midiValue = instrDef.attribute("midi.volume").as_float();
+            instrDef.attribute("midi.volume").set_value(StringFormat("%.2f%%", midiValue / 127 * 100).c_str());
         }
     }
 
@@ -4102,7 +4127,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if (measure.attribute("ulx") && measure.attribute("lrx") && (this->m_doc->GetType() == Transcription)) {
+    if (measure.attribute("ulx") && measure.attribute("lrx") && (m_doc->GetType() == Transcription)) {
         vrvMeasure->m_xAbs = atoi(measure.attribute("ulx").value()) * DEFINITION_FACTOR;
         vrvMeasure->m_xAbs2 = atoi(measure.attribute("lrx").value()) * DEFINITION_FACTOR;
         measure.remove_attribute("ulx");
@@ -4143,6 +4168,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "breath") {
             success = ReadBreath(parent, current);
+        }
+        else if (std::string(current.name()) == "caesura") {
+            success = ReadCaesura(parent, current);
         }
         else if (std::string(current.name()) == "dir") {
             success = ReadDir(parent, current);
@@ -4285,6 +4313,20 @@ bool MEIInput::ReadBreath(Object *parent, pugi::xml_node breath)
 
     parent->AddChild(vrvBreath);
     ReadUnsupportedAttr(breath, vrvBreath);
+    return true;
+}
+
+bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
+{
+    Caesura *vrvCaesura = new Caesura();
+    ReadControlElement(caesura, vrvCaesura);
+
+    ReadTimePointInterface(caesura, vrvCaesura);
+    vrvCaesura->ReadColor(caesura);
+    vrvCaesura->ReadPlacementRelStaff(caesura);
+
+    parent->AddChild(vrvCaesura);
+    ReadUnsupportedAttr(caesura, vrvCaesura);
     return true;
 }
 
@@ -4649,7 +4691,7 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if (staff.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
+    if (staff.attribute("uly") && (m_doc->GetType() == Transcription)) {
         vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
         staff.remove_attribute("uly");
     }
@@ -4865,7 +4907,7 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 
 bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
-    if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
+    if (element.attribute("ulx") && (m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
     }
@@ -4978,6 +5020,13 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
 {
     Chord *vrvChord = new Chord();
     ReadLayerElement(chord, vrvChord);
+
+    if (m_version < MEI_4_0_0) {
+        if (chord.attribute("size")) {
+            chord.remove_attribute("size");
+            chord.append_attribute("cue").set_value("true");
+        }
+    }
 
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadColor(chord);
@@ -5162,6 +5211,13 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     Mensur *vrvMensur = new Mensur();
     ReadLayerElement(mensur, vrvMensur);
 
+    if (m_version < MEI_4_0_0) {
+        if (mensur.attribute("size")) {
+            mensur.remove_attribute("size");
+            mensur.append_attribute("cue").set_value("true");
+        }
+    }
+
     vrvMensur->ReadColor(mensur);
     vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
@@ -5197,6 +5253,13 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     MRest *vrvMRest = new MRest();
     ReadLayerElement(mRest, vrvMRest);
     ReadPositionInterface(mRest, vrvMRest);
+
+    if (m_version < MEI_4_0_0) {
+        if (mRest.attribute("size")) {
+            mRest.remove_attribute("size");
+            mRest.append_attribute("cue").set_value("true");
+        }
+    }
 
     vrvMRest->ReadColor(mRest);
     vrvMRest->ReadCue(mRest);
@@ -5313,6 +5376,13 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     Note *vrvNote = new Note();
     ReadLayerElement(note, vrvNote);
 
+    if (m_version < MEI_4_0_0) {
+        if (note.attribute("size")) {
+            note.remove_attribute("size");
+            note.append_attribute("cue").set_value("true");
+        }
+    }
+
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
     ReadPositionInterface(note, vrvNote);
@@ -5357,6 +5427,13 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
 {
     Rest *vrvRest = new Rest();
     ReadLayerElement(rest, vrvRest);
+
+    if (m_version < MEI_4_0_0) {
+        if (rest.attribute("size")) {
+            rest.remove_attribute("size");
+            rest.append_attribute("cue").set_value("true");
+        }
+    }
 
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);

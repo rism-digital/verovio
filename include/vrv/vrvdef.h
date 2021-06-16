@@ -12,6 +12,7 @@
 #include <functional>
 #include <list>
 #include <map>
+#include <set>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -160,6 +161,7 @@ enum ClassId {
     ARPEG,
     BRACKETSPAN,
     BREATH,
+    CAESURA,
     DIR,
     DYNAM,
     FERMATA,

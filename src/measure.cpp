@@ -317,7 +317,7 @@ int Measure::GetWidth() const
         }
     }
 
-    if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+    if (m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -443,7 +443,86 @@ double Measure::GetRealTimeOffsetMilliseconds(int repeat) const
     return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
 
-void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
+data_BARRENDITION Measure::GetDrawingLeftBarLineByStaffN(int staffN) const
+{
+    auto elementIter = m_invisibleStaffBarlines.find(staffN);
+    if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.first;
+    return GetDrawingLeftBarLine();
+}
+
+data_BARRENDITION Measure::GetDrawingRightBarLineByStaffN(int staffN) const
+{
+    auto elementIter = m_invisibleStaffBarlines.find(staffN);
+    if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.second;
+    return GetDrawingRightBarLine();
+}
+
+Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
+{
+    // Barlines are stored in the map in the following format:
+    // previous measure right -> current measure left -> expected barlines (previous, current)
+    static std::map<data_BARRENDITION, std::map<data_BARRENDITION, BarlineRenditionPair>> drawingLines = {
+        // previous right barline is dotted
+        { BARRENDITION_dotted,
+            { { BARRENDITION_dotted, { BARRENDITION_dotted, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is dashed
+        { BARRENDITION_dashed,
+            { { BARRENDITION_dotted, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dashed, BARRENDITION_dotted } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is single
+        { BARRENDITION_single,
+            { { BARRENDITION_dotted, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_single, BARRENDITION_dotted } },
+                { BARRENDITION_dbldashed, { BARRENDITION_single, BARRENDITION_dashed } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double dotted
+        { BARRENDITION_dbldotted,
+            { { BARRENDITION_dotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dotted, BARRENDITION_dashed } },
+                { BARRENDITION_single, { BARRENDITION_dotted, BARRENDITION_single } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double dashed
+        { BARRENDITION_dbldashed,
+            { { BARRENDITION_dotted, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_dashed, BARRENDITION_single } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double
+        { BARRENDITION_dbl,
+            { { BARRENDITION_dotted, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+    };
+
+    const BarlineRenditionPair defaultValue = { previous->GetRight(), GetLeft() };
+    auto previousRight = drawingLines.find(previous->GetRight());
+    if (previousRight == drawingLines.end()) return defaultValue;
+
+    auto currentLeft = previousRight->second.find(GetLeft());
+    if (currentLeft == previousRight->second.end()) return defaultValue;
+
+    return currentLeft->second;
+}
+
+void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
 {
     // First set the right barline. If none then set a single one.
     data_BARRENDITION rightBarline = (this->HasRight()) ? this->GetRight() : BARRENDITION_single;
@@ -453,7 +532,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
     if (!previous) {
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
-    else if (systemBreak) {
+    else if (barlineDrawingFlags & BarlineDrawingFlags::SYSTEM_BREAK) {
         // we have rptboth on one of the two sides, split them (ignore any other value)
         if ((previous->GetRight() == BARRENDITION_rptboth) || (this->GetLeft() == BARRENDITION_rptboth)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptend);
@@ -464,7 +543,9 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             this->SetDrawingLeftBarLine(this->GetLeft());
         }
     }
-    else if (!scoreDefInsert) {
+    else if (!((barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT)
+                 || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+                 || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS))) {
         // we have rptboth split in the two measures, make them one rptboth
         if ((previous->GetRight() == BARRENDITION_rptend) && (this->GetLeft() == BARRENDITION_rptstart)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
@@ -486,14 +567,54 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             previous->SetDrawingRightBarLine(BARRENDITION_invis);
             this->SetDrawingLeftBarLine(BARRENDITION_rptboth);
         }
-        // nothing we can do with any other value?
+        // handle other possible barline interactions
         else {
-            this->SetDrawingLeftBarLine(this->GetLeft());
+            auto [right, left] = SelectDrawingBarLines(previous);
+            if (right != left) {
+                previous->SetDrawingRightBarLine(right);
+                this->SetDrawingLeftBarLine(left);
+                if (this->HasInvisibleStaffBarlines()) vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
+            }
         }
     }
     else {
-        // with a scoredef in-between always set it to what we have in the encoding
+        if ((barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS)
+            && !(barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+            && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT)) {
+            if (this->GetLeft() == BARRENDITION_NONE) {
+                this->SetLeft(BARRENDITION_single);
+            }
+            vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
+        }
+        // with a scoredef inbetween always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
+    }
+}
+
+void Measure::SetInvisibleStaffBarlines(
+    Measure *previous, ListOfObjects &currentInvisible, ListOfObjects &previousInvisible, int barlineDrawingFlags)
+{
+    if (!previous) return;
+
+    // Process invisible staves in the current measure and set right barline values for previous measure
+    for (const auto object : currentInvisible) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        data_BARRENDITION right = previous->GetRight();
+        if (right == BARRENDITION_NONE) right = BARRENDITION_single;
+        auto [iter, result]
+            = previous->m_invisibleStaffBarlines.insert({ staff->GetN(), { BARRENDITION_NONE, right } });
+        if (!result) iter->second.second = right;
+    }
+    // Then process invisible staves in the previous measure and set left barline values in the current measure
+    for (const auto object : previousInvisible) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        data_BARRENDITION left = GetLeft();
+        if ((left == BARRENDITION_NONE) && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT))
+            left = BARRENDITION_single;
+        auto [iter, result] = m_invisibleStaffBarlines.insert({ staff->GetN(), { left, BARRENDITION_NONE } });
+        if (!result) iter->second.first = left;
     }
 }
 
@@ -981,7 +1102,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
 
 int Measure::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_timestampAligner.Reset();
+    m_timestampAligner.Reset();
     m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
 }
@@ -994,6 +1115,9 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     // Check if the measure has some overflowing control elements
     int overflow = this->GetDrawingOverflow();
 
+    Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
+    const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
+        && (params->m_doc->GetOptions()->m_breaks.GetValue() != BREAKS_encoded));
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
         if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
@@ -1005,11 +1129,15 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+        else if (m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
             > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
             params->m_shift = this->m_drawingXRel;
+            // If last measure requires separate system - mark that system as leftover for the future CastOffPages call
+            if (isLeftoverMeasure) {
+                params->m_leftoverSystem = params->m_currentSystem;
+            }
             for (Object *oneOfPendingObjects : params->m_pendingObjects) {
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
@@ -1097,7 +1225,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
 
     if (params->m_currentEnding) {
         // Set the ending to each measure in between
-        this->m_drawingEnding = params->m_currentEnding;
+        m_drawingEnding = params->m_currentEnding;
     }
 
     // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)

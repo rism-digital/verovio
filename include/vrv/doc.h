@@ -318,13 +318,6 @@ public:
     void ConvertToUnCastOffMensuralDoc();
 
     /**
-     * Convert scoreDef / staffDef attributes (clef.*, key.*, meter.*, etc.) to corresponding elements
-     * By default, the element are used only for the rendering and not preserved in the MEI output
-     * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
-     */
-    void ConvertScoreDefMarkupDoc(bool permanent = false);
-
-    /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.

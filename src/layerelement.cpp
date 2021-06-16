@@ -170,7 +170,7 @@ bool LayerElement::IsGraceNote()
     return false;
 }
 
-bool LayerElement::GetDrawingCueSize()
+bool LayerElement::GetDrawingCueSize() const
 {
     return m_drawingCueSize;
 }
@@ -395,7 +395,7 @@ int LayerElement::GetDrawingY() const
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
-    Object *object = this->m_crossStaff; // GetCrossStaff();
+    Object *object = m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff
     // (e.g. artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -451,7 +451,7 @@ void LayerElement::SetDrawingYRel(int drawingYRel)
 
 void LayerElement::CenterDrawingX()
 {
-    if (this->m_xAbs != VRV_UNSET) return;
+    if (m_xAbs != VRV_UNSET) return;
 
     SetDrawingXRel(0);
 
@@ -464,7 +464,7 @@ void LayerElement::CenterDrawingX()
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
     if (this->Is({ NOTE, CHORD }) && withArtic) {
-        int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
+        int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
         if (articY != VRV_UNSET) return articY;
     }
 
@@ -502,7 +502,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticTy
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticType type)
 {
     if (this->Is({ NOTE, CHORD }) && withArtic) {
-        int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
+        int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
         if (articY != -VRV_UNSET) return articY;
     }
 
@@ -655,7 +655,7 @@ double LayerElement::GetAlignmentDuration(
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
-        if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
+        if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetTotalCount();
 
         if (this->Is(HALFMRPT)) {
             return (DUR_MAX / meterUnit * meterCount) / 2;
@@ -670,7 +670,7 @@ double LayerElement::GetAlignmentDuration(
 }
 
 double LayerElement::GetSameAsContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -683,7 +683,7 @@ double LayerElement::GetSameAsContentAlignmentDuration(
 }
 
 double LayerElement::GetContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -1170,12 +1170,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             if ((rest->GetDur() == DUR_1) && (staff->m_drawingLines > 1)) loc += 2;
             if ((rest->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
 
-            Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
-            // Limitation: GetLayerCount does not take into account editorial markup
-            // should be refined later
-            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
-
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
+            Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
             if (beam) {
                 beam->ResetList(beam);
 
@@ -1282,11 +1278,9 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                         loc++;
                 }
             }
-            if (hasMultipleLayer || m_crossStaff) {
-                Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-                assert(staff);
-                loc = rest->GetOptimalLayerLocation(staff, layer, loc);
-            }
+
+            Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+            loc = rest->GetOptimalLayerLocation(staff, layer, loc);
         }
         rest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
@@ -1708,7 +1702,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
 int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
-    if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
+    if (m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
@@ -1887,8 +1881,8 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
             }
         }
         if (crossStaff) {
-            this->m_crossStaff = crossStaff;
-            this->m_crossLayer = crossLayer;
+            m_crossStaff = crossStaff;
+            m_crossLayer = crossLayer;
         }
     }
 
@@ -1975,11 +1969,9 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 
     // For mRest we do not look at the time span
     if (this->Is(MREST)) {
-        // Add the layerN to the list of layer element occuring in this time frame
-        if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
-            == params->m_layers.end()) {
-            params->m_layers.push_back(this->GetAlignmentLayerN());
-        }
+        // Add the layerN to the list of layer elements occuring in this time frame
+        params->m_layers.insert(this->GetAlignmentLayerN());
+
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1998,11 +1990,8 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
         return FUNCTOR_STOP;
     }
 
-    // Add the layerN to the list of layer element occuring in this time frame
-    if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
-        == params->m_layers.end()) {
-        params->m_layers.push_back(this->GetAlignmentLayerN());
-    }
+    // Add the layerN to the list of layer elements occuring in this time frame
+    params->m_layers.insert(this->GetAlignmentLayerN());
 
     // Not need to recurse for chords? Not quite sure about it.
     return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;

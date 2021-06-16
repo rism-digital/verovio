@@ -201,7 +201,8 @@ protected:
     void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
-    void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, bool eraseIntersections = false);
+    void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, data_BARRENDITION form,
+        bool eraseIntersections = false);
     void DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine);
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
@@ -323,7 +324,8 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
-    void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff);
+    void DrawMeterSigFigures(
+        DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 

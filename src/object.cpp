@@ -238,7 +238,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
             idx++;
         }
         else {
-            this->m_children.push_back(child);
+            m_children.push_back(child);
         }
     }
 }
@@ -840,7 +840,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         };
 
         // We need a pointer to the array for the option to work on a reversed copy
-        ArrayOfObjects *children = &this->m_children;
+        ArrayOfObjects *children = &m_children;
         if (direction == BACKWARD) {
             for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
@@ -1001,7 +1001,7 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
 {
     // actually nothing to do, we just don't want the list to be copied
     if (this != &interface) {
-        this->m_list.clear();
+        m_list.clear();
     }
     return *this;
 }
@@ -1364,7 +1364,7 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 
     assert(m_parent);
     // We want to move only the children of the layer of any type (notes, editorial elements, etc)
-    if (this->m_parent->Is(LAYER)) {
+    if (m_parent->Is(LAYER)) {
         assert(params->m_targetLayer);
         this->MoveItselfTo(params->m_targetLayer);
         // Do not precess children because we move the full sub-tree
@@ -1511,11 +1511,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(MEASURE)) {
         Measure *measure = vrv_cast<Measure *>(this);
         assert(measure);
-        bool systemBreak = false;
-        bool scoreDefInsert = false;
+        int drawingFlags = 0;
         // This is the first measure of the system - more to do...
         if (params->m_currentSystem) {
-            systemBreak = true;
+            drawingFlags |= Measure::BarlineDrawingFlags::SYSTEM_BREAK;
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
@@ -1534,13 +1533,35 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             params->m_drawLabels = false;
         }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
-            scoreDefInsert = true;
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
-        measure->SetDrawingBarLines(params->m_previousMeasure, systemBreak, scoreDefInsert);
+
+        // set other flags based on score def change
+        if (params->m_upcomingScoreDef->m_insertScoreDef) {
+            drawingFlags |= Measure::BarlineDrawingFlags::SCORE_DEF_INSERT;
+            params->m_upcomingScoreDef->m_insertScoreDef = false;
+        }
+
+        // check if we need to draw barlines for current/previous measures (in cases when all staves are invisible in
+        // them)
+        ListOfObjects currentObjects, previousObjects;
+        AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
+        measure->FindAllDescendantByComparison(&currentObjects, &comparison);
+        if ((int)currentObjects.size() == measure->GetChildCount(STAFF)) {
+            drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
+        }
+        if (params->m_previousMeasure) {
+            params->m_previousMeasure->FindAllDescendantByComparison(&previousObjects, &comparison);
+            if ((int)previousObjects.size() == params->m_previousMeasure->GetChildCount(STAFF))
+                drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
+        }
+
+        measure->SetInvisibleStaffBarlines(params->m_previousMeasure, currentObjects, previousObjects, drawingFlags);
+        measure->SetDrawingBarLines(params->m_previousMeasure, drawingFlags);
+
         params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }
@@ -1551,7 +1572,11 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
-        params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
+        if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
+            || scoreDef->HasMensurInfo(UNLIMITED_DEPTH) || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
+            params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
+            params->m_upcomingScoreDef->m_insertScoreDef = true;
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -1801,7 +1826,7 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
         }
     }
 
-    std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
+    std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
     this->Modify();
     return FUNCTOR_CONTINUE;
 }

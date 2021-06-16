@@ -637,7 +637,9 @@ void View::DrawOctave(
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         if (octave->HasEndid()) {
-            x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+            if (octave->GetEnd()->HasContentBB()) {
+                x2 += octave->GetEnd()->GetContentX2();
+            }
         }
     }
 
@@ -1168,7 +1170,10 @@ void View::DrawSylConnector(
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
     int y = staff->GetDrawingY() + GetSylYRel(syl->m_drawingVerse, staff);
-    TextExtend extend;
+
+    // Invalid bounding boxes might occur for empty syllables without text child
+    if (!syl->HasContentHorizontalBB()) return;
+    if (syl->m_nextWordSyl && !syl->m_nextWordSyl->HasContentHorizontalBB()) return;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
@@ -1297,8 +1302,8 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     // We cannot draw without a top and bottom note
     if (!topNote || !bottomNote) return;
 
-    int top = topNote->GetDrawingY();
-    int bottom = bottomNote->GetDrawingY();
+    const int top = topNote->GetDrawingY();
+    const int bottom = bottomNote->GetDrawingY();
 
     // We arbitrarily look at the top note
     Staff *staff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
@@ -1316,19 +1321,18 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
     length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int x = arpeg->GetDrawingX();
-    int angle = -90;
+    const int x = arpeg->GetDrawingX();
+    const int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int angle = -90;
 
+    wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
     wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
     wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
     if (arpeg->GetOrder() == arpegLog_ORDER_down) {
-        y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        x -= m_doc->GetGlyphWidth(SMUFL_EAAA_wiggleArpeggiatoDown, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
         fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
-        endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
-        angle = 90;
+        endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
     }
 
     if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
@@ -1340,7 +1344,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     // Smufl glyphs are horizontal - Rotate them counter clockwise
     dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
 
-    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, 0, endGlyph);
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
 
     dc->EndGraphic(arpeg, this);
 }
@@ -1892,7 +1896,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         }
         else if (mordent->HasAccidupper()) {
             double mordentHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
-            int accid = Accid::GetAccidGlyph(mordent->GetAccidupper());
+            wchar_t accid = Accid::GetAccidGlyph(mordent->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));

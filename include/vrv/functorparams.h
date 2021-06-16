@@ -1069,7 +1069,8 @@ public:
  * member 1: a pointer the document we are adding pages to
  * member 2: a pointer to the current page
  * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
- * member 4: the page height
+ * members 4-8: the page heights
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffPagesParams : public FunctorParams {
@@ -1085,6 +1086,7 @@ public:
         m_pgFootHeight = 0;
         m_pgHead2Height = 0;
         m_pgFoot2Height = 0;
+        m_leftoverSystem = NULL;
     }
     Page *m_contentPage;
     Doc *m_doc;
@@ -1095,6 +1097,7 @@ public:
     int m_pgFootHeight;
     int m_pgHead2Height;
     int m_pgFoot2Height;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1111,6 +1114,7 @@ public:
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
  * member 8: whether to smartly use encoded system breaks
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffSystemsParams : public FunctorParams {
@@ -1125,6 +1129,7 @@ public:
         m_currentScoreDefWidth = 0;
         m_doc = doc;
         m_smart = smart;
+        m_leftoverSystem = NULL;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -1135,6 +1140,7 @@ public:
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
     bool m_smart;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1173,20 +1179,6 @@ class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
     std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
-};
-
-//----------------------------------------------------------------------------
-// ConvertScoreDefMarkupParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating whereas the conversion is permanent of not
- **/
-
-class ConvertScoreDefMarkupParams : public FunctorParams {
-public:
-    ConvertScoreDefMarkupParams(bool permanent) { m_permanent = permanent; }
-    bool m_permanent;
 };
 
 //----------------------------------------------------------------------------
@@ -1464,11 +1456,22 @@ public:
 //----------------------------------------------------------------------------
 
 /**
+ * Helper struct to store note sequences which replace notes in MIDI output due to expanded ornaments and tremolandi
+ */
+struct MIDINote {
+    char pitch;
+    double duration;
+};
+
+using MIDINoteSequence = std::list<MIDINote>;
+
+/**
  * member 0: MidiFile*: the MidiFile we are writing to
  * member 1: int: the midi track number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
  * member 5: int with the current tempo
+ * member 6: expanded notes due to ornaments and tremolandi
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1489,6 +1492,7 @@ public:
     double m_totalTime;
     int m_transSemi;
     int m_currentTempo;
+    std::map<Note *, MIDINoteSequence> m_expandedNotes;
     Functor *m_functor;
 };
 
@@ -1663,7 +1667,7 @@ public:
     }
     double m_time;
     double m_duration;
-    std::vector<int> m_layers;
+    std::set<int> m_layers;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;

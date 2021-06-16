@@ -264,19 +264,18 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 {
     Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!layer) return defaultLocation;
-    const int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+    const std::set<int> layersN = parentLayer->GetLayersNForTimeSpanOf(this);
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
-    if (layerCount != 2) return defaultLocation;
+    if (layersN.size() != 2) return defaultLocation;
 
+    const bool isTopLayer
+        = m_crossStaff ? (staff->GetN() < m_crossStaff->GetN()) : (layer->GetN() == *layersN.cbegin());
+
+    // find best rest location relative to elements on other layers
     Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
-
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     realStaff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer((m_crossStaff && (staff->GetN() < m_crossStaff->GetN()))
-        || (!m_crossStaff && vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN()));
-
-    // find best rest location relative to elements on other layers
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer, isTopLayer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
@@ -435,7 +434,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     return VRV_UNSET;
 }
 
-std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer)
+std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer) const
 {
     if (object->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(object);
@@ -513,9 +512,19 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
         assert(staff);
         const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
-        const int newLoc = GetDrawingLoc() + locAdjust - locAdjust % 2;
+        const int oldLoc = GetDrawingLoc();
+        const int newLoc = oldLoc + locAdjust - locAdjust % 2;
         SetDrawingLoc(newLoc);
         SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
+        // If there are dots, adjust their location as well
+        if (GetDots() > 0) {
+            Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
+            if (dots) {
+                std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+                const auto iter = std::find(dotLocs->begin(), dotLocs->end(), oldLoc);
+                if (iter != dotLocs->end()) *iter = newLoc;
+            }
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -578,7 +587,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;

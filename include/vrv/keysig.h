@@ -76,7 +76,7 @@ public:
      */
     std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname);
 
-    int GetFifthsInt();
+    int GetFifthsInt() const;
 
     //----------------//
     // Static methods //

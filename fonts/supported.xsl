@@ -2354,10 +2354,10 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         </medievalAndRenaissancePlainchantArticulations>
         <medievalAndRenaissanceAccidentals>
             <description>Medieval and Renaissance accidentals</description>
-            <!--<glyph glyph-code="E9E0" smufl-name="medRenFlatSoftB"/>-->
-            <!--<glyph glyph-code="E9E1" smufl-name="medRenFlatHardB"/>-->
-            <!--<glyph glyph-code="E9E2" smufl-name="medRenNatural"/>-->
-            <!--<glyph glyph-code="E9E3" smufl-name="medRenSharpCroix"/>-->
+            <glyph glyph-code="E9E0" smufl-name="medRenFlatSoftB"/>
+            <glyph glyph-code="E9E1" smufl-name="medRenFlatHardB"/>
+            <glyph glyph-code="E9E2" smufl-name="medRenNatural"/>
+            <glyph glyph-code="E9E3" smufl-name="medRenSharpCroix"/>
             <!--<glyph glyph-code="E9E4" smufl-name="medRenFlatWithDot"/>-->
             <!--<glyph glyph-code="E9E5" smufl-name="medRenNaturalWithCross"/>-->
             <range_end>U+E9EF</range_end>
