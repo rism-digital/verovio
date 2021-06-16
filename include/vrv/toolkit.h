@@ -371,6 +371,20 @@ public:
     std::string GetHumdrum();
 
     /**
+     * Convert MEI data into Humdrum data.
+     *
+     * @return The Humdrum data as a string
+     */
+    std::string ConvertMEIToHumdrum(const std::string &meiData);
+
+    /**
+     * Filter Humdrum data.
+     *
+     * @return The Humdrum data as a string
+     */
+    std::string ConvertHumdrumToHumdrum(const std::string &humdrumData);
+
+    /**
      * Write the humdrum buffer to the file
      *
      * This methods is not available in the JavaScript version of the toolkit.
@@ -590,9 +604,25 @@ public:
     const char *GetHumdrumBuffer();
 
     /**
+     * Clear the Humdrum buffer of any contents.
+     *
+     * @ingroup nodoc
+     */
+    void ClearHumdrumBuffer();
+
+    /**
      * @ingroup nodoc
      */
     void SetInputFrom(FileFormat format) { m_inputFrom = format; }
+
+    /**
+     * Get the input format.
+     *
+     * @return Input format enumeration
+     *
+     * @ingroup nodoc
+     */
+    int GetInputFrom() { return m_inputFrom; }
 
     /**
      * @ingroup nodoc

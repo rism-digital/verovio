@@ -18,6 +18,8 @@ const char *vrvToolkit_getElementAttr(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec);
 const char *vrvToolkit_getExpansionIdsForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getHumdrum(Toolkit *tk);
+const char *vrvToolkit_convertHumdrumToHumdrum(Toolkit *tk, const char *humdrumData);
+const char *vrvToolkit_convertMEIToHumdrum(Toolkit *tk, const char *meiData);
 const char *vrvToolkit_getLog(Toolkit *tk);
 const char *vrvToolkit_getMEI(Toolkit *tk, const char *options);
 const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId);

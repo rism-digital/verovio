@@ -568,7 +568,7 @@ bool HumdrumInput::convertHumdrum()
     importVerovioOptions(m_doc);
 
     if (GetOutputFormat() == "humdrum") {
-        // allow for filtering within toolkit.
+        // Allow for filtering within toolkit.
         return true;
     }
     if (m_infiles.getCount() == 0) {

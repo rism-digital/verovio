@@ -418,6 +418,10 @@ bool Toolkit::LoadData(const std::string &data)
     std::string newData;
     Input *input = NULL;
 
+#ifndef NO_HUMDRUM_SUPPORT
+    ClearHumdrumBuffer();
+#endif
+
     auto inputFormat = m_inputFrom;
     if (inputFormat == AUTO) {
         inputFormat = IdentifyInputFrom(data);
@@ -544,24 +548,14 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     else if (inputFormat == MEIHUM) {
-        // This is the indirect converter from MEI to MEI using iohumdrum:
-        hum::Tool_mei2hum converter;
-        pugi::xml_document xmlfile;
-        xmlfile.load_string(data.c_str());
-        stringstream conversion;
-        bool status = converter.convert(conversion, xmlfile);
-        if (!status) {
-            LogError("Error converting MEI data");
-            return false;
-        }
-        std::string buffer = conversion.str();
-        SetHumdrumBuffer(buffer.c_str());
+        ConvertMEIToHumdrum(data);
 
         // Now convert Humdrum into MEI:
+        std::string conversion = GetHumdrumBuffer();
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         Input *tempinput = new HumdrumInput(&tempdoc);
-        if (!tempinput->Import(conversion.str())) {
+        if (!tempinput->Import(conversion)) {
             LogError("Error importing Humdrum data (3)");
             delete tempinput;
             return false;
@@ -898,6 +892,11 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             if (iter->first == "inputFrom") {
                 if (json.has<jsonxx::String>("inputFrom")) {
                     SetInputFrom(json.get<jsonxx::String>("inputFrom"));
+                }
+            }
+            else if (iter->first == "outputTo") {
+                if (json.has<jsonxx::String>("outputTo")) {
+                    SetOutputTo(json.get<jsonxx::String>("outputTo"));
                 }
             }
             else if (iter->first == "scale") {
@@ -1513,10 +1512,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
-    if (m_humdrumBuffer) {
-        free(m_humdrumBuffer);
-        m_humdrumBuffer = NULL;
-    }
+    ClearHumdrumBuffer();
     size_t size = strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
@@ -1532,7 +1528,8 @@ const char *Toolkit::GetHumdrumBuffer()
         return m_humdrumBuffer;
     }
     else {
-        // Convert MEI data to Humdrum
+#ifndef NO_HUMDRUM_SUPPORT
+        // Convert from MEI to Humdrum
         MEIOutput meioutput(&m_doc);
         meioutput.SetScoreBasedMEI(true);
         std::string meidata = meioutput.GetOutput();
@@ -1542,6 +1539,7 @@ const char *Toolkit::GetHumdrumBuffer()
         hum::Tool_mei2hum converter;
         converter.convert(out, infile);
         SetHumdrumBuffer(out.str().c_str());
+#endif
         if (m_humdrumBuffer) {
             return m_humdrumBuffer;
         }
@@ -1575,6 +1573,83 @@ const char *Toolkit::GetCString()
     else {
         return "[unspecified]";
     }
+}
+
+void Toolkit::ClearHumdrumBuffer(void)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+    if (m_humdrumBuffer) {
+        free(m_humdrumBuffer);
+        m_humdrumBuffer = NULL;
+    }
+#endif
+}
+
+std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+    hum::Tool_mei2hum converter;
+    pugi::xml_document xmlfile;
+    xmlfile.load_string(meiData.c_str());
+    std::stringstream conversion;
+    bool status = converter.convert(conversion, xmlfile);
+    if (!status) {
+        LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
+    }
+    SetHumdrumBuffer(conversion.str().c_str());
+    return conversion.str();
+#else
+    return "";
+#endif
+}
+
+std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+
+    hum::HumdrumFileSet infiles;
+    // bool result = infiles.readString(humdrumData);
+    bool result = infiles.readString(humdrumData);
+    if (!result) {
+        SetHumdrumBuffer("");
+        return "";
+    }
+    if (infiles.getCount() == 0) {
+        SetHumdrumBuffer("");
+        return "";
+    }
+
+    // Apply Humdrum tools if there are any filters in the file.
+    hum::Tool_filter filter;
+    for (int i = 0; i < infiles.getCount(); ++i) {
+        if (infiles[i].hasGlobalFilters()) {
+            filter.run(infiles[i]);
+            if (filter.hasHumdrumText()) {
+                infiles[i].readString(filter.getHumdrumText());
+            }
+            else {
+                // should have auto updated itself in the filter.
+            }
+        }
+    }
+
+    // Apply Humdrum tools to the entire set if they are
+    // at the universal level.
+    if (infiles.hasUniversalFilters()) {
+        filter.runUniversal(infiles);
+        if (filter.hasHumdrumText()) {
+            infiles.readString(filter.getHumdrumText());
+        }
+    }
+
+    hum::HumdrumFile &infile = infiles[0];
+    std::stringstream humout;
+    humout << infile;
+    SetHumdrumBuffer(humout.str().c_str());
+    return humout.str();
+#else
+    return "";
+#endif
 }
 
 } // namespace vrv
