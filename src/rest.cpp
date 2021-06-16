@@ -522,7 +522,7 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
                 Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
                 if (dots) {
                     std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
-                    const int dotLoc = (oldLoc % 2)? oldLoc : oldLoc + 1;
+                    const int dotLoc = (oldLoc % 2) ? oldLoc : oldLoc + 1;
                     if (std::find(dotLocs.cbegin(), dotLocs.cend(), dotLoc) != dotLocs.cend()) {
                         dotLocs.erase(dotLoc);
                         dotLocs.insert(newLoc);
