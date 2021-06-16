@@ -1280,7 +1280,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
 
             // time
-            MeterSig *meterSig = NULL;
             pugi::xpath_node time;
             xpath = StringFormat("time[@number='%d']", i + 1);
             time = it->select_node(xpath.c_str());
@@ -1289,43 +1288,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 if (nbStaves > 1) time.node().remove_attribute("id");
             }
             if (time) {
-                if (!meterSig) meterSig = new MeterSig();
-                std::string symbol = time.node().attribute("symbol").as_string();
-                if (time.node().attribute("id")) {
-                    meterSig->SetUuid(time.node().attribute("id").as_string());
-                }
-                if (!symbol.empty()) {
-                    if (symbol == "cut" || symbol == "common")
-                        meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
-                    else if (symbol == "single-number")
-                        meterSig->SetForm(METERFORM_num);
-                    else
-                        meterSig->SetForm(METERFORM_norm);
-                }
-                if (time.node().select_nodes("beats").size() > 1) {
-                    LogWarning("MusicXML import: Compound meter signatures are not supported");
-                }
-                pugi::xml_node beats = time.node().child("beats");
-                pugi::xml_node beatType = time.node().child("beat-type");
-                if (beats) {
-                    m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
-                    meterSig->SetCount(m_meterCount);
-                    m_meterUnit = beatType.text().as_int();
-                    meterSig->SetUnit(m_meterUnit);
-                }
-                else if (time.node().child("senza-misura")) {
-                    if (time.node().child("senza-misura").text()) {
-                        meterSig->SetSym(METERSIGN_open);
-                    }
-                    else {
-                        meterSig->SetForm(METERFORM_invis);
-                    }
-                }
+                ReadMusicXMLMeterSig(time.node(), staffDef);
             }
             // add it if necessary
-            if (meterSig) {
-                staffDef->AddChild(meterSig);
-            }
 
             // transpose
             pugi::xpath_node transpose;
@@ -1356,6 +1321,46 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     }
 
     return nbStaves;
+}
+
+void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node& time, Object *parent)
+{
+    if ((time.select_nodes("beats").size() > 1) || time.select_node("interchangeable")) {
+        LogWarning("MusicXML import: Compound meter signatures are not supported");
+    }
+    MeterSig *meterSig = new MeterSig();
+    if (time.attribute("id")) {
+        meterSig->SetUuid(time.attribute("id").as_string());
+    }
+    const std::string symbol = time.attribute("symbol").as_string();
+    if (!symbol.empty()) {
+        if (symbol == "cut" || symbol == "common") {
+            meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
+        }
+        else if (symbol == "single-number") {
+            meterSig->SetForm(METERFORM_num);
+        }
+        else {
+            meterSig->SetForm(METERFORM_norm);
+        }
+    }
+    pugi::xml_node beats = time.child("beats");
+    pugi::xml_node beatType = time.child("beat-type");
+    if (beats) {
+        m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
+        meterSig->SetCount(m_meterCount);
+        m_meterUnit = beatType.text().as_int();
+        meterSig->SetUnit(m_meterUnit);
+    }
+    else if (time.child("senza-misura")) {
+        if (time.child("senza-misura").text()) {
+            meterSig->SetSym(METERSIGN_open);
+        }
+        else {
+            meterSig->SetForm(METERFORM_invis);
+        }
+    }
+    parent->AddChild(meterSig);
 }
 
 bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset)
@@ -1618,39 +1623,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
 
         if (time) {
-            MeterSig *meterSig = new MeterSig();
-            if (time.attribute("id")) {
-                meterSig->SetUuid(time.attribute("id").as_string());
-            }
-            std::string symbol = time.attribute("symbol").as_string();
-            if (!symbol.empty()) {
-                if (symbol == "cut" || symbol == "common")
-                    meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
-                else if (symbol == "single-number")
-                    meterSig->SetForm(METERFORM_num);
-                else
-                    meterSig->SetForm(METERFORM_norm);
-            }
-            pugi::xml_node beats = time.child("beats");
-            pugi::xml_node beatType = time.child("beat-type");
-            if (beats) {
-                m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
-                meterSig->SetCount(m_meterCount);
-                m_meterUnit = beatType.text().as_int();
-                meterSig->SetUnit(m_meterUnit);
-                if (time.select_nodes("beats").size() > 1) {
-                    LogWarning("MusicXML import: Compound meter signatures are not supported");
-                }
-            }
-            else if (time.child("senza-misura")) {
-                if (time.child("senza-misura").text()) {
-                    meterSig->SetSym(METERSIGN_open);
-                }
-                else {
-                    meterSig->SetForm(METERFORM_invis);
-                }
-            }
-            scoreDef->AddChild(meterSig);
+            ReadMusicXMLMeterSig(time, scoreDef);
         }
 
         if (divisions) {
@@ -1934,8 +1907,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     pugi::xpath_node_set words = node.select_nodes("direction-type/words");
     const bool containsWords = !words.empty();
     bool containsDynamics
-        = !node.select_node("direction-type/dynamics").node().empty() or soundNode.attribute("dynamics");
-    bool containsTempo = !node.select_node("direction-type/metronome").node().empty() or soundNode.attribute("tempo");
+        = !node.select_node("direction-type/dynamics").node().empty() || soundNode.attribute("dynamics");
+    bool containsTempo = !node.select_node("direction-type/metronome").node().empty() || soundNode.attribute("tempo");
 
     // Directive
     int defaultY = 0; // y position attribute, only for directives and dynamics

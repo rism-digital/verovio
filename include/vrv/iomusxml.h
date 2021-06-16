@@ -212,6 +212,7 @@ private:
     void ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
+    void ReadMusicXMLMeterSig(const pugi::xml_node &node, Object *parent);
     ///@}
 
     /**
