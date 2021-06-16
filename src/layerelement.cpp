@@ -866,6 +866,10 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
+//----------------------------------------------------------------------------
+// Static methods for LayerElement
+//----------------------------------------------------------------------------
+
 int LayerElement::GetDotCount(const MapOfDotLocs &dotLocations)
 {
     return std::accumulate(dotLocations.cbegin(), dotLocations.cend(), 0,
@@ -888,7 +892,7 @@ int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDot
 }
 
 //----------------------------------------------------------------------------
-// LayerElement functors methods
+// LayerElement functor methods
 //----------------------------------------------------------------------------
 
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)

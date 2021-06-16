@@ -381,6 +381,49 @@ public:
      */
     virtual int GetRelativeLayerElement(FunctorParams *functorParams);
 
+protected:
+    /**
+     * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
+     * This function assumes that two chords are already in unison and checks whether chords can overlap with
+     * their unison notes or if they should be placed separately.
+     * Returns true if all elements can safely overlap.
+     */
+    virtual int CountElementsInUnison(
+        const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
+
+    /**
+     * The note locations w.r.t. each staff, implemented for note and chord
+     */
+    virtual MapOfNoteLocs CalcNoteLocations() { return {}; };
+
+    /**
+     * The dot locations w.r.t. each staff, implemented for note and chord
+     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
+     * secondary
+     */
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; };
+
+    /**
+     * Calculate the optimal dot location for a note or chord
+     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
+     */
+    MapOfDotLocs CalcOptimalDotLocations();
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Helper to count the number of dots
+     * This can be used as an indicator to choose between different sets of dots
+     */
+    static int GetDotCount(const MapOfDotLocs &dotLocations);
+
+    /**
+     * Helper to count the collisions between two sets of dots
+     */
+    static int GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2);
+
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type);
 
@@ -415,47 +458,9 @@ protected:
     int m_drawingXRel;
 
     /**
-     * The cached drawing cue size set by PrepareDarwingCueSize
+     * The cached drawing cue size set by PrepareDrawingCueSize
      */
     bool m_drawingCueSize;
-
-    /**
-     * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
-     * This function assumes that two chords are already in unison and checks whether chords can overlap with
-     * their unison notes or if they should be placed separately.
-     * Returns true if all elements can safely overlap.
-     */
-    virtual int CountElementsInUnison(
-        const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
-
-    /**
-     * The note locations w.r.t. each staff, implemented for note and chord
-     */
-    virtual MapOfNoteLocs CalcNoteLocations() { return {}; };
-
-    /**
-     * The dot locations w.r.t. each staff, implemented for note and chord
-     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
-     * secondary
-     */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; };
-
-    /**
-     * Calculate the optimal dot location for a note or chord
-     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
-     */
-    MapOfDotLocs CalcOptimalDotLocations();
-
-    /**
-     * Helper to count the number of dots
-     * This can be used as an indicator to choose between different sets of dots
-     */
-    static int GetDotCount(const MapOfDotLocs &dotLocations);
-
-    /**
-     * Helper to count the collisions between two sets of dots
-     */
-    static int GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2);
 
 private:
     /**
