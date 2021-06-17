@@ -132,8 +132,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLedgerLineAbove(int count, int left, int right, bool cueSize);
-    void AddLedgerLineBelow(int count, int left, int right, bool cueSize);
+    void AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize);
+    void AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize);
     ///@}
 
     /**
@@ -235,7 +235,7 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
+    void AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right, int extension);
 
 public:
     /**
@@ -310,7 +310,7 @@ public:
      * Add a dash to the ledger line object.
      * If necessary merges overlapping dashes.
      */
-    void AddDash(int left, int right);
+    void AddDash(int left, int right, int extension);
 
 protected:
     //

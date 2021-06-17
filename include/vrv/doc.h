@@ -147,7 +147,7 @@ public:
     int GetDrawingHairpinSize(int staffSize, bool withMargin) const;
     int GetDrawingBeamWidth(int staffSize, bool graceSize) const;
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
-    int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
+    int GetDrawingLedgerLineExtension(int staffSize, bool graceSize) const;
     int GetCueSize(int value) const;
     double GetCueScaling() const;
     ///@}
@@ -498,8 +498,6 @@ private:
     int m_drawingBeamWidth;
     /** Height of a beam spacing (white) (10 and 6 by default) */
     int m_drawingBeamWhiteWidth;
-    /** Ledger line length and normal and grace size */
-    int m_drawingLedgerLine;
     /** Brevis width */
     int m_drawingBrevisWidth;
 

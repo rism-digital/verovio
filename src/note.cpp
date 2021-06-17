@@ -1088,36 +1088,23 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     int linesAbove = 0;
     int linesBelow = 0;
 
-    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
+    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
 
-    const int ledgerLineExtension
-        = params->m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * params->m_doc->GetDrawingUnit(staffSize);
-    int leftExtender = ledgerLineExtension;
-    int rightExtender = ledgerLineExtension;
-    if (drawingCueSize || (this->GetDrawingDur() >= DUR_8)) {
-        leftExtender = 0.7 * ledgerLineExtension;
-        rightExtender = 0.5 * ledgerLineExtension;
-    }
-
-    if (drawingCueSize) {
-        leftExtender = params->m_doc->GetCueSize(leftExtender);
-        rightExtender = params->m_doc->GetCueSize(rightExtender);
-    }
-
-    int left = this->GetDrawingX() - leftExtender - staffX;
-    int right = this->GetDrawingX() + 2 * radius + rightExtender - staffX;
+    const int extension = params->m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
+    const int left = this->GetDrawingX() - extension - staffX;
+    int right = this->GetDrawingX() + 2 * radius + extension - staffX;
     if (this->GetDrawingDur() == DUR_MX) {
         right += 2 * radius;
     }
 
     if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, drawingCueSize);
+        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
     }
     else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, drawingCueSize);
+        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
     }
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)

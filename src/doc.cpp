@@ -1571,10 +1571,10 @@ int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const
     return value;
 }
 
-int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
+int Doc::GetDrawingLedgerLineExtension(int staffSize, bool graceSize) const
 {
-    int value = m_drawingLedgerLine * staffSize / 100;
-    if (graceSize) value = value * m_options->m_graceFactor.GetValue();
+    int value = m_options->m_ledgerLineExtension.GetValue() * this->GetDrawingUnit(staffSize);
+    if (graceSize) value = this->GetCueSize(value);
     return value;
 }
 
@@ -1780,9 +1780,6 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // values for fonts
     m_drawingSmuflFontSize = CalcMusicFontSize();
     m_drawingLyricFontSize = m_options->m_unit.GetValue() * m_options->m_lyricSize.GetValue();
-
-    glyph_size = GetGlyphWidth(SMUFL_E0A3_noteheadHalf, 100, 0);
-    m_drawingLedgerLine = glyph_size * 72 / 100;
 
     glyph_size = GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 

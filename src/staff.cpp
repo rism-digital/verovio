@@ -252,38 +252,38 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
     return (loc - staffLocOffset) * doc->GetDrawingUnit(m_drawingStaffSize);
 }
 
-void Staff::AddLedgerLineAbove(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize)
 {
     if (cueSize) {
         if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAboveCue, count, left, right);
+        AddLedgerLines(m_ledgerLinesAboveCue, count, left, right, extension);
     }
     else {
         if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAbove, count, left, right);
+        AddLedgerLines(m_ledgerLinesAbove, count, left, right, extension);
     }
 }
 
-void Staff::AddLedgerLineBelow(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize)
 {
     if (cueSize) {
         if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelowCue, count, left, right);
+        AddLedgerLines(m_ledgerLinesBelowCue, count, left, right, extension);
     }
     else {
         if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelow, count, left, right);
+        AddLedgerLines(m_ledgerLinesBelow, count, left, right, extension);
     }
 }
 
-void Staff::AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right)
+void Staff::AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right, int extension)
 {
     assert(lines);
 
     if ((int)lines->size() < count) lines->resize(count);
     int i = 0;
     for (i = 0; i < count; ++i) {
-        lines->at(i).AddDash(left, right);
+        lines->at(i).AddDash(left, right, extension);
     }
 }
 
@@ -338,7 +338,7 @@ void LedgerLine::Reset()
     m_dashes.clear();
 }
 
-void LedgerLine::AddDash(int left, int right)
+void LedgerLine::AddDash(int left, int right, int extension)
 {
     assert(left < right);
 
@@ -350,12 +350,14 @@ void LedgerLine::AddDash(int left, int right)
     }
     m_dashes.insert(iter, std::make_pair(left, right));
 
-    // Merge overlapping dashes
+    // Merge dashes which overlap by more than 1.5 extensions
+    // => Dashes belonging to the same chord overlap at least by two extensions and will get merged
+    // => Overlapping dashes of adjacent notes will not get merged
     std::list<std::pair<int, int>>::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
-        if (previous->second > iter->first) {
+        if (previous->second > iter->first + 1.5 * extension) {
             previous->second = std::max(iter->second, previous->second);
             iter = m_dashes.erase(iter);
         }
