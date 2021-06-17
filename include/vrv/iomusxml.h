@@ -44,6 +44,7 @@ class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
+class MeterSigGrp;
 class Octave;
 class Pedal;
 class Section;
@@ -333,6 +334,14 @@ private:
     ///@{
     ///@}
     void GenerateUuid(pugi::xml_node node);
+    
+    /*
+     * @name Helper method for meterSigGrp. Separates beat/beat-type into MeterSig and adds them to the MeterSigGrp.
+     * Returns total meterCount and meterUnit for the group
+     */
+    ///@{
+    std::pair<std::vector<int>, int> GetMeterSigGrpValues(const pugi::xml_node &node, MeterSigGrp *parent);
+    ///@}
 
     /*
      * @name Helper method for multirests. Returns number of measure hidden by MRest before

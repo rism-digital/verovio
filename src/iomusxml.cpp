@@ -47,6 +47,7 @@
 #include "lb.h"
 #include "mdiv.h"
 #include "measure.h"
+#include "metersiggrp.h"
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
@@ -1326,41 +1327,54 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
 void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node& time, Object *parent)
 {
     if ((time.select_nodes("beats").size() > 1) || time.select_node("interchangeable")) {
-        LogWarning("MusicXML import: Compound meter signatures are not supported");
-    }
-    MeterSig *meterSig = new MeterSig();
-    if (time.attribute("id")) {
-        meterSig->SetUuid(time.attribute("id").as_string());
-    }
-    const std::string symbol = time.attribute("symbol").as_string();
-    if (!symbol.empty()) {
-        if (symbol == "cut" || symbol == "common") {
-            meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
+        MeterSigGrp *meterSigGrp = new MeterSigGrp();
+        if (time.attribute("id")) {
+            meterSigGrp->SetUuid(time.attribute("id").as_string());
         }
-        else if (symbol == "single-number") {
-            meterSig->SetForm(METERFORM_num);
+        pugi::xpath_node interchangeable = time.select_node("interchangeable");
+        meterSigGrp->SetFunc(interchangeable ? meterSigGrpLog_FUNC_interchanging : meterSigGrpLog_FUNC_mixed);
+
+        std::tie(m_meterCount, m_meterUnit) = GetMeterSigGrpValues(time, meterSigGrp);
+        if (interchangeable) {
+            [[maybe_unused]] auto [interCount, interUnit] = GetMeterSigGrpValues(interchangeable.node(), meterSigGrp);
         }
-        else {
-            meterSig->SetForm(METERFORM_norm);
-        }
+        parent->AddChild(meterSigGrp);
     }
-    pugi::xml_node beats = time.child("beats");
-    pugi::xml_node beatType = time.child("beat-type");
-    if (beats) {
-        m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
-        meterSig->SetCount(m_meterCount);
-        m_meterUnit = beatType.text().as_int();
-        meterSig->SetUnit(m_meterUnit);
-    }
-    else if (time.child("senza-misura")) {
-        if (time.child("senza-misura").text()) {
-            meterSig->SetSym(METERSIGN_open);
+    else {
+        MeterSig *meterSig = new MeterSig();
+        if (time.attribute("id")) {
+            meterSig->SetUuid(time.attribute("id").as_string());
         }
-        else {
-            meterSig->SetForm(METERFORM_invis);
+        const std::string symbol = time.attribute("symbol").as_string();
+        if (!symbol.empty()) {
+            if (symbol == "cut" || symbol == "common") {
+                meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
+            }
+            else if (symbol == "single-number") {
+                meterSig->SetForm(METERFORM_num);
+            }
+            else {
+                meterSig->SetForm(METERFORM_norm);
+            }
         }
+        pugi::xml_node beats = time.child("beats");
+        pugi::xml_node beatType = time.child("beat-type");
+        if (beats) {
+            m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
+            meterSig->SetCount(m_meterCount);
+            m_meterUnit = beatType.text().as_int();
+            meterSig->SetUnit(m_meterUnit);
+        }
+        else if (time.child("senza-misura")) {
+            if (time.child("senza-misura").text()) {
+                meterSig->SetSym(METERSIGN_open);
+            }
+            else {
+                meterSig->SetForm(METERFORM_invis);
+            }
+        }
+        parent->AddChild(meterSig);
     }
-    parent->AddChild(meterSig);
 }
 
 bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset)
@@ -4186,6 +4200,44 @@ bool MusicXmlInput::IsMultirestMeasure(int index) const
         if (index <= multiRest.second) return true;
     }
     return false;
+}
+
+std::pair<std::vector<int>, int> MusicXmlInput::GetMeterSigGrpValues(const pugi::xml_node &node, MeterSigGrp *parent)
+{
+    pugi::xpath_node_set beats = node.select_nodes("beats");
+    pugi::xpath_node_set beat_type = node.select_nodes("beat-type");
+    int maxUnit = 0;
+    std::vector<int> meterCounts;
+    for (auto iter1 = beats.begin(), iter2 = beat_type.begin(); (iter1 != beats.end()) && (iter2 != beat_type.end());
+         ++iter1, ++iter2) {
+        // Process current beat/beat-type combination and add it to the meterSigGrp
+        MeterSig *meterSig = new MeterSig();
+        std::vector<int> currentCount = meterSig->AttMeterSigLog::StrToSummandList(iter1->node().text().as_string());
+        meterSig->SetCount(currentCount);
+        int currentUnit = iter2->node().text().as_int();
+        meterSig->SetUnit(currentUnit);
+        parent->AddChild(meterSig);
+        // Process meterCount and meterUnit based on current/previous beats
+        if (maxUnit == 0) maxUnit = currentUnit;
+        if (maxUnit == currentUnit) {
+            meterCounts.insert(meterCounts.end(), currentCount.begin(), currentCount.end());
+        }
+        else if (maxUnit > currentUnit) {
+            int ratio = maxUnit / currentUnit;
+            std::transform(currentCount.begin(), currentCount.end(), currentCount.begin(),
+                [&ratio](int elem) -> int { return elem * ratio; });
+            meterCounts.insert(meterCounts.end(), currentCount.begin(), currentCount.end());
+        }
+        else if (maxUnit < currentUnit) {
+            int ratio = currentUnit / maxUnit;
+            std::transform(meterCounts.begin(), meterCounts.end(), meterCounts.begin(),
+                [&ratio](int elem) -> int { return elem * ratio; });
+            meterCounts.insert(meterCounts.end(), currentCount.begin(), currentCount.end());
+            maxUnit = currentUnit;
+        }
+    }
+
+    return { meterCounts, maxUnit };
 }
 
 int MusicXmlInput::GetMrestMeasuresCountBeforeIndex(int index) const
