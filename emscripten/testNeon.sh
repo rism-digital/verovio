@@ -20,7 +20,7 @@ mv verovio_new.js [location_of_your_Neon]/Neon/verovio-util
 
 cd [location_of_your_Neon]/Neon/verovio-util
 
-rm verovio.js && mv verovio_new.js verovio.js
+rm verovio.js; mv verovio_new.js verovio.js
 
 # Runs Neon
 yarn build && yarn start
