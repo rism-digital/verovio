@@ -47,20 +47,12 @@ Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), Att
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    // owned pointers need to be set to NULL;
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
 
     Reset();
     SetN(n);
 }
 
-Staff::~Staff()
-{
-    ClearLedgerLines();
-}
+Staff::~Staff() {}
 
 void Staff::Reset()
 {
@@ -87,11 +79,6 @@ void Staff::CloneReset()
 {
     Object::CloneReset();
 
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
-
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
@@ -108,22 +95,10 @@ const ArrayOfObjects *Staff::GetChildren(bool docChildren) const
 
 void Staff::ClearLedgerLines()
 {
-    if (m_ledgerLinesAbove) {
-        delete m_ledgerLinesAbove;
-        m_ledgerLinesAbove = NULL;
-    }
-    if (m_ledgerLinesBelow) {
-        delete m_ledgerLinesBelow;
-        m_ledgerLinesBelow = NULL;
-    }
-    if (m_ledgerLinesAboveCue) {
-        delete m_ledgerLinesAboveCue;
-        m_ledgerLinesAboveCue = NULL;
-    }
-    if (m_ledgerLinesBelowCue) {
-        delete m_ledgerLinesBelowCue;
-        m_ledgerLinesBelowCue = NULL;
-    }
+    m_ledgerLinesAbove.clear();
+    m_ledgerLinesBelow.clear();
+    m_ledgerLinesAboveCue.clear();
+    m_ledgerLinesBelowCue.clear();
 }
 
 bool Staff::IsSupportedChild(Object *child)
@@ -254,26 +229,12 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 
 void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize)
 {
-    if (cueSize) {
-        if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
-        AddLedgerLines(*m_ledgerLinesAboveCue, count, left, right, extension);
-    }
-    else {
-        if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
-        AddLedgerLines(*m_ledgerLinesAbove, count, left, right, extension);
-    }
+    AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension);
 }
 
 void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize)
 {
-    if (cueSize) {
-        if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
-        AddLedgerLines(*m_ledgerLinesBelowCue, count, left, right, extension);
-    }
-    else {
-        if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
-        AddLedgerLines(*m_ledgerLinesBelow, count, left, right, extension);
-    }
+    AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension);
 }
 
 void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension)
@@ -523,13 +484,13 @@ int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
 
     int extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, false);
     int minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, false);
-    if (m_ledgerLinesAbove) AdjustLedgerLines(*m_ledgerLinesAbove, extension, minExtension);
-    if (m_ledgerLinesBelow) AdjustLedgerLines(*m_ledgerLinesBelow, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesAbove, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesBelow, extension, minExtension);
 
     extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, true);
     minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, true);
-    if (m_ledgerLinesAboveCue) AdjustLedgerLines(*m_ledgerLinesAboveCue, extension, minExtension);
-    if (m_ledgerLinesBelowCue) AdjustLedgerLines(*m_ledgerLinesBelowCue, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesAboveCue, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesBelowCue, extension, minExtension);
 
     return FUNCTOR_CONTINUE;
 }

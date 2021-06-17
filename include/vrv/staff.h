@@ -118,13 +118,13 @@ public:
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     /**
-     * Return the ledger line arrays (NULL if none)
+     * Return the ledger line arrays
      */
     ///@{
-    ArrayOfLedgerLines *GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
-    ArrayOfLedgerLines *GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
-    ArrayOfLedgerLines *GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
-    ArrayOfLedgerLines *GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
+    const ArrayOfLedgerLines &GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
+    const ArrayOfLedgerLines &GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
+    const ArrayOfLedgerLines &GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
+    const ArrayOfLedgerLines &GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
     ///@}
 
     /**
@@ -285,13 +285,13 @@ private:
     StaffAlignment *m_staffAlignment;
 
     /**
-     * A pointer to the legder lines (above / below and normal / cue)
+     * The legder lines (above / below and normal / cue)
      */
     ///@{
-    ArrayOfLedgerLines *m_ledgerLinesAbove;
-    ArrayOfLedgerLines *m_ledgerLinesBelow;
-    ArrayOfLedgerLines *m_ledgerLinesAboveCue;
-    ArrayOfLedgerLines *m_ledgerLinesBelowCue;
+    ArrayOfLedgerLines m_ledgerLinesAbove;
+    ArrayOfLedgerLines m_ledgerLinesBelow;
+    ArrayOfLedgerLines m_ledgerLinesAboveCue;
+    ArrayOfLedgerLines m_ledgerLinesBelowCue;
     ///@}
 };
 

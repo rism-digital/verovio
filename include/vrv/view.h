@@ -204,7 +204,7 @@ protected:
     void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, data_BARRENDITION form,
         bool eraseIntersections = false);
     void DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine);
-    void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
+    void DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
     void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset);

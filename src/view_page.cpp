@@ -1125,16 +1125,16 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffDef(dc, staff, measure);
 
-    if (staff->GetLedgerLinesAbove()) {
+    if (!staff->GetLedgerLinesAbove().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesAbove(), false, false);
     }
-    if (staff->GetLedgerLinesBelow()) {
+    if (!staff->GetLedgerLinesBelow().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelow(), true, false);
     }
-    if (staff->GetLedgerLinesAboveCue()) {
+    if (!staff->GetLedgerLinesAboveCue().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesAboveCue(), false, true);
     }
-    if (staff->GetLedgerLinesBelowCue()) {
+    if (!staff->GetLedgerLinesBelowCue().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelowCue(), true, true);
     }
 
@@ -1215,11 +1215,10 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     return;
 }
 
-void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize)
+void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize)
 {
     assert(dc);
     assert(staff);
-    assert(lines);
 
     std::string gClass = "above";
     int y = staff->GetDrawingY();
@@ -1246,14 +1245,10 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    ArrayOfLedgerLines::iterator iter;
-    std::list<std::pair<int, int>>::iterator iterDashes;
-
-    // First add the dash
-    for (iter = lines->begin(); iter != lines->end(); ++iter) {
-        for (iterDashes = (*iter).m_dashes.begin(); iterDashes != (*iter).m_dashes.end(); ++iterDashes) {
-            dc->DrawLine(ToDeviceContextX(x + iterDashes->first), ToDeviceContextY(y),
-                ToDeviceContextX(x + iterDashes->second), ToDeviceContextY(y));
+    for (const LedgerLine &line : lines) {
+        for (const std::pair<int, int> &dash : line.m_dashes) {
+            dc->DrawLine(ToDeviceContextX(x + dash.first), ToDeviceContextY(y), ToDeviceContextX(x + dash.second),
+                ToDeviceContextY(y));
         }
         y += ySpace;
     }
@@ -1262,8 +1257,6 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->ResetBrush();
 
     dc->EndCustomGraphic();
-
-    return;
 }
 
 void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
