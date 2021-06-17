@@ -148,6 +148,7 @@ public:
     int GetDrawingBeamWidth(int staffSize, bool graceSize) const;
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
     int GetDrawingLedgerLineExtension(int staffSize, bool graceSize) const;
+    int GetDrawingMinimalLedgerLineExtension(int staffSize, bool graceSize) const;
     int GetCueSize(int value) const;
     double GetCueScaling() const;
     ///@}

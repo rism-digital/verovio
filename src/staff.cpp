@@ -256,11 +256,11 @@ void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bo
 {
     if (cueSize) {
         if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAboveCue, count, left, right, extension);
+        AddLedgerLines(*m_ledgerLinesAboveCue, count, left, right, extension);
     }
     else {
         if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAbove, count, left, right, extension);
+        AddLedgerLines(*m_ledgerLinesAbove, count, left, right, extension);
     }
 }
 
@@ -268,23 +268,28 @@ void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bo
 {
     if (cueSize) {
         if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelowCue, count, left, right, extension);
+        AddLedgerLines(*m_ledgerLinesBelowCue, count, left, right, extension);
     }
     else {
         if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelow, count, left, right, extension);
+        AddLedgerLines(*m_ledgerLinesBelow, count, left, right, extension);
     }
 }
 
-void Staff::AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right, int extension)
+void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension)
 {
-    assert(lines);
+    assert(left < right);
 
-    if ((int)lines->size() < count) lines->resize(count);
+    if ((int)lines.size() < count) lines.resize(count);
     int i = 0;
     for (i = 0; i < count; ++i) {
-        lines->at(i).AddDash(left, right, extension);
+        lines.at(i).AddDash(left, right, extension);
     }
+}
+
+void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension)
+{
+    assert(minExtension <= extension);
 }
 
 void Staff::SetFromFacsimile(Doc *doc)
@@ -507,6 +512,24 @@ int Staff::AlignVertically(FunctorParams *functorParams)
 
     // for next staff
     params->m_staffIdx++;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    int extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, false);
+    int minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, false);
+    if (m_ledgerLinesAbove) AdjustLedgerLines(*m_ledgerLinesAbove, extension, minExtension);
+    if (m_ledgerLinesBelow) AdjustLedgerLines(*m_ledgerLinesBelow, extension, minExtension);
+
+    extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, true);
+    minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, true);
+    if (m_ledgerLinesAboveCue) AdjustLedgerLines(*m_ledgerLinesAboveCue, extension, minExtension);
+    if (m_ledgerLinesBelowCue) AdjustLedgerLines(*m_ledgerLinesBelowCue, extension, minExtension);
 
     return FUNCTOR_CONTINUE;
 }

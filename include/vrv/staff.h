@@ -148,6 +148,13 @@ public:
      */
     int GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place);
 
+    /**
+     * Set staff parameters based on
+     * facsimile information (if it
+     * exists).
+     */
+    virtual void SetFromFacsimile(Doc *doc);
+
     //----------//
     // Functors //
     //----------//
@@ -188,6 +195,11 @@ public:
     virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
+     * See Object::CalcLedgerLinesEnd
+     */
+    virtual int CalcLedgerLinesEnd(FunctorParams *functorParams);
+
+    /**
      * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
@@ -210,13 +222,6 @@ public:
     ///@}
 
     /**
-     * Set staff parameters based on
-     * facsimile information (if it
-     * exists).
-     */
-    virtual void SetFromFacsimile(Doc *doc);
-
-    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *);
@@ -235,7 +240,12 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right, int extension);
+    void AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension);
+
+    /**
+     * Shorten ledger lines which overlap with neighbors
+     */
+    void AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension);
 
 public:
     /**

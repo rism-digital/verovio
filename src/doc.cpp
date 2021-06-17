@@ -1578,6 +1578,13 @@ int Doc::GetDrawingLedgerLineExtension(int staffSize, bool graceSize) const
     return value;
 }
 
+int Doc::GetDrawingMinimalLedgerLineExtension(int staffSize, bool graceSize) const
+{
+    int value = m_options->m_ledgerLineExtension.GetMin() * this->GetDrawingUnit(staffSize);
+    if (graceSize) value = this->GetCueSize(value);
+    return value;
+}
+
 int Doc::GetCueSize(int value) const
 {
     return value * this->GetCueScaling();
