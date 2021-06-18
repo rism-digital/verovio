@@ -251,35 +251,65 @@ void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int r
 void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension)
 {
     assert(minExtension <= extension);
+    if (lines.empty()) return;
 
-    for (LedgerLine &line : lines) {
-        const int defaultGap = 100 * extension; // A large value which should not trigger any adjustments
-        int leftGap = defaultGap;
-        int rightGap = defaultGap;
-        using IterType = std::list<std::pair<int, int>>::iterator;
-        for (IterType iterDash = line.m_dashes.begin(); iterDash != line.m_dashes.end(); ++iterDash) {
-            // Calculate the right gap
-            IterType iterNextDash = std::next(iterDash);
-            if (iterNextDash != line.m_dashes.end()) {
-                rightGap = iterNextDash->first - iterDash->second;
-            }
-            else {
-                rightGap = defaultGap;
-            }
+    // By construction, any overlaps or small gaps in outer dash lines must also occur in the most inner dash line.
+    // Thus it suffices to resolve any problems in the inner dash line and apply the adjustments to corresponding
+    // dashes further away from the staff.
+    LedgerLine &innerLine = lines[0];
+    struct Adjustment {
+        int left;
+        int right;
+        int delta;
+    };
+    std::list<Adjustment> adjustments;
 
-            // The gap between successive dashes should be at least one dash extension
-            const int minGap = std::min(leftGap, rightGap);
-            if (minGap < extension) {
-                const int minDistance = minGap + 2 * extension;
-                const int newExtension = std::max(minDistance / 3, minExtension);
-                const int delta = extension - newExtension;
-                assert(delta >= 0);
-                iterDash->first += delta;
-                iterDash->second -= delta;
-            }
+    const int defaultGap = 100 * extension; // A large value which should not trigger any adjustments
+    int leftGap = defaultGap;
+    int rightGap = defaultGap;
+    using DashType = std::pair<int, int>;
+    using IterType = std::list<DashType>::iterator;
+    for (IterType iterDash = innerLine.m_dashes.begin(); iterDash != innerLine.m_dashes.end(); ++iterDash) {
+        // Calculate the right gap
+        IterType iterNextDash = std::next(iterDash);
+        if (iterNextDash != innerLine.m_dashes.end()) {
+            rightGap = iterNextDash->first - iterDash->second;
+        }
+        else {
+            rightGap = defaultGap;
+        }
 
-            // The left gap of the next dash is the right gap of the current dash
-            leftGap = rightGap;
+        // The gap between successive dashes should be at least one dash extension
+        const int minGap = std::min(leftGap, rightGap);
+        if (minGap < extension) {
+            const int minDistance = minGap + 2 * extension;
+            const int newExtension = std::max(minDistance / 3, minExtension);
+            const int delta = extension - newExtension;
+            assert(delta >= 0);
+
+            // Apply and store the adjustment
+            adjustments.push_back({ iterDash->first, iterDash->second, delta });
+            iterDash->first += delta;
+            iterDash->second -= delta;
+        }
+
+        // The left gap of the next dash is the right gap of the current dash
+        leftGap = rightGap;
+    }
+
+    // Now we transfer the adjustments from the inner dash line to the outer dash lines.
+    // This ensures that all dashes on the same note/chord obtain the same ledger line extension.
+    for (const Adjustment &adjustment : adjustments) {
+        for (int index = 1; index < lines.size(); ++index) {
+            LedgerLine &outerLine = lines[index];
+            IterType iterDash = std::find_if(
+                outerLine.m_dashes.begin(), outerLine.m_dashes.end(), [&adjustment](const DashType &dash) {
+                    return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
+                });
+            if (iterDash != outerLine.m_dashes.end()) {
+                iterDash->first += adjustment.delta;
+                iterDash->second -= adjustment.delta;
+            }
         }
     }
 }
