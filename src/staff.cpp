@@ -251,6 +251,37 @@ void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int r
 void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension)
 {
     assert(minExtension <= extension);
+
+    for (LedgerLine &line : lines) {
+        const int defaultGap = 100 * extension; // A large value which should not trigger any adjustments
+        int leftGap = defaultGap;
+        int rightGap = defaultGap;
+        using IterType = std::list<std::pair<int, int>>::iterator;
+        for (IterType iterDash = line.m_dashes.begin(); iterDash != line.m_dashes.end(); ++iterDash) {
+            // Calculate the right gap
+            IterType iterNextDash = std::next(iterDash);
+            if (iterNextDash != line.m_dashes.end()) {
+                rightGap = iterNextDash->first - iterDash->second;
+            }
+            else {
+                rightGap = defaultGap;
+            }
+
+            // The gap between successive dashes should be at least one dash extension
+            const int minGap = std::min(leftGap, rightGap);
+            if (minGap < extension) {
+                const int minDistance = minGap + 2 * extension;
+                const int newExtension = std::max(minDistance / 3, minExtension);
+                const int delta = extension - newExtension;
+                assert(delta >= 0);
+                iterDash->first += delta;
+                iterDash->second -= delta;
+            }
+
+            // The left gap of the next dash is the right gap of the current dash
+            leftGap = rightGap;
+        }
+    }
 }
 
 void Staff::SetFromFacsimile(Doc *doc)
