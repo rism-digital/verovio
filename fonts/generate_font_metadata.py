@@ -14,10 +14,11 @@
 # while designing the November 2.0 font.
 # Use, distribute and edit this script as you wish!
 
-import fontforge
-import sys
-import os
 import json
+import os
+import sys
+
+import fontforge
 
 
 def validateGlyph(glyph):

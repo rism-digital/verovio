@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <climits>
 #include <math.h>
+#include <numeric>
 
 //----------------------------------------------------------------------------
 
@@ -789,8 +790,109 @@ int LayerElement::CountElementsInUnison(
     return (int)intersection.size();
 }
 
+MapOfDotLocs LayerElement::CalcOptimalDotLocations()
+{
+    if (!this->Is({ NOTE, CHORD })) {
+        return {};
+    }
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    const int layerCount = staff->GetChildCount(LAYER);
+
+    // Calculate primary/secondary dot locations
+    const MapOfDotLocs dotLocs1 = this->CalcDotLocations(layerCount, true);
+    const MapOfDotLocs dotLocs2 = this->CalcDotLocations(layerCount, false);
+
+    // Special treatment for two layers
+    if (layerCount == 2) {
+        // Find the first note on the other layer
+        Alignment *alignment = this->GetAlignment();
+        const int currentLayerN = abs(this->GetAlignmentLayerN());
+        ListOfObjects notes;
+        ClassIdComparison noteCmp(NOTE);
+        alignment->FindAllDescendantByComparison(&notes, &noteCmp, 2);
+        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN](Object *obj) {
+            const int otherLayerN = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
+            return (currentLayerN != otherLayerN);
+        });
+
+        if (noteIt != notes.cend()) {
+            // Prefer the note's chord if it has one
+            LayerElement *other = vrv_cast<Note *>(*noteIt);
+            if (Chord *chord = vrv_cast<Note *>(*noteIt)->IsChordTone(); chord) {
+                other = chord;
+            }
+            assert(other);
+            const int otherLayerN = abs(other->GetAlignmentLayerN());
+
+            // Calculate the primary/secondary dot locations
+            const MapOfDotLocs otherDotLocs1 = other->CalcDotLocations(layerCount, true);
+            const MapOfDotLocs otherDotLocs2 = other->CalcDotLocations(layerCount, false);
+
+            // Handling of unisons
+            if (this->Is(NOTE) && other->Is(NOTE)) {
+                Note *note = vrv_cast<Note *>(this);
+                Note *otherNote = vrv_cast<Note *>(other);
+                if (note->IsUnisonWith(otherNote)) {
+                    return (currentLayerN < otherLayerN) ? dotLocs1 : dotLocs2;
+                }
+            }
+
+            // Count collisions between each pair of dot choices
+            const int collisions11 = GetCollisionCount(dotLocs1, otherDotLocs1);
+            const int collisions12 = GetCollisionCount(dotLocs1, otherDotLocs2);
+            const int collisions21 = GetCollisionCount(dotLocs2, otherDotLocs1);
+            const int collisions22 = GetCollisionCount(dotLocs2, otherDotLocs2);
+            const int maxCollisions = std::max({ collisions11, collisions12, collisions21, collisions22 });
+
+            if (maxCollisions > 0) {
+                // Collisions might occur => choose dots which minimize the number of collisions
+                const int minCollisions = std::min({ collisions11, collisions12, collisions21, collisions22 });
+                if (collisions11 == minCollisions) return dotLocs1;
+                if (collisions12 == minCollisions) {
+                    if (collisions21 == minCollisions) {
+                        // Symmetric case: choose primary dot location on upper layer
+                        return (currentLayerN < otherLayerN) ? dotLocs1 : dotLocs2;
+                    }
+                    return dotLocs1;
+                }
+                return dotLocs2;
+            }
+        }
+    }
+
+    // Count dots to decide which set is used
+    const bool usePrimary = (GetDotCount(dotLocs1) >= GetDotCount(dotLocs2));
+    return usePrimary ? dotLocs1 : dotLocs2;
+}
+
 //----------------------------------------------------------------------------
-// LayerElement functors methods
+// Static methods for LayerElement
+//----------------------------------------------------------------------------
+
+int LayerElement::GetDotCount(const MapOfDotLocs &dotLocations)
+{
+    return std::accumulate(dotLocations.cbegin(), dotLocations.cend(), 0,
+        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + mapEntry.second.size(); });
+}
+
+int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2)
+{
+    int count = 0;
+    for (const auto &mapEntry : dotLocs1) {
+        if (dotLocs2.find(mapEntry.first) != dotLocs2.cend()) {
+            std::set<int> commonElements;
+            std::set_intersection(mapEntry.second.cbegin(), mapEntry.second.cend(),
+                dotLocs2.at(mapEntry.first).cbegin(), dotLocs2.at(mapEntry.first).cend(),
+                std::inserter(commonElements, commonElements.begin()));
+            count += commonElements.size();
+        }
+    }
+    return count;
+}
+
+//----------------------------------------------------------------------------
+// LayerElement functor methods
 //----------------------------------------------------------------------------
 
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
@@ -1170,12 +1272,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             if ((rest->GetDur() == DUR_1) && (staff->m_drawingLines > 1)) loc += 2;
             if ((rest->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
 
-            Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
-            // Limitation: GetLayerCount does not take into account editorial markup
-            // should be refined later
-            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
-
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
+            Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
             if (beam) {
                 beam->ResetList(beam);
 
@@ -1282,11 +1380,9 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                         loc++;
                 }
             }
-            if (hasMultipleLayer || m_crossStaff) {
-                Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-                assert(staff);
-                loc = rest->GetOptimalLayerLocation(staff, layer, loc);
-            }
+
+            Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+            loc = rest->GetOptimalLayerLocation(staff, layer, loc);
         }
         rest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
@@ -1384,12 +1480,13 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
 
-    AdjustOverlappingLayers(params->m_doc, params->m_previous, params->m_unison);
+    AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
 
     return FUNCTOR_SIBLINGS;
 }
 
-void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+void LayerElement::AdjustOverlappingLayers(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
 {
     if (Is(NOTE) && GetParent()->Is(CHORD))
         return;
@@ -1398,7 +1495,7 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
         return;
     }
 
-    auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, false);
+    auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, areDotsAdjusted, false);
     if (Is(NOTE)) {
         isUnison = isInUnison;
         if (isUnison) return;
@@ -1414,8 +1511,9 @@ void LayerElement::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElem
     }
 }
 
-std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool isChordElement, bool isLowerElement, bool unison)
+std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
+    const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool isChordElement, bool isLowerElement,
+    bool unison)
 {
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
@@ -1443,9 +1541,9 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
             Note *currentNote = vrv_cast<Note *>(this);
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
-            isUnisonElement = currentNote->IsUnissonWith(previousNote, true);
+            isUnisonElement = currentNote->IsUnisonWith(previousNote, true);
             // Unisson, look at the duration for the note heads
-            if (unison && currentNote->IsUnissonWith(previousNote, false)) {
+            if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
                 const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
@@ -1496,17 +1594,14 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(
                 }
             }
         }
-        // handle dot/stem collision
-        else if (Is(DOTS) && !otherElements.at(i)->Is(DOTS)) {
+        // handle dot collisions
+        else if (Is(DOTS) && !otherElements.at(i)->Is(DOTS) && areDotsAdjusted) {
             // No need for shift if dot is adjusted
             Dots *dot = vrv_cast<Dots *>(this);
             if (dot->IsAdjusted() || !HorizontalSelfOverlap(otherElements.at(i), horizontalMargin)) continue;
 
-            if (otherElements.at(i)->Is(STEM)) {
-                Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
-                const int right = stem->HorizontalLeftOverlap(this, doc, 0, 0);
-                shift += -right - horizontalMargin / 2;
-                break;
+            if (otherElements.at(i)->Is({ NOTE, STEM })) {
+                shift -= otherElements.at(i)->HorizontalLeftOverlap(this, doc, shift + horizontalMargin / 2, 0);
             }
             else {
                 shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
@@ -1975,11 +2070,9 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 
     // For mRest we do not look at the time span
     if (this->Is(MREST)) {
-        // Add the layerN to the list of layer element occuring in this time frame
-        if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
-            == params->m_layers.end()) {
-            params->m_layers.push_back(this->GetAlignmentLayerN());
-        }
+        // Add the layerN to the list of layer elements occuring in this time frame
+        params->m_layers.insert(this->GetAlignmentLayerN());
+
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1998,11 +2091,8 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
         return FUNCTOR_STOP;
     }
 
-    // Add the layerN to the list of layer element occuring in this time frame
-    if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
-        == params->m_layers.end()) {
-        params->m_layers.push_back(this->GetAlignmentLayerN());
-    }
+    // Add the layerN to the list of layer elements occuring in this time frame
+    params->m_layers.insert(this->GetAlignmentLayerN());
 
     // Not need to recurse for chords? Not quite sure about it.
     return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;

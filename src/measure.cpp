@@ -1115,6 +1115,9 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     // Check if the measure has some overflowing control elements
     int overflow = this->GetDrawingOverflow();
 
+    Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
+    const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
+        && (params->m_doc->GetOptions()->m_breaks.GetValue() != BREAKS_encoded));
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
         if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
@@ -1126,11 +1129,15 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+        else if (m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
             > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = m_drawingXRel;
+            params->m_shift = this->m_drawingXRel;
+            // If last measure requires separate system - mark that system as leftover for the future CastOffPages call
+            if (isLeftoverMeasure) {
+                params->m_leftoverSystem = params->m_currentSystem;
+            }
             for (Object *oneOfPendingObjects : params->m_pendingObjects) {
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);

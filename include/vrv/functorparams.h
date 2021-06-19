@@ -1069,7 +1069,8 @@ public:
  * member 1: a pointer the document we are adding pages to
  * member 2: a pointer to the current page
  * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
- * member 4: the page height
+ * members 4-8: the page heights
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffPagesParams : public FunctorParams {
@@ -1085,6 +1086,7 @@ public:
         m_pgFootHeight = 0;
         m_pgHead2Height = 0;
         m_pgFoot2Height = 0;
+        m_leftoverSystem = NULL;
     }
     Page *m_contentPage;
     Doc *m_doc;
@@ -1095,6 +1097,7 @@ public:
     int m_pgFootHeight;
     int m_pgHead2Height;
     int m_pgFoot2Height;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1111,6 +1114,7 @@ public:
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
  * member 8: whether to smartly use encoded system breaks
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffSystemsParams : public FunctorParams {
@@ -1125,6 +1129,7 @@ public:
         m_currentScoreDefWidth = 0;
         m_doc = doc;
         m_smart = smart;
+        m_leftoverSystem = NULL;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -1135,6 +1140,7 @@ public:
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
     bool m_smart;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1661,7 +1667,7 @@ public:
     }
     double m_time;
     double m_duration;
-    std::vector<int> m_layers;
+    std::set<int> m_layers;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;

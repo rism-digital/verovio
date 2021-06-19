@@ -47,9 +47,17 @@ void Dots::Reset()
     m_dotLocsByStaff.clear();
 }
 
-std::list<int> *Dots::GetDotLocsForStaff(Staff *staff)
+std::set<int> Dots::GetDotLocsForStaff(Staff *staff) const
 {
-    return &m_dotLocsByStaff[staff];
+    if (m_dotLocsByStaff.find(staff) != m_dotLocsByStaff.end()) {
+        return m_dotLocsByStaff.at(staff);
+    }
+    return {};
+}
+
+std::set<int> &Dots::ModifyDotLocsForStaff(Staff *staff)
+{
+    return m_dotLocsByStaff[staff];
 }
 
 //----------------------------------------------------------------------------

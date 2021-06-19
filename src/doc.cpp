@@ -867,6 +867,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
+    System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
@@ -884,6 +885,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         Functor castOffSystems(&Object::CastOffSystems);
         Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
         contentSystem->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
+        leftoverSystem = castOffSystemsParams.m_leftoverSystem;
     }
     delete contentSystem;
 
@@ -909,7 +911,8 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     Page *currentPage = new Page();
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
-    castOffPagesParams.m_pageHeight = m_drawingPageContentHeight;
+    castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
+    castOffPagesParams.m_leftoverSystem = leftoverSystem;
     Functor castOffPages(&Object::CastOffPages);
     pages->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);
