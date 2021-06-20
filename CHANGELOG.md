@@ -1,10 +1,14 @@
 # Changelog
 
 ## [unreleased]
+* Option --breaks-no-widow to prevent a single measure on last page (@eNote-GmbH)
+* Support for additive meters (@eNote-GmbH)
+* Switch from XSLT to Python for font generation (@eNote-GmbH)
 * Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)
 * Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
 * Improved rendering of octave brackets ending (@eNote-GmbH)
 * Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
+* Fix loading/updating of MEI3 files (@rettinghaus)
 * Fix option --octave-alternative-symbols
 
 ## [3.4.1] - 2021-05-03
