@@ -36,9 +36,9 @@ if __name__ == '__main__':
     parser.add_argument('--shortlist', nargs='?', default='')
     args = parser.parse_args()
 
-    tk = verovio.toolkit(False)
     # version of the toolkit
-    print(tk.getVersion())
+    tk = verovio.toolkit(False)
+    print(f'Verovio {tk.getVersion()}')
 
     # keep all the options to be able to reset them for each test
     defaultOptions = json.loads(tk.getOptions(True))

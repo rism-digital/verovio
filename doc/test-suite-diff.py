@@ -131,11 +131,11 @@ if __name__ == "__main__":
             pngFileOut = os.path.join(path_out, item1, name + '.png')
             pngFile1Out = os.path.join(path_out, item1, name + '.after.png')
             pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
-            print(pngFile1, pngFile2)
+            print(f'Comparing {name}')
 
             diffValue = diffimg.diff(pngFile1, pngFile2, delete_diff_file=True)
             if (diffValue > (args.threshold / 100.0)):
-                print("Img diff:", diffValue)
+                print(f'Img diff: {diffValue}')
                 row = etree.SubElement(table, 'tr')
                 col = etree.SubElement(row, 'td')
                 p = etree.SubElement(col, 'p')
@@ -196,7 +196,7 @@ if __name__ == "__main__":
             # unused for now
             diff = main.diff_trees(root1, root2)
             if (len(diff) > 0):
-                print("Node diff:", len(diff))
+                print(f'Node diff: {len(diff)}')
 
         if (nbChanges > 0):
             li = etree.SubElement(ulTablist, 'li', attrib={
