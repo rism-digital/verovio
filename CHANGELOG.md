@@ -3,6 +3,7 @@
 ## [unreleased]
 * Option --breaks-no-widow to prevent a single measure on last page (@eNote-GmbH)
 * Support for additive meters (@eNote-GmbH)
+* Improved octave line positions with `@endid` (@eNote-GmbH)
 * Switch from XSLT to Python for font generation (@eNote-GmbH)
 * Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)
 * Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
