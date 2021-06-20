@@ -1,12 +1,13 @@
 import argparse
-import diffimg
 import json
+import os
+import sys
+
+import diffimg
 import lxml.etree as etree
 import PIL.Image as Image
 import PIL.ImageChops as ImageChops
 import PIL.ImageOps as ImageOps
-import os
-import sys
 import xmldiff.main as main
 
 ns = {'svg': 'http://www.w3.org/2000/svg'}

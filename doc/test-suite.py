@@ -1,10 +1,11 @@
 # This script it expected to be run from ./bindings/python
 import argparse
-import cairosvg
 import json
 import os
 import sys
 import xml.etree.ElementTree as ET
+
+import cairosvg
 
 # Add path for toolkit built in-place
 sys.path.append('.')
