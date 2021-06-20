@@ -21,7 +21,7 @@ def start_webpage():
     head = etree.Element('head')
     html.append(head)
     title = etree.SubElement(head, 'title')
-    title.text = "Verovio test suite for Pull Request"
+    title.text = 'Verovio test suite for Pull Request'
 
     etree.SubElement(head, 'link', attrib={
                      'rel': 'stylesheet', 'href': 'https://www.verovio.org/css/bootstrap/css/bootstrap.min.css', 'type': 'text/css'})
@@ -67,9 +67,9 @@ def end_webpage(html, body, htmlOutFile):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Examine diffrences in renderings of MEI scores')
-    parser.add_argument("input_dir1")
-    parser.add_argument("input_dir2")
-    parser.add_argument("output_dir")
+    parser.add_argument('input_dir1')
+    parser.add_argument('input_dir2')
+    parser.add_argument('output_dir')
     parser.add_argument('-t', '--threshold', required=False, type=float,
                         default=0.1, help='Threshold for visual difference in percent')
     args = parser.parse_args()
@@ -149,7 +149,7 @@ if __name__ == "__main__":
                 # link to show before - after
                 p = etree.SubElement(col, 'p')
                 a = etree.SubElement(
-                    p, 'a', attrib={'href': '#', 'class': "before-after"})
+                    p, 'a', attrib={'href': '#', 'class': 'before-after'})
                 a.text = 'Show before / after'
                 divBeforeAfter = etree.SubElement(
                     col, 'div', attrib={'class': 'img-before-after', 'style': 'display: none'})
@@ -183,14 +183,14 @@ if __name__ == "__main__":
             for node in root1.xpath('//*[@*]'):
                 node.attrib.clear()
 
-            for e in root1.findall("./svg:desc", namespaces=ns):
+            for e in root1.findall('./svg:desc', namespaces=ns):
                 root1.remove(e)
 
             # remove //svg/desc (version will be different)
             for node in root2.xpath('//*[@*]'):
                 node.attrib.clear()
 
-            for e in root2.findall("./svg:desc", namespaces=ns):
+            for e in root2.findall('./svg:desc', namespaces=ns):
                 root2.remove(e)
 
             # unused for now
