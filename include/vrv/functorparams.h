@@ -669,6 +669,8 @@ public:
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
+        m_currentAlignment.Reset();
+        m_previousAlignment.Reset();
     }
     int m_minPos;
     int m_upcomingMinPos;
