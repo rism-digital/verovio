@@ -977,6 +977,9 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
         params->m_staffN = (staffN);
+        params->m_boundingBoxes.clear();
+        params->m_previousAlignment.Reset();
+        params->m_currentAlignment.Reset();
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
     
