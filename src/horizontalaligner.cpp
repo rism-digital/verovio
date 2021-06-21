@@ -555,7 +555,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
     return alignmentRef->HasMultipleLayer();
 }
 
-bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
+bool Alignment::IsOfType(const std::vector<AlignmentType> &types) const
 {
     return (std::find(types.begin(), types.end(), m_type) != types.end());
 }

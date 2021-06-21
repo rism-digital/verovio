@@ -123,7 +123,7 @@ public:
     /**
      * Check if the element is of on of the types
      */
-    bool IsOfType(const std::vector<AlignmentType> &types);
+    bool IsOfType(const std::vector<AlignmentType> &types) const;
 
     /**
      * Retrive the minimum left and maximum right position for the objects in an alignment.
