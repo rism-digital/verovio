@@ -118,8 +118,8 @@ public:
     // Static members //
     //----------------//
 
-    static thread_local data_PITCHNAME s_pnameForFlats[];
-    static thread_local data_PITCHNAME s_pnameForSharps[];
+    static const data_PITCHNAME s_pnameForFlats[];
+    static const data_PITCHNAME s_pnameForSharps[];
 
 private:
     static const int octave_map[2][9][7];

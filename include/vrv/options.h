@@ -120,12 +120,12 @@ public:
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */
-    static thread_local std::map<int, std::string> s_breaks;
-    static thread_local std::map<int, std::string> s_condense;
-    static thread_local std::map<int, std::string> s_footer;
-    static thread_local std::map<int, std::string> s_header;
-    static thread_local std::map<int, std::string> s_multiRestStyle;
-    static thread_local std::map<int, std::string> s_systemDivider;
+    static const std::map<int, std::string> s_breaks;
+    static const std::map<int, std::string> s_condense;
+    static const std::map<int, std::string> s_footer;
+    static const std::map<int, std::string> s_header;
+    static const std::map<int, std::string> s_multiRestStyle;
+    static const std::map<int, std::string> s_systemDivider;
 
 protected:
     std::string m_title;
@@ -337,7 +337,7 @@ public:
     OptionIntMap();
     virtual ~OptionIntMap() {}
     virtual void CopyTo(Option *option);
-    void Init(int defaultValue, std::map<int, std::string> *values);
+    void Init(int defaultValue, const std::map<int, std::string> *values);
 
     virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
@@ -355,7 +355,7 @@ private:
 public:
     //
 private:
-    std::map<int, std::string> *m_values;
+    const std::map<int, std::string> *m_values;
     int m_value;
     int m_defaultValue;
 };

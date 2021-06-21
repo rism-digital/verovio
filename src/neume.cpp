@@ -32,7 +32,7 @@
 
 namespace vrv {
 
-thread_local std::map<std::string, NeumeGroup> Neume::s_neumes
+const std::map<std::string, NeumeGroup> Neume::s_neumes
     = { { "", PUNCTUM }, { "u", PES }, { "d", CLIVIS }, { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS },
           { "du", PORRECTUS }, { "ddd", CLIMACUS }, { "ddu", CLIMACUS_RESUPINUS }, { "udu", TORCULUS_RESUPINUS },
           { "dud", PORRECTUS_FLEXUS }, { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS },
@@ -117,7 +117,13 @@ NeumeGroup Neume::GetNeumeGroup()
         }
         previous = current;
     }
-    return s_neumes[key];
+
+    try {
+        return s_neumes.at(key);
+    }
+    catch (std::out_of_range &e) {
+        return NEUME_ERROR;
+    }
 }
 
 std::vector<int> Neume::GetPitchDifferences()

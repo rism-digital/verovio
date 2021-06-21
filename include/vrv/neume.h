@@ -100,7 +100,7 @@ public:
     /**
      * String keys come from the contours of neume groupings as defined in MEI4
      */
-    static thread_local std::map<std::string, NeumeGroup> s_neumes;
+    static const std::map<std::string, NeumeGroup> s_neumes;
 
     static std::string NeumeGroupToString(NeumeGroup group);
 
