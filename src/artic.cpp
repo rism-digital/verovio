@@ -295,8 +295,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
-
     if (params->m_parent->m_crossLayer) {
         layer = params->m_parent->m_crossLayer;
     }
@@ -337,23 +335,12 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     // Exception for artic because they are relative to the staff - we set m_crossStaff and m_crossLayer
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
-        m_crossStaff = params->m_staffAbove;
-        m_crossLayer = params->m_layerAbove;
-        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the
-        // parent where the beam is
-        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_below) {
-            m_crossStaff = NULL;
-            m_crossLayer = NULL;
-        }
+        this->m_crossStaff = params->m_staffAbove;
+        this->m_crossLayer = params->m_layerAbove;
     }
     else if (this->GetDrawingPlace() == STAFFREL_below && params->m_crossStaffBelow) {
-        m_crossStaff = params->m_staffBelow;
-        m_crossLayer = params->m_layerBelow;
-        // Exception - opposite as above
-        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_above) {
-            m_crossStaff = NULL;
-            m_crossLayer = NULL;
-        }
+        this->m_crossStaff = params->m_staffBelow;
+        this->m_crossLayer = params->m_layerBelow;
     }
 
     return FUNCTOR_CONTINUE;
@@ -377,6 +364,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         staff = m_crossStaff;
     }
 
+    Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
@@ -389,6 +377,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         yIn = std::min(
             params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
             0);
+        if (beam && beam->m_crossStaffContent && beam->m_drawingPlace == BEAMPLACE_mixed) yIn -= beam->m_beamWidth;
         yOut = std::min(yIn, staffYBottom);
     }
 
