@@ -23,7 +23,7 @@ namespace vrv {
 // TabGrp
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
+static const ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
 
 TabGrp::TabGrp() : LayerElement("tabgrp-"), DurationInterface()
 {

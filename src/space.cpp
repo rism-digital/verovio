@@ -23,7 +23,7 @@ namespace vrv {
 // Space
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Space> s_factory("space", SPACE);
+static const ClassRegistrar<Space> s_factory("space", SPACE);
 
 Space::Space() : LayerElement("space-"), DurationInterface()
 {

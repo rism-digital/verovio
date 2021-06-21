@@ -19,7 +19,7 @@ namespace vrv {
 // Expansion
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Expansion> s_factory("expansion", EXPANSION);
+static const ClassRegistrar<Expansion> s_factory("expansion", EXPANSION);
 
 Expansion::Expansion() : SystemElement("expansion-"), PlistInterface()
 {

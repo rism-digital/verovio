@@ -23,7 +23,7 @@ namespace vrv {
 // Num
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Num> s_factory("num", NUM);
+static const ClassRegistrar<Num> s_factory("num", NUM);
 
 Num::Num() : TextElement("num-")
 {

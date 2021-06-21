@@ -34,7 +34,7 @@ const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_d
 // Artic
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Artic> s_factory("artic", ARTIC);
+static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
 Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
 {

@@ -19,7 +19,7 @@ namespace vrv {
 // PgHead2
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<PgHead2> s_factory("pgHead2", PGHEAD2);
+static const ClassRegistrar<PgHead2> s_factory("pgHead2", PGHEAD2);
 
 PgHead2::PgHead2() : RunningElement("pghead2-")
 {

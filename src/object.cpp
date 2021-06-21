@@ -1175,7 +1175,7 @@ void Functor::Call(Object *ptr, FunctorParams *functorParams)
 
 ObjectFactory *ObjectFactory::GetInstance()
 {
-    static ObjectFactory factory;
+    static thread_local ObjectFactory factory;
     return &factory;
 }
 

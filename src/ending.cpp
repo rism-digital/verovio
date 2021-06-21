@@ -27,7 +27,7 @@ namespace vrv {
 // Ending
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Ending> s_factory("ending", ENDING);
+static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
 Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttLineRend(), AttNNumberLike()
 {

@@ -28,7 +28,7 @@ namespace vrv {
 // MRpt2
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<MRpt2> s_factory("mRpt2", MRPT2);
+static const ClassRegistrar<MRpt2> s_factory("mRpt2", MRPT2);
 
 MRpt2::MRpt2() : LayerElement("mrpt2-"), AttColor()
 {

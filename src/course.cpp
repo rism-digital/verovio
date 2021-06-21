@@ -19,7 +19,7 @@ namespace vrv {
 // Course
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Course> s_factory("course", COURSE);
+static const ClassRegistrar<Course> s_factory("course", COURSE);
 
 Course::Course() : Object("course-"), AttNNumberLike()
 {

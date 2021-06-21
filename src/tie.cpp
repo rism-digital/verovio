@@ -30,7 +30,7 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Tie> s_factory("tie", TIE);
+static const ClassRegistrar<Tie> s_factory("tie", TIE);
 
 Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {

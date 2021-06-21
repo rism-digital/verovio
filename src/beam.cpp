@@ -1023,7 +1023,7 @@ void BeamSegment::CalcSetValues()
 // Beam
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Beam> s_factory("beam", BEAM);
+static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
 Beam::Beam() : LayerElement("beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {

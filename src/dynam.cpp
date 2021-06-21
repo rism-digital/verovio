@@ -32,7 +32,7 @@ std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE5
 // Dynam
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Dynam> s_factory("dynam", DYNAM);
+static const ClassRegistrar<Dynam> s_factory("dynam", DYNAM);
 
 Dynam::Dynam()
     : ControlElement("dynam-")

@@ -21,7 +21,7 @@ namespace vrv {
 // Damage
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<Damage> s_factory("damage", DAMAGE);
+static const ClassRegistrar<Damage> s_factory("damage", DAMAGE);
 
 Damage::Damage() : EditorialElement("lem-"), AttSource()
 {

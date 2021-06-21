@@ -22,7 +22,7 @@ namespace vrv {
 // PitchInflection
 //----------------------------------------------------------------------------
 
-// static ClassRegistrar<PitchInflection> s_factory("pitchInflection", PITCHINFLECTION);
+static const ClassRegistrar<PitchInflection> s_factory("pitchInflection", PITCHINFLECTION);
 
 PitchInflection::PitchInflection() : ControlElement("pinflexion-"), TimeSpanningInterface()
 {
