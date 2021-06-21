@@ -1724,7 +1724,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_SIBLINGS;
     }
-
+    
     // If we have a list of types to excludes and it is one of them, stop it
     if (!params->m_excludes.empty() && this->Is(params->m_excludes)) {
         return FUNCTOR_CONTINUE;
@@ -1747,6 +1747,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int offset = 0;
     int selfLeft;
     int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
+    
+    bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment() && this->GetAlignment()->PerfomBoundingBoxAlignment());
+    
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
@@ -1756,39 +1759,30 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         selfLeft = this->GetAlignment()->GetXRel();
     }
-    //if (this->Is(BARLINE_ATTR_RIGHT)) {
-    //    selfLeft = this->GetSelfLeft();
-    //    selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * drawingUnit;
-    //}
     else {
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
-        selfLeft = this->GetSelfLeft();
-        /*//conflicting during merge
-        selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
-        // Remember current alignment for futher adjustments
         params->m_currentAlignment.m_alignment = GetAlignment();
-        ****///
-        // selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * drawingUnit;
+        selfLeft = this->GetSelfLeft();
+        if (performBoundingBoxAlignment) {
+            int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
+            int overlap = 0;
+            for (auto &boundingBox : params->m_boundingBoxes) {
+                LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
+                assert(element);
+                int margin = (params->m_doc->GetRightMargin(element->GetClassId()) + selfLeftMargin) * drawingUnit;
+                bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
 
-        int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
-        int overlap = 0;
-        for (auto &boundingBox : params->m_boundingBoxes) {
-            LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
-            assert(element);
-            int margin = (params->m_doc->GetRightMargin(element->GetClassId()) + selfLeftMargin) * drawingUnit;
-            if (this->Is(BARLINE_ATTR_RIGHT)) {
-                overlap = overlap = std::max(overlap, element->GetSelfRight() - selfLeft + margin);
-                continue;
+                if (hasOverlap) {
+                    overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+                    // LogDebug("%s overlaps of %d, margin %d", this->GetClassName().c_str(), overlap, margin);
+                }
             }
-            bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
-
-            if (hasOverlap) {
-                overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
-                LogDebug("%s overlaps of %d, margin %d", this->GetClassName().c_str(), overlap, margin);
-            }
+            offset -= overlap;
         }
-        offset -= overlap;
+        else {
+            selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+        }
     }
 
     offset = std::min(offset, selfLeft - params->m_minPos);
@@ -1803,7 +1797,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
     }
-    else if (this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, BARLINE, CLEF, KEYSIG, MENSUR, METERSIG })) {
+    else {
         selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
     }
 
