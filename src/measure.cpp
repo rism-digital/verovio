@@ -967,7 +967,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     params->m_minPos = 0;
     params->m_upcomingMinPos = VRV_UNSET;
     params->m_cumulatedXShift = 0;
-    
+
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
 
@@ -982,7 +982,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         params->m_currentAlignment.Reset();
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
-    
+
         filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;

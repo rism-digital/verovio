@@ -1724,7 +1724,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_SIBLINGS;
     }
-    
+
     // If we have a list of types to excludes and it is one of them, stop it
     if (!params->m_excludes.empty() && this->Is(params->m_excludes)) {
         return FUNCTOR_CONTINUE;
@@ -1747,9 +1747,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int offset = 0;
     int selfLeft;
     int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
-    
-    bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment() && this->GetAlignment()->PerfomBoundingBoxAlignment());
-    
+
+    bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
+        && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
+        && this->GetAlignment()->PerfomBoundingBoxAlignment());
+
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
