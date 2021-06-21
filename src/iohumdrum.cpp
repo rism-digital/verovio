@@ -8788,63 +8788,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if (layerdata[i]->isBarline() && (!layerdata[i]->allSameBarlineStyle())) {
             // display a barline local to the staff
-
-            BarLine *barline = new BarLine;
-            setLocationId(barline, layerdata[i]);
-
-            if (layerdata[i]->compare(0, 2, "==") == 0) {
-                barline->SetForm(BARRENDITION_end);
-            }
-            else if (layerdata[i]->find(":|!|:") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptboth);
-            }
-            else if (layerdata[i]->find(":!!:") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptboth);
-            }
-            else if (layerdata[i]->find(":||:") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptboth);
-            }
-            else if (layerdata[i]->find(":!:") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptboth);
-            }
-            else if (layerdata[i]->find(":|:") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptboth);
-            }
-            else if (layerdata[i]->find(":|") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptend);
-            }
-            else if (layerdata[i]->find(":!") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptend);
-            }
-            else if (layerdata[i]->find("!:") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptstart);
-            }
-            else if (layerdata[i]->find("|:") != std::string::npos) {
-                barline->SetForm(BARRENDITION_rptstart);
-            }
-            else if (layerdata[i]->find("||") != std::string::npos) {
-                barline->SetForm(BARRENDITION_dbl);
-            }
-            else if (layerdata[i]->find("-") != std::string::npos) {
-                barline->SetForm(BARRENDITION_invis);
-            }
-            else if (layerdata[i]->find("..") != std::string::npos) {
-                barline->SetForm(BARRENDITION_dbldotted);
-            }
-            else if (layerdata[i]->find(".") != std::string::npos) {
-                barline->SetForm(BARRENDITION_dotted);
-            }
-            else if (layerdata[i]->find("::") != std::string::npos) {
-                barline->SetForm(BARRENDITION_dbldashed);
-            }
-            else if (layerdata[i]->find(":") != std::string::npos) {
-                barline->SetForm(BARRENDITION_dashed);
-            }
-            else {
-                barline->SetForm(BARRENDITION_single);
-            }
-
-            appendElement(elements, pointers, barline);
+            addBarLineElement(layerdata[i], elements, pointers);
         }
         if (!layerdata[i]->isData()) {
             continue;
@@ -9261,7 +9205,77 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         processDirections(layerdata.back(), staffindex);
     }
 
+    if (m_mens && (layerdata.size() > 0) && layerdata.back()->isBarline()) {
+        // add barLine in mensural music
+        addBarLineElement(layerdata.back(), elements, pointers);
+    }
+
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addBarLineElement --
+//
+
+void HumdrumInput::addBarLineElement(hum::HTp bartok, std::vector<std::string> &elements, std::vector<void *> &pointers)
+{
+    BarLine *barline = new BarLine;
+    setLocationId(barline, bartok);
+
+    if (bartok->compare(0, 2, "==") == 0) {
+        barline->SetForm(BARRENDITION_end);
+    }
+    else if (bartok->find(":|!|:") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptboth);
+    }
+    else if (bartok->find(":!!:") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptboth);
+    }
+    else if (bartok->find(":||:") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptboth);
+    }
+    else if (bartok->find(":!:") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptboth);
+    }
+    else if (bartok->find(":|:") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptboth);
+    }
+    else if (bartok->find(":|") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptend);
+    }
+    else if (bartok->find(":!") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptend);
+    }
+    else if (bartok->find("!:") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptstart);
+    }
+    else if (bartok->find("|:") != std::string::npos) {
+        barline->SetForm(BARRENDITION_rptstart);
+    }
+    else if (bartok->find("||") != std::string::npos) {
+        barline->SetForm(BARRENDITION_dbl);
+    }
+    else if (bartok->find("-") != std::string::npos) {
+        barline->SetForm(BARRENDITION_invis);
+    }
+    else if (bartok->find("..") != std::string::npos) {
+        barline->SetForm(BARRENDITION_dbldotted);
+    }
+    else if (bartok->find(".") != std::string::npos) {
+        barline->SetForm(BARRENDITION_dotted);
+    }
+    else if (bartok->find("::") != std::string::npos) {
+        barline->SetForm(BARRENDITION_dbldashed);
+    }
+    else if (bartok->find(":") != std::string::npos) {
+        barline->SetForm(BARRENDITION_dashed);
+    }
+    else {
+        barline->SetForm(BARRENDITION_single);
+    }
+
+    appendElement(elements, pointers, barline);
 }
 
 //////////////////////////////
