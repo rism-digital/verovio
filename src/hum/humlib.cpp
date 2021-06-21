@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jun 11 14:44:26 PDT 2021
+// Last Modified: Sat Jun 19 23:41:10 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -56353,6 +56353,7 @@ Tool_composite::Tool_composite(void) {
 	define("g|grace=b",     "include grace notes in composite rhythm");
 	define("u|stem-up=b",   "stem-up for composite rhythm parts");
 	define("x|extract=b",   "only output composite rhythm spines");
+	define("o|only=s",      "output notes of given group");
 	define("t|tremolo=b",   "preserve tremolos");
 	define("B|no-beam=b",   "do not apply automatic beaming");
 	define("G|no-groups=b", "do not split composite rhythm into separate streams by group markers");
@@ -56408,9 +56409,11 @@ bool Tool_composite::run(HumdrumFile& infile, ostream& out) {
 bool Tool_composite::run(HumdrumFile& infile) {
 	initialize();
 	processFile(infile);
-	infile.createLinesFromTokens();
-	// need to convert to text for now:
-	m_humdrum_text << infile;
+	if (!m_onlyQ) {
+		infile.createLinesFromTokens();
+		// need to convert to text for now:
+		m_humdrum_text << infile;
+	}
 	return true;
 }
 
@@ -56430,6 +56433,8 @@ void Tool_composite::initialize(void) {
 	m_upQ       = getBoolean("stem-up");
 	m_appendQ   = getBoolean("append");
 	m_debugQ    = getBoolean("debug");
+	m_onlyQ     = getBoolean("only");
+	m_only      = getString("only");
 	m_coincidenceQ = getBoolean("coincidence-rhythm");
 
 	if (getBoolean("together-in-score")) {
@@ -56483,7 +56488,16 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 	if (!m_tremoloQ) {
 		reduceTremolos(infile);
 	}
+
 	m_hasGroupsQ = hasGroupInterpretations(infile);
+
+	if (m_onlyQ) {
+		assignGroups(infile);
+		analyzeLineGroups(infile);
+		extractGroup(infile, m_only);
+		return;
+	}
+
 	if (m_hasGroupsQ && (!m_nogroupsQ)) {
 		prepareMultipleGroups(infile);
 	} else {
@@ -56509,6 +56523,51 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 		extractNestingData(infile);
 	}
 
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::extractGroup --
+//
+
+void Tool_composite::extractGroup(HumdrumFile& infile, const string &target) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile[i].token(j);
+			if ((!token->isData()) || token->isNull()) {
+				m_humdrum_text << token;
+				if (j < infile[i].getFieldCount() - 1) {
+					m_humdrum_text << "\t";
+				}
+				continue;
+			}
+			string group = token->getValue("auto", "group");
+			if (group == target) {
+				m_humdrum_text << token;
+			} else {
+				if (token->isRest()) {
+					m_humdrum_text << token << "yy";
+				} else {
+					HumRegex hre;
+					string rhythm = "4";
+					if (hre.search(token, "(\\d+%?\\d*\\.*)")) {
+						rhythm = hre.getMatch(1);
+					}
+					m_humdrum_text << rhythm << "ryy";
+				}
+			}
+			if (j < infile[i].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << endl;
+	}
 }
 
 
@@ -56737,6 +56796,7 @@ bool Tool_composite::hasGroupInterpretations(HumdrumFile& infile) {
 //
 
 void Tool_composite::prepareMultipleGroups(HumdrumFile& infile) {
+
 	Tool_extract extract;
 
 	// add two columns, one for each rhythm stream:
@@ -70306,7 +70366,6 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 		m_outdata.setDynamicsPresent(staffnum-1);
 	}
 
-// ggg
 }
 
 
@@ -70681,7 +70740,7 @@ void Tool_mei2hum::processPgHead(xml_node pgHead, HumNum starttime) {
 	NODE_VERIFY(pgHead, )
 	return;
 }
- 
+
 
 
 //////////////////////////////
@@ -70693,7 +70752,7 @@ void Tool_mei2hum::processKeySig(mei_staffDef& staffinfo, xml_node keysig, HumNu
 	MAKE_CHILD_LIST(children, keysig);
 	string token = "*k[";
 	for (xml_node item : children) {
-		string pname = item.attribute("pname").value(); 
+		string pname = item.attribute("pname").value();
 		string accid = item.attribute("accid").value();
 		if (pname.empty()) {
 			continue;
@@ -70975,8 +71034,7 @@ void Tool_mei2hum::fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node 
 
 	int nnum = 0;  // For staffnumber of element is staffDef.
 
-	for (auto atti = element.attributes_begin(); atti != element.attributes_end();
-				atti++) {
+	for (auto atti = element.attributes_begin(); atti != element.attributes_end(); atti++) {
 		string attname = atti->name();
 		if (attname == "clef.shape") {
 			clefshape = atti->value();
@@ -71019,6 +71077,47 @@ void Tool_mei2hum::fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node 
 	if (nnum < 1) {
 		nnum = 1;
 	}
+
+	// Fill in possible child element attributes:
+
+	// staffDef/mensur
+	xml_node mensurNode = element.select_node(".//mensur").node();
+	if (mensurNode) {
+		for (auto atti = mensurNode.attributes_begin(); atti != mensurNode.attributes_end(); atti++) {
+			string attname = atti->name();
+			if (attname == "prolatio") {
+				prolatio = atti->as_int();
+			} else if (attname == "tempus") {
+				tempus = atti->as_int();
+			} else if (attname == "modusminor") {
+				modus = atti->as_int();
+			} else if (attname == "modusmaior") {
+				maximodus = atti->as_int();
+			}
+		}
+	}
+
+	// staffDef/label
+	xml_node labelNode = element.select_node(".//label").node();
+	if (labelNode) {
+		string testlabel = labelNode.child_value();
+		if (!testlabel.empty()) {
+			label = testlabel;
+		}
+	}
+
+	// staffDef/labelAbbr
+	xml_node labelAbbrNode = element.select_node(".//labelAbbr").node();
+	if (labelAbbrNode) {
+		string testlabelabbr = labelAbbrNode.child_value();
+		if (!testlabelabbr.empty()) {
+			labelabbr = testlabelabbr;
+		}
+	}
+
+
+// ggg
+
 
 	if ((transsemi != 0) || (transdiat != 0)) {
 		// Fix octave transposition problems:
