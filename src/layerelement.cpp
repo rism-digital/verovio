@@ -1768,9 +1768,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
         params->m_currentAlignment.m_alignment = GetAlignment();
-        selfLeft = this->GetSelfLeft();
         // Here we look how bounding boxes overlap and adjust the position only when necessary
         if (performBoundingBoxAlignment) {
+            selfLeft = this->GetAlignment()->GetXRel();
             int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
             int overlap = 0;
             for (auto &boundingBox : params->m_boundingBoxes) {
@@ -1788,6 +1788,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         }
         // Otherwise only look at the horizontal position
         else {
+            selfLeft = this->GetSelfLeft();
             selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
         }
     }
