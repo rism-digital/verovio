@@ -968,19 +968,27 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     params->m_upcomingMinPos = VRV_UNSET;
     params->m_cumulatedXShift = 0;
 
-    std::vector<int>::iterator iter;
+    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    assert(system);
+
     ArrayOfComparisons filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
+    for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
-        params->m_staffN = (*iter);
+        params->m_staffN = (staffN);
+        params->m_boundingBoxes.clear();
+        params->m_previousAlignment.Reset();
+        params->m_currentAlignment.Reset();
+        StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
+        params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
+
         filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
-        ns.push_back(*iter);
+        ns.push_back(staffN);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 

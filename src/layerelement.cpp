@@ -1744,7 +1744,17 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    int offset = 0;
     int selfLeft;
+    int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
+
+    // Nested aligment of bounding boxes is performed only when both the previous alignment and
+    // the current one allow it. For example, when one of them is a barline, we do not look how
+    // bounding boxes can be nested but instead only look at the horizontal position
+    bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
+        && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
+        && this->GetAlignment()->PerfomBoundingBoxAlignment());
+
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
@@ -1757,13 +1767,32 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     else {
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
-        selfLeft = this->GetSelfLeft();
-        selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
-        // Remember current alignment for futher adjustments
         params->m_currentAlignment.m_alignment = GetAlignment();
+        selfLeft = this->GetSelfLeft();
+        // Here we look how bounding boxes overlap and adjust the position only when necessary
+        if (performBoundingBoxAlignment) {
+            int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
+            int overlap = 0;
+            for (auto &boundingBox : params->m_boundingBoxes) {
+                LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
+                assert(element);
+                int margin = (params->m_doc->GetRightMargin(element->GetClassId()) + selfLeftMargin) * drawingUnit;
+                bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
+
+                if (hasOverlap) {
+                    overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+                    // LogDebug("%s overlaps of %d, margin %d", this->GetClassName().c_str(), overlap, margin);
+                }
+            }
+            offset -= overlap;
+        }
+        // Otherwise only look at the horizontal position
+        else {
+            selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+        }
     }
 
-    int offset = selfLeft - params->m_minPos;
+    offset = std::min(offset, selfLeft - params->m_minPos);
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         // Also move the accumulated x shift and the minimum position for the next alignment accordingly
@@ -1771,14 +1800,12 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingMinPos += (-offset);
     }
 
-    int selfRight;
+    int selfRight = this->GetAlignment()->GetXRel();
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
-        selfRight = this->GetAlignment()->GetXRel()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
     }
     else {
-        selfRight = this->GetSelfRight()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
     }
 
     // In case of dots/flags we need to hold off of adjusting upcoming min position right away - if it happens that
