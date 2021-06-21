@@ -22,6 +22,8 @@ namespace vrv {
 // Dot
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Dot> s_factory("dot", DOT);
+
 Dot::Dot() : LayerElement("dot-"), PositionInterface(), AttColor(), AttDotLog()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -65,8 +67,8 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
-    this->m_drawingPreviousElement = NULL;
-    this->m_drawingNextElement = NULL;
+    m_drawingPreviousElement = NULL;
+    m_drawingNextElement = NULL;
 
     return FUNCTOR_CONTINUE;
 }

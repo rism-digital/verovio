@@ -29,7 +29,7 @@
 namespace vrv {
 
 typedef std::map<RestLayer,
-    std::map<RestAccidental, std::map<RestLayerPlace, std::map<RestNotePlace, std::map<int, int> > > > >
+    std::map<RestAccidental, std::map<RestLayerPlace, std::map<RestNotePlace, std::map<int, int>>>>>
     RestOffsets;
 
 RestOffsets g_defaultRests{
@@ -149,13 +149,22 @@ RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental)
 // Rest
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Rest> s_factory("rest", REST);
+
 Rest::Rest()
-    : LayerElement("rest-"), DurationInterface(), PositionInterface(), AttColor(), AttCue(), AttRestVisMensural()
+    : LayerElement("rest-")
+    , DurationInterface()
+    , PositionInterface()
+    , AttColor()
+    , AttCue()
+    , AttExtSym()
+    , AttRestVisMensural()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CUE);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
 }
@@ -169,6 +178,7 @@ void Rest::Reset()
     PositionInterface::Reset();
     ResetColor();
     ResetCue();
+    ResetExtSym();
     ResetRestVisMensural();
 }
 
@@ -210,23 +220,33 @@ void Rest::AddChild(Object *child)
 
 wchar_t Rest::GetRestGlyph() const
 {
-    int symc = 0;
-    switch (this->GetActualDur()) {
-        case DUR_LG: symc = SMUFL_E4E1_restLonga; break;
-        case DUR_BR: symc = SMUFL_E4E2_restDoubleWhole; break;
-        case DUR_1: symc = SMUFL_E4E3_restWhole; break;
-        case DUR_2: symc = SMUFL_E4E4_restHalf; break;
-        case DUR_4: symc = SMUFL_E4E5_restQuarter; break;
-        case DUR_8: symc = SMUFL_E4E6_rest8th; break;
-        case DUR_16: symc = SMUFL_E4E7_rest16th; break;
-        case DUR_32: symc = SMUFL_E4E8_rest32nd; break;
-        case DUR_64: symc = SMUFL_E4E9_rest64th; break;
-        case DUR_128: symc = SMUFL_E4EA_rest128th; break;
-        case DUR_256: symc = SMUFL_E4EB_rest256th; break;
-        case DUR_512: symc = SMUFL_E4EC_rest512th; break;
-        case DUR_1024: symc = SMUFL_E4ED_rest1024th; break;
+    // If there is glyph.num, prioritize it
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
     }
-    return symc;
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    switch (this->GetActualDur()) {
+        case DUR_LG: return SMUFL_E4E1_restLonga; break;
+        case DUR_BR: return SMUFL_E4E2_restDoubleWhole; break;
+        case DUR_1: return SMUFL_E4E3_restWhole; break;
+        case DUR_2: return SMUFL_E4E4_restHalf; break;
+        case DUR_4: return SMUFL_E4E5_restQuarter; break;
+        case DUR_8: return SMUFL_E4E6_rest8th; break;
+        case DUR_16: return SMUFL_E4E7_rest16th; break;
+        case DUR_32: return SMUFL_E4E8_rest32nd; break;
+        case DUR_64: return SMUFL_E4E9_rest64th; break;
+        case DUR_128: return SMUFL_E4EA_rest128th; break;
+        case DUR_256: return SMUFL_E4EB_rest256th; break;
+        case DUR_512: return SMUFL_E4EC_rest512th; break;
+        case DUR_1024: return SMUFL_E4ED_rest1024th; break;
+    }
+    return 0;
 }
 
 void Rest::UpdateFromTransLoc(const TransPitch &tp)
@@ -244,19 +264,18 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 {
     Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!layer) return defaultLocation;
-    const int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+    const std::set<int> layersN = parentLayer->GetLayersNForTimeSpanOf(this);
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
-    if (layerCount != 2) return defaultLocation;
+    if (layersN.size() != 2) return defaultLocation;
 
+    const bool isTopLayer
+        = m_crossStaff ? (staff->GetN() < m_crossStaff->GetN()) : (layer->GetN() == *layersN.cbegin());
+
+    // find best rest location relative to elements on other layers
     Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
-
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     realStaff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer((m_crossStaff && (staff->GetN() < m_crossStaff->GetN()))
-        || (!m_crossStaff && vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN()));
-
-    // find best rest location relative to elements on other layers
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer, isTopLayer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
@@ -278,8 +297,14 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         }
     }
 
-    return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
-                      : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
+    // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
+    // margin that will adjust rest position
+    const int marginLocation = isTopLayer ? 6 : 2;
+    const int optimalLocation = isTopLayer
+        ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
+        : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
+
+    return optimalLocation;
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
@@ -306,9 +331,9 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
         if (GetAlignment()->GetTime() != vrv_cast<LayerElement *>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = RA_none;
             // limit how much rest can be offset when there is duration overlap, but no x position overlap
-            if (abs(currentElementInfo.first) > 4) {
+            if ((isTopLayer && (currentElementInfo.first > 12)) || (!isTopLayer && (currentElementInfo.first < -4))) {
                 if (finalElementInfo.first != VRV_UNSET) continue;
-                currentElementInfo.first = isTopLayer ? 4 : -4;
+                currentElementInfo.first = isTopLayer ? 12 : -4;
             }
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
@@ -352,10 +377,21 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
         ? GetElementLocation(nextElement, currentLayer, !isTopLayer).first
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, isTopLayer);
 
-    if (VRV_UNSET == previousElementLoc) return nextElementLoc;
-    if (VRV_UNSET == nextElementLoc) return previousElementLoc;
+    int currentOptimalLocation = 0;
+    if (VRV_UNSET == previousElementLoc) {
+        currentOptimalLocation = nextElementLoc;
+    }
+    else if (VRV_UNSET == nextElementLoc) {
+        currentOptimalLocation = previousElementLoc;
+    }
+    else {
+        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2;
+    }
+    const int marginLocation = isTopLayer ? 10 : -2;
+    currentOptimalLocation = isTopLayer ? std::min(currentOptimalLocation, marginLocation)
+                                        : std::max(currentOptimalLocation, marginLocation);
 
-    return isTopLayer ? std::min(previousElementLoc, nextElementLoc) : std::max(previousElementLoc, nextElementLoc);
+    return currentOptimalLocation;
 }
 
 int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer)
@@ -398,7 +434,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     return VRV_UNSET;
 }
 
-std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer)
+std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer) const
 {
     if (object->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(object);
@@ -416,7 +452,7 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
             (accid && accid->GetAccid() != 0) ? MeiAccidentalToRestAccidental(accid->GetAccid()) : RA_none };
     }
     if (object->Is(FTREM)) {
-        std::vector<std::pair<int, RestAccidental> > btremElements;
+        std::vector<std::pair<int, RestAccidental>> btremElements;
         for (int i = 0; i < object->GetChildCount(); ++i) {
             btremElements.emplace_back(GetElementLocation(object->GetChild(i), layer, isTopLayer));
         }
@@ -435,16 +471,75 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
 int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
+    int duration = GetActualDur();
+    if (duration > DURATION_128) duration = DURATION_128;
     return g_defaultRests.at(layer)
         .at(RL_sameLayer == layer ? location.second : RA_none)
         .at(isTopLayer ? RLP_restOnTopLayer : RLP_restOnBottomLayer)
         .at(0 == location.first % 2 ? RNP_noteOnLine : RNP_noteInSpace)
-        .at(GetActualDur());
+        .at(duration);
 }
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Rest::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_beam) return FUNCTOR_SIBLINGS;
+
+    // Calculate possible overlap for the rest with beams
+    int leftMargin = 0, rightMargin = 0;
+    const int beams = vrv_cast<Beam *>(params->m_beam)->m_shortestDur - DUR_4;
+    const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
+    if (params->m_directionBias > 0) {
+        leftMargin = params->m_y1 - beams * beamWidth - GetSelfTop();
+        rightMargin = params->m_y2 - beams * beamWidth - GetSelfTop();
+    }
+    else {
+        leftMargin = GetSelfBottom() - params->m_y1 - beams * beamWidth;
+        rightMargin = GetSelfBottom() - params->m_y2 - beams * beamWidth;
+    }
+
+    // Adjust drawing location for the rest based on the overlap with beams.
+    // Adjustment should be an even number, so that the rest is positioned properly
+    const int overlapMargin = std::min(leftMargin, rightMargin);
+    if (overlapMargin < 0) {
+        Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
+        assert(staff);
+        if ((!HasOloc() || !HasPloc()) && !HasLoc()) {
+            const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
+            const int oldLoc = GetDrawingLoc();
+            const int newLoc = oldLoc + locAdjust - locAdjust % 2;
+            SetDrawingLoc(newLoc);
+            SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
+            // If there are dots, adjust their location as well
+            if (GetDots() > 0) {
+                Dots *dots = vrv_cast<Dots *>(FindDescendantByType(DOTS, 1));
+                if (dots) {
+                    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
+                    const int dotLoc = (oldLoc % 2) ? oldLoc : oldLoc + 1;
+                    if (std::find(dotLocs.cbegin(), dotLocs.cend(), dotLoc) != dotLocs.cend()) {
+                        dotLocs.erase(dotLoc);
+                        dotLocs.insert(newLoc);
+                    }
+                }
+            }
+        }
+        else {
+            const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            params->m_overlapMargin
+                = (((overlapMargin * params->m_directionBias + staffOffset - 1) / staffOffset + 1.5) * staffOffset)
+                * params->m_directionBias;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
@@ -503,16 +598,16 @@ int Rest::CalcDots(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
-    bool drawingCueSize = this->GetDrawingCueSize();
-    int staffSize = staff->m_drawingStaffSize;
+    const bool drawingCueSize = this->GetDrawingCueSize();
+    const int staffSize = staff->m_drawingStaffSize;
 
     // For single rests we need here to set the dot loc
     Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
-    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
     int loc = this->GetDrawingLoc();
 
     // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
@@ -521,19 +616,16 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     switch (this->GetActualDur()) {
-        case DUR_1: loc += 0; break;
-        case DUR_2: loc += 0; break;
-        case DUR_4: loc += 0; break;
-        case DUR_8: loc += 0; break;
-        case DUR_16: loc += 0; break;
-        case DUR_32: loc += 2; break;
+        case DUR_32:
         case DUR_64: loc += 2; break;
-        case DUR_128: loc += 4; break;
+        case DUR_128:
         case DUR_256: loc += 4; break;
+        case DUR_512: loc += 6; break;
+        case DUR_1024: loc += 8; break;
         default: break;
     }
 
-    dotLocs->push_back(loc);
+    dotLocs.insert(loc);
 
     // HARDCODED
     int xRel = params->m_doc->GetDrawingUnit(staffSize) * 2.5;

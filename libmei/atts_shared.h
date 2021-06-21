@@ -2798,8 +2798,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCount(int count_) { m_count = count_; }
-    int GetCount() const { return m_count; }
+    void SetCount(data_SUMMAND_List count_) { m_count = count_; }
+    data_SUMMAND_List GetCount() const { return m_count; }
     bool HasCount() const;
     //
     void SetSym(data_METERSIGN sym_) { m_sym = sym_; }
@@ -2813,7 +2813,7 @@ public:
 
 private:
     /** Indicates the number of performers. **/
-    int m_count;
+    data_SUMMAND_List m_count;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
@@ -2849,8 +2849,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterCount(int meterCount_) { m_meterCount = meterCount_; }
-    int GetMeterCount() const { return m_meterCount; }
+    void SetMeterCount(data_SUMMAND_List meterCount_) { m_meterCount = meterCount_; }
+    data_SUMMAND_List GetMeterCount() const { return m_meterCount; }
     bool HasMeterCount() const;
     //
     void SetMeterUnit(int meterUnit_) { m_meterUnit = meterUnit_; }
@@ -2869,7 +2869,7 @@ private:
      * It must contain a decimal number or an additive expression that evaluates to a
      * decimal number, such as 2+3.
      **/
-    int m_meterCount;
+    data_SUMMAND_List m_meterCount;
     /**
      * Contains the number indicating the beat unit, that is, the bottom number of the
      * meter signature.
@@ -3778,22 +3778,97 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttPlacement
+// AttPlacementOnStaff
 //----------------------------------------------------------------------------
 
-class AttPlacement : public Att {
+class AttPlacementOnStaff : public Att {
 public:
-    AttPlacement();
-    virtual ~AttPlacement();
+    AttPlacementOnStaff();
+    virtual ~AttPlacementOnStaff();
 
     /** Reset the default values for the attribute class **/
-    void ResetPlacement();
+    void ResetPlacementOnStaff();
 
     /** Read the values for the attribute class **/
-    bool ReadPlacement(pugi::xml_node element);
+    bool ReadPlacementOnStaff(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WritePlacement(pugi::xml_node element);
+    bool WritePlacementOnStaff(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOnstaff(data_BOOLEAN onstaff_) { m_onstaff = onstaff_; }
+    data_BOOLEAN GetOnstaff() const { return m_onstaff; }
+    bool HasOnstaff() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the placement of the item within the staff.
+     * A value of 'true' means on the staff, and 'false' off the staff.
+     **/
+    data_BOOLEAN m_onstaff;
+
+    /* include <attonstaff> */
+};
+
+//----------------------------------------------------------------------------
+// AttPlacementRelEvent
+//----------------------------------------------------------------------------
+
+class AttPlacementRelEvent : public Att {
+public:
+    AttPlacementRelEvent();
+    virtual ~AttPlacementRelEvent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPlacementRelEvent();
+
+    /** Read the values for the attribute class **/
+    bool ReadPlacementRelEvent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePlacementRelEvent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPlace(data_STAFFREL place_) { m_place = place_; }
+    data_STAFFREL GetPlace() const { return m_place; }
+    bool HasPlace() const;
+    ///@}
+
+private:
+    /** Records the placement of the beam relative to the events it affects. **/
+    data_STAFFREL m_place;
+
+    /* include <attplace> */
+};
+
+//----------------------------------------------------------------------------
+// AttPlacementRelStaff
+//----------------------------------------------------------------------------
+
+class AttPlacementRelStaff : public Att {
+public:
+    AttPlacementRelStaff();
+    virtual ~AttPlacementRelStaff();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPlacementRelStaff();
+
+    /** Read the values for the attribute class **/
+    bool ReadPlacementRelStaff(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePlacementRelStaff(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.

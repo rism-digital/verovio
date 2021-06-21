@@ -108,7 +108,7 @@ public:
     /** Return true if the element is a grace note */
     bool IsGraceNote();
     /** Return true if the element is has to be rederred as cue sized */
-    bool GetDrawingCueSize();
+    bool GetDrawingCueSize() const;
     /** Return true if the element is a note within a ligature */
     bool IsInLigature() const;
     /** Return the FTrem parten if the element is a note or a chord within a fTrem */
@@ -212,10 +212,10 @@ public:
      * Used only on beam, tuplet or ftrem have.
      */
     double GetSameAsContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
-        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     double GetContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
-        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**
      * Get zone bounds using child elements with facsimile information.
@@ -224,9 +224,17 @@ public:
     bool GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry);
 
     /**
-     * Helper to adjust overlaping layers for notes, chords, stems, etc.
+     * Helper to adjust overlapping layers for notes, chords, stems, etc.
      */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison) {}
+    virtual void AdjustOverlappingLayers(
+        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
+
+    /**
+     * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
+     * element if it's in unison with it
+     */
+    std::pair<int, bool> CalcElementHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
+        bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     //----------//
     // Functors //
@@ -236,6 +244,11 @@ public:
      * See Object::AdjustBeams
      */
     virtual int AdjustBeams(FunctorParams *);
+
+    /**
+     * See Object::AdjustDots
+     */
+    virtual int AdjustDots(FunctorParams *);
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -368,6 +381,49 @@ public:
      */
     virtual int GetRelativeLayerElement(FunctorParams *functorParams);
 
+protected:
+    /**
+     * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
+     * This function assumes that two chords are already in unison and checks whether chords can overlap with
+     * their unison notes or if they should be placed separately.
+     * Returns true if all elements can safely overlap.
+     */
+    virtual int CountElementsInUnison(
+        const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
+
+    /**
+     * The note locations w.r.t. each staff, implemented for note and chord
+     */
+    virtual MapOfNoteLocs CalcNoteLocations() { return {}; };
+
+    /**
+     * The dot locations w.r.t. each staff, implemented for note and chord
+     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
+     * secondary
+     */
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; };
+
+    /**
+     * Calculate the optimal dot location for a note or chord
+     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
+     */
+    MapOfDotLocs CalcOptimalDotLocations();
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Helper to count the number of dots
+     * This can be used as an indicator to choose between different sets of dots
+     */
+    static int GetDotCount(const MapOfDotLocs &dotLocations);
+
+    /**
+     * Helper to count the collisions between two sets of dots
+     */
+    static int GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2);
+
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type);
 
@@ -402,18 +458,9 @@ protected:
     int m_drawingXRel;
 
     /**
-     * The cached drawing cue size set by PrepareDarwingCueSize
+     * The cached drawing cue size set by PrepareDrawingCueSize
      */
     bool m_drawingCueSize;
-
-    /**
-     * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
-     * This function assumes that two chords are already in unison and checks whether chords can overlap with
-     * their unison notes or if they should be placed separately.
-     * Returns true if all elements can safely overlap.
-     */
-    virtual int CountElementsInUnison(
-        const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
 
 private:
     /**

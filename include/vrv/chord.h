@@ -15,6 +15,7 @@
 
 namespace vrv {
 
+class Dots;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
@@ -132,7 +133,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
-    virtual int CalcStemLenInThirdUnits(Staff *staff);
+    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir);
     ///@}
 
     /**
@@ -146,9 +147,10 @@ public:
     bool HasNoteWithDots();
 
     /**
-     * Helper to adjust overlaping layers for chords
+     * Helper to adjust overlapping layers for chords
      */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+    virtual void AdjustOverlappingLayers(
+        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
 
     //----------//
     // Functors //
@@ -163,11 +165,6 @@ public:
      * See Object::AdjustArtic
      */
     virtual int AdjustArtic(FunctorParams *functorParams);
-
-    /**
-     * See Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertMarkupAnalytical
@@ -208,6 +205,18 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
+    /**
+     * The note locations w.r.t. each staff
+     */
+    virtual MapOfNoteLocs CalcNoteLocations();
+
+    /**
+     * The dot locations w.r.t. each staff
+     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
+     * secondary
+     */
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary);
+
     /**
      * Clear the m_clusters vector and delete all the objects.
      */

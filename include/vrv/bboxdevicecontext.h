@@ -31,7 +31,7 @@ class Object;
  * It can be used when doing the layout of the object in order to manage object spacing.
  * The drawing primitives do not draw anything but update the bounding box values of the
  * layout objects currently drawn. The layout objects store their own bounding box and a
- * bounding box of their content. The own bouding box is updated only for the object being
+ * bounding box of their content. The own bounding box is updated only for the object being
  * drawn (the top one on the stack). The content bounding box is updated for all objects
  * on the stack
  */
@@ -70,8 +70,9 @@ public:
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawSimpleBezierPath(Point bezier[4]);
-    virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]);
+    virtual void DrawQuadBezierPath(Point bezier[3]);
+    virtual void DrawCubicBezierPath(Point bezier[4]);
+    virtual void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]);
     virtual void DrawCircle(int x, int y, int radius);
     virtual void DrawEllipse(int x, int y, int width, int height);
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);

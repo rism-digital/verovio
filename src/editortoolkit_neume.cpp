@@ -81,7 +81,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
         int ulx = 0, uly = 0, lrx = 0, lry = 0;
-        std::vector<std::pair<std::string, std::string> > attributes;
+        std::vector<std::pair<std::string, std::string>> attributes;
         if (this->ParseInsertAction(
                 json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &lrx, &lry, &attributes)) {
             return this->Insert(elementType, staffId, ulx, uly, lrx, lry, attributes);
@@ -288,7 +288,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ListOfObjects facsChildren;
             element->FindAllDescendantByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
-                // dont change the text bbox position
+                // don't change the text bbox position
                 if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
                     continue;
                 }
@@ -334,9 +334,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         //  Case 2:
         //      The clef you're dragging moves across other clefs. In other words the preceding and
         //      subsequent clefs are different before and after the drag. In this case elements that were
-        //      associated with this clef before the drag need to be reassociated to the clef that preceded
+        //      associated with this clef before the drag need to be re-associated to the clef that preceded
         //      this clef before the drag. Elements that become newly associated with the clef after the drag
-        //      need to be reassociated from the clef that preceeds this clef after the drag to this clef.
+        //      need to be re-associated from the clef that precedes this clef after the drag to this clef.
         //
         // Extracting the exact elements that need to have their pitch modified in each of these cases is
         // tricky, and required some dicey naming.
@@ -385,7 +385,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
         // that these calls are oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
         // So if we're changing an element's pitch from this clef to something else, we need the line of
-        // this clef to be what it was before the drag. On the other hand, if we're reassociating an element
+        // this clef to be what it was before the drag. On the other hand, if we're re-associating an element
         // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
         // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
         //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -571,7 +571,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 }
 
 bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
-    std::vector<std::pair<std::string, std::string> > attributes)
+    std::vector<std::pair<std::string, std::string>> attributes)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
@@ -1076,7 +1076,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 {
     std::string status = "OK", message = "";
     std::wstring wtext;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     wtext = conv.from_bytes(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
@@ -1262,7 +1262,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     int newUly = staff->GetZone()->GetUly()
         - ((x - staff->GetZone()->GetUlx()) * tan(staff->GetZone()->GetRotate() * M_PI / 180.0));
     int newLry = staff->GetZone()->GetLry(); // don't need to maintain height since we're setting rotate manually
-    std::vector<std::pair<std::string, std::string> > v;
+    std::vector<std::pair<std::string, std::string>> v;
 
     if (!this->Insert("staff", "auto", newUlx, newUly, newLrx, newLry, v)) {
         LogError("Failed to create a second staff.");
@@ -1410,7 +1410,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         return false;
     }
     // Check if this leaves any containers empty and delete them
-    if (isNc && result) {
+    if (isNc) {
         assert(parent->Is(NEUME));
         obj = parent;
         parent = parent->GetParent();
@@ -1427,7 +1427,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             }
         }
     }
-    if (isNeumeOrNc && result) {
+    if (isNeumeOrNc) {
         assert(parent->Is(SYLLABLE));
         obj = parent;
         parent = parent->GetParent();
@@ -1842,17 +1842,21 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
                 // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
                 FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
+
                 if (facsInter != NULL) {
-                    if (ulx == -1) {
-                        ulx = facsInter->GetDrawingX();
-                        uly = facsInter->GetDrawingY();
-                        lrx = facsInter->GetWidth() + ulx;
-                        lry = facsInter->GetHeight() + uly;
+                    // Update bb to valid extremes
+                    int newUlx = facsInter->GetDrawingX();
+                    int newUly = facsInter->GetDrawingY();
+                    int newLrx = facsInter->GetWidth() + newUlx;
+                    int newLry = facsInter->GetHeight() + newUly;
+                    if ((ulx > newUlx) || (ulx < 0)) {
+                        ulx = newUlx;
                     }
-                    else {
-                        lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
-                        lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                    if ((uly > newUly) || (uly < 0)) {
+                        uly = newUly;
                     }
+                    lrx = std::max(lrx, newLrx);
+                    lry = std::max(lry, newLry);
                 }
             }
             assert(fullSyl);
@@ -2561,7 +2565,7 @@ bool EditorToolkitNeume::ParseInsertAction(
 }
 
 bool EditorToolkitNeume::ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId,
-    int *ulx, int *uly, int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes)
+    int *ulx, int *uly, int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
     (*elementType) = param.get<jsonxx::String>("elementType");
@@ -2782,7 +2786,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
     // it should also only be called in cases where finding the old clef is not required
     // since doing it based only on clefs is much more efficient than based on position
     // also if you are calling this function in a loop you should always be passing a clef argument
-    // since repeatedly finding the previous clef is very inneficient
+    // since repeatedly finding the previous clef is very inefficient
 
     if (obj->Is(CUSTOS)) {
         Custos *custos = dynamic_cast<Custos *>(obj);
@@ -2831,7 +2835,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         }
         pi->SetOct(3);
 
-        // glyphs in verovio are actually not centered, but are in the top left corner of a giant box
+        // glyphs in Verovio are actually not centered, but are in the top left corner of a giant box
         int centerY = fi->GetZone()->GetUly();
         int centerX = fi->GetZone()->GetUlx();
 

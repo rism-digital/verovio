@@ -37,11 +37,13 @@ class BoundaryEnd;
 class BracketSpan;
 class Breath;
 class BTrem;
+class Caesura;
 class Choice;
 class Chord;
 class Clef;
 class ControlElement;
 class Corr;
+class Course;
 class Custos;
 class Damage;
 class Del;
@@ -103,6 +105,7 @@ class PgFoot2;
 class PgHead;
 class PgHead2;
 class Phrase;
+class PitchInflection;
 class PitchInterface;
 class Plica;
 class PlistInterface;
@@ -134,6 +137,8 @@ class Syl;
 class Syllable;
 class System;
 class SystemElement;
+class TabDurSym;
+class TabGrp;
 class Tempo;
 class Text;
 class TextDirInterface;
@@ -142,6 +147,7 @@ class Tie;
 class TimePointInterface;
 class TimeSpanningInterface;
 class Trill;
+class Tuning;
 class Turn;
 class Tuplet;
 class Unclear;
@@ -246,6 +252,8 @@ private:
     void WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef);
     void WriteLabel(pugi::xml_node currentNode, Label *label);
     void WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr);
+    void WriteTuning(pugi::xml_node currentNode, Tuning *tuning);
+    void WriteCourse(pugi::xml_node currentNode, Course *course);
     void WriteMeasure(pugi::xml_node currentNode, Measure *measure);
     void WriteFb(pugi::xml_node currentNode, Fb *fb);
     void WriteStaff(pugi::xml_node currentNode, Staff *staff);
@@ -289,6 +297,8 @@ private:
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
     void WriteSyllable(pugi::xml_node currentNode, Syllable *syllable);
+    void WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym);
+    void WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp);
     void WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
 
@@ -300,6 +310,7 @@ private:
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
     void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
+    void WriteCaesura(pugi::xml_node currentNode, Caesura *caesura);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
@@ -312,6 +323,7 @@ private:
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
     void WritePhrase(pugi::xml_node currentNode, Phrase *phrase);
+    void WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection);
     void WriteReh(pugi::xml_node currentNode, Reh *reh);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteTempo(pugi::xml_node currentNode, Tempo *tempo);
@@ -496,6 +508,9 @@ private:
     bool ReadInstrDef(Object *parent, pugi::xml_node instrDef);
     bool ReadLabel(Object *parent, pugi::xml_node label);
     bool ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
+    bool ReadTuning(Object *parent, pugi::xml_node tuning);
+    bool ReadTuningChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadCourse(Object *parent, pugi::xml_node course);
     bool ReadMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeasureChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadFb(Object *parent, pugi::xml_node fb);
@@ -545,6 +560,8 @@ private:
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
+    bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
+    bool ReadTabGrp(Object *parent, pugi::xml_node tabGrp);
     bool ReadTuplet(Object *parent, pugi::xml_node tuplet);
     bool ReadVerse(Object *parent, pugi::xml_node verse);
     ///@}
@@ -557,6 +574,7 @@ private:
     bool ReadArpeg(Object *parent, pugi::xml_node arpeg);
     bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
+    bool ReadCaesura(Object *parent, pugi::xml_node caesura);
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
@@ -569,6 +587,7 @@ private:
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
     bool ReadPhrase(Object *parent, pugi::xml_node phrase);
+    bool ReadPitchInflection(Object *parent, pugi::xml_node pitchInflection);
     bool ReadReh(Object *parent, pugi::xml_node reh);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
     bool ReadTempo(Object *parent, pugi::xml_node tempo);
@@ -621,7 +640,7 @@ private:
     ///@}
 
     /**
-     * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
+     * @name Methods for reading MEI LayerElement, EditorialElement and interfaces
      */
     ///@{
     bool ReadControlElement(pugi::xml_node element, ControlElement *object);
@@ -701,6 +720,13 @@ private:
     // to MEI 3.0.0 (Page-Based MEI only)
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
+    ///@}
+
+    /**
+     * @name Methods for reading MEI common attributes
+     */
+    ///@{
+    void ReadAccidAttr(pugi::xml_node node, Object *object);
     ///@}
 
 public:

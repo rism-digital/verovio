@@ -212,12 +212,12 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
     }
-    // This is the case when the tie is split over two system of two pages.
+    // This is the case when the slur is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if (spanningType == SPANNING_START) {
         stemDir = startStemDir;
     }
-    // Now this is the case when the tie is split but we are drawing the end of it
+    // Now this is the case when the slur is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
         stemDir = endStemDir;
     }
@@ -300,7 +300,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             }
             // d(^)
             else {
-                // put it on the side, move it left, but not if we have a @stamp
+                // put it on the side, move it left, but not if we have a @tstamp
                 if (!start->Is(TIMESTAMP_ATTR) && (startStemLen != 0))
                     x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
                 if (startChord || startParentChord)
@@ -400,7 +400,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             }
             // (_)P
             else {
-                // put it on the side, move it right, but not if we have a @stamp2
+                // put it on the side, move it right, but not if we have a @tstamp2
                 if (!end->Is(TIMESTAMP_ATTR)) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (endChord || endParentChord) {
                     y2 = yChordMin - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
@@ -420,6 +420,10 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         else {
             y2 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
         }
+        // At the end of a system, the slur finishes just short of the last barline
+        x2 -= (m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize)
+                  + m_doc->GetDrawingUnit(staff->m_drawingStaffSize))
+            / 2;
     }
     if (end->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above) {
@@ -549,7 +553,7 @@ float View::CalcInitialSlur(
     findSpannedLayerElementsParams.m_minPos = p1.x;
     findSpannedLayerElementsParams.m_maxPos = p2.x;
     findSpannedLayerElementsParams.m_classIds
-        = { ACCID, ARTIC, CHORD, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
+        = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)

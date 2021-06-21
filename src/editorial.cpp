@@ -107,19 +107,6 @@ bool EditorialElement::IsSupportedChild(Object *child)
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-int EditorialElement::ConvertMarkupArticEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
-    assert(params);
-
-    for (auto &artic : params->m_articsToConvert) {
-        artic->SplitMultival(this);
-    }
-    params->m_articsToConvert.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
@@ -135,7 +122,7 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    if (this->m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+    if (m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
 
     return FUNCTOR_CONTINUE;
 }

@@ -1,14 +1,48 @@
 # Changelog
 
 ## [unreleased]
+* Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)
+* Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
+* Improved rendering of octave brackets ending (@eNote-GmbH)
+* Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
+* Fix option --octave-alternative-symbols
+
+## [3.4.1] - 2021-05-03
+* Fix bug in font names in the Python distribution
+
+## [3.4.0] - 2021-05-01
+* Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
+* Support for chords with cuesize notes (@eNote-GmbH)
+* Improved horizontal layout with dots and flags (@eNote-GmbH)
+* Improvement of the the positioning of mRest (@eNote-GmbH)
+* Improvement of alignment for dots in different voices (@eNote-GmbH)
+* Improvement of rendering of ties that collide with dots (@eNote-GmbH)
+* Improvement of barLine positioning (@eNote-GmbH)
+* Improvement of MusicXML import of chord symbol `<degree>` (@th-we)
+* Improvement of input format auto-detection (@JRegimbal)
+* Method renderToPAE added to the JS toolkit (@davidrizo)
+* Preliminary support for tablature (experimental work)
+* Option --preserve-analytical-markup to preserve analytical markup (default is now off) (@rettinghaus)
+* Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
+* Option --harm-dist to control the minimal distance of harm (@DavidBauer1984)
+* Option --output-format-raw for raw MEI output without indentation and line breaks
+* Option --multi-rest-style for better control over the rendering style of multiple measure rest (@eNote-GmbH) 
+* Option --octave-alternative-symbols to switch to alternate SMuFL glyphs (@eNote-GmbH)
+
+## [3.3.0] - 2021-02-25
 * Support for `@glyph.name`
 * Support for `accid@glyph.num` and `@glyph.name`
 * Support for MusicXML compressed files
+* Improved consistency of logging functions across bindings
 * Improved PyPI packages for Linux (@rettinghaus and @musicEnfanthen)
-* Method loadZipDataBase64 and loadZipDataBuffer (JS) for loading MusicXML compressed files
+* Function loadZipDataBase64 and loadZipDataBuffer (JS) for loading MusicXML compressed files
+* Function enableLog(bool) to enable or disable logging
+* Function enableLogToBuffer(bool) to enable logging to a buffer instead of the stderr or the JS console
 * Option --clef-change-factor for adjusting clef change size (default is .66) (@rettinghaus)
 * Option --svg-format-raw for raw SVG output without indentation and line breaks
 * New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
+* Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
+* Fixes in the MusicXML importer (@eNote-GmBH)
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)
@@ -318,17 +352,17 @@
 * Several bug fixes and code refactoring enhancement
 
 ## [Pre-release versions]
-- [0.9.13](https://github.com/rism-ch/verovio/releases/tag/version-0.9.13)
-- [0.9.12](https://github.com/rism-ch/verovio/releases/tag/version-0.9.12)
-- [0.9.11](https://github.com/rism-ch/verovio/releases/tag/version-0.9.11)
-- [0.9.10](https://github.com/rism-ch/verovio/releases/tag/version-0.9.10)
-- [0.9.9](https://github.com/rism-ch/verovio/releases/tag/version-0.9.9)
-- [0.9.8](https://github.com/rism-ch/verovio/releases/tag/version-0.9.8)
-- [0.9.7](https://github.com/rism-ch/verovio/releases/tag/version-0.9.7)
-- [0.9.6](https://github.com/rism-ch/verovio/releases/tag/version-0.9.6)
-- [0.9.5](https://github.com/rism-ch/verovio/releases/tag/version-0.9.5)
-- [0.9.4](https://github.com/rism-ch/verovio/releases/tag/version-0.9.4)
-- [0.9.3](https://github.com/rism-ch/verovio/releases/tag/version-0.9.3)
-- [0.9.2](https://github.com/rism-ch/verovio/releases/tag/version-0.9.2)
-- [0.9.1](https://github.com/rism-ch/verovio/releases/tag/version-0.9.1)
-- [0.9.0](https://github.com/rism-ch/verovio/releases/tag/version-0.9.0)
+- [0.9.13](https://github.com/rism-digital/verovio/releases/tag/version-0.9.13)
+- [0.9.12](https://github.com/rism-digital/verovio/releases/tag/version-0.9.12)
+- [0.9.11](https://github.com/rism-digital/verovio/releases/tag/version-0.9.11)
+- [0.9.10](https://github.com/rism-digital/verovio/releases/tag/version-0.9.10)
+- [0.9.9](https://github.com/rism-digital/verovio/releases/tag/version-0.9.9)
+- [0.9.8](https://github.com/rism-digital/verovio/releases/tag/version-0.9.8)
+- [0.9.7](https://github.com/rism-digital/verovio/releases/tag/version-0.9.7)
+- [0.9.6](https://github.com/rism-digital/verovio/releases/tag/version-0.9.6)
+- [0.9.5](https://github.com/rism-digital/verovio/releases/tag/version-0.9.5)
+- [0.9.4](https://github.com/rism-digital/verovio/releases/tag/version-0.9.4)
+- [0.9.3](https://github.com/rism-digital/verovio/releases/tag/version-0.9.3)
+- [0.9.2](https://github.com/rism-digital/verovio/releases/tag/version-0.9.2)
+- [0.9.1](https://github.com/rism-digital/verovio/releases/tag/version-0.9.1)
+- [0.9.0](https://github.com/rism-digital/verovio/releases/tag/version-0.9.0)

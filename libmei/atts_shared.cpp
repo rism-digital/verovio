@@ -3645,7 +3645,7 @@ AttMeterSigLog::~AttMeterSigLog()
 
 void AttMeterSigLog::ResetMeterSigLog()
 {
-    m_count = 0;
+    m_count = std::vector<int>();
     m_sym = METERSIGN_NONE;
     m_unit = 0;
 }
@@ -3654,7 +3654,7 @@ bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("count")) {
-        this->SetCount(StrToInt(element.attribute("count").value()));
+        this->SetCount(StrToSummandList(element.attribute("count").value()));
         element.remove_attribute("count");
         hasAttribute = true;
     }
@@ -3675,7 +3675,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasCount()) {
-        element.append_attribute("count") = IntToStr(this->GetCount()).c_str();
+        element.append_attribute("count") = SummandListToStr(this->GetCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSym()) {
@@ -3691,7 +3691,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 
 bool AttMeterSigLog::HasCount() const
 {
-    return (m_count != 0);
+    return (m_count != std::vector<int>());
 }
 
 bool AttMeterSigLog::HasSym() const
@@ -3721,7 +3721,7 @@ AttMeterSigDefaultLog::~AttMeterSigDefaultLog()
 
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
-    m_meterCount = 0;
+    m_meterCount = std::vector<int>();
     m_meterUnit = 0;
     m_meterSym = METERSIGN_NONE;
 }
@@ -3730,7 +3730,7 @@ bool AttMeterSigDefaultLog::ReadMeterSigDefaultLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("meter.count")) {
-        this->SetMeterCount(StrToInt(element.attribute("meter.count").value()));
+        this->SetMeterCount(StrToSummandList(element.attribute("meter.count").value()));
         element.remove_attribute("meter.count");
         hasAttribute = true;
     }
@@ -3751,7 +3751,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMeterCount()) {
-        element.append_attribute("meter.count") = IntToStr(this->GetMeterCount()).c_str();
+        element.append_attribute("meter.count") = SummandListToStr(this->GetMeterCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMeterUnit()) {
@@ -3767,7 +3767,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 
 bool AttMeterSigDefaultLog::HasMeterCount() const
 {
-    return (m_meterCount != 0);
+    return (m_meterCount != std::vector<int>());
 }
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
@@ -5002,24 +5002,70 @@ bool AttPitch::HasPname() const
 /* include <attpname> */
 
 //----------------------------------------------------------------------------
-// AttPlacement
+// AttPlacementOnStaff
 //----------------------------------------------------------------------------
 
-AttPlacement::AttPlacement() : Att()
+AttPlacementOnStaff::AttPlacementOnStaff() : Att()
 {
-    ResetPlacement();
+    ResetPlacementOnStaff();
 }
 
-AttPlacement::~AttPlacement()
+AttPlacementOnStaff::~AttPlacementOnStaff()
 {
 }
 
-void AttPlacement::ResetPlacement()
+void AttPlacementOnStaff::ResetPlacementOnStaff()
+{
+    m_onstaff = BOOLEAN_NONE;
+}
+
+bool AttPlacementOnStaff::ReadPlacementOnStaff(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("onstaff")) {
+        this->SetOnstaff(StrToBoolean(element.attribute("onstaff").value()));
+        element.remove_attribute("onstaff");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPlacementOnStaff::WritePlacementOnStaff(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasOnstaff()) {
+        element.append_attribute("onstaff") = BooleanToStr(this->GetOnstaff()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPlacementOnStaff::HasOnstaff() const
+{
+    return (m_onstaff != BOOLEAN_NONE);
+}
+
+/* include <attonstaff> */
+
+//----------------------------------------------------------------------------
+// AttPlacementRelEvent
+//----------------------------------------------------------------------------
+
+AttPlacementRelEvent::AttPlacementRelEvent() : Att()
+{
+    ResetPlacementRelEvent();
+}
+
+AttPlacementRelEvent::~AttPlacementRelEvent()
+{
+}
+
+void AttPlacementRelEvent::ResetPlacementRelEvent()
 {
     m_place = data_STAFFREL();
 }
 
-bool AttPlacement::ReadPlacement(pugi::xml_node element)
+bool AttPlacementRelEvent::ReadPlacementRelEvent(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("place")) {
@@ -5030,7 +5076,7 @@ bool AttPlacement::ReadPlacement(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttPlacement::WritePlacement(pugi::xml_node element)
+bool AttPlacementRelEvent::WritePlacementRelEvent(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPlace()) {
@@ -5040,7 +5086,53 @@ bool AttPlacement::WritePlacement(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttPlacement::HasPlace() const
+bool AttPlacementRelEvent::HasPlace() const
+{
+    return (m_place != data_STAFFREL());
+}
+
+/* include <attplace> */
+
+//----------------------------------------------------------------------------
+// AttPlacementRelStaff
+//----------------------------------------------------------------------------
+
+AttPlacementRelStaff::AttPlacementRelStaff() : Att()
+{
+    ResetPlacementRelStaff();
+}
+
+AttPlacementRelStaff::~AttPlacementRelStaff()
+{
+}
+
+void AttPlacementRelStaff::ResetPlacementRelStaff()
+{
+    m_place = data_STAFFREL();
+}
+
+bool AttPlacementRelStaff::ReadPlacementRelStaff(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("place")) {
+        this->SetPlace(StrToStaffrel(element.attribute("place").value()));
+        element.remove_attribute("place");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPlacementRelStaff::WritePlacementRelStaff(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasPlace()) {
+        element.append_attribute("place") = StaffrelToStr(this->GetPlace()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPlacementRelStaff::HasPlace() const
 {
     return (m_place != data_STAFFREL());
 }
@@ -8641,7 +8733,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigLog *att = dynamic_cast<AttMeterSigLog *>(element);
         assert(att);
         if (attrType == "count") {
-            att->SetCount(att->StrToInt(attrValue));
+            att->SetCount(att->StrToSummandList(attrValue));
             return true;
         }
         if (attrType == "sym") {
@@ -8657,7 +8749,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog *>(element);
         assert(att);
         if (attrType == "meter.count") {
-            att->SetMeterCount(att->StrToInt(attrValue));
+            att->SetMeterCount(att->StrToSummandList(attrValue));
             return true;
         }
         if (attrType == "meter.unit") {
@@ -8913,8 +9005,24 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
-    if (element->HasAttClass(ATT_PLACEMENT)) {
-        AttPlacement *att = dynamic_cast<AttPlacement *>(element);
+    if (element->HasAttClass(ATT_PLACEMENTONSTAFF)) {
+        AttPlacementOnStaff *att = dynamic_cast<AttPlacementOnStaff *>(element);
+        assert(att);
+        if (attrType == "onstaff") {
+            att->SetOnstaff(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_PLACEMENTRELEVENT)) {
+        AttPlacementRelEvent *att = dynamic_cast<AttPlacementRelEvent *>(element);
+        assert(att);
+        if (attrType == "place") {
+            att->SetPlace(att->StrToStaffrel(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_PLACEMENTRELSTAFF)) {
+        AttPlacementRelStaff *att = dynamic_cast<AttPlacementRelStaff *>(element);
         assert(att);
         if (attrType == "place") {
             att->SetPlace(att->StrToStaffrel(attrValue));
@@ -10071,7 +10179,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMeterSigLog *att = dynamic_cast<const AttMeterSigLog *>(element);
         assert(att);
         if (att->HasCount()) {
-            attributes->push_back(std::make_pair("count", att->IntToStr(att->GetCount())));
+            attributes->push_back(std::make_pair("count", att->SummandListToStr(att->GetCount())));
         }
         if (att->HasSym()) {
             attributes->push_back(std::make_pair("sym", att->MetersignToStr(att->GetSym())));
@@ -10084,7 +10192,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMeterSigDefaultLog *att = dynamic_cast<const AttMeterSigDefaultLog *>(element);
         assert(att);
         if (att->HasMeterCount()) {
-            attributes->push_back(std::make_pair("meter.count", att->IntToStr(att->GetMeterCount())));
+            attributes->push_back(std::make_pair("meter.count", att->SummandListToStr(att->GetMeterCount())));
         }
         if (att->HasMeterUnit()) {
             attributes->push_back(std::make_pair("meter.unit", att->IntToStr(att->GetMeterUnit())));
@@ -10295,8 +10403,22 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("pname", att->PitchnameToStr(att->GetPname())));
         }
     }
-    if (element->HasAttClass(ATT_PLACEMENT)) {
-        const AttPlacement *att = dynamic_cast<const AttPlacement *>(element);
+    if (element->HasAttClass(ATT_PLACEMENTONSTAFF)) {
+        const AttPlacementOnStaff *att = dynamic_cast<const AttPlacementOnStaff *>(element);
+        assert(att);
+        if (att->HasOnstaff()) {
+            attributes->push_back(std::make_pair("onstaff", att->BooleanToStr(att->GetOnstaff())));
+        }
+    }
+    if (element->HasAttClass(ATT_PLACEMENTRELEVENT)) {
+        const AttPlacementRelEvent *att = dynamic_cast<const AttPlacementRelEvent *>(element);
+        assert(att);
+        if (att->HasPlace()) {
+            attributes->push_back(std::make_pair("place", att->StaffrelToStr(att->GetPlace())));
+        }
+    }
+    if (element->HasAttClass(ATT_PLACEMENTRELSTAFF)) {
+        const AttPlacementRelStaff *att = dynamic_cast<const AttPlacementRelStaff *>(element);
         assert(att);
         if (att->HasPlace()) {
             attributes->push_back(std::make_pair("place", att->StaffrelToStr(att->GetPlace())));

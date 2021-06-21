@@ -80,6 +80,7 @@ private:
     // decoration functions
     void parseDecoration(const std::string &decorationString);
     void AddArticulation(LayerElement *element);
+    void AddChordSymbol(LayerElement *element);
     void AddDynamic(LayerElement *element);
     void AddFermata(LayerElement *element);
     void AddOrnaments(LayerElement *element);
@@ -119,12 +120,12 @@ private:
     /*
      * ABC metadata stacks
      */
-    std::vector<std::pair<std::string, int> > m_composer; // C:
-    std::vector<std::pair<std::string, int> > m_history; // H:
-    std::vector<std::pair<std::string, int> > m_notes; // N:
-    std::vector<std::pair<std::string, int> > m_origin; // O:
-    std::vector<std::pair<std::string, int> > m_title; // T:
-    std::vector<std::pair<std::pair<std::string, int>, char> > m_info;
+    std::vector<std::pair<std::string, int>> m_composer; // C:
+    std::vector<std::pair<std::string, int>> m_history; // H:
+    std::vector<std::pair<std::string, int>> m_notes; // N:
+    std::vector<std::pair<std::string, int>> m_origin; // O:
+    std::vector<std::pair<std::string, int>> m_title; // T:
+    std::vector<std::pair<std::pair<std::string, int>, char>> m_info;
 
     std::vector<ControlElement *> m_tempoStack;
     std::vector<Harm *> m_harmStack;
@@ -143,7 +144,7 @@ private:
     /*
      * The stack of control elements to be added at the end of each measure
      */
-    std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
+    std::vector<std::pair<std::string, ControlElement *>> m_controlElements;
     /*
      * container for work entries
      */

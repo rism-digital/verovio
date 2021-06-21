@@ -77,7 +77,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
     if (noteDots != -1) {
         duration = 2 * duration - (duration / pow(2, noteDots));
     }
-    // LogDebug("Duration %d; Dot %d; Alignement %f", noteDur, GetDots(), duration);
+    // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, GetDots(), duration);
     return duration;
 }
 
@@ -105,7 +105,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
             numBase *= 3;
         }
     }
-    // imperfecta in perfect mensuration (three imperfectas in the place of the two orignal perfectas)
+    // imperfecta in perfect mensuration (three imperfectas in the place of the two original perfectas)
     else if (this->GetDurQuality() == DURQUALITY_mensural_imperfecta) {
         if (((this->GetDur() == DURATION_longa) && (currentMensur->GetModusminor() != MODUSMINOR_2))
             || ((this->GetDur() == DURATION_brevis) && (currentMensur->GetTempus() != TEMPUS_2))
@@ -141,7 +141,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
             break;
     }
     duration *= (double)numBase / (double)num;
-    // LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", noteDur, num, numbase, duration, ratio);
+    // LogDebug("Duration %d; %d/%d; Alignment %f; Ratio %f", noteDur, num, numbase, duration, ratio);
     duration = durRound(duration);
     return duration;
 }
@@ -205,7 +205,7 @@ int DurationInterface::GetNoteOrChordDur(LayerElement *element)
     return this->GetActualDur();
 }
 
-bool DurationInterface::IsMensuralDur()
+bool DurationInterface::IsMensuralDur() const
 {
     // maxima (-1) is a mensural only value
     if (this->GetDur() == DURATION_maxima) return true;

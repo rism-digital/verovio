@@ -203,7 +203,7 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
     partialHeight = ceil(tmp / (double)glyph->GetUnitsPerEm());
     tmp = y * m_fontStack.top()->GetPointSize();
     y = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    // Following lines were commented out because result of these assignemens were not used (dead store)
+    // Following lines were commented out because result of these assignments were not used (dead store)
     // tmp = x * m_fontStack.top()->GetPointSize();
     // x = ceil(tmp / (double)glyph->GetUnitsPerEm());
 

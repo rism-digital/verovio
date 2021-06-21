@@ -30,7 +30,6 @@ public:
     TextElement(const std::string &classid);
     virtual ~TextElement();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "TextElement"; }
     virtual ClassId GetClassId() const { return TEXT_ELEMENT; }
     ///@}
 

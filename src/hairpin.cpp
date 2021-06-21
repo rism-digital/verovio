@@ -13,11 +13,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "dynam.h"
 #include "functorparams.h"
 #include "measure.h"
+#include "system.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -27,20 +29,22 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Hairpin> s_factory("hairpin", HAIRPIN);
+
 Hairpin::Hairpin()
     : ControlElement("hairpin-")
     , TimeSpanningInterface()
     , AttColor()
     , AttHairpinLog()
     , AttHairpinVis()
-    , AttPlacement()
+    , AttPlacementRelStaff()
     , AttVerticalGroup()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_HAIRPINLOG);
     RegisterAttClass(ATT_HAIRPINVIS);
-    RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
@@ -55,7 +59,7 @@ void Hairpin::Reset()
     ResetColor();
     ResetHairpinLog();
     ResetHairpinVis();
-    ResetPlacement();
+    ResetPlacementRelStaff();
     ResetVerticalGroup();
 
     m_leftLink = NULL;
@@ -77,14 +81,14 @@ int Hairpin::CalcHeight(
     // Something is probably wrong before...
     if (!this->GetDrawingLength()) return endY;
 
-    // Do not adjust heigt when not a full hairpin
+    // Do not adjust height when not a full hairpin
     if (spanningType != SPANNING_START_END) return endY;
 
     int length = this->GetDrawingLength();
 
     // Second of a <>
     if ((this->GetForm() == hairpinLog_FORM_dim) && m_leftLink && m_leftLink->Is(HAIRPIN)) {
-        // Do no ajust height when previous hairpin is not a full hairpin
+        // Do no adjust height when previous hairpin is not a full hairpin
         if (!leftPositioner || (leftPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
         Hairpin *left = vrv_cast<Hairpin *>(m_leftLink);
         assert(left);
@@ -96,7 +100,7 @@ int Hairpin::CalcHeight(
 
     // First of a <>
     if ((this->GetForm() == hairpinLog_FORM_cres) && m_rightLink && m_rightLink->Is(HAIRPIN)) {
-        // Do no ajust height when next hairpin is not a full hairpin
+        // Do no adjust height when next hairpin is not a full hairpin
         if (!rightPositioner || (rightPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
         Hairpin *right = vrv_cast<Hairpin *>(m_rightLink);
         assert(right);
@@ -154,7 +158,7 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
     rightLink->SetDrawingGrpId(grpId);
 }
 
-std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX)
+std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX, int spanningType)
 {
     Measure *startMeasure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
     Measure *endMeasure = vrv_cast<Measure *>(GetEnd()->GetFirstAncestor(MEASURE));
@@ -165,17 +169,32 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
     // default margin to consider them overlapping, which is adjusted in case we have wider barline on the left
     int leftAdjustment = 0;
     BarLine *leftBarline = startMeasure->GetLeftBarLine();
-    if (leftBarline) {
+    if (leftBarline && (spanningType == SPANNING_START_END || spanningType == SPANNING_START)) {
         int margin = doubleUnit;
         const int leftBarlineX = leftBarline->GetDrawingX();
         const int diff = leftX - leftBarlineX;
         if (leftBarline->GetForm() == BARRENDITION_rptstart) margin *= 1.5;
         if (diff < margin) leftAdjustment = margin - diff;
     }
-    // Same calculation is done for the right barline, with it having two barline forms that we need to consider
-    // as opposed to only one for the left barline
+
+    // Similar calculation is done for the right barline, with it having two barline forms that we need to consider
+    // as opposed to only one for the left barline. Additionally, when we have spanning hairpins, correct barline should
+    // be selected - when processing start of the spanning hairpin, we should check for the last measure of the current
+    // system, instead of the endMeasure
     int rightAdjustment = 0;
-    BarLine *rightBarline = endMeasure->GetRightBarLine();
+    BarLine *rightBarline = NULL;
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
+        rightBarline = endMeasure->GetRightBarLine();
+    }
+    else if (spanningType == SPANNING_START) {
+        System *startSystem = vrv_cast<System *>(GetStart()->GetFirstAncestor(SYSTEM));
+        if (startSystem) {
+            ClassIdComparison cmp(MEASURE);
+            Measure *measure
+                = vrv_cast<Measure *>(startSystem->FindDescendantByComparison(&cmp, UNLIMITED_DEPTH, BACKWARD));
+            if (measure) rightBarline = measure->GetRightBarLine();
+        }
+    }
     if (rightBarline) {
         int margin = doubleUnit;
         const int rightBarlineX = rightBarline->GetDrawingX();
@@ -207,21 +226,21 @@ int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
 
     for (auto &dynam : params->m_dynams) {
         if ((dynam->GetStart() == this->GetStart()) && (dynam->GetStaff() == this->GetStaff())) {
-            if (!this->m_leftLink) this->SetLeftLink(dynam);
+            if (!m_leftLink) this->SetLeftLink(dynam);
         }
         else if ((dynam->GetStart() == this->GetEnd()) && (dynam->GetStaff() == this->GetStaff())) {
-            if (!this->m_rightLink) this->SetRightLink(dynam);
+            if (!m_rightLink) this->SetRightLink(dynam);
         }
     }
 
     for (auto &hairpin : params->m_hairpins) {
         if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!this->m_leftLink) this->SetLeftLink(hairpin);
+            if (!m_leftLink) this->SetLeftLink(hairpin);
             if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
         }
         if ((hairpin->GetStart() == this->GetEnd()) && (hairpin->GetStaff() == this->GetStaff())) {
             if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(this);
-            if (!this->m_rightLink) this->SetRightLink(hairpin);
+            if (!m_rightLink) this->SetRightLink(hairpin);
         }
     }
 

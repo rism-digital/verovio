@@ -1,5 +1,6 @@
 ---
 Language:        Cpp
+Standard: Cpp11
 # BasedOnStyle:  WebKit
 AccessModifierOffset: -4
 AlignAfterOpenBracket: false
@@ -49,7 +50,6 @@ PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Right
 SpacesBeforeTrailingComments: 1
 Cpp11BracedListStyle: false
-Standard:        Cpp03
 IndentWidth:     4
 TabWidth:        8
 UseTab:          Never

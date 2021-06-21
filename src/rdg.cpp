@@ -21,6 +21,8 @@ namespace vrv {
 // Rdg
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Rdg> s_factory("rdg", RDG);
+
 Rdg::Rdg() : EditorialElement("rdg-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);

@@ -173,6 +173,7 @@ public:
         m_directionBias = 0;
         m_overlapMargin = 0;
         m_doc = doc;
+        m_isOtherLayer = false;
     }
 
     Object *m_beam;
@@ -181,6 +182,7 @@ public:
     int m_directionBias;
     int m_overlapMargin;
     Doc *m_doc;
+    bool m_isOtherLayer;
 };
 
 //----------------------------------------------------------------------------
@@ -223,6 +225,36 @@ public:
     std::list<Artic *> m_articBelow;
     LayerElement *m_parent;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustDotsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the list of staffN in the top-level scoreDef
+ * member 1: the list of all elements (except for dots) in for the alignment in the staff
+ * member 2: the list of all dots in for the alignment in the staff
+ * member 3: the Doc
+ * member 4: the Functor for redirection to the MeasureAligner
+ * member 5: the end Functor for redirection
+ **/
+
+class AdjustDotsParams : public FunctorParams {
+public:
+    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    {
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+        m_staffNs = staffNs;
+    }
+    std::vector<int> m_staffNs;
+    std::vector<LayerElement *> m_elements;
+    std::vector<LayerElement *> m_dots;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -413,6 +445,7 @@ public:
         m_functor = functor;
         m_staffNs = staffNs;
         m_unison = false;
+        m_ignoreDots = true;
     }
     std::vector<int> m_staffNs;
     int m_currentLayerN;
@@ -423,6 +456,7 @@ public:
     Doc *m_doc;
     Functor *m_functor;
     bool m_unison;
+    bool m_ignoreDots;
 };
 
 //----------------------------------------------------------------------------
@@ -580,6 +614,29 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustXPosAlignmentOffset
+//----------------------------------------------------------------------------
+// Class to hold information about alignment, possible offset and overlapping bounding box. This is a helper class to be
+// used solely with AdjustXPosParams to store information regarding current/previous alignment that are being processed
+class AdjustXPosAlignmentOffset {
+public:
+    AdjustXPosAlignmentOffset() : m_offset(0), m_overlappingBB(NULL){};
+
+    void Reset()
+    {
+        m_alignment = NULL;
+        m_offset = 0;
+        m_overlappingBB = NULL;
+    }
+
+public:
+    // data members
+    Alignment *m_alignment;
+    int m_offset;
+    BoundingBox *m_overlappingBB;
+};
+
+//----------------------------------------------------------------------------
 // AdjustXPosParams
 //----------------------------------------------------------------------------
 
@@ -595,6 +652,8 @@ public:
  * member 8: the Doc
  * member 9: the Functor for redirection to the MeasureAligner
  * member 10: the end Functor for redirection
+ * member 11: current aligner that is being processed
+ * member 12: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -619,9 +678,13 @@ public:
     std::vector<int> m_staffNs;
     std::vector<BoundingBox *> m_boundingBoxes;
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
+    std::vector<ClassId> m_includes;
+    std::vector<ClassId> m_excludes;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
+    AdjustXPosAlignmentOffset m_currentAlignment;
+    AdjustXPosAlignmentOffset m_previousAlignment;
 };
 
 //----------------------------------------------------------------------------
@@ -1009,7 +1072,8 @@ public:
  * member 1: a pointer the document we are adding pages to
  * member 2: a pointer to the current page
  * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
- * member 4: the page height
+ * members 4-8: the page heights
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffPagesParams : public FunctorParams {
@@ -1025,6 +1089,7 @@ public:
         m_pgFootHeight = 0;
         m_pgHead2Height = 0;
         m_pgFoot2Height = 0;
+        m_leftoverSystem = NULL;
     }
     Page *m_contentPage;
     Doc *m_doc;
@@ -1035,6 +1100,7 @@ public:
     int m_pgFootHeight;
     int m_pgHead2Height;
     int m_pgFoot2Height;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1051,6 +1117,7 @@ public:
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
  * member 8: whether to smartly use encoded system breaks
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffSystemsParams : public FunctorParams {
@@ -1065,6 +1132,7 @@ public:
         m_currentScoreDefWidth = 0;
         m_doc = doc;
         m_smart = smart;
+        m_leftoverSystem = NULL;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -1075,6 +1143,7 @@ public:
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
     bool m_smart;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1112,21 +1181,7 @@ public:
 class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
-    std::vector<Artic *> m_articsToConvert;
-};
-
-//----------------------------------------------------------------------------
-// ConvertScoreDefMarkupParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating whereas the conversion is permanent of not
- **/
-
-class ConvertScoreDefMarkupParams : public FunctorParams {
-public:
-    ConvertScoreDefMarkupParams(bool permanent) { m_permanent = permanent; }
-    bool m_permanent;
+    std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
 };
 
 //----------------------------------------------------------------------------
@@ -1404,11 +1459,22 @@ public:
 //----------------------------------------------------------------------------
 
 /**
+ * Helper struct to store note sequences which replace notes in MIDI output due to expanded ornaments and tremolandi
+ */
+struct MIDINote {
+    char pitch;
+    double duration;
+};
+
+using MIDINoteSequence = std::list<MIDINote>;
+
+/**
  * member 0: MidiFile*: the MidiFile we are writing to
  * member 1: int: the midi track number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
  * member 5: int with the current tempo
+ * member 6: expanded notes due to ornaments and tremolandi
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1429,6 +1495,7 @@ public:
     double m_totalTime;
     int m_transSemi;
     int m_currentTempo;
+    std::map<Note *, MIDINoteSequence> m_expandedNotes;
     Functor *m_functor;
 };
 
@@ -1456,8 +1523,8 @@ public:
         m_functor = functor;
     }
     std::map<double, double> realTimeToScoreTime;
-    std::map<double, std::vector<std::string> > realTimeToOnElements;
-    std::map<double, std::vector<std::string> > realTimeToOffElements;
+    std::map<double, std::vector<std::string>> realTimeToOnElements;
+    std::map<double, std::vector<std::string>> realTimeToOffElements;
     std::map<double, int> realTimeToTempo;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
@@ -1603,7 +1670,7 @@ public:
     }
     double m_time;
     double m_duration;
-    std::vector<int> m_layers;
+    std::set<int> m_layers;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;
@@ -1628,12 +1695,14 @@ public:
     {
         m_time = 0.0;
         m_duration = 0.0;
+        m_allLayersButCurrent = false;
         m_meterSig = meterSig;
         m_mensur = mensur;
         m_layer = layer;
     }
     double m_time;
     double m_duration;
+    bool m_allLayersButCurrent;
     ListOfObjects m_elements;
     MeterSig *m_meterSig;
     Mensur *m_mensur;

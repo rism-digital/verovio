@@ -52,17 +52,17 @@ std::string Att::VUToStr(data_VU data) const
 
 // Basic converters for reading
 
-double Att::StrToDbl(std::string value) const
+double Att::StrToDbl(const std::string &value) const
 {
     return atof(value.c_str());
 }
 
-int Att::StrToInt(std::string value) const
+int Att::StrToInt(const std::string &value) const
 {
     return atoi(value.c_str());
 }
 
-data_VU Att::StrToVU(std::string value, bool logWarning) const
+data_VU Att::StrToVU(const std::string &value, bool logWarning) const
 {
     std::regex test("[0-9]*(\\.[0-9]+)?(vu)?");
     if (!std::regex_match(value, test)) {
@@ -84,7 +84,7 @@ std::string Att::ArticulationListToStr(data_ARTICULATION_List data) const
     return ss.str();
 }
 
-data_ARTICULATION_List Att::StrToArticulationList(std::string value, bool logWarning) const
+data_ARTICULATION_List Att::StrToArticulationList(const std::string &value, bool logWarning) const
 {
     data_ARTICULATION_List list;
     std::istringstream iss(value);
@@ -113,7 +113,7 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
     return value;
 }
 
-data_BEATRPT_REND Att::StrToBeatrptRend(std::string value, bool logWarning) const
+data_BEATRPT_REND Att::StrToBeatrptRend(const std::string &value, bool logWarning) const
 {
     if (value == "1") return BEATRPT_REND_1;
     if (value == "2") return BEATRPT_REND_2;
@@ -158,7 +158,7 @@ std::string Att::DurationToStr(data_DURATION data) const
     return value;
 }
 
-data_DURATION Att::StrToDuration(std::string value, bool logWarning) const
+data_DURATION Att::StrToDuration(const std::string &value, bool logWarning) const
 {
     if (value == "maxima") return DURATION_maxima;
     if (value == "longa") return DURATION_longa;
@@ -236,7 +236,7 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
     return value;
 }
 
-data_FONTSIZE Att::StrToFontsize(std::string value, bool logWarning) const
+data_FONTSIZE Att::StrToFontsize(const std::string &value, bool logWarning) const
 {
     data_FONTSIZE data;
     data.SetFontSizeNumeric(StrToFontsizenumeric(value, false));
@@ -262,7 +262,7 @@ std::string Att::LinewidthToStr(data_LINEWIDTH data) const
     return value;
 }
 
-data_LINEWIDTH Att::StrToLinewidth(std::string value, bool logWarning) const
+data_LINEWIDTH Att::StrToLinewidth(const std::string &value, bool logWarning) const
 {
     data_LINEWIDTH data;
     data.SetLineWidthTerm(StrToLinewidthterm(value, false));
@@ -280,7 +280,7 @@ std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
     return StringFormat("%.2fpt", data);
 }
 
-data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarning) const
+data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool logWarning) const
 {
     std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
     if (!std::regex_match(value, test)) {
@@ -307,7 +307,7 @@ std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
     return value;
 }
 
-data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) const
+data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarning) const
 {
     int alterationNumber = 0;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
@@ -370,7 +370,7 @@ std::string Att::MidivalueNameToStr(data_MIDIVALUE_NAME data) const
     return value;
 }
 
-data_MIDIVALUE_NAME Att::StrToMidivalueName(std::string value, bool logWarning) const
+data_MIDIVALUE_NAME Att::StrToMidivalueName(const std::string &value, bool logWarning) const
 {
     data_MIDIVALUE_NAME data;
     data.SetMidivalue(StrToMidivalue(value));
@@ -394,7 +394,7 @@ std::string Att::MidivaluePanToStr(data_MIDIVALUE_PAN data) const
     return value;
 }
 
-data_MIDIVALUE_PAN Att::StrToMidivaluePan(std::string value, bool logWarning) const
+data_MIDIVALUE_PAN Att::StrToMidivaluePan(const std::string &value, bool logWarning) const
 {
     data_MIDIVALUE_PAN data;
     data.SetMidivalue(StrToMidivalue(value));
@@ -421,11 +421,11 @@ std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
     return value;
 }
 
-data_MODUSMAIOR Att::StrToModusmaior(std::string value, bool logWarning) const
+data_MODUSMAIOR Att::StrToModusmaior(const std::string &value, bool logWarning) const
 {
     if (value == "2") return MODUSMAIOR_2;
     if (value == "3") return MODUSMAIOR_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MODUSMAIOR '%s'", value.c_str());
     return MODUSMAIOR_NONE;
 }
 
@@ -436,18 +436,18 @@ std::string Att::ModusminorToStr(data_MODUSMINOR data) const
         case MODUSMINOR_2: value = "2"; break;
         case MODUSMINOR_3: value = "3"; break;
         default:
-            LogWarning("Unknown modusmaior '%d'", data);
+            LogWarning("Unknown modusminor '%d'", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_MODUSMINOR Att::StrToModusminor(std::string value, bool logWarning) const
+data_MODUSMINOR Att::StrToModusminor(const std::string &value, bool logWarning) const
 {
     if (value == "2") return MODUSMINOR_2;
     if (value == "3") return MODUSMINOR_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MODUSMINOR '%s'", value.c_str());
     return MODUSMINOR_NONE;
 }
 
@@ -466,12 +466,12 @@ std::string Att::OctaveDisToStr(data_OCTAVE_DIS data) const
     return value;
 }
 
-data_OCTAVE_DIS Att::StrToOctaveDis(std::string value, bool logWarning) const
+data_OCTAVE_DIS Att::StrToOctaveDis(const std::string &value, bool logWarning) const
 {
     if (value == "8") return OCTAVE_DIS_8;
     if (value == "15") return OCTAVE_DIS_15;
     if (value == "22") return OCTAVE_DIS_22;
-    if (logWarning && !value.empty()) LogWarning("Unsupported octave dis '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.OCTAVE.DIS '%s'", value.c_str());
     return OCTAVE_DIS_NONE;
 }
 
@@ -490,12 +490,12 @@ std::string Att::OrientationToStr(data_ORIENTATION data) const
     return value;
 }
 
-data_ORIENTATION Att::StrToOrientation(std::string value, bool logWarning) const
+data_ORIENTATION Att::StrToOrientation(const std::string &value, bool logWarning) const
 {
     if (value == "reversed") return ORIENTATION_reversed;
     if (value == "90CW") return ORIENTATION_90CW;
     if (value == "90CCW") return ORIENTATION_90CCW;
-    if (logWarning && !value.empty()) LogWarning("Unsupported orientation '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.ORIENTATION '%s'", value.c_str());
     return ORIENTATION_NONE;
 }
 
@@ -504,7 +504,7 @@ std::string Att::PercentToStr(data_PERCENT data) const
     return StringFormat("%.2f%%", data);
 }
 
-data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
+data_PERCENT Att::StrToPercent(const std::string &value, bool logWarning) const
 {
     std::regex test("[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
@@ -519,7 +519,7 @@ std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
     return StringFormat("%.2f%%", data);
 }
 
-data_PERCENT_LIMITED Att::StrToPercentLimited(std::string value, bool logWarning) const
+data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool logWarning) const
 {
     std::regex test("[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
@@ -534,7 +534,7 @@ std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) con
     return StringFormat("%.2f%%", data);
 }
 
-data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(std::string value, bool logWarning) const
+data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &value, bool logWarning) const
 {
     std::regex test("(+|-)?[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
@@ -563,7 +563,7 @@ std::string Att::PitchnameToStr(data_PITCHNAME data) const
     return value;
 }
 
-data_PITCHNAME Att::StrToPitchname(std::string value, bool logWarning) const
+data_PITCHNAME Att::StrToPitchname(const std::string &value, bool logWarning) const
 {
     if (value == "c") return PITCHNAME_c;
     if (value == "d") return PITCHNAME_d;
@@ -572,7 +572,7 @@ data_PITCHNAME Att::StrToPitchname(std::string value, bool logWarning) const
     if (value == "g") return PITCHNAME_g;
     if (value == "a") return PITCHNAME_a;
     if (value == "b") return PITCHNAME_b;
-    if (logWarning && !value.empty()) LogWarning("Unsupported pitch name '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.PITCHNAME '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 
@@ -589,7 +589,7 @@ std::string Att::PlacementToStr(data_PLACEMENT data) const
     return value;
 }
 
-data_PLACEMENT Att::StrToPlacement(std::string value, bool logWarning) const
+data_PLACEMENT Att::StrToPlacement(const std::string &value, bool logWarning) const
 {
     data_PLACEMENT data;
     data.SetStaffRel(StrToStaffrel(value, false));
@@ -619,12 +619,33 @@ std::string Att::ProlatioToStr(data_PROLATIO data) const
     return value;
 }
 
-data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
+data_PROLATIO Att::StrToProlatio(const std::string &value, bool logWarning) const
 {
     if (value == "2") return PROLATIO_2;
     if (value == "3") return PROLATIO_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported prolatio '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.PROLATIO '%s'", value.c_str());
     return PROLATIO_NONE;
+}
+
+std::string Att::SummandListToStr(data_SUMMAND_List data) const
+{
+    std::ostringstream ss;
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (i != 0) ss << "+";
+        ss << data[i];
+    }
+    return ss.str();
+}
+
+data_SUMMAND_List Att::StrToSummandList(std::string value) const
+{
+    data_SUMMAND_List list;
+    std::istringstream iss(value);
+    std::string token;
+    while (std::getline(iss, token, '+')) {
+        list.push_back(atoi(token.c_str()));
+    }
+    return list;
 }
 
 std::string Att::TempusToStr(data_TEMPUS data) const
@@ -641,11 +662,11 @@ std::string Att::TempusToStr(data_TEMPUS data) const
     return value;
 }
 
-data_TEMPUS Att::StrToTempus(std::string value, bool logWarning) const
+data_TEMPUS Att::StrToTempus(const std::string &value, bool logWarning) const
 {
     if (value == "2") return TEMPUS_2;
     if (value == "3") return TEMPUS_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported tempus '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.TEMPUS '%s'", value.c_str());
     return TEMPUS_NONE;
 }
 
@@ -664,12 +685,12 @@ std::string Att::TieToStr(data_TIE data) const
     return value;
 }
 
-data_TIE Att::StrToTie(std::string value, bool logWarning) const
+data_TIE Att::StrToTie(const std::string &value, bool logWarning) const
 {
     if (value == "i") return TIE_i;
     if (value == "m") return TIE_m;
     if (value == "t") return TIE_t;
-    if (logWarning && !value.empty()) LogWarning("Unsupported tie '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.TIE '%s'", value.c_str());
     return TIE_NONE;
 }
 
@@ -683,7 +704,7 @@ std::string Att::XsdAnyURIListToStr(xsdAnyURI_List data) const
     return ss.str();
 }
 
-xsdAnyURI_List Att::StrToXsdAnyURIList(std::string value) const
+xsdAnyURI_List Att::StrToXsdAnyURIList(const std::string &value) const
 {
     xsdAnyURI_List list;
     std::istringstream iss(value);
@@ -704,7 +725,7 @@ std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const
     return ss.str();
 }
 
-xsdPositiveInteger_List Att::StrToXsdPositiveIntegerList(std::string value) const
+xsdPositiveInteger_List Att::StrToXsdPositiveIntegerList(const std::string &value) const
 {
     xsdPositiveInteger_List list;
     std::istringstream iss(value);

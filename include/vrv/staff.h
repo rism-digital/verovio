@@ -21,6 +21,7 @@ class StaffAlignment;
 class StaffDef;
 class Syl;
 class TimeSpanningInterface;
+class Tuning;
 
 //----------------------------------------------------------------------------
 // Staff
@@ -91,6 +92,15 @@ public:
      * Looks for the parent system and its current drawing scoreDef
      */
     bool DrawingIsVisible();
+
+    /**
+     * @name Get notation type
+     */
+    ///@{
+    bool IsMensural();
+    bool IsNeume();
+    bool IsTablature();
+    ///@}
 
     /**
      * Return the index position of the staff in its measure parent
@@ -216,6 +226,11 @@ public:
      */
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.
@@ -250,6 +265,8 @@ public:
     int m_yAbs;
 
     StaffDef *m_drawingStaffDef;
+
+    Tuning *m_drawingTuning;
 
 private:
     /**
@@ -303,7 +320,7 @@ public:
     /**
      * A list of dashes relative to the staff position.
      */
-    std::list<std::pair<int, int> > m_dashes;
+    std::list<std::pair<int, int>> m_dashes;
 
 protected:
     //

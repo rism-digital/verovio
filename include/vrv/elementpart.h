@@ -41,9 +41,14 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
-    std::list<int> *GetDotLocsForStaff(Staff *staff);
+    std::set<int> GetDotLocsForStaff(Staff *staff) const;
+    std::set<int> &ModifyDotLocsForStaff(Staff *staff);
 
-    const MapOfDotLocs *GetMapOfDotLocs() const { return &m_dotLocsByStaff; }
+    const MapOfDotLocs &GetMapOfDotLocs() const { return m_dotLocsByStaff; }
+    void SetMapOfDotLocs(const MapOfDotLocs &dotLocs) { m_dotLocsByStaff = dotLocs; };
+
+    void IsAdjusted(bool isAdjusted) { m_isAdjusted = isAdjusted; }
+    bool IsAdjusted() const { return m_isAdjusted; }
 
     //----------//
     // Functors //
@@ -81,6 +86,8 @@ private:
      * A map of dot locations
      */
     MapOfDotLocs m_dotLocsByStaff;
+
+    bool m_isAdjusted;
 };
 
 //----------------------------------------------------------------------------
@@ -107,10 +114,10 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
-    wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir);
+    wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
 
-    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
-    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
+    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
+    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
 
     //----------//
     // Functors //
@@ -355,7 +362,7 @@ public:
     /**
      * Helper to adjust overlaping layers for stems
      */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+    int CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin);
 
     //----------//
     // Functors //

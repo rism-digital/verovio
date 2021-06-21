@@ -38,6 +38,8 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Layer> s_factory("layer", LAYER);
+
 Layer::Layer()
     : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
@@ -237,10 +239,10 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
         return STEMDIRECTION_NONE;
     }
     else {
-        if (this->m_crossStaffFromBelow) {
+        if (m_crossStaffFromBelow) {
             return (element->m_crossStaff) ? STEMDIRECTION_down : STEMDIRECTION_up;
         }
-        else if (this->m_crossStaffFromAbove) {
+        else if (m_crossStaffFromAbove) {
             return (element->m_crossStaff) ? STEMDIRECTION_up : STEMDIRECTION_down;
         }
         else {
@@ -285,7 +287,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     }
 }
 
-int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
+std::set<int> Layer::GetLayersNForTimeSpanOf(LayerElement *element)
 {
     assert(element);
 
@@ -303,10 +305,15 @@ int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
     // At this stage we have the parent or the cross-staff
     assert(staff);
 
-    return this->GetLayerCountInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+    return this->GetLayersNInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
 }
 
-int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff)
+int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
+{
+    return static_cast<int>(this->GetLayersNForTimeSpanOf(element).size());
+}
+
+std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, Measure *measure, int staff)
 {
     assert(measure);
 
@@ -322,18 +329,47 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
 
     measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
-    return (int)layerCountInTimeSpanParams.m_layers.size();
+    return layerCountInTimeSpanParams.m_layers;
 }
 
-ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
+int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff)
+{
+    return static_cast<int>(this->GetLayersNInTimeSpan(time, duration, measure, staff).size());
+}
+
+ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool excludeCurrent)
 {
     assert(element);
 
     Measure *measure = static_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
+    double time = 0.0;
+    double duration = 0.0;
     Alignment *alignment = element->GetAlignment();
-    assert(alignment);
+    // Get duration and time if element has alignment
+    if (alignment) {
+        time = alignment->GetTime();
+        duration = element->GetAlignmentDuration();
+    }
+    // If it is Beam, try to get alignments for first and last elements and calculate
+    // the duration of the beam based on those
+    else if (element->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(element);
+        const ArrayOfObjects *beamChildren = beam->GetList(beam);
+
+        LayerElement *first = vrv_cast<LayerElement *>(beamChildren->front());
+        LayerElement *last = vrv_cast<LayerElement *>(beamChildren->back());
+
+        if (!first || !last) return {};
+
+        time = first->GetAlignment()->GetTime();
+        double lastTime = last->GetAlignment()->GetTime();
+        duration = lastTime - time + last->GetAlignmentDuration();
+    }
+    else {
+        return {};
+    }
 
     Layer *layer = NULL;
     Staff *staff = element->GetCrossStaff(layer);
@@ -343,10 +379,11 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element)
     // At this stage we have the parent or the cross-staff
     assert(staff);
 
-    return GetLayerElementsInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+    return GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
 }
 
-ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Measure *measure, int staff)
+ListOfObjects Layer::GetLayerElementsInTimeSpan(
+    double time, double duration, Measure *measure, int staff, bool excludeCurrent)
 {
     assert(measure);
 
@@ -354,6 +391,7 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Me
     LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(GetCurrentMeterSig(), GetCurrentMensur(), this);
     layerElementsInTimeSpanParams.m_time = time;
     layerElementsInTimeSpanParams.m_duration = duration;
+    layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
 
     ArrayOfComparisons filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
@@ -403,20 +441,20 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     this->ResetStaffDefObjects();
 
     if (currentStaffDef->DrawClef()) {
-        this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-        this->m_staffDefClef->SetParent(this);
+        m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        m_staffDefClef->SetParent(this);
     }
     if (currentStaffDef->DrawKeySig()) {
-        this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-        this->m_staffDefKeySig->SetParent(this);
+        m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        m_staffDefKeySig->SetParent(this);
     }
     if (currentStaffDef->DrawMensur()) {
-        this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-        this->m_staffDefMensur->SetParent(this);
+        m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        m_staffDefMensur->SetParent(this);
     }
     if (currentStaffDef->DrawMeterSig()) {
-        this->m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
-        this->m_staffDefMeterSig->SetParent(this);
+        m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        m_staffDefMeterSig->SetParent(this);
     }
 
     // Don't draw on the next one
@@ -434,21 +472,21 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     }
 
     if (currentStaffDef->DrawClef()) {
-        this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-        this->m_cautionStaffDefClef->SetParent(this);
+        m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        m_cautionStaffDefClef->SetParent(this);
     }
     // special case - see above
     if (currentStaffDef->DrawKeySig()) {
-        this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-        this->m_cautionStaffDefKeySig->SetParent(this);
+        m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        m_cautionStaffDefKeySig->SetParent(this);
     }
     if (currentStaffDef->DrawMensur()) {
-        this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-        this->m_cautionStaffDefMensur->SetParent(this);
+        m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        m_cautionStaffDefMensur->SetParent(this);
     }
     if (currentStaffDef->DrawMeterSig()) {
-        this->m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
-        this->m_cautionStaffDefMeterSig->SetParent(this);
+        m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        m_cautionStaffDefMeterSig->SetParent(this);
     }
 
     // Don't draw on the next one
@@ -461,6 +499,19 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
+
+int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
+    assert(params);
+
+    for (auto &[parent, artic] : params->m_articPairsToConvert) {
+        artic->SplitMultival(parent);
+    }
+    params->m_articPairsToConvert.clear();
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
@@ -659,8 +710,8 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 
 int Layer::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_crossStaffFromBelow = false;
-    this->m_crossStaffFromAbove = false;
+    m_crossStaffFromBelow = false;
+    m_crossStaffFromAbove = false;
     return FUNCTOR_CONTINUE;
 }
 

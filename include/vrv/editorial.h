@@ -61,11 +61,6 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
-
-    /**
      * See Object::ConvertToPageBased
      */
     virtual int ConvertToPageBased(FunctorParams *functorParams);

@@ -31,6 +31,8 @@ namespace vrv {
 // Verse
 //----------------------------------------------------------------------------
 
+static ClassRegistrar<Verse> s_factory("verse", VERSE);
+
 Verse::Verse() : LayerElement("verse-"), AttColor(), AttLang(), AttNInteger(), AttTypography()
 {
     RegisterAttClass(ATT_COLOR);
@@ -81,7 +83,7 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
     int nextFreeSpace = 0;
 
     if (overlap > 0) {
-        // We have enough space to absorb the overla completely
+        // We have enough space to absorb the overlay completely
         if (freeSpace > overlap) {
             this->SetDrawingXRel(this->GetDrawingXRel() - overlap);
             // The space is set to 0. This means that consecutive overlaps will not be recursively absorbed.
@@ -133,7 +135,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     }
 
     bool newLabelAbbr = false;
-    this->m_drawingLabelAbbr = NULL;
+    m_drawingLabelAbbr = NULL;
     // Find the labelAbbr (if none previously given)
     if (params->m_currentLabelAbbr == NULL) {
         params->m_currentLabelAbbr = dynamic_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR));
@@ -185,7 +187,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
         params->m_lastSyl = lastSyl;
 
         if (!newLabelAbbr && params->m_currentLabelAbbr) {
-            this->m_drawingLabelAbbr = params->m_currentLabelAbbr;
+            m_drawingLabelAbbr = params->m_currentLabelAbbr;
         }
 
         // No free space because we never move the first one back

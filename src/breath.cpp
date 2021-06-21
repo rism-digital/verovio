@@ -21,11 +21,13 @@ namespace vrv {
 // Breath
 //----------------------------------------------------------------------------
 
-Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), AttPlacement()
+static ClassRegistrar<Breath> s_factory("breath", BREATH);
+
+Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
     Reset();
 }
@@ -37,7 +39,7 @@ void Breath::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
-    ResetPlacement();
+    ResetPlacementRelStaff();
 }
 
 } // namespace vrv

@@ -67,7 +67,7 @@ void LinkingInterface::SetUuidStr()
 Measure *LinkingInterface::GetNextMeasure()
 {
     if (!m_next) return NULL;
-    return dynamic_cast<Measure *>(this->m_next->GetFirstAncestor(MEASURE));
+    return dynamic_cast<Measure *>(m_next->GetFirstAncestor(MEASURE));
 }
 
 //----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
     FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
-    // Only Dir and Dynam can be spanning with @next (extender)
+    // Only dir and dynam can be spanning with @next (extender)
     if (!object->Is({ DIR, DYNAM })) {
         return FUNCTOR_CONTINUE;
     }

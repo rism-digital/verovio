@@ -572,6 +572,9 @@
             <!--<glyph glyph-code="E22F" smufl-name="tremoloDivisiDots3"/>-->
             <!--<glyph glyph-code="E230" smufl-name="tremoloDivisiDots4"/>-->
             <!--<glyph glyph-code="E231" smufl-name="tremoloDivisiDots6"/>-->
+            <!--<glyph glyph-code="E232" smufl-name="stockhausenTremolo"/>-->
+            <!--<glyph glyph-code="E233" smufl-name="oneHandedRollStevens"/>-->
+            <!--<glyph glyph-code="E234" smufl-name="doubleLateralRollStevens"/>-->
             <range_end>U+E23F</range_end>
             <range_start>U+E220</range_start>
         </tremolos>
@@ -1004,13 +1007,13 @@
         </herculeanSagittalExtensionVeryHighPrecisionAccidentalDiacritics>
         <olympianSagittalExtensionExtremePrecisionAccidentalDiacritics>
             <description>Olympian Sagittal extension (extreme precision) accidental diacritics</description>
-            <range_end>U+E40F</range_end>
-            <range_start>U+E400</range_start>
+            <range_end>U+E3F7</range_end>
+            <range_start>U+E3F4</range_start>
         </olympianSagittalExtensionExtremePrecisionAccidentalDiacritics>
         <magratheanSagittalExtensionInsanePrecisionAccidentalDiacritics>
             <description>Magrathean Sagittal extension (insane precision) accidental diacritics</description>
             <range_end>U+E41F</range_end>
-            <range_start>U+E410</range_start>
+            <range_start>U+E3F8</range_start>
         </magratheanSagittalExtensionInsanePrecisionAccidentalDiacritics>
         <wyschnegradskyAccidentals72Edo>
             <description>Wyschnegradsky accidentals (72-EDO)</description>
@@ -1190,10 +1193,11 @@
             <!--<glyph glyph-code="E4EF" smufl-name="restHBarLeft"/>-->
             <!--<glyph glyph-code="E4F0" smufl-name="restHBarMiddle"/>-->
             <!--<glyph glyph-code="E4F1" smufl-name="restHBarRight"/>-->
-            <!--<glyph glyph-code="E4F2" smufl-name="restQuarterOld"/>-->
+            <glyph glyph-code="E4F2" smufl-name="restQuarterOld"/>
             <!--<glyph glyph-code="E4F3" smufl-name="restDoubleWholeLegerLine"/>-->
             <!--<glyph glyph-code="E4F4" smufl-name="restWholeLegerLine"/>-->
             <!--<glyph glyph-code="E4F5" smufl-name="restHalfLegerLine"/>-->
+            <glyph glyph-code="E4F6" smufl-name="restQuarterZ"/>
             <range_end>U+E4FF</range_end>
             <range_start>U+E4E0</range_start>
         </rests>
@@ -1202,6 +1206,9 @@
             <glyph glyph-code="E500" smufl-name="repeat1Bar"/>
             <glyph glyph-code="E501" smufl-name="repeat2Bars"/>
             <glyph glyph-code="E502" smufl-name="repeat4Bars"/>
+            <!--<glyph glyph-code="E503" smufl-name="repeatBarUpperDot"/>-->
+            <!--<glyph glyph-code="E504" smufl-name="repeatBarSlash"/>-->
+            <!--<glyph glyph-code="E505" smufl-name="repeatBarLowerDot"/>-->
             <range_end>U+E50F</range_end>
             <range_start>U+E500</range_start>
         </barRepeats>
@@ -1219,6 +1226,10 @@
             <glyph glyph-code="E519" smufl-name="ventiduesimaBassa"/>
             <glyph glyph-code="E51A" smufl-name="octaveParensLeft"/>
             <glyph glyph-code="E51B" smufl-name="octaveParensRight"/>
+            <glyph glyph-code="E51C" smufl-name="ottavaBassaVb"/>
+            <glyph glyph-code="E51D" smufl-name="quindicesimaBassaMb"/>
+            <glyph glyph-code="E51E" smufl-name="ventiduesimaBassaMb"/>
+            <!--<glyph glyph-code="E51F" smufl-name="octaveParensRight"/>-->
             <range_end>U+E51F</range_end>
             <range_start>U+E510</range_start>
         </octaves>
@@ -1285,8 +1296,8 @@
             <glyph glyph-code="E569" smufl-name="ornamentTurnSlash"/>
             <glyph glyph-code="E56A" smufl-name="ornamentTurnUp"/>
             <glyph glyph-code="E56B" smufl-name="ornamentTurnUpS"/>
-            <glyph glyph-code="E56C" smufl-name="ornamentMordent"/>
-            <glyph glyph-code="E56D" smufl-name="ornamentMordentInverted"/>
+            <glyph glyph-code="E56C" smufl-name="ornamentShortTrill"/>
+            <glyph glyph-code="E56D" smufl-name="ornamentMordent"/>
             <glyph glyph-code="E56E" smufl-name="ornamentTremblement"/>
             <glyph glyph-code="E56F" smufl-name="ornamentHaydn"/>
             <range_end>U+E56F</range_end>
@@ -1477,15 +1488,15 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         </stringTechniques>
         <pluckedTechniques>
             <description>Plucked techniques</description>
-            <!--<glyph glyph-code="E630" smufl-name="pluckedSnapPizzicatoBelow"/>-->
-            <!--<glyph glyph-code="E631" smufl-name="pluckedSnapPizzicatoAbove"/>-->
-            <!--<glyph glyph-code="E632" smufl-name="pluckedBuzzPizzicato"/>-->
-            <!--<glyph glyph-code="E633" smufl-name="pluckedLeftHandPizzicato"/>-->
+            <glyph glyph-code="E630" smufl-name="pluckedSnapPizzicatoBelow"/>
+            <glyph glyph-code="E631" smufl-name="pluckedSnapPizzicatoAbove"/>
+            <glyph glyph-code="E632" smufl-name="pluckedBuzzPizzicato"/>
+            <glyph glyph-code="E633" smufl-name="pluckedLeftHandPizzicato"/>
             <!--<glyph glyph-code="E634" smufl-name="arpeggiatoUp"/>-->
             <!--<glyph glyph-code="E635" smufl-name="arpeggiatoDown"/>-->
             <!--<glyph glyph-code="E636" smufl-name="pluckedWithFingernails"/>-->
             <!--<glyph glyph-code="E637" smufl-name="pluckedFingernailFlick"/>-->
-            <!--<glyph glyph-code="E638" smufl-name="pluckedDamp"/>-->
+            <glyph glyph-code="E638" smufl-name="pluckedDamp"/>
             <!--<glyph glyph-code="E639" smufl-name="pluckedDampAll"/>-->
             <!--<glyph glyph-code="E63A" smufl-name="pluckedPlectrum"/>-->
             <!--<glyph glyph-code="E63B" smufl-name="pluckedDampOnStem"/>-->
@@ -1501,6 +1512,11 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <!--<glyph glyph-code="E644" smufl-name="vocalMouthPursed"/>-->
             <glyph glyph-code="E645" smufl-name="vocalSprechgesang"/>
             <!--<glyph glyph-code="E646" smufl-name="vocalsSussurando"/>-->
+            <!--<glyph glyph-code="E647" smufl-name="vocalNasalVoice"/>-->
+            <!--<glyph glyph-code="E648" smufl-name="vocalTongueClickStockhausen"/>-->
+            <!--<glyph glyph-code="E649" smufl-name="vocalFingerClickStockhausen"/>-->
+            <!--<glyph glyph-code="E64A" smufl-name="vocalTongueFingerClickStockhausen"/>-->
+            <!--<glyph glyph-code="E64B" smufl-name="vocalHalbGesungen"/>-->
             <range_end>U+E64F</range_end>
             <range_start>U+E640</range_start>
         </vocalTechniques>
@@ -2338,10 +2354,10 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         </medievalAndRenaissancePlainchantArticulations>
         <medievalAndRenaissanceAccidentals>
             <description>Medieval and Renaissance accidentals</description>
-            <!--<glyph glyph-code="E9E0" smufl-name="medRenFlatSoftB"/>-->
-            <!--<glyph glyph-code="E9E1" smufl-name="medRenFlatHardB"/>-->
-            <!--<glyph glyph-code="E9E2" smufl-name="medRenNatural"/>-->
-            <!--<glyph glyph-code="E9E3" smufl-name="medRenSharpCroix"/>-->
+            <glyph glyph-code="E9E0" smufl-name="medRenFlatSoftB"/>
+            <glyph glyph-code="E9E1" smufl-name="medRenFlatHardB"/>
+            <glyph glyph-code="E9E2" smufl-name="medRenNatural"/>
+            <glyph glyph-code="E9E3" smufl-name="medRenSharpCroix"/>
             <!--<glyph glyph-code="E9E4" smufl-name="medRenFlatWithDot"/>-->
             <!--<glyph glyph-code="E9E5" smufl-name="medRenNaturalWithCross"/>-->
             <range_end>U+E9EF</range_end>
@@ -2777,19 +2793,19 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         </renaissanceLuteTablature>
         <frenchAndEnglishRenaissanceLuteTablature>
             <description>French and English Renaissance lute tablature</description>
-            <!--<glyph glyph-code="EBC0" smufl-name="luteFrenchFretA"/>-->
-            <!--<glyph glyph-code="EBC1" smufl-name="luteFrenchFretB"/>-->
-            <!--<glyph glyph-code="EBC2" smufl-name="luteFrenchFretC"/>-->
-            <!--<glyph glyph-code="EBC3" smufl-name="luteFrenchFretD"/>-->
-            <!--<glyph glyph-code="EBC4" smufl-name="luteFrenchFretE"/>-->
-            <!--<glyph glyph-code="EBC5" smufl-name="luteFrenchFretF"/>-->
-            <!--<glyph glyph-code="EBC6" smufl-name="luteFrenchFretG"/>-->
-            <!--<glyph glyph-code="EBC7" smufl-name="luteFrenchFretH"/>-->
-            <!--<glyph glyph-code="EBC8" smufl-name="luteFrenchFretI"/>-->
-            <!--<glyph glyph-code="EBC9" smufl-name="luteFrenchFretK"/>-->
-            <!--<glyph glyph-code="EBCA" smufl-name="luteFrenchFretL"/>-->
-            <!--<glyph glyph-code="EBCB" smufl-name="luteFrenchFretM"/>-->
-            <!--<glyph glyph-code="EBCC" smufl-name="luteFrenchFretN"/>-->
+            <glyph glyph-code="EBC0" smufl-name="luteFrenchFretA"/>
+            <glyph glyph-code="EBC1" smufl-name="luteFrenchFretB"/>
+            <glyph glyph-code="EBC2" smufl-name="luteFrenchFretC"/>
+            <glyph glyph-code="EBC3" smufl-name="luteFrenchFretD"/>
+            <glyph glyph-code="EBC4" smufl-name="luteFrenchFretE"/>
+            <glyph glyph-code="EBC5" smufl-name="luteFrenchFretF"/>
+            <glyph glyph-code="EBC6" smufl-name="luteFrenchFretG"/>
+            <glyph glyph-code="EBC7" smufl-name="luteFrenchFretH"/>
+            <glyph glyph-code="EBC8" smufl-name="luteFrenchFretI"/>
+            <glyph glyph-code="EBC9" smufl-name="luteFrenchFretK"/>
+            <glyph glyph-code="EBCA" smufl-name="luteFrenchFretL"/>
+            <glyph glyph-code="EBCB" smufl-name="luteFrenchFretM"/>
+            <glyph glyph-code="EBCC" smufl-name="luteFrenchFretN"/>
             <!--<glyph glyph-code="EBCD" smufl-name="luteFrench7thCourse"/>-->
             <!--<glyph glyph-code="EBCE" smufl-name="luteFrench8thCourse"/>-->
             <!--<glyph glyph-code="EBCF" smufl-name="luteFrench9thCourse"/>-->

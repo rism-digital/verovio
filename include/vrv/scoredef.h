@@ -62,10 +62,10 @@ public:
      * @name Methods for checking the presence of clef, key signature, etc. information and getting them.
      */
     ///@{
-    bool HasClefInfo();
-    bool HasKeySigInfo();
-    bool HasMensurInfo();
-    bool HasMeterSigInfo();
+    bool HasClefInfo(int depth = 1);
+    bool HasKeySigInfo(int depth = 1);
+    bool HasMensurInfo(int depth = 1);
+    bool HasMeterSigInfo(int depth = 1);
     ///@}
 
     /**
@@ -111,7 +111,8 @@ class ScoreDef : public ScoreDefElement,
                  public ObjectListInterface,
                  public AttDistances,
                  public AttEndings,
-                 public AttOptimization {
+                 public AttOptimization,
+                 public AttTimeBase {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -218,6 +219,7 @@ private:
     //
 public:
     bool m_setAsDrawing;
+    bool m_insertScoreDef;
     //
 private:
     /** Flags for indicating whether labels need to be drawn or not */

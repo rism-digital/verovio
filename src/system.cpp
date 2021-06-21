@@ -141,7 +141,7 @@ int System::GetHeight() const
 int System::GetMinimumSystemSpacing(const Doc *doc) const
 {
     const auto &spacingSystem = doc->GetOptions()->m_spacingSystem;
-    if (!spacingSystem.isSet()) {
+    if (!spacingSystem.IsSet()) {
         assert(m_drawingScoreDef);
         if (m_drawingScoreDef->HasSpacingSystem()) {
             return m_drawingScoreDef->GetSpacingSystem() * doc->GetDrawingUnit(100);
@@ -267,7 +267,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
 
-    if (object->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, PHRASE, OCTAVE, SLUR, SYL, TIE })) {
+    if (object->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, SYL, TIE })) {
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {
@@ -600,7 +600,7 @@ int System::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    SetDrawingXRel(this->m_systemLeftMar + this->GetDrawingLabelsWidth());
+    SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
     params->m_shift = 0;
     params->m_justifiableWidth = 0;
 
@@ -637,7 +637,7 @@ int System::AlignSystems(FunctorParams *functorParams)
 
     params->m_justificationSum += m_systemAligner.GetJustificationSum(params->m_doc);
     if (!this->GetIdx()) {
-        // remove extra system justification factor to get exaclty (systemsCount-1)*justificationSystem
+        // remove extra system justification factor to get exactly (systemsCount-1)*justificationSystem
         params->m_justificationSum -= params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     }
 
@@ -657,7 +657,7 @@ int System::JustifyX(FunctorParams *functorParams)
     Object *parent = GetParent();
 
     params->m_measureXRel = 0;
-    int margins = this->m_systemLeftMar + this->m_systemRightMar;
+    int margins = m_systemLeftMar + m_systemRightMar;
     int nonJustifiableWidth
         = margins + (m_drawingTotalWidth - m_drawingJustifiableWidth); // m_drawingTotalWidth includes the labels
     params->m_justifiableRatio
@@ -880,12 +880,23 @@ int System::CastOffPages(FunctorParams *functorParams)
     const int childCount = params->m_currentPage->GetChildCount();
     if ((systemMaxPerPage && systemMaxPerPage == childCount)
         || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
-        params->m_currentPage = new Page();
-        // Use VRV_UNSET value as a flag
-        params->m_pgHeadHeight = VRV_UNSET;
-        assert(params->m_doc->GetPages());
-        params->m_doc->GetPages()->AddChild(params->m_currentPage);
-        params->m_shift = this->m_drawingYRel - params->m_pageHeight;
+        // If this is last system in the list, it doesn't fit the page and it's leftover system (has just one last
+        // measure) - get measure out of that system and try adding it to the previous system
+        Object *nextSystem = params->m_contentPage->GetNext(this, SYSTEM);
+        if ((NULL == nextSystem) && (this == params->m_leftoverSystem)) {
+            Measure *measure = dynamic_cast<Measure *>(Relinquish(GetFirst(MEASURE)->GetIdx()));
+            System *lastSystem = dynamic_cast<System *>(params->m_currentPage->GetLast());
+            if (measure && lastSystem) lastSystem->AddChild(measure);
+            return FUNCTOR_SIBLINGS;
+        }
+        else {
+            params->m_currentPage = new Page();
+            // Use VRV_UNSET value as a flag
+            params->m_pgHeadHeight = VRV_UNSET;
+            assert(params->m_doc->GetPages());
+            params->m_doc->GetPages()->AddChild(params->m_currentPage);
+            params->m_shift = this->m_drawingYRel - params->m_pageHeight;
+        }
     }
 
     // Special case where we use the Relinquish method.
@@ -904,7 +915,7 @@ int System::UnCastOff(FunctorParams *functorParams)
     UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
     assert(params);
 
-    // Just move all the content of the system to the continous one (parameter)
+    // Just move all the content of the system to the continuous one (parameter)
     // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
     params->m_currentSystem->MoveChildrenFrom(this);

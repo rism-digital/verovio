@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <numeric>
 
 //----------------------------------------------------------------------------
 
@@ -22,6 +23,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // MeterSig
 //----------------------------------------------------------------------------
+
+static ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
 MeterSig::MeterSig() : LayerElement("msig-"), AttMeterSigLog(), AttMeterSigVis()
 {
@@ -38,6 +41,12 @@ void MeterSig::Reset()
     LayerElement::Reset();
     ResetMeterSigLog();
     ResetMeterSigVis();
+}
+
+int MeterSig::GetTotalCount() const
+{
+    const data_SUMMAND_List &summands = this->GetCount();
+    return std::accumulate(summands.cbegin(), summands.cend(), 0);
 }
 
 //----------------------------------------------------------------------------

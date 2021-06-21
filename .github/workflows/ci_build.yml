@@ -15,7 +15,7 @@ on:
 # globals
 env:
   # general settings
-  MAIN_REPO_OWNER: rism-ch      # Main repo owner (default: rism-ch; should not be changed)
+  MAIN_REPO_OWNER: rism-digital # Main repo owner (default: rism-digital; should not be changed)
                                 # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
                                 # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
 
@@ -23,12 +23,12 @@ env:
                                 # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
                                 # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
                                 # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
-                                # Will be programmatically set to 'false' for rism-ch repo.
+                                # Will be programmatically set to 'false' for rism-digital repo.
 
   IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
                                 # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
                                 # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
-                                # Will be programmatically set to 'false' for rism-ch repo.
+                                # Will be programmatically set to 'false' for rism-digital repo.
 
   # build artifacts
   CLI_BUILD: cli-build
@@ -36,15 +36,15 @@ env:
   TOOLKIT_BUILD: toolkit-build
 
   # doxygen
-  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-ch and from forks
-  DOXYGEN_BRANCH: master
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-digital and from forks
+  DOXYGEN_BRANCH: develop
 
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: 'emsdk-cache'
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-ch and from forks
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-digital and from forks
   GH_PAGES_BRANCH: gh-pages
 
   # temporary directories
@@ -364,7 +364,7 @@ jobs:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
           # Deploy key as secret for accessing <owner>/<GH_PAGES_REPO>;
-          # cf. explanation in https://github.com/rism-ch/verovio/pull/1751
+          # cf. explanation in https://github.com/rism-digital/verovio/pull/1751
           ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY }}
           # ref (branch, tag or SHA) to check out
           ref: ${{ env.GH_PAGES_BRANCH }}
@@ -492,7 +492,7 @@ jobs:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
           # Deploy key as secret for accessing <owner>/<DOXYGEN_REPO>;
-          # cf. explanation in https://github.com/rism-ch/verovio/pull/1751
+          # cf. explanation in https://github.com/rism-digital/verovio/pull/1751
           ssh-key: ${{ secrets.GH_ACTIONS_DEPLOY_KEY_DOXYGEN }}
           # ref (branch, tag or SHA) to check out
           ref: ${{ env.DOXYGEN_BRANCH }}
