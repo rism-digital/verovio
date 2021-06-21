@@ -1748,6 +1748,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
+    // Nested aligment of bounding boxes is performed only when both the previous alignment and
+    // the current one allow it. For example, when one of them is a barline, we do not look how
+    // bounding boxes can be nested but instead only look at the horizontal position
     bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
         && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
         && this->GetAlignment()->PerfomBoundingBoxAlignment());
@@ -1766,6 +1769,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingBoundingBoxes.push_back(this);
         params->m_currentAlignment.m_alignment = GetAlignment();
         selfLeft = this->GetSelfLeft();
+        // Here we look how bounding boxes overlap and adjust the position only when necessary
         if (performBoundingBoxAlignment) {
             int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
             int overlap = 0;
@@ -1782,6 +1786,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
             }
             offset -= overlap;
         }
+        // Otherwise only look at the horizontal position
         else {
             selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
         }
