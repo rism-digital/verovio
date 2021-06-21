@@ -171,7 +171,9 @@ bool Slur::AdjustSlurPosition(
 {
     bool isNotAdjustable = false;
     const int margin = doc->GetDrawingUnit(100);
-    auto [maxShiftLeft, maxShiftRight]
+    int maxShiftLeft = 0;
+    int maxShiftRight = 0;
+    std::tie(maxShiftLeft, maxShiftRight)
         = CalculateAdjustedSlurShift(curve, bezierCurve, margin, forceBothSides, isNotAdjustable);
     if (!maxShiftLeft && !maxShiftRight) return false;
 
@@ -204,7 +206,9 @@ bool Slur::AdjustSlurPosition(
             points[2] = bezierCurve.c2;
             points[3] = bezierCurve.p2;
             // Approximate bezier extrema and find time at which curve has highest/lowest Y value
-            const auto [time, yPos]
+            double time = 0.0;
+            int yPos = 0;
+            std::tie(time, yPos)
                 = BoundingBox::ApproximateBezierExtrema(points, (curve->GetDir() == curvature_CURVEDIR_above));
                         
             const double extremaShift = time - 0.5;

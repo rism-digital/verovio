@@ -52,8 +52,6 @@ public:
     curvature_CURVEDIR GetDrawingCurvedir() const { return m_drawingCurvedir; }
     void SetDrawingCurvedir(curvature_CURVEDIR curvedir) { m_drawingCurvedir = curvedir; }
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
-    //void IsCrossStaff(bool isCrossStaff) { m_isCrossStaff = isCrossStaff; }
-    //bool IsCrossStaff() const { return m_isCrossStaff; }
     ///@}
 
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
@@ -105,7 +103,6 @@ private:
      * This is not instantiated in Prepare::CrossStaff but in View::DrawSlurInitial
      * When set, the slur needs to be Re-drawn and re-adjusted after the vertical adjustment of the staves
      */
-    //bool m_isCrossStaff;
 };
 
 } // namespace vrv

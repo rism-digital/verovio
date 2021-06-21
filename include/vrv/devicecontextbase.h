@@ -17,6 +17,8 @@
 
 namespace vrv {
 
+class Doc;
+
 #define AxNONE -1
 #define AxWHITE 255 << 16 | 255 << 8 | 255
 #define AxBLACK 0
@@ -210,7 +212,6 @@ public:
  * Simple class for representing bezier cCurve
  */
 
-class Doc;
 class BezierCurve {
 public:
     Point p1; // start point
