@@ -146,6 +146,11 @@ public:
     bool HasGraceAligner(int id) const;
 
     /**
+     * Returns true for Alignment for which we want to do bounding box alignment
+     */
+    bool PerfomBoundingBoxAlignment() const;
+
+    /**
      * Return the AlignmentReference holding the element.
      * If staffN is provided, uses the AlignmentReference->GetN() to accelerate the search.
      */

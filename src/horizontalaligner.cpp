@@ -610,6 +610,11 @@ bool Alignment::HasGraceAligner(int id) const
     return (m_graceAligners.count(id) == 1);
 }
 
+bool Alignment::PerfomBoundingBoxAlignment() const
+{
+    return this->IsOfType({ALIGNMENT_ACCID, ALIGNMENT_DOT, ALIGNMENT_DEFAULT});
+}
+
 AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)
 {
     AlignmentReference *reference = NULL;
