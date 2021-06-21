@@ -13,7 +13,7 @@ Verovio is written in standard 2017 C++ and can be compiled as a standalone comm
 
 Verovio uses the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
-The project page is http://www.verovio.org. Verovio is available under the LGPL license (see [COPYING](https://github.com/rism-digital/verovio/blob/develop/COPYING) and [COPYING.LESSER](https://github.com/rism-digital/verovio/blob/develop/COPYING.LESSER)).
+The project page is https://www.verovio.org. Verovio is available under the LGPL license (see [COPYING](https://github.com/rism-digital/verovio/blob/develop/COPYING) and [COPYING.LESSER](https://github.com/rism-digital/verovio/blob/develop/COPYING.LESSER)).
 
 Building and use instructions by environment
 --------------------------------------------
