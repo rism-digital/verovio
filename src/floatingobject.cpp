@@ -334,26 +334,18 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         int minStaffDistance
             = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
         if (m_place == STAFFREL_above) {
-            yRel = GetContentY1();
+            yRel = this->GetContentY1();
             yRel -= doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
-            if (m_object->Is({ DIR, DYNAM })) {
-                SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
-            }
-            else {
-                SetDrawingYRel(yRel);
-                SetDrawingYRel(-minStaffDistance);
-            }
+            this->SetDrawingYRel(yRel);
+            this->SetDrawingYRel(m_object->GetMaxDrawingYRel());
+            this->SetDrawingYRel(-minStaffDistance);
         }
         else {
-            yRel = staffAlignment->GetStaffHeight() + GetContentY2();
+            yRel = staffAlignment->GetStaffHeight() + this->GetContentY2();
             yRel += doc->GetTopMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
-            if (m_object->Is({ DIR, DYNAM })) {
-                SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
-            }
-            else {
-                SetDrawingYRel(yRel);
-                SetDrawingYRel(minStaffDistance + staffAlignment->GetStaffHeight());
-            }
+            this->SetDrawingYRel(yRel);
+            this->SetDrawingYRel(m_object->GetMaxDrawingYRel());
+            this->SetDrawingYRel(minStaffDistance + staffAlignment->GetStaffHeight());
         }
     }
     else {
@@ -365,9 +357,9 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 
         if (m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-                int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
+                const int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
-                    SetDrawingYRel(GetDrawingYRel() - shift);
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
                 return true;
             }
@@ -376,46 +368,49 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 // whitespace. For such cases, DYNAM should be compared to individual elements of BEAM instead
                 return true;
             }
-            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + this->GetContentY1() - margin;
             
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            // For elements, that can have extender lines, we need to make sure that they continue in next system on the
+            // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (m_object->Is({ DIR, DYNAM })) {
                 if (m_object->GetMaxDrawingYRel() > yRel) m_object->SetMaxDrawingYRel(yRel);
-                SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
+                this->SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
             }
             // With LayerElement always move them up
             else if (object && object->IsLayerElement()) {
-                if (yRel < 0) SetDrawingYRel(yRel);
+                if (yRel < 0) this->SetDrawingYRel(yRel);
             }
-            // Otherwise only if the is a vertical overlap
-            else if (VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                SetDrawingYRel(yRel);
+            // Otherwise only if there is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
+                this->SetDrawingYRel(yRel);
             }
         }
         else {
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-                int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
+                const int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
-                    SetDrawingYRel(GetDrawingYRel() - shift);
-                    // LogDebug("Shift %d", shift);
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
                 return true;
             }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-                + GetContentY2() + margin;
-            
+                + this->GetContentY2() + margin;
+
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            // For elements, that can have extender lines, we need to make sure that they continue in next system on the
+            // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (m_object->Is({ DIR, DYNAM })) {
                 if (m_object->GetMaxDrawingYRel() < yRel) m_object->SetMaxDrawingYRel(yRel);
-                SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
+                this->SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
             }
             // With LayerElement always move them down
             else if (object && object->IsLayerElement()) {
-                if (yRel > 0) SetDrawingYRel(yRel);
+                if (yRel > 0) this->SetDrawingYRel(yRel);
             }
-            // Otherwise only if the is a vertical overlap
-            else if (VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                SetDrawingYRel(yRel);
+            // Otherwise only if there is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
+                this->SetDrawingYRel(yRel);
             }
         }
     }
