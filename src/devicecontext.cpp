@@ -15,10 +15,27 @@
 
 //----------------------------------------------------------------------------
 
+#include "boundingbox.h"
+#include "doc.h"
 #include "glyph.h"
 #include "vrv.h"
 
 namespace vrv {
+
+void BezierCurve::Rotate(float angle, const Point &rotationPoint)
+{
+    p1 = BoundingBox::CalcPositionAfterRotation(p1, angle, rotationPoint);
+    p2 = BoundingBox::CalcPositionAfterRotation(p2, angle, rotationPoint);
+    c1 = BoundingBox::CalcPositionAfterRotation(c1, angle, rotationPoint);
+    c2 = BoundingBox::CalcPositionAfterRotation(c2, angle, rotationPoint);
+}
+
+void BezierCurve::CalculateControlPointOffset(Doc *doc, int staffSize)
+{
+    m_rightControlPointOffset = std::min(
+        (p2.x - p1.x) / doc->GetOptions()->m_slurControlPoints.GetValue(), doc->GetDrawingStaffSize(staffSize));
+    m_leftControlPointOffset = m_rightControlPointOffset;
+}
 
 //----------------------------------------------------------------------------
 // DeviceContext

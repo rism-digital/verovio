@@ -855,7 +855,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         if (adjusted) {
             params->m_adjusted = true;
         }
-        if (slur->IsCrossStaff()) {
+        if (curve->IsCrossStaff()) {
             params->m_crossStaffSlurs = true;
         }
     }
