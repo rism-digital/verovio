@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Making Veroivo thread safe (@eNote-GmbH)
+* Improved rendering of cross-staff slurs (@eNote-GmbH)
 * Option --breaks-no-widow to prevent a single measure on last page (@eNote-GmbH)
 * Support for additive meters (@eNote-GmbH)
 * Improved octave line positions with `@endid` (@eNote-GmbH)
