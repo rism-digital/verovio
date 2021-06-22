@@ -169,6 +169,18 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
     this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
     int yRel = adjustTupletNumOverlapParams.m_yRel - yReference + numVerticalMargin;
 
+    // If yRel turns out to be too far from the tuplet - try to adjust it accordingly, aligning with the staff
+    // top/bottom sides, unless doing so will make tuplet number overlap
+    const int relevenatPosition = (m_drawingNumPos == STAFFREL_basic_above) ? GetContentTop() : GetContentBottom();
+    const int adjustedPosition
+        = (m_drawingNumPos == STAFFREL_basic_above) ? yReference : yReference - staffHeight;
+    if (((m_drawingNumPos == STAFFREL_basic_above) && (yRel > relevenatPosition)
+            && (adjustedPosition > relevenatPosition))
+        || ((m_drawingNumPos == STAFFREL_basic_below) && (yRel < relevenatPosition)
+            && (adjustedPosition < relevenatPosition))) {
+        yRel = adjustedPosition;
+    }
+
     // If we have a beam, see if we can move it to more appropriate postion
     Beam *beam = this->GetNumAlignedBeam();
     if (beam && !m_crossStaff) {
