@@ -97,12 +97,6 @@ private:
      * document is cast-off.
      */
     curvature_CURVEDIR m_drawingCurvedir;
-
-    /**
-     * A flag indicating that the slur is cross-staff.
-     * This is not instantiated in Prepare::CrossStaff but in View::DrawSlurInitial
-     * When set, the slur needs to be Re-drawn and re-adjusted after the vertical adjustment of the staves
-     */
 };
 
 } // namespace vrv
