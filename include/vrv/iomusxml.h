@@ -9,9 +9,9 @@
 #define __VRV_IOMUSXML_H__
 
 #include <map>
+#include <queue>
 #include <string>
 #include <vector>
-#include <queue>
 
 //----------------------------------------------------------------------------
 

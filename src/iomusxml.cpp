@@ -267,7 +267,7 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
         Layer *otherLayer = vrv_cast<Layer *>(listLayer);
         if (m_layerTimes.find(otherLayer) == m_layerTimes.end()) continue;
         // Get first element for the same (or higher if same is not present) duration
-        const auto start = m_layerTimes[otherLayer].lower_bound(scoreOnset);
+        const auto start = m_layerTimes.at(otherLayer).lower_bound(scoreOnset);
         // Add either clef or #sameas, depending on the layer we're adding to
         Clef *clefToAdd = NULL;
         if (listLayer == layer) {
@@ -280,24 +280,24 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
 
         // In case scoreOnset is 0 - add clef before the first element
         if (!scoreOnset) {
-             otherLayer->InsertBefore(start->second, clefToAdd);
-            m_layerTimes[otherLayer].emplace(scoreOnset, clefToAdd);
+            otherLayer->InsertBefore(start->second, clefToAdd);
+            m_layerTimes.at(otherLayer).emplace(scoreOnset, clefToAdd);
         }
         else {
             // If corresponding time couldn't be found (i.e. it's higher than any other duration in the layer) - add
             // clef to the end of the layer
-            if (start == m_layerTimes[otherLayer].end()) {
+            if (start == m_layerTimes.at(otherLayer).end()) {
                 otherLayer->AddChild(clefToAdd);
-                m_layerTimes[otherLayer].emplace(std::prev(m_layerTimes[otherLayer].end())->first, clefToAdd);
+                m_layerTimes.at(otherLayer).emplace(std::prev(m_layerTimes.at(otherLayer).end())->first, clefToAdd);
             }
             else {
                 // Always try to add clefs at the end of current duration, to honor their order in the musicxml
                 const int actualScoreOnSet = start->first;
-                auto end = m_layerTimes[otherLayer].upper_bound(actualScoreOnSet);
+                auto end = m_layerTimes.at(otherLayer).upper_bound(actualScoreOnSet);
                 LayerElement *layerElement = (--end)->second;
                 if (layerElement->GetParent()->Is(LAYER)) {
                     otherLayer->InsertAfter(layerElement, clefToAdd);
-                    m_layerTimes[otherLayer].emplace(actualScoreOnSet, clefToAdd);
+                    m_layerTimes.at(otherLayer).emplace(actualScoreOnSet, clefToAdd);
                 }
                 else if (layerElement->GetParent()->Is(BEAM)) {
                     layerElement->GetParent()->InsertAfter(layerElement, clefToAdd);
