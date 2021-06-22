@@ -65,7 +65,7 @@ private:
     // Static members //
     //----------------//
 
-    static pitchmap PitchMap[];
+    static const pitchmap PitchMap[];
 };
 
 #endif /* NO_DARMS_SUPPORT */

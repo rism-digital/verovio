@@ -44,7 +44,7 @@ namespace vrv {
 // Static members
 //----------------------------------------------------------------------------
 
-std::vector<void *> FloatingObject::s_drawingObjectIds;
+thread_local std::vector<void *> FloatingObject::s_drawingObjectIds;
 
 //----------------------------------------------------------------------------
 // FloatingObject
@@ -456,6 +456,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_angle = 0.0;
     m_thickness = 0;
     m_dir = curvature_CURVEDIR_NONE;
+    m_crossStaff = NULL;
     m_cachedMinMaxY = VRV_UNSET;
     ClearSpannedElements();
 }

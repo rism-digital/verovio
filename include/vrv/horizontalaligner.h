@@ -123,7 +123,7 @@ public:
     /**
      * Check if the element is of on of the types
      */
-    bool IsOfType(const std::vector<AlignmentType> &types);
+    bool IsOfType(const std::vector<AlignmentType> &types) const;
 
     /**
      * Retrive the minimum left and maximum right position for the objects in an alignment.
@@ -144,6 +144,11 @@ public:
      * Returns true if the aligner has a GraceAligner
      */
     bool HasGraceAligner(int id) const;
+
+    /**
+     * Returns true for Alignment for which we want to do bounding box alignment
+     */
+    bool PerfomBoundingBoxAlignment() const;
 
     /**
      * Return the AlignmentReference holding the element.

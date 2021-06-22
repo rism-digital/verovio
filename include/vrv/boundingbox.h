@@ -14,6 +14,8 @@
 
 namespace vrv {
 
+#define BEZIER_APPROXIMATION 50.0
+
 class Doc;
 class FloatingCurvePositioner;
 class Glyph;
@@ -174,6 +176,9 @@ public:
      * This is useful for example when calculating bezier positions.
      */
     static void SwapPoints(Point &p1, Point &p2);
+
+    static std::pair<double, int> ApproximateBezierExtrema(
+        const Point bezier[4], bool isMaxExtrema, int approximationSteps = BEZIER_APPROXIMATION);
 
     /**
      * Calculate the slope represented by two points

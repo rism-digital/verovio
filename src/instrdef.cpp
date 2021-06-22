@@ -22,7 +22,7 @@ namespace vrv {
 // InstrDef
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<InstrDef> s_factory("instrDef", INSTRDEF);
+static const ClassRegistrar<InstrDef> s_factory("instrDef", INSTRDEF);
 
 InstrDef::InstrDef() : Object("instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
 {

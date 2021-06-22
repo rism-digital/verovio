@@ -20,7 +20,7 @@ namespace vrv {
 // MSpace
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<MSpace> s_factory("mSpace", MSPACE);
+static const ClassRegistrar<MSpace> s_factory("mSpace", MSPACE);
 
 MSpace::MSpace() : LayerElement("mSpace-")
 {

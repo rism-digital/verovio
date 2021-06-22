@@ -555,7 +555,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
     return alignmentRef->HasMultipleLayer();
 }
 
-bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
+bool Alignment::IsOfType(const std::vector<AlignmentType> &types) const
 {
     return (std::find(types.begin(), types.end(), m_type) != types.end());
 }
@@ -608,6 +608,11 @@ GraceAligner *Alignment::GetGraceAligner(int id)
 bool Alignment::HasGraceAligner(int id) const
 {
     return (m_graceAligners.count(id) == 1);
+}
+
+bool Alignment::PerfomBoundingBoxAlignment() const
+{
+    return this->IsOfType({ ALIGNMENT_ACCID, ALIGNMENT_DOT, ALIGNMENT_DEFAULT });
 }
 
 AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)

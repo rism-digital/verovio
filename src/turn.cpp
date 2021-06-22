@@ -22,7 +22,7 @@ namespace vrv {
 // Turn
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Turn> s_factory("turn", TURN);
+static const ClassRegistrar<Turn> s_factory("turn", TURN);
 
 Turn::Turn()
     : ControlElement("turn-")
