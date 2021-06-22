@@ -118,10 +118,10 @@ NeumeGroup Neume::GetNeumeGroup()
         previous = current;
     }
 
-    try {
+    if (s_neumes.count(key) > 0) {
         return s_neumes.at(key);
     }
-    catch (std::out_of_range &e) {
+    else {
         return NEUME_ERROR;
     }
 }
