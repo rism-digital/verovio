@@ -43,7 +43,7 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Measure> s_factory("measure", MEASURE);
+static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object("measure-")
@@ -317,7 +317,7 @@ int Measure::GetWidth() const
         }
     }
 
-    if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+    if (m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -968,19 +968,27 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     params->m_upcomingMinPos = VRV_UNSET;
     params->m_cumulatedXShift = 0;
 
-    std::vector<int>::iterator iter;
+    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    assert(system);
+
     ArrayOfComparisons filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
+    for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
-        params->m_staffN = (*iter);
+        params->m_staffN = (staffN);
+        params->m_boundingBoxes.clear();
+        params->m_previousAlignment.Reset();
+        params->m_currentAlignment.Reset();
+        StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
+        params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
+
         filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
-        ns.push_back(*iter);
+        ns.push_back(staffN);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
@@ -1102,7 +1110,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
 
 int Measure::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_timestampAligner.Reset();
+    m_timestampAligner.Reset();
     m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
 }
@@ -1115,6 +1123,9 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     // Check if the measure has some overflowing control elements
     int overflow = this->GetDrawingOverflow();
 
+    Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
+    const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
+        && (params->m_doc->GetOptions()->m_breaks.GetValue() != BREAKS_encoded));
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
         if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
@@ -1126,11 +1137,15 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+        else if (m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
             > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
             params->m_shift = this->m_drawingXRel;
+            // If last measure requires separate system - mark that system as leftover for the future CastOffPages call
+            if (isLeftoverMeasure) {
+                params->m_leftoverSystem = params->m_currentSystem;
+            }
             for (Object *oneOfPendingObjects : params->m_pendingObjects) {
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
@@ -1218,7 +1233,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
 
     if (params->m_currentEnding) {
         // Set the ending to each measure in between
-        this->m_drawingEnding = params->m_currentEnding;
+        m_drawingEnding = params->m_currentEnding;
     }
 
     // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)

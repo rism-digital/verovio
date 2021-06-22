@@ -645,14 +645,15 @@ public:
  * member 1: the upcoming minimum position (i.e., the min pos for the next element)
  * member 2: the cumulated shift on the previous aligners
  * member 3: the @n of the staff currently processed (used for grace note alignment)
- * member 4: the list of staffN in the top-level scoreDef
- * member 5: the bounding box in the previous aligner
- * member 6: the upcoming bounding boxes (to be used in the next aligner)
- * member 7: the Doc
- * member 8: the Functor for redirection to the MeasureAligner
- * member 9: the end Functor for redirection
- * member 10: current aligner that is being processed
- * member 11: preceeding aligner that was handled before
+ * member 4: the size of the staff being processed
+ * member 5: the list of staffN in the top-level scoreDef
+ * member 6: the bounding box in the previous aligner
+ * member 7: the upcoming bounding boxes (to be used in the next aligner)
+ * member 8: the Doc
+ * member 9: the Functor for redirection to the MeasureAligner
+ * member 10: the end Functor for redirection
+ * member 11: current aligner that is being processed
+ * member 12: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -664,14 +665,18 @@ public:
         m_cumulatedXShift = 0;
         m_staffN = 0;
         m_staffNs = staffNs;
+        m_staffSize = 100;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
+        m_currentAlignment.Reset();
+        m_previousAlignment.Reset();
     }
     int m_minPos;
     int m_upcomingMinPos;
     int m_cumulatedXShift;
     int m_staffN;
+    int m_staffSize;
     std::vector<int> m_staffNs;
     std::vector<BoundingBox *> m_boundingBoxes;
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
@@ -1069,7 +1074,8 @@ public:
  * member 1: a pointer the document we are adding pages to
  * member 2: a pointer to the current page
  * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
- * member 4: the page height
+ * members 4-8: the page heights
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffPagesParams : public FunctorParams {
@@ -1085,6 +1091,7 @@ public:
         m_pgFootHeight = 0;
         m_pgHead2Height = 0;
         m_pgFoot2Height = 0;
+        m_leftoverSystem = NULL;
     }
     Page *m_contentPage;
     Doc *m_doc;
@@ -1095,6 +1102,7 @@ public:
     int m_pgFootHeight;
     int m_pgHead2Height;
     int m_pgFoot2Height;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1111,6 +1119,7 @@ public:
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
  * member 8: whether to smartly use encoded system breaks
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffSystemsParams : public FunctorParams {
@@ -1125,6 +1134,7 @@ public:
         m_currentScoreDefWidth = 0;
         m_doc = doc;
         m_smart = smart;
+        m_leftoverSystem = NULL;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -1135,6 +1145,7 @@ public:
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
     bool m_smart;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1173,20 +1184,6 @@ class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
     std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
-};
-
-//----------------------------------------------------------------------------
-// ConvertScoreDefMarkupParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating whereas the conversion is permanent of not
- **/
-
-class ConvertScoreDefMarkupParams : public FunctorParams {
-public:
-    ConvertScoreDefMarkupParams(bool permanent) { m_permanent = permanent; }
-    bool m_permanent;
 };
 
 //----------------------------------------------------------------------------
@@ -1675,7 +1672,7 @@ public:
     }
     double m_time;
     double m_duration;
-    std::vector<int> m_layers;
+    std::set<int> m_layers;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;

@@ -333,7 +333,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
          staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
         int transSemi = 0;
-        if (StaffDef *staffDef = this->m_mdivScoreDef.GetStaffDef(staves->first)) {
+        if (StaffDef *staffDef = m_mdivScoreDef.GetStaffDef(staves->first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
@@ -366,9 +366,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
             // set MIDI time signature
-            MeterSig *meterSig = dynamic_cast<MeterSig *>(this->m_mdivScoreDef.FindDescendantByType(METERSIG));
+            MeterSig *meterSig = dynamic_cast<MeterSig *>(m_mdivScoreDef.FindDescendantByType(METERSIG));
             if (meterSig && meterSig->HasCount()) {
-                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetCount(), meterSig->GetUnit());
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
         }
 
@@ -867,6 +867,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
+    System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
@@ -876,7 +877,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     else {
         CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this, smart);
         castOffSystemsParams.m_systemWidth
-            = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+            = m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
         castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
         castOffSystemsParams.m_currentScoreDefWidth
             = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
@@ -884,6 +885,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         Functor castOffSystems(&Object::CastOffSystems);
         Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
         contentSystem->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
+        leftoverSystem = castOffSystemsParams.m_leftoverSystem;
     }
     delete contentSystem;
 
@@ -910,6 +912,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
     castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
+    castOffPagesParams.m_leftoverSystem = leftoverSystem;
     Functor castOffPages(&Object::CastOffPages);
     pages->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);
@@ -1176,15 +1179,6 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     this->ScoreDefSetCurrentDoc(true);
 }
 
-void Doc::ConvertScoreDefMarkupDoc(bool permanent)
-{
-    ConvertScoreDefMarkupParams convertScoreDefMarkupParams(permanent);
-    Functor convertScoreDefMarkup(&Object::ConvertScoreDefMarkup);
-
-    m_mdivScoreDef.Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
-    this->Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
-}
-
 void Doc::ConvertMarkupDoc(bool permanent)
 {
     if (m_markup == MARKUP_DEFAULT) return;
@@ -1256,7 +1250,7 @@ void Doc::TransposeDoc()
 {
     Transposer transposer;
     transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
-    std::string transpositionOption = this->m_options->m_transpose.GetValue();
+    std::string transpositionOption = m_options->m_transpose.GetValue();
     if (transposer.IsValidIntervalName(transpositionOption)) {
         transposer.SetTransposition(transpositionOption);
     }
@@ -1265,7 +1259,7 @@ void Doc::TransposeDoc()
         // Find the starting key tonic of the data to use in calculating the tranposition interval:
         // Set transposition by key tonic.
         // Detect the current key from the keysignature.
-        KeySig *keysig = dynamic_cast<KeySig *>(this->m_mdivScoreDef.FindDescendantByType(KEYSIG));
+        KeySig *keysig = dynamic_cast<KeySig *>(m_mdivScoreDef.FindDescendantByType(KEYSIG));
         // If there is no keysignature, assume it is C.
         TransPitch currentKey = TransPitch(0, 0, 0);
         if (keysig && keysig->HasPname()) {
@@ -1282,7 +1276,7 @@ void Doc::TransposeDoc()
     }
 
     else if (transposer.IsValidSemitones(transpositionOption)) {
-        KeySig *keysig = dynamic_cast<KeySig *>(this->m_mdivScoreDef.FindDescendantByType(KEYSIG, 3));
+        KeySig *keysig = dynamic_cast<KeySig *>(m_mdivScoreDef.FindDescendantByType(KEYSIG, 3));
         int fifths = 0;
         if (keysig) {
             fifths = keysig->GetFifthsInt();
@@ -1305,7 +1299,7 @@ void Doc::TransposeDoc()
     Functor transpose(&Object::Transpose);
     TransposeParams transposeParams(this, &transposer);
 
-    if (this->m_options->m_transposeSelectedOnly.GetValue() == false) {
+    if (m_options->m_transposeSelectedOnly.GetValue() == false) {
         transpose.m_visibleOnly = false;
     }
 
@@ -1327,7 +1321,7 @@ void Doc::ExpandExpansions()
 
     xsdAnyURI_List expansionList = start->GetPlist();
     xsdAnyURI_List existingList;
-    this->m_expansionMap.Expand(expansionList, existingList, start);
+    m_expansionMap.Expand(expansionList, existingList, start);
 
     // save original/notated expansion as element in expanded MEI
     // Expansion *originalExpansion = new Expansion();
@@ -1382,7 +1376,7 @@ int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) h = h * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) h = h * m_options->m_graceFactor.GetValue();
     h = h * staffSize / 100;
     return h;
 }
@@ -1394,7 +1388,7 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) w = w * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) w = w * m_options->m_graceFactor.GetValue();
     w = w * staffSize / 100;
     return w;
 }
@@ -1405,7 +1399,7 @@ int Doc::GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
     advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) advX = advX * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) advX = advX * m_options->m_graceFactor.GetValue();
     advX = advX * staffSize / 100;
     return advX;
 }
@@ -1418,8 +1412,8 @@ Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staf
     point.x = fontPoint.x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     point.y = fontPoint.y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) {
-        point.x = point.x * this->m_options->m_graceFactor.GetValue();
-        point.y = point.y * this->m_options->m_graceFactor.GetValue();
+        point.x = point.x * m_options->m_graceFactor.GetValue();
+        point.y = point.y * m_options->m_graceFactor.GetValue();
     }
     if (staffSize != 100) {
         point.x = point.x * staffSize / 100;
@@ -1435,7 +1429,7 @@ int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) y = y * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) y = y * m_options->m_graceFactor.GetValue();
     y = y * staffSize / 100;
     return y;
 }
@@ -1449,7 +1443,7 @@ int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
-    if (graceSize) h = h * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) h = h * m_options->m_graceFactor.GetValue();
     return h;
 }
 
@@ -1462,7 +1456,7 @@ int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
-    if (graceSize) w = w * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) w = w * m_options->m_graceFactor.GetValue();
     return w;
 }
 
@@ -1474,7 +1468,7 @@ int Doc::GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
     advX = advX * font->GetPointSize() / glyph->GetUnitsPerEm();
-    if (graceSize) advX = advX * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) advX = advX * m_options->m_graceFactor.GetValue();
     return advX;
 }
 
@@ -1487,7 +1481,7 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
-    if (graceSize) y = y * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) y = y * m_options->m_graceFactor.GetValue();
     return y;
 }
 
@@ -1566,21 +1560,21 @@ int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWidth * staffSize / 100;
-    if (graceSize) value = value * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) value = value * m_options->m_graceFactor.GetValue();
     return value;
 }
 
 int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWhiteWidth * staffSize / 100;
-    if (graceSize) value = value * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) value = value * m_options->m_graceFactor.GetValue();
     return value;
 }
 
 int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
 {
     int value = m_drawingLedgerLine * staffSize / 100;
-    if (graceSize) value = value * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) value = value * m_options->m_graceFactor.GetValue();
     return value;
 }
 
@@ -1598,7 +1592,7 @@ FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
 {
     m_drawingSmuflFont.SetFaceName(m_options->m_font.GetValue().c_str());
     int value = m_drawingSmuflFontSize * staffSize / 100;
-    if (graceSize) value = value * this->m_options->m_graceFactor.GetValue();
+    if (graceSize) value = value * m_options->m_graceFactor.GetValue();
     m_drawingSmuflFont.SetPointSize(value);
     return &m_drawingSmuflFont;
 }
@@ -1626,6 +1620,7 @@ double Doc::GetLeftMargin(const ClassId classId) const
     if (classId == MULTIREST) return m_options->m_leftMarginMultiRest.GetValue();
     if (classId == MULTIRPT) return m_options->m_leftMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_leftMarginNote.GetValue();
+    if (classId == STEM) return m_options->m_leftMarginNote.GetValue();
     if (classId == REST) return m_options->m_leftMarginRest.GetValue();
     if (classId == TABDURSYM) return m_options->m_leftMarginTabDurSym.GetValue();
     return m_options->m_defaultLeftMargin.GetValue();
@@ -1648,6 +1643,7 @@ double Doc::GetRightMargin(const ClassId classId) const
     if (classId == MULTIREST) return m_options->m_rightMarginMultiRest.GetValue();
     if (classId == MULTIRPT) return m_options->m_rightMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_rightMarginNote.GetValue();
+    if (classId == STEM) return m_options->m_rightMarginNote.GetValue();
     if (classId == REST) return m_options->m_rightMarginRest.GetValue();
     if (classId == TABDURSYM) return m_options->m_rightMarginTabDurSym.GetValue();
     return m_options->m_defaultRightMargin.GetValue();
@@ -1739,13 +1735,13 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageMarginRight = m_drawingPage->m_pageMarginRight;
         m_drawingPageMarginTop = m_drawingPage->m_pageMarginTop;
     }
-    else if (this->m_pageHeight != -1) {
-        m_drawingPageHeight = this->m_pageHeight;
-        m_drawingPageWidth = this->m_pageWidth;
-        m_drawingPageMarginBottom = this->m_pageMarginBottom;
-        m_drawingPageMarginLeft = this->m_pageMarginLeft;
-        m_drawingPageMarginRight = this->m_pageMarginRight;
-        m_drawingPageMarginTop = this->m_pageMarginTop;
+    else if (m_pageHeight != -1) {
+        m_drawingPageHeight = m_pageHeight;
+        m_drawingPageWidth = m_pageWidth;
+        m_drawingPageMarginBottom = m_pageMarginBottom;
+        m_drawingPageMarginLeft = m_pageMarginLeft;
+        m_drawingPageMarginRight = m_pageMarginRight;
+        m_drawingPageMarginTop = m_pageMarginTop;
     }
     else {
         m_drawingPageHeight = m_options->m_pageHeight.GetValue();
@@ -1756,7 +1752,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageMarginTop = m_options->m_pageMarginTop.GetValue();
     }
 
-    if (this->m_options->m_landscape.GetValue()) {
+    if (m_options->m_landscape.GetValue()) {
         int pageHeight = m_drawingPageWidth;
         m_drawingPageWidth = m_drawingPageHeight;
         m_drawingPageHeight = pageHeight;
@@ -1772,14 +1768,14 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // Since m_options->m_interlDefin stays the same, it's useless to do it
     // every time for now.
 
-    m_drawingBeamMaxSlope = this->m_options->m_beamMaxSlope.GetValue();
-    m_drawingBeamMinSlope = this->m_options->m_beamMinSlope.GetValue();
+    m_drawingBeamMaxSlope = m_options->m_beamMaxSlope.GetValue();
+    m_drawingBeamMinSlope = m_options->m_beamMinSlope.GetValue();
     m_drawingBeamMaxSlope /= 100;
     m_drawingBeamMinSlope /= 100;
 
     // values for beams
-    m_drawingBeamWidth = this->m_options->m_unit.GetValue();
-    m_drawingBeamWhiteWidth = this->m_options->m_unit.GetValue() / 2;
+    m_drawingBeamWidth = m_options->m_unit.GetValue();
+    m_drawingBeamWhiteWidth = m_options->m_unit.GetValue() / 2;
 
     // values for fonts
     m_drawingSmuflFontSize = CalcMusicFontSize();

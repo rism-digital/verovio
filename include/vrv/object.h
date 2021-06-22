@@ -660,14 +660,6 @@ public:
     ///@}
 
     /**
-     * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
-     * See Doc::ConvertScoreDefMarkupDoc
-     */
-    ///@{
-    virtual int ConvertScoreDefMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */
     ///@{
@@ -1357,7 +1349,7 @@ private:
     /**
      * A static counter for uuid generation.
      */
-    static unsigned long s_objectCounter;
+    static thread_local unsigned long s_objectCounter;
 };
 
 //----------------------------------------------------------------------------

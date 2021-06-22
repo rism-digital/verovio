@@ -31,7 +31,7 @@ namespace vrv {
 // Verse
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Verse> s_factory("verse", VERSE);
+static const ClassRegistrar<Verse> s_factory("verse", VERSE);
 
 Verse::Verse() : LayerElement("verse-"), AttColor(), AttLang(), AttNInteger(), AttTypography()
 {
@@ -135,7 +135,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     }
 
     bool newLabelAbbr = false;
-    this->m_drawingLabelAbbr = NULL;
+    m_drawingLabelAbbr = NULL;
     // Find the labelAbbr (if none previously given)
     if (params->m_currentLabelAbbr == NULL) {
         params->m_currentLabelAbbr = dynamic_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR));
@@ -187,7 +187,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
         params->m_lastSyl = lastSyl;
 
         if (!newLabelAbbr && params->m_currentLabelAbbr) {
-            this->m_drawingLabelAbbr = params->m_currentLabelAbbr;
+            m_drawingLabelAbbr = params->m_currentLabelAbbr;
         }
 
         // No free space because we never move the first one back

@@ -41,7 +41,7 @@ namespace vrv {
 #ifndef NO_DARMS_SUPPORT
 
 // Ok, this is ugly, but since this is static data, why not?
-pitchmap DarmsInput::PitchMap[] = {
+const pitchmap DarmsInput::PitchMap[] = {
     /* 00 */ { 1, PITCHNAME_c },
     { 1, PITCHNAME_d },
     { 1, PITCHNAME_e },

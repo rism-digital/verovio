@@ -32,7 +32,7 @@
 
 namespace vrv {
 
-std::map<std::string, NeumeGroup> Neume::s_neumes
+const std::map<std::string, NeumeGroup> Neume::s_neumes
     = { { "", PUNCTUM }, { "u", PES }, { "d", CLIVIS }, { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS },
           { "du", PORRECTUS }, { "ddd", CLIMACUS }, { "ddu", CLIMACUS_RESUPINUS }, { "udu", TORCULUS_RESUPINUS },
           { "dud", PORRECTUS_FLEXUS }, { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS },
@@ -42,7 +42,7 @@ std::map<std::string, NeumeGroup> Neume::s_neumes
 // Neume
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Neume> s_factory("neume", NEUME);
+static const ClassRegistrar<Neume> s_factory("neume", NEUME);
 
 Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor()
 {
@@ -117,7 +117,13 @@ NeumeGroup Neume::GetNeumeGroup()
         }
         previous = current;
     }
-    return s_neumes[key];
+
+    if (s_neumes.count(key) > 0) {
+        return s_neumes.at(key);
+    }
+    else {
+        return NEUME_ERROR;
+    }
 }
 
 std::vector<int> Neume::GetPitchDifferences()

@@ -776,18 +776,13 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    MapOfDotLocs::const_iterator iter;
-    const MapOfDotLocs *map = dots->GetMapOfDotLocs();
-    for (iter = map->begin(); iter != map->end(); ++iter) {
-        Staff *dotStaff = (iter->first) ? iter->first : staff;
+    for (const auto &mapEntry : dots->GetMapOfDotLocs()) {
+        Staff *dotStaff = (mapEntry.first) ? mapEntry.first : staff;
         int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const std::list<int> *dotLocs = &iter->second;
-        std::list<int>::const_iterator intIter;
-        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); ++intIter) {
-            DrawDotsPart(
-                dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
+        for (int loc : mapEntry.second) {
+            DrawDotsPart(dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
         }
     }
 
@@ -1650,12 +1645,17 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
 }
 
-void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff)
+void View::DrawMeterSigFigures(
+    DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff)
 {
     assert(dc);
     assert(staff);
 
-    std::wstring timeSigCombNumerator = IntToTimeSigFigures(num), timeSigCombDenominator;
+    std::wstring timeSigCombNumerator, timeSigCombDenominator;
+    for (int summand : numSummands) {
+        if (!timeSigCombNumerator.empty()) timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall;
+        timeSigCombNumerator += IntToTimeSigFigures(summand);
+    }
     if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));

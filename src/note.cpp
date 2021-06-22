@@ -45,7 +45,7 @@ namespace vrv {
 // Note
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Note> s_factory("note", NOTE);
+static const ClassRegistrar<Note> s_factory("note", NOTE);
 
 Note::Note()
     : LayerElement("note-")
@@ -231,7 +231,7 @@ int Note::GetDrawingDur() const
 
 bool Note::IsClusterExtreme() const
 {
-    ChordCluster *cluster = this->m_cluster;
+    ChordCluster *cluster = m_cluster;
     if (this == cluster->at(0)) return true;
     if (this == cluster->at(cluster->size() - 1))
         return true;
@@ -244,7 +244,7 @@ TabGrp *Note::IsTabGrpNote() const
     return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
+std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 {
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::wstring fretStr;
@@ -312,7 +312,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
     }
 }
 
-bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
+bool Note::IsUnisonWith(Note *note, bool ignoreAccid)
 {
     if (!ignoreAccid) {
         Accid *accid = this->GetDrawingAccid();
@@ -434,7 +434,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
     return baseStem;
 }
 
-wchar_t Note::GetMensuralNoteheadGlyph()
+wchar_t Note::GetMensuralNoteheadGlyph() const
 {
     assert(this->IsMensuralDur());
 
@@ -521,14 +521,14 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
     return SMUFL_E0A4_noteheadBlack;
 }
 
-bool Note::IsVisible()
+bool Note::IsVisible() const
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
-    else if (GetParent() && GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(GetParent());
+    else if (this->GetParent() && this->GetParent()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this->GetParent());
         assert(chord);
         return chord->IsVisible();
     }
@@ -595,37 +595,37 @@ void Note::CalcMIDIPitch(int shift)
     }
 }
 
-double Note::GetScoreTimeOnset()
+double Note::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }
 
-double Note::GetRealTimeOnsetMilliseconds()
+double Note::GetRealTimeOnsetMilliseconds() const
 {
     return m_realTimeOnsetMilliseconds;
 }
 
-double Note::GetScoreTimeOffset()
+double Note::GetScoreTimeOffset() const
 {
     return m_scoreTimeOffset;
 }
 
-double Note::GetRealTimeOffsetMilliseconds()
+double Note::GetRealTimeOffsetMilliseconds() const
 {
     return m_realTimeOffsetMilliseconds;
 }
 
-double Note::GetScoreTimeTiedDuration()
+double Note::GetScoreTimeTiedDuration() const
 {
     return m_scoreTimeTiedDuration;
 }
 
-double Note::GetScoreTimeDuration()
+double Note::GetScoreTimeDuration() const
 {
-    return GetScoreTimeOffset() - GetScoreTimeOnset();
+    return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
 }
 
-char Note::GetMIDIPitch()
+char Note::GetMIDIPitch() const
 {
     return m_MIDIPitch;
 }
@@ -685,7 +685,7 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
 
 bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted)
 {
-    Object *stem = GetFirst(STEM);
+    Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
     Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
@@ -694,10 +694,10 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
     wchar_t flagGlyph = SMUFL_E242_flag16thUp;
     data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(GetDrawingStemDir());
-    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
+    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(this->GetDrawingStemDir());
+    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
 
-    const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
+    const int dotMargin = flag->GetDrawingY() - this->GetDrawingY() - flagHeight - this->GetDrawingRadius(doc) / 2
         - (isDotShifted ? doc->GetDrawingUnit(staffSize) : 0);
 
     return dotMargin < 0;
@@ -785,11 +785,11 @@ int Note::CalcArtic(FunctorParams *functorParams)
     params->m_crossStaffAbove = false;
     params->m_crossStaffBelow = false;
 
-    if (this->m_crossStaff) {
-        params->m_staffAbove = this->m_crossStaff;
-        params->m_staffBelow = this->m_crossStaff;
-        params->m_layerAbove = this->m_crossLayer;
-        params->m_layerBelow = this->m_crossLayer;
+    if (m_crossStaff) {
+        params->m_staffAbove = m_crossStaff;
+        params->m_staffBelow = m_crossStaff;
+        params->m_layerAbove = m_crossLayer;
+        params->m_layerBelow = m_crossLayer;
         params->m_crossStaffAbove = true;
         params->m_crossStaffBelow = true;
     }
@@ -847,9 +847,9 @@ int Note::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
+        layer = m_crossLayer;
     }
 
     // Cache the in params to avoid further lookup
@@ -966,6 +966,33 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+MapOfNoteLocs Note::CalcNoteLocations()
+{
+    Layer *layer = NULL;
+    Staff *staff = this->GetCrossStaff(layer);
+    if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    MapOfNoteLocs noteLocations;
+    noteLocations[staff] = { this->GetDrawingLoc() };
+    return noteLocations;
+}
+
+MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
+{
+    const bool isUpwardDirection = (GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
+    const bool shiftUpwards = (isUpwardDirection && primary) || (!isUpwardDirection && !primary);
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations();
+    assert(noteLocs.size() == 1);
+
+    MapOfDotLocs dotLocs;
+    Staff *staff = noteLocs.cbegin()->first;
+    int loc = *noteLocs.cbegin()->second.cbegin();
+    if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
+    dotLocs[staff] = { loc };
+    return dotLocs;
+}
+
 int Note::CalcDots(FunctorParams *functorParams)
 {
     CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
@@ -982,7 +1009,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
@@ -1016,21 +1043,8 @@ int Note::CalcDots(FunctorParams *functorParams)
         dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
 
-        std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-        int loc = this->GetDrawingLoc();
-
-        // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-        const bool isDotShifted(loc % 2 == 0);
-        if (isDotShifted) {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            if ((GetDrawingStemDir() == STEMDIRECTION_up) || (staff->GetChildCount(LAYER) == 1))
-                ++loc;
-            else
-                --loc;
-        }
-
-        loc = CorrectDotsPlacement(staff, GetDrawingLoc(), loc, isDotShifted);
-        dotLocs->push_back(loc);
+        dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
+        const bool isDotShifted = (this->GetDrawingLoc() % 2 == 0);
 
         // Stem up, shorter than 4th and not in beam
         if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
@@ -1044,53 +1058,6 @@ int Note::CalcDots(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Note::CorrectDotsPlacement(Staff *staff, int noteLoc, int dotLoc, bool isDotShifted)
-{
-    if (staff->GetChildCount(LAYER) > 2) return dotLoc;
-
-    ListOfObjects objects;
-    ClassIdsComparison cmp({ DOTS, NOTE });
-    Alignment *alignment = GetAlignment();
-    alignment->FindAllDescendantByComparison(&objects, &cmp, 2);
-
-    // process all dots and notes in the alignment and save them separately - notes as vector and dot locations as set
-    std::set<int> dotLocations;
-    std::vector<Note *> otherNotes;
-    for (const auto element : objects) {
-        if (element->Is(DOTS)) {
-            std::list<int> *dotLocs = vrv_cast<Dots *>(element)->GetDotLocsForStaff(staff);
-            if (dotLocs->empty()) continue;
-            std::copy(dotLocs->begin(), dotLocs->end(), std::inserter(dotLocations, dotLocations.begin()));
-        }
-        else {
-            if (this == element) continue;
-            Note *note = vrv_cast<Note *>(element);
-            otherNotes.push_back(note);
-        }
-    }
-
-    int newLocation = dotLoc;
-    for (Note *note : otherNotes) {
-        if (IsUnissonWith(note)) {
-            if (note->HasDots()) {
-                return isDotShifted ? noteLoc + 1 : dotLoc;
-            }
-            continue;
-        }
-        if (note->GetDrawingLoc() == newLocation) {
-            // mirror dot location (if it was placed above - try placing it below now)
-            newLocation = 2 * noteLoc - dotLoc;
-        }
-    }
-
-    // if there already exists a dot on the preferred location
-    if (dotLocations.find(newLocation) != dotLocations.end()) {
-        newLocation = 2 * noteLoc - dotLoc;
-    }
-
-    return newLocation;
 }
 
 int Note::CalcLedgerLines(FunctorParams *functorParams)
@@ -1109,7 +1076,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (this->m_crossStaff) staff = this->m_crossStaff;
+    if (m_crossStaff) staff = m_crossStaff;
 
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;

@@ -48,7 +48,7 @@ public:
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoordRefs();
+    const ArrayOfBeamElementCoords *GetElementCoordRefs() const;
 
     /**
      * Initializes the m_beamElementCoords vector objects.
@@ -186,7 +186,7 @@ protected:
      * Helper function to calculate overlap with layer elements that
      * are placed within the duration of the beam
      */
-    int CalcLayerOverlap(Doc *doc, int directionBias, int y1, int y2);
+    int CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2);
 
 private:
     //
@@ -221,7 +221,7 @@ public:
      * Return the encoded stem direction.
      * Access the value in the Stem element if already set.
      */
-    data_STEMDIRECTION GetStemDir();
+    data_STEMDIRECTION GetStemDir() const;
 
     void SetDrawingStemDir(
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);

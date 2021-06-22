@@ -135,7 +135,7 @@ private:
      * The ids of the group is then the position in the vector + GRPS_BASE_ID.
      * Groups coded in MEI have negative ids (-@vgrp value)
      */
-    static std::vector<void *> s_drawingObjectIds;
+    static thread_local std::vector<void *> s_drawingObjectIds;
 };
 
 //----------------------------------------------------------------------------
@@ -313,6 +313,15 @@ public:
      */
     const ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
 
+    /**
+     * @name Getter, setter and checker for the crossStaff
+     */
+    ///@{
+    void SetCrossStaff(Staff *crossStaff) { m_crossStaff = crossStaff; }
+    Staff *GetCrossStaff() const { return m_crossStaff; }
+    bool IsCrossStaff() const { return m_crossStaff != NULL; }
+    ///@}
+
 private:
     //
 public:
@@ -327,6 +336,7 @@ private:
     float m_angle;
     int m_thickness;
     curvature_CURVEDIR m_dir;
+    Staff* m_crossStaff;
     ///@}
 
     ArrayOfCurveSpannedElements m_spannedElements;

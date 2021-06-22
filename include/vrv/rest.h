@@ -151,7 +151,7 @@ private:
     /**
      * Get location of the object on the layer if it's note, chord or ftrem
      */
-    std::pair<int, RestAccidental> GetElementLocation(Object *object, Layer *layer, bool isTopLayer);
+    std::pair<int, RestAccidental> GetElementLocation(Object *object, Layer *layer, bool isTopLayer) const;
 
     /**
      * Get correct offset for the rest from the options based on layer and location

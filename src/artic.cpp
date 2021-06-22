@@ -24,17 +24,17 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
+const std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
     ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
 
-std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow,
-    ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
+const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc,
+    ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
 
 //----------------------------------------------------------------------------
 // Artic
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Artic> s_factory("artic", ARTIC);
+static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
 Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
 {
@@ -59,14 +59,14 @@ void Artic::Reset()
     m_drawingPlace = STAFFREL_NONE;
 }
 
-bool Artic::IsInsideArtic()
+bool Artic::IsInsideArtic() const
 {
     auto end = Artic::s_outStaffArtic.end();
     auto i = std::find(Artic::s_outStaffArtic.begin(), end, this->GetArticFirst());
     return (i == end);
 }
 
-data_ARTICULATION Artic::GetArticFirst()
+data_ARTICULATION Artic::GetArticFirst() const
 {
     std::vector<data_ARTICULATION> articList = this->GetArtic();
     if (articList.empty()) return ARTICULATION_NONE;
@@ -165,7 +165,7 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
     }
 }
 
-wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
+wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
 {
     // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
@@ -295,8 +295,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
-
     if (params->m_parent->m_crossLayer) {
         layer = params->m_parent->m_crossLayer;
     }
@@ -339,21 +337,10 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
         this->m_crossStaff = params->m_staffAbove;
         this->m_crossLayer = params->m_layerAbove;
-        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the
-        // parent where the beam is
-        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_below) {
-            this->m_crossStaff = NULL;
-            this->m_crossLayer = NULL;
-        }
     }
     else if (this->GetDrawingPlace() == STAFFREL_below && params->m_crossStaffBelow) {
         this->m_crossStaff = params->m_staffBelow;
         this->m_crossLayer = params->m_layerBelow;
-        // Exception - opposite as above
-        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_above) {
-            this->m_crossStaff = NULL;
-            this->m_crossLayer = NULL;
-        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -373,10 +360,11 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
     }
 
+    Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
@@ -389,6 +377,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         yIn = std::min(
             params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
             0);
+        if (beam && beam->m_crossStaffContent && beam->m_drawingPlace == BEAMPLACE_mixed) yIn -= beam->m_beamWidth;
         yOut = std::min(yIn, staffYBottom);
     }
 

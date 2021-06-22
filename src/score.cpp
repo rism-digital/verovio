@@ -25,7 +25,7 @@ namespace vrv {
 // Score
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Score> s_factory("score", SCORE);
+static const ClassRegistrar<Score> s_factory("score", SCORE);
 
 Score::Score() : Object("score-"), AttLabelled(), AttNNumberLike()
 {

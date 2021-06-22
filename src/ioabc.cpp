@@ -292,7 +292,7 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
 void ABCInput::CalcUnitNoteLength()
 {
     MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_mdivScoreDef.FindDescendantByType(METERSIG));
-    if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
+    if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
         // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
@@ -364,6 +364,19 @@ void ABCInput::AddArticulation(LayerElement *element)
     element->AddChild(artic);
 
     m_artic.clear();
+}
+
+void ABCInput::AddChordSymbol(LayerElement *element)
+{
+    assert(element);
+
+    // there should always only be one element in the harmony stack
+    if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
+        m_harmStack.back()->SetStartid("#" + element->GetUuid());
+        m_harmStack.clear();
+    }
+
+    m_dynam.clear();
 }
 
 void ABCInput::AddDynamic(LayerElement *element)
@@ -740,12 +753,12 @@ void ABCInput::parseMeter(const std::string &meterString)
     if (meterString.find('C') != std::string::npos) {
         if (meterString[meterString.find('C') + 1] == '|') {
             m_meter->SetSym(METERSIGN_cut);
-            m_meter->SetCount(2);
+            m_meter->SetCount({ 2 });
             m_meter->SetUnit(2);
         }
         else {
             m_meter->SetSym(METERSIGN_common);
-            m_meter->SetCount(4);
+            m_meter->SetCount({ 4 });
             m_meter->SetUnit(4);
         }
     }
@@ -754,7 +767,7 @@ void ABCInput::parseMeter(const std::string &meterString)
         if (meterCount.front() == '(' && meterCount.back() == ')')
             meterCount = meterCount.substr(1, meterCount.length() - 1);
         // this is a little "hack", until libMEI is fixed
-        m_meter->SetCount(atoi(meterCount.c_str()));
+        m_meter->SetCount({ atoi(meterCount.c_str()) });
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
         m_meter->IsAttribute(true);
     }
@@ -1107,6 +1120,11 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 AddArticulation(chord);
             }
 
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(chord);
+            }
+
             // add dynamics
             if (!m_dynam.empty()) {
                 AddDynamic(chord);
@@ -1257,6 +1275,11 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 AddArticulation(note);
             }
 
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(note);
+            }
+
             // add dynamics
             if (!m_dynam.empty()) {
                 AddDynamic(note);
@@ -1301,11 +1324,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 else
                     m_noteStack.push_back(note);
             }
-            // there should always only be one element in the harmony stack
-            if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
-                m_harmStack.back()->SetStartid("#" + m_ID);
-                m_harmStack.clear();
-            }
+
             if (!m_tieStack.empty()) {
                 m_tieStack.back()->SetEndid("#" + m_ID);
                 m_tieStack.clear();
@@ -1321,6 +1340,11 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         else if (musicCode.at(i) == 'x') {
             Space *space = new Space();
             m_ID = space->GetUuid();
+
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(space);
+            }
 
             // set duration
             std::string numStr, numbaseStr;
@@ -1389,7 +1413,12 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             Rest *rest = new Rest();
             m_ID = rest->GetUuid();
 
-            // add Fermata
+            // add chord symbols
+            if (!m_harmStack.empty()) {
+                AddChordSymbol(rest);
+            }
+
+            // add fermata
             if (m_fermata != STAFFREL_NONE) {
                 AddFermata(rest);
             }

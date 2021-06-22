@@ -28,7 +28,7 @@ namespace vrv {
 // HalfmRpt
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<HalfmRpt> s_factory("halfmRpt", HALFMRPT);
+static const ClassRegistrar<HalfmRpt> s_factory("halfmRpt", HALFMRPT);
 
 HalfmRpt::HalfmRpt() : LayerElement("mrpt-")
 {

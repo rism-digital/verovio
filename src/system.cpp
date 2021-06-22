@@ -27,6 +27,7 @@
 #include "pages.h"
 #include "pedal.h"
 #include "section.h"
+#include "slur.h"
 #include "staff.h"
 #include "syl.h"
 #include "trill.h"
@@ -259,6 +260,44 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     }
 
     return false;
+}
+
+curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, LayerElement *end, Slur* slur) 
+{
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
+    findSpannedLayerElementsParams.m_minPos = start->GetDrawingX();
+    findSpannedLayerElementsParams.m_maxPos = end->GetDrawingX();
+    findSpannedLayerElementsParams.m_classIds = { CHORD, NOTE };
+
+    Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
+    assert(layerStart);
+
+    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
+    Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL);
+
+    curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
+    for (auto element : findSpannedLayerElementsParams.m_elements) {
+        Layer *layer = vrv_cast<Layer *>((element)->GetFirstAncestor(LAYER));
+        assert(layer);
+        if (layer == layerStart) continue;
+
+        if (curvature_CURVEDIR_NONE == preferredDirection) {
+            if (layer->GetN() > layerStart->GetN()) {
+                preferredDirection = curvature_CURVEDIR_above;
+            }
+            else {
+                preferredDirection = curvature_CURVEDIR_below;
+            }
+        }
+        // if there are layers both above and below - discard previous location and return - we'll use default direction
+        else if (((curvature_CURVEDIR_above == preferredDirection) && (layer->GetN() < layerStart->GetN()))
+            || ((curvature_CURVEDIR_below == preferredDirection) && (layer->GetN() > layerStart->GetN()))) {
+            preferredDirection = curvature_CURVEDIR_NONE;
+            break;
+        }
+    }
+
+    return preferredDirection;
 }
 
 void System::AddToDrawingListIfNeccessary(Object *object)
@@ -600,7 +639,7 @@ int System::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    SetDrawingXRel(this->m_systemLeftMar + this->GetDrawingLabelsWidth());
+    SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
     params->m_shift = 0;
     params->m_justifiableWidth = 0;
 
@@ -657,7 +696,7 @@ int System::JustifyX(FunctorParams *functorParams)
     Object *parent = GetParent();
 
     params->m_measureXRel = 0;
-    int margins = this->m_systemLeftMar + this->m_systemRightMar;
+    int margins = m_systemLeftMar + m_systemRightMar;
     int nonJustifiableWidth
         = margins + (m_drawingTotalWidth - m_drawingJustifiableWidth); // m_drawingTotalWidth includes the labels
     params->m_justifiableRatio
@@ -880,12 +919,23 @@ int System::CastOffPages(FunctorParams *functorParams)
     const int childCount = params->m_currentPage->GetChildCount();
     if ((systemMaxPerPage && systemMaxPerPage == childCount)
         || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
-        params->m_currentPage = new Page();
-        // Use VRV_UNSET value as a flag
-        params->m_pgHeadHeight = VRV_UNSET;
-        assert(params->m_doc->GetPages());
-        params->m_doc->GetPages()->AddChild(params->m_currentPage);
-        params->m_shift = this->m_drawingYRel - params->m_pageHeight;
+        // If this is last system in the list, it doesn't fit the page and it's leftover system (has just one last
+        // measure) - get measure out of that system and try adding it to the previous system
+        Object *nextSystem = params->m_contentPage->GetNext(this, SYSTEM);
+        if ((NULL == nextSystem) && (this == params->m_leftoverSystem)) {
+            Measure *measure = dynamic_cast<Measure *>(Relinquish(GetFirst(MEASURE)->GetIdx()));
+            System *lastSystem = dynamic_cast<System *>(params->m_currentPage->GetLast());
+            if (measure && lastSystem) lastSystem->AddChild(measure);
+            return FUNCTOR_SIBLINGS;
+        }
+        else {
+            params->m_currentPage = new Page();
+            // Use VRV_UNSET value as a flag
+            params->m_pgHeadHeight = VRV_UNSET;
+            assert(params->m_doc->GetPages());
+            params->m_doc->GetPages()->AddChild(params->m_currentPage);
+            params->m_shift = this->m_drawingYRel - params->m_pageHeight;
+        }
     }
 
     // Special case where we use the Relinquish method.
