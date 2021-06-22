@@ -8,6 +8,8 @@
 #ifndef __VRV_IOMUSXML_H__
 #define __VRV_IOMUSXML_H__
 
+#include <map>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -121,10 +123,11 @@ namespace musicxml {
 
     class ClefChange {
     public:
-        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset, bool afterBarline)
+        ClefChange(const std::string &measureNum, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset, bool afterBarline)
         {
             m_measureNum = measureNum;
             m_staff = staff;
+            m_layer = layer;
             m_clef = clef;
             m_scoreOnset = scoreOnset;
             m_afterBarline = afterBarline;
@@ -132,9 +135,9 @@ namespace musicxml {
 
         std::string m_measureNum;
         Staff *m_staff;
+        Layer *m_layer;
         Clef *m_clef;
         int m_scoreOnset; // the score position of clef change
-        bool isFirst = true; // insert clef change at first layer, others use @sameas
         bool m_afterBarline = false; // musicXML attribute
     };
 
@@ -211,10 +214,20 @@ private:
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     ///@}
 
-    /*
+    /**
+     * Process all clef change queue and add clefs to corresponding places in the score
+     */
+    void ProcessClefChangeQueue(Section *section);
+
+    /**
      * Add clef changes to all layers of a given measure, staff, and time stamp
      */
-    void AddClef(Section *section, Measure *measure, Staff *staff, const std::string &measureNum);
+    void AddClefs(Measure *measure, const musicxml::ClefChange &clefChange);
+    
+    /**
+     * Add clef as layer element to specified layer and #sameas clefs to previous layers, if needed
+     */
+    void InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, int scoreOnSet);
 
     /*
      * Add a Measure to the section.
@@ -410,6 +423,7 @@ private:
     std::map<Layer *, std::vector<LayerElement *>> m_elementStackMap;
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
+    std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */
@@ -448,7 +462,7 @@ private:
      */
     std::vector<std::pair<std::string, ControlElement *>> m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
-    std::vector<musicxml::ClefChange> m_clefChangeStack;
+    std::queue<musicxml::ClefChange> m_clefChangeQueue;
     /* stack of new arpeggios that get more notes added. */
     std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio>> m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */
