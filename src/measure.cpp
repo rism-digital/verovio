@@ -43,7 +43,7 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Measure> s_factory("measure", MEASURE);
+static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object("measure-")

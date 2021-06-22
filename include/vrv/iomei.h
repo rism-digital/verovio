@@ -781,7 +781,7 @@ private:
     /**
      * A static array for storing the implemented editorial elements
      */
-    static std::vector<std::string> s_editorialElementNames;
+    static const std::vector<std::string> s_editorialElementNames;
 };
 
 } // namespace vrv

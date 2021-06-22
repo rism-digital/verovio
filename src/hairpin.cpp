@@ -29,7 +29,7 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Hairpin> s_factory("hairpin", HAIRPIN);
+static const ClassRegistrar<Hairpin> s_factory("hairpin", HAIRPIN);
 
 Hairpin::Hairpin()
     : ControlElement("hairpin-")

@@ -22,7 +22,7 @@ namespace vrv {
 // Annot
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Annot> s_factory("annot", ANNOT);
+static const ClassRegistrar<Annot> s_factory("annot", ANNOT);
 
 Annot::Annot() : EditorialElement("annot-"), TextListInterface(), AttPlist(), AttSource()
 {

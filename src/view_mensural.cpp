@@ -31,8 +31,8 @@
 
 namespace vrv {
 
-int View::s_drawingLigX[2], View::s_drawingLigY[2]; // to keep coords. of ligatures
-bool View::s_drawingLigObliqua = false; // mark the first pass for an oblique
+thread_local int View::s_drawingLigX[2], View::s_drawingLigY[2]; // to keep coords. of ligatures
+thread_local bool View::s_drawingLigObliqua = false; // mark the first pass for an oblique
 
 //----------------------------------------------------------------------------
 // View - Mensural

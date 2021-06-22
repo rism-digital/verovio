@@ -118,11 +118,11 @@ public:
     // Static members //
     //----------------//
 
-    static data_PITCHNAME s_pnameForFlats[];
-    static data_PITCHNAME s_pnameForSharps[];
+    static const data_PITCHNAME s_pnameForFlats[];
+    static const data_PITCHNAME s_pnameForSharps[];
 
 private:
-    static int octave_map[2][9][7];
+    static const int octave_map[2][9][7];
 };
 
 } // namespace vrv

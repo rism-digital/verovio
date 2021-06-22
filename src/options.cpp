@@ -21,23 +21,23 @@
 
 namespace vrv {
 
-std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
+const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
     { BREAKS_line, "line" }, { BREAKS_smart, "smart" }, { BREAKS_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_condense
+const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_footer
+const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
-std::map<int, std::string> Option::s_header
+const std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
-std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
+const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
-std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_auto, "auto" },
-    { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
+    { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 constexpr const char *engravingDefaults
     = "{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
@@ -464,7 +464,7 @@ void OptionIntMap::CopyTo(Option *option)
     *child = *this;
 }
 
-void OptionIntMap::Init(int defaultValue, std::map<int, std::string> *values)
+void OptionIntMap::Init(int defaultValue, const std::map<int, std::string> *values)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -476,8 +476,8 @@ bool OptionIntMap::SetValue(const std::string &value)
 {
     assert(m_values);
 
-    std::map<int, std::string>::iterator it;
-    for (it = m_values->begin(); it != m_values->end(); ++it)
+    std::map<int, std::string>::const_iterator it;
+    for (it = m_values->cbegin(); it != m_values->cend(); ++it)
         if (it->second == value) {
             m_value = it->first;
             m_isSet = true;
@@ -520,8 +520,8 @@ std::vector<std::string> OptionIntMap::GetStrValues(bool withoutDefault) const
 
     std::vector<std::string> strValues;
     strValues.reserve(m_values->size());
-    std::map<int, std::string>::iterator it;
-    for (it = m_values->begin(); it != m_values->end(); ++it) {
+    std::map<int, std::string>::const_iterator it;
+    for (it = m_values->cbegin(); it != m_values->cend(); ++it) {
         if (withoutDefault && (it->first == m_defaultValue)) {
             continue;
         }

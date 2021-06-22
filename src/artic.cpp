@@ -24,17 +24,17 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
+const std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
     ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
 
-std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow,
-    ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
+const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc,
+    ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
 
 //----------------------------------------------------------------------------
 // Artic
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Artic> s_factory("artic", ARTIC);
+static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
 Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
 {

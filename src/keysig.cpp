@@ -28,12 +28,12 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-data_PITCHNAME KeySig::s_pnameForFlats[]
+const data_PITCHNAME KeySig::s_pnameForFlats[]
     = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-data_PITCHNAME KeySig::s_pnameForSharps[]
+const data_PITCHNAME KeySig::s_pnameForSharps[]
     = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
 
-int KeySig::octave_map[2][9][7] = {
+const int KeySig::octave_map[2][9][7] = {
     {
         // flats
         // C,  D,  E,  F,  G,  A,  B
@@ -66,7 +66,7 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<KeySig> s_factory("keySig", KEYSIG);
+static const ClassRegistrar<KeySig> s_factory("keySig", KEYSIG);
 
 KeySig::KeySig()
     : LayerElement("keysig-")
@@ -200,22 +200,19 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
         return keyAccid->GetSymbolStr();
     }
 
-    data_PITCHNAME *accidSet;
-
     if (pos > 6) return symbolStr;
 
     int symb;
     accid = this->GetAccidType();
     if (accid == ACCIDENTAL_WRITTEN_f) {
         symb = SMUFL_E260_accidentalFlat;
-        accidSet = s_pnameForFlats;
+        pname = s_pnameForFlats[pos];
     }
     else {
         symb = SMUFL_E262_accidentalSharp;
-        accidSet = s_pnameForSharps;
+        pname = s_pnameForSharps[pos];
     }
 
-    pname = accidSet[pos];
     symbolStr.push_back(symb);
     return symbolStr;
 }
@@ -237,18 +234,14 @@ int KeySig::GetFifthsInt() const
 
 data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int pos)
 {
-    data_PITCHNAME *accidSet;
-
     if (pos > 6) return PITCHNAME_c;
 
     if (accidType == ACCIDENTAL_WRITTEN_f) {
-        accidSet = s_pnameForFlats;
+        return s_pnameForFlats[pos];
     }
     else {
-        accidSet = s_pnameForSharps;
+        return s_pnameForSharps[pos];
     }
-
-    return accidSet[pos];
 }
 
 int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, Clef *clef)
