@@ -93,25 +93,23 @@ const char *vrvToolkit_getHumdrum(void *tkPtr)
     return buffer;
 }
 
-<<<<<<< HEAD
-const char *vrvToolkit_convertHumdrumToHumdrum(Toolkit *tk, const char *humdrumData)
+const char *vrvToolkit_convertHumdrumToHumdrum(void *tkPtr, const char *humdrumData)
 {
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->ConvertHumdrumToHumdrum(humdrumData);
     const char *buffer = tk->GetHumdrumBuffer();
     return buffer;
 }
 
-const char *vrvToolkit_convertMEIToHumdrum(Toolkit *tk, const char *meiData)
+const char *vrvToolkit_convertMEIToHumdrum(void *tkPtr, const char *meiData)
 {
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->ConvertMEIToHumdrum(meiData);
     const char *buffer = tk->GetHumdrumBuffer();
     return buffer;
 }
 
-const char *vrvToolkit_getLog(Toolkit *tk)
-=======
 const char *vrvToolkit_getLog(void *tkPtr)
->>>>>>> develop
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->GetLog());
