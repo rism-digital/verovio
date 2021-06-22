@@ -1401,7 +1401,7 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
         || (!params->m_isOtherLayer && Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam)
             && !IsGraceNote()))
         return FUNCTOR_SIBLINGS;
-    if (Is({ GRACEGRP, TUPLET, TUPLET_NUM, TUPLET_BRACKET, BTREM })) return FUNCTOR_CONTINUE;
+    if (Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
