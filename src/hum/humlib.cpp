@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 19 23:41:10 PDT 2021
+// Last Modified: Mon Jun 21 10:09:00 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -5396,7 +5396,11 @@ GridSlice* GridMeasure::addDataToken(const string& tok, HumNum timestamp,
 				iterator++;
 				continue;
 			}
-			if (!(*iterator)->isDataSlice()) {
+			if ((timestamp == (*iterator)->getTimestamp()) && ((*iterator)->isMeasureSlice())) {
+				iterator++;
+				continue;
+			}
+			if ((!(*iterator)->isDataSlice()) && (timestamp >= (*iterator)->getTimestamp())) {
 				iterator++;
 				continue;
 			} else if ((*iterator)->getTimestamp() == timestamp) {
@@ -5404,7 +5408,7 @@ GridSlice* GridMeasure::addDataToken(const string& tok, HumNum timestamp,
 				target->addToken(tok, part, staff, voice);
 				gs = target;
 				break;
-			} else if ((*iterator)->getTimestamp() > timestamp) {
+			} else if (timestamp < (*iterator)->getTimestamp()) {
 				gs = new GridSlice(this, timestamp, SliceType::Notes, maxstaff);
 				gs->addToken(tok, part, staff, voice);
 				this->insert(iterator, gs);
@@ -70034,7 +70038,9 @@ void Tool_kernview::processFile(HumdrumFile& infile) {
 
 
 
-#define QUARTER_CONVERT * 4
+// #define QUARTER_CONVERT * 4
+#define QUARTER_CONVERT
+
 #define ELEMENT_DEBUG_STATEMENT(X)
 //#define ELEMENT_DEBUG_STATEMENT(X)  cerr << #X << endl;
 
@@ -71998,8 +72004,15 @@ HumNum Tool_mei2hum::parseLayer_mensural(xml_node layer, HumNum starttime, vecto
 void Tool_mei2hum::parseBarline(xml_node barLine, HumNum starttime) {
 	NODE_VERIFY(barLine, )
 
-	// m_outdata.back()->addBarlineToken("=", starttime QUARTER_CONVERT,
-	// 		m_currentStaff-1, 0, 0, m_staffcount);
+	// Check to see if there is another barline following this one, and if so
+	// do not insert this barline.
+	xml_node nextsibling = barLine.next_sibling();
+	if (strcmp(nextsibling.name(), "barLine") == 0) {
+		return;
+	}
+
+	m_outdata.back()->addBarlineToken("=", starttime QUARTER_CONVERT,
+ 		m_currentStaff-1, 0, 0, m_staffcount);
 }
 
 
