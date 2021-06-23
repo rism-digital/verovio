@@ -1780,7 +1780,14 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                 bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
 
                 if (hasOverlap) {
-                    overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+                    // For note to note alignment, make sure there is a standard spacing even if they to not overlap vertically
+                    if (this->Is(NOTE) and element->Is(NOTE)) {
+                        overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
+
+                    }
+                    else {
+                        overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+                    }
                     // LogDebug("%s overlaps of %d, margin %d", this->GetClassName().c_str(), overlap, margin);
                 }
             }
