@@ -986,6 +986,47 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 }
 
+void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    
+    MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
+    const ArrayOfObjects *childList = meterSigGrp->GetList(meterSigGrp);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int offset = 0;
+    dc->StartGraphic(meterSigGrp, "", meterSigGrp->GetUuid());
+    // Draw meterSigGrp by alternating meterSig and plus sign (when required)
+    for (auto iter = childList->begin(); iter != childList->end(); ++iter) {
+        MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
+        assert(meterSig);
+
+        dc->StartGraphic(meterSig, "", meterSig->GetUuid());
+        int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
+        int x = meterSig->GetDrawingX() + offset;
+
+        if (meterSig->HasCount()) {
+            DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+        }
+
+        dc->EndGraphic(meterSig, this);
+        int margin = unit / 2;
+        const int width = meterSig->GetContentRight() - meterSig->GetContentLeft();
+        if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))){
+            // draw plus sign here
+            const int plusX = x + width;
+            DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
+            offset += width + 2 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false);
+        }
+        else {
+            offset += width + margin;
+        }
+    }
+
+    dc->EndGraphic(meterSigGrp, this);
+}
+
 void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
 {
     assert(dc);
@@ -1236,7 +1277,10 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     if (layer->GetStaffDefMensur()) {
         DrawLayerElement(dc, layer->GetStaffDefMensur(), layer, staff, measure);
     }
-    if (layer->GetStaffDefMeterSig()) {
+    if (layer->GetStaffDefMeterSigGrp()) {
+        DrawMeterSigGrp(dc, layer, staff);
+    }
+    else if (layer->GetStaffDefMeterSig()) {
         DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
     }
 
