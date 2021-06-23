@@ -947,16 +947,20 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Show cancellation if show cancellation (showchange) is true (false by default)
     // This is not meant to make sense with mixed key signature
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
-        // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
-        if (keySig->GetAccidType() != keySig->m_drawingCancelAccidType) {
-            for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-                loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+        const int beginCancel
+            = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
+        for (i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
+            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
+            loc = PitchInterface::CalcLoc(
+                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += naturalGlyphWidth + naturalStep;
+            DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+
+            x += naturalGlyphWidth + naturalStep;
+            if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
+                // Add some extra space after last natural
+                x += step;
             }
         }
     }
@@ -979,24 +983,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     dc->ResetFont();
-
-    // Show cancellation if show cancellation (showchange) is true (false by default)
-    // This is not meant to make sense with mixed key signature
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
-        // Same time of alteration, but smaller number - cancellation is displayed afterwards
-        if ((keySig->GetAccidType() == keySig->m_drawingCancelAccidType)
-            && (keySig->GetAccidCount() < keySig->m_drawingCancelAccidCount)) {
-            for (i = keySig->GetAccidCount(); i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-                loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += naturalGlyphWidth + naturalStep;
-            }
-        }
-    }
 
     dc->EndGraphic(element, this);
 }
