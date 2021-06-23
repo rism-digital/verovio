@@ -59,9 +59,13 @@ public:
     virtual bool IsSupportedChild(Object *object);
     ///@}
 
+    MeterSig *GetSimplifiedMeterSig();
+
     //----------//
     // Functors //
     //----------//
+
+    int AlignHorizontally(FunctorParams *functorParams);
 
 protected:
     /**
@@ -71,6 +75,7 @@ protected:
 
 private:
     //
+    int m_count = 0;
 }; // MeterSigGrp
 
 } // namespace vrv

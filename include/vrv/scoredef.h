@@ -20,6 +20,7 @@ class Clef;
 class KeySig;
 class Mensur;
 class MeterSig;
+class MeterSigGrp;
 class PgFoot;
 class PgFoot2;
 class PgHead;
@@ -66,6 +67,7 @@ public:
     bool HasKeySigInfo(int depth = 1);
     bool HasMensurInfo(int depth = 1);
     bool HasMeterSigInfo(int depth = 1);
+    bool HasMeterSigGrpInfo(int depth = 1);
     ///@}
 
     /**
@@ -85,6 +87,8 @@ public:
     Mensur *GetMensurCopy();
     MeterSig *GetMeterSig();
     MeterSig *GetMeterSigCopy();
+    MeterSigGrp *GetMeterSigGrp();
+    MeterSigGrp *GetMeterSigGrpCopy();
     ///@}
 
     //----------//
@@ -156,7 +160,7 @@ public:
      * This is necessary at the beginning or when a scoreDef occurs.
      * Only true flags are applied, unless applyToAll is set to true.
      */
-    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll);
+    void SetRedrawFlags(int redrawFlags);
 
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.

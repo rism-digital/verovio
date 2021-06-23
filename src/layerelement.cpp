@@ -36,6 +36,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "metersiggrp.h"
 #include "mrest.h"
 #include "mrpt.h"
 #include "mrpt2.h"
@@ -1025,6 +1026,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_SCOREDEF_METERSIG;
         else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_METERSIG;
+        else if (this->GetParent() && this->GetParent()->Is(METERSIGGRP))
+            type = ALIGNMENT_SCOREDEF_METERSIG;
         else {
             // replace the current meter signature
             params->m_currentMeterSig = vrv_cast<MeterSig *>(this);
