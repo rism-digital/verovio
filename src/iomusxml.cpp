@@ -241,7 +241,6 @@ void MusicXmlInput::AddClefs(Measure *measure, const musicxml::ClefChange &clefC
             if (mSpace) {
                 Layer *parentLayer = dynamic_cast<Layer *>(mSpace->GetParent());
                 if (mSpace && parentLayer) {
-                    int index = mSpace->GetIdx();
                     parentLayer->DeleteChild(mSpace);
                     m_elementStackMap[parentLayer] = {};
                     FillSpace(parentLayer, clefChange.m_scoreOnset);
