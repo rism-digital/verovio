@@ -1771,6 +1771,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // Here we look how bounding boxes overlap and adjust the position only when necessary
         if (performBoundingBoxAlignment) {
             selfLeft = this->GetAlignment()->GetXRel();
+            // If we want the nesting to be reduced, we can set to:
+            // selfLeft = this->GetSelfLeft();
+            // This could be made an option (--spacing-limited-nesting)
             int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
             int overlap = 0;
             for (auto &boundingBox : params->m_boundingBoxes) {
@@ -1783,7 +1786,6 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                     // For note to note alignment, make sure there is a standard spacing even if they to not overlap vertically
                     if (this->Is(NOTE) and element->Is(NOTE)) {
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
-
                     }
                     else {
                         overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
