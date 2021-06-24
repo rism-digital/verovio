@@ -470,6 +470,7 @@ int Staff::AlignHorizontally(FunctorParams *functorParams)
     else {
         params->m_notationType = NOTATIONTYPE_cmn;
     }
+    m_drawingStaffDef->AlternateCurrentMeterSig(GetParent()->GetUuid());
 
     return FUNCTOR_CONTINUE;
 }

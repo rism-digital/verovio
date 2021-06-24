@@ -1606,6 +1606,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         if (staff->IsTablature()) {
             staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
         }
+        if (MeterSigGrp *metersiggrp = params->m_currentStaffDef->GetCurrentMeterSigGrp();
+            metersiggrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
+            metersiggrp->AddMeasureIdToVector(staff->GetParent()->GetUuid());
+        }
         return FUNCTOR_CONTINUE;
     }
 

@@ -486,6 +486,16 @@ bool StaffDefDrawingInterface::DrawMeterSigGrp()
     return false;
 }
 
+void StaffDefDrawingInterface::AlternateCurrentMeterSig(const std::string& measureId) 
+{
+    if (MeterSigGrp *meterSigGrp = GetCurrentMeterSigGrp(); meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
+        meterSigGrp->SetMeasureBasedCount(measureId);
+        MeterSig *meter = meterSigGrp->GetSimplifiedMeterSig();
+        SetCurrentMeterSig(meter);
+        delete meter;
+    }
+}
+
 //----------------------------------------------------------------------------
 // StemmedDrawingInterface
 //----------------------------------------------------------------------------

@@ -59,14 +59,29 @@ public:
     virtual bool IsSupportedChild(Object *object);
     ///@}
 
+    /**
+     * Add specified measureId to the m_alternatingMeasures vector
+     */
+    void AddMeasureIdToVector(const std::string &measureId);
+
+    /**
+     * Get simplified (i.e. single metersig with count/unit) based on the MeterSigGrp function
+     */
     MeterSig *GetSimplifiedMeterSig();
+
+    /**
+     * Set counter for the alternating meterSigGrp based on the provided measureId
+     */
+    void SetMeasureBasedCount(const std::string &measureId);    
 
     //----------//
     // Functors //
     //----------//
-
+    /**
+     * See Object::AlignHorizontally
+     */
     int AlignHorizontally(FunctorParams *functorParams);
-
+    
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
@@ -74,7 +89,9 @@ protected:
     virtual void FilterList(ArrayOfObjects *childList);
 
 private:
-    //
+    // vector with alternating measures Ids (used only with meterSigGrpLog_FUNC_alternating)
+    std::vector<std::string> m_alternatingMeasures; 
+    // counter for the meterSig to be used with meterSigGrpLog_FUNC_alternating
     int m_count = 0;
 }; // MeterSigGrp
 

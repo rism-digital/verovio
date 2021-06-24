@@ -72,6 +72,11 @@ void MeterSigGrp::FilterList(ArrayOfObjects *childList)
         childList->end());
 }
 
+void MeterSigGrp::AddMeasureIdToVector(const std::string &measureId) 
+{
+    m_alternatingMeasures.emplace_back(measureId);
+}
+
 MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
 {
     MeterSig *newMeterSig = NULL;
@@ -82,7 +87,6 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
             if (!newMeterSig) {
                 const int index = m_count % childList->size();
                 newMeterSig = vrv_cast<MeterSig *>((childList->at(index))->Clone());
-                ++m_count;
             }
             break;
         }
@@ -157,9 +161,15 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
     return newMeterSig;
 }
 
-//----------//
-// Functors //
-//----------//
+void MeterSigGrp::SetMeasureBasedCount(const std::string &measureId)
+{
+    auto it = std::find(m_alternatingMeasures.begin(), m_alternatingMeasures.end(), measureId);
+    m_count = it - m_alternatingMeasures.begin();
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
 
 int MeterSigGrp::AlignHorizontally(FunctorParams *functorParams)
 {
