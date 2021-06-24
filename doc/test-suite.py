@@ -1,10 +1,11 @@
 # This script it expected to be run from ./bindings/python
 import argparse
-import cairosvg
 import json
 import os
 import sys
 import xml.etree.ElementTree as ET
+
+import cairosvg
 
 # Add path for toolkit built in-place
 sys.path.append('.')
@@ -28,16 +29,16 @@ testOptions = {
     'spacingStaff': 4
 }
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("test_suite_dir")
-    parser.add_argument("output_dir")
-    parser.add_argument("--shortlist", nargs='?', default='')
+    parser.add_argument('test_suite_dir')
+    parser.add_argument('output_dir')
+    parser.add_argument('--shortlist', nargs='?', default='')
     args = parser.parse_args()
 
-    tk = verovio.toolkit(False)
     # version of the toolkit
-    print(tk.getVersion())
+    tk = verovio.toolkit(False)
+    print(f'Verovio {tk.getVersion()}')
 
     # keep all the options to be able to reset them for each test
     defaultOptions = json.loads(tk.getOptions(True))
@@ -50,7 +51,7 @@ if __name__ == "__main__":
         with open(args.shortlist) as f:
             for line in f:
                 shortlist.append(line.strip('\n'))
-                print("File {} added to the shortlist".format(line))
+                print('File {} added to the shortlist'.format(line))
 
     path1 = args.test_suite_dir.replace("\ ", " ")
     path2 = args.output_dir.replace("\ ", " ")
@@ -90,8 +91,8 @@ if __name__ == "__main__":
                 tree = ET.parse(inputFile)
                 root = tree.getroot()
                 # try to get the extMeta tag and load the options if existing
-                meta = root.findtext(".//mei:meiHead/mei:extMeta", namespaces=ns)
-                if (meta != None and meta != ''):
+                meta = root.findtext('.//mei:meiHead/mei:extMeta', namespaces=ns)
+                if meta is not None and meta != '':
                     print(meta)
                     metaOptions = json.loads(meta)
                     options = {**options, **metaOptions}

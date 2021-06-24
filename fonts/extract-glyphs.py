@@ -86,6 +86,7 @@ if __name__ == '__main__':
     # (1) Parse files
     supported_glyph_codes = get_supported_glyph_codes()
     (font_family, units_per_em, glyphs) = read_svg_file()
+    rel_path = f'../data/{font_family}'
 
     # (2) Create xml file for each glyph
     for glyph in glyphs:
@@ -100,7 +101,8 @@ if __name__ == '__main__':
             path.set('transform', 'scale(1,-1)')
             if 'd' in glyph.attrib:
                 path.set('d', glyph.attrib['d'])
-            file_path = f"../data/{font_family}/{glyph_code}-{supported_glyph_codes[glyph_code]}.xml"
+            os.makedirs(rel_path, exist_ok=True)
+            file_path = f'{rel_path}/{glyph_code}-{supported_glyph_codes[glyph_code]}.xml'
             xml = ET.tostring(root, encoding='unicode')
             write_file_content(file_path, xml)
 
