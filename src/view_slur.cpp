@@ -550,11 +550,11 @@ float View::CalcInitialSlur(
 
     System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
     assert(system);
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
     findSpannedLayerElementsParams.m_minPos = bezier.p1.x;
     findSpannedLayerElementsParams.m_maxPos = bezier.p2.x;
-    findSpannedLayerElementsParams.m_classIds
-        = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
+    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
+        TUPLET_NUM }; // Ties obtain separate treatment below
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
     std::set<int> staffNumbers;
@@ -609,10 +609,24 @@ float View::CalcInitialSlur(
         }
     }
 
-    for (auto &positioner : findSpannedLayerElementsParams.m_ties) {
-        CurveSpannedElement *spannedElement = new CurveSpannedElement;
-        spannedElement->m_boundingBox = positioner;
-        curve->AddSpannedElement(spannedElement);
+    // Ties can be broken across systems, so we have to look for all floating curve positioners that represent them
+    ArrayOfFloatingPositioners tiePositioners = staff->GetAlignment()->FindAllFloatingPositioners(TIE);
+    if (startStaff && (startStaff != staff)) {
+        const ArrayOfFloatingPositioners tiePositionersStart
+            = startStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
+        std::copy(tiePositionersStart.begin(), tiePositionersStart.end(), std::back_inserter(tiePositioners));
+    }
+    else if (endStaff && (endStaff != staff)) {
+        const ArrayOfFloatingPositioners tiePositionersEnd = endStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
+        std::copy(tiePositionersEnd.begin(), tiePositionersEnd.end(), std::back_inserter(tiePositioners));
+    }
+    for (FloatingPositioner *positioner : tiePositioners) {
+        if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)
+            && (positioner->GetContentLeft() < bezier.p2.x)) {
+            CurveSpannedElement *spannedElement = new CurveSpannedElement;
+            spannedElement->m_boundingBox = positioner;
+            curve->AddSpannedElement(spannedElement);
+        }
     }
 
     /************** angle **************/

@@ -178,6 +178,11 @@ public:
     FloatingPositioner *FindFirstFloatingPositioner(ClassId classId);
 
     /**
+     * Find all FloatingPositioner corresponding to a FloatingObject with given ClassId.
+     */
+    ArrayOfFloatingPositioners FindAllFloatingPositioners(ClassId classId);
+
+    /**
      * Look for the FloatingPositioner corresponding to the FloatingObject.
      * Return NULL if not found and does not create anything.
      */

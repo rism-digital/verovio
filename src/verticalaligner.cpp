@@ -493,6 +493,14 @@ FloatingPositioner *StaffAlignment::FindFirstFloatingPositioner(ClassId classId)
     return NULL;
 }
 
+ArrayOfFloatingPositioners StaffAlignment::FindAllFloatingPositioners(ClassId classId)
+{
+    ArrayOfFloatingPositioners positioners;
+    std::copy_if(m_floatingPositioners.begin(), m_floatingPositioners.end(), std::back_inserter(positioners),
+        [classId](FloatingPositioner *positioner) { return (positioner->GetObject()->GetClassId() == classId); });
+    return positioners;
+}
+
 FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject *object)
 {
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),

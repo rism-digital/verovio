@@ -65,11 +65,6 @@ public:
     virtual int ResolveMIDITies(FunctorParams *functorParams);
     ///@}
 
-    /**
-     * See Object::FindSpannedLayerElements
-     */
-    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
-
 private:
     // Calculate initial position X position and return stem direction of the startNote
     void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
