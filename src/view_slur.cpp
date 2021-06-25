@@ -609,16 +609,18 @@ float View::CalcInitialSlur(
         }
     }
 
-    // Ties can be broken across systems, so we have to look for all floating curve positioners that represent them
+    // Ties can be broken across systems, so we have to look for all floating curve positioners that represent them.
+    // This might be refined later, since using the entire bounding box of a tie for collision avoidance with slurs is
+    // coarse.
     ArrayOfFloatingPositioners tiePositioners = staff->GetAlignment()->FindAllFloatingPositioners(TIE);
     if (startStaff && (startStaff != staff)) {
-        const ArrayOfFloatingPositioners tiePositionersStart
+        const ArrayOfFloatingPositioners startTiePositioners
             = startStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
-        std::copy(tiePositionersStart.begin(), tiePositionersStart.end(), std::back_inserter(tiePositioners));
+        std::copy(startTiePositioners.begin(), startTiePositioners.end(), std::back_inserter(tiePositioners));
     }
     else if (endStaff && (endStaff != staff)) {
-        const ArrayOfFloatingPositioners tiePositionersEnd = endStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
-        std::copy(tiePositionersEnd.begin(), tiePositionersEnd.end(), std::back_inserter(tiePositioners));
+        const ArrayOfFloatingPositioners endTiePositioners = endStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
+        std::copy(endTiePositioners.begin(), endTiePositioners.end(), std::back_inserter(tiePositioners));
     }
     for (FloatingPositioner *positioner : tiePositioners) {
         if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)

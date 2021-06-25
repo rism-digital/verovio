@@ -142,27 +142,16 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     /************** y position **************/
 
-    bool isShortTie = false;
     // shortTie correction cannot be applied for chords
-    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit)) {
-        isShortTie = true;
-    }
+    const bool isShortTie = !startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit);
 
-    if (drawingCurveDir == curvature_CURVEDIR_above) {
-        startPoint.y += drawingUnit / 2;
-        endPoint.y += drawingUnit / 2;
-        if (isShortTie) {
-            startPoint.y += drawingUnit;
-            endPoint.y += drawingUnit;
-        }
-    }
-    else {
-        startPoint.y -= drawingUnit / 2;
-        endPoint.y -= drawingUnit / 2;
-        if (isShortTie) {
-            startPoint.y -= drawingUnit;
-            endPoint.y -= drawingUnit;
-        }
+    const int ySign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
+
+    startPoint.y += ySign * drawingUnit / 2;
+    endPoint.y += ySign * drawingUnit / 2;
+    if (isShortTie) {
+        startPoint.y += ySign * drawingUnit;
+        endPoint.y += ySign * drawingUnit;
     }
 
     /************** bezier points **************/
@@ -182,14 +171,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     c1.x = startPoint.x + (endPoint.x - startPoint.x) / 4; // point at 1/4
     c2.x = startPoint.x + (endPoint.x - startPoint.x) / 4 * 3; // point at 3/4
 
-    if (drawingCurveDir == curvature_CURVEDIR_above) {
-        c1.y = startPoint.y + height;
-        c2.y = endPoint.y + height;
-    }
-    else {
-        c1.y = startPoint.y - height;
-        c2.y = endPoint.y - height;
-    }
+    c1.y = startPoint.y + ySign * height;
+    c2.y = endPoint.y + ySign * height;
 
     // Point bezier[4];
     bezier[0] = startPoint;
