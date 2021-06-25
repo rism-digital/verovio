@@ -8412,6 +8412,9 @@ void HumdrumInput::checkForVerseLabels(hum::HTp token)
         if (current->compare(0, 3, "*v:") == 0) {
             ss[staffindex].verse_labels.push_back(current);
         }
+        if (current->compare(0, 4, "*vv:") == 0) {
+            ss[staffindex].verse_labels.push_back(current);
+        }
         current = current->getNextFieldToken();
     }
 }
@@ -19468,10 +19471,14 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
 
         std::vector<hum::HTp> labels;
         std::string verselabel;
+        std::string verselabelabbr;
         if (!ss[staff].verse_labels.empty()) {
             labels = getVerseLabels(line.token(i), staff);
             if (!labels.empty()) {
                 verselabel = getVerseLabelText(labels[0]);
+                if (labels[0]->compare(0, 4, "*vv:") == 0) {
+                    verselabelabbr = verselabel;
+                }
             }
         }
 
@@ -19522,6 +19529,14 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
 
             if (!verselabel.empty()) {
                 Label *label = new Label;
+                Text *text = new Text;
+                std::wstring wtext = UTF8to16(verselabel);
+                text->SetText(wtext);
+                verse->AddChild(label);
+                label->AddChild(text);
+            }
+            if (!verselabelabbr.empty()) {
+                LabelAbbr *label = new LabelAbbr;
                 Text *text = new Text;
                 std::wstring wtext = UTF8to16(verselabel);
                 text->SetText(wtext);
@@ -19740,20 +19755,15 @@ std::string HumdrumInput::getVerseLabelText(hum::HTp token)
     if (!token->isInterpretation()) {
         return "";
     }
-    if (token->compare(0, 3, "*v:") != 0) {
-        return "";
-    }
-    std::string contents = token->substr(3);
-    std::string output;
     hum::HumRegex hre;
-    if (hre.search(contents, "^\\d+$")) {
-        output = contents;
-        output += '.';
+    if (hre.search(token, "^\\*vv?:(.*)")) {
+        std::string output = hre.getMatch(1);
+        if (hre.search(output, "^\\d+$")) {
+            output += ".";
+        }
+        return output;
     }
-    else {
-        output = contents;
-    }
-    return output;
+    return "";
 }
 
 //////////////////////////////
