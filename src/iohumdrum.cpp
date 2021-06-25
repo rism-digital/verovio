@@ -8677,7 +8677,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
 
             bool forceClefChange = false;
-            if (layerdata[i]->isClef()) {
+            if (layerdata[i]->isClef() || (*layerdata[i] == "*")) {
                 if (layerdata[i]->getValueBool("auto", "clefChange")) {
                     forceClefChange = true;
                 }
