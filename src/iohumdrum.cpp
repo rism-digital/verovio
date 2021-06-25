@@ -737,6 +737,7 @@ bool HumdrumInput::convertHumdrum()
     m_transpose.resize(staffstarts.size());
     std::fill(m_transpose.begin(), m_transpose.end(), 0);
 
+    prepareFingerings(infile);
     prepareVerses();
     // ggg problem here: mens calculation after this point or before?
     prepareSections();
@@ -776,6 +777,98 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareFingerings -- Mark fingerings with explicit
+//    above/below placements.
+//
+
+void HumdrumInput::prepareFingerings(hum::HumdrumFile &infile)
+{
+    if (!m_fing) {
+        // No fingerings, so nothing to do.
+        return;
+    }
+
+    std::vector<hum::HTp> fingstarts;
+    infile.getSpineStartList(fingstarts, "**fing");
+    for (hum::HTp fstart : fingstarts) {
+        prepareFingerings(fstart);
+    }
+}
+
+void HumdrumInput::prepareFingerings(hum::HTp fstart)
+{
+    //  0 = undefined
+    // +1 = above
+    // -1 = below
+    std::vector<int> states(100, 0);
+    hum::HTp current = fstart->getNextToken();
+    hum::HTp fcurrent;
+    int track;
+    int ttrack;
+    while (current) {
+        if (current->isInterpretation()) {
+            fcurrent = current;
+            track = fcurrent->getTrack();
+            while (fcurrent) {
+                ttrack = fcurrent->getTrack();
+                if (track != ttrack) {
+                    break;
+                }
+                if (*fcurrent == "*above") {
+                    int subtrack = fcurrent->getSubtrack();
+                    states.at(subtrack) = +1;
+                }
+                else if (*fcurrent == "*Xabove") {
+                    int subtrack = fcurrent->getSubtrack();
+                    states.at(subtrack) = 0;
+                }
+                else if (*fcurrent == "*below") {
+                    int subtrack = fcurrent->getSubtrack();
+                    states.at(subtrack) = -1;
+                }
+                else if (*fcurrent == "*Xbelow") {
+                    int subtrack = fcurrent->getSubtrack();
+                    states.at(subtrack) = 0;
+                }
+                fcurrent = fcurrent->getNextFieldToken();
+            }
+        }
+        if (!current->isData()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->isNull()) {
+            current = current->getNextToken();
+            continue;
+        }
+        fcurrent = current;
+        track = fcurrent->getTrack();
+        while (fcurrent) {
+            ttrack = fcurrent->getTrack();
+            if (track != ttrack) {
+                break;
+            }
+            if (fcurrent->isNull()) {
+                fcurrent = fcurrent->getNextFieldToken();
+                continue;
+            }
+            int subtrack = fcurrent->getSubtrack();
+            if (states.at(subtrack) != 0) {
+                if (states.at(subtrack) > 0) {
+                    fcurrent->setValue("auto", "place", "above");
+                }
+                else if (states.at(subtrack) < 0) {
+                    fcurrent->setValue("auto", "place", "below");
+                }
+            }
+            fcurrent = fcurrent->getNextFieldToken();
+        }
+        current = current->getNextToken();
+    }
 }
 
 //////////////////////////////
@@ -6728,6 +6821,13 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
 
             int staffindex = m_rkern[track];
             int maxstaff = (int)staffstarts.size();
+
+            if (token->getValue("auto", "place") == "above") {
+                aboveQ = true;
+            }
+            else if (token->getValue("auto", "place") == "below") {
+                aboveQ = false;
+            }
 
             if (aboveQ) {
                 for (int k = 0; k < (int)nums.size(); k++) {

@@ -722,6 +722,8 @@ protected:
     bool layerOnlyContainsNullStuff(std::vector<hum::HTp> &data);
     int getNoteStaff(hum::HTp token, int homestaff);
     void addBarLineElement(hum::HTp bartok, std::vector<std::string> &elements, std::vector<void *> &pointers);
+    void prepareFingerings(hum::HumdrumFile &infile);
+    void prepareFingerings(hum::HTp fstart);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
