@@ -36,6 +36,9 @@ verovio.vrvToolkit.convertMEIToHumdrum = Module.cwrap( 'vrvToolkit_convertMEIToH
 // char *convertHumdrumToHumdrum(Toolkit *ic, const char *humdrumData)
 verovio.vrvToolkit.convertHumdrumToHumdrum = Module.cwrap( 'vrvToolkit_convertHumdrumToHumdrum', 'string', ['number', 'string'] );
 
+// char *convertHumdrumToMIDI(Toolkit *ic, const char *humdrumData)
+verovio.vrvToolkit.convertHumdrumToMIDI = Module.cwrap( 'vrvToolkit_convertHumdrumToMIDI', 'string', ['number', 'string'] );
+
 // char *getLog(Toolkit *ic)
 verovio.vrvToolkit.getLog = Module.cwrap( 'vrvToolkit_getLog', 'string', ['number'] );
 
@@ -156,6 +159,11 @@ verovio.toolkit.prototype.getHumdrum = function ()
 verovio.toolkit.prototype.convertHumdrumToHumdrum = function ( data )
 {
     return verovio.vrvToolkit.convertHumdrumToHumdrum( this.ptr, data );
+};
+
+verovio.toolkit.prototype.convertHumdrumToMIDI = function ( data )
+{
+    return verovio.vrvToolkit.convertHumdrumToMIDI( this.ptr, data );
 };
 
 verovio.toolkit.prototype.convertMEIToHumdrum = function ( data )

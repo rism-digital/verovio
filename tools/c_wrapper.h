@@ -24,6 +24,7 @@ const char *vrvToolkit_getElementsAtTime(void *tkPtr, int millisec);
 const char *vrvToolkit_getExpansionIdsForElement(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getHumdrum(void *tkPtr);
 const char *vrvToolkit_convertHumdrumToHumdrum(void *tkPtr, const char *humdrumData);
+const char *vrvToolkit_convertHumdrumToMIDI(void *tkPtr, const char *humdrumData);
 const char *vrvToolkit_convertMEIToHumdrum(void *tkPtr, const char *meiData);
 const char *vrvToolkit_getLog(void *tkPtr);
 const char *vrvToolkit_getMEI(void *tkPtr, const char *options);

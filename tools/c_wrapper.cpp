@@ -101,6 +101,13 @@ const char *vrvToolkit_convertHumdrumToHumdrum(void *tkPtr, const char *humdrumD
     return buffer;
 }
 
+const char *vrvToolkit_convertHumdrumToMIDI(void *tkPtr, const char *humdrumData)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->ConvertHumdrumToMIDI(humdrumData));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_convertMEIToHumdrum(void *tkPtr, const char *meiData)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

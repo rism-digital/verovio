@@ -27,6 +27,7 @@ enum FileFormat {
     MEI,
     HUMDRUM,
     HUMMEI,
+    HUMMIDI,
     PAE,
     ABC,
     DARMS,
@@ -383,6 +384,13 @@ public:
      * @return The Humdrum data as a string
      */
     std::string ConvertHumdrumToHumdrum(const std::string &humdrumData);
+
+    /**
+     * Convert Humdrum data to MIDI.
+     *
+     * @return The MIDI file as a base64-encoded string
+     */
+    std::string ConvertHumdrumToMIDI(const std::string &humdrumData);
 
     /**
      * Write the humdrum buffer to the file
