@@ -1044,9 +1044,38 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         else {
             Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
             appendTypeTag(tie, "hanging");
-            tie->SetColor("red");
+            bool allowedToHang = isTieAllowedToHang(token);
+            if (!allowedToHang) {
+                tie->SetColor("red");
+            }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isTieAllowedToHang -- True if there is a *rep or *> marker
+//     before the next non-null data.
+//
+
+bool HumdrumInput::isTieAllowedToHang(hum::HTp token)
+{
+    hum::HTp current = token->getNextToken();
+    while (current) {
+        if (current->isInterpretation()) {
+            if (*current == "*rep") {
+                return true;
+            }
+            if (current->compare(0, 2, "*>") == 0) {
+                return true;
+            }
+        }
+        else if (current->isData() && !current->isNull()) {
+            return false;
+        }
+        current = current->getNextToken();
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -1060,6 +1089,8 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
     Tie *tie = new Tie;
     addTieLineStyle(tie, token, subindex);
     measure->AddChild(tie);
+
+    addTieLineStyle(tie, token, subindex);
 
     hum::HTp trackend = token->getOwner()->getTrackEnd(token->getTrack());
     hum::HTp current = token->getNextToken();
@@ -10437,6 +10468,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     }
 
     vector<Artic *> articlist;
+    std::string color = getLoColor(token, "ART");
     for (int i = 0; i < (int)artics.size(); i++) {
         Artic *artic = new Artic;
         articlist.push_back(artic);
@@ -10447,6 +10479,9 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         }
         else {
             setLocationId(artic, token);
+        }
+        if (!color.empty()) {
+            artic->SetColor(color);
         }
         std::vector<data_ARTICULATION> oneartic;
         oneartic.clear();
@@ -12979,6 +13014,10 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     }
                 }
                 setLocationId(hairpin, dyntok, -1);
+                std::string color = getLoColor(dyntok, "HP");
+                if (!color.empty()) {
+                    hairpin->SetColor(color);
+                }
                 hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 hum::HumNum tstamp2;
                 if (duration > 0) {
@@ -13135,6 +13174,10 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     else if (forceBelowQ) {
                         setPlaceRelStaff(hairpin, "below", showplace);
                     }
+                }
+                std::string color = getLoColor(dyntok, "HP");
+                if (!color.empty()) {
+                    hairpin->SetColor(color);
                 }
                 setLocationId(hairpin, dyntok, -1);
                 hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
@@ -13512,6 +13555,40 @@ string HumdrumInput::getLayoutParameter(hum::HTp token, const std::string &categ
         }
     }
     return falseString;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLoColor -- Get any layout color value.
+//
+
+std::string HumdrumInput::getLoColor(hum::HTp token, const string &category, int subtoken)
+{
+    int lcount = token->getLinkedParameterSetCount();
+    if (lcount == 0) {
+        return "";
+    }
+
+    for (int p = 0; p < token->getLinkedParameterSetCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); ++q) {
+            std::string key = hps->getParameterName(q);
+            std::string value = hps->getParameterValue(q);
+            if (key == "color") {
+                return value;
+            }
+        }
+    }
+    return "";
 }
 
 //////////////////////////////
@@ -14654,32 +14731,65 @@ void HumdrumInput::addSlurLineStyle(Slur *element, hum::HTp token, int slurnumbe
 //        Default parameter: index = 0.
 //
 
-void HumdrumInput::addTieLineStyle(Tie *element, hum::HTp token, int noteindex)
+void HumdrumInput::addTieLineStyle(Tie *tie, hum::HTp token, int noteindex)
 {
+    std::string tstring;
+    if (noteindex < 0) {
+        tstring = *token;
+    }
+    else {
+        tstring = token->getSubtoken(noteindex);
+    }
 
     std::string dashed = token->getLayoutParameter("T", "dash", noteindex);
     std::string dotted = token->getLayoutParameter("T", "dot", noteindex);
     if (!dotted.empty()) {
-        element->SetLform(LINEFORM_dotted);
+        tie->SetLform(LINEFORM_dotted);
     }
     else if (!dashed.empty()) {
-        element->SetLform(LINEFORM_dashed);
+        tie->SetLform(LINEFORM_dashed);
     }
 
     std::string color = token->getLayoutParameter("T", "color", noteindex);
     if (!color.empty()) {
-        element->SetColor(color);
+        tie->SetColor(color);
     }
-
     std::string above = token->getLayoutParameter("T", "a", noteindex);
     if (!above.empty()) {
-        element->SetCurvedir(curvature_CURVEDIR_above);
+        tie->SetCurvedir(curvature_CURVEDIR_above);
     }
     else {
         std::string below = token->getLayoutParameter("T", "b", noteindex);
         if (!below.empty()) {
-            element->SetCurvedir(curvature_CURVEDIR_below);
+            tie->SetCurvedir(curvature_CURVEDIR_below);
         }
+    }
+
+    std::string marker1 = "[";
+    std::string marker2 = "[";
+    std::string marker3 = "_";
+    std::string marker4 = "_";
+
+    if (m_signifiers.above) {
+        marker1 += m_signifiers.above;
+        marker3 += m_signifiers.above;
+    }
+    if (m_signifiers.below) {
+        marker2 += m_signifiers.below;
+        marker4 += m_signifiers.below;
+    }
+
+    if (m_signifiers.above && tstring.find(marker1) != std::string::npos) {
+        tie->SetCurvedir(curvature_CURVEDIR_above);
+    }
+    else if (m_signifiers.below && tstring.find(marker2) != std::string::npos) {
+        tie->SetCurvedir(curvature_CURVEDIR_below);
+    }
+    else if (m_signifiers.above && tstring.find(marker3) != std::string::npos) {
+        tie->SetCurvedir(curvature_CURVEDIR_above);
+    }
+    else if (m_signifiers.below && tstring.find(marker4) != std::string::npos) {
+        tie->SetCurvedir(curvature_CURVEDIR_below);
     }
 }
 
@@ -21651,33 +21761,6 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
         }
         tie->SetStartid("#" + startid);
         tie->SetEndid("#" + endid);
-
-        std::string marker1 = "[";
-        std::string marker2 = "[";
-        std::string marker3 = "_";
-        std::string marker4 = "_";
-
-        if (m_signifiers.above) {
-            marker1 += m_signifiers.above;
-            marker3 += m_signifiers.above;
-        }
-        if (m_signifiers.below) {
-            marker2 += m_signifiers.below;
-            marker4 += m_signifiers.below;
-        }
-
-        if (m_signifiers.above && tstring.find(marker1) != std::string::npos) {
-            tie->SetCurvedir(curvature_CURVEDIR_above);
-        }
-        else if (m_signifiers.below && tstring.find(marker2) != std::string::npos) {
-            tie->SetCurvedir(curvature_CURVEDIR_below);
-        }
-        else if (m_signifiers.above && tstring.find(marker3) != std::string::npos) {
-            tie->SetCurvedir(curvature_CURVEDIR_above);
-        }
-        else if (m_signifiers.below && tstring.find(marker4) != std::string::npos) {
-            tie->SetCurvedir(curvature_CURVEDIR_below);
-        }
 
         return;
     }

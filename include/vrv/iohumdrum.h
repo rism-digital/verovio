@@ -724,6 +724,8 @@ protected:
     void addBarLineElement(hum::HTp bartok, std::vector<std::string> &elements, std::vector<void *> &pointers);
     void prepareFingerings(hum::HumdrumFile &infile);
     void prepareFingerings(hum::HTp fstart);
+    std::string getLoColor(hum::HTp token, const string &category, int subtoken = 0);
+    bool isTieAllowedToHang(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
