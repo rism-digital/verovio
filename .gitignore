@@ -15,7 +15,6 @@ build-tools-*
 doc/pae-tests.html
 
 # include file generated at compilation
-include/vrv/git_commit.h
 bindings/iOS/all.h
 
 # cmake build
