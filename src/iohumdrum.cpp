@@ -10780,7 +10780,7 @@ void HumdrumInput::colorVerse(Verse *verse, std::string &token)
 
 //////////////////////////////
 //
-// setPlace --
+// setPlaceRelStaff --
 //
 
 template <class ELEMENT> void HumdrumInput::setPlaceRelStaff(ELEMENT *element, const std::string &place, bool showplace)
@@ -21248,155 +21248,201 @@ template <class ELEMENT> void HumdrumInput::setWrittenAccidentalLower(ELEMENT el
 
 void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 {
-    bool lowerQ = false;
-    int subtok = 0;
-    size_t tpos = std::string::npos;
-    for (int i = 0; i < (int)token->size(); ++i) {
-        char chit = token->at(i);
-        if (chit == ' ') {
-            subtok++;
-            continue;
-        }
-        if (chit == 'w') {
-            tpos = i;
-            lowerQ = true;
-            break;
-        }
-        else if (chit == 'm') {
-            tpos = i;
-            break;
-        }
-        else if (chit == 'W') {
-            tpos = i;
-            lowerQ = true;
-            break;
-        }
-        else if (chit == 'M') {
-            tpos = i;
-            break;
-        }
-    }
-
-    if ((subtok == 0) && token->find(" ") == std::string::npos) {
-        subtok = -1;
-    }
-
-    if (tpos == std::string::npos) {
-        // no mordent on note
+    std::vector<std::string> subtoks = token->getSubtokens();
+    if (subtoks.empty()) {
         return;
     }
 
-    // int layer = m_currentlayer; // maybe place below if in layer 2
-    int staff = getNoteStaff(token, m_currentstaff);
-    Mordent *mordent = new Mordent;
-    appendElement(m_measure, mordent);
-    setStaff(mordent, staff);
-    mordent->SetStartid("#" + getLocationId("note", token, subtok));
-    // if (linked) {
-    //     mordent->SetStartid("#" + linked->GetUuid());
-    // }
-    // else {
-    //     hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-    //     mordent->SetTstamp(tstamp.getFloat());
-    // }
-    setLocationId(mordent, token, subtok);
-
-    if (!lowerQ) {
-        // reversing for now
-        // 300: mordent->SetForm(mordentLog_FORM_inv);
-        mordent->SetForm(mordentLog_FORM_upper);
-        // } else {
-        //    mordent->SetForm(mordentLog_FORM_norm);
-    }
-    // also "long" form to consider
-
-    int layer = m_currentlayer;
-    if (layer == 2) {
-        // Force the mordent below the staff by default:
-        setPlaceRelStaff(mordent, "below", false);
-    }
+    int subtrack = token->getSubtrack();
+    std::vector<int> mindex; // index of subtokens with mordent
+    std::vector<string> mstring; // list of mordent string and any placements
+    std::vector<int> mpitch; // pitch of mordent note
 
     hum::HumRegex hre;
-    std::string query;
+    std::string query = "(";
+    query += "[wWmM]+";
+    query += "[y";
     if (m_signifiers.above) {
-        query = "[Mm]+";
         query += m_signifiers.above;
-        if (hre.search(token, query)) {
-            setPlaceRelStaff(mordent, "above", true);
-        }
     }
     if (m_signifiers.below) {
-        query = "[Mm]+";
         query += m_signifiers.below;
-        if (hre.search(token, query)) {
-            setPlaceRelStaff(mordent, "below", true);
+    }
+    query += "]*";
+    query += ")";
+
+    for (int i = 0; i < (int)subtoks.size(); i++) {
+        if (subtoks[i].find('r') != std::string::npos) {
+            continue;
+        }
+        if (!hre.search(subtoks[i], query)) {
+            continue;
+        }
+        std::string match = hre.getMatch(1);
+        if (match.find("y") != std::string::npos) {
+            // Hidden mordent, so suppress from conversion.
+            continue;
+        }
+        mindex.push_back(i);
+        mstring.push_back(match);
+        mpitch.push_back(hum::Convert::kernToBase40(subtoks[i]));
+    }
+
+    if (mindex.empty()) {
+        return;
+    }
+
+    int highest = mpitch.at(0);
+    int lowest = mpitch.at(0);
+    for (int i = 1; i < (int)mpitch.size(); i++) {
+        if (highest < mpitch[i]) {
+            highest = mpitch[i];
+        }
+        if (lowest > mpitch[i]) {
+            lowest = mpitch[i];
         }
     }
 
-    int tokindex = subtok;
-    if (tokindex < 0) {
-        tokindex = 0;
-    }
-
-    if (std::tolower(token->at(tpos)) == 'w') {
-        // lower mordent
-        std::string accid = token->getValue("auto", to_string(tokindex), "mordentLowerAccidental");
-        bool hasaccid = accid.empty() ? false : true;
-        int accidval = 0;
-        if (hasaccid) {
-            accidval = stoi(accid);
-            switch (accidval) {
-                case -1: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_f); break;
-                case 0: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_n); break;
-                case +1: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_s); break;
-                case -2: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_ff); break;
-                case +2: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_x); break;
-            }
+    std::vector<int> mplace(mindex.size(), 0);
+    if (subtrack) {
+        if (subtrack % 2) {
+            // force above for first/third/fifth/etc. layers:
+            std::fill(mplace.begin(), mplace.end(), +1);
+        }
+        else {
+            // force below for second/fourth/etc. layers:
+            std::fill(mplace.begin(), mplace.end(), -1);
         }
     }
     else {
-        // upper mordent
-        std::string accid = token->getValue("auto", to_string(tokindex), "mordentUpperAccidental");
-        bool hasaccid = accid.empty() ? false : true;
-        int accidval = 0;
-        if (hasaccid) {
-            accidval = stoi(accid);
-            switch (accidval) {
-                case -1: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_f); break;
-                case 0: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_n); break;
-                case +1: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_s); break;
-                case -2: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_ff); break;
-                case +2: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
+        // Single voice so put above if a single mordent,
+        // but place a second mordent below if a dyad.
+        if (mindex.size() == 1) {
+            mplace.at(0) = +1;
+        }
+        else if (mindex.size() == 2) {
+            if (highest == mpitch.at(0)) {
+                mplace.at(0) = +1;
+                mplace.at(1) = -1;
+            }
+            else {
+                mplace.at(0) = -1;
+                mplace.at(1) = +1;
             }
         }
-    }
-
-    if (token->find("MM") != std::string::npos) {
-        mordent->SetLong(BOOLEAN_true);
-    }
-    else if (token->find("mm") != std::string::npos) {
-        mordent->SetLong(BOOLEAN_true);
-    }
-    else if (token->find("WW") != std::string::npos) {
-        mordent->SetLong(BOOLEAN_true);
-    }
-    else if (token->find("ww") != std::string::npos) {
-        mordent->SetLong(BOOLEAN_true);
-    }
-
-    // Set an explicit visual accidental for the mordent.
-    // Maybe in the future allow for lacc and uacc to place the accidental.
-    // Also deal with a mordent in a chord later.
-    std::string acctext = token->getLayoutParameter("MOR", "acc");
-    if ((!acctext.empty()) && acctext != "true") {
-        if (acctext == "false") {
-            acctext = "none";
+        else {
+            // If there are three or more mordents in a chord, place them
+            // all above the staff, and if any should be placed below, then
+            // it will have to be manually specified.
+            std::fill(mplace.begin(), mplace.end(), +1);
         }
+    }
+
+    int staff = getNoteStaff(token, m_currentstaff);
+
+    for (int i = 0; i < (int)mindex.size(); i++) {
+        if (mstring.at(i).empty()) {
+            continue;
+        }
+        // Set any explicit placement of the mordent:
+        int direction = mplace.at(i);
+        if (m_signifiers.above) {
+            if (mstring.at(i).find(m_signifiers.above) != std::string::npos) {
+                direction = +1;
+            }
+        }
+        if (m_signifiers.below) {
+            if (mstring.at(i).find(m_signifiers.below) != std::string::npos) {
+                direction = -1;
+            }
+        }
+
+        bool lowerQ = false;
+        if ((mstring[i][0] == 'w') || (mstring[i][0] == 'W')) {
+            lowerQ = true;
+        }
+
+        Mordent *mordent = new Mordent;
+        appendElement(m_measure, mordent);
+        setStaff(mordent, staff);
+
+        int subtok = mindex.at(i);
+        if (mindex.size() == 1) {
+            subtok = -1;
+        }
+        mordent->SetStartid("#" + getLocationId("note", token, subtok));
+        setLocationId(mordent, token, subtok);
+
         if (lowerQ) {
-            setWrittenAccidentalLower(mordent, acctext);
+            mordent->SetForm(mordentLog_FORM_lower);
         }
         else {
-            setWrittenAccidentalUpper(mordent, acctext);
+            mordent->SetForm(mordentLog_FORM_upper);
+        }
+
+        if (direction < 0) {
+            setPlaceRelStaff(mordent, "below", false);
+        }
+        else if (direction > 0) {
+            setPlaceRelStaff(mordent, "above", false);
+        }
+
+        int tokindex = subtok;
+        if (tokindex < 0) {
+            tokindex = 0;
+        }
+
+        if ((mstring.at(i).find('w') != std::string::npos) || (mstring.at(i).find('W') != std::string::npos)) {
+            // lower mordent
+            std::string accid = token->getValue("auto", to_string(tokindex), "mordentLowerAccidental");
+            bool hasaccid = accid.empty() ? false : true;
+            int accidval = 0;
+            if (hasaccid) {
+                accidval = stoi(accid);
+                switch (accidval) {
+                    case -1: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_f); break;
+                    case 0: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_n); break;
+                    case +1: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_s); break;
+                    case -2: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_ff); break;
+                    case +2: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_x); break;
+                }
+            }
+        }
+        else {
+            // upper mordent
+            std::string accid = token->getValue("auto", to_string(tokindex), "mordentUpperAccidental");
+            bool hasaccid = accid.empty() ? false : true;
+            int accidval = 0;
+            if (hasaccid) {
+                accidval = stoi(accid);
+                switch (accidval) {
+                    case -1: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_f); break;
+                    case 0: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_n); break;
+                    case +1: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_s); break;
+                    case -2: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_ff); break;
+                    case +2: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
+                }
+            }
+        }
+
+        if (hre.search(mstring.at(i), "MM|WW", "i")) {
+            mordent->SetLong(BOOLEAN_true);
+        }
+
+        // Set an explicit visual accidental for the mordent.
+        // Maybe in the future allow for lacc and uacc to place the accidental.
+        // Also deal multiple mordents in a chord later.
+        std::string acctext = token->getLayoutParameter("MOR", "acc");
+        if ((!acctext.empty()) && acctext != "true") {
+            if (acctext == "false") {
+                acctext = "none";
+            }
+            if (lowerQ) {
+                setWrittenAccidentalLower(mordent, acctext);
+            }
+            else {
+                setWrittenAccidentalUpper(mordent, acctext);
+            }
         }
     }
 }
