@@ -17,7 +17,8 @@ option(NO_ABC_SUPPORT           "Disable ABC support"                          O
 option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
-option(BUILD_AS_LIBRARY         "Build verovio as library"                     OFF)
+option(BUILD_AS_LIBRARY         "Build verovio as a shared library"            OFF)
+option(BUILD_AS_STATIC_LIBRARY  "Build verovio as a static library"            OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
     message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
@@ -166,6 +167,14 @@ set(all_SRC
 if (BUILD_AS_LIBRARY)
     message(STATUS "***** Building Verovio as shared library *****")
     add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
+
+##################
+# Static library #
+##################
+
+elseif (BUILD_AS_STATIC_LIBRARY)
+    message(STATUS "***** Building Verovio as static library *****")
+    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
 
 ###########
 # WASM BC #
