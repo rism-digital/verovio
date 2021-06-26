@@ -19,6 +19,7 @@ option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      O
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
 option(BUILD_AS_LIBRARY         "Build verovio as a shared library"            OFF)
 option(BUILD_AS_STATIC_LIBRARY  "Build verovio as a static library"            OFF)
+option(GET_GIT_COMMIT           "Write current git commit in header"           ON)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
     message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
@@ -98,11 +99,13 @@ else()
 
 endif()
 
-execute_process(
-    COMMAND ../tools/get_git_commit.sh
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE GIT_COMMIT
-)
+if (GET_GIT_COMMIT)
+    execute_process(
+        COMMAND ../tools/get_git_commit.sh
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        OUTPUT_VARIABLE GIT_COMMIT
+    )
+endif()
 
 if(VRV_DYNAMIC_CAST)
     add_definitions(-DVRV_DYNAMIC_CAST)
