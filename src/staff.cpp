@@ -256,7 +256,7 @@ void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minE
     // By construction, any overlaps or small gaps in outer dash lines must also occur in the most inner dash line.
     // Thus it suffices to resolve any problems in the inner dash line and apply the adjustments to corresponding
     // dashes further away from the staff.
-    LedgerLine &innerLine = lines[0];
+    LedgerLine &innerLine = lines.at(0);
     struct Adjustment {
         int left;
         int right;
@@ -301,7 +301,7 @@ void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minE
     // This ensures that all dashes on the same note/chord obtain the same ledger line extension.
     for (const Adjustment &adjustment : adjustments) {
         for (int index = 1; index < lines.size(); ++index) {
-            LedgerLine &outerLine = lines[index];
+            LedgerLine &outerLine = lines.at(index);
             IterType iterDash = std::find_if(
                 outerLine.m_dashes.begin(), outerLine.m_dashes.end(), [&adjustment](const DashType &dash) {
                     return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
