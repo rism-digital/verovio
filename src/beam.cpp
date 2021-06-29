@@ -1127,6 +1127,11 @@ void Beam::FilterList(ArrayOfObjects *childList)
                     continue;
                 }
             }
+            // and spaces
+            else if (element->Is(SPACE)) {
+                iter = childList->erase(iter);
+                continue;
+            }
             ++iter;
         }
     }
