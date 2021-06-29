@@ -2029,22 +2029,24 @@ void MusicXmlInput::ReadMusicXmlDirection(
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         m_dynamStack.push_back(dynam);
 
-        pugi::xpath_node extender = (dynamics.end() - 1)->parent().next_sibling("direction-type").first_child();
-        if (!strcmp(extender.node().name(), "bracket") || !strcmp(extender.node().name(), "dashes")) {
-            int extNumber = extender.node().attribute("number").as_int();
-            extNumber = (extNumber < 1) ? 1 : extNumber;
-            int staffNum = staffNode.text().as_int() + staffOffset;
-            staffNum = (staffNum < 1) ? 1 : staffNum;
-            dynam->SetExtender(BOOLEAN_true);
-            if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
-                dynam->SetLform(
-                    dynam->AttLineRendBase::StrToLineform(extender.node().attribute("line-type").as_string()));
+        if (!dynamics.empty()) {
+            pugi::xpath_node extender = (dynamics.end() - 1)->parent().next_sibling("direction-type").first_child();
+            if (!strcmp(extender.node().name(), "bracket") || !strcmp(extender.node().name(), "dashes")) {
+                int extNumber = extender.node().attribute("number").as_int();
+                extNumber = (extNumber < 1) ? 1 : extNumber;
+                int staffNum = staffNode.text().as_int() + staffOffset;
+                staffNum = (staffNum < 1) ? 1 : staffNum;
+                dynam->SetExtender(BOOLEAN_true);
+                if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
+                    dynam->SetLform(
+                        dynam->AttLineRendBase::StrToLineform(extender.node().attribute("line-type").as_string()));
+                }
+                else {
+                    dynam->SetLform(LINEFORM_dashed);
+                }
+                musicxml::OpenDashes openDashes(extNumber, staffNum, m_measureCounts.at(measure));
+                m_openDashesStack.push_back(std::make_pair(dynam, openDashes));
             }
-            else {
-                dynam->SetLform(LINEFORM_dashed);
-            }
-            musicxml::OpenDashes openDashes(extNumber, staffNum, m_measureCounts.at(measure));
-            m_openDashesStack.push_back(std::make_pair(dynam, openDashes));
         }
     }
 
