@@ -158,7 +158,7 @@ public:
     /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
-     * Only true flags are applied, unless applyToAll is set to true.
+     * Apply StaffDefRedrawFlags that are defined in functorparams.h
      */
     void SetRedrawFlags(int redrawFlags);
 

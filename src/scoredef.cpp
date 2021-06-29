@@ -22,7 +22,6 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
-#include "metersiggrp.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -243,11 +242,6 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     m_insertScoreDef = false;
     m_setAsDrawing = true;
 
-    bool drawClef = false;
-    bool drawKeySig = false;
-    bool drawMensur = false;
-    bool drawMeterSig = false;
-    bool drawMeterSigGrp = false;
     int redrawFlags = 0;
     Clef const *clef = NULL;
     KeySig const *keySig = NULL;

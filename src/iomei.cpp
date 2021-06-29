@@ -4305,7 +4305,7 @@ bool MEIInput::ReadMeterSigGrpChildren(Object *parent, pugi::xml_node parentNode
             success = ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <meterSig>", current.name());
+            LogWarning("Unsupported '<%s>' within <meterSigGrp>", current.name());
         }
     }
     return success;

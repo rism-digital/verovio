@@ -11,18 +11,20 @@
 #include "atts_cmn.h"
 #include "atts_mei.h"
 #include "atts_shared.h"
-#include "metersig.h"
+#include "linkinginterface.h"
 #include "object.h"
 
 namespace vrv {
+
+class MeterSig;
 
 //----------------------------------------------------------------------------
 // MeterSigGrp
 //----------------------------------------------------------------------------
 
 /**
- * This class represents a MEI staffGrp.
- * It contains StaffDef objects.
+ * This class represents a MEI meterSigGrp.
+ * It contains meterSigGrp objects.
  */
 class MeterSigGrp : public Object,
                     public ObjectListInterface,
@@ -49,7 +51,7 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual LinkingInterface *GetLinkingInterface() { return dynamic_cast<LinkingInterface *>(this); }
+    virtual LinkingInterface *GetLinkingInterface() { return this; }
     ///@}
 
     /**
@@ -84,7 +86,7 @@ public:
     
 protected:
     /**
-     * Filter the flat list and keep only StaffDef elements.
+     * Filter the flat list and keep only meterSigGrp elements.
      */
     virtual void FilterList(ArrayOfObjects *childList);
 

@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "metersig.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -68,7 +69,7 @@ void MeterSigGrp::FilterList(ArrayOfObjects *childList)
 {
     // We want to keep only MeterSig
     childList->erase(std::remove_if(childList->begin(), childList->end(),
-                         [&](const Object *object) -> bool { return !object->Is(METERSIG); }),
+                         [](const Object *object) -> bool { return !object->Is(METERSIG); }),
         childList->end());
 }
 
@@ -82,12 +83,10 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
     MeterSig *newMeterSig = NULL;
     const ArrayOfObjects *childList = this->GetList(this);
     switch (GetFunc()) {
-        // For alternatinve meterSig group alternate between children sequentially
+        // For alternating meterSig group alternate between children sequentially
         case meterSigGrpLog_FUNC_alternating: {
-            if (!newMeterSig) {
-                const int index = m_count % childList->size();
-                newMeterSig = vrv_cast<MeterSig *>((childList->at(index))->Clone());
-            }
+            const int index = m_count % childList->size();
+            newMeterSig = vrv_cast<MeterSig *>((childList->at(index))->Clone());
             break;
         }
         // For interchanging meterSig group select the largest signature, but make sure to align unit with the shortest
@@ -106,9 +105,7 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
                 if (meterSig->GetUnit() > maxUnit) maxUnit = meterSig->GetUnit();
             });
 
-            if (!newMeterSig) {
-                newMeterSig = vrv_cast<MeterSig *>((*it)->Clone());
-            }
+            newMeterSig = vrv_cast<MeterSig *>((*it)->Clone());
             if (newMeterSig->GetUnit() < maxUnit) {
                 const int ratio = maxUnit / newMeterSig->GetUnit();
                 data_SUMMAND_List currentCount = newMeterSig->GetCount();
@@ -171,14 +168,9 @@ void MeterSigGrp::SetMeasureBasedCount(const std::string &measureId)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSigGrp::AlignHorizontally(FunctorParams *functorParams)
+int MeterSigGrp::AlignHorizontally(FunctorParams *)
 {
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_STOP;
-
-    return FUNCTOR_CONTINUE;
+    return this->IsScoreDefElement() ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

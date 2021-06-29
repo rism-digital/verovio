@@ -515,7 +515,7 @@ private:
     bool ReadCourse(Object *parent, pugi::xml_node course);
     bool ReadMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeasureChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadMeterSigGrp(Object *parent, pugi::xml_node staffGrp);
+    bool ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp);
     bool ReadMeterSigGrpChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadFb(Object *parent, pugi::xml_node fb);
     bool ReadFbChildren(Object *parent, pugi::xml_node parentNode);
