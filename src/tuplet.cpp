@@ -172,8 +172,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
     // If yRel turns out to be too far from the tuplet - try to adjust it accordingly, aligning with the staff
     // top/bottom sides, unless doing so will make tuplet number overlap
     const int relevenatPosition = (m_drawingNumPos == STAFFREL_basic_above) ? GetContentTop() : GetContentBottom();
-    const int adjustedPosition
-        = (m_drawingNumPos == STAFFREL_basic_above) ? yReference : yReference - staffHeight;
+    const int adjustedPosition = (m_drawingNumPos == STAFFREL_basic_above) ? 0 : -staffHeight;
     if (((m_drawingNumPos == STAFFREL_basic_above) && (yRel > relevenatPosition)
             && (adjustedPosition > relevenatPosition))
         || ((m_drawingNumPos == STAFFREL_basic_below) && (yRel < relevenatPosition)
@@ -187,9 +186,9 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
         const int xMid = tupletNum->GetDrawingXMid(doc);
         const int yMid = beam->m_beamSegment.m_startingY
             + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
-        int beamYRel = yMid - yReference + numVerticalMargin;
-        if (((m_drawingNumPos == STAFFREL_basic_above) && (beamYRel > yReference))
-            || ((m_drawingNumPos == STAFFREL_basic_below) && (beamYRel < yReference - staffHeight))) {
+        const int beamYRel = yMid - yReference + numVerticalMargin;
+        if (((m_drawingNumPos == STAFFREL_basic_above) && (beamYRel > 0))
+            || ((m_drawingNumPos == STAFFREL_basic_below) && (beamYRel < -staffHeight))) {
             yRel = beamYRel;
         }
     }

@@ -664,7 +664,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         auto end = overflowBoxes->end();
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizontally
-            const int margin = (*iter)->GetObject()->Is(DYNAM) && GetFirstAncestor(BEAM)
+            const int margin = ((*iter)->GetObject()->Is(DYNAM) && GetFirstAncestor(BEAM))
                 ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize)
                 : 0;
             i = std::find_if(
