@@ -1020,7 +1020,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
             offset += width + 2 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false);
         }
         else {
-            offset += width + margin;
+            offset += width + margin * 2;
         }
     }
 
