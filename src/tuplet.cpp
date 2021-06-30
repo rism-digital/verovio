@@ -136,7 +136,7 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
-void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int staffHeight)
+void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int staffSize)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
@@ -160,28 +160,24 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
         return !element->m_crossStaff;
     });
 
+    const int staffHeight = doc->GetDrawingStaffSize(staffSize);
+    const int adjustedPosition = (m_drawingNumPos == STAFFREL_basic_above) ? 0 : -staffHeight;
+    Beam *beam = this->GetNumAlignedBeam();
+    if (!beam) {
+        tupletNum->SetDrawingYRel(adjustedPosition);
+    }
+
     // Calculate relative Y for the tupletNum
     AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
+    adjustTupletNumOverlapParams.m_horizontalMargin = doc->GetDrawingUnit(staffSize);
     adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
     adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
     adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
     Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
     this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
-    int yRel = adjustTupletNumOverlapParams.m_yRel - yReference + numVerticalMargin;
-
-    // If yRel turns out to be too far from the tuplet - try to adjust it accordingly, aligning with the staff
-    // top/bottom sides, unless doing so will make tuplet number overlap
-    const int relevenatPosition = (m_drawingNumPos == STAFFREL_basic_above) ? GetContentTop() : GetContentBottom();
-    const int adjustedPosition = (m_drawingNumPos == STAFFREL_basic_above) ? 0 : -staffHeight;
-    if (((m_drawingNumPos == STAFFREL_basic_above) && (yRel > relevenatPosition)
-            && (adjustedPosition > relevenatPosition))
-        || ((m_drawingNumPos == STAFFREL_basic_below) && (yRel < relevenatPosition)
-            && (adjustedPosition < relevenatPosition))) {
-        yRel = adjustedPosition;
-    }
+    int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
 
     // If we have a beam, see if we can move it to more appropriate postion
-    Beam *beam = this->GetNumAlignedBeam();
     if (beam && !m_crossStaff) {
         const int xMid = tupletNum->GetDrawingXMid(doc);
         const int yMid = beam->m_beamSegment.m_startingY
@@ -191,6 +187,16 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
             || ((m_drawingNumPos == STAFFREL_basic_below) && (beamYRel < -staffHeight))) {
             yRel = beamYRel;
         }
+    }
+    else {
+        yRel += numVerticalMargin;
+    }
+
+    // If yRel turns out to be too far from the tuplet - try to adjust it accordingly, aligning with the staff
+    // top/bottom sides, unless doing so will make tuplet number overlap
+    if (((m_drawingNumPos == STAFFREL_basic_below) && (yRel > adjustedPosition))
+        || ((m_drawingNumPos == STAFFREL_basic_above) && (yRel < adjustedPosition))) {
+        yRel = adjustedPosition;
     }
 
     tupletNum->SetDrawingYRel(yRel);
@@ -563,7 +569,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         }
     }
 
-    AdjustTupletNumY(params->m_doc, verticalMargin, yReference, params->m_doc->GetDrawingStaffSize(staffSize));
+    AdjustTupletNumY(params->m_doc, verticalMargin, yReference, staffSize);
 
     return FUNCTOR_SIBLINGS;
 }

@@ -1692,7 +1692,7 @@ int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams)
 
     if (params->m_ignoreCrossStaff && Is({ CHORD, NOTE, REST }) && m_crossStaff) return FUNCTOR_SIBLINGS;
 
-    if (!params->m_tupletNum->HorizontalSelfOverlap(this)
+    if (!params->m_tupletNum->HorizontalSelfOverlap(this, params->m_horizontalMargin)
         && !params->m_tupletNum->VerticalSelfOverlap(this, params->m_verticalMargin)) {
         return FUNCTOR_CONTINUE;
     }

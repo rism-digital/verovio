@@ -575,6 +575,7 @@ public:
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;
+        m_horizontalMargin = 0;
         m_verticalMargin = 0;
         m_ignoreCrossStaff = false;
         m_yRel = 0;
@@ -582,6 +583,7 @@ public:
 
     TupletNum *m_tupletNum;
     data_STAFFREL_basic m_drawingNumPos;
+    int m_horizontalMargin;
     int m_verticalMargin;
     bool m_ignoreCrossStaff;
     int m_yRel;
