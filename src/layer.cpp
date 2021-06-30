@@ -251,6 +251,21 @@ int Layer::GetClefLocOffset(LayerElement *test)
     return clef->GetClefLocOffset();
 }
 
+int Layer::GetCrossStaffClefLocOffset(LayerElement* element, int currentOffset) 
+{
+    if (element->m_crossStaff) {
+        ResetList(this);
+        if (!element->Is(CLEF)) {
+            Clef *clef = vrv_cast<Clef *>(GetListFirstBackward(element, CLEF));
+            if (clef && clef->m_crossStaff) {
+                return clef->GetClefLocOffset();
+            }
+        }
+    }
+
+    return currentOffset;
+}
+
 data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
 {
     assert(element);

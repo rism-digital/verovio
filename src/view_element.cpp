@@ -517,6 +517,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
 
+    if (clef->m_crossStaff) staff = clef->m_crossStaff;
+
     // hidden clef
     if (clef->GetVisible() == BOOLEAN_false) {
         clef->SetEmptyBB();
