@@ -46,7 +46,7 @@ public:
     virtual std::string GetClassName() const { return "MeterSigGrp"; }
     virtual ClassId GetClassId() const { return METERSIGGRP; }
     ///@}
-    
+
     /**
      * @name Getter to interfaces
      */
@@ -74,7 +74,7 @@ public:
     /**
      * Set counter for the alternating meterSigGrp based on the provided measureId
      */
-    void SetMeasureBasedCount(const std::string &measureId);    
+    void SetMeasureBasedCount(const std::string &measureId);
 
     //----------//
     // Functors //
@@ -83,7 +83,7 @@ public:
      * See Object::AlignHorizontally
      */
     int AlignHorizontally(FunctorParams *functorParams);
-    
+
 protected:
     /**
      * Filter the flat list and keep only meterSigGrp elements.
@@ -92,7 +92,7 @@ protected:
 
 private:
     // vector with alternating measures Ids (used only with meterSigGrpLog_FUNC_alternating)
-    std::vector<std::string> m_alternatingMeasures; 
+    std::vector<std::string> m_alternatingMeasures;
     // counter for the meterSig to be used with meterSigGrpLog_FUNC_alternating
     int m_count = 0;
 }; // MeterSigGrp

@@ -991,7 +991,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(dc);
     assert(layer);
     assert(staff);
-    
+
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
     const ArrayOfObjects *childList = meterSigGrp->GetList(meterSigGrp);
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1013,7 +1013,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
         dc->EndGraphic(meterSig, this);
         int margin = unit / 2;
         const int width = meterSig->GetContentRight() - meterSig->GetContentLeft();
-        if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))){
+        if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))) {
             // draw plus sign here
             const int plusX = x + width;
             DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);

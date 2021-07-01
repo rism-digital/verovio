@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        metersiggrp.cpp
 // Author:      Andriy Makarchuk
-// Created:     2021 
+// Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +73,7 @@ void MeterSigGrp::FilterList(ArrayOfObjects *childList)
         childList->end());
 }
 
-void MeterSigGrp::AddMeasureIdToVector(const std::string &measureId) 
+void MeterSigGrp::AddMeasureIdToVector(const std::string &measureId)
 {
     m_alternatingMeasures.emplace_back(measureId);
 }

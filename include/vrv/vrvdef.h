@@ -100,7 +100,7 @@ enum ClassId {
     LAYER,
     MDIV,
     MEASURE,
-    MEASURE_ALIGNER,    
+    MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
     METERSIGGRP,

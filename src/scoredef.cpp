@@ -272,7 +272,8 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ReplaceDrawingValuesInStaffDefParams replaceDrawingValuesInStaffDefParams(clef, keySig, mensur, meterSig, meterSigGrp);
+    ReplaceDrawingValuesInStaffDefParams replaceDrawingValuesInStaffDefParams(
+        clef, keySig, mensur, meterSig, meterSigGrp);
     Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
     this->Process(&replaceDrawingValuesInScoreDef, &replaceDrawingValuesInStaffDefParams);
 
