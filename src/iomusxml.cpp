@@ -45,6 +45,7 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
+#include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "metersiggrp.h"
@@ -2860,32 +2861,46 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // ties
-        pugi::xpath_node startTie = notations.node().select_node("tied[@type='start']");
-        pugi::xpath_node endTie = notations.node().select_node("tied[@type='stop']");
-        if (endTie) { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
-            if (!m_tieStack.empty() && note->GetPname() == m_tieStack.back().second->GetPname()
-                && note->GetOct() == m_tieStack.back().second->GetOct()) {
-                m_tieStack.back().first->SetEndid("#" + note->GetUuid());
-                m_tieStack.pop_back();
+        pugi::xpath_node xmlTie = notations.node().select_node("tied");
+        if (xmlTie) {
+            const std::string tieType = xmlTie.node().attribute("type").as_string();
+            if ("stop" == tieType) { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
+                if (!m_tieStack.empty() && note->GetPname() == m_tieStack.back().second->GetPname()
+                    && note->GetOct() == m_tieStack.back().second->GetOct()) {
+                    m_tieStack.back().first->SetEndid("#" + note->GetUuid());
+                    m_tieStack.pop_back();
+                }
+                else {
+                    m_tieStopStack.push_back(note);
+                }
             }
-            else {
-                m_tieStopStack.push_back(note);
+            else if (m_tieStack.empty()) {
+                CloseTie(note);
             }
-        }
-        else if (m_tieStack.empty()) {
-            CloseTie(note);
-        }
-        if (startTie) {
-            Tie *tie = new Tie();
-            // color
-            tie->SetColor(startTie.node().attribute("color").as_string());
-            // placement and orientation
-            tie->SetCurvedir(InferCurvedir(startTie.node()));
-            tie->SetLform(tie->AttCurveRend::StrToLineform(startTie.node().attribute("line-type").as_string()));
-            if (startTie.node().attribute("id")) tie->SetUuid(startTie.node().attribute("id").as_string());
-            // add it to the stack
-            m_controlElements.push_back(std::make_pair(measureNum, tie));
-            OpenTie(note, tie);
+            if ("start" == tieType) {
+                Tie *tie = new Tie();
+                // color
+                tie->SetColor(xmlTie.node().attribute("color").as_string());
+                // placement and orientation
+                tie->SetCurvedir(InferCurvedir(xmlTie.node()));
+                tie->SetLform(tie->AttCurveRend::StrToLineform(xmlTie.node().attribute("line-type").as_string()));
+                if (xmlTie.node().attribute("id")) tie->SetUuid(xmlTie.node().attribute("id").as_string());
+                // add it to the stack
+                m_controlElements.push_back(std::make_pair(measureNum, tie));
+                OpenTie(note, tie);
+            }
+            else if ("let-ring" == tieType) {
+                Lv *lv = new Lv();
+                // color
+                lv->SetColor(xmlTie.node().attribute("color").as_string());
+                // placement and orientation
+                lv->SetCurvedir(InferCurvedir(xmlTie.node()));
+                lv->SetLform(lv->AttCurveRend::StrToLineform(xmlTie.node().attribute("line-type").as_string()));
+                if (xmlTie.node().attribute("id")) lv->SetUuid(xmlTie.node().attribute("id").as_string());
+                // add it to the stack
+                m_controlElements.push_back(std::make_pair(measureNum, lv));
+                lv->SetStartid("#" + note->GetUuid());
+            }
         }
 
         // articulation

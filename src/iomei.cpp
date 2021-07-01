@@ -67,6 +67,7 @@
 #include "lb.h"
 #include "lem.h"
 #include "ligature.h"
+#include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
@@ -443,6 +444,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(HARM)) {
         m_currentNode = m_currentNode.append_child("harm");
         WriteHarm(m_currentNode, dynamic_cast<Harm *>(object));
+    }
+    else if (object->Is(LV)) {
+        m_currentNode = m_currentNode.append_child("lv");
+        WriteLv(m_currentNode, dynamic_cast<Lv *>(object));
     }
     else if (object->Is(MNUM)) {
         m_currentNode = m_currentNode.append_child("mNum");
@@ -1375,6 +1380,17 @@ void MEIOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
     harm->WriteNNumberLike(currentNode);
+}
+
+void MEIOutput::WriteLv(pugi::xml_node currentNode, Lv *lv)
+{
+    assert(lv);
+
+    WriteControlElement(currentNode, lv);
+    WriteTimeSpanningInterface(currentNode, lv);
+    lv->WriteColor(currentNode);
+    lv->WriteCurvature(currentNode);
+    lv->WriteCurveRend(currentNode);
 }
 
 void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
@@ -4216,6 +4232,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "harm") {
             success = ReadHarm(parent, current);
         }
+        else if (std::string(current.name()) == "lv") {
+            success = ReadLv(parent, current);
+        }
         else if (std::string(current.name()) == "mNum") {
             success = ReadMNum(parent, current);
         }
@@ -4504,6 +4523,21 @@ bool MEIInput::ReadHarm(Object *parent, pugi::xml_node harm)
     parent->AddChild(vrvHarm);
     ReadUnsupportedAttr(harm, vrvHarm);
     return ReadTextChildren(vrvHarm, harm, vrvHarm);
+}
+
+bool MEIInput::ReadLv(Object* parent, pugi::xml_node lv) 
+{
+    Lv *vrvLv = new Lv();
+    ReadControlElement(lv, vrvLv);
+
+    ReadTimeSpanningInterface(lv, vrvLv);
+    vrvLv->ReadColor(lv);
+    vrvLv->ReadCurvature(lv);
+    vrvLv->ReadCurveRend(lv);
+
+    parent->AddChild(vrvLv);
+    ReadUnsupportedAttr(lv, vrvLv);
+    return true;
 }
 
 bool MEIInput::ReadMNum(Object *parent, pugi::xml_node mNum)
