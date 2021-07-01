@@ -161,7 +161,7 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
 void MeterSigGrp::SetMeasureBasedCount(const std::string &measureId)
 {
     auto it = std::find(m_alternatingMeasures.begin(), m_alternatingMeasures.end(), measureId);
-    m_count = std::distance(m_alternatingMeasures.begin(), it);
+    m_count = int(std::distance(m_alternatingMeasures.begin(), it));
 }
 
 //----------------------------------------------------------------------------
