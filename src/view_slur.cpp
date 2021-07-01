@@ -599,7 +599,7 @@ float View::CalcInitialSlur(
         pRight.x = element->GetSelfRight();
         if (((pLeft.x > bezier.p1.x) && (pLeft.x < bezier.p2.x))
             || ((pRight.x > bezier.p1.x) && (pRight.x < bezier.p2.x))) {
-            CurveSpannedElement *spannedElement = new CurveSpannedElement;
+            CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = element;
             curve->AddSpannedElement(spannedElement);
         }
@@ -625,7 +625,7 @@ float View::CalcInitialSlur(
     for (FloatingPositioner *positioner : tiePositioners) {
         if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)
             && (positioner->GetContentLeft() < bezier.p2.x)) {
-            CurveSpannedElement *spannedElement = new CurveSpannedElement;
+            CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = positioner;
             curve->AddSpannedElement(spannedElement);
         }
