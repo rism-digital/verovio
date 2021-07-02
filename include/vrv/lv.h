@@ -8,8 +8,7 @@
 #ifndef __VRV_LV_H__
 #define __VRV_LV_H__
 
-#include "controlelement.h"
-#include "timeinterface.h"
+#include "tie.h"
 
 namespace vrv {
 
@@ -20,11 +19,7 @@ namespace vrv {
 /**
  * This class models the MEI <lv> element.
  */
-class Lv : public ControlElement,
-           public TimeSpanningInterface,
-           public AttColor,
-           public AttCurvature,
-           public AttCurveRend {
+class Lv : public Tie {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -39,13 +34,7 @@ public:
     virtual ClassId GetClassId() const { return LV; }
     ///@}
 
-    /**
-     * @name Getter to interfaces
-     */
-    ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return this; }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return this; }
-    ///@}
+    virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
 
     //----------//
     // Functors //

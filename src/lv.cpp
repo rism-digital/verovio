@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "layerelement.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -21,13 +23,8 @@ namespace vrv {
 
 static const ClassRegistrar<Lv> s_factory("lv", LV);
 
-Lv::Lv() : ControlElement("lv-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Lv::Lv() : Tie("lv-")
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
-
     Reset();
 }
 
@@ -35,16 +32,30 @@ Lv::~Lv() {}
 
 void Lv::Reset()
 {
-    ControlElement::Reset();
-    TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetCurvature();
-    ResetCurveRend();
+    Tie::Reset();
+}
+
+bool Lv::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4])
+{
+    if (spanningType != SPANNING_START_END) {
+        //  this makes no sense
+        LogWarning("Lv across systems is not supported. Use <tie> iinstead.");
+        return false;
+    }
+
+    LayerElement *start = GetStart();
+    LayerElement *end = GetEnd();
+    if (start->GetFirstAncestor(MEASURE) != end->GetFirstAncestor(MEASURE)) {
+        //  this makes no sense
+        LogWarning("Lv across measures is not supported. Use <tie> instead.");
+        return false;
+    }
+
+    return Tie::CalculatePosition(doc, staff, x1, x2, spanningType, bezier);
 }
 
 //----------------------------------------------------------------------------
 // Lv functor methods
 //----------------------------------------------------------------------------
-
 
 } // namespace vrv

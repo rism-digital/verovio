@@ -36,6 +36,7 @@ public:
      */
     ///@{
     Tie();
+    Tie(const std::string &classid);
     virtual ~Tie();
     virtual Object *Clone() const { return new Tie(*this); }
     virtual void Reset();
@@ -51,7 +52,7 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
-    bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
+    virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
 
     //----------//
     // Functors //
@@ -71,7 +72,7 @@ public:
 
 private:
     // Calculate initial position X position and return stem direction of the startNote
-    void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
+    virtual void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
         bool isOuterChordNote, Point &startPoint, Point &endPoint);
 
     // Helper function to get preferred curve direction based on the number of conditions (like note direction, position
