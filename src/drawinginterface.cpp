@@ -486,7 +486,7 @@ bool StaffDefDrawingInterface::DrawMeterSigGrp()
     return false;
 }
 
-void StaffDefDrawingInterface::AlternateCurrentMeterSig(const Measure *measure) 
+void StaffDefDrawingInterface::AlternateCurrentMeterSig(Measure *measure) 
 {
     if (MeterSigGrp *meterSigGrp = GetCurrentMeterSigGrp(); meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
         meterSigGrp->SetMeasureBasedCount(measure);

@@ -205,7 +205,7 @@ public:
     void SetCurrentMensur(Mensur const *mensur);
     void SetCurrentMeterSig(MeterSig const *meterSig);
     void SetCurrentMeterSigGrp(MeterSigGrp const *meterSig);
-    void AlternateCurrentMeterSig(const Measure *measure);
+    void AlternateCurrentMeterSig(Measure *measure);
     ///@}
 
     /**

@@ -65,7 +65,7 @@ public:
     /**
      * Add specified measureId to the m_alternatingMeasures vector
      */
-    void AddAlternatingMeasureToVector(const Measure *measure);
+    void AddAlternatingMeasureToVector(Measure *measure);
 
     /**
      * Get simplified (i.e. single metersig with count/unit) based on the MeterSigGrp function
@@ -75,7 +75,7 @@ public:
     /**
      * Set counter for the alternating meterSigGrp based on the provided measureId
      */
-    void SetMeasureBasedCount(const Measure *measure);
+    void SetMeasureBasedCount(Measure *measure);
 
     //----------//
     // Functors //
