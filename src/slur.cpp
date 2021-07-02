@@ -210,7 +210,7 @@ bool Slur::AdjustSlurPosition(
             int yPos = 0;
             std::tie(time, yPos)
                 = BoundingBox::ApproximateBezierExtrema(points, (curve->GetDir() == curvature_CURVEDIR_above));
-                        
+
             const double extremaShift = time - 0.5;
             const int relevantPoint = extremaShift < 0 ? bezierCurve.p1.y : bezierCurve.p2.y;
             Object *startMeasure
@@ -238,7 +238,7 @@ bool Slur::AdjustSlurPosition(
                 bezierCurve.p1.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftLeft : -maxShiftLeft;
                 bezierCurve.p2.y += (curve->GetDir() == curvature_CURVEDIR_above) ? maxShiftRight : -maxShiftRight;
                 return false;
-            }            
+            }
         }
     }
     // otherwise it is normal slur - just move position of the start/end points up or down and recalculate angle
@@ -264,9 +264,8 @@ bool Slur::AdjustSlurPosition(
     }
 }
 
-
-std::pair<int, int> Slur::CalculateAdjustedSlurShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin, bool forceBothSides, bool &isNotAdjustable)
+std::pair<int, int> Slur::CalculateAdjustedSlurShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+    int margin, bool forceBothSides, bool &isNotAdjustable)
 {
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
@@ -284,7 +283,7 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(
         [dir = curve->GetDir(), &extremeY](CurveSpannedElement *element) {
             if (dir == curvature_CURVEDIR_above) {
                 const int y = element->m_boundingBox->GetSelfTop();
-                extremeY = (extremeY == VRV_UNSET)? y : std::max(y, extremeY);
+                extremeY = (extremeY == VRV_UNSET) ? y : std::max(y, extremeY);
             }
             else {
                 const int y = element->m_boundingBox->GetSelfBottom();
@@ -333,7 +332,7 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(
             maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
             maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
         }
-        
+
         // if intersection happens on the start/end of the slur, make sure that there is enough place for proper slur to
         // be drawn. If intersection is too large, cross-staff slurs should not be drawn with adjusted angles to avoid
         // extreme cases

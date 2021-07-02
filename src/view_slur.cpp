@@ -180,7 +180,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         // situations
         if (system->HasMixedDrawingStemDir(start, end)) {
             auto curveDir = system->GetPreferredCurveDirection(start, end, slur);
-            slur->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE? curveDir : curvature_CURVEDIR_above);
+            slur->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
         }
     }
 
@@ -562,7 +562,7 @@ float View::CalcInitialSlur(
     Staff *startStaff = slur->GetStart()->m_crossStaff ? slur->GetStart()->m_crossStaff
                                                        : vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF));
     Staff *endStaff = slur->GetEnd()->m_crossStaff ? slur->GetEnd()->m_crossStaff
-                                                     : vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF));
+                                                   : vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF));
     if (startStaff && (startStaff != staff)) {
         staffNumbers.emplace(startStaff->GetN());
     }

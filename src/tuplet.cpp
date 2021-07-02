@@ -272,8 +272,10 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
             beamed = true;
         }
     }
-    // Is a beam the only child? (will not work with editorial elements)
-    if ((this->GetChildCount() == 1) && (this->GetChildCount(BEAM) == 1)) beamed = true;
+    // Is a beam or bTrem the only child? (will not work with editorial elements)
+    if (this->GetChildCount() == 1) {
+        if ((this->GetChildCount(BEAM) == 1) || (this->GetChildCount(BTREM) == 1)) beamed = true;
+    }
 
     if ((!this->HasBracketVisible() && !beamed) || (this->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
