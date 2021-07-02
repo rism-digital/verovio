@@ -1608,7 +1608,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         }
         if (MeterSigGrp *metersiggrp = params->m_currentStaffDef->GetCurrentMeterSigGrp();
             metersiggrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
-            metersiggrp->AddMeasureIdToVector(staff->GetParent()->GetUuid());
+            Measure *parentMeasure = vrv_cast<Measure *>(staff->GetFirstAncestor(MEASURE));
+            if (parentMeasure) metersiggrp->AddAlternatingMeasureToVector(parentMeasure);
         }
         return FUNCTOR_CONTINUE;
     }

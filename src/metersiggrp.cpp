@@ -73,9 +73,9 @@ void MeterSigGrp::FilterList(ArrayOfObjects *childList)
         childList->end());
 }
 
-void MeterSigGrp::AddMeasureIdToVector(const std::string &measureId)
+void MeterSigGrp::AddAlternatingMeasureToVector(const Measure *measure)
 {
-    m_alternatingMeasures.emplace_back(measureId);
+    m_alternatingMeasures.emplace_back(measure);
 }
 
 MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
@@ -158,9 +158,9 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
     return newMeterSig;
 }
 
-void MeterSigGrp::SetMeasureBasedCount(const std::string &measureId)
+void MeterSigGrp::SetMeasureBasedCount(const Measure *measure)
 {
-    auto it = std::find(m_alternatingMeasures.begin(), m_alternatingMeasures.end(), measureId);
+    auto it = std::find(m_alternatingMeasures.begin(), m_alternatingMeasures.end(), measure);
     m_count = int(std::distance(m_alternatingMeasures.begin(), it));
 }
 
