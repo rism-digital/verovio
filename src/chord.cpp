@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -814,6 +815,78 @@ int Chord::ResetDrawing(FunctorParams *functorParams)
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::JustifyY(FunctorParams *functorParams)
+{
+    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
+    assert(params);
+    assert(params->m_justificationSum > 0);
+
+    // Check if chord spreads across several staves by comparing the minimal and maximal staff number of its child
+    // notes.
+    const ArrayOfObjects *notes = this->GetList(this);
+    assert(notes);
+
+    bool firstNote = true;
+    int minStaffN, maxStaffN;
+    for (Object *obj : *notes) {
+        Note *note = vrv_cast<Note *>(obj);
+        assert(note);
+
+        Layer *layer = NULL;
+        Staff *staff = note->GetCrossStaff(layer);
+        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+
+        if (firstNote) {
+            minStaffN = staff->GetN();
+            maxStaffN = staff->GetN();
+            firstNote = false;
+        }
+        else {
+            minStaffN = std::min(minStaffN, staff->GetN());
+            maxStaffN = std::max(maxStaffN, staff->GetN());
+        }
+    }
+
+    if (minStaffN < maxStaffN) {
+        // The chord goes indeed across several staves.
+        // Now calculate the shift due to vertical justification of the involved staves.
+        Object *measure = this->GetFirstAncestor(MEASURE);
+        if (!measure) return FUNCTOR_CONTINUE;
+
+        ListOfObjects staves;
+        ClassIdComparison matchType(STAFF);
+        measure->FindAllDescendantByComparison(&staves, &matchType, 1);
+
+        int shift = 0;
+        for (Object *staff : staves) {
+            Staff *currentStaff = vrv_cast<Staff *>(staff);
+            assert(currentStaff);
+
+            if ((currentStaff->GetN() > minStaffN) && (currentStaff->GetN() <= maxStaffN)) {
+                const double staffJustificationFactor
+                    = currentStaff->GetAlignment()->GetJustificationFactor(params->m_doc);
+                shift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+            }
+        }
+
+        // Add the shift to the stem length of the chord.
+        Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));
+        if (!stem) return FUNCTOR_CONTINUE;
+
+        const int stemLen = stem->GetDrawingStemLen();
+        if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
+            stem->SetDrawingStemLen(stemLen - shift);
+            stem->SetDrawingYRel(stem->GetDrawingYRel() - shift);
+        }
+        else {
+            stem->SetDrawingStemLen(stemLen + shift);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
