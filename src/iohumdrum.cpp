@@ -10848,17 +10848,17 @@ void HumdrumInput::colorRest(Rest *rest, const std::string &token, int line, int
     }
 
     if (m_mens) {
-        for (int i = 0; i < (int)m_signifiers.mark.size(); ++i) {
-            if (token.find(m_signifiers.mark[i]) != std::string::npos) {
+        for (int i = 0; i < (int)m_signifiers.mens_mark.size(); ++i) {
+            if (token.find(m_signifiers.mens_mark[i]) != std::string::npos) {
                 rest->SetColor(m_signifiers.mens_mcolor[i]);
                 break;
             }
         }
     }
     else {
-        for (int i = 0; i < (int)m_signifiers.mens_mark.size(); ++i) {
-            if (token.find(m_signifiers.mens_mark[i]) != std::string::npos) {
-                rest->SetColor(m_signifiers.mens_mcolor[i]);
+        for (int i = 0; i < (int)m_signifiers.mark.size(); ++i) {
+            if (token.find(m_signifiers.mark[i]) != std::string::npos) {
+                rest->SetColor(m_signifiers.mcolor[i]);
                 break;
             }
         }
