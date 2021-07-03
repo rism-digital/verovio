@@ -18854,8 +18854,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         note->SetColor("#c41414");
     }
 
+    // These three variables keep track of whether or not verovio is allowed
+    // to convert the <accid> element into note@accid.  If there are attributes
+    // to the accidental, any of these three can be set to true, which will
+    // prevent the accid element from converting into an accid attribute.
     bool cautionaryQ = false;
+    bool subelementQ = false;
     bool editorialQ = false;
+
     std::string edittype;
     if (!m_signifiers.editacc.empty()) {
         for (int x = 0; x < (int)m_signifiers.editacc.size(); ++x) {
@@ -19007,6 +19013,12 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         appendElement(note, accid);
         setLocationId(accid, token, subtoken);
 
+        std::string color = token->getLayoutParameter("ACC", "color", subtoken);
+        if (!color.empty()) {
+            accid->SetColor(color);
+            subelementQ = true;
+        }
+
         if (gesturalQ) {
             switch (accidCount) {
                 case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
@@ -19036,10 +19048,16 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
     }
-    else if (!mensit && (!unpitchedQ)) {
+    else if (!mensit && !unpitchedQ) {
         accid = new Accid;
         appendElement(note, accid);
         setLocationId(accid, token, subtoken);
+
+        std::string color = token->getLayoutParameter("ACC", "color", subtoken);
+        if (!color.empty()) {
+            accid->SetColor(color);
+            subelementQ = true;
+        }
 
         if (!editorialQ) {
             // don't mark cautionary accidentals if the note has
@@ -19161,7 +19179,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
 
-        if (!(editorialQ || cautionaryQ)) {
+        if (!(editorialQ || cautionaryQ || subelementQ)) {
             // No need for sub-element so make them attributes of the note:
             accid->IsAttribute(true);
         }
