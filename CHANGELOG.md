@@ -1,11 +1,18 @@
 # Changelog
 
 ## [unreleased]
+* Support for additive meters (@eNote-GmbH)
 * Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)
+* Improved rendering of cross-staff slurs (@eNote-GmbH)
+* Improved octave line positions with `@endid` (@eNote-GmbH)
 * Improved layout algorithm with nested layer content arrangement
 * Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
 * Improved rendering of octave brackets ending (@eNote-GmbH)
+* Option --breaks-no-widow to prevent a single measure on last page (@eNote-GmbH)
 * Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
+* Making Verovio thread safe (@eNote-GmbH)
+* Switch from XSLT to Python for font generation (@eNote-GmbH)
+* Fix loading/updating of MEI3 files (@rettinghaus)
 * Fix option --octave-alternative-symbols
 
 ## [3.4.1] - 2021-05-03

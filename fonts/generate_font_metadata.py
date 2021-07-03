@@ -45,7 +45,7 @@ def validateGlyph(glyph):
             report += '- DUPLICATE UNICODE POINT'
 
         if report != '':
-            print('%s (%#0.2x) issues: %s' % (g.glyphname, glyph.unicode, report), log)
+            print('%s (%#0.2x) issues: %s' % (g.glyphname, glyph.unicode, report))
     return report
 
 

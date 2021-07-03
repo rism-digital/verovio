@@ -1401,7 +1401,7 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
         || (!params->m_isOtherLayer && Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam)
             && !IsGraceNote()))
         return FUNCTOR_SIBLINGS;
-    if (Is({ GRACEGRP, TUPLET, TUPLET_NUM, TUPLET_BRACKET, BTREM })) return FUNCTOR_CONTINUE;
+    if (Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
@@ -1768,9 +1768,12 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
         params->m_currentAlignment.m_alignment = GetAlignment();
-        selfLeft = this->GetSelfLeft();
         // Here we look how bounding boxes overlap and adjust the position only when necessary
         if (performBoundingBoxAlignment) {
+            selfLeft = this->GetAlignment()->GetXRel();
+            // If we want the nesting to be reduced, we can set to:
+            // selfLeft = this->GetSelfLeft();
+            // This could be made an option (--spacing-limited-nesting)
             int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
             int overlap = 0;
             for (auto &boundingBox : params->m_boundingBoxes) {
@@ -1780,7 +1783,13 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                 bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
 
                 if (hasOverlap) {
-                    overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+                    // For note to note alignment, make sure there is a standard spacing even if they to not overlap vertically
+                    if (this->Is(NOTE) and element->Is(NOTE)) {
+                        overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
+                    }
+                    else {
+                        overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+                    }
                     // LogDebug("%s overlaps of %d, margin %d", this->GetClassName().c_str(), overlap, margin);
                 }
             }
@@ -1788,6 +1797,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         }
         // Otherwise only look at the horizontal position
         else {
+            selfLeft = this->GetSelfLeft();
             selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
         }
     }
