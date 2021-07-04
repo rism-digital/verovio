@@ -1126,7 +1126,14 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
                 // found a matching tie end from a previous layer, so link the ends.
                 tieinfo.setEndId(found->getEndId());
                 tieinfo.setEndMeasure(found->getEndMeasure());
-                tieinfo.insertTieIntoDom();
+                Tie *tie = tieinfo.insertTieIntoDom();
+                if (tie) {
+                    hum::HTp tiestart = tieinfo.getStartTokenPointer();
+                    hum::HTp tieend = found->getEndToken();
+                    int sindex = tieinfo.getStartSubindex();
+                    int eindex = found->getEndSubindex();
+                    setTieLocationId(tie, tiestart, sindex, tieend, eindex);
+                }
                 ss[staffindex].tieends.erase(found);
                 return;
             }
