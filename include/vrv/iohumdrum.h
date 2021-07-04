@@ -726,6 +726,8 @@ protected:
     void prepareFingerings(hum::HTp fstart);
     std::string getLoColor(hum::HTp token, const string &category, int subtoken = 0);
     bool isTieAllowedToHang(hum::HTp token);
+    void analyzeVerseColor(hum::HumdrumFile &infile);
+    void analyzeVerseColor(hum::HTp &token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

@@ -616,6 +616,7 @@ bool HumdrumInput::convertHumdrum()
 
     m_multirest = analyzeMultiRest(infile);
     m_breaks = analyzeBreaks(infile);
+    analyzeVerseColor(infile);
 
     infile.analyzeSlurs();
     infile.analyzePhrasings();
@@ -19637,7 +19638,6 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
     vector<string> vtexts;
     vector<hum::HTp> vtoks;
     hum::HTp vtoken = NULL;
-    std::string vcolor;
     std::string content;
     hum::HumdrumLine &line = *token->getLine();
     int track = token->getTrack();
@@ -19712,9 +19712,8 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
 
         vtexts.clear();
         vtoks.clear();
-        vcolor.clear();
-        int track = line.token(i)->getTrack();
-        int strack = line.token(i)->getSubtrack();
+        // int track = line.token(i)->getTrack();
+        // int strack = line.token(i)->getSubtrack();
         if (line.token(i)->isDataType("**silbe")) {
             vtoks.push_back(line.token(i));
             std::string value = line.token(i)->getText();
@@ -19723,12 +19722,10 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             hre.replaceDestructive(value, "&auml;", "a2", "g");
             hre.replaceDestructive(value, "&ouml;", "o2", "g");
             vtexts.push_back(value);
-            vcolor = m_spine_color[track].at(strack);
         }
         else {
             vtoks.push_back(line.token(i));
             vtexts.push_back(*line.token(i));
-            vcolor = m_spine_color[track].at(strack);
         }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
@@ -19743,9 +19740,22 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             }
 
             Verse *verse = new Verse;
-            if (!vcolor.empty() && (vcolor != "black") && (vcolor != "#000") && (vcolor != "#000000")) {
-                verse->SetColor(vcolor);
+
+            std::string color = vtoken->getValue("auto", "color");
+            if (color == "black") {
+                color = "";
             }
+            else if (color == "#000") {
+                color = "";
+            }
+            else if (color == "#000000") {
+                color = "";
+            }
+
+            if (!color.empty()) {
+                verse->SetColor(color);
+            }
+
             if (vvdataQ) {
                 setLocationId(verse, line.token(i), j + 1);
             }
@@ -24451,6 +24461,80 @@ void HumdrumInput::finalizeDocument(Doc *doc)
         doc->SetMensuralMusicOnly(true);
         doc->m_notationType = NOTATIONTYPE_mensural;
         doc->ConvertToCastOffMensuralDoc();
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeVerseColor -- Calculate color of lyric text from *color:
+//    interpretations.
+//
+
+void HumdrumInput::analyzeVerseColor(hum::HumdrumFile &infile)
+{
+    std::vector<hum::HTp> exinterps;
+    infile.getSpineStartList(exinterps, "**text");
+    for (int i = 0; i < (int)exinterps.size(); i++) {
+        analyzeVerseColor(exinterps[i]);
+    }
+}
+
+void HumdrumInput::analyzeVerseColor(hum::HTp &token)
+{
+    // Only checking primary spine (no spine splits)
+    hum::HTp current = token;
+    std::string color = "";
+    hum::HumRegex hre;
+    while (current) {
+        if (current->isInterpretation()) {
+            if (hre.search(current, "^\\*color:\\s*([^\\s]+)")) {
+                color = hre.getMatch(1);
+                if (color == "black") {
+                    color = "";
+                }
+                else if (color == "#000") {
+                    color = "";
+                }
+                else if (color == "#000000") {
+                    color = "";
+                }
+            }
+            else if (hre.search(current, "^\\*color:")) {
+                color = "";
+            }
+        }
+        if (color.empty()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (!current->isData()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->isNull()) {
+            current = current->getNextToken();
+            continue;
+        }
+        std::string localColor = current->getLayoutParameter("LY", "color");
+        if (!localColor.empty()) {
+            if (localColor == "black") {
+                localColor = "";
+            }
+            else if (localColor == "#000") {
+                localColor = "";
+            }
+            else if (localColor == "#000000") {
+                localColor = "";
+            }
+            if (!localColor.empty()) {
+                current->setValue("auto", "color", localColor);
+            }
+        }
+        else {
+            current->setValue("auto", "color", color);
+        }
+        current = current->getNextToken();
+        continue;
     }
 }
 
