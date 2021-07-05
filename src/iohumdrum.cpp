@@ -4482,7 +4482,7 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top
             hum::HTp token = infile[i].token(0);
             if (hre.search(token, "!!!OMD")) {
                 omd = token;
-                break;
+                // Don't break: search for last OMD in non-data region.
             }
         }
         if (omd) {
@@ -6288,9 +6288,6 @@ void HumdrumInput::checkForOmd(int startline, int endline)
     if (m_omd > infile[startline].getDurationFromStart()) {
         return;
     }
-    // if (m_omd < 0) {
-    //    startline = 0;
-    //}
 
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     if (staffstarts.size() == 0) {
@@ -6322,7 +6319,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (key == "OMD") {
             index = i;
             value = infile[i].getReferenceValue();
-            break;
+            // Don't break: search for the last OMD in a non-data region.
         }
     }
 
