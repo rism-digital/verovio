@@ -60,7 +60,7 @@ FloatingObject::FloatingObject(const std::string &classid) : Object(classid)
     Reset();
 
     m_currentPositioner = NULL;
-    m_maxDrawingYRel = 0;
+    m_maxDrawingYRel = VRV_UNSET;
 }
 
 FloatingObject::~FloatingObject() {}
@@ -106,6 +106,18 @@ int FloatingObject::GetDrawingY() const
 {
     if (!m_currentPositioner) return 0;
     return m_currentPositioner->GetDrawingY();
+}
+
+void FloatingObject::SetMaxDrawingYRel(int maxDrawingYRel)
+{
+    if (!m_currentPositioner) return;
+    data_STAFFREL drawingPlace = m_currentPositioner->GetDrawingPlace();
+    if (drawingPlace == STAFFREL_above) {
+        if ((m_maxDrawingYRel == VRV_UNSET) || (m_maxDrawingYRel > maxDrawingYRel)) m_maxDrawingYRel = maxDrawingYRel;
+    }
+    else {
+        if ((m_maxDrawingYRel == VRV_UNSET) || (m_maxDrawingYRel < maxDrawingYRel)) m_maxDrawingYRel = maxDrawingYRel;
+    }
 }
 
 void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
@@ -337,14 +349,12 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             yRel = this->GetContentY1();
             yRel -= doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
-            this->SetDrawingYRel(m_object->GetMaxDrawingYRel());
             this->SetDrawingYRel(-minStaffDistance);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + this->GetContentY2();
             yRel += doc->GetTopMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
-            this->SetDrawingYRel(m_object->GetMaxDrawingYRel());
             this->SetDrawingYRel(minStaffDistance + staffAlignment->GetStaffHeight());
         }
     }
@@ -374,7 +384,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (m_object->Is({ DIR, DYNAM })) {
-                if (m_object->GetMaxDrawingYRel() > yRel) m_object->SetMaxDrawingYRel(yRel);
+                m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
             }
             // With LayerElement always move them up
@@ -401,7 +411,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (m_object->Is({ DIR, DYNAM })) {
-                if (m_object->GetMaxDrawingYRel() < yRel) m_object->SetMaxDrawingYRel(yRel);
+                m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
             }
             // With LayerElement always move them down
