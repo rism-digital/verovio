@@ -10450,7 +10450,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         posch = i < tsize - 1 ? token->at(i + 1) : 0;
         if ((ch == '^') && (posch == '^')) {
             // use 6 slot in array for "^^" (heavy accent)
-            ch = 6;
+            ch = '6';
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
             ++i;
         }
@@ -10544,9 +10544,9 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         gestural.push_back(articges['~']);
         showingpositions.push_back(showpos['~']);
     }
-    if (articloc[6]) {
+    if (articloc['6']) {
         artics.push_back(ARTICULATION_marc);
-        positions.push_back(articpos[6]);
+        positions.push_back(articpos['6']);
         gestural.push_back(articges['6']);
         showingpositions.push_back(showpos['6']);
     }
@@ -10604,7 +10604,13 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         std::vector<data_ARTICULATION> oneartic;
         oneartic.clear();
         oneartic.push_back(artics.at(i));
-        artic->SetArtic(oneartic);
+        if (gestural.at(i)) {
+            // artic->SetArticGes(oneartic);
+            continue;
+        }
+        else {
+            artic->SetArtic(oneartic);
+        }
         if (positions.at(i) > 0) {
             setPlaceRelEvent(artic, "above", positions.at(i));
         }
