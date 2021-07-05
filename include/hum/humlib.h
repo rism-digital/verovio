@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jun 21 10:09:00 PDT 2021
+// Last Modified: Mon Jul  5 01:28:26 PDT 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5870,6 +5870,8 @@ class Tool_composite : public HumTool {
 		void        processCoincidenceInterpretation(HumdrumFile& infile, HTp token);
 		bool        hasPipeRdf           (HumdrumFile& infile);
 		void        extractGroup         (HumdrumFile& infile, const string &target);
+		void        backfillGroup        (vector<vector<string>>& curgroup, HumdrumFile& infile,
+		                                  int line, int track, int subtrack, const string& group);
 
 	private:
 		std::string m_pitch     = "eR";   // pitch to display for composite rhythm
