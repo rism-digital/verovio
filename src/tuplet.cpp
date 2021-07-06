@@ -177,7 +177,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
     this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
     int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
 
-    // If we have a beam, see if we can move it to more appropriate postion
+    // If we have a beam, see if we can move it to more appropriate position
     if (beam && !m_crossStaff) {
         const int xMid = tupletNum->GetDrawingXMid(doc);
         const int yMid = beam->m_beamSegment.m_startingY
