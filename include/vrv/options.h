@@ -588,6 +588,7 @@ public:
     OptionBool m_humType;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
+    OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
