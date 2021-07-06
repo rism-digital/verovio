@@ -69,6 +69,27 @@ bool Ligature::IsSupportedChild(Object *child)
     return true;
 }
 
+Note *Ligature::GetFirstNote()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    Note *firstNote = vrv_cast<Note *>(childList->front());
+    assert(firstNote);
+    return firstNote;
+}
+
+Note *Ligature::GetLastNote()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The first note is the bottom
+    Note *lastNote = vrv_cast<Note *>(childList->back());
+    assert(lastNote);
+    return lastNote;
+}
+
 void Ligature::FilterList(ArrayOfObjects *childList)
 {
     // Retain only note children of ligatures
