@@ -96,26 +96,14 @@ void Ligature::FilterList(ArrayOfObjects *childList)
     ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if (!(*iter)->IsLayerElement()) {
+        if (!(*iter)->Is(NOTE)) {
             // remove anything that is not an LayerElement
-            iter = childList->erase(iter);
-            continue;
-        }
-        LayerElement *currentElement = vrv_cast<LayerElement *>(*iter);
-        assert(currentElement);
-        if (!currentElement->HasInterface(INTERFACE_DURATION)) {
             iter = childList->erase(iter);
         }
         else {
-            Note *n = dynamic_cast<Note *>(currentElement);
-
-            if (n) {
-                ++iter;
-            }
-            else {
-                // if it is not a note, drop it
-                iter = childList->erase(iter);
-            }
+            // assert that we keep only notes 
+            assert(dynamic_cast<Note *>(*iter));
+            ++iter;
         }
     }
 
