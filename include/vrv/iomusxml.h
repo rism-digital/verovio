@@ -124,7 +124,8 @@ namespace musicxml {
 
     class ClefChange {
     public:
-        ClefChange(const std::string &measureNum, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset, bool afterBarline)
+        ClefChange(const std::string &measureNum, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset,
+            bool afterBarline)
         {
             m_measureNum = measureNum;
             m_staff = staff;
@@ -225,7 +226,7 @@ private:
      * Add clef changes to all layers of a given measure, staff, and time stamp
      */
     void AddClefs(Measure *measure, const musicxml::ClefChange &clefChange);
-    
+
     /**
      * Add clef as layer element to specified layer and #sameas clefs to previous layers, if needed
      */
@@ -334,7 +335,7 @@ private:
     ///@{
     ///@}
     void GenerateUuid(pugi::xml_node node);
-    
+
     /*
      * @name Helper method for meterSigGrp. Separates beat/beat-type into MeterSig and adds them to the MeterSigGrp.
      * Returns total meterCount and meterUnit for the group

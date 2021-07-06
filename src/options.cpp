@@ -884,6 +884,10 @@ Options::Options()
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
+    m_ligatureAsBracket.SetInfo("Ligature as bracket", "Render ligatures as bracket instead of original notation");
+    m_ligatureAsBracket.Init(false);
+    this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_general);
+
     m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);

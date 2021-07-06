@@ -230,7 +230,7 @@ public:
      * @name Getter/setter for control point offset (as well as method to calculate it from options)
      */
     ///@{
-    void CalculateControlPointOffset(Doc* doc, int staffSize);
+    void CalculateControlPointOffset(Doc *doc, int staffSize);
     void SetControlPointOffset(int controlPointOffset)
     {
         m_leftControlPointOffset = m_rightControlPointOffset = controlPointOffset;

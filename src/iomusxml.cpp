@@ -1058,7 +1058,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     if (!m_slurStack.empty()) { // There are slurs left open
         std::vector<std::pair<Slur *, musicxml::OpenSlur>>::iterator iter;
         for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number, iter->second.m_measureNum.c_str());
+            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number,
+                iter->second.m_measureNum.c_str());
         }
         m_slurStack.clear();
     }
@@ -1324,7 +1325,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     return nbStaves;
 }
 
-void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node& time, Object *parent)
+void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *parent)
 {
     if ((time.select_nodes("beats").size() > 1) || time.select_node("interchangeable")) {
         MeterSigGrp *meterSigGrp = new MeterSigGrp();
@@ -3382,8 +3383,7 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     pugi::xpath_node currentMeasure = node.select_node("ancestor::measure");
 
     pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1' and text()='end']]").node();
-    pugi::xml_node tupletEnd
-        = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+    pugi::xml_node tupletEnd = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
     const auto measureNodeChildren = currentMeasure.node().children();
     std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
@@ -3416,7 +3416,9 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
 
         if (beamEndIterator == currentMeasureNodes.end()) {
-            std::string measureName = (currentMeasure.node().attribute("id"))? currentMeasure.node().attribute("id").as_string() : currentMeasure.node().attribute("number").as_string();
+            std::string measureName = (currentMeasure.node().attribute("id"))
+                ? currentMeasure.node().attribute("id").as_string()
+                : currentMeasure.node().attribute("number").as_string();
             LogError("MusicXML import: Beam without end in measure %s", measureName.c_str());
             return;
         }

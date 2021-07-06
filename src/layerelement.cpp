@@ -948,6 +948,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     Note *noteParent = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = dynamic_cast<Rest *>(this->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
     TabGrp *tabGrpParent = dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    const bool ligatureAsBracket = params->m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
 
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
@@ -964,7 +965,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is({ DOTS, FLAG, STEM })) {
         assert(false);
     }
-    else if (ligatureParent && this->Is(NOTE)) {
+    else if (ligatureParent && this->Is(NOTE) && !ligatureAsBracket) {
         // Ligature notes are all aligned with the first note
         Note *note = vrv_cast<Note *>(this);
         assert(note);
@@ -1786,7 +1787,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                 bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
 
                 if (hasOverlap) {
-                    // For note to note alignment, make sure there is a standard spacing even if they to not overlap vertically
+                    // For note to note alignment, make sure there is a standard spacing even if they to not overlap
+                    // vertically
                     if (this->Is(NOTE) and element->Is(NOTE)) {
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
                     }
