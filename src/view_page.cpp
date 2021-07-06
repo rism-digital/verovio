@@ -1017,7 +1017,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
             // draw plus sign here
             const int plusX = x + width;
             DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
-            offset += width + 2 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false);
+            offset += width + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
         }
         else {
             offset += width + margin * 2;
