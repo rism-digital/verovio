@@ -130,6 +130,8 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
+    
+    if (params->m_doc->GetOptions()->m_ligatureAsBracket.GetValue()) return FUNCTOR_CONTINUE;
 
     m_drawingShapes.clear();
 
