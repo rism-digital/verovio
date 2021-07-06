@@ -695,7 +695,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 std::string matches("0123456789");
                 std::size_t offset = iter->second.find_first_of(matches);
                 if (offset < iter->second.length()) {
-                    const float mmval = std::stof(iter->second.substr(offset));
+                    const double mmval = std::stod(iter->second.substr(offset));
                     tempo->SetMm(mmval);
                 }
                 if (!iter->second.empty()) {
@@ -804,7 +804,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
-    if (scoreMidiBpm) m_doc->m_mdivScoreDef.SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_int());
+    if (scoreMidiBpm) m_doc->m_mdivScoreDef.SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -1057,7 +1057,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     if (!m_slurStack.empty()) { // There are slurs left open
         std::vector<std::pair<Slur *, musicxml::OpenSlur>>::iterator iter;
         for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number, iter->second.m_measureNum.c_str());
+            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number,
+                iter->second.m_measureNum.c_str());
         }
         m_slurStack.clear();
     }
@@ -2306,7 +2307,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (words.size() != 0) TextRendition(words, tempo);
         if (metronome) PrintMetronome(metronome.node(), tempo);
         if (soundNode.attribute("tempo")) {
-            tempo->SetMidiBpm(round(soundNode.attribute("tempo").as_float()));
+            tempo->SetMidiBpm(soundNode.attribute("tempo").as_double());
         }
         tempo->SetTstamp(timeStamp);
         if (staffNode) {
@@ -3395,8 +3396,7 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     pugi::xpath_node currentMeasure = node.select_node("ancestor::measure");
 
     pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1' and text()='end']]").node();
-    pugi::xml_node tupletEnd
-        = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+    pugi::xml_node tupletEnd = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
     const auto measureNodeChildren = currentMeasure.node().children();
     std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
@@ -3429,7 +3429,9 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
 
         if (beamEndIterator == currentMeasureNodes.end()) {
-            std::string measureName = (currentMeasure.node().attribute("id"))? currentMeasure.node().attribute("id").as_string() : currentMeasure.node().attribute("number").as_string();
+            std::string measureName = (currentMeasure.node().attribute("id"))
+                ? currentMeasure.node().attribute("id").as_string()
+                : currentMeasure.node().attribute("number").as_string();
             LogError("MusicXML import: Beam without end in measure %s", measureName.c_str());
             return;
         }

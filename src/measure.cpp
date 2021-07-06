@@ -136,7 +136,7 @@ void Measure::Reset()
 
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
-    m_currentTempo = 120;
+    m_currentTempo = 120.0;
 }
 
 bool Measure::IsSupportedChild(Object *child)
@@ -1433,7 +1433,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
         params->m_currentTempo = tempo->GetMidiBpm();
     }
     else if (tempo && tempo->HasMm()) {
-        int mm = tempo->GetMm();
+        double mm = tempo->GetMm();
         int mmUnit = 4;
         if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
             mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
@@ -1441,7 +1441,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
         if (tempo->HasMmDots()) {
             mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
         }
-        params->m_currentTempo = int(mm * 4.0 / mmUnit + 0.5);
+        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
     }
     m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
 

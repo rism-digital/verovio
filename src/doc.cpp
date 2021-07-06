@@ -261,7 +261,7 @@ void Doc::CalculateMidiTimemap()
         page->LayOutHorizontally();
     }
 
-    int tempo = MIDI_TEMPO;
+    double tempo = MIDI_TEMPO;
 
     // Set tempo
     if (m_mdivScoreDef.HasMidiBpm()) {

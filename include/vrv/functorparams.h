@@ -954,14 +954,14 @@ public:
         m_currentRealTimeSeconds = 0.0;
         m_maxCurrentScoreTime = 0.0;
         m_maxCurrentRealTimeSeconds = 0.0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_tempoAdjustment = 1.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     double m_maxCurrentScoreTime;
     double m_maxCurrentRealTimeSeconds;
-    int m_currentTempo;
+    double m_currentTempo;
     double m_tempoAdjustment;
 };
 
