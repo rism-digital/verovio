@@ -44,6 +44,7 @@ class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
+class MeterSigGrp;
 class Octave;
 class Pedal;
 class Section;
@@ -212,6 +213,7 @@ private:
     void ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
+    void ReadMusicXMLMeterSig(const pugi::xml_node &node, Object *parent);
     ///@}
 
     /**
@@ -332,6 +334,14 @@ private:
     ///@{
     ///@}
     void GenerateUuid(pugi::xml_node node);
+    
+    /*
+     * @name Helper method for meterSigGrp. Separates beat/beat-type into MeterSig and adds them to the MeterSigGrp.
+     * Returns total meterCount and meterUnit for the group
+     */
+    ///@{
+    std::pair<std::vector<int>, int> GetMeterSigGrpValues(const pugi::xml_node &node, MeterSigGrp *parent);
+    ///@}
 
     /*
      * @name Helper method for multirests. Returns number of measure hidden by MRest before

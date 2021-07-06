@@ -103,6 +103,7 @@ enum ClassId {
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
+    METERSIGGRP,
     PAGE,
     PAGES,
     SCORE,
