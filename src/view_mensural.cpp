@@ -392,13 +392,12 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     // Draw children (notes)
     DrawLayerChildren(dc, ligature, layer, staff, measure);
-    
+
     // Render a bracket for the ligature
     if (m_options->m_ligatureAsBracket.GetValue()) {
         const ArrayOfObjects *notes = ligature->GetList(ligature);
         assert(notes);
 
-        
         if (notes->size() > 0) {
             int y = staff->GetDrawingY();
             Note *firstNote = ligature->GetFirstNote();

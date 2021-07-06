@@ -2206,16 +2206,13 @@ enum StaffDefRedrawFlags {
     REDRAW_METERSIGGRP = 0x10,
     // all flags
     REDRAW_ALL = REDRAW_CLEF | REDRAW_KEYSIG | REDRAW_MENSUR | REDRAW_METERSIG | REDRAW_METERSIGGRP,
-    // 
+    //
     FORCE_REDRAW = 0x100
 };
 
 class SetStaffDefRedrawFlagsParams : public FunctorParams {
 public:
-    SetStaffDefRedrawFlagsParams()
-    {
-        m_redrawFlags = 0;
-    }
+    SetStaffDefRedrawFlagsParams() { m_redrawFlags = 0; }
     int m_redrawFlags;
 };
 

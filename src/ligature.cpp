@@ -101,7 +101,7 @@ void Ligature::FilterList(ArrayOfObjects *childList)
             iter = childList->erase(iter);
         }
         else {
-            // assert that we keep only notes 
+            // assert that we keep only notes
             assert(dynamic_cast<Note *>(*iter));
             ++iter;
         }
@@ -130,7 +130,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_doc->GetOptions()->m_ligatureAsBracket.GetValue()) return FUNCTOR_CONTINUE;
 
     m_drawingShapes.clear();

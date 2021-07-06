@@ -1525,7 +1525,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
                 params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
             }
             // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_CLEF | StaffDefRedrawFlags::REDRAW_KEYSIG);
+            params->m_upcomingScoreDef->SetRedrawFlags(
+                StaffDefRedrawFlags::REDRAW_CLEF | StaffDefRedrawFlags::REDRAW_KEYSIG);
             // Set it to the current system (used e.g. for endings)
             params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentSystem->GetDrawingScoreDef()->SetDrawLabels(params->m_drawLabels);

@@ -47,7 +47,7 @@ public:
      * Add children (notes or editorial markup)
      */
     virtual bool IsSupportedChild(Object *object);
-    
+
     /**
      * Return the first or last note
      */
