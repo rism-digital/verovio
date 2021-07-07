@@ -417,7 +417,7 @@ private:
     /* measure repeats */
     bool m_slash = false;
     /* MIDI ticks */
-    int m_ppq;
+    int m_ppq = 1;
     /* measure time */
     int m_durTotal = 0;
     /* measure time */
