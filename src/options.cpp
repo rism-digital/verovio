@@ -1171,11 +1171,6 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
-    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
-        "The default horizontal distance between the dots and the inner barline of a repeat barline");
-    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
-    this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
-
     m_octaveAlternativeSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
     m_octaveAlternativeSymbols.Init(false);
     this->Register(&m_octaveAlternativeSymbols, "octaveAlternativeSymbols", &m_generalLayout);
@@ -1183,6 +1178,15 @@ Options::Options()
     m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
     m_octaveLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_octaveLineThickness, "octaveLineThickness", &m_generalLayout);
+
+    m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
+    m_pedalLineThickness.Init(0.20, 0.10, 1.00);
+    this->Register(&m_pedalLineThickness, "pedalLineThickness", &m_generalLayout);
+    
+    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
+        "The default horizontal distance between the dots and the inner barline of a repeat barline");
+    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
     m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
@@ -1596,6 +1600,7 @@ void Options::Sync()
         { "subBracketThickness", &m_subBracketThickness }, //
         { "hairpinThickness", &m_hairpinThickness }, //
         { "octaveLineThickness", &m_octaveLineThickness }, //
+        { "pedalLineThickness", &m_pedalLineThickness }, //
         { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
         { "lyricLineThickness", &m_lyricLineThickness }, //
         { "tupletBracketThickness", &m_tupletBracketThickness }, //

@@ -667,6 +667,7 @@ public:
     OptionIntMap m_multiRestStyle;
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
+    OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionInt m_slurControlPoints;
