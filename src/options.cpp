@@ -717,6 +717,15 @@ bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, c
     return true;
 }
 
+std::set<std::string> OptionJson::GetKeys() const
+{
+    std::set<std::string> keys;
+    for (const auto &mapEntry : m_values.kv_map()) {
+        keys.insert(mapEntry.first);
+    }
+    return keys;
+}
+
 OptionJson::JsonPath OptionJson::StringPath2NodePath(
     const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
 {
@@ -1562,7 +1571,14 @@ Options::~Options() {}
 void Options::Sync()
 {
     if (!m_engravingDefaults.IsSet() && !m_engravingDefaultsFile.IsSet()) return;
-    // override default or passed engravingDefaults with explicitly set values
+
+    // We track all unmatched keys to generate appropriate errors later on
+    std::set<std::string> unmatchedKeys = m_engravingDefaults.GetKeys();
+    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeys();
+    std::set_union(unmatchedKeys.begin(), unmatchedKeys.end(), otherKeys.begin(), otherKeys.end(),
+        std::inserter(unmatchedKeys, unmatchedKeys.end()));
+
+    // Override default or passed engravingDefaults with explicitly set values
     std::list<std::pair<std::string, OptionDbl *>> engravingDefaults = {
         { "staffLineThickness", &m_staffLineWidth }, //
         { "stemThickness", &m_stemWidth }, //
@@ -1587,18 +1603,30 @@ void Options::Sync()
     };
 
     for (const auto &pair : engravingDefaults) {
-        if (pair.second->IsSet()) continue;
-
         const std::vector<std::string> jsonNodePath = { pair.first };
+        double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
-            const double jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
-            pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
+            jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
         }
         else if (m_engravingDefaults.HasValue(jsonNodePath)) {
-            const double jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
+            jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
+        }
+        else
+            continue;
+
+        if (!pair.second->IsSet()) {
             pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
         }
+        else if (jsonValue * 2.0 != pair.second->GetValue()) {
+            LogWarning(
+                "The engraving default '%s' is skipped because the corresponding option '%s' was set before to %f.",
+                pair.first.c_str(), pair.second->GetKey().c_str(), pair.second->GetValue());
+        }
+        unmatchedKeys.erase(pair.first);
     }
+
+    std::for_each(unmatchedKeys.cbegin(), unmatchedKeys.cend(),
+        [](const std::string &key) { LogError("Unsupported engraving default '%s'", key.c_str()); });
 }
 
 void Options::Register(Option *option, const std::string &key, OptionGrp *grp)

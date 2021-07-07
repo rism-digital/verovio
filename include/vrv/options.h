@@ -475,6 +475,12 @@ public:
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
     ///@}
+
+    /**
+     * Accessing all keys
+     */
+    std::set<std::string> GetKeys() const;
+
 protected:
     JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
 
