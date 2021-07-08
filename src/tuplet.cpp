@@ -169,7 +169,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
 
     // Calculate relative Y for the tupletNum
     AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
-    adjustTupletNumOverlapParams.m_horizontalMargin = doc->GetDrawingUnit(staffSize);
+    adjustTupletNumOverlapParams.m_horizontalMargin = 2 * doc->GetDrawingUnit(staffSize);
     adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
     adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
     adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
@@ -178,7 +178,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
     int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
 
     // If we have a beam, see if we can move it to more appropriate position
-    if (beam && !m_crossStaff) {
+    if (beam && !m_crossStaff && !FindDescendantByType(ARTIC)) {
         const int xMid = tupletNum->GetDrawingXMid(doc);
         const int yMid = beam->m_beamSegment.m_startingY
             + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
