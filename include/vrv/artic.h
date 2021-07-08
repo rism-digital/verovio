@@ -21,6 +21,7 @@ namespace vrv {
 class Artic : public LayerElement,
               public AttArticulation,
               public AttColor,
+              public AttEnclosingChars,
               public AttExtSym,
               public AttPlacementRelEvent {
 public:
@@ -81,6 +82,11 @@ public:
      * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
     wchar_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
+
+    /**
+     * Retrieves parentheses / brackets from the enclose attribute
+     */
+    wchar_t GetEnclosingGlyph(bool beforeArtic) const;
 
     //----------------//
     // Static methods //

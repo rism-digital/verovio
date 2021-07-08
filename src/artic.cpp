@@ -40,6 +40,7 @@ Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlace
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_ENCLOSINGCHARS);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
@@ -53,6 +54,7 @@ void Artic::Reset()
     LayerElement::Reset();
     ResetArticulation();
     ResetColor();
+    ResetEnclosingChars();
     ResetExtSym();
     ResetPlacementRelEvent();
 
@@ -246,6 +248,23 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
         return 0;
 }
 
+wchar_t Artic::GetEnclosingGlyph(bool beforeArtic) const
+{
+    wchar_t glyph = 0;
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack:
+                glyph = beforeArtic ? SMUFL_E26C_accidentalBracketLeft : SMUFL_E26D_accidentalBracketRight;
+                break;
+            case ENCLOSURE_paren:
+                glyph = beforeArtic ? SMUFL_E26A_accidentalParensLeft : SMUFL_E26B_accidentalParensRight;
+                break;
+            default: break;
+        }
+    }
+    return glyph;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for Artic
 //----------------------------------------------------------------------------
@@ -257,6 +276,8 @@ bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
     else if (code == SMUFL_E611_stringsDownBowTurned)
         return true;
     else if (code == SMUFL_E613_stringsUpBowTurned)
+        return true;
+    else if (code == SMUFL_E630_pluckedSnapPizzicatoBelow)
         return true;
     else
         return false;
