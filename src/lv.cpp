@@ -39,7 +39,7 @@ bool Lv::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningT
 {
     if (spanningType != SPANNING_START_END) {
         //  this makes no sense
-        LogWarning("Lv across systems is not supported. Use <tie> iinstead.");
+        LogWarning("Lv across systems is not supported. Use <tie> instead.");
         return false;
     }
 
