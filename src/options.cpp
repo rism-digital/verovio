@@ -39,12 +39,6 @@ const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_a
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
     { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
-constexpr const char *engravingDefaults
-    = "{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
-      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
-      "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.1,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.075,'textEnclosureThickness':0.1}";
-
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
@@ -1059,7 +1053,7 @@ Options::Options()
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
 
     m_engravingDefaults.SetInfo("Engraving defaults", "Json describing defaults for engraving SMuFL elements");
-    m_engravingDefaults.Init(JsonSource::String, engravingDefaults);
+    m_engravingDefaults.Init(JsonSource::String, "{}");
     this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
 
     m_engravingDefaultsFile.SetInfo(
@@ -1182,7 +1176,7 @@ Options::Options()
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_pedalLineThickness, "pedalLineThickness", &m_generalLayout);
-    
+
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
     m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
