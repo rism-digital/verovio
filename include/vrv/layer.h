@@ -153,7 +153,11 @@ public:
     KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; }
     Mensur *GetStaffDefMensur() { return m_staffDefMensur; }
     MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; }
-    bool HasStaffDef() { return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig); }
+    MeterSigGrp *GetStaffDefMeterSigGrp() { return m_staffDefMeterSigGrp; }
+    bool HasStaffDef()
+    {
+        return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig || m_staffDefMeterSigGrp);
+    }
 
     /**
      * Set drawing clef, keysig and mensur if necessary and if available.
@@ -271,6 +275,7 @@ private:
     KeySig *m_staffDefKeySig;
     Mensur *m_staffDefMensur;
     MeterSig *m_staffDefMeterSig;
+    MeterSigGrp *m_staffDefMeterSigGrp;
     bool m_drawKeySigCancellation;
 
     /** */

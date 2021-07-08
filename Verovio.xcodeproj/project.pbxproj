@@ -1210,6 +1210,12 @@
 		BBC19FBF22B37CA000100F42 /* all.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FBE22B37CA000100F42 /* all.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FC222B38C1400100F42 /* VerovioFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BBC19FC922B39AC400100F42 /* git_commit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDA81C21268B38760065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
+		BDA81C22268B38770065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
+		BDA81C24268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
+		BDA81C25268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
+		BDA81C26268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
+		BDA81C27268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
 		BDC366C72576AF9300E4D826 /* grpsym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDC366C52576AF9300E4D826 /* grpsym.cpp */; };
 		BDC366CC2576AF9B00E4D826 /* grpsym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDC366C52576AF9300E4D826 /* grpsym.cpp */; };
 		BDC366D12576AF9C00E4D826 /* grpsym.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDC366C52576AF9300E4D826 /* grpsym.cpp */; };
@@ -1671,6 +1677,8 @@
 		BB4C4BCA22A941F9001F6AF0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = SOURCE_ROOT; };
 		BBC19FBE22B37CA000100F42 /* all.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = all.h; path = bindings/iOS/all.h; sourceTree = SOURCE_ROOT; };
 		BBC19FC222B38C1400100F42 /* VerovioFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VerovioFramework.h; sourceTree = "<group>"; };
+		BDA81C20268B386C0065B802 /* metersiggrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersiggrp.h; path = include/vrv/metersiggrp.h; sourceTree = "<group>"; };
+		BDA81C23268B38A10065B802 /* metersiggrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersiggrp.cpp; path = src/metersiggrp.cpp; sourceTree = "<group>"; };
 		BDC366C52576AF9300E4D826 /* grpsym.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grpsym.cpp; path = src/grpsym.cpp; sourceTree = "<group>"; };
 		BDC366C62576AF9300E4D826 /* grpsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grpsym.h; path = include/vrv/grpsym.h; sourceTree = "<group>"; };
 		BDEF9EC626725234008A3A47 /* caesura.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = caesura.cpp; path = src/caesura.cpp; sourceTree = "<group>"; };
@@ -2283,6 +2291,8 @@
 				8F59292118854BF800FE51AD /* mensur.h */,
 				4D763EC51987D04D003FCAB5 /* metersig.cpp */,
 				4D763EC81987D067003FCAB5 /* metersig.h */,
+				BDA81C23268B38A10065B802 /* metersiggrp.cpp */,
+				BDA81C20268B386C0065B802 /* metersiggrp.h */,
 				4D22C41818890E6100D0831F /* mrest.cpp */,
 				4D22C41B18890E9900D0831F /* mrest.h */,
 				403BEFEA206C00B400D022D5 /* mrpt.cpp */,
@@ -2545,6 +2555,7 @@
 				4DC34BA419BC4A71006175CD /* dot.h in Headers */,
 				4D6DF9F920E1074500C12BBD /* subst.h in Headers */,
 				4DEC4DC421C8292900D1D273 /* app.h in Headers */,
+				BDA81C22268B38770065B802 /* metersiggrp.h in Headers */,
 				4DB3D8BD1F83D0D500B5FC2B /* expansion.h in Headers */,
 				4DF2AF7E1A62F6A50016F869 /* drawinginterface.h in Headers */,
 				4DB3D8AC1F83D04200B5FC2B /* atts_gestural.h in Headers */,
@@ -2631,6 +2642,7 @@
 				BB4C4B2022A932CF001F6AF0 /* breath.h in Headers */,
 				BB4C4B7222A932D7001F6AF0 /* rest.h in Headers */,
 				BB4C4B3A22A932CF001F6AF0 /* turn.h in Headers */,
+				BDA81C21268B38760065B802 /* metersiggrp.h in Headers */,
 				BB4C4ACA22A932B6001F6AF0 /* pages.h in Headers */,
 				BB4C4ACC22A932B6001F6AF0 /* pb.h in Headers */,
 				BB4C4B1222A932C8001F6AF0 /* expansion.h in Headers */,
@@ -3070,6 +3082,7 @@
 				4D1694401E3A44F300569BF4 /* view_tuplet.cpp in Sources */,
 				4DB78742201F9F7200394520 /* svg.cpp in Sources */,
 				4DB3D8EF1F83D1A600B5FC2B /* fig.cpp in Sources */,
+				BDA81C25268B38A10065B802 /* metersiggrp.cpp in Sources */,
 				4DEC4DA721C81ED400D1D273 /* reg.cpp in Sources */,
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
 				4D1694431E3A44F300569BF4 /* view.cpp in Sources */,
@@ -3311,6 +3324,7 @@
 				40ACDEA924079F9000F82B8C /* reh.cpp in Sources */,
 				40BD9390206B95060037BF8E /* annot.cpp in Sources */,
 				4DC12A591F716E27000440E9 /* pghead.cpp in Sources */,
+				BDA81C24268B38A10065B802 /* metersiggrp.cpp in Sources */,
 				4D20740322A46BAA00E0765F /* atts_frettab.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
@@ -3485,6 +3499,7 @@
 				4DA80D971A6ACF5D0089802D /* options.cpp in Sources */,
 				4D16947B1E41DCE100569BF4 /* atts_cmnornaments.cpp in Sources */,
 				4DB3D8E91F83D17400B5FC2B /* ligature.cpp in Sources */,
+				BDA81C26268B38A10065B802 /* metersiggrp.cpp in Sources */,
 				4DB787652022F0BC00394520 /* jsonxx.cc in Sources */,
 				4DC12A831F741110000440E9 /* pgfoot.cpp in Sources */,
 				4DEC4D8421C804E000D1D273 /* app.cpp in Sources */,
@@ -3693,6 +3708,7 @@
 				BB4C4BC322A9330D001F6AF0 /* pugixml.cpp in Sources */,
 				4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */,
 				4D2E758D22BC2B5B004C51F0 /* tabdursym.cpp in Sources */,
+				BDA81C27268B38A10065B802 /* metersiggrp.cpp in Sources */,
 				BB4C4BC022A932FC001F6AF0 /* MidiMessage.cpp in Sources */,
 				BB4C4AED22A932BC001F6AF0 /* expand.cpp in Sources */,
 				BB4C4B0F22A932C8001F6AF0 /* ending.cpp in Sources */,

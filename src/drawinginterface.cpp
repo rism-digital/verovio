@@ -424,11 +424,13 @@ void StaffDefDrawingInterface::Reset()
     m_currentKeySig.Reset();
     m_currentMensur.Reset();
     m_currentMeterSig.Reset();
+    m_currentMeterSigGrp.Reset();
 
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;
     m_drawMeterSig = false;
+    m_drawMeterSigGrp = false;
 }
 
 void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
@@ -464,6 +466,33 @@ void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
     if (meterSig) {
         m_currentMeterSig = *meterSig;
         m_currentMeterSig.CloneReset();
+    }
+}
+
+void StaffDefDrawingInterface::SetCurrentMeterSigGrp(MeterSigGrp const *meterSigGrp)
+{
+    if (meterSigGrp) {
+        m_currentMeterSigGrp = *meterSigGrp;
+        m_currentMeterSigGrp.CloneReset();
+    }
+}
+
+bool StaffDefDrawingInterface::DrawMeterSigGrp()
+{
+    if (m_drawMeterSigGrp) {
+        const ArrayOfObjects *childList = m_currentMeterSigGrp.GetList(&m_currentMeterSigGrp);
+        if (childList->size() > 1) return true;
+    }
+    return false;
+}
+
+void StaffDefDrawingInterface::AlternateCurrentMeterSig(Measure *measure)
+{
+    if (MeterSigGrp *meterSigGrp = GetCurrentMeterSigGrp(); meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
+        meterSigGrp->SetMeasureBasedCount(measure);
+        MeterSig *meter = meterSigGrp->GetSimplifiedMeterSig();
+        SetCurrentMeterSig(meter);
+        delete meter;
     }
 }
 

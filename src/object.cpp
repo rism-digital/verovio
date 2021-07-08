@@ -1491,7 +1491,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         Page *page = vrv_cast<Page *>(this);
         assert(page);
         if (page->GetParent()->GetChildIndex(page) == 0) {
-            params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
+            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
             params->m_drawLabels = true;
         }
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
@@ -1525,7 +1525,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
                 params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
             }
             // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false);
+            params->m_upcomingScoreDef->SetRedrawFlags(
+                StaffDefRedrawFlags::REDRAW_CLEF | StaffDefRedrawFlags::REDRAW_KEYSIG);
             // Set it to the current system (used e.g. for endings)
             params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentSystem->GetDrawingScoreDef()->SetDrawLabels(params->m_drawLabels);
@@ -1535,7 +1536,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
-            params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
+            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::FORCE_REDRAW);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
 
@@ -1573,7 +1574,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
         if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
-            || scoreDef->HasMensurInfo(UNLIMITED_DEPTH) || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
+            || scoreDef->HasMensurInfo(UNLIMITED_DEPTH) || scoreDef->HasMeterSigGrpInfo(UNLIMITED_DEPTH)
+            || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
             params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
             params->m_upcomingScoreDef->m_insertScoreDef = true;
         }
@@ -1604,6 +1606,11 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         }
         if (staff->IsTablature()) {
             staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
+        }
+        if (MeterSigGrp *metersiggrp = params->m_currentStaffDef->GetCurrentMeterSigGrp();
+            metersiggrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
+            Measure *parentMeasure = vrv_cast<Measure *>(staff->GetFirstAncestor(MEASURE));
+            if (parentMeasure) metersiggrp->AddAlternatingMeasureToVector(parentMeasure);
         }
         return FUNCTOR_CONTINUE;
     }

@@ -21,6 +21,7 @@
 #include "label.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "metersiggrp.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -71,6 +72,11 @@ bool ScoreDefElement::HasMensurInfo(int depth)
 bool ScoreDefElement::HasMeterSigInfo(int depth)
 {
     return (this->FindDescendantByType(METERSIG, depth));
+}
+
+bool ScoreDefElement::HasMeterSigGrpInfo(int depth)
+{
+    return (this->FindDescendantByType(METERSIGGRP, depth));
 }
 
 Clef *ScoreDefElement::GetClef()
@@ -141,6 +147,23 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
     return clone;
 }
 
+MeterSigGrp *ScoreDefElement::GetMeterSigGrp()
+{
+    // Always check if HasMeterSigGrpInfo() is true before asking for it
+    MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(this->FindDescendantByType(METERSIGGRP, 1));
+    assert(meterSigGrp);
+    return meterSigGrp;
+}
+
+MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy()
+{
+    // Always check if HasMeterSigGrpInfo() is true before asking for a clone
+    MeterSigGrp *clone = dynamic_cast<MeterSigGrp *>(this->GetMeterSigGrp()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
+}
+
 //----------------------------------------------------------------------------
 // ScoreDef
 //----------------------------------------------------------------------------
@@ -197,6 +220,9 @@ bool ScoreDef::IsSupportedChild(Object *child)
     else if (child->Is(METERSIG)) {
         assert(dynamic_cast<MeterSig *>(child));
     }
+    else if (child->Is(METERSIGGRP)) {
+        assert(dynamic_cast<MeterSigGrp *>(child));
+    }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
@@ -216,40 +242,45 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     m_insertScoreDef = false;
     m_setAsDrawing = true;
 
-    bool drawClef = false;
-    bool drawKeySig = false;
-    bool drawMensur = false;
-    bool drawMeterSig = false;
+    int redrawFlags = 0;
     Clef const *clef = NULL;
     KeySig const *keySig = NULL;
     Mensur *mensur = NULL;
     MeterSig *meterSig = NULL;
+    MeterSigGrp *meterSigGrp = NULL;
 
     if (newScoreDef->HasClefInfo()) {
-        drawClef = true;
+        redrawFlags |= StaffDefRedrawFlags::REDRAW_CLEF;
         clef = newScoreDef->GetClef();
     }
     if (newScoreDef->HasKeySigInfo()) {
-        drawKeySig = true;
+        redrawFlags |= StaffDefRedrawFlags::REDRAW_KEYSIG;
         keySig = newScoreDef->GetKeySig();
     }
     if (newScoreDef->HasMensurInfo()) {
-        drawMensur = true;
+        redrawFlags |= StaffDefRedrawFlags::REDRAW_MENSUR;
         mensur = newScoreDef->GetMensurCopy();
     }
-    if (newScoreDef->HasMeterSigInfo()) {
-        drawMeterSig = true;
+    if (newScoreDef->HasMeterSigGrpInfo()) {
+        redrawFlags &= ~(StaffDefRedrawFlags::REDRAW_MENSUR);
+        redrawFlags |= StaffDefRedrawFlags::REDRAW_METERSIGGRP;
+        meterSigGrp = newScoreDef->GetMeterSigGrp();
+        meterSig = meterSigGrp->GetSimplifiedMeterSig();
+    }
+    else if (newScoreDef->HasMeterSigInfo()) {
+        redrawFlags |= StaffDefRedrawFlags::REDRAW_METERSIG;
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ReplaceDrawingValuesInStaffDefParams replaceDrawingValuesInStaffDefParams(clef, keySig, mensur, meterSig);
+    ReplaceDrawingValuesInStaffDefParams replaceDrawingValuesInStaffDefParams(
+        clef, keySig, mensur, meterSig, meterSigGrp);
     Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
     this->Process(&replaceDrawingValuesInScoreDef, &replaceDrawingValuesInStaffDefParams);
 
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;
 
-    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, false);
+    this->SetRedrawFlags(redrawFlags);
 }
 
 void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
@@ -279,7 +310,18 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             staffDef->SetCurrentMensur(mensur);
             delete mensur;
         }
-        if (newStaffDef->HasMeterSigInfo()) {
+        if (newStaffDef->HasMeterSigGrpInfo()) {
+            staffDef->SetDrawMeterSigGrp(true);
+            // Never draw a meterSig AND a mensur
+            staffDef->SetDrawMeterSig(false);
+            staffDef->SetDrawMensur(false);
+            MeterSigGrp *meterSigGrp = newStaffDef->GetMeterSigGrpCopy();
+            MeterSig *meterSig = meterSigGrp->GetSimplifiedMeterSig();
+            delete meterSigGrp;
+            staffDef->SetCurrentMeterSig(meterSig);
+            delete meterSig;
+        }
+        else if (newStaffDef->HasMeterSigInfo()) {
             staffDef->SetDrawMeterSig(true);
             // Never draw a meterSig AND a mensur
             staffDef->SetDrawMensur(false);
@@ -347,16 +389,11 @@ std::vector<int> ScoreDef::GetStaffNs()
     return ns;
 }
 
-void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
+void ScoreDef::SetRedrawFlags(int redrawFlags)
 {
     m_setAsDrawing = true;
-
     SetStaffDefRedrawFlagsParams setStaffDefRedrawFlagsParams;
-    setStaffDefRedrawFlagsParams.m_clef = clef;
-    setStaffDefRedrawFlagsParams.m_keySig = keySig;
-    setStaffDefRedrawFlagsParams.m_mensur = mensur;
-    setStaffDefRedrawFlagsParams.m_meterSig = meterSig;
-    setStaffDefRedrawFlagsParams.m_applyToAll = applyToAll;
+    setStaffDefRedrawFlagsParams.m_redrawFlags = redrawFlags;
     Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
     this->Process(&setStaffDefDraw, &setStaffDefRedrawFlagsParams);
 }

@@ -336,7 +336,7 @@ private:
     float m_angle;
     int m_thickness;
     curvature_CURVEDIR m_dir;
-    Staff* m_crossStaff;
+    Staff *m_crossStaff;
     ///@}
 
     ArrayOfCurveSpannedElements m_spannedElements;

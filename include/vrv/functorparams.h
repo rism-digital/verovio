@@ -41,6 +41,7 @@ class Measure;
 class MeasureAligner;
 class Mensur;
 class MeterSig;
+class MeterSigGrp;
 class MRpt;
 class Object;
 class Page;
@@ -1967,18 +1968,20 @@ public:
 
 class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
 public:
-    ReplaceDrawingValuesInStaffDefParams(
-        Clef const *clef, KeySig const *keySig, Mensur const *mensur, MeterSig const *meterSig)
+    ReplaceDrawingValuesInStaffDefParams(Clef const *clef, KeySig const *keySig, Mensur const *mensur,
+        MeterSig const *meterSig, MeterSigGrp const *meterSigGrp)
     {
         m_clef = clef;
         m_keySig = keySig;
         m_mensur = mensur;
         m_meterSig = meterSig;
+        m_meterSigGrp = meterSigGrp;
     }
     Clef const *m_clef;
     KeySig const *m_keySig;
     Mensur const *m_mensur;
     MeterSig const *m_meterSig;
+    MeterSigGrp const *m_meterSigGrp;
 };
 
 //----------------------------------------------------------------------------
@@ -2195,21 +2198,22 @@ public:
  * member 4: bool the flag for indicating if apply to all or not
  **/
 
+enum StaffDefRedrawFlags {
+    REDRAW_CLEF = 0x1,
+    REDRAW_KEYSIG = 0x2,
+    REDRAW_MENSUR = 0x4,
+    REDRAW_METERSIG = 0x8,
+    REDRAW_METERSIGGRP = 0x10,
+    // all flags
+    REDRAW_ALL = REDRAW_CLEF | REDRAW_KEYSIG | REDRAW_MENSUR | REDRAW_METERSIG | REDRAW_METERSIGGRP,
+    //
+    FORCE_REDRAW = 0x100
+};
+
 class SetStaffDefRedrawFlagsParams : public FunctorParams {
 public:
-    SetStaffDefRedrawFlagsParams()
-    {
-        m_clef = false;
-        m_keySig = false;
-        m_mensur = false;
-        m_meterSig = false;
-        m_applyToAll = false;
-    }
-    bool m_clef;
-    bool m_keySig;
-    bool m_mensur;
-    bool m_meterSig;
-    bool m_applyToAll;
+    SetStaffDefRedrawFlagsParams() { m_redrawFlags = 0; }
+    int m_redrawFlags;
 };
 
 //----------------------------------------------------------------------------

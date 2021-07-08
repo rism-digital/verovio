@@ -80,7 +80,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     /************** Noteheads: **************/
 
     // Ligature, maxima,longa, and brevis
-    if (note->IsInLigature()) {
+    if (note->IsInLigature() && !m_options->m_ligatureAsBracket.GetValue()) {
         DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DUR_1) {
@@ -392,6 +392,33 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     // Draw children (notes)
     DrawLayerChildren(dc, ligature, layer, staff, measure);
+
+    // Render a bracket for the ligature
+    if (m_options->m_ligatureAsBracket.GetValue()) {
+        const ArrayOfObjects *notes = ligature->GetList(ligature);
+        assert(notes);
+
+        if (notes->size() > 0) {
+            int y = staff->GetDrawingY();
+            Note *firstNote = ligature->GetFirstNote();
+            int x1 = firstNote->GetContentLeft();
+            Note *lastNote = ligature->GetLastNote();
+            int x2 = lastNote->GetContentRight();
+            // Look for the highest note position in the ligature
+            for (auto &iter : *notes) {
+                Note *note = vrv_cast<Note *>(iter);
+                assert(note);
+                y = std::max(y, note->GetContentTop());
+            }
+            int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            // move the bracket up
+            y += bracketSize + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y - bracketSize);
+            DrawFilledRectangle(dc, x1, y, x2, y - lineWidth);
+            DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y - bracketSize);
+        }
+    }
 
     dc->EndGraphic(ligature, this);
 }
