@@ -1151,8 +1151,15 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     }
 
     // set dimensions
-    deviceContext->SetWidth(width);
-    deviceContext->SetHeight(height);
+    if (m_options->m_landscape.GetValue()) {
+        deviceContext->SetWidth(height);
+        deviceContext->SetHeight(width);
+    }
+    else {
+        deviceContext->SetWidth(width);
+        deviceContext->SetHeight(height);
+    }
+    
     double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
