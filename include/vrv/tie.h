@@ -72,7 +72,7 @@ public:
 
 private:
     // Calculate initial position X position and return stem direction of the startNote
-    virtual void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
+    void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
         bool isOuterChordNote, Point &startPoint, Point &endPoint);
 
     // Helper function to get preferred curve direction based on the number of conditions (like note direction, position
