@@ -42,6 +42,17 @@ Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCur
     Reset();
 }
 
+Tie::Tie(const std::string &classid)
+    : ControlElement(classid), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+{
+    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
+
+    Reset();
+}
+
 Tie::~Tie() {}
 
 void Tie::Reset()

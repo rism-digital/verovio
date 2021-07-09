@@ -53,6 +53,11 @@ public:
     virtual void AddChild(Object *object);
 
     /**
+     * Adjust tuplet relative positioning based on possible overlaps
+     */
+    void AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int staffSize);
+
+    /**
      * @name Setter and getter for darwing elements and position
      */
     ///@{
