@@ -361,6 +361,11 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
+            else if (m_object->Is(DYNAM) && horizOverlapingBBox->Is(BEAM)) {
+                // Try to avoid comparing with BEAM BB since it might be much larger overlap while having a lot of
+                // whitespace. For such cases, DYNAM should be compared to individual elements of BEAM instead
+                return true;
+            }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // With LayerElement always move them up
