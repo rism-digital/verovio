@@ -85,7 +85,7 @@ public:
         m_isCmdOnly = false;
     }
     virtual ~Option() {}
-    virtual void CopyTo(Option *option);
+    virtual void CopyTo(Option *option) = 0;
 
     void SetKey(const std::string &key) { m_key = key; }
     std::string GetKey() const { return m_key; }
@@ -94,8 +94,10 @@ public:
     virtual bool SetValueDbl(double value);
     virtual bool SetValueArray(const std::vector<std::string> &values);
     virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
+    virtual std::string GetStrValue() const = 0;
+    virtual std::string GetDefaultStrValue() const = 0;
+
+    virtual void Reset() = 0;
 
     void SetInfo(const std::string &title, const std::string &description);
     std::string GetTitle() const { return m_title; }
@@ -161,6 +163,8 @@ public:
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
+    virtual void Reset();
+
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
     bool SetValue(bool value);
@@ -198,6 +202,8 @@ public:
     virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
+
+    virtual void Reset();
 
     double GetValue() const { return m_value; }
     double GetDefault() const { return m_defaultValue; }
@@ -241,6 +247,8 @@ public:
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
+    virtual void Reset();
+
     int GetValue() const;
     int GetUnfactoredValue() const;
     int GetDefault() const { return m_defaultValue; }
@@ -282,6 +290,8 @@ public:
     std::string GetValue() const { return m_value; }
     std::string GetDefault() const { return m_defaultValue; }
 
+    virtual void Reset();
+
 private:
     //
 public:
@@ -314,6 +324,8 @@ public:
     std::vector<std::string> GetValue() const { return m_values; }
     std::vector<std::string> GetDefault() const { return m_defaultValues; }
     bool SetValue(std::vector<std::string> const &values);
+
+    virtual void Reset();
 
 private:
     //
@@ -350,6 +362,8 @@ public:
     std::vector<std::string> GetStrValues(bool withoutDefault) const;
     std::string GetStrValuesAsStr(bool withoutDefault) const;
 
+    virtual void Reset();
+
 private:
     //
 public:
@@ -380,7 +394,9 @@ public:
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
-    // For altenate types return a reference to the value
+    virtual void Reset();
+
+    // For alternate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
     const data_STAFFREL *GetValueAlternate() const { return &m_value; }
     const data_STAFFREL *GetDefaultAlernate() const { return &m_defaultValue; }
@@ -392,38 +408,6 @@ public:
 private:
     data_STAFFREL m_value;
     data_STAFFREL m_defaultValue;
-};
-
-//----------------------------------------------------------------------------
-// OptionStaffrelBasic
-//----------------------------------------------------------------------------
-
-/**
- * This class is for map styling params
- */
-class OptionStaffrelBasic : public Option {
-public:
-    // constructors and destructors
-    OptionStaffrelBasic(){};
-    virtual ~OptionStaffrelBasic(){};
-    virtual void CopyTo(Option *option);
-    void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
-
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
-
-    data_STAFFREL_basic GetValue() const { return m_value; }
-    data_STAFFREL_basic GetDefault() const { return m_defaultValue; }
-
-private:
-    //
-public:
-    //
-private:
-    std::vector<data_STAFFREL_basic> m_values;
-    data_STAFFREL_basic m_value;
-    data_STAFFREL_basic m_defaultValue;
 };
 
 //----------------------------------------------------------------------------
@@ -464,6 +448,8 @@ public:
     bool SetValue(const std::string &value) override;
     std::string GetStrValue() const override;
     std::string GetDefaultStrValue() const override;
+
+    void Reset() override;
     ///@}
 
     /**
@@ -567,7 +553,7 @@ public:
     // They are ordered by short option alphabetical order
     OptionBool m_standardOutput;
     OptionBool m_help;
-    OptionBool m_allPpages;
+    OptionBool m_allPages;
     OptionString m_inputFrom;
     OptionString m_outfile;
     OptionInt m_page;

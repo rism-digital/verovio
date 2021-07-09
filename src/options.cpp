@@ -43,12 +43,6 @@ const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_non
 // Option
 //----------------------------------------------------------------------------
 
-void Option::CopyTo(Option *option)
-{
-    // Make sure it is overriden
-    assert(false);
-}
-
 void Option::SetInfo(const std::string &title, const std::string &description)
 {
     m_title = title;
@@ -87,20 +81,6 @@ bool Option::SetValue(const std::string &value)
     // If not overriden
     LogError("Unsupported type string for %s", m_key.c_str());
     return false;
-}
-
-std::string Option::GetStrValue() const
-{
-    // If not overriden
-    assert(false);
-    return "[unspecified]";
-}
-
-std::string Option::GetDefaultStrValue() const
-{
-    // If not overriden
-    assert(false);
-    return "[unspecified]";
 }
 
 jsonxx::Object Option::ToJson() const
@@ -223,6 +203,12 @@ std::string OptionBool::GetDefaultStrValue() const
     return (m_defaultValue) ? "true" : "false";
 }
 
+void OptionBool::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
+}
+
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
@@ -279,6 +265,12 @@ bool OptionDbl::SetValue(double value)
     m_value = value;
     m_isSet = true;
     return true;
+}
+
+void OptionDbl::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -343,6 +335,12 @@ bool OptionInt::SetValue(int value)
     return true;
 }
 
+void OptionInt::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
+}
+
 //----------------------------------------------------------------------------
 // OptionString
 //----------------------------------------------------------------------------
@@ -365,6 +363,12 @@ bool OptionString::SetValue(const std::string &value)
     m_value = value;
     m_isSet = true;
     return true;
+}
+
+void OptionString::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -437,6 +441,12 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
     return true;
+}
+
+void OptionArray::Reset()
+{
+    m_values.clear();
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -539,6 +549,12 @@ std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
     return ss.str();
 }
 
+void OptionIntMap::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
+}
+
 //----------------------------------------------------------------------------
 // OptionStaffrel
 //----------------------------------------------------------------------------
@@ -579,6 +595,12 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 {
     Att converter;
     return converter.StaffrelToStr(m_defaultValue);
+}
+
+void OptionStaffrel::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -640,6 +662,12 @@ std::string OptionJson::GetStrValue() const
 std::string OptionJson::GetDefaultStrValue() const
 {
     return m_defaultValues.json();
+}
+
+void OptionJson::Reset()
+{
+    m_values.reset();
+    m_isSet = false;
 }
 
 bool OptionJson::ReadJson(jsonxx::Object &output, const std::string &input) const
@@ -777,11 +805,11 @@ Options::Options()
     m_help.SetShortOption('h', true);
     m_baseOptions.AddOption(&m_help);
 
-    m_allPpages.SetInfo("All pages", "Output all pages");
-    m_allPpages.Init(false);
-    m_allPpages.SetKey("allPages");
-    m_allPpages.SetShortOption('a', true);
-    m_baseOptions.AddOption(&m_allPpages);
+    m_allPages.SetInfo("All pages", "Output all pages");
+    m_allPages.Init(false);
+    m_allPages.SetKey("allPages");
+    m_allPages.SetShortOption('a', true);
+    m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
         "Select input format from: \"abc\", \"darms\", \"humdrum\", \"mei\", \"pae\", \"xml\" (musicxml)");
