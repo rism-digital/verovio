@@ -170,6 +170,7 @@ enum ClassId {
     GLISS,
     HAIRPIN,
     HARM,
+    LV,
     MORDENT,
     MNUM,
     OCTAVE,
