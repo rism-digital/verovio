@@ -987,14 +987,14 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
     data_NOTATIONTYPE m_notationType;
-    int m_currentTempo;
+    double m_currentTempo;
 };
 
 //----------------------------------------------------------------------------
@@ -1475,7 +1475,7 @@ using MIDINoteSequence = std::list<MIDINote>;
  * member 1: int: the midi track number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
- * member 5: int with the current tempo
+ * member 5: double with the current tempo
  * member 6: expanded notes due to ornaments and tremolandi
  **/
 
@@ -1488,7 +1488,7 @@ public:
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
@@ -1496,7 +1496,7 @@ public:
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;
-    int m_currentTempo;
+    double m_currentTempo;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
     Functor *m_functor;
 };
@@ -1521,16 +1521,16 @@ public:
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_functor = functor;
     }
     std::map<double, double> realTimeToScoreTime;
     std::map<double, std::vector<std::string>> realTimeToOnElements;
     std::map<double, std::vector<std::string>> realTimeToOffElements;
-    std::map<double, int> realTimeToTempo;
+    std::map<double, double> realTimeToTempo;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
-    int m_currentTempo;
+    double m_currentTempo;
     Functor *m_functor;
 };
 

@@ -299,7 +299,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
     }
 
-    int tempo = MIDI_TEMPO;
+    double tempo = MIDI_TEMPO;
 
     // set MIDI tempo
     if (m_mdivScoreDef.HasMidiBpm()) {
@@ -416,11 +416,11 @@ bool Doc::ExportTimemap(std::string &output)
 
 void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
     std::map<double, std::vector<std::string>> &realTimeToOnElements,
-    std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, int> &realTimeToTempo)
+    std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, double> &realTimeToTempo)
 {
 
-    int currentTempo = -1000;
-    int newTempo;
+    double currentTempo = -1000.0;
+    double newTempo;
     int mapsize = (int)realTimeToScoreTime.size();
     output = "";
     output.reserve(mapsize * 100); // Estimate 100 characters for each entry.
