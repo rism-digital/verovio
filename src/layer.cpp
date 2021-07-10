@@ -26,6 +26,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "metersiggrp.h"
 #include "mrpt.h"
 #include "note.h"
 #include "staff.h"
@@ -52,6 +53,7 @@ Layer::Layer()
     m_staffDefKeySig = NULL;
     m_staffDefMensur = NULL;
     m_staffDefMeterSig = NULL;
+    m_staffDefMeterSigGrp = NULL;
     m_cautionStaffDefClef = NULL;
     m_cautionStaffDefKeySig = NULL;
     m_cautionStaffDefMensur = NULL;
@@ -90,6 +92,7 @@ void Layer::CloneReset()
     m_staffDefKeySig = NULL;
     m_staffDefMensur = NULL;
     m_staffDefMeterSig = NULL;
+    m_staffDefMeterSigGrp = NULL;
     m_drawCautionKeySigCancel = false;
     m_cautionStaffDefClef = NULL;
     m_cautionStaffDefKeySig = NULL;
@@ -120,6 +123,10 @@ void Layer::ResetStaffDefObjects()
         delete m_staffDefMeterSig;
         m_staffDefMeterSig = NULL;
     }
+    if (m_staffDefMeterSigGrp) {
+        delete m_staffDefMeterSigGrp;
+        m_staffDefMeterSigGrp = NULL;
+    }
     // cautionary values
     m_drawCautionKeySigCancel = false;
     if (m_cautionStaffDefClef) {
@@ -147,6 +154,9 @@ bool Layer::IsSupportedChild(Object *child)
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->Is(METERSIGGRP)) {
+        assert(dynamic_cast<MeterSigGrp *>(child));
     }
     else {
         return false;
@@ -452,7 +462,11 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
         m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
         m_staffDefMensur->SetParent(this);
     }
-    if (currentStaffDef->DrawMeterSig()) {
+    if (currentStaffDef->DrawMeterSigGrp()) {
+        m_staffDefMeterSigGrp = new MeterSigGrp(*currentStaffDef->GetCurrentMeterSigGrp());
+        m_staffDefMeterSigGrp->SetParent(this);
+    }
+    else if (currentStaffDef->DrawMeterSig()) {
         m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
         m_staffDefMeterSig->SetParent(this);
     }
@@ -462,6 +476,7 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawKeySig(false);
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
+    currentStaffDef->SetDrawMeterSigGrp(false);
 }
 
 void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
@@ -614,7 +629,11 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     if (this->GetStaffDefMensur()) {
         GetStaffDefMensur()->AlignHorizontally(params);
     }
-    if (this->GetStaffDefMeterSig()) {
+    if (this->GetStaffDefMeterSigGrp()) {
+        Functor alignHorizontally(&Object::AlignHorizontally);
+        GetStaffDefMeterSigGrp()->Process(&alignHorizontally, params);
+    }
+    else if (this->GetStaffDefMeterSig()) {
         if (GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
             GetStaffDefMeterSig()->AlignHorizontally(params);
         }

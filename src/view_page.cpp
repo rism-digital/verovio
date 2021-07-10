@@ -176,6 +176,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TRILL);
     DrawSystemList(dc, system, FIGURE);
+    DrawSystemList(dc, system, LV);
     DrawSystemList(dc, system, PHRASE);
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, PEDAL);
@@ -212,6 +213,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == LV)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == PHRASE)) {
@@ -955,7 +959,15 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
             if ((mnumInterval == 0 && measure == systemStart && measure->GetN() != "0" && measure->GetN() != "1")
                 || !mnum->IsGenerated()
                 || (mnumInterval >= 1 && (std::atoi(measure->GetN().c_str()) % mnumInterval == 0))) {
-                DrawMNum(dc, mnum, measure);
+                int symbolOffset = m_doc->GetDrawingUnit(100);
+                ScoreDef *scoreDef = system->GetDrawingScoreDef();
+                GrpSym *groupSymbol = vrv_cast<GrpSym *>(scoreDef->FindDescendantByType(GRPSYM));
+                if (groupSymbol && (groupSymbol->GetSymbol() == staffGroupingSym_SYMBOL_bracket)) {
+                    symbolOffset += m_doc->GetGlyphHeight(SMUFL_E003_bracketTop, 100, false);                  
+                }
+                // hardcoded offset for the mNum based on the lyric font size
+                const int yOffset = m_doc->GetDrawingLyricFont(60)->GetPointSize();
+                DrawMNum(dc, mnum, measure, std::max(symbolOffset, yOffset));
             }
         }
     }
@@ -986,7 +998,48 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 }
 
-void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
+void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+
+    MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
+    const ArrayOfObjects *childList = meterSigGrp->GetList(meterSigGrp);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int offset = 0;
+    dc->StartGraphic(meterSigGrp, "", meterSigGrp->GetUuid());
+    // Draw meterSigGrp by alternating meterSig and plus sign (when required)
+    for (auto iter = childList->begin(); iter != childList->end(); ++iter) {
+        MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
+        assert(meterSig);
+
+        dc->StartGraphic(meterSig, "", meterSig->GetUuid());
+        int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
+        int x = meterSig->GetDrawingX() + offset;
+
+        if (meterSig->HasCount()) {
+            DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+        }
+
+        dc->EndGraphic(meterSig, this);
+        int margin = unit / 2;
+        const int width = meterSig->GetContentRight() - meterSig->GetContentLeft();
+        if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))) {
+            // draw plus sign here
+            const int plusX = x + width;
+            DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
+            offset += width + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
+        }
+        else {
+            offset += width + margin * 2;
+        }
+    }
+
+    dc->EndGraphic(meterSigGrp, this);
+}
+
+void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset)
 {
     assert(dc);
     assert(measure);
@@ -1012,7 +1065,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
         // HARDCODED
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = staff->GetDrawingX();
-        params.m_y = staff->GetDrawingY() + m_doc->GetDrawingLyricFont(60)->GetPointSize();
+        params.m_y = staff->GetDrawingY() + yOffset;
         if (mnum->HasFontsize()) {
             data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
             if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
@@ -1236,7 +1289,10 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     if (layer->GetStaffDefMensur()) {
         DrawLayerElement(dc, layer->GetStaffDefMensur(), layer, staff, measure);
     }
-    if (layer->GetStaffDefMeterSig()) {
+    if (layer->GetStaffDefMeterSigGrp()) {
+        DrawMeterSigGrp(dc, layer, staff);
+    }
+    else if (layer->GetStaffDefMeterSig()) {
         DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
     }
 

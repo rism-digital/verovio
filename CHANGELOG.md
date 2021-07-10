@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `lv` (@eNote-GmbH)
 * Support for additive meters (@eNote-GmbH)
 * Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)
 * Improved rendering of cross-staff slurs (@eNote-GmbH)
@@ -8,7 +9,9 @@
 * Improved layout algorithm with nested layer content arrangement
 * Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
 * Improved rendering of octave brackets ending (@eNote-GmbH)
+* Function getTimeForElement includes `measure` and `chord` elements (@gitelicious)
 * Option --breaks-no-widow to prevent a single measure on last page (@eNote-GmbH)
+* Option --ligature-as-bracket to render ligatures as bracket instead of original notation
 * Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
 * Making Verovio thread safe (@eNote-GmbH)
 * Switch from XSLT to Python for font generation (@eNote-GmbH)

@@ -78,10 +78,12 @@ class LayerElement;
 class Lb;
 class Lem;
 class Ligature;
+class Lv;
 class Mdiv;
 class Measure;
 class Mensur;
 class MeterSig;
+class MeterSigGrp;
 class MNum;
 class Mordent;
 class MRest;
@@ -255,6 +257,7 @@ private:
     void WriteTuning(pugi::xml_node currentNode, Tuning *tuning);
     void WriteCourse(pugi::xml_node currentNode, Course *course);
     void WriteMeasure(pugi::xml_node currentNode, Measure *measure);
+    void WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp);
     void WriteFb(pugi::xml_node currentNode, Fb *fb);
     void WriteStaff(pugi::xml_node currentNode, Staff *staff);
     void WriteLayer(pugi::xml_node currentNode, Layer *layer);
@@ -318,6 +321,7 @@ private:
     void WriteGliss(pugi::xml_node currentNode, Gliss *gliss);
     void WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteHarm(pugi::xml_node currentNode, Harm *harm);
+    void WriteLv(pugi::xml_node currentNode, Lv *lv);
     void WriteMNum(pugi::xml_node currentNode, MNum *mnum);
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
@@ -513,6 +517,8 @@ private:
     bool ReadCourse(Object *parent, pugi::xml_node course);
     bool ReadMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeasureChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp);
+    bool ReadMeterSigGrpChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadFb(Object *parent, pugi::xml_node fb);
     bool ReadFbChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadNum(Object *parent, pugi::xml_node parentNode);
@@ -582,6 +588,7 @@ private:
     bool ReadGliss(Object *parent, pugi::xml_node gliss);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
+    bool ReadLv(Object *parent, pugi::xml_node lv);
     bool ReadMNum(Object *parent, pugi::xml_node mnum);
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);

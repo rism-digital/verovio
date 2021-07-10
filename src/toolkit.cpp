@@ -1154,8 +1154,15 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     }
 
     // set dimensions
-    deviceContext->SetWidth(width);
-    deviceContext->SetHeight(height);
+    if (m_options->m_landscape.GetValue()) {
+        deviceContext->SetWidth(height);
+        deviceContext->SetHeight(width);
+    }
+    else {
+        deviceContext->SetWidth(width);
+        deviceContext->SetHeight(height);
+    }
+    
     double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
@@ -1416,15 +1423,30 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     }
 
     int timeofElement = 0;
+    if (!m_doc.HasMidiTimemap()) {
+        // generate MIDI timemap before progressing
+        m_doc.CalculateMidiTimemap();
+    }
+    if (!m_doc.HasMidiTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+    }
     if (element->Is(NOTE)) {
-        if (!m_doc.HasMidiTimemap()) {
-            // generate MIDI timemap before progressing
-            m_doc.CalculateMidiTimemap();
-        }
-        if (!m_doc.HasMidiTimemap()) {
-            LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
-        }
         Note *note = vrv_cast<Note *>(element);
+        assert(note);
+        Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
+        assert(measure);
+        // For now ignore repeats and access always the first
+        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement += note->GetRealTimeOnsetMilliseconds();
+    } else if (element->Is(MEASURE)) {
+        Measure *measure = vrv_cast<Measure *>(element);
+        assert(measure);
+        // For now ignore repeats and access always the first
+        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+    } else if (element->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(element);
+        assert(chord);
+        Note *note = vrv_cast<Note *>(chord->FindDescendantByType(NOTE));
         assert(note);
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);

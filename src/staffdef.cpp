@@ -17,6 +17,7 @@
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
+#include "metersiggrp.h"
 #include "staffgrp.h"
 #include "tuning.h"
 #include "vrv.h"
@@ -96,6 +97,9 @@ bool StaffDef::IsSupportedChild(Object *child)
     else if (child->Is(METERSIG)) {
         assert(dynamic_cast<MeterSig *>(child));
     }
+    else if (child->Is(METERSIGGRP)) {
+        assert(dynamic_cast<MeterSigGrp *>(child));
+    }
     else if (child->Is(TUNING)) {
         assert(dynamic_cast<Tuning *>(child));
     }
@@ -127,6 +131,9 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
     if (params->m_meterSig) {
         this->SetCurrentMeterSig(params->m_meterSig);
     }
+    if (params->m_meterSigGrp) {
+        this->SetCurrentMeterSigGrp(params->m_meterSigGrp);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -136,17 +143,26 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
     SetStaffDefRedrawFlagsParams *params = vrv_params_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
     assert(params);
 
-    if (params->m_clef || params->m_applyToAll) {
-        this->SetDrawClef(params->m_clef);
+    const bool forceRedraw = params->m_redrawFlags & StaffDefRedrawFlags::FORCE_REDRAW;
+    const bool redrawClef = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_CLEF;
+    if (redrawClef || forceRedraw) {
+        this->SetDrawClef(redrawClef);
     }
-    if (params->m_keySig || params->m_applyToAll) {
-        this->SetDrawKeySig(params->m_keySig);
+    const bool redrawKeySig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_KEYSIG;
+    if (redrawKeySig || forceRedraw) {
+        this->SetDrawKeySig(redrawKeySig);
     }
-    if (params->m_mensur || params->m_applyToAll) {
-        this->SetDrawMensur(params->m_mensur);
+    const bool redrawMensur = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_MENSUR;
+    if (redrawMensur || forceRedraw) {
+        this->SetDrawMensur(redrawMensur);
     }
-    if (params->m_meterSig || params->m_applyToAll) {
-        this->SetDrawMeterSig(params->m_meterSig);
+    const bool redrawMeterSig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIG;
+    if (redrawMeterSig || forceRedraw) {
+        this->SetDrawMeterSig(redrawMeterSig);
+    }
+    const bool redrawMeterSigGrp = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIGGRP;
+    if (redrawMeterSigGrp || forceRedraw) {
+        this->SetDrawMeterSigGrp(redrawMeterSigGrp);
     }
 
     return FUNCTOR_CONTINUE;

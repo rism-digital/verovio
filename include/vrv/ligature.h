@@ -49,6 +49,14 @@ public:
     virtual bool IsSupportedChild(Object *object);
 
     /**
+     * Return the first or last note
+     */
+    ///@{
+    Note *GetFirstNote();
+    Note *GetLastNote();
+    ///@}
+
+    /**
      * @name Return shape information about the note ligature
      */
     ///@{

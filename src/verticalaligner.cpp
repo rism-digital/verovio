@@ -469,7 +469,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        if (object->Is({ PHRASE, SLUR, TIE })) {
+        if (object->Is({ LV, PHRASE, SLUR, TIE })) {
             positioner = new FloatingCurvePositioner(object, this, spanningType);
             m_floatingPositioners.push_back(positioner);
         }
@@ -613,7 +613,8 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         if (!(*iter)->HasContentBB()) continue;
 
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
-        if ((params->m_classId == PHRASE) || (params->m_classId == SLUR) || (params->m_classId == TIE)) {
+        if ((params->m_classId == LV) || (params->m_classId == PHRASE) || (params->m_classId == SLUR)
+            || (params->m_classId == TIE)) {
 
             assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
             FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(*iter);
@@ -627,7 +628,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
                 assert(slur);
                 slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
-            else if ((*iter)->GetObject()->Is(TIE)) {
+            else if ((*iter)->GetObject()->Is({ LV, TIE })) {
                 Tie *tie = vrv_cast<Tie *>((*iter)->GetObject());
                 assert(tie);
                 tie->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
@@ -664,7 +665,11 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         auto end = overflowBoxes->end();
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizontally
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
+            const int margin = ((*iter)->GetObject()->Is(DYNAM) && GetFirstAncestor(BEAM))
+                ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize)
+                : 0;
+            i = std::find_if(
+                i, end, [iter, margin](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem, margin); });
             if (i != end) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
