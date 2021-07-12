@@ -329,6 +329,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // Center the glyph if necessary
+    int yCorr = 0;
     if (Artic::IsCentered(articValue)) {
         y += (place == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
     }
@@ -336,7 +337,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += (place == STAFFREL_above) ? (exceedingHeight / 2) : -(exceedingHeight / 2);
         // @glyph.num/name are (usually?) aligned for placement above and needs to be shifted when below
         if ((artic->HasGlyphNum() || artic->HasGlyphName()) && (place == STAFFREL_below)) {
-            y -= glyphHeight;
+            yCorr += glyphHeight;
         }
     }
 
@@ -353,15 +354,16 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->StartGraphic(element, "", element->GetUuid());
 
     if (enclosingFront) {
-        const int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
-        DrawSmuflCode(
-            dc, x - xCorr - xCorrEncl, y - yCorrEncl, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+        int xCorrEncl = std::max(xCorr, m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+        xCorrEncl += m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, x - xCorrEncl, y - yCorrEncl, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
     }
 
-    DrawSmuflCode(dc, x - xCorr, y, code, staff->m_drawingStaffSize, drawingCueSize);
+    DrawSmuflCode(dc, x - xCorr, y - yCorr, code, staff->m_drawingStaffSize, drawingCueSize);
 
     if (enclosingBack) {
-        DrawSmuflCode(dc, x + xCorr, y - yCorrEncl, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
+        const int xCorrEncl = std::max(xCorr, m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+        DrawSmuflCode(dc, x + xCorrEncl, y - yCorrEncl, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
     }
 
     dc->EndGraphic(element, this);
