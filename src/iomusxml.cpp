@@ -302,11 +302,14 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
                     otherLayer->InsertAfter(layerElement, clefToAdd);
                     m_layerTimes.at(otherLayer).emplace(actualScoreOnSet, clefToAdd);
                 }
-                else if (layerElement->GetParent()->Is(BEAM)) {
-                    layerElement->GetParent()->InsertAfter(layerElement, clefToAdd);
-                }
-                else if (layerElement->GetParent()->Is({ CHORD, FTREM })) {
-                    otherLayer->InsertAfter(layerElement->GetParent(), clefToAdd);
+                else {
+                    Object *parent = layerElement->GetParent();
+                    if (parent->Is({ CHORD, FTREM })) {
+                        parent->GetParent()->InsertAfter(parent, clefToAdd);
+                    }
+                    else {
+                        parent->InsertAfter(layerElement, clefToAdd);
+                    }
                 }
             }
         }
@@ -369,7 +372,9 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
         m_elementStackMap.at(layer).back()->AddChild(element);
     }
     m_layerEndTimes[layer] = m_durTotal + duration;
-    m_layerTimes[layer].emplace(m_durTotal + duration, element);
+    if (!element->Is({ BEAM, TUPLET })) {
+        m_layerTimes[layer].emplace(m_durTotal + duration, element);
+    }
 }
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
