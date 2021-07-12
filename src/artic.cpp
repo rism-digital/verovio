@@ -361,8 +361,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     /************** adjust the xRel position **************/
 
-    int xShift = params->m_parent->GetDrawingRadius(params->m_doc);
-    this->SetDrawingXRel(xShift);
+    this->SetDrawingXRel(CalculateHorizontalShift(params->m_doc, params->m_parent, params->m_stemDir));
 
     /************** set cross-staff / layer **************/
 
@@ -527,6 +526,34 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
     m_drawingPlace = STAFFREL_NONE;
 
     return FUNCTOR_CONTINUE;
+}
+
+int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIRECTION stemDir) const
+{
+    int shift = parent->GetDrawingRadius(doc);
+    if ((parent->GetChildCount(ARTIC) > 1) || (!doc->GetOptions()->m_stemSideStaccato.GetValue())) {
+        return shift;
+    }
+    data_ARTICULATION artic = GetArticFirst();
+    switch (artic) {
+        case ARTICULATION_stacc:
+        case ARTICULATION_stacciss: 
+        {
+            const int stemWidth = doc->GetDrawingStemWidth(100);
+            if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
+                shift += shift - stemWidth;
+            }
+            else if ((stemDir == STEMDIRECTION_down) && (m_drawingPlace == STAFFREL_below)) {
+                shift = stemWidth;
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+    
+    return shift;
 }
 
 } // namespace vrv
