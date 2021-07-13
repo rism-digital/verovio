@@ -264,7 +264,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 
 curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, LayerElement *end, Slur *slur)
 {
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
     findSpannedLayerElementsParams.m_minPos = start->GetDrawingX();
     findSpannedLayerElementsParams.m_maxPos = end->GetDrawingX();
     findSpannedLayerElementsParams.m_classIds = { CHORD, NOTE };

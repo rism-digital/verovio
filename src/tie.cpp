@@ -142,27 +142,16 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     /************** y position **************/
 
-    bool isShortTie = false;
     // shortTie correction cannot be applied for chords
-    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit)) {
-        isShortTie = true;
-    }
+    const bool isShortTie = !startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit);
 
-    if (drawingCurveDir == curvature_CURVEDIR_above) {
-        startPoint.y += drawingUnit / 2;
-        endPoint.y += drawingUnit / 2;
-        if (isShortTie) {
-            startPoint.y += drawingUnit;
-            endPoint.y += drawingUnit;
-        }
-    }
-    else {
-        startPoint.y -= drawingUnit / 2;
-        endPoint.y -= drawingUnit / 2;
-        if (isShortTie) {
-            startPoint.y -= drawingUnit;
-            endPoint.y -= drawingUnit;
-        }
+    const int ySign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
+
+    startPoint.y += ySign * drawingUnit / 2;
+    endPoint.y += ySign * drawingUnit / 2;
+    if (isShortTie) {
+        startPoint.y += ySign * drawingUnit;
+        endPoint.y += ySign * drawingUnit;
     }
 
     /************** bezier points **************/
@@ -182,14 +171,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     c1.x = startPoint.x + (endPoint.x - startPoint.x) / 4; // point at 1/4
     c2.x = startPoint.x + (endPoint.x - startPoint.x) / 4 * 3; // point at 3/4
 
-    if (drawingCurveDir == curvature_CURVEDIR_above) {
-        c1.y = startPoint.y + height;
-        c2.y = endPoint.y + height;
-    }
-    else {
-        c1.y = startPoint.y - height;
-        c2.y = endPoint.y - height;
-    }
+    c1.y = startPoint.y + ySign * height;
+    c2.y = endPoint.y + ySign * height;
 
     // Point bezier[4];
     bezier[0] = startPoint;
@@ -437,54 +420,6 @@ int Tie::ResolveMIDITies(FunctorParams *)
     note2->SetScoreTimeTiedDuration(-1.0);
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Tie::FindSpannedLayerElements(FunctorParams *functorParams)
-{
-    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
-    assert(params);
-
-    FloatingPositioner *positioner = params->m_slur->GetCorrespFloatingPositioner(this);
-
-    if (!positioner) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (positioner->HasContentBB() && (positioner->GetContentRight() > params->m_minPos)
-        && (positioner->GetContentLeft() < params->m_maxPos)) {
-
-        params->m_ties.push_back(positioner);
-    }
-
-    return FUNCTOR_CONTINUE;
-
-    /*
-    if (!this->Is(params->m_classIds)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
-        && (this->GetContentLeft() < params->m_maxPos)) {
-
-        // We skip the start or end of the slur
-        if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
-            return FUNCTOR_CONTINUE;
-        }
-        if (params->m_interface->GetStart()->HasChild(this) || this->HasChild(params->m_interface->GetStart())) {
-            return FUNCTOR_CONTINUE;
-        }
-        if (params->m_interface->GetEnd()->HasChild(this) || this->HasChild(params->m_interface->GetEnd())) {
-            return FUNCTOR_CONTINUE;
-        }
-
-        params->m_elements.push_back(this);
-    }
-    else if (this->GetDrawingX() > params->m_maxPos) {
-        return FUNCTOR_STOP;
-    }
-
-    return FUNCTOR_CONTINUE;
-    */
 }
 
 } // namespace vrv
