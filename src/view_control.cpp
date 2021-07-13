@@ -1598,13 +1598,14 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     const wchar_t enclosingBack = fermata->GetEnclosingGlyph(false);
 
     const int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
-    const int y = fermata->GetDrawingY();
 
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure, fermata);
     for (Staff *staff : staffList) {
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), fermata, fermata->GetStart(), staff)) {
             continue;
         }
+
+        const int y = fermata->GetDrawingY();
 
         // The correction for centering the glyph
         const int xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
