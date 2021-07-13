@@ -1326,6 +1326,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     WriteControlElement(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
+    fermata->WriteEnclosingChars(currentNode);
     fermata->WriteExtSym(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacementRelStaff(currentNode);
@@ -4436,6 +4437,7 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
 
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
+    vrvFermata->ReadEnclosingChars(fermata);
     vrvFermata->ReadExtSym(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacementRelStaff(fermata);

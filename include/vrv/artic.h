@@ -93,11 +93,11 @@ public:
     //----------------//
 
     /**
-     * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.
+     * Static method that retrieves the vertical correction for a SMuFL code with data_STAFFREL.
      * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
      * See bow indications for an example where is is always above
      */
-    static bool VerticalCorr(wchar_t code, const data_STAFFREL &place);
+    static bool VerticalCorr(wchar_t code, data_STAFFREL place);
 
     /**
      * Static method that returns true if the data_ARTICULATION has to be centered between staff lines

@@ -28,6 +28,7 @@ class ConvertMarkupAnalyticalParams;
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
+                public AttEnclosingChars,
                 public AttExtSym,
                 public AttFermataVis,
                 public AttPlacementRelStaff {
@@ -62,6 +63,20 @@ public:
      * Get the SMuFL glyph for the fermata based on type, shape or glyph.num
      */
     wchar_t GetFermataGlyph() const;
+
+    /**
+     * Retrieves parentheses / brackets from the enclose attribute
+     */
+    wchar_t GetEnclosingGlyph(bool beforeFermata) const;
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Retrieves the vertical alignment for the fermata SMuFL code
+     */
+    static data_VERTICALALIGNMENT GetVerticalAlignment(wchar_t code);
 
     //----------//
     // Functors //

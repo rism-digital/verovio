@@ -312,6 +312,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
     if (code == 0) {
         artic->SetEmptyBB();
+        dc->ResetFont();
         return;
     }
 
@@ -367,6 +368,8 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     dc->EndGraphic(element, this);
+
+    dc->ResetFont();
 }
 
 void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

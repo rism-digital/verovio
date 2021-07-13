@@ -269,7 +269,7 @@ wchar_t Artic::GetEnclosingGlyph(bool beforeArtic) const
 // Static methods for Artic
 //----------------------------------------------------------------------------
 
-bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
+bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
 {
     if (place == STAFFREL_above)
         return false;
