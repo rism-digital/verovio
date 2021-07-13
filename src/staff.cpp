@@ -299,8 +299,9 @@ void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minE
 
     // Now we transfer the adjustments from the inner dash line to the outer dash lines.
     // This ensures that all dashes on the same note/chord obtain the same ledger line extension.
+    const int lineCount = static_cast<int>(lines.size());
     for (const Adjustment &adjustment : adjustments) {
-        for (size_t index = 1; index < lines.size(); ++index) {
+        for (int index = 1; index < lineCount; ++index) {
             LedgerLine &outerLine = lines.at(index);
             IterType iterDash = std::find_if(
                 outerLine.m_dashes.begin(), outerLine.m_dashes.end(), [&adjustment](const DashType &dash) {
