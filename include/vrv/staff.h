@@ -118,13 +118,13 @@ public:
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     /**
-     * Return the ledger line arrays (NULL if none)
+     * Return the ledger line arrays
      */
     ///@{
-    ArrayOfLedgerLines *GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
-    ArrayOfLedgerLines *GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
-    ArrayOfLedgerLines *GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
-    ArrayOfLedgerLines *GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
+    const ArrayOfLedgerLines &GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
+    const ArrayOfLedgerLines &GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
+    const ArrayOfLedgerLines &GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
+    const ArrayOfLedgerLines &GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
     ///@}
 
     /**
@@ -132,8 +132,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLedgerLineAbove(int count, int left, int right, bool cueSize);
-    void AddLedgerLineBelow(int count, int left, int right, bool cueSize);
+    void AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize);
+    void AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize);
     ///@}
 
     /**
@@ -147,6 +147,13 @@ public:
      * The *Doc is the parent doc but passed as param in order to avoid look-up
      */
     int GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place);
+
+    /**
+     * Set staff parameters based on
+     * facsimile information (if it
+     * exists).
+     */
+    virtual void SetFromFacsimile(Doc *doc);
 
     //----------//
     // Functors //
@@ -188,6 +195,11 @@ public:
     virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
+     * See Object::CalcLedgerLinesEnd
+     */
+    virtual int CalcLedgerLinesEnd(FunctorParams *functorParams);
+
+    /**
      * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
@@ -210,13 +222,6 @@ public:
     ///@}
 
     /**
-     * Set staff parameters based on
-     * facsimile information (if it
-     * exists).
-     */
-    virtual void SetFromFacsimile(Doc *doc);
-
-    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *);
@@ -235,7 +240,12 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
+    void AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension);
+
+    /**
+     * Shorten ledger lines which overlap with neighbors
+     */
+    void AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension);
 
 public:
     /**
@@ -275,13 +285,13 @@ private:
     StaffAlignment *m_staffAlignment;
 
     /**
-     * A pointer to the legder lines (above / below and normal / cue)
+     * The legder lines (above / below and normal / cue)
      */
     ///@{
-    ArrayOfLedgerLines *m_ledgerLinesAbove;
-    ArrayOfLedgerLines *m_ledgerLinesBelow;
-    ArrayOfLedgerLines *m_ledgerLinesAboveCue;
-    ArrayOfLedgerLines *m_ledgerLinesBelowCue;
+    ArrayOfLedgerLines m_ledgerLinesAbove;
+    ArrayOfLedgerLines m_ledgerLinesBelow;
+    ArrayOfLedgerLines m_ledgerLinesAboveCue;
+    ArrayOfLedgerLines m_ledgerLinesBelowCue;
     ///@}
 };
 
@@ -310,7 +320,7 @@ public:
      * Add a dash to the ledger line object.
      * If necessary merges overlapping dashes.
      */
-    void AddDash(int left, int right);
+    void AddDash(int left, int right, int extension);
 
 protected:
     //
