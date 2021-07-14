@@ -136,7 +136,7 @@ void Measure::Reset()
 
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
-    m_currentTempo = 120;
+    m_currentTempo = 120.0;
 }
 
 bool Measure::IsSupportedChild(Object *child)
@@ -427,8 +427,8 @@ Staff *Measure::GetBottomVisibleStaff()
 int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;
-    int timeDuration = int(
-        m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
+    double timeDuration
+        = m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5;
     std::vector<double>::const_iterator iter;
     for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
@@ -1433,7 +1433,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
         params->m_currentTempo = tempo->GetMidiBpm();
     }
     else if (tempo && tempo->HasMm()) {
-        int mm = tempo->GetMm();
+        double mm = tempo->GetMm();
         int mmUnit = 4;
         if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
             mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
@@ -1441,7 +1441,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
         if (tempo->HasMmDots()) {
             mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
         }
-        params->m_currentTempo = int(mm * 4.0 / mmUnit + 0.5);
+        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
     }
     m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
 
