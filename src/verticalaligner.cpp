@@ -953,6 +953,15 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
         while (i != end) {
             // find all the elements from the bottom staff that have an overflow at the top with an horizontal overlap
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
+            i = std::find_if(i, end, [iter](BoundingBox *elem) {
+                if ((*iter)->Is(FLOATING_POSITIONER)) {
+                    FloatingPositioner *fp = vrv_cast<FloatingPositioner *>(*iter);
+                    if (fp->GetObject()->Is({ DIR, DYNAM })) {
+                        return (*iter)->HorizontalContentOverlap(elem) || (*iter)->VerticalContentOverlap(elem);
+                    }
+                }
+                return (*iter)->HorizontalContentOverlap(elem);
+            });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space
                 int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
