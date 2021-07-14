@@ -709,7 +709,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
                 ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize)
                 : 0;
             i = std::find_if(i, end, [iter, drawingUnit, margin](BoundingBox *elem) {
-                if ((*iter)->GetObject()->IsExtenderElement()) {
+                if ((*iter)->GetObject()->IsExtenderElement() && !elem->Is(FLOATING_POSITIONER)) {
                     return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 8)
                         || (*iter)->VerticalContentOverlap(elem);                
                 }

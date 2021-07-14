@@ -73,7 +73,7 @@ public:
     /**
      * See FloatingObject::IsExtenderElement
      */
-    virtual bool IsExtenderElement() const { return GetSymbolStr().empty(); }
+    virtual bool IsExtenderElement() const { return GetExtender() == BOOLEAN_true; }
 
     //----------------//
     // Static methods //

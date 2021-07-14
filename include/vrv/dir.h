@@ -63,7 +63,7 @@ public:
     /**
      * See FloatingObject::IsExtenderElement
      */
-    virtual bool IsExtenderElement() const { return GetCurrentSize() == 0; }
+    virtual bool IsExtenderElement() const { return GetExtender() == BOOLEAN_true; }
 
     //----------//
     // Functors //
