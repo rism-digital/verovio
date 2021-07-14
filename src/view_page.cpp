@@ -464,7 +464,7 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
         }
         case staffGroupingSym_SYMBOL_bracketsq: {
             DrawBracketSq(dc, x, yTop, yBottom, staffSize);
-            x -= m_doc->GetDrawingUnit(staffSize) * (1.0 + 2.0 * m_options->m_bracketThickness.GetValue());
+            x -= m_doc->GetDrawingUnit(staffSize);
             break;
         }
         default: break;
@@ -568,12 +568,11 @@ void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 
     const int y = std::min(y1, y2);
     const int height = std::abs(y2 - y1);
-    const int horizontalThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
-    const int verticalThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
-    const int width = 2 * verticalThickness;
+    const int horizontalThickness = m_doc->GetDrawingStaffLineWidth(staffSize);
+    const int verticalThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
+    const int width = m_doc->GetDrawingUnit(staffSize);
 
-    DrawSquareBracket(dc, true, x - width - m_doc->GetDrawingUnit(staffSize), y, height, width, horizontalThickness,
-        verticalThickness);
+    DrawSquareBracket(dc, true, x - width, y, height, width, horizontalThickness, verticalThickness);
 }
 
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
