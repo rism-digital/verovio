@@ -37,6 +37,7 @@ Arpeg::Arpeg()
     RegisterAttClass(ATT_ARPEGLOG);
     RegisterAttClass(ATT_ARPEGVIS);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_ENCLOSINGCHARS);
 
     Reset();
 }
@@ -51,6 +52,7 @@ void Arpeg::Reset()
     ResetArpegLog();
     ResetArpegVis();
     ResetColor();
+    ResetEnclosingChars();
 
     m_drawingXRel = 0;
 }
@@ -250,7 +252,8 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     if (minTopLeft != -VRV_UNSET) {
         int dist = topNote->GetDrawingX() - minTopLeft;
         // HARDCODED
-        dist += (params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize));
+        const double unitFactor = (this->GetEnclose() == ENCLOSURE_brack) ? 1.5 : 1.0;
+        dist += unitFactor * params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize);
         this->SetDrawingXRel(-dist);
     }
 

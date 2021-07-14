@@ -459,14 +459,12 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
         }
         case staffGroupingSym_SYMBOL_bracket: {
             DrawBracket(dc, x, yTop, yBottom, staffSize);
-            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue()
-                + m_doc->GetDrawingUnit(staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize) * (1.0 + m_options->m_bracketThickness.GetValue());
             break;
         }
         case staffGroupingSym_SYMBOL_bracketsq: {
-            DrawBracketsq(dc, x, yTop, yBottom, staffSize);
-            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue()
-                + m_doc->GetDrawingUnit(staffSize);
+            DrawBracketSq(dc, x, yTop, yBottom, staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize) * (1.0 + 2.0 * m_options->m_bracketThickness.GetValue());
             break;
         }
         default: break;
@@ -562,25 +560,20 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     DrawSmuflCode(dc, x1, y2 - offset - bracketThickness / 2, SMUFL_E004_bracketBottom, staffSize, false);
 
     DrawFilledRectangle(dc, x1, y1 + 2 * offset + bracketThickness / 2, x2, y2 - 2 * offset - bracketThickness / 2);
-
-    return;
 }
 
-void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
 
-    const int offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
-    const int basicDist = m_doc->GetDrawingUnit(staffSize);
+    const int y = std::min(y1, y2);
+    const int height = std::abs(y2 - y1);
+    const int horizontalThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
+    const int verticalThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
+    const int width = 2 * verticalThickness;
 
-    const int bracketWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
-    x -= basicDist;
-
-    DrawFilledRectangle(dc, x, y1 + offset, x - bracketWidth, y2 - offset); // left
-    DrawFilledRectangle(dc, x, y1 + offset, x + basicDist, y1 - offset); // top
-    DrawFilledRectangle(dc, x, y2 + offset, x + basicDist, y2 - offset); // bottom
-
-    return;
+    DrawSquareBracket(dc, true, x - width - m_doc->GetDrawingUnit(staffSize), y, height, width, horizontalThickness,
+        verticalThickness);
 }
 
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)

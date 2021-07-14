@@ -1350,9 +1350,25 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     // Smufl glyphs are horizontal - Rotate them counter clockwise
     dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
 
-    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
+    this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
 
     dc->EndGraphic(arpeg, this);
+
+    // Possibly draw enclosing brackets
+    if (arpeg->GetEnclose() == ENCLOSURE_brack) {
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int yCorr
+            = ((arpeg->GetArrow() == BOOLEAN_true) && (arpeg->GetOrder() == arpegLog_ORDER_down)) ? unit : 0;
+        const int height = length + ((arpeg->GetArrow() == BOOLEAN_true) ? unit : 0);
+        const int width = m_doc->GetGlyphHeight(fillGlyph, staff->m_drawingStaffSize, drawingCueSize);
+        const int bracketWidth = width / 2;
+        const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+        dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+        this->DrawEnclosingBrackets(
+            dc, x - width, y - yCorr, height, width, unit / 2, bracketWidth, thickness, thickness);
+        dc->EndGraphic(arpeg, this);
+    }
 }
 
 void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system)
