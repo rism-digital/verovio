@@ -70,6 +70,11 @@ public:
      */
     std::wstring GetSymbolStr() const;
 
+    /**
+     * See FloatingObject::IsExtenderElement
+     */
+    virtual bool IsExtenderElement() const { return GetSymbolStr().empty(); }
+
     //----------------//
     // Static methods //
     //----------------//

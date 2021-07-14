@@ -80,6 +80,11 @@ public:
     int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
     ///@}
 
+    /**
+     * Check whether current object represents initial element or extender lines
+     */
+    virtual bool IsExtenderElement() const { return false; }
+
     //----------//
     // Functors //
     //----------//

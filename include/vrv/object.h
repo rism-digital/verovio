@@ -1395,6 +1395,11 @@ public:
     Object *GetListNext(Object *listElement);
 
     /**
+     * Returns current size of the m_list
+     */
+    int GetCurrentSize() const { return static_cast<int>(m_list.size()); }
+
+    /**
      * Return the list.
      * Before returning the list, it checks that the list is up-to-date with Object::IsModified
      * If not, it updates the list and also calls FilterList.
