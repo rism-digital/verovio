@@ -139,7 +139,8 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
-    //
+    bool IsInsideArtic(data_ARTICULATION artic) const;
+
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;
     std::vector<FloatingCurvePositioner *> m_endSlurPositioners;

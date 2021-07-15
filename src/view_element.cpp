@@ -331,7 +331,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // Center the glyph if necessary
     int yCorr = 0;
-    if (Artic::IsCentered(articValue)) {
+    if (Artic::IsCentered(articValue) && !enclosingFront && !enclosingBack) {
         y += (place == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
     }
     else {

@@ -61,11 +61,21 @@ void Artic::Reset()
     m_drawingPlace = STAFFREL_NONE;
 }
 
+bool Artic::IsInsideArtic(data_ARTICULATION artic) const
+{
+    // Always outside if enclosing brackets are used
+    if ((this->GetEnclose() == ENCLOSURE_brack) || (this->GetEnclose() == ENCLOSURE_paren)) {
+        return false;
+    }
+
+    const auto end = Artic::s_outStaffArtic.end();
+    const auto it = std::find(Artic::s_outStaffArtic.begin(), end, artic);
+    return (it == end);
+}
+
 bool Artic::IsInsideArtic() const
 {
-    auto end = Artic::s_outStaffArtic.end();
-    auto i = std::find(Artic::s_outStaffArtic.begin(), end, this->GetArticFirst());
-    return (i == end);
+    return IsInsideArtic(this->GetArticFirst());
 }
 
 data_ARTICULATION Artic::GetArticFirst() const
@@ -132,17 +142,12 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     assert(insideSlur);
     assert(outsideSlur);
 
-    std::vector<data_ARTICULATION>::iterator iter;
-    auto end = Artic::s_outStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
-
-    for (iter = articList.begin(); iter != articList.end(); ++iter) {
-        // return false if one cannot be rendered on the staff
-        auto i = std::find(Artic::s_outStaffArtic.begin(), end, *iter);
-        if (i != end)
-            outsideSlur->push_back(*iter);
+    for (data_ARTICULATION artic : articList) {
+        if (IsInsideArtic(artic))
+            insideSlur->push_back(artic);
         else
-            insideSlur->push_back(*iter);
+            outsideSlur->push_back(artic);
     }
 }
 
