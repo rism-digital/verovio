@@ -963,7 +963,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
                 ScoreDef *scoreDef = system->GetDrawingScoreDef();
                 GrpSym *groupSymbol = vrv_cast<GrpSym *>(scoreDef->FindDescendantByType(GRPSYM));
                 if (groupSymbol && (groupSymbol->GetSymbol() == staffGroupingSym_SYMBOL_bracket)) {
-                    symbolOffset += m_doc->GetGlyphHeight(SMUFL_E003_bracketTop, 100, false);                  
+                    symbolOffset += m_doc->GetGlyphHeight(SMUFL_E003_bracketTop, 100, false);
                 }
                 // hardcoded offset for the mNum based on the lyric font size
                 const int yOffset = m_doc->GetDrawingLyricFont(60)->GetPointSize();

@@ -3455,7 +3455,8 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
     m_elementStackMap.at(layer).push_back(beam);
 }
 
-void MusicXmlInput::ReadMusicXmlTies(const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum)
+void MusicXmlInput::ReadMusicXmlTies(
+    const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum)
 {
     pugi::xpath_node xmlTie = node.select_node("tied");
     if (!xmlTie) return;
