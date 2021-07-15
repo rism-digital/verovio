@@ -835,6 +835,12 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
                 Note *note = vrv_cast<Note *>(this);
                 Note *otherNote = vrv_cast<Note *>(other);
                 if (note->IsUnisonWith(otherNote)) {
+                    if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
+                        otherNote->AlignDotsShift(note);
+                    }
+                    else if (otherNote->GetDrawingStemDir() == STEMDIRECTION_up) {
+                        note->AlignDotsShift(otherNote);
+                    }
                     return (currentLayerN < otherLayerN) ? dotLocs1 : dotLocs2;
                 }
             }
@@ -1789,7 +1795,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                 if (hasOverlap) {
                     // For note to note alignment, make sure there is a standard spacing even if they to not overlap
                     // vertically
-                    if (this->Is(NOTE) and element->Is(NOTE)) {
+                    if (this->Is(NOTE) && element->Is(NOTE)) {
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
                     }
                     else {

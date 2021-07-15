@@ -105,6 +105,11 @@ public:
     virtual void AddChild(Object *object);
 
     /**
+     * Align dots shift for two notes. Should be used for unison notes to align dots positioning
+     */
+    void AlignDotsShift(Note *otherNote);
+
+    /**
      * @name Setter and getter for accid attribute and other pointers
      */
     ///@{

@@ -191,6 +191,16 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
+void Note::AlignDotsShift(Note* otherNote) 
+{
+    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *otherDots = vrv_cast<Dots *>(otherNote->FindDescendantByType(DOTS, 1));
+    if (!dots || !otherDots) return;
+    if (otherDots->GetFlagShift()) {
+        dots->SetFlagShift(otherDots->GetFlagShift());
+    }
+}
+
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
@@ -1047,10 +1057,15 @@ int Note::CalcDots(FunctorParams *functorParams)
         const bool isDotShifted = (this->GetDrawingLoc() % 2 == 0);
 
         // Stem up, shorter than 4th and not in beam
-        if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
+        if (const int shift = dots->GetFlagShift(); shift) {
+            flagShift += shift;
+        }
+        else if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
             && (IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
             // HARDCODED
-            flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            flagShift += shift;
+            dots->SetFlagShift(shift);
         }
 
         int xRel = 2 * radius + flagShift;
