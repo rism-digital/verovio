@@ -39,7 +39,7 @@ namespace vrv {
 template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin, Iterator end, bool isReverseOrder)
 {
     // location adjustment that should be applied when looking for optimal position
-    std::vector<int> locAdjust{ 0, 1, -2, 2 };
+    std::vector<int> locAdjust{ 0, 1, -1, 2, -2 };
     if (isReverseOrder) std::transform(locAdjust.begin(), locAdjust.end(), locAdjust.begin(), std::negate<int>());
     std::set<int> dotLocations;
     for (auto iter = begin; iter != end; ++iter) {
