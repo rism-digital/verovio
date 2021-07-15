@@ -246,7 +246,7 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffD
 StaffAlignment::StaffAlignment() : Object()
 {
     m_yRel = 0;
-    m_verseCount = 0;
+    m_verseNs.clear();
     m_staff = NULL;
 
     m_overflowAbove = 0;
@@ -324,12 +324,38 @@ void StaffAlignment::SetOverflowBelow(int overflowBottom)
     }
 }
 
-void StaffAlignment::SetVerseCount(int verse_count)
+void StaffAlignment::AddVerseN(int verseN)
 {
     // if 0, then assume 1;
-    verse_count = std::max(verse_count, 1);
-    if (verse_count > m_verseCount) {
-        m_verseCount = verse_count;
+    verseN = std::max(verseN, 1);
+    m_verseNs.insert(verseN);
+}
+
+int StaffAlignment::GetVerseCount(bool collapse) const
+{
+    if (m_verseNs.empty()) {
+        return 0;
+    }
+    else if (collapse) {
+        return (int)m_verseNs.size();
+    }
+    else {
+        return *m_verseNs.rbegin();
+    }
+}
+
+int StaffAlignment::GetVersePosition(int verseN, bool collapse) const
+{
+    if (m_verseNs.empty()) {
+        return 0;
+    }
+    else if (collapse) {
+        auto it = std::find(m_verseNs.rbegin(), m_verseNs.rend(), verseN);
+        int pos = (int)std::distance(m_verseNs.rbegin(), it);
+        return pos;
+    }
+    else {
+        return (*m_verseNs.rbegin()) - verseN;
     }
 }
 
@@ -448,7 +474,8 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     }
 
     int overflowSum = 0;
-    if (prevAlignment->GetVerseCount() > 0) {
+    const bool verseCollapse = doc->GetOptions()->m_lyricVerseCollapse.GetValue();
+    if (prevAlignment->GetVerseCount(verseCollapse) > 0) {
         overflowSum = prevAlignment->GetOverflowBelow() + GetOverflowAbove();
     }
     else {
@@ -588,8 +615,9 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     int staffSize = this->GetStaffSize();
 
+    const bool verseCollapse = params->m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
     if (params->m_classId == SYL) {
-        if (this->GetVerseCount() > 0) {
+        if (this->GetVerseCount(verseCollapse) > 0) {
             FontInfo *lyricFont = params->m_doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
             int descender = params->m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
             int height = params->m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
@@ -597,7 +625,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             int minMargin = std::max((int)(params->m_doc->GetOptions()->m_lyricTopMinMargin.GetValue()
                                          * params->m_doc->GetDrawingUnit(staffSize)),
                 this->GetOverflowBelow());
-            this->SetOverflowBelow(minMargin + this->GetVerseCount() * (height - descender + margin));
+            this->SetOverflowBelow(minMargin + this->GetVerseCount(verseCollapse) * (height - descender + margin));
             // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
             // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
             m_overflowBelowBBoxes.clear();

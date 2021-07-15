@@ -530,7 +530,7 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     if (it != m_timeSpanningElements.end()) {
         Verse *v = vrv_cast<Verse *>(*it);
         assert(v);
-        alignment->SetVerseCount(v->GetN());
+        alignment->AddVerseN(v->GetN());
     }
 
     // for next staff
