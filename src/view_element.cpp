@@ -673,6 +673,16 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
     }
 
+    // Possibly draw enclosing brackets
+    if (clef->GetEnclose() == ENCLOSURE_brack) {
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int height = clefSizeFactor * m_doc->GetGlyphHeight(sym, staff->m_drawingStaffSize, false);
+        const int width = clefSizeFactor * m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, false);
+        const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+        this->DrawEnclosingBrackets(dc, x, y - height / 2, height, width, unit, 3 * unit / 4, thickness, thickness);
+    }
+
     dc->EndGraphic(element, this);
 }
 
