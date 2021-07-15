@@ -1,0 +1,19 @@
+# Run clang-format
+name: Clang-format check
+
+on: [push, pull_request]
+
+jobs:
+  checkout-and-check-formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run clang-format
+      uses: HorstBaerbel/action-clang-format@1.5
+      # These are optional (defaults displayed)
+      with:
+        scandir: '.'
+        excludedirs: 'data,doc,emscripten,fonts,include/hum,include/json,include/midi,include/pugi,include/utf8,include/win32,include/zip,libmei,src/hum,src/json,src/midi,src/pugi,tools'
+        extensions: 'h,cpp'
+        style: 'file'
