@@ -39,7 +39,7 @@ jobs:
       - name: Get Short SHA
         run: |
           echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
-          
+
       - name: Add additional environment variables for creating URL slugs
         run: |
           echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
@@ -71,7 +71,7 @@ jobs:
         with:
           ref: develop
           path: ${{ env.DEV_DIR }}/
-                    
+
       - name: Install the VerovioText font
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/
         run: |
@@ -127,7 +127,7 @@ jobs:
           required-permission: write
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Run only if user has NOT sufficient permissions
         if: steps.check_files.outputs.files_exists == 'true' && !steps.check_permission.outputs.has-permission
         run: |
