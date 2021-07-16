@@ -36,7 +36,8 @@ const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_d
 
 static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
-Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
+Artic::Artic()
+    : LayerElement("artic-"), AttArticulation(), AttColor(), AttEnclosingChars(), AttExtSym(), AttPlacementRelEvent()
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
@@ -99,6 +100,8 @@ void Artic::SplitMultival(Object *parent)
         Artic *artic = new Artic();
         artic->SetArtic({ *iter });
         artic->AttColor::operator=(*this);
+        artic->AttEnclosingChars::operator=(*this);
+        artic->AttExtSym::operator=(*this);
         artic->AttPlacementRelEvent::operator=(*this);
         artic->SetParent(parent);
         parent->InsertChild(artic, idx);
