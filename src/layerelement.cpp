@@ -1789,7 +1789,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                 if (hasOverlap) {
                     // For note to note alignment, make sure there is a standard spacing even if they to not overlap
                     // vertically
-                    if (this->Is(NOTE) and element->Is(NOTE)) {
+                    if (this->Is(NOTE) && element->Is(NOTE)) {
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
                     }
                     else {
