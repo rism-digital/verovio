@@ -21,7 +21,7 @@ namespace vrv {
 // Phrase
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Phrase> s_factory("phrase", PHRASE);
+static const ClassRegistrar<Phrase> s_factory("phrase", PHRASE);
 
 Phrase::Phrase() : Slur("phrase-")
 {

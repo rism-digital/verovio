@@ -82,35 +82,32 @@ my $FLAGS = "-O3";
 $FLAGS .= " -DNDEBUG";
 $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++$cpp";
-$FLAGS .= " -s ASM_JS=1";
-$FLAGS .= " -s INITIAL_MEMORY=256MB";
-$FLAGS .= " -s TOTAL_STACK=128MB";
-$FLAGS .= " -s WASM=0";
 
+my $LFLAGS =  " -s ASM_JS=1";
+$LFLAGS .= " -s INITIAL_MEMORY=256MB";
+$LFLAGS .= " -s TOTAL_STACK=128MB";
+$LFLAGS .= " -s WASM=0";
 
 # Process command-line options:
 
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
-	$FLAGS = "-O3";
-	$FLAGS .= " -DNDEBUG";
-	$FLAGS .= " --memory-init-file 0";
-	$FLAGS .= " -std=c++$cpp";
-	$FLAGS .= " -s WASM=1";
-    $FLAGS .= " -s STRICT=1"; 
 	# We can try to find the cause of integer overflow runtime errors with
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
     # For now, trapping them (followign option does not work with Safari)
 	#$FLAGS .= " -mnontrapping-fptoint";
-	$FLAGS .= " -s INITIAL_MEMORY=512MB";
-	$FLAGS .= " -s TOTAL_STACK=256MB";
-    $FLAGS .= " -s SINGLE_FILE=1";
+	$FLAGS .= " -s STRICT=1"; 
+	# Linker flags
+	$LFLAGS = " -s WASM=1";
+	$LFLAGS .= " -s INITIAL_MEMORY=512MB";
+	$LFLAGS .= " -s TOTAL_STACK=256MB";
+    $LFLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";
 }
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++$cpp -s ASM_JS=1 -s WASM=0";
+	$LFLAGS = " -s ASM_JS=1 -s WASM=0";
 	$FLAGS_NAME = "-light";
 }
 
@@ -167,6 +164,8 @@ $exports .= "'_vrvToolkit_getElementAttr',";
 $exports .= "'_vrvToolkit_getElementsAtTime',";
 $exports .= "'_vrvToolkit_getExpansionIdsForElement',";
 $exports .= "'_vrvToolkit_getHumdrum',";
+$exports .= "'_vrvToolkit_convertHumdrumToHumdrum',";
+$exports .= "'_vrvToolkit_convertMEIToHumdrum',";
 $exports .= "'_vrvToolkit_getLog',";
 $exports .= "'_vrvToolkit_getMEI',";
 $exports .= "'_vrvToolkit_getMIDIValuesForElement',";
@@ -192,7 +191,7 @@ $exports .= "'_malloc',";
 $exports .= "'_free'";
 $exports .= "]\"";
 
-my $extra_exports = "-s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
+my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
 if ($makeQ) {
     system("rm -rf CMakeFiles/");
@@ -208,7 +207,7 @@ my $makeCmd = "$EMMAKE make -j 8";
 system($makeCmd);
 
 print "*************\nLinking...\n";
-my $ccCmd = "$EMCC $CHATTY libverovio.a $FLAGS $embed $exports $extra_exports $output";
+my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $embed $exports $extra_exports $output";
 print "$ccCmd\n" if $CHATTY;
 
 system($ccCmd);

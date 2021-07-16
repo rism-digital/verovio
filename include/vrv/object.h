@@ -660,14 +660,6 @@ public:
     ///@}
 
     /**
-     * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
-     * See Doc::ConvertScoreDefMarkupDoc
-     */
-    ///@{
-    virtual int ConvertScoreDefMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */
     ///@{
@@ -845,12 +837,15 @@ public:
     virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the note head flipped positions and calc the ledger lines
+     * Calculate the ledger lines
      */
+    ///@{
     virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcLedgerLinesEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
-     * Calcultate the position the outside articulations.
+     * Calculate the position of the outside articulations.
      */
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -1357,7 +1352,7 @@ private:
     /**
      * A static counter for uuid generation.
      */
-    static unsigned long s_objectCounter;
+    static thread_local unsigned long s_objectCounter;
 };
 
 //----------------------------------------------------------------------------

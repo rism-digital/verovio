@@ -29,7 +29,7 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
+static const ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
 
 BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
@@ -72,6 +72,7 @@ bool BarLine::HasRepetitionDots() const
 BarLineAttr::BarLineAttr() : BarLine()
 {
     m_isLeft = false;
+    m_noAttr = false;
 }
 
 BarLineAttr::~BarLineAttr() {}

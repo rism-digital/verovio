@@ -1,6 +1,27 @@
 # Changelog
 
 ## [unreleased]
+* Support for `lv` (@eNote-GmbH)
+* Support for additive meters (@eNote-GmbH)
+* Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)
+* Improved rendering of cross-staff slurs (@eNote-GmbH)
+* Improved octave line positions with `@endid` (@eNote-GmbH)
+* Improved layout algorithm with nested layer content arrangement
+* Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
+* Improved rendering of octave brackets ending (@eNote-GmbH)
+* Function getTimeForElement includes `measure` and `chord` elements (@gitelicious)
+* Option --breaks-no-widow to prevent a single measure on last page (@eNote-GmbH)
+* Option --ligature-as-bracket to render ligatures as bracket instead of original notation
+* Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
+* Making Verovio thread safe (@eNote-GmbH)
+* Switch from XSLT to Python for font generation (@eNote-GmbH)
+* Fix loading/updating of MEI3 files (@rettinghaus)
+* Fix option --octave-alternative-symbols
+
+## [3.4.1] - 2021-05-03
+* Fix bug in font names in the Python distribution
+
+## [3.4.0] - 2021-05-01
 * Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
 * Support for chords with cuesize notes (@eNote-GmbH)
 * Improved horizontal layout with dots and flags (@eNote-GmbH)
@@ -32,7 +53,7 @@
 * Option --svg-format-raw for raw SVG output without indentation and line breaks
 * New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
 * Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
-* Fixes in the MusicXML importer (@Enote-GmbH)
+* Fixes in the MusicXML importer (@eNote-GmBH)
 
 ## [3.2.0] - 2021-02-08
 * Support for `clef@visible` (@rettinghaus)

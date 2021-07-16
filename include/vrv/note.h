@@ -146,14 +146,14 @@ public:
      * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    std::wstring GetTabFretString(data_NOTATIONTYPE notationType);
+    std::wstring GetTabFretString(data_NOTATIONTYPE notationType) const;
     ///@}
 
     /**
-     * Return true if the note is a unisson.
+     * Return true if the note is a unison.
      * If ignoreAccid is set to true then only @pname and @oct are compared.
      */
-    bool IsUnissonWith(Note *note, bool ignoreAccid = false);
+    bool IsUnisonWith(Note *note, bool ignoreAccid = false);
 
     /**
      * @name Setter and getter for the chord cluster and the position of the note
@@ -189,7 +189,7 @@ public:
     /**
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */
-    wchar_t GetMensuralNoteheadGlyph();
+    wchar_t GetMensuralNoteheadGlyph() const;
 
     /**
      * Return a SMuFL code for the notehead
@@ -199,12 +199,7 @@ public:
     /**
      * Check if a note or its parent chord are visible
      */
-    bool IsVisible();
-
-    /**
-     * Correct dots placement depending on other dots present in the current alignment
-     */
-    int CorrectDotsPlacement(Staff *staff, int NoteLoc, int dotLoc, bool isDotShifted);
+    bool IsVisible() const;
 
     /**
      * MIDI timing information
@@ -215,14 +210,14 @@ public:
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
-    void SetMIDIPitch(char pitch);
-    double GetScoreTimeOnset();
-    double GetRealTimeOnsetMilliseconds();
-    double GetScoreTimeOffset();
-    double GetScoreTimeTiedDuration();
-    double GetRealTimeOffsetMilliseconds();
-    double GetScoreTimeDuration();
-    char GetMIDIPitch();
+    void CalcMIDIPitch(int shift);
+    double GetScoreTimeOnset() const;
+    double GetRealTimeOnsetMilliseconds() const;
+    double GetScoreTimeOffset() const;
+    double GetScoreTimeTiedDuration() const;
+    double GetRealTimeOffsetMilliseconds() const;
+    double GetScoreTimeDuration() const;
+    char GetMIDIPitch() const;
     ///@}
 
 public:
@@ -299,6 +294,19 @@ public:
      * See Object::Transpose
      */
     virtual int Transpose(FunctorParams *);
+
+protected:
+    /**
+     * The note locations w.r.t. each staff
+     */
+    virtual MapOfNoteLocs CalcNoteLocations();
+
+    /**
+     * The dot locations w.r.t. each staff
+     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
+     * secondary
+     */
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary);
 
 private:
     /**

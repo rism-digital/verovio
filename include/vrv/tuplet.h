@@ -53,6 +53,11 @@ public:
     virtual void AddChild(Object *object);
 
     /**
+     * Adjust tuplet relative positioning based on possible overlaps
+     */
+    void AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int staffSize);
+
+    /**
      * @name Setter and getter for darwing elements and position
      */
     ///@{
@@ -82,7 +87,7 @@ public:
      * Return the maximum and minimum X positions of the notes in the tuplets.
      * Look at flipped noteheads in chords.
      */
-    void GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc);
+    void GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc) const;
 
     //----------//
     // Functors //

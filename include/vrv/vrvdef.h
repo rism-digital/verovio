@@ -12,6 +12,7 @@
 #include <functional>
 #include <list>
 #include <map>
+#include <set>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 4
+#define VERSION_MINOR 5
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -102,6 +103,7 @@ enum ClassId {
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
+    METERSIGGRP,
     PAGE,
     PAGES,
     SCORE,
@@ -160,6 +162,7 @@ enum ClassId {
     ARPEG,
     BRACKETSPAN,
     BREATH,
+    CAESURA,
     DIR,
     DYNAM,
     FERMATA,
@@ -167,6 +170,7 @@ enum ClassId {
     GLISS,
     HAIRPIN,
     HARM,
+    LV,
     MORDENT,
     MNUM,
     OCTAVE,
@@ -335,7 +339,9 @@ typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
 typedef std::vector<TextElement *> ArrayOfTextElements;
 
-typedef std::map<Staff *, std::list<int>> MapOfDotLocs;
+typedef std::map<Staff *, std::multiset<int>> MapOfNoteLocs;
+
+typedef std::map<Staff *, std::set<int>> MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
 

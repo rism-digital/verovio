@@ -52,21 +52,26 @@ public:
     curvature_CURVEDIR GetDrawingCurvedir() const { return m_drawingCurvedir; }
     void SetDrawingCurvedir(curvature_CURVEDIR curvedir) { m_drawingCurvedir = curvedir; }
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
-    void IsCrossStaff(bool isCrossStaff) { m_isCrossStaff = isCrossStaff; }
-    bool IsCrossStaff() const { return m_isCrossStaff; }
     ///@}
 
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
-    int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
-        Point &c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
-    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
-        const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
-        curvature_CURVEDIR curveDir, float &angle, bool forceBothSides);
+    int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve,
+        curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
+
+    /**
+     * Adjust slur position based on overlapping objects within its spanning elements
+     */
+    bool AdjustSlurPosition(
+        Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides);
+    /**
+     * Calculate slur left/right maximum shifts required for slur not to overlap with other objects
+     */
+    std::pair<int, int> CalculateAdjustedSlurShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+        int margin, bool forceBothSides, bool &isNotAdjustable);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
-    void GetControlPoints(
-        Doc *doc, Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, int height, int staffSize);
+    void GetControlPoints(BezierCurve &curve, curvature_CURVEDIR curveDir, bool ignoreAngle = false);
     void GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
         curvature_CURVEDIR curveDir, int staffSize);
 
@@ -92,13 +97,6 @@ private:
      * document is cast-off.
      */
     curvature_CURVEDIR m_drawingCurvedir;
-
-    /**
-     * A flag indicating that the slur is cross-staff.
-     * This is not instantiated in Prepare::CrossStaff but in View::DrawSlurInitial
-     * When set, the slur needs to be Re-drawn and re-adjusted after the vertical adjustment of the staves
-     */
-    bool m_isCrossStaff;
 };
 
 } // namespace vrv

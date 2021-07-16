@@ -4,8 +4,8 @@
   "identifier": "Verovio",
   "name": "Verovio",
   "description": "Verovio is a fast, portable and lightweight open-source library for engraving Music Encoding Initiative (MEI) music scores into SVG.",
-  "softwareVersion": "3.4.0-dev",
-  "datePublished": "2021-02-25",
+  "softwareVersion": "3.5.0-dev",
+  "datePublished": "2021-05-01",
   "license": "https://www.gnu.org/licenses/lgpl-3.0",
   "programmingLanguage": [{
     "@type": "ComputerLanguage",
@@ -54,6 +54,29 @@
       "@type": "Person",
       "givenName": "Craig",
       "familyName": "Sapp"
+    },
+    {
+      "@id": "https://orcid.org/0000-0003-2663-0003",
+      "@type": "Person",
+      "givenName": "Andrew",
+      "familyName": "Hankinson"
+    },
+    {
+      "@id": "https://orcid.org/0000-0002-0744-5374",
+      "@type": "Person",
+      "givenName": "Stefan",
+      "familyName": "Münnich"
+    },
+    {
+      "@id": "https://orcid.org/0000-0003-3448-2688",
+      "@type": "Person",
+      "givenName": "David",
+      "familyName": "Rizo"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Thomas",
+      "familyName": "Weber"
     },
     {
       "@type": "Person",

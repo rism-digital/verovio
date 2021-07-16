@@ -20,6 +20,7 @@ class Clef;
 class KeySig;
 class Mensur;
 class MeterSig;
+class MeterSigGrp;
 class PgFoot;
 class PgFoot2;
 class PgHead;
@@ -62,10 +63,11 @@ public:
      * @name Methods for checking the presence of clef, key signature, etc. information and getting them.
      */
     ///@{
-    bool HasClefInfo();
-    bool HasKeySigInfo();
-    bool HasMensurInfo();
-    bool HasMeterSigInfo();
+    bool HasClefInfo(int depth = 1);
+    bool HasKeySigInfo(int depth = 1);
+    bool HasMensurInfo(int depth = 1);
+    bool HasMeterSigInfo(int depth = 1);
+    bool HasMeterSigGrpInfo(int depth = 1);
     ///@}
 
     /**
@@ -85,6 +87,8 @@ public:
     Mensur *GetMensurCopy();
     MeterSig *GetMeterSig();
     MeterSig *GetMeterSigCopy();
+    MeterSigGrp *GetMeterSigGrp();
+    MeterSigGrp *GetMeterSigGrpCopy();
     ///@}
 
     //----------//
@@ -154,9 +158,9 @@ public:
     /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
-     * Only true flags are applied, unless applyToAll is set to true.
+     * Apply StaffDefRedrawFlags that are defined in functorparams.h
      */
-    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll);
+    void SetRedrawFlags(int redrawFlags);
 
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
@@ -219,6 +223,7 @@ private:
     //
 public:
     bool m_setAsDrawing;
+    bool m_insertScoreDef;
     //
 private:
     /** Flags for indicating whether labels need to be drawn or not */

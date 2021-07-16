@@ -27,7 +27,7 @@ namespace vrv {
 // StaffGrp
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<StaffGrp> s_factory("staffGrp", STAFFGRP);
+static const ClassRegistrar<StaffGrp> s_factory("staffGrp", STAFFGRP);
 
 StaffGrp::StaffGrp()
     : Object("staffgrp-")

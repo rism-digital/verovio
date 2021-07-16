@@ -28,7 +28,7 @@ namespace vrv {
 // MRpt
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<MRpt> s_factory("mRpt", MRPT);
+static const ClassRegistrar<MRpt> s_factory("mRpt", MRPT);
 
 MRpt::MRpt() : LayerElement("mrpt-"), AttColor()
 {
@@ -73,11 +73,11 @@ int MRpt::PrepareRpt(FunctorParams *functorParams)
 
     // If this is the first one, number has to be 2
     if (params->m_currentMRpt == NULL) {
-        this->m_drawingMeasureCount = 2;
+        m_drawingMeasureCount = 2;
     }
     // Otherwise increment it
     else {
-        this->m_drawingMeasureCount = params->m_currentMRpt->m_drawingMeasureCount + 1;
+        m_drawingMeasureCount = params->m_currentMRpt->m_drawingMeasureCount + 1;
     }
     params->m_currentMRpt = this;
     return FUNCTOR_CONTINUE;

@@ -363,7 +363,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
 
-    DrawBarLine(dc, yTop + offset, yBottom - offset, barLine);
+    DrawBarLine(dc, yTop + offset, yBottom - offset, barLine, barLine->GetForm());
     if (barLine->HasRepetitionDots()) {
         DrawBarLineDots(dc, staff, barLine);
     }
@@ -776,18 +776,13 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    MapOfDotLocs::const_iterator iter;
-    const MapOfDotLocs *map = dots->GetMapOfDotLocs();
-    for (iter = map->begin(); iter != map->end(); ++iter) {
-        Staff *dotStaff = (iter->first) ? iter->first : staff;
+    for (const auto &mapEntry : dots->GetMapOfDotLocs()) {
+        Staff *dotStaff = (mapEntry.first) ? mapEntry.first : staff;
         int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const std::list<int> *dotLocs = &iter->second;
-        std::list<int>::const_iterator intIter;
-        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); ++intIter) {
-            DrawDotsPart(
-                dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
+        for (int loc : mapEntry.second) {
+            DrawDotsPart(dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
         }
     }
 
@@ -952,16 +947,20 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Show cancellation if show cancellation (showchange) is true (false by default)
     // This is not meant to make sense with mixed key signature
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
-        // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
-        if (keySig->GetAccidType() != keySig->m_drawingCancelAccidType) {
-            for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-                loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+        const int beginCancel
+            = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
+        for (i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
+            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
+            loc = PitchInterface::CalcLoc(
+                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += naturalGlyphWidth + naturalStep;
+            DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+
+            x += naturalGlyphWidth + naturalStep;
+            if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
+                // Add some extra space after last natural
+                x += step;
             }
         }
     }
@@ -984,24 +983,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     dc->ResetFont();
-
-    // Show cancellation if show cancellation (showchange) is true (false by default)
-    // This is not meant to make sense with mixed key signature
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
-        // Same time of alteration, but smaller number - cancellation is displayed afterwards
-        if ((keySig->GetAccidType() == keySig->m_drawingCancelAccidType)
-            && (keySig->GetAccidCount() < keySig->m_drawingCancelAccidCount)) {
-            for (i = keySig->GetAccidCount(); i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-                loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += naturalGlyphWidth + naturalStep;
-            }
-        }
-    }
 
     dc->EndGraphic(element, this);
 }
@@ -1650,12 +1631,17 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
 }
 
-void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff)
+void View::DrawMeterSigFigures(
+    DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff)
 {
     assert(dc);
     assert(staff);
 
-    std::wstring timeSigCombNumerator = IntToTimeSigFigures(num), timeSigCombDenominator;
+    std::wstring timeSigCombNumerator, timeSigCombDenominator;
+    for (int summand : numSummands) {
+        if (!timeSigCombNumerator.empty()) timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall;
+        timeSigCombNumerator += IntToTimeSigFigures(summand);
+    }
     if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));

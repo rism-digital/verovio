@@ -593,6 +593,8 @@ enum data_ENCLOSURE {
     ENCLOSURE_NONE = 0,
     ENCLOSURE_paren,
     ENCLOSURE_brack,
+    ENCLOSURE_box,
+    ENCLOSURE_none,
     ENCLOSURE_MAX
 };
 

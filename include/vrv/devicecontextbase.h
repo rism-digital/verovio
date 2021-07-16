@@ -17,6 +17,8 @@
 
 namespace vrv {
 
+class Doc;
+
 #define AxNONE -1
 #define AxWHITE 255 << 16 | 255 << 8 | 255
 #define AxBLACK 0
@@ -200,6 +202,65 @@ public:
         int y = std::max(this->y, p.y);
         return Point(x, y);
     }
+};
+
+// ---------------------------------------------------------------------------
+// BezierCurve
+// ---------------------------------------------------------------------------
+
+/**
+ * Simple class for representing bezier cCurve
+ */
+
+class BezierCurve {
+public:
+    Point p1; // start point
+    Point c1, c2; // control points
+    Point p2; // end point
+
+    // no copy ctor or assignment operator - the defaults are ok
+
+    BezierCurve() {}
+    BezierCurve(const Point &p1, const Point &c1, const Point &c2, const Point &p2) : p1(p1), c1(c1), c2(c2), p2(p2) {}
+
+    // Helper to rotate all points within bezier curve around @rotationPoint by @angle
+    void Rotate(float angle, const Point &rotationPoint);
+
+    /**
+     * @name Getter/setter for control point offset (as well as method to calculate it from options)
+     */
+    ///@{
+    void CalculateControlPointOffset(Doc *doc, int staffSize);
+    void SetControlPointOffset(int controlPointOffset)
+    {
+        m_leftControlPointOffset = m_rightControlPointOffset = controlPointOffset;
+    };
+    void SetLeftControlPointOffset(int height) { m_leftControlPointOffset = height; }
+    void SetRightControlPointOffset(int height) { m_rightControlPointOffset = height; }
+    int GetLeftControlPointOffset() const { return m_leftControlPointOffset; }
+    int GetRightControlPointOffset() const { return m_rightControlPointOffset; }
+    ///@}
+
+    /**
+     * @name Getter/setter for the height of control points (left and right)
+     */
+    ///@{
+    void SetControlHeight(int height) { m_leftControlHeight = m_rightControlHeight = height; }
+    void SetLeftControlHeight(int height) { m_leftControlHeight = height; }
+    void SetRightControlHeight(int height) { m_rightControlHeight = height; }
+    int GetLeftControlHeight() const { return m_leftControlHeight; }
+    int GetRightControlHeight() const { return m_rightControlHeight; }
+    ///@}
+
+private:
+    // Control point X-axis offset for both start/end points
+    // In future, when more complex shapes are required, this should probably be changed to left/right offsets
+    int m_leftControlPointOffset = 0;
+    int m_rightControlPointOffset = 0;
+    int m_leftControlHeight = 0;
+    int m_rightControlHeight = 0;
+
+    // no copy ctor or assignment operator - the defaults are ok
 };
 
 // ---------------------------------------------------------------------------

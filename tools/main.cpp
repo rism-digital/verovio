@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <assert.h>
+#include <fstream>
 #include <iostream>
 #include <regex>
 #include <sstream>
@@ -153,7 +154,6 @@ void display_option(vrv::Option *option)
                   << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
     }
     std::cout << std::endl;
-    
 }
 
 void display_version()
@@ -176,15 +176,15 @@ void display_usage()
 
     // Options with both short and long forms
     vrv::Options options;
-    
+
     std::cout << "Options (marked as * are repeatable)" << std::endl;
     const std::vector<vrv::Option *> *baseOptions = options.GetBaseOptions();
-    
+
     // All other option groups
     for (auto const &option : *baseOptions) {
         display_option(option);
     }
-    
+
     std::vector<vrv::OptionGrp *> *grps = options.GetGrps();
 
     for (auto const &grp : *grps) {
@@ -287,7 +287,7 @@ int main(int argc, char **argv)
                 key = long_options[option_index].name;
                 opt = params->at(toCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
-                
+
                 // Handle deprecated options
                 /*
                 if (key == "condense-encoded") {
@@ -340,7 +340,7 @@ int main(int argc, char **argv)
             case 'v': show_version = 1; break;
 
             case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
-                
+
             case 'z':
                 if (!strcmp(long_options[option_index].name, "stdin")) {
                     infile = "-";
@@ -422,20 +422,22 @@ int main(int argc, char **argv)
     }
 
     // Load the std input or load the file
-    if (infile == "-") {
-        std::ostringstream data_stream;
-        for (std::string line; getline(std::cin, line);) {
-            data_stream << line << std::endl;
+    if (!((toolkit.GetOutputTo() == vrv::HUMDRUM) && (toolkit.GetInputFrom() == vrv::MEI))) {
+        if (infile == "-") {
+            std::ostringstream data_stream;
+            for (std::string line; getline(std::cin, line);) {
+                data_stream << line << std::endl;
+            }
+            if (!toolkit.LoadData(data_stream.str())) {
+                std::cerr << "The input could not be loaded." << std::endl;
+                exit(1);
+            }
         }
-        if (!toolkit.LoadData(data_stream.str())) {
-            std::cerr << "The input could not be loaded." << std::endl;
-            exit(1);
-        }
-    }
-    else {
-        if (!toolkit.LoadFile(infile)) {
-            std::cerr << "The file '" << infile << "' could not be opened." << std::endl;
-            exit(1);
+        else {
+            if (!toolkit.LoadFile(infile)) {
+                std::cerr << "The file '" << infile << "' could not be opened." << std::endl;
+                exit(1);
+            }
         }
     }
 
@@ -508,6 +510,73 @@ int main(int argc, char **argv)
         }
     }
     else if (outformat == "humdrum" || outformat == "hum") {
+        if (toolkit.GetInputFrom() == vrv::MEI) {
+            std::string meidata;
+
+            if (infile == "-") {
+                std::ostringstream input_data;
+                for (std::string line; getline(std::cin, line);) {
+                    input_data << line << std::endl;
+                }
+                if (input_data.str().empty()) {
+                    std::cerr << "The input could not be loaded." << std::endl;
+                    exit(1);
+                }
+                meidata = input_data.str();
+            }
+            else {
+                std::ifstream instream(infile.c_str());
+                if (!instream.is_open()) {
+                    return 1;
+                }
+
+                instream.seekg(0, std::ios::end);
+                std::streamsize fileSize = (std::streamsize)instream.tellg();
+                instream.clear();
+                instream.seekg(0, std::ios::beg);
+
+                // read the file into the std::string:
+                meidata.resize(fileSize, 0);
+                instream.read(meidata.data(), fileSize);
+            }
+
+            // Output will be accessible from toolkit.GetHumdrum():
+            toolkit.ConvertMEIToHumdrum(meidata);
+        }
+        else if (toolkit.GetInputFrom() == vrv::HUMDRUM) {
+
+            std::string humdata;
+            if (infile == "-") {
+                std::ostringstream input_data;
+                for (std::string line; getline(std::cin, line);) {
+                    input_data << line << std::endl;
+                }
+                if (input_data.str().empty()) {
+                    std::cerr << "The input could not be loaded." << std::endl;
+                    exit(1);
+                }
+                humdata = input_data.str();
+            }
+            else {
+                std::ifstream instream(infile.c_str());
+                if (!instream.is_open()) {
+                    return 1;
+                }
+
+                instream.seekg(0, std::ios::end);
+                std::streamsize fileSize = (std::streamsize)instream.tellg();
+                instream.clear();
+                instream.seekg(0, std::ios::beg);
+
+                // read the file into the std::string:
+                humdata.resize(fileSize, 0);
+                instream.read(humdata.data(), fileSize);
+            }
+
+            // Output will be accessible from toolkit.GetHumdrum():
+            toolkit.ConvertHumdrumToHumdrum(humdata);
+        }
+
         outfile += ".krn";
         if (std_output) {
             toolkit.GetHumdrum(std::cout);

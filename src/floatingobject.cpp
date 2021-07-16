@@ -44,7 +44,7 @@ namespace vrv {
 // Static members
 //----------------------------------------------------------------------------
 
-std::vector<void *> FloatingObject::s_drawingObjectIds;
+thread_local std::vector<void *> FloatingObject::s_drawingObjectIds;
 
 //----------------------------------------------------------------------------
 // FloatingObject
@@ -330,17 +330,17 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     if (horizOverlapingBBox == NULL) {
         // Apply element margin and enforce minimal staff distance
         int staffIndex = staffAlignment->GetStaff()->GetN();
-        int minStaffDistance = doc->GetStaffDistance(this->m_object->GetClassId(), staffIndex, this->m_place)
-            * doc->GetDrawingUnit(staffSize);
-        if (this->m_place == STAFFREL_above) {
+        int minStaffDistance
+            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
+        if (m_place == STAFFREL_above) {
             yRel = GetContentY1();
-            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+            yRel -= doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(-minStaffDistance);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + GetContentY2();
-            yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+            yRel += doc->GetTopMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(minStaffDistance + staffAlignment->GetStaffHeight());
         }
@@ -350,15 +350,20 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
-        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+        int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
-        if (this->m_place == STAFFREL_above) {
-            if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
+        if (m_place == STAFFREL_above) {
+            if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
                 int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     // LogDebug("Shift %d", shift);
                 }
+                return true;
+            }
+            else if (m_object->Is(DYNAM) && horizOverlapingBBox->Is(BEAM)) {
+                // Try to avoid comparing with BEAM BB since it might be much larger overlap while having a lot of
+                // whitespace. For such cases, DYNAM should be compared to individual elements of BEAM instead
                 return true;
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
@@ -373,7 +378,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             }
         }
         else {
-            if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
+            if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
                 int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -399,7 +404,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 
 int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
-    if (this->m_place != STAFFREL_between) return VRV_UNSET;
+    if (m_place != STAFFREL_between) return VRV_UNSET;
 
     int staffSize = staffAlignment->GetStaffSize();
 
@@ -407,9 +412,9 @@ int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, 
     if (curve) {
         assert(curve->m_object);
     }
-    int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+    int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
-    if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
+    if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
         // For now ignore curves
         return 0;
     }
@@ -456,6 +461,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_angle = 0.0;
     m_thickness = 0;
     m_dir = curvature_CURVEDIR_NONE;
+    m_crossStaff = NULL;
     m_cachedMinMaxY = VRV_UNSET;
     ClearSpannedElements();
 }
@@ -493,7 +499,7 @@ void FloatingCurvePositioner::MoveBackVertical(int distance)
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
-    assert(this->GetObject()->Is({ PHRASE, SLUR, TIE }));
+    assert(this->GetObject()->Is({ LV, PHRASE, SLUR, TIE }));
     assert(m_dir != curvature_CURVEDIR_NONE);
 
     if (m_cachedMinMaxY != VRV_UNSET) return m_cachedMinMaxY;

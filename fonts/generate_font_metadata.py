@@ -14,10 +14,11 @@
 # while designing the November 2.0 font.
 # Use, distribute and edit this script as you wish!
 
-import fontforge
-import sys
-import os
 import json
+import os
+import sys
+
+import fontforge
 
 
 def validateGlyph(glyph):
@@ -44,7 +45,7 @@ def validateGlyph(glyph):
             report += '- DUPLICATE UNICODE POINT'
 
         if report != '':
-            print('%s (%#0.2x) issues: %s' % (g.glyphname, glyph.unicode, report), log)
+            print('%s (%#0.2x) issues: %s' % (g.glyphname, glyph.unicode, report))
     return report
 
 

@@ -83,7 +83,7 @@ void TimePointInterface::SetUuidStr()
 Measure *TimePointInterface::GetStartMeasure()
 {
     if (!m_start) return NULL;
-    return dynamic_cast<Measure *>(this->m_start->GetFirstAncestor(MEASURE));
+    return dynamic_cast<Measure *>(m_start->GetFirstAncestor(MEASURE));
 }
 
 bool TimePointInterface::IsOnStaff(int n)
@@ -204,7 +204,7 @@ bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 Measure *TimeSpanningInterface::GetEndMeasure()
 {
     if (!m_end) return NULL;
-    return dynamic_cast<Measure *>(this->m_end->GetFirstAncestor(MEASURE));
+    return dynamic_cast<Measure *>(m_end->GetFirstAncestor(MEASURE));
 }
 
 bool TimeSpanningInterface::IsSpanningMeasures()

@@ -30,6 +30,12 @@ verovio.vrvToolkit.getExpansionIdsForElement = Module.cwrap( 'vrvToolkit_getExpa
 // char *getHumdrum(Toolkit *ic)
 verovio.vrvToolkit.getHumdrum = Module.cwrap( 'vrvToolkit_getHumdrum', 'string' );
 
+// char *convertMEIToHumdrum(Toolkit *ic, const char *meiData)
+verovio.vrvToolkit.convertMEIToHumdrum = Module.cwrap( 'vrvToolkit_convertMEIToHumdrum', 'string', ['number', 'string'] );
+
+// char *convertHumdrumToHumdrum(Toolkit *ic, const char *humdrumData)
+verovio.vrvToolkit.convertHumdrumToHumdrum = Module.cwrap( 'vrvToolkit_convertHumdrumToHumdrum', 'string', ['number', 'string'] );
+
 // char *getLog(Toolkit *ic)
 verovio.vrvToolkit.getLog = Module.cwrap( 'vrvToolkit_getLog', 'string', ['number'] );
 
@@ -145,6 +151,16 @@ verovio.toolkit.prototype.getExpansionIdsForElement = function ( xmlId )
 verovio.toolkit.prototype.getHumdrum = function ()
 {
     return verovio.vrvToolkit.getHumdrum( this.ptr );
+};
+
+verovio.toolkit.prototype.convertHumdrumToHumdrum = function ( data )
+{
+    return verovio.vrvToolkit.convertHumdrumToHumdrum( this.ptr, data );
+};
+
+verovio.toolkit.prototype.convertMEIToHumdrum = function ( data )
+{
+    return verovio.vrvToolkit.convertMEIToHumdrum( this.ptr, data );
 };
 
 verovio.toolkit.prototype.getLog = function ()

@@ -44,7 +44,10 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
+
+#ifndef NO_MXL_SUPPORT
 #include "zip_file.hpp"
+#endif /* NO_MXL_SUPPORT */
 
 namespace vrv {
 
@@ -366,6 +369,7 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
+#ifndef NO_MXL_SUPPORT
     miniz_cpp::zip_file file(bytes);
 
     std::string filename;
@@ -391,6 +395,10 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
         LogError("No file to load found in the archive");
         return false;
     }
+#else
+    LogError("MXL import is not supported in this build.");
+    return false;
+#endif
 }
 
 bool Toolkit::LoadZipDataBase64(const std::string &data)
@@ -409,6 +417,10 @@ bool Toolkit::LoadData(const std::string &data)
 {
     std::string newData;
     Input *input = NULL;
+
+#ifndef NO_HUMDRUM_SUPPORT
+    ClearHumdrumBuffer();
+#endif
 
     auto inputFormat = m_inputFrom;
     if (inputFormat == AUTO) {
@@ -536,24 +548,14 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     else if (inputFormat == MEIHUM) {
-        // This is the indirect converter from MusicXML to MEI using iohumdrum:
-        hum::Tool_mei2hum converter;
-        pugi::xml_document xmlfile;
-        xmlfile.load_string(data.c_str());
-        stringstream conversion;
-        bool status = converter.convert(conversion, xmlfile);
-        if (!status) {
-            LogError("Error converting MEI data");
-            return false;
-        }
-        std::string buffer = conversion.str();
-        SetHumdrumBuffer(buffer.c_str());
+        ConvertMEIToHumdrum(data);
 
         // Now convert Humdrum into MEI:
+        std::string conversion = GetHumdrumBuffer();
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         Input *tempinput = new HumdrumInput(&tempdoc);
-        if (!tempinput->Import(conversion.str())) {
+        if (!tempinput->Import(conversion)) {
             LogError("Error importing Humdrum data (3)");
             delete tempinput;
             return false;
@@ -797,6 +799,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
         const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
         const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
+        const OptionJson *optJson = dynamic_cast<const OptionJson *>(iter->second);
 
         if (optDbl) {
             double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
@@ -820,6 +823,12 @@ std::string Toolkit::GetOptions(bool defaultValues) const
                 values << (*strIter);
             }
             o << iter->first << values;
+        }
+        else if (optJson) {
+            // Reading json from file is not supported in toolkit
+            if (optJson->GetSource() == JsonSource::String) {
+                o << iter->first << optJson->GetValue(defaultValues);
+            }
         }
         else {
             std::string stringValue
@@ -849,6 +858,10 @@ std::string Toolkit::GetAvailableOptions() const
         const std::vector<Option *> *options = optionGrp->GetOptions();
 
         for (auto const &option : *options) {
+            // Reading json from file is not supported in toolkit
+            const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
+            if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
+
             opts << option->GetKey() << option->ToJson();
         }
 
@@ -879,6 +892,11 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             if (iter->first == "inputFrom") {
                 if (json.has<jsonxx::String>("inputFrom")) {
                     SetInputFrom(json.get<jsonxx::String>("inputFrom"));
+                }
+            }
+            else if (iter->first == "outputTo") {
+                if (json.has<jsonxx::String>("outputTo")) {
+                    SetOutputTo(json.get<jsonxx::String>("outputTo"));
                 }
             }
             else if (iter->first == "scale") {
@@ -937,10 +955,19 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
             opt->SetValueArray(strValues);
         }
+        else if (json.has<jsonxx::Object>(iter->first)) {
+            const OptionJson *optJson = dynamic_cast<OptionJson *>(opt);
+            if (optJson && (optJson->GetSource() == JsonSource::String)) {
+                const jsonxx::Object value = json.get<jsonxx::Object>(iter->first);
+                opt->SetValue(value.json());
+            }
+        }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());
         }
     }
+
+    m_options->Sync();
 
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed
@@ -1124,8 +1151,15 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     }
 
     // set dimensions
-    deviceContext->SetWidth(width);
-    deviceContext->SetHeight(height);
+    if (m_options->m_landscape.GetValue()) {
+        deviceContext->SetWidth(height);
+        deviceContext->SetHeight(width);
+    }
+    else {
+        deviceContext->SetWidth(width);
+        deviceContext->SetHeight(height);
+    }
+
     double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
@@ -1386,15 +1420,32 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     }
 
     int timeofElement = 0;
+    if (!m_doc.HasMidiTimemap()) {
+        // generate MIDI timemap before progressing
+        m_doc.CalculateMidiTimemap();
+    }
+    if (!m_doc.HasMidiTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+    }
     if (element->Is(NOTE)) {
-        if (!m_doc.HasMidiTimemap()) {
-            // generate MIDI timemap before progressing
-            m_doc.CalculateMidiTimemap();
-        }
-        if (!m_doc.HasMidiTimemap()) {
-            LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
-        }
         Note *note = vrv_cast<Note *>(element);
+        assert(note);
+        Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
+        assert(measure);
+        // For now ignore repeats and access always the first
+        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement += note->GetRealTimeOnsetMilliseconds();
+    }
+    else if (element->Is(MEASURE)) {
+        Measure *measure = vrv_cast<Measure *>(element);
+        assert(measure);
+        // For now ignore repeats and access always the first
+        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+    }
+    else if (element->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(element);
+        assert(chord);
+        Note *note = vrv_cast<Note *>(chord->FindDescendantByType(NOTE));
         assert(note);
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
@@ -1485,10 +1536,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
-    if (m_humdrumBuffer) {
-        free(m_humdrumBuffer);
-        m_humdrumBuffer = NULL;
-    }
+    ClearHumdrumBuffer();
     size_t size = strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
@@ -1504,7 +1552,24 @@ const char *Toolkit::GetHumdrumBuffer()
         return m_humdrumBuffer;
     }
     else {
-        return "[empty]";
+#ifndef NO_HUMDRUM_SUPPORT
+        // Convert from MEI to Humdrum
+        MEIOutput meioutput(&m_doc);
+        meioutput.SetScoreBasedMEI(true);
+        std::string meidata = meioutput.GetOutput();
+        pugi::xml_document infile;
+        infile.load_string(meidata.c_str());
+        stringstream out;
+        hum::Tool_mei2hum converter;
+        converter.convert(out, infile);
+        SetHumdrumBuffer(out.str().c_str());
+#endif
+        if (m_humdrumBuffer) {
+            return m_humdrumBuffer;
+        }
+        else {
+            return "[empty]";
+        }
     }
 }
 
@@ -1532,6 +1597,83 @@ const char *Toolkit::GetCString()
     else {
         return "[unspecified]";
     }
+}
+
+void Toolkit::ClearHumdrumBuffer(void)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+    if (m_humdrumBuffer) {
+        free(m_humdrumBuffer);
+        m_humdrumBuffer = NULL;
+    }
+#endif
+}
+
+std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+    hum::Tool_mei2hum converter;
+    pugi::xml_document xmlfile;
+    xmlfile.load_string(meiData.c_str());
+    std::stringstream conversion;
+    bool status = converter.convert(conversion, xmlfile);
+    if (!status) {
+        LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
+    }
+    SetHumdrumBuffer(conversion.str().c_str());
+    return conversion.str();
+#else
+    return "";
+#endif
+}
+
+std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+
+    hum::HumdrumFileSet infiles;
+    // bool result = infiles.readString(humdrumData);
+    bool result = infiles.readString(humdrumData);
+    if (!result) {
+        SetHumdrumBuffer("");
+        return "";
+    }
+    if (infiles.getCount() == 0) {
+        SetHumdrumBuffer("");
+        return "";
+    }
+
+    // Apply Humdrum tools if there are any filters in the file.
+    hum::Tool_filter filter;
+    for (int i = 0; i < infiles.getCount(); ++i) {
+        if (infiles[i].hasGlobalFilters()) {
+            filter.run(infiles[i]);
+            if (filter.hasHumdrumText()) {
+                infiles[i].readString(filter.getHumdrumText());
+            }
+            else {
+                // should have auto updated itself in the filter.
+            }
+        }
+    }
+
+    // Apply Humdrum tools to the entire set if they are
+    // at the universal level.
+    if (infiles.hasUniversalFilters()) {
+        filter.runUniversal(infiles);
+        if (filter.hasHumdrumText()) {
+            infiles.readString(filter.getHumdrumText());
+        }
+    }
+
+    hum::HumdrumFile &infile = infiles[0];
+    std::stringstream humout;
+    humout << infile;
+    SetHumdrumBuffer(humout.str().c_str());
+    return humout.str();
+#else
+    return "";
+#endif
 }
 
 } // namespace vrv

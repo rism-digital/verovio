@@ -395,10 +395,10 @@ void PAEOutput::WriteMeterSig(MeterSig *meterSig)
         sig = (meterSig->GetSym() == METERSIGN_common) ? "c" : "c/";
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        sig = StringFormat("%d", meterSig->GetCount());
+        sig = StringFormat("%d", meterSig->GetTotalCount());
     }
     else if (meterSig->HasCount() && meterSig->GetUnit()) {
-        sig = StringFormat("%d/%d", meterSig->GetCount(), meterSig->GetUnit());
+        sig = StringFormat("%d/%d", meterSig->GetTotalCount(), meterSig->GetUnit());
     }
 
     m_streamStringOutput << outStart << sig << outEnd;
@@ -1386,11 +1386,11 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     std::cmatch matches;
     if (meter) {
         if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
-            meter->SetCount(std::stoi(matches[1]));
+            meter->SetCount({ std::stoi(matches[1]) });
             meter->SetUnit(std::stoi(matches[2]));
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
-            meter->SetCount(std::stoi(timesig_str));
+            meter->SetCount({ std::stoi(timesig_str) });
             meter->SetUnit(1);
             meter->SetForm(METERFORM_num);
         }
@@ -1405,12 +1405,12 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         else if (strcmp(timesig_str, "c3") == 0) {
             // C3
             meter->SetSym(METERSIGN_common);
-            meter->SetCount(3);
+            meter->SetCount({ 3 });
         }
         else if (strcmp(timesig_str, "c3/2") == 0) {
             // C3/2
             meter->SetSym(METERSIGN_common); // ??
-            meter->SetCount(3);
+            meter->SetCount({ 3 });
             meter->SetUnit(2);
         }
         else {

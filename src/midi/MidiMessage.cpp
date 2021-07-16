@@ -89,7 +89,7 @@ MidiMessage& MidiMessage::operator=(const MidiMessage& message) {
 	if (this == &message) {
 		return *this;
 	}
-	(*this) = message;
+	std::vector<uchar>::operator=(static_cast<const std::vector<uchar> &>(message));
 	return *this;
 }
 
@@ -934,7 +934,7 @@ void MidiMessage::setP0(int value) {
 	if (getSize() < 1) {
 		resize(1);
 	}
-	(*this)[0] = value;
+	(*this)[0] = static_cast<uchar>(value);
 }
 
 
@@ -952,7 +952,7 @@ void MidiMessage::setP1(int value) {
 	if (getSize() < 2) {
 		resize(2);
 	}
-	(*this)[1] = value;
+	(*this)[1] = static_cast<uchar>(value);
 }
 
 
@@ -971,7 +971,7 @@ void MidiMessage::setP2(int value) {
 	if (getSize() < 3) {
 		resize(3);
 	}
-	(*this)[2] = value;
+	(*this)[2] = static_cast<uchar>(value);
 }
 
 
@@ -990,7 +990,7 @@ void MidiMessage::setP3(int value) {
 	if (getSize() < 4) {
 		resize(4);
 	}
-	(*this)[3] = value;
+	(*this)[3] = static_cast<uchar>(value);
 }
 
 
@@ -1341,7 +1341,7 @@ void MidiMessage::setSpelling(int base7, int accidental) {
 
 	}
 
-	uchar vel = getVelocity();
+	uchar vel = static_cast<uchar>(getVelocity());
 	// suppress any previous content in the first two bits:
 	vel = vel & 0xFC;
 	// insert the spelling code:
