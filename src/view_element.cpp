@@ -682,6 +682,9 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
         this->DrawEnclosingBrackets(dc, x, y - height / 2, height, width, unit, 3 * unit / 4, thickness, thickness);
     }
+    else if (clef->HasEnclose()) {
+        LogWarning("Only drawing of enclosing brackets is supported for clef.");
+    }
 
     dc->EndGraphic(element, this);
 }

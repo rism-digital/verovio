@@ -1369,6 +1369,9 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
             dc, x - width, y - yCorr, height, width, unit / 2, bracketWidth, thickness, thickness);
         dc->EndGraphic(arpeg, this);
     }
+    else if (arpeg->HasEnclose()) {
+        LogWarning("Only drawing of enclosing brackets is supported for arpeggio.");
+    }
 }
 
 void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system)
