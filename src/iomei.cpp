@@ -4525,7 +4525,7 @@ bool MEIInput::ReadHarm(Object *parent, pugi::xml_node harm)
     return ReadTextChildren(vrvHarm, harm, vrvHarm);
 }
 
-bool MEIInput::ReadLv(Object* parent, pugi::xml_node lv) 
+bool MEIInput::ReadLv(Object *parent, pugi::xml_node lv)
 {
     Lv *vrvLv = new Lv();
     ReadControlElement(lv, vrvLv);
