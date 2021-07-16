@@ -234,6 +234,15 @@ private:
     void InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, int scoreOnSet);
 
     /*
+     * @name Helper function to insert clef into correct position in layer/other parent based on the insertAfter
+     * variable.
+     */
+    ///@{
+    void InsertClefIntoObject(Object *layerElement, Clef *clef, Layer *layer, int scoreOnset, bool insertAfter);
+    void InsertClefIntoObject(Object *parent, Clef *clef, Object *relevantChild, bool insertAfter);
+    ///@}
+
+    /*
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
