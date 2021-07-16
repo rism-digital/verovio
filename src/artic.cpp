@@ -541,10 +541,10 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
         {
             const int stemWidth = doc->GetDrawingStemWidth(100);
             if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
-                shift += shift - stemWidth;
+                shift += shift - stemWidth / 2;
             }
             else if ((stemDir == STEMDIRECTION_down) && (m_drawingPlace == STAFFREL_below)) {
-                shift = stemWidth;
+                shift = stemWidth / 2;
             }
             break;
         }
