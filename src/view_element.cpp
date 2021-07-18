@@ -1734,7 +1734,8 @@ int View::GetSylYRel(int verseN, Staff *staff)
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
     StaffAlignment *alignment = staff->GetAlignment();
-    if (alignment) {
+    if (alignment)
+    {
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
