@@ -1731,6 +1731,7 @@ int View::GetSylYRel(int verseN, Staff *staff)
 {
     assert(staff);
 
+    const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
     StaffAlignment *alignment = staff->GetAlignment();
     if (alignment) {
@@ -1740,7 +1741,7 @@ int View::GetSylYRel(int verseN, Staff *staff)
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + (alignment->GetVerseCount() - verseN) * (height + descender + margin) + (descender);
+            + alignment->GetVersePosition(verseN, verseCollapse) * (height + descender + margin) + (descender);
     }
     return y;
 }

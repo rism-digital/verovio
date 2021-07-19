@@ -117,7 +117,7 @@ int Verse::AlignVertically(FunctorParams *functorParams)
     if (!alignment) return FUNCTOR_CONTINUE;
 
     // Add the number count
-    alignment->SetVerseCount(this->GetN());
+    alignment->AddVerseN(this->GetN());
 
     return FUNCTOR_CONTINUE;
 }
