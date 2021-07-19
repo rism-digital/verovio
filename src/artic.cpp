@@ -147,10 +147,12 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
 
     std::vector<data_ARTICULATION> articList = this->GetArtic();
     for (data_ARTICULATION artic : articList) {
-        if (IsInsideArtic(artic))
+        if (IsInsideArtic(artic)) {
             insideSlur->push_back(artic);
-        else
+        }
+        else {
             outsideSlur->push_back(artic);
+        }
     }
 }
 
