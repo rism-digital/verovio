@@ -957,7 +957,7 @@ void View::DrawPedalLine(
     }
 
     const int bracketSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    const int lineWidth = m_options->m_pedalLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);;
+    const int lineWidth = m_options->m_pedalLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // Opening bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
