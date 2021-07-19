@@ -190,7 +190,10 @@ SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(Staff *staff)
     }
 
     auto iter = m_spacingTypes.find(staff->GetN());
-    assert(iter != m_spacingTypes.end());
+    if (iter == m_spacingTypes.end()) {
+        LogWarning("No spacing type found matching @n=%d for '<%s>'", staff->GetN(), staff->GetUuid().c_str());
+        return SpacingType::None;
+    }
 
     return iter->second;
 }
