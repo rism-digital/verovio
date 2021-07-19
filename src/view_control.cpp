@@ -1314,7 +1314,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     // We arbitrarily look at the top note
     Staff *staff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
     assert(staff);
-    bool drawingCueSize = topNote->GetDrawingCueSize();
+    const bool drawingCueSize = topNote->GetDrawingCueSize();
 
     // We are going to have only one FloatingPositioner - staff will be the top note one
     if (!system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff)) {
@@ -1355,18 +1355,41 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     dc->EndGraphic(arpeg, this);
 
     // Possibly draw enclosing brackets
+    this->DrawArpegEnclosing(dc, arpeg, staff, startGlyph, fillGlyph, endGlyph, x, y, length, drawingCueSize);
+}
+
+void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wchar_t startGlyph, wchar_t fillGlyph,
+    wchar_t endGlyph, int x, int y, int height, bool cueSize)
+{
+    assert(dc);
+    assert(arpeg);
+    assert(staff);
+
     if (arpeg->GetEnclose() == ENCLOSURE_brack) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int yCorr
-            = ((arpeg->GetArrow() == BOOLEAN_true) && (arpeg->GetOrder() == arpegLog_ORDER_down)) ? unit : 0;
-        const int height = length + ((arpeg->GetArrow() == BOOLEAN_true) ? unit : 0);
-        const int width = m_doc->GetGlyphHeight(fillGlyph, staff->m_drawingStaffSize, drawingCueSize);
+        int width = m_doc->GetGlyphHeight(fillGlyph, staff->m_drawingStaffSize, cueSize);
+        int xCorr = width;
+        int yCorr = 0;
+        if (arpeg->GetArrow() == BOOLEAN_true) {
+            height += unit;
+            int arrowWidth = 0;
+            if (arpeg->GetOrder() == arpegLog_ORDER_down) {
+                arrowWidth = m_doc->GetGlyphHeight(startGlyph, staff->m_drawingStaffSize, cueSize);
+                yCorr += unit;
+            }
+            else {
+                arrowWidth = m_doc->GetGlyphHeight(endGlyph, staff->m_drawingStaffSize, cueSize);
+            }
+            const int exceedingWidth = std::max(arrowWidth - width, 0);
+            width += exceedingWidth;
+            xCorr += exceedingWidth / 2;
+        }
         const int bracketWidth = width / 2;
         const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
         dc->StartGraphic(arpeg, "", arpeg->GetUuid());
         this->DrawEnclosingBrackets(
-            dc, x - width, y - yCorr, height, width, unit / 2, bracketWidth, thickness, thickness);
+            dc, x - xCorr, y - yCorr, height, width, unit / 2, bracketWidth, thickness, thickness);
         dc->EndGraphic(arpeg, this);
     }
     else if (arpeg->HasEnclose()) {

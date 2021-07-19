@@ -395,6 +395,8 @@ protected:
     void DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
     void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
     void DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *system);
+    void DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wchar_t startGlyph, wchar_t fillGlyph,
+        wchar_t endGlyph, int x, int y, int height, bool cueSize);
     void DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);

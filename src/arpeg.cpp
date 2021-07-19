@@ -252,7 +252,9 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     if (minTopLeft != -VRV_UNSET) {
         int dist = topNote->GetDrawingX() - minTopLeft;
         // HARDCODED
-        const double unitFactor = (this->GetEnclose() == ENCLOSURE_brack) ? 1.5 : 1.0;
+        double unitFactor = 1.0;
+        if (this->GetEnclose() == ENCLOSURE_brack) unitFactor += 0.5;
+        if (this->GetArrow() == BOOLEAN_true) unitFactor += 0.33;
         dist += unitFactor * params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize);
         this->SetDrawingXRel(-dist);
     }
