@@ -326,6 +326,7 @@ protected:
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
+    void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
     void DrawMeterSigFigures(
         DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff);

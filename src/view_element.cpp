@@ -674,19 +674,28 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     // Possibly draw enclosing brackets
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, clefSizeFactor);
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawClefEnclosing(
+    DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor)
+{
     if (clef->GetEnclose() == ENCLOSURE_brack) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int height = clefSizeFactor * m_doc->GetGlyphHeight(sym, staff->m_drawingStaffSize, false);
-        const int width = clefSizeFactor * m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, false);
+        const int height = sizeFactor * m_doc->GetGlyphHeight(glyph, staff->m_drawingStaffSize, false);
+        const int width = sizeFactor * m_doc->GetGlyphWidth(glyph, staff->m_drawingStaffSize, false);
+        const int xCorr = sizeFactor * m_doc->GetGlyphLeft(glyph, staff->m_drawingStaffSize, false);
+        const int yCorr = sizeFactor * m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, false);
         const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
-        this->DrawEnclosingBrackets(dc, x, y - height / 2, height, width, unit, 3 * unit / 4, thickness, thickness);
+        this->DrawEnclosingBrackets(
+            dc, x + xCorr, y + yCorr, height, width, 3 * unit / 4, unit, 2 * thickness, thickness);
     }
     else if (clef->HasEnclose()) {
         LogWarning("Only drawing of enclosing brackets is supported for clef.");
     }
-
-    dc->EndGraphic(element, this);
 }
 
 void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
