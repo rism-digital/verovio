@@ -1371,11 +1371,11 @@ void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wch
         int xCorr = width;
         int yCorr = 0;
         if (arpeg->GetArrow() == BOOLEAN_true) {
-            height += unit;
+            height += 2 * unit;
+            yCorr += unit;
             int arrowWidth = 0;
             if (arpeg->GetOrder() == arpegLog_ORDER_down) {
                 arrowWidth = m_doc->GetGlyphHeight(startGlyph, staff->m_drawingStaffSize, cueSize);
-                yCorr += unit;
             }
             else {
                 arrowWidth = m_doc->GetGlyphHeight(endGlyph, staff->m_drawingStaffSize, cueSize);
