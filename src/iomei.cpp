@@ -1331,6 +1331,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     WriteControlElement(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
+    fermata->WriteEnclosingChars(currentNode);
     fermata->WriteExtSym(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacementRelStaff(currentNode);
@@ -1608,6 +1609,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     WriteLayerElement(currentNode, artic);
     artic->WriteArticulation(currentNode);
     artic->WriteColor(currentNode);
+    artic->WriteEnclosingChars(currentNode);
     artic->WriteExtSym(currentNode);
     artic->WritePlacementRelEvent(currentNode);
 }
@@ -4454,6 +4456,7 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
 
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
+    vrvFermata->ReadEnclosingChars(fermata);
     vrvFermata->ReadExtSym(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacementRelStaff(fermata);
@@ -5045,6 +5048,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
 
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadColor(artic);
+    vrvArtic->ReadEnclosingChars(artic);
     vrvArtic->ReadExtSym(artic);
     vrvArtic->ReadPlacementRelEvent(artic);
 

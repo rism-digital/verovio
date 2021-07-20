@@ -36,10 +36,12 @@ const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_d
 
 static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
-Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
+Artic::Artic()
+    : LayerElement("artic-"), AttArticulation(), AttColor(), AttEnclosingChars(), AttExtSym(), AttPlacementRelEvent()
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_ENCLOSINGCHARS);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
@@ -53,17 +55,28 @@ void Artic::Reset()
     LayerElement::Reset();
     ResetArticulation();
     ResetColor();
+    ResetEnclosingChars();
     ResetExtSym();
     ResetPlacementRelEvent();
 
     m_drawingPlace = STAFFREL_NONE;
 }
 
+bool Artic::IsInsideArtic(data_ARTICULATION artic) const
+{
+    // Always outside if enclosing brackets are used
+    if ((this->GetEnclose() == ENCLOSURE_brack) || (this->GetEnclose() == ENCLOSURE_paren)) {
+        return false;
+    }
+
+    const auto end = Artic::s_outStaffArtic.end();
+    const auto it = std::find(Artic::s_outStaffArtic.begin(), end, artic);
+    return (it == end);
+}
+
 bool Artic::IsInsideArtic() const
 {
-    auto end = Artic::s_outStaffArtic.end();
-    auto i = std::find(Artic::s_outStaffArtic.begin(), end, this->GetArticFirst());
-    return (i == end);
+    return IsInsideArtic(this->GetArticFirst());
 }
 
 data_ARTICULATION Artic::GetArticFirst() const
@@ -87,6 +100,8 @@ void Artic::SplitMultival(Object *parent)
         Artic *artic = new Artic();
         artic->SetArtic({ *iter });
         artic->AttColor::operator=(*this);
+        artic->AttEnclosingChars::operator=(*this);
+        artic->AttExtSym::operator=(*this);
         artic->AttPlacementRelEvent::operator=(*this);
         artic->SetParent(parent);
         parent->InsertChild(artic, idx);
@@ -130,17 +145,14 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     assert(insideSlur);
     assert(outsideSlur);
 
-    std::vector<data_ARTICULATION>::iterator iter;
-    auto end = Artic::s_outStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
-
-    for (iter = articList.begin(); iter != articList.end(); ++iter) {
-        // return false if one cannot be rendered on the staff
-        auto i = std::find(Artic::s_outStaffArtic.begin(), end, *iter);
-        if (i != end)
-            outsideSlur->push_back(*iter);
-        else
-            insideSlur->push_back(*iter);
+    for (data_ARTICULATION artic : articList) {
+        if (IsInsideArtic(artic)) {
+            insideSlur->push_back(artic);
+        }
+        else {
+            outsideSlur->push_back(artic);
+        }
     }
 }
 
@@ -246,17 +258,36 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
         return 0;
 }
 
+wchar_t Artic::GetEnclosingGlyph(bool beforeArtic) const
+{
+    wchar_t glyph = 0;
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack:
+                glyph = beforeArtic ? SMUFL_E26C_accidentalBracketLeft : SMUFL_E26D_accidentalBracketRight;
+                break;
+            case ENCLOSURE_paren:
+                glyph = beforeArtic ? SMUFL_E26A_accidentalParensLeft : SMUFL_E26B_accidentalParensRight;
+                break;
+            default: break;
+        }
+    }
+    return glyph;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for Artic
 //----------------------------------------------------------------------------
 
-bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
+bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
 {
     if (place == STAFFREL_above)
         return false;
     else if (code == SMUFL_E611_stringsDownBowTurned)
         return true;
     else if (code == SMUFL_E613_stringsUpBowTurned)
+        return true;
+    else if (code == SMUFL_E630_pluckedSnapPizzicatoBelow)
         return true;
     else
         return false;
