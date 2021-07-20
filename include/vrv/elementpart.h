@@ -66,7 +66,7 @@ public:
     virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-    
+
     /**
      * Set/get methods for the flagShift
      */
