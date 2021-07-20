@@ -191,7 +191,7 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
-void Note::AlignDotsShift(Note* otherNote) 
+void Note::AlignDotsShift(Note *otherNote)
 {
     Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     Dots *otherDots = vrv_cast<Dots *>(otherNote->FindDescendantByType(DOTS, 1));
