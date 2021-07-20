@@ -835,6 +835,12 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
                 Note *note = vrv_cast<Note *>(this);
                 Note *otherNote = vrv_cast<Note *>(other);
                 if (note->IsUnisonWith(otherNote)) {
+                    if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
+                        otherNote->AlignDotsShift(note);
+                    }
+                    else if (otherNote->GetDrawingStemDir() == STEMDIRECTION_up) {
+                        note->AlignDotsShift(otherNote);
+                    }
                     return (currentLayerN < otherLayerN) ? dotLocs1 : dotLocs2;
                 }
             }

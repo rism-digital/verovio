@@ -44,6 +44,7 @@ void Dots::Reset()
     ResetAugmentDots();
 
     m_isAdjusted = false;
+    m_flagShift = 0;
     m_dotLocsByStaff.clear();
 }
 
