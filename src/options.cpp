@@ -1178,7 +1178,7 @@ Options::Options()
     this->Register(&m_lyricWordSpace, "lyricWordSpace", &m_generalLayout);
 
     m_lyricVerseCollapse.SetInfo("Lyric verse collapse", "Collapse empty verse lines in lyrics");
-    m_lyricVerseCollapse.Init(true);
+    m_lyricVerseCollapse.Init(false);
     this->Register(&m_lyricVerseCollapse, "lyricVerseCollapse", &m_generalLayout);
 
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
