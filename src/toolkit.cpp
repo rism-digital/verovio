@@ -1000,6 +1000,15 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
     return opt->SetValue(value);
 }
 
+void Toolkit::ResetOptions()
+{
+    std::for_each(m_options->GetItems()->begin(), m_options->GetItems()->end(),
+        [](const MapOfStrOptions::value_type &opt) { opt.second->Reset(); });
+
+    // Set the (default) font
+    Resources::SetFont(m_options->m_font.GetValue());
+}
+
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;

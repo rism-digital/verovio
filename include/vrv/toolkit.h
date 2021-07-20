@@ -217,6 +217,11 @@ public:
     bool SetOption(const std::string &option, const std::string &value);
 
     /**
+     * Reset all options to default values
+     */
+    void ResetOptions();
+
+    /**
      * Set the scale option
      *
      * @param scale the scale value as integer
