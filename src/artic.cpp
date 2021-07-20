@@ -539,7 +539,10 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
         case ARTICULATION_stacc:
         case ARTICULATION_stacciss: 
         {
-            const int stemWidth = doc->GetDrawingStemWidth(100);
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            assert(staff);
+            const int staffSize = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+            const int stemWidth = doc->GetDrawingStemWidth(staffSize);
             if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
                 shift += shift - stemWidth / 2;
             }
