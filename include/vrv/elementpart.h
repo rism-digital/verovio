@@ -68,6 +68,14 @@ public:
     ///@}
 
     /**
+     * Set/get methods for the flagShift
+     */
+    ///@{
+    int GetFlagShift() const { return m_flagShift; }
+    void SetFlagShift(int shiftVal) { m_flagShift = shiftVal; }
+    ///@}
+
+    /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
@@ -88,6 +96,7 @@ private:
     MapOfDotLocs m_dotLocsByStaff;
 
     bool m_isAdjusted;
+    int m_flagShift;
 };
 
 //----------------------------------------------------------------------------

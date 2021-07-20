@@ -283,8 +283,7 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
 
         // In case scoreOnset is 0 - add clef before the first element
         if (!scoreOnset) {
-            otherLayer->InsertBefore(start->second, clefToAdd);
-            m_layerTimes.at(otherLayer).emplace(scoreOnset, clefToAdd);
+            InsertClefIntoObject(start->second, clefToAdd, otherLayer, scoreOnset, false);
         }
         else {
             // If corresponding time couldn't be found (i.e. it's higher than any other duration in the layer) - add
@@ -298,21 +297,38 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
                 const int actualScoreOnSet = start->first;
                 auto end = m_layerTimes.at(otherLayer).upper_bound(actualScoreOnSet);
                 LayerElement *layerElement = (--end)->second;
-                if (layerElement->GetParent()->Is(LAYER)) {
-                    otherLayer->InsertAfter(layerElement, clefToAdd);
-                    m_layerTimes.at(otherLayer).emplace(actualScoreOnSet, clefToAdd);
-                }
-                else {
-                    Object *parent = layerElement->GetParent();
-                    if (parent->Is({ CHORD, FTREM })) {
-                        parent->GetParent()->InsertAfter(parent, clefToAdd);
-                    }
-                    else {
-                        parent->InsertAfter(layerElement, clefToAdd);
-                    }
-                }
+                InsertClefIntoObject(layerElement, clefToAdd, otherLayer, scoreOnset, true);
             }
         }
+    }
+}
+
+void MusicXmlInput::InsertClefIntoObject(
+    Object *layerElement, Clef *clef, Layer *layer, int scoreOnset, bool insertAfter)
+{
+    if (layerElement->GetParent()->Is(LAYER)) {
+        InsertClefIntoObject(layer, clef, layerElement, insertAfter);
+        m_layerTimes.at(layer).emplace(scoreOnset, clef);
+    }
+    else {
+        Object *parent = layerElement->GetParent();
+        if (parent->Is({ CHORD, FTREM })) {
+            InsertClefIntoObject(parent->GetParent(), clef, parent, insertAfter);
+        }
+        else {
+            InsertClefIntoObject(parent, clef, layerElement, insertAfter);
+        }
+    }
+}
+
+void MusicXmlInput::InsertClefIntoObject(Object *parent, Clef *clef, Object *layerElement, bool insertAfter)
+{
+    if (parent->GetChildIndex(layerElement) == -1) return;
+    if (insertAfter) {
+        parent->InsertAfter(layerElement, clef);
+    }
+    else {
+        parent->InsertBefore(layerElement, clef);
     }
 }
 
@@ -578,6 +594,9 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
         std::string textStr = GetWordsOrDynamicsText(textNode);
         std::string textColor = textNode.attribute("color").as_string();
         Object *textParent = element;
+        if (it != words.begin()) {
+            textParent->AddChild(new Lb());
+        }
         if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
             || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style")
             || textNode.attribute("font-weight") || textNode.attribute("enclosure")) {
