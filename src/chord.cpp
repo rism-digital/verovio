@@ -824,35 +824,20 @@ int Chord::JustifyY(FunctorParams *functorParams)
     assert(params);
     assert(params->m_justificationSum > 0);
 
-    // Check if chord spreads across several staves by comparing the minimal and maximal staff number of its child
-    // notes.
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
-
-    bool firstNote = true;
-    int minStaffN, maxStaffN;
-    for (Object *obj : *notes) {
-        Note *note = vrv_cast<Note *>(obj);
-        assert(note);
-
+    // Check if chord spreads across several staves
+    std::list<Staff *> extremalStaves;
+    for (Note *note : { this->GetTopNote(), this->GetBottomNote() }) {
         Layer *layer = NULL;
         Staff *staff = note->GetCrossStaff(layer);
         if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
         assert(staff);
-
-        if (firstNote) {
-            minStaffN = staff->GetN();
-            maxStaffN = staff->GetN();
-            firstNote = false;
-        }
-        else {
-            minStaffN = std::min(minStaffN, staff->GetN());
-            maxStaffN = std::max(maxStaffN, staff->GetN());
-        }
+        extremalStaves.push_back(staff);
     }
+    assert(extremalStaves.size() == 2);
 
-    if (minStaffN < maxStaffN) {
-        // The chord goes indeed across several staves.
+    const int topStaffN = extremalStaves.front()->GetN();
+    const int bottomStaffN = extremalStaves.back()->GetN();
+    if (topStaffN < bottomStaffN) {
         // Now calculate the shift due to vertical justification of the involved staves.
         Object *measure = this->GetFirstAncestor(MEASURE);
         if (!measure) return FUNCTOR_CONTINUE;
@@ -866,7 +851,7 @@ int Chord::JustifyY(FunctorParams *functorParams)
             Staff *currentStaff = vrv_cast<Staff *>(staff);
             assert(currentStaff);
 
-            if ((currentStaff->GetN() > minStaffN) && (currentStaff->GetN() <= maxStaffN)) {
+            if ((currentStaff->GetN() > topStaffN) && (currentStaff->GetN() <= bottomStaffN)) {
                 const double staffJustificationFactor
                     = currentStaff->GetAlignment()->GetJustificationFactor(params->m_doc);
                 shift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
