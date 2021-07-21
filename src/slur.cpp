@@ -197,6 +197,17 @@ bool Slur::AdjustSlurPosition(
                 bezierCurve.SetLeftControlPointOffset(2 * bezierCurve.GetLeftControlPointOffset());
                 bezierCurve.SetLeftControlHeight(0.5 * bezierCurve.GetLeftControlHeight());
             }
+            if (std::abs(double(bezierCurve.p2.y - bezierCurve.p1.y) / double(bezierCurve.p2.x - bezierCurve.p1.x))
+                > 2.0) {
+                if (((curve->GetDir() == curvature_CURVEDIR_below) && (bezierCurve.p1.y > bezierCurve.p2.y))
+                    || ((curve->GetDir() == curvature_CURVEDIR_above) && (bezierCurve.p1.y < bezierCurve.p2.y))) {
+                    bezierCurve.SetLeftControlPointOffset(0.5 * bezierCurve.GetLeftControlPointOffset());
+                }
+                else if (((curve->GetDir() == curvature_CURVEDIR_above) && (bezierCurve.p1.y > bezierCurve.p2.y))
+                    || ((curve->GetDir() == curvature_CURVEDIR_below) && (bezierCurve.p1.y < bezierCurve.p2.y))) {
+                    bezierCurve.SetRightControlPointOffset(0.5 * bezierCurve.GetRightControlPointOffset());
+                }
+            }
             return true;
         }
         else {
@@ -308,6 +319,14 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(FloatingCurvePositioner *cu
         }
 
         if (intersection == 0) {
+            continue;
+        }
+
+        // In case of cross-staff, intersection with the note that is in the staff directly under the start/end point
+        // might result in too big curve or strange slurs. If intersection is bigger than maximum height of the
+        // cross-staff slur, we should ignore it.
+        if (curve->IsCrossStaff()
+            && (intersection > std::max(std::abs(rightPointMaxHeight), std::abs(leftPointMaxHeight)))) {
             continue;
         }
 
