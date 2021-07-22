@@ -9,8 +9,7 @@ on:
 env:
   PACKAGE_NAME: verovio
   CHECK_INSTALL_DIR: check_install_dir
-  CIBW_BUILD_IDENTIFIER: ''
-
+  CIBW_BUILD_IDENTIFIER: ""
 
 jobs:
   #===============================================#
@@ -24,9 +23,9 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS for Python 3.9
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-20.04]
+        os: [macos-latest, windows-latest, ubuntu-20.04]
         python-version: [3.6, 3.7, 3.8, 3.9]
-        architecture: [ x86, x64 ]
+        architecture: [x86, x64]
         include:
           - os: macos-latest
             architecture: x64
@@ -52,10 +51,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          
+
       - uses: nuget/setup-nuget@v1
         with:
-          nuget-version: 'latest'
+          nuget-version: "latest"
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -131,7 +130,6 @@ jobs:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
 
-
   #===============================================#
   #         BUILD SOURCE DISTRIBUTION             #
   #===============================================#
@@ -149,7 +147,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: "3.9"
 
       #===============================================#
       # Swig
@@ -208,7 +206,6 @@ jobs:
           name: sdist-${{ runner.os }}-python-3.9
           path: dist/*.tar.gz
 
-
   #===============================================#
   #         UPLOAD TO PACKAGE INDEX               #
   #===============================================#
@@ -225,8 +222,8 @@ jobs:
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
-          architecture: 'x64'
+          python-version: "3.9"
+          architecture: "x64"
 
       #===============================================#
       # Dependencies

@@ -21,6 +21,7 @@ namespace vrv {
 class Artic : public LayerElement,
               public AttArticulation,
               public AttColor,
+              public AttEnclosingChars,
               public AttExtSym,
               public AttPlacementRelEvent {
 public:
@@ -43,7 +44,7 @@ public:
     /** Override the method since it is align to the staff */
     virtual bool IsRelativeToStaff() const { return true; }
 
-    data_ARTICULATION GetArticFirst();
+    data_ARTICULATION GetArticFirst() const;
 
     /**
      * Split the multi-valued artic attributes into distinct artic elements.
@@ -64,8 +65,8 @@ public:
      * Return the inside and outside part of an artic if any (NULL otherwiser)
      */
     ///@{
-    bool IsInsideArtic();
-    bool IsOutsideArtic() { return !IsInsideArtic(); };
+    bool IsInsideArtic() const;
+    bool IsOutsideArtic() const { return !IsInsideArtic(); };
     ///@}
 
     /**
@@ -80,18 +81,23 @@ public:
     /**
      * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
-    wchar_t GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place);
+    wchar_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
+
+    /**
+     * Retrieves parentheses / brackets from the enclose attribute
+     */
+    wchar_t GetEnclosingGlyph(bool beforeArtic) const;
 
     //----------------//
     // Static methods //
     //----------------//
 
     /**
-     * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.
+     * Static method that retrieves the vertical correction for a SMuFL code with data_STAFFREL.
      * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
      * See bow indications for an example where is is always above
      */
-    static bool VerticalCorr(wchar_t code, const data_STAFFREL &place);
+    static bool VerticalCorr(wchar_t code, data_STAFFREL place);
 
     /**
      * Static method that returns true if the data_ARTICULATION has to be centered between staff lines
@@ -133,7 +139,8 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
-    //
+    bool IsInsideArtic(data_ARTICULATION artic) const;
+
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;
     std::vector<FloatingCurvePositioner *> m_endSlurPositioners;
@@ -141,11 +148,11 @@ public:
     /**
      * A static array for storing the articulation that have to be placed outside the staff
      */
-    static std::vector<data_ARTICULATION> s_outStaffArtic;
+    static const std::vector<data_ARTICULATION> s_outStaffArtic;
     /**
      * A static array for storing the articulation that have to be place above the staff is possible
      */
-    static std::vector<data_ARTICULATION> s_aboveStaffArtic;
+    static const std::vector<data_ARTICULATION> s_aboveStaffArtic;
 
 private:
     //

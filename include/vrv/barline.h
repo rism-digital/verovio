@@ -87,10 +87,15 @@ public:
     virtual ~BarLineAttr();
     virtual Object *Clone() const { return new BarLineAttr(*this); }
     virtual std::string GetClassName() const { return "BarLineAttr"; }
-    virtual ClassId GetClassId() const { return (m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT); }
+    virtual ClassId GetClassId() const
+    {
+        if (m_noAttr) return BARLINE;
+        return m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT;
+    }
     ///@}
 
     void SetLeft() { m_isLeft = true; }
+    void SetNoAttr() { m_noAttr = true; }
 
 private:
     //
@@ -99,6 +104,7 @@ public:
 private:
     /** A flag for left barlines (right if false) */
     bool m_isLeft;
+    bool m_noAttr;
 };
 
 } // namespace vrv

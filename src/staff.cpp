@@ -39,7 +39,7 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Staff> s_factory("staff", STAFF);
+static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 
 Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
@@ -47,20 +47,12 @@ Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), Att
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    // owned pointers need to be set to NULL;
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
 
     Reset();
     SetN(n);
 }
 
-Staff::~Staff()
-{
-    ClearLedgerLines();
-}
+Staff::~Staff() {}
 
 void Staff::Reset()
 {
@@ -87,11 +79,6 @@ void Staff::CloneReset()
 {
     Object::CloneReset();
 
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
-
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
@@ -108,22 +95,10 @@ const ArrayOfObjects *Staff::GetChildren(bool docChildren) const
 
 void Staff::ClearLedgerLines()
 {
-    if (m_ledgerLinesAbove) {
-        delete m_ledgerLinesAbove;
-        m_ledgerLinesAbove = NULL;
-    }
-    if (m_ledgerLinesBelow) {
-        delete m_ledgerLinesBelow;
-        m_ledgerLinesBelow = NULL;
-    }
-    if (m_ledgerLinesAboveCue) {
-        delete m_ledgerLinesAboveCue;
-        m_ledgerLinesAboveCue = NULL;
-    }
-    if (m_ledgerLinesBelowCue) {
-        delete m_ledgerLinesBelowCue;
-        m_ledgerLinesBelowCue = NULL;
-    }
+    m_ledgerLinesAbove.clear();
+    m_ledgerLinesBelow.clear();
+    m_ledgerLinesAboveCue.clear();
+    m_ledgerLinesBelowCue.clear();
 }
 
 bool Staff::IsSupportedChild(Object *child)
@@ -204,7 +179,7 @@ void Staff::AdjustDrawingStaffSize()
             assert(zone);
             int yDiff
                 = zone->GetLry() - zone->GetUly() - (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
-            this->m_drawingStaffSize = 100 * yDiff / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+            m_drawingStaffSize = 100 * yDiff / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
         }
     }
 }
@@ -222,25 +197,24 @@ bool Staff::DrawingIsVisible()
 
 bool Staff::IsMensural()
 {
-    bool isMensural = (this->m_drawingNotationType == NOTATIONTYPE_mensural
-        || this->m_drawingNotationType == NOTATIONTYPE_mensural_white
-        || this->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    bool isMensural
+        = (m_drawingNotationType == NOTATIONTYPE_mensural || m_drawingNotationType == NOTATIONTYPE_mensural_white
+            || m_drawingNotationType == NOTATIONTYPE_mensural_black);
     return isMensural;
 }
 
 bool Staff::IsNeume()
 {
-    bool isNeume = (this->m_drawingNotationType == NOTATIONTYPE_neume);
+    bool isNeume = (m_drawingNotationType == NOTATIONTYPE_neume);
     return isNeume;
 }
 
 bool Staff::IsTablature()
 {
-    bool isTablature
-        = (this->m_drawingNotationType == NOTATIONTYPE_tab || this->m_drawingNotationType == NOTATIONTYPE_tab_guitar
-            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
-            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_french
-            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_german);
+    bool isTablature = (m_drawingNotationType == NOTATIONTYPE_tab || m_drawingNotationType == NOTATIONTYPE_tab_guitar
+        || m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
+        || m_drawingNotationType == NOTATIONTYPE_tab_lute_french
+        || m_drawingNotationType == NOTATIONTYPE_tab_lute_german);
     return isTablature;
 }
 
@@ -249,42 +223,95 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
     assert(doc);
 
     // the staff loc offset is based on the number of lines: 0 with 1 line, 2 with 2, etc
-    int staffLocOffset = (this->m_drawingLines - 1) * 2;
-    return (loc - staffLocOffset) * doc->GetDrawingUnit(this->m_drawingStaffSize);
+    int staffLocOffset = (m_drawingLines - 1) * 2;
+    return (loc - staffLocOffset) * doc->GetDrawingUnit(m_drawingStaffSize);
 }
 
-void Staff::AddLedgerLineAbove(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize)
 {
-    if (cueSize) {
-        if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAboveCue, count, left, right);
-    }
-    else {
-        if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAbove, count, left, right);
-    }
+    AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension);
 }
 
-void Staff::AddLedgerLineBelow(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize)
 {
-    if (cueSize) {
-        if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelowCue, count, left, right);
-    }
-    else {
-        if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelow, count, left, right);
-    }
+    AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension);
 }
 
-void Staff::AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right)
+void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension)
 {
-    assert(lines);
+    assert(left < right);
 
-    if ((int)lines->size() < count) lines->resize(count);
+    if ((int)lines.size() < count) lines.resize(count);
     int i = 0;
     for (i = 0; i < count; ++i) {
-        lines->at(i).AddDash(left, right);
+        lines.at(i).AddDash(left, right, extension);
+    }
+}
+
+void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension)
+{
+    assert(minExtension <= extension);
+    if (lines.empty()) return;
+
+    // By construction, any overlaps or small gaps in outer dash lines must also occur in the most inner dash line.
+    // Thus it suffices to resolve any problems in the inner dash line and apply the adjustments to corresponding
+    // dashes further away from the staff.
+    LedgerLine &innerLine = lines.at(0);
+    struct Adjustment {
+        int left;
+        int right;
+        int delta;
+    };
+    std::list<Adjustment> adjustments;
+
+    const int defaultGap = 100 * extension; // A large value which should not trigger any adjustments
+    int leftGap = defaultGap;
+    int rightGap = defaultGap;
+    using DashType = std::pair<int, int>;
+    using IterType = std::list<DashType>::iterator;
+    for (IterType iterDash = innerLine.m_dashes.begin(); iterDash != innerLine.m_dashes.end(); ++iterDash) {
+        // Calculate the right gap
+        IterType iterNextDash = std::next(iterDash);
+        if (iterNextDash != innerLine.m_dashes.end()) {
+            rightGap = iterNextDash->first - iterDash->second;
+        }
+        else {
+            rightGap = defaultGap;
+        }
+
+        // The gap between successive dashes should be at least one dash extension
+        const int minGap = std::min(leftGap, rightGap);
+        if (minGap < extension) {
+            const int minDistance = minGap + 2 * extension;
+            const int newExtension = std::max(minDistance / 3, minExtension);
+            const int delta = extension - newExtension;
+            assert(delta >= 0);
+
+            // Apply and store the adjustment
+            adjustments.push_back({ iterDash->first, iterDash->second, delta });
+            iterDash->first += delta;
+            iterDash->second -= delta;
+        }
+
+        // The left gap of the next dash is the right gap of the current dash
+        leftGap = rightGap;
+    }
+
+    // Now we transfer the adjustments from the inner dash line to the outer dash lines.
+    // This ensures that all dashes on the same note/chord obtain the same ledger line extension.
+    const int lineCount = static_cast<int>(lines.size());
+    for (const Adjustment &adjustment : adjustments) {
+        for (int index = 1; index < lineCount; ++index) {
+            LedgerLine &outerLine = lines.at(index);
+            IterType iterDash = std::find_if(
+                outerLine.m_dashes.begin(), outerLine.m_dashes.end(), [&adjustment](const DashType &dash) {
+                    return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
+                });
+            if (iterDash != outerLine.m_dashes.end()) {
+                iterDash->first += adjustment.delta;
+                iterDash->second -= adjustment.delta;
+            }
+        }
     }
 }
 
@@ -304,7 +331,7 @@ bool Staff::IsOnStaffLine(int y, Doc *doc)
 {
     assert(doc);
 
-    return ((y - this->GetDrawingY()) % (2 * doc->GetDrawingUnit(this->m_drawingStaffSize)) == 0);
+    return ((y - this->GetDrawingY()) % (2 * doc->GetDrawingUnit(m_drawingStaffSize)) == 0);
 }
 
 int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
@@ -312,14 +339,14 @@ int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
     assert(doc);
 
     int yPos = y - this->GetDrawingY();
-    int distance = yPos % doc->GetDrawingUnit(this->m_drawingStaffSize);
+    int distance = yPos % doc->GetDrawingUnit(m_drawingStaffSize);
     if (place == STAFFREL_above) {
-        if (distance > 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) - distance;
-        return y - distance + doc->GetDrawingUnit(this->m_drawingStaffSize);
+        if (distance > 0) distance = doc->GetDrawingUnit(m_drawingStaffSize) - distance;
+        return y - distance + doc->GetDrawingUnit(m_drawingStaffSize);
     }
     else {
-        if (distance < 0) distance = doc->GetDrawingUnit(this->m_drawingStaffSize) + distance;
-        return y - distance - doc->GetDrawingUnit(this->m_drawingStaffSize);
+        if (distance < 0) distance = doc->GetDrawingUnit(m_drawingStaffSize) + distance;
+        return y - distance - doc->GetDrawingUnit(m_drawingStaffSize);
     }
 }
 
@@ -339,7 +366,7 @@ void LedgerLine::Reset()
     m_dashes.clear();
 }
 
-void LedgerLine::AddDash(int left, int right)
+void LedgerLine::AddDash(int left, int right, int extension)
 {
     assert(left < right);
 
@@ -351,12 +378,14 @@ void LedgerLine::AddDash(int left, int right)
     }
     m_dashes.insert(iter, std::make_pair(left, right));
 
-    // Merge overlapping dashes
+    // Merge dashes which overlap by more than 1.5 extensions
+    // => Dashes belonging to the same chord overlap at least by two extensions and will get merged
+    // => Overlapping dashes of adjacent notes will not get merged
     std::list<std::pair<int, int>>::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
-        if (previous->second > iter->first) {
+        if (previous->second > iter->first + 1.5 * extension) {
             previous->second = std::max(iter->second, previous->second);
             iter = m_dashes.erase(iter);
         }
@@ -463,14 +492,16 @@ int Staff::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    assert(this->m_drawingStaffDef);
+    assert(m_drawingStaffDef);
 
-    if (this->m_drawingStaffDef->HasNotationtype()) {
-        params->m_notationType = this->m_drawingStaffDef->GetNotationtype();
+    if (m_drawingStaffDef->HasNotationtype()) {
+        params->m_notationType = m_drawingStaffDef->GetNotationtype();
     }
     else {
         params->m_notationType = NOTATIONTYPE_cmn;
     }
+    Measure *parentMeasure = vrv_cast<Measure *>(GetFirstAncestor(MEASURE));
+    if (parentMeasure) m_drawingStaffDef->AlternateCurrentMeterSig(parentMeasure);
 
     return FUNCTOR_CONTINUE;
 }
@@ -499,11 +530,29 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     if (it != m_timeSpanningElements.end()) {
         Verse *v = vrv_cast<Verse *>(*it);
         assert(v);
-        alignment->SetVerseCount(v->GetN());
+        alignment->AddVerseN(v->GetN());
     }
 
     // for next staff
     params->m_staffIdx++;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    int extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, false);
+    int minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, false);
+    AdjustLedgerLines(m_ledgerLinesAbove, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesBelow, extension, minExtension);
+
+    extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, true);
+    minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, true);
+    AdjustLedgerLines(m_ledgerLinesAboveCue, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesBelowCue, extension, minExtension);
 
     return FUNCTOR_CONTINUE;
 }
@@ -531,7 +580,7 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 
 int Staff::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_timeSpanningElements.clear();
+    m_timeSpanningElements.clear();
     ClearLedgerLines();
     return FUNCTOR_CONTINUE;
 }
@@ -564,10 +613,10 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    assert(this->m_drawingStaffDef);
+    assert(m_drawingStaffDef);
 
-    if (this->m_drawingStaffDef->HasNotationtype()) {
-        params->m_notationType = this->m_drawingStaffDef->GetNotationtype();
+    if (m_drawingStaffDef->HasNotationtype()) {
+        params->m_notationType = m_drawingStaffDef->GetNotationtype();
     }
     else {
         params->m_notationType = NOTATIONTYPE_cmn;
@@ -632,7 +681,17 @@ int Staff::AdjustSylSpacing(FunctorParams *functorParams)
     assert(params);
 
     // Set the staff size for this pass
-    params->m_staffSize = this->m_drawingStaffSize;
+    params->m_staffSize = m_drawingStaffSize;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    params->m_expandedNotes.clear();
 
     return FUNCTOR_CONTINUE;
 }

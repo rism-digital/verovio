@@ -2,7 +2,7 @@ version: 1.0.{build}
 
 branches:
   only:
-  - develop
+    - develop
 
 image: Visual Studio 2017
 
@@ -11,9 +11,8 @@ configuration: Release
 platform: x64
 
 before_build:
-- cmd: >-
+  - cmd: >-
     cd tools
-    
     cmake -DCMAKE_GENERATOR_PLATFORM=x64 ../cmake
 
 build:

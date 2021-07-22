@@ -147,9 +147,10 @@ public:
     bool HasNoteWithDots();
 
     /**
-     * Helper to adjust overlaping layers for chords
+     * Helper to adjust overlapping layers for chords
      */
-    virtual void AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison);
+    virtual void AdjustOverlappingLayers(
+        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
 
     //----------//
     // Functors //
@@ -203,11 +204,23 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::JustifyY
+     */
+    virtual int JustifyY(FunctorParams *functorParams);
+
 protected:
     /**
-     * Helper function for calculation of optimal locations for dots
+     * The note locations w.r.t. each staff
      */
-    void CaltOptimalDots(Dots *dots, Staff *staff, const std::set<int> &noteLocations);
+    virtual MapOfNoteLocs CalcNoteLocations();
+
+    /**
+     * The dot locations w.r.t. each staff
+     * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
+     * secondary
+     */
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary);
 
     /**
      * Clear the m_clusters vector and delete all the objects.

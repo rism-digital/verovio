@@ -25,7 +25,7 @@ namespace vrv {
 // Dir
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Dir> s_factory("dir", DIR);
+static const ClassRegistrar<Dir> s_factory("dir", DIR);
 
 Dir::Dir()
     : ControlElement("dir-")

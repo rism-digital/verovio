@@ -24,22 +24,24 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
+const std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
     ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
 
-std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow,
-    ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
+const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc,
+    ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp };
 
 //----------------------------------------------------------------------------
 // Artic
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Artic> s_factory("artic", ARTIC);
+static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
-Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacementRelEvent()
+Artic::Artic()
+    : LayerElement("artic-"), AttArticulation(), AttColor(), AttEnclosingChars(), AttExtSym(), AttPlacementRelEvent()
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_ENCLOSINGCHARS);
     RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
@@ -53,20 +55,31 @@ void Artic::Reset()
     LayerElement::Reset();
     ResetArticulation();
     ResetColor();
+    ResetEnclosingChars();
     ResetExtSym();
     ResetPlacementRelEvent();
 
     m_drawingPlace = STAFFREL_NONE;
 }
 
-bool Artic::IsInsideArtic()
+bool Artic::IsInsideArtic(data_ARTICULATION artic) const
 {
-    auto end = Artic::s_outStaffArtic.end();
-    auto i = std::find(Artic::s_outStaffArtic.begin(), end, this->GetArticFirst());
-    return (i == end);
+    // Always outside if enclosing brackets are used
+    if ((this->GetEnclose() == ENCLOSURE_brack) || (this->GetEnclose() == ENCLOSURE_paren)) {
+        return false;
+    }
+
+    const auto end = Artic::s_outStaffArtic.end();
+    const auto it = std::find(Artic::s_outStaffArtic.begin(), end, artic);
+    return (it == end);
 }
 
-data_ARTICULATION Artic::GetArticFirst()
+bool Artic::IsInsideArtic() const
+{
+    return IsInsideArtic(this->GetArticFirst());
+}
+
+data_ARTICULATION Artic::GetArticFirst() const
 {
     std::vector<data_ARTICULATION> articList = this->GetArtic();
     if (articList.empty()) return ARTICULATION_NONE;
@@ -87,6 +100,8 @@ void Artic::SplitMultival(Object *parent)
         Artic *artic = new Artic();
         artic->SetArtic({ *iter });
         artic->AttColor::operator=(*this);
+        artic->AttEnclosingChars::operator=(*this);
+        artic->AttExtSym::operator=(*this);
         artic->AttPlacementRelEvent::operator=(*this);
         artic->SetParent(parent);
         parent->InsertChild(artic, idx);
@@ -130,17 +145,14 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     assert(insideSlur);
     assert(outsideSlur);
 
-    std::vector<data_ARTICULATION>::iterator iter;
-    auto end = Artic::s_outStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
-
-    for (iter = articList.begin(); iter != articList.end(); ++iter) {
-        // return false if one cannot be rendered on the staff
-        auto i = std::find(Artic::s_outStaffArtic.begin(), end, *iter);
-        if (i != end)
-            outsideSlur->push_back(*iter);
-        else
-            insideSlur->push_back(*iter);
+    for (data_ARTICULATION artic : articList) {
+        if (IsInsideArtic(artic)) {
+            insideSlur->push_back(artic);
+        }
+        else {
+            outsideSlur->push_back(artic);
+        }
     }
 }
 
@@ -165,7 +177,7 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
     }
 }
 
-wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place)
+wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
 {
     // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
@@ -246,17 +258,36 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, const data_STAFFREL &place
         return 0;
 }
 
+wchar_t Artic::GetEnclosingGlyph(bool beforeArtic) const
+{
+    wchar_t glyph = 0;
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack:
+                glyph = beforeArtic ? SMUFL_E26C_accidentalBracketLeft : SMUFL_E26D_accidentalBracketRight;
+                break;
+            case ENCLOSURE_paren:
+                glyph = beforeArtic ? SMUFL_E26A_accidentalParensLeft : SMUFL_E26B_accidentalParensRight;
+                break;
+            default: break;
+        }
+    }
+    return glyph;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for Artic
 //----------------------------------------------------------------------------
 
-bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
+bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
 {
     if (place == STAFFREL_above)
         return false;
     else if (code == SMUFL_E611_stringsDownBowTurned)
         return true;
     else if (code == SMUFL_E613_stringsUpBowTurned)
+        return true;
+    else if (code == SMUFL_E630_pluckedSnapPizzicatoBelow)
         return true;
     else
         return false;
@@ -294,8 +325,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-
-    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
 
     if (params->m_parent->m_crossLayer) {
         layer = params->m_parent->m_crossLayer;
@@ -339,21 +368,10 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
         this->m_crossStaff = params->m_staffAbove;
         this->m_crossLayer = params->m_layerAbove;
-        // Exception - the artic is above in a cross-staff note / chord going down - the positioning is relative to the
-        // parent where the beam is
-        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_below) {
-            this->m_crossStaff = NULL;
-            this->m_crossLayer = NULL;
-        }
     }
     else if (this->GetDrawingPlace() == STAFFREL_below && params->m_crossStaffBelow) {
         this->m_crossStaff = params->m_staffBelow;
         this->m_crossLayer = params->m_layerBelow;
-        // Exception - opposite as above
-        if (beam && beam->m_crossStaffContent && !beam->m_crossStaff && beam->m_crossStaffRel == STAFFREL_basic_above) {
-            this->m_crossStaff = NULL;
-            this->m_crossLayer = NULL;
-        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -373,10 +391,11 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
     }
 
+    Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
@@ -389,6 +408,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         yIn = std::min(
             params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
             0);
+        if (beam && beam->m_crossStaffContent && beam->m_drawingPlace == BEAMPLACE_mixed) yIn -= beam->m_beamWidth;
         yOut = std::min(yIn, staffYBottom);
     }
 

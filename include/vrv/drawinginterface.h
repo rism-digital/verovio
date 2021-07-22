@@ -13,6 +13,7 @@
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "metersiggrp.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -191,6 +192,8 @@ public:
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
     bool DrawMeterSig() { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
+    bool DrawMeterSigGrp();
+    void SetDrawMeterSigGrp(bool drawMeterSigGrp) { m_drawMeterSigGrp = drawMeterSigGrp; }
     ///@}
 
     /**
@@ -201,6 +204,8 @@ public:
     void SetCurrentKeySig(KeySig const *keySig);
     void SetCurrentMensur(Mensur const *mensur);
     void SetCurrentMeterSig(MeterSig const *meterSig);
+    void SetCurrentMeterSigGrp(MeterSigGrp const *meterSig);
+    void AlternateCurrentMeterSig(Measure *measure);
     ///@}
 
     /**
@@ -212,6 +217,7 @@ public:
     KeySig *GetCurrentKeySig() { return &m_currentKeySig; }
     Mensur *GetCurrentMensur() { return &m_currentMensur; }
     MeterSig *GetCurrentMeterSig() { return &m_currentMeterSig; }
+    MeterSigGrp *GetCurrentMeterSigGrp() { return &m_currentMeterSigGrp; }
     ///@}
 
 private:
@@ -223,6 +229,8 @@ private:
     Mensur m_currentMensur;
     /** The meter signature (time signature) */
     MeterSig m_currentMeterSig;
+    /** The meter signature group */
+    MeterSigGrp m_currentMeterSigGrp;
 
     /**
      *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not
@@ -232,6 +240,7 @@ private:
     bool m_drawKeySig;
     bool m_drawMensur;
     bool m_drawMeterSig;
+    bool m_drawMeterSigGrp;
     ///@}
 };
 

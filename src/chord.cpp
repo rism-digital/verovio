@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -39,19 +40,19 @@ namespace vrv {
 template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin, Iterator end, bool isReverseOrder)
 {
     // location adjustment that should be applied when looking for optimal position
-    std::vector<int> locAdjust{ 1, 2, -3 };
+    std::vector<int> locAdjust{ 0, 1, -1, -2, 2 };
     if (isReverseOrder) std::transform(locAdjust.begin(), locAdjust.end(), locAdjust.begin(), std::negate<int>());
     std::set<int> dotLocations;
+    Iterator prev = begin;
     for (auto iter = begin; iter != end; ++iter) {
         bool result = false;
-        if (*iter % 2 != 0) std::tie(std::ignore, result) = dotLocations.insert(*iter);
-        if (!result) {
-            for (auto adjust : locAdjust) {
-                if ((*iter + adjust) % 2 == 0) continue;
-                std::tie(std::ignore, result) = dotLocations.insert(*iter + adjust);
-                if (result) break;
-            }
+        for (int adjust : locAdjust) {
+            if ((*iter + adjust) % 2 == 0) continue;
+            if ((prev != iter) && (*prev == *iter) && (adjust == -2)) continue;
+            std::tie(std::ignore, result) = dotLocations.insert(*iter + adjust);
+            if (result) break;
         }
+        prev = iter;
     }
     return dotLocations;
 }
@@ -60,7 +61,7 @@ template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin,
 // Chord
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Chord> s_factory("chord", CHORD);
+static const ClassRegistrar<Chord> s_factory("chord", CHORD);
 
 Chord::Chord()
     : LayerElement("chord-")
@@ -424,7 +425,8 @@ bool Chord::HasNoteWithDots()
     return false;
 }
 
-void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool &isUnison)
+void Chord::AdjustOverlappingLayers(
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
 {
     int margin = 0;
     // get positions of other elements
@@ -455,7 +457,7 @@ void Chord::AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
         auto [overlap, isInUnison] = note->CalcElementHorizontalOverlap(
-            doc, otherElements, true, isLowerPosition, expectedElementsInUnison > 0);
+            doc, otherElements, areDotsAdjusted, true, isLowerPosition, expectedElementsInUnison > 0);
         if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
             margin = overlap;
         }
@@ -546,11 +548,11 @@ int Chord::CalcArtic(FunctorParams *functorParams)
     params->m_crossStaffAbove = false;
     params->m_crossStaffBelow = false;
 
-    if (this->m_crossStaff) {
-        params->m_staffAbove = this->m_crossStaff;
-        params->m_staffBelow = this->m_crossStaff;
-        params->m_layerAbove = this->m_crossLayer;
-        params->m_layerBelow = this->m_crossLayer;
+    if (m_crossStaff) {
+        params->m_staffAbove = m_crossStaff;
+        params->m_staffBelow = m_crossStaff;
+        params->m_layerAbove = m_crossLayer;
+        params->m_layerBelow = m_crossLayer;
         params->m_crossStaffAbove = true;
         params->m_crossStaffBelow = true;
     }
@@ -610,9 +612,9 @@ int Chord::CalcStem(FunctorParams *functorParams)
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
-    if (this->m_crossStaff) {
-        staff = this->m_crossStaff;
-        layer = this->m_crossLayer;
+    if (m_crossStaff) {
+        staff = m_crossStaff;
+        layer = m_crossLayer;
     }
 
     // Cache the in params to avoid further lookup
@@ -657,48 +659,39 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-void Chord::CaltOptimalDots(Dots *dots, Staff *staff, const std::set<int> &noteLocations)
+MapOfNoteLocs Chord::CalcNoteLocations()
 {
-    // calculate optimal dot locations both in normal and reverse orders
-    std::set<int> forwardLocations = CalculateDotLocations(noteLocations.begin(), noteLocations.end(), false);
-    std::set<int> backwardLocations = CalculateDotLocations(noteLocations.rbegin(), noteLocations.rend(), true);
-    //
-    std::vector<int> firstElem, secondElem;
-    const std::set<int> *firstRef, *secondRef;
-    Staff *currentStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    const bool isUpwardDirection
-        = (GetDrawingStemDir() == STEMDIRECTION_up) || (currentStaff->GetChildCount(LAYER) == 1);
-    // On upper layer normal order positioning is prioritized, hence assign positions in the same order as they were
-    // calculated. This way, if differences in positioning are the same for both normal/reverse orders, normal is going
-    // to be selected
-    if (isUpwardDirection) {
-        firstElem.assign(forwardLocations.begin(), forwardLocations.end());
-        secondElem.assign(backwardLocations.begin(), backwardLocations.end());
-        firstRef = &forwardLocations;
-        secondRef = &backwardLocations;
-    }
-    // ... and vice versa for the bottom layer, where reverse ordering is in priority
-    else {
-        firstElem.assign(backwardLocations.begin(), backwardLocations.end());
-        secondElem.assign(forwardLocations.begin(), forwardLocations.end());
-        firstRef = &backwardLocations;
-        secondRef = &forwardLocations;
-    }
+    const ArrayOfObjects *notes = this->GetList(this);
+    assert(notes);
 
-    // substract note and dot positions and calculate difference between all locations. This way, better positioning can
-    // be determined by taking order, where difference between dot and note positions is the smallest
-    std::transform(firstElem.begin(), firstElem.end(), noteLocations.begin(), firstElem.begin(), std::minus<int>());
-    std::transform(secondElem.begin(), secondElem.end(), noteLocations.begin(), secondElem.begin(), std::minus<int>());
-    // apply std::abs to elements in the vectors and then calculate sum of the elements. Can be achieved with
-    // std::transform_reduce, but gcc needs to support it
-    std::transform(firstElem.begin(), firstElem.end(), firstElem.begin(), static_cast<float (*)(float)>(&std::abs));
-    std::transform(secondElem.begin(), secondElem.end(), secondElem.begin(), static_cast<float (*)(float)>(&std::abs));
-    const int firstDiff = std::accumulate(firstElem.begin(), firstElem.end(), 0);
-    const int secondDiff = std::accumulate(secondElem.begin(), secondElem.end(), 0);
-    std::set<int> dotLocations = (secondDiff < firstDiff) ? *secondRef : *firstRef;
+    MapOfNoteLocs noteLocations;
+    for (Object *obj : *notes) {
+        Note *note = vrv_cast<Note *>(obj);
+        assert(note);
 
-    std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-    dotLocs->insert(dotLocs->end(), dotLocations.begin(), dotLocations.end());
+        Layer *layer = NULL;
+        Staff *staff = note->GetCrossStaff(layer);
+        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+
+        noteLocations[staff].insert(note->GetDrawingLoc());
+    }
+    return noteLocations;
+}
+
+MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary)
+{
+    const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
+    const bool useReverseOrder = (isUpwardDirection && !primary) || (!isUpwardDirection && primary);
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations();
+    MapOfDotLocs dotLocs;
+    for (const auto &mapEntry : noteLocs) {
+        if (useReverseOrder)
+            dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.rbegin(), mapEntry.second.rend(), true);
+        else
+            dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.begin(), mapEntry.second.end(), false);
+    }
+    return dotLocs;
 }
 
 int Chord::CalcDots(FunctorParams *functorParams)
@@ -727,33 +720,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     params->m_chordDrawingX = this->GetDrawingX();
     params->m_chordStemDir = this->GetDrawingStemDir();
 
-    ArrayOfObjects::const_reverse_iterator rit;
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
-
-    assert(this->GetTopNote());
-    assert(this->GetBottomNote());
-
-    // Get note locations first
-    std::map<Staff *, std::set<int>> noteLocations;
-    for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
-        Note *note = vrv_cast<Note *>(*rit);
-        assert(note);
-        if (note->GetDots() == 0) {
-            continue;
-        }
-
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-        if (noteLocations.end() == noteLocations.find(staff)) {
-            noteLocations[staff] = {};
-        }
-        noteLocations[staff].insert(note->GetDrawingLoc());
-    }
-
-    for (const auto &loc : noteLocations) {
-        CaltOptimalDots(dots, loc.first, loc.second);
-    }
+    dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
 
     return FUNCTOR_CONTINUE;
 }
@@ -851,6 +818,63 @@ int Chord::ResetDrawing(FunctorParams *functorParams)
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::JustifyY(FunctorParams *functorParams)
+{
+    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
+    assert(params);
+    assert(params->m_justificationSum > 0);
+
+    // Check if chord spreads across several staves
+    std::list<Staff *> extremalStaves;
+    for (Note *note : { this->GetTopNote(), this->GetBottomNote() }) {
+        Layer *layer = NULL;
+        Staff *staff = note->GetCrossStaff(layer);
+        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+        extremalStaves.push_back(staff);
+    }
+    assert(extremalStaves.size() == 2);
+
+    const int topStaffN = extremalStaves.front()->GetN();
+    const int bottomStaffN = extremalStaves.back()->GetN();
+    if (topStaffN < bottomStaffN) {
+        // Now calculate the shift due to vertical justification of the involved staves.
+        Object *measure = this->GetFirstAncestor(MEASURE);
+        if (!measure) return FUNCTOR_CONTINUE;
+
+        ListOfObjects staves;
+        ClassIdComparison matchType(STAFF);
+        measure->FindAllDescendantByComparison(&staves, &matchType, 1);
+
+        int shift = 0;
+        for (Object *staff : staves) {
+            Staff *currentStaff = vrv_cast<Staff *>(staff);
+            assert(currentStaff);
+
+            if ((currentStaff->GetN() > topStaffN) && (currentStaff->GetN() <= bottomStaffN)) {
+                const double staffJustificationFactor
+                    = currentStaff->GetAlignment()->GetJustificationFactor(params->m_doc);
+                shift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+            }
+        }
+
+        // Add the shift to the stem length of the chord.
+        Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));
+        if (!stem) return FUNCTOR_CONTINUE;
+
+        const int stemLen = stem->GetDrawingStemLen();
+        if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
+            stem->SetDrawingStemLen(stemLen - shift);
+            stem->SetDrawingYRel(stem->GetDrawingYRel() - shift);
+        }
+        else {
+            stem->SetDrawingStemLen(stemLen + shift);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

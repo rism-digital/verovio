@@ -44,12 +44,21 @@ void Dots::Reset()
     ResetAugmentDots();
 
     m_isAdjusted = false;
+    m_flagShift = 0;
     m_dotLocsByStaff.clear();
 }
 
-std::list<int> *Dots::GetDotLocsForStaff(Staff *staff)
+std::set<int> Dots::GetDotLocsForStaff(Staff *staff) const
 {
-    return &m_dotLocsByStaff[staff];
+    if (m_dotLocsByStaff.find(staff) != m_dotLocsByStaff.end()) {
+        return m_dotLocsByStaff.at(staff);
+    }
+    return {};
+}
+
+std::set<int> &Dots::ModifyDotLocsForStaff(Staff *staff)
+{
+    return m_dotLocsByStaff[staff];
 }
 
 //----------------------------------------------------------------------------
@@ -71,7 +80,7 @@ void Flag::Reset()
     m_drawingNbFlags = 0;
 }
 
-wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir)
+wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir) const
 {
     if (stemDir == STEMDIRECTION_up) {
         switch (m_drawingNbFlags) {
@@ -101,7 +110,7 @@ wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir)
     }
 }
 
-Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
+Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const
 {
     code = this->GetFlagGlyph(STEMDIRECTION_up);
 
@@ -109,7 +118,7 @@ Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
     return Point(0, h + doc->GetGlyphDescender(code, staffSize, graceSize));
 }
 
-Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
+Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const
 {
     code = this->GetFlagGlyph(STEMDIRECTION_down);
 

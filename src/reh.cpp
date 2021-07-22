@@ -24,7 +24,7 @@ namespace vrv {
 // Reh
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Reh> s_factory("reh", REH);
+static const ClassRegistrar<Reh> s_factory("reh", REH);
 
 Reh::Reh() : ControlElement("reh-"), TextDirInterface(), TimePointInterface(), AttColor(), AttLang(), AttVerticalGroup()
 {

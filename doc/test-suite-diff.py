@@ -1,12 +1,13 @@
 import argparse
-import diffimg
 import json
+import os
+import sys
+
+import diffimg
 import lxml.etree as etree
 import PIL.Image as Image
 import PIL.ImageChops as ImageChops
 import PIL.ImageOps as ImageOps
-import os
-import sys
 import xmldiff.main as main
 
 ns = {'svg': 'http://www.w3.org/2000/svg'}
@@ -20,7 +21,7 @@ def start_webpage():
     head = etree.Element('head')
     html.append(head)
     title = etree.SubElement(head, 'title')
-    title.text = "Verovio test suite for Pull Request"
+    title.text = 'Verovio test suite for Pull Request'
 
     etree.SubElement(head, 'link', attrib={
                      'rel': 'stylesheet', 'href': 'https://www.verovio.org/css/bootstrap/css/bootstrap.min.css', 'type': 'text/css'})
@@ -66,9 +67,9 @@ def end_webpage(html, body, htmlOutFile):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Examine diffrences in renderings of MEI scores')
-    parser.add_argument("input_dir1")
-    parser.add_argument("input_dir2")
-    parser.add_argument("output_dir")
+    parser.add_argument('input_dir1')
+    parser.add_argument('input_dir2')
+    parser.add_argument('output_dir')
     parser.add_argument('-t', '--threshold', required=False, type=float,
                         default=0.1, help='Threshold for visual difference in percent')
     args = parser.parse_args()
@@ -130,11 +131,11 @@ if __name__ == "__main__":
             pngFileOut = os.path.join(path_out, item1, name + '.png')
             pngFile1Out = os.path.join(path_out, item1, name + '.after.png')
             pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
-            print(pngFile1, pngFile2)
+            print(f'Comparing {name}')
 
             diffValue = diffimg.diff(pngFile1, pngFile2, delete_diff_file=True)
             if (diffValue > (args.threshold / 100.0)):
-                print("Img diff:", diffValue)
+                print(f'Img diff: {diffValue}')
                 row = etree.SubElement(table, 'tr')
                 col = etree.SubElement(row, 'td')
                 p = etree.SubElement(col, 'p')
@@ -148,7 +149,7 @@ if __name__ == "__main__":
                 # link to show before - after
                 p = etree.SubElement(col, 'p')
                 a = etree.SubElement(
-                    p, 'a', attrib={'href': '#', 'class': "before-after"})
+                    p, 'a', attrib={'href': '#', 'class': 'before-after'})
                 a.text = 'Show before / after'
                 divBeforeAfter = etree.SubElement(
                     col, 'div', attrib={'class': 'img-before-after', 'style': 'display: none'})
@@ -182,20 +183,20 @@ if __name__ == "__main__":
             for node in root1.xpath('//*[@*]'):
                 node.attrib.clear()
 
-            for e in root1.findall("./svg:desc", namespaces=ns):
+            for e in root1.findall('./svg:desc', namespaces=ns):
                 root1.remove(e)
 
             # remove //svg/desc (version will be different)
             for node in root2.xpath('//*[@*]'):
                 node.attrib.clear()
 
-            for e in root2.findall("./svg:desc", namespaces=ns):
+            for e in root2.findall('./svg:desc', namespaces=ns):
                 root2.remove(e)
 
             # unused for now
             diff = main.diff_trees(root1, root2)
             if (len(diff) > 0):
-                print("Node diff:", len(diff))
+                print(f'Node diff: {len(diff)}')
 
         if (nbChanges > 0):
             li = etree.SubElement(ulTablist, 'li', attrib={

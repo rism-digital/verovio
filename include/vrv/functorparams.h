@@ -41,6 +41,7 @@ class Measure;
 class MeasureAligner;
 class Mensur;
 class MeterSig;
+class MeterSigGrp;
 class MRpt;
 class Object;
 class Page;
@@ -575,6 +576,7 @@ public:
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;
+        m_horizontalMargin = 0;
         m_verticalMargin = 0;
         m_ignoreCrossStaff = false;
         m_yRel = 0;
@@ -582,6 +584,7 @@ public:
 
     TupletNum *m_tupletNum;
     data_STAFFREL_basic m_drawingNumPos;
+    int m_horizontalMargin;
     int m_verticalMargin;
     bool m_ignoreCrossStaff;
     int m_yRel;
@@ -645,14 +648,15 @@ public:
  * member 1: the upcoming minimum position (i.e., the min pos for the next element)
  * member 2: the cumulated shift on the previous aligners
  * member 3: the @n of the staff currently processed (used for grace note alignment)
- * member 4: the list of staffN in the top-level scoreDef
- * member 5: the bounding box in the previous aligner
- * member 6: the upcoming bounding boxes (to be used in the next aligner)
- * member 7: the Doc
- * member 8: the Functor for redirection to the MeasureAligner
- * member 9: the end Functor for redirection
- * member 10: current aligner that is being processed
- * member 11: preceeding aligner that was handled before
+ * member 4: the size of the staff being processed
+ * member 5: the list of staffN in the top-level scoreDef
+ * member 6: the bounding box in the previous aligner
+ * member 7: the upcoming bounding boxes (to be used in the next aligner)
+ * member 8: the Doc
+ * member 9: the Functor for redirection to the MeasureAligner
+ * member 10: the end Functor for redirection
+ * member 11: current aligner that is being processed
+ * member 12: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -664,14 +668,18 @@ public:
         m_cumulatedXShift = 0;
         m_staffN = 0;
         m_staffNs = staffNs;
+        m_staffSize = 100;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
+        m_currentAlignment.Reset();
+        m_previousAlignment.Reset();
     }
     int m_minPos;
     int m_upcomingMinPos;
     int m_cumulatedXShift;
     int m_staffN;
+    int m_staffSize;
     std::vector<int> m_staffNs;
     std::vector<BoundingBox *> m_boundingBoxes;
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
@@ -949,14 +957,14 @@ public:
         m_currentRealTimeSeconds = 0.0;
         m_maxCurrentScoreTime = 0.0;
         m_maxCurrentRealTimeSeconds = 0.0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_tempoAdjustment = 1.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     double m_maxCurrentScoreTime;
     double m_maxCurrentRealTimeSeconds;
-    int m_currentTempo;
+    double m_currentTempo;
     double m_tempoAdjustment;
 };
 
@@ -982,14 +990,14 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
     data_NOTATIONTYPE m_notationType;
-    int m_currentTempo;
+    double m_currentTempo;
 };
 
 //----------------------------------------------------------------------------
@@ -1069,7 +1077,8 @@ public:
  * member 1: a pointer the document we are adding pages to
  * member 2: a pointer to the current page
  * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
- * member 4: the page height
+ * members 4-8: the page heights
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffPagesParams : public FunctorParams {
@@ -1085,6 +1094,7 @@ public:
         m_pgFootHeight = 0;
         m_pgHead2Height = 0;
         m_pgFoot2Height = 0;
+        m_leftoverSystem = NULL;
     }
     Page *m_contentPage;
     Doc *m_doc;
@@ -1095,6 +1105,7 @@ public:
     int m_pgFootHeight;
     int m_pgHead2Height;
     int m_pgFoot2Height;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1111,6 +1122,7 @@ public:
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
  * member 8: whether to smartly use encoded system breaks
+ * member 9: a pointer to the leftover system (last system with only one measure)
  **/
 
 class CastOffSystemsParams : public FunctorParams {
@@ -1125,6 +1137,7 @@ public:
         m_currentScoreDefWidth = 0;
         m_doc = doc;
         m_smart = smart;
+        m_leftoverSystem = NULL;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -1135,6 +1148,7 @@ public:
     ArrayOfObjects m_pendingObjects;
     Doc *m_doc;
     bool m_smart;
+    System *m_leftoverSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -1173,20 +1187,6 @@ class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
     std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
-};
-
-//----------------------------------------------------------------------------
-// ConvertScoreDefMarkupParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating whereas the conversion is permanent of not
- **/
-
-class ConvertScoreDefMarkupParams : public FunctorParams {
-public:
-    ConvertScoreDefMarkupParams(bool permanent) { m_permanent = permanent; }
-    bool m_permanent;
 };
 
 //----------------------------------------------------------------------------
@@ -1437,26 +1437,21 @@ public:
  * member 2: the maximum position
  * member 3: the timespanning interface
  * member 4: the class Ids to keep
- * member 5: the slur for finding ties (too specific, to be refactored)
- * member 6: the ties we need to consider (too specific, to be refactored)
  **/
 
 class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindSpannedLayerElementsParams(TimeSpanningInterface *interface, Slur *slur)
+    FindSpannedLayerElementsParams(TimeSpanningInterface *interface)
     {
         m_interface = interface;
         m_minPos = 0;
         m_maxPos = 0;
-        m_slur = slur;
     }
     std::vector<LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
     TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
-    Slur *m_slur;
-    std::vector<FloatingPositioner *> m_ties;
 };
 
 //----------------------------------------------------------------------------
@@ -1464,11 +1459,22 @@ public:
 //----------------------------------------------------------------------------
 
 /**
+ * Helper struct to store note sequences which replace notes in MIDI output due to expanded ornaments and tremolandi
+ */
+struct MIDINote {
+    char pitch;
+    double duration;
+};
+
+using MIDINoteSequence = std::list<MIDINote>;
+
+/**
  * member 0: MidiFile*: the MidiFile we are writing to
  * member 1: int: the midi track number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
- * member 5: int with the current tempo
+ * member 5: double with the current tempo
+ * member 6: expanded notes due to ornaments and tremolandi
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1480,7 +1486,7 @@ public:
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
@@ -1488,7 +1494,8 @@ public:
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;
-    int m_currentTempo;
+    double m_currentTempo;
+    std::map<Note *, MIDINoteSequence> m_expandedNotes;
     Functor *m_functor;
 };
 
@@ -1512,16 +1519,16 @@ public:
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_functor = functor;
     }
     std::map<double, double> realTimeToScoreTime;
     std::map<double, std::vector<std::string>> realTimeToOnElements;
     std::map<double, std::vector<std::string>> realTimeToOffElements;
-    std::map<double, int> realTimeToTempo;
+    std::map<double, double> realTimeToTempo;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
-    int m_currentTempo;
+    double m_currentTempo;
     Functor *m_functor;
 };
 
@@ -1663,7 +1670,7 @@ public:
     }
     double m_time;
     double m_duration;
-    std::vector<int> m_layers;
+    std::set<int> m_layers;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Functor *m_functor;
@@ -1958,18 +1965,20 @@ public:
 
 class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
 public:
-    ReplaceDrawingValuesInStaffDefParams(
-        Clef const *clef, KeySig const *keySig, Mensur const *mensur, MeterSig const *meterSig)
+    ReplaceDrawingValuesInStaffDefParams(Clef const *clef, KeySig const *keySig, Mensur const *mensur,
+        MeterSig const *meterSig, MeterSigGrp const *meterSigGrp)
     {
         m_clef = clef;
         m_keySig = keySig;
         m_mensur = mensur;
         m_meterSig = meterSig;
+        m_meterSigGrp = meterSigGrp;
     }
     Clef const *m_clef;
     KeySig const *m_keySig;
     Mensur const *m_mensur;
     MeterSig const *m_meterSig;
+    MeterSigGrp const *m_meterSigGrp;
 };
 
 //----------------------------------------------------------------------------
@@ -2186,21 +2195,22 @@ public:
  * member 4: bool the flag for indicating if apply to all or not
  **/
 
+enum StaffDefRedrawFlags {
+    REDRAW_CLEF = 0x1,
+    REDRAW_KEYSIG = 0x2,
+    REDRAW_MENSUR = 0x4,
+    REDRAW_METERSIG = 0x8,
+    REDRAW_METERSIGGRP = 0x10,
+    // all flags
+    REDRAW_ALL = REDRAW_CLEF | REDRAW_KEYSIG | REDRAW_MENSUR | REDRAW_METERSIG | REDRAW_METERSIGGRP,
+    //
+    FORCE_REDRAW = 0x100
+};
+
 class SetStaffDefRedrawFlagsParams : public FunctorParams {
 public:
-    SetStaffDefRedrawFlagsParams()
-    {
-        m_clef = false;
-        m_keySig = false;
-        m_mensur = false;
-        m_meterSig = false;
-        m_applyToAll = false;
-    }
-    bool m_clef;
-    bool m_keySig;
-    bool m_mensur;
-    bool m_meterSig;
-    bool m_applyToAll;
+    SetStaffDefRedrawFlagsParams() { m_redrawFlags = 0; }
+    int m_redrawFlags;
 };
 
 //----------------------------------------------------------------------------

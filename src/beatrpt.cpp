@@ -32,7 +32,7 @@ namespace vrv {
 // BeatRpt
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<BeatRpt> s_factory("beatRpt", BEATRPT);
+static const ClassRegistrar<BeatRpt> s_factory("beatRpt", BEATRPT);
 
 BeatRpt::BeatRpt() : LayerElement("beatrpt-"), AttColor(), AttBeatRptVis()
 {
@@ -62,7 +62,7 @@ void BeatRpt::SetScoreTimeOnset(double scoreTime)
     m_scoreTimeOnset = scoreTime;
 }
 
-double BeatRpt::GetScoreTimeOnset()
+double BeatRpt::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }

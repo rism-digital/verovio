@@ -39,7 +39,7 @@ jobs:
       - name: Get Short SHA
         run: |
           echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
-          
+
       - name: Add additional environment variables for creating URL slugs
         run: |
           echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
@@ -50,6 +50,7 @@ jobs:
           repository: ${{ env.GH_PAGES_REPO }}
           ref: ${{ env.GH_PAGES_BRANCH }}
           path: ${{ env.GH_PAGES_DIR }}
+          submodules: recursive
 
       - name: Create directories and install packages
         working-directory: ${{ github.workspace }}
@@ -70,7 +71,7 @@ jobs:
         with:
           ref: develop
           path: ${{ env.DEV_DIR }}/
-                    
+
       - name: Install the VerovioText font
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/
         run: |
@@ -84,6 +85,7 @@ jobs:
           cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
+          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/musicxmlTestSuite ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
 
       - name: Checkout the PR
         uses: actions/checkout@v2
@@ -98,6 +100,7 @@ jobs:
           cd python
           make -j8
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
+          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/musicxmlTestSuite ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
@@ -124,7 +127,7 @@ jobs:
           required-permission: write
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Run only if user has NOT sufficient permissions
         if: steps.check_files.outputs.files_exists == 'true' && !steps.check_permission.outputs.has-permission
         run: |

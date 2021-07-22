@@ -345,7 +345,7 @@ AttMidiTempo::~AttMidiTempo()
 
 void AttMidiTempo::ResetMidiTempo()
 {
-    m_midiBpm = -1;
+    m_midiBpm = 0.0;
     m_midiMspb = -1;
 }
 
@@ -353,7 +353,7 @@ bool AttMidiTempo::ReadMidiTempo(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("midi.bpm")) {
-        this->SetMidiBpm(StrToMidibpm(element.attribute("midi.bpm").value()));
+        this->SetMidiBpm(StrToDbl(element.attribute("midi.bpm").value()));
         element.remove_attribute("midi.bpm");
         hasAttribute = true;
     }
@@ -369,7 +369,7 @@ bool AttMidiTempo::WriteMidiTempo(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMidiBpm()) {
-        element.append_attribute("midi.bpm") = MidibpmToStr(this->GetMidiBpm()).c_str();
+        element.append_attribute("midi.bpm") = DblToStr(this->GetMidiBpm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMidiMspb()) {
@@ -381,7 +381,7 @@ bool AttMidiTempo::WriteMidiTempo(pugi::xml_node element)
 
 bool AttMidiTempo::HasMidiBpm() const
 {
-    return (m_midiBpm != -1);
+    return (m_midiBpm != 0.0);
 }
 
 bool AttMidiTempo::HasMidiMspb() const
@@ -645,7 +645,7 @@ bool Att::SetMidi(Object *element, const std::string &attrType, const std::strin
         AttMidiTempo *att = dynamic_cast<AttMidiTempo *>(element);
         assert(att);
         if (attrType == "midi.bpm") {
-            att->SetMidiBpm(att->StrToMidibpm(attrValue));
+            att->SetMidiBpm(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "midi.mspb") {
@@ -747,7 +747,7 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
         const AttMidiTempo *att = dynamic_cast<const AttMidiTempo *>(element);
         assert(att);
         if (att->HasMidiBpm()) {
-            attributes->push_back(std::make_pair("midi.bpm", att->MidibpmToStr(att->GetMidiBpm())));
+            attributes->push_back(std::make_pair("midi.bpm", att->DblToStr(att->GetMidiBpm())));
         }
         if (att->HasMidiMspb()) {
             attributes->push_back(std::make_pair("midi.mspb", att->MidimspbToStr(att->GetMidiMspb())));

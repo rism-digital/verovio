@@ -51,7 +51,7 @@ public:
      */
     ///@{
     void SetScoreTimeOnset(double scoreTime);
-    double GetScoreTimeOnset();
+    double GetScoreTimeOnset() const;
 
     //----------//
     // Functors //

@@ -262,6 +262,7 @@ public:
     AttNIntegerAnyComparison(ClassId classId, std::vector<int> ns) : ClassIdComparison(classId) { m_ns = ns; }
 
     void SetNs(std::vector<int> ns) { m_ns = ns; }
+    void AppendN(int n) { m_ns.push_back(n); }
 
     virtual bool operator()(Object *object)
     {
@@ -347,6 +348,33 @@ public:
 private:
     int m_extremeDur;
     DurExtreme m_extremeType;
+};
+
+//----------------------------------------------------------------------------
+// AttVisibilityComparison
+//----------------------------------------------------------------------------
+/**
+ * This class evaluates if the object is visible
+ */
+class AttVisibilityComparison : public ClassIdComparison {
+
+public:
+    AttVisibilityComparison(ClassId classId, data_BOOLEAN isVisible) : ClassIdComparison(classId)
+    {
+        m_isVisible = isVisible;
+    };
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        if (!object->HasAttClass(ATT_VISIBILITY)) return false;
+        AttVisibility *visibility = dynamic_cast<AttVisibility *>(object);
+        assert(visibility);
+        return (visibility->GetVisible() == m_isVisible);
+    }
+
+private:
+    data_BOOLEAN m_isVisible;
 };
 
 //----------------------------------------------------------------------------

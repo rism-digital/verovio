@@ -41,9 +41,11 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
-    std::list<int> *GetDotLocsForStaff(Staff *staff);
+    std::set<int> GetDotLocsForStaff(Staff *staff) const;
+    std::set<int> &ModifyDotLocsForStaff(Staff *staff);
 
-    const MapOfDotLocs *GetMapOfDotLocs() const { return &m_dotLocsByStaff; }
+    const MapOfDotLocs &GetMapOfDotLocs() const { return m_dotLocsByStaff; }
+    void SetMapOfDotLocs(const MapOfDotLocs &dotLocs) { m_dotLocsByStaff = dotLocs; };
 
     void IsAdjusted(bool isAdjusted) { m_isAdjusted = isAdjusted; }
     bool IsAdjusted() const { return m_isAdjusted; }
@@ -63,6 +65,14 @@ public:
     ///@{
     virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Set/get methods for the flagShift
+     */
+    ///@{
+    int GetFlagShift() const { return m_flagShift; }
+    void SetFlagShift(int shiftVal) { m_flagShift = shiftVal; }
     ///@}
 
     /**
@@ -86,6 +96,7 @@ private:
     MapOfDotLocs m_dotLocsByStaff;
 
     bool m_isAdjusted;
+    int m_flagShift;
 };
 
 //----------------------------------------------------------------------------
@@ -112,10 +123,10 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
-    wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir);
+    wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
 
-    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
-    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
+    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
+    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
 
     //----------//
     // Functors //

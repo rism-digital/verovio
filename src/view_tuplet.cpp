@@ -97,9 +97,6 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         return;
     }
 
-    // do not draw brackets on tremolos
-    if (tuplet->GetChildCount(BTREM)) return;
-
     data_STAFFREL_basic position = tuplet->GetDrawingBracketPos();
     const int lineWidth
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tupletBracketThickness.GetValue();

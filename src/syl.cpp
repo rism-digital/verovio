@@ -30,7 +30,7 @@ namespace vrv {
 // Syl
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<Syl> s_factory("syl", SYL);
+static const ClassRegistrar<Syl> s_factory("syl", SYL);
 
 Syl::Syl() : LayerElement("syl-"), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
 {

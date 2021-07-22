@@ -148,7 +148,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         currentDur = (current->GetDurationInterface())->GetActualDur();
 
         if (current->Is(CHORD)) {
-            this->m_beamHasChord = true;
+            m_beamHasChord = true;
         }
 
         m_beamElementCoords.at(elementCount)->m_element = current;
@@ -158,39 +158,39 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         m_beamElementCoords.at(elementCount)->m_breaksec = 0;
         AttBeamSecondary *beamsecondary = dynamic_cast<AttBeamSecondary *>(current);
         if (beamsecondary && beamsecondary->HasBreaksec()) {
-            if (!this->m_changingDur) this->m_changingDur = true;
+            if (!m_changingDur) m_changingDur = true;
             m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
         }
 
         Staff *staff = current->GetCrossStaff(layer);
         if (staff && (staff != m_beamStaff)) {
-            this->m_crossStaffContent = staff;
-            this->m_crossStaffRel = current->GetCrossStaffRel();
+            m_crossStaffContent = staff;
+            m_crossStaffRel = current->GetCrossStaffRel();
         }
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
             // Look at the stemDir to see if we have multiple stem Dir
-            if (!this->m_hasMultipleStemDir) {
+            if (!m_hasMultipleStemDir) {
                 // At this stage, BeamCoord::m_stem is not necessary set, so we need to look at the Note / Chord
                 // original value Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first
                 // note of the beam
                 currentStemDir = m_beamElementCoords.at(elementCount)->GetStemDir();
                 if (currentStemDir != STEMDIRECTION_NONE) {
-                    if ((this->m_notesStemDir != STEMDIRECTION_NONE) && (this->m_notesStemDir != currentStemDir)) {
-                        this->m_hasMultipleStemDir = true;
-                        this->m_notesStemDir = STEMDIRECTION_NONE;
+                    if ((m_notesStemDir != STEMDIRECTION_NONE) && (m_notesStemDir != currentStemDir)) {
+                        m_hasMultipleStemDir = true;
+                        m_notesStemDir = STEMDIRECTION_NONE;
                     }
                     else {
-                        this->m_notesStemDir = currentStemDir;
+                        m_notesStemDir = currentStemDir;
                     }
                 }
             }
             // keep the shortest dur in the beam
-            this->m_shortestDur = std::max(currentDur, this->m_shortestDur);
+            m_shortestDur = std::max(currentDur, m_shortestDur);
         }
         // check if we have more than duration in the beam
-        if (!this->m_changingDur && currentDur != lastDur) this->m_changingDur = true;
+        if (!m_changingDur && currentDur != lastDur) m_changingDur = true;
         lastDur = currentDur;
 
         elementCount++;
@@ -216,11 +216,11 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     int last = elementCount - 1;
 
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
-    this->m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
+    m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
 
     // Always set stem direction to up for grace note beam unless stem direction is provided
-    if (this->m_cueSize && (this->m_notesStemDir == STEMDIRECTION_NONE)) {
-        this->m_notesStemDir = STEMDIRECTION_up;
+    if (m_cueSize && (m_notesStemDir == STEMDIRECTION_NONE)) {
+        m_notesStemDir = STEMDIRECTION_up;
     }
 }
 
@@ -424,11 +424,13 @@ void StaffDefDrawingInterface::Reset()
     m_currentKeySig.Reset();
     m_currentMensur.Reset();
     m_currentMeterSig.Reset();
+    m_currentMeterSigGrp.Reset();
 
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;
     m_drawMeterSig = false;
+    m_drawMeterSigGrp = false;
 }
 
 void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
@@ -464,6 +466,33 @@ void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
     if (meterSig) {
         m_currentMeterSig = *meterSig;
         m_currentMeterSig.CloneReset();
+    }
+}
+
+void StaffDefDrawingInterface::SetCurrentMeterSigGrp(MeterSigGrp const *meterSigGrp)
+{
+    if (meterSigGrp) {
+        m_currentMeterSigGrp = *meterSigGrp;
+        m_currentMeterSigGrp.CloneReset();
+    }
+}
+
+bool StaffDefDrawingInterface::DrawMeterSigGrp()
+{
+    if (m_drawMeterSigGrp) {
+        const ArrayOfObjects *childList = m_currentMeterSigGrp.GetList(&m_currentMeterSigGrp);
+        if (childList->size() > 1) return true;
+    }
+    return false;
+}
+
+void StaffDefDrawingInterface::AlternateCurrentMeterSig(Measure *measure)
+{
+    if (MeterSigGrp *meterSigGrp = GetCurrentMeterSigGrp(); meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
+        meterSigGrp->SetMeasureBasedCount(measure);
+        MeterSig *meter = meterSigGrp->GetSimplifiedMeterSig();
+        SetCurrentMeterSig(meter);
+        delete meter;
     }
 }
 

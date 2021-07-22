@@ -28,7 +28,7 @@ namespace vrv {
 // KeyAccid
 //----------------------------------------------------------------------------
 
-static ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
+static const ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
 
 KeyAccid::KeyAccid() : LayerElement("keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
 {
@@ -78,15 +78,18 @@ std::wstring KeyAccid::GetSymbolStr() const
     std::wstring symbolStr;
 
     if (this->HasEnclose()) {
-        if (this->GetEnclose() == ENCLOSURE_brack) {
-            symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
-            symbolStr.push_back(symc);
-            symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
-        }
-        else {
-            symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
-            symbolStr.push_back(symc);
-            symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack:
+                symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
+                symbolStr.push_back(symc);
+                symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
+                break;
+            case ENCLOSURE_paren:
+                symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
+                symbolStr.push_back(symc);
+                symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
+                break;
+            default: symbolStr.push_back(symc);
         }
     }
     else {
