@@ -711,7 +711,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             i = std::find_if(i, end, [iter, drawingUnit, margin](BoundingBox *elem) {
                 if ((*iter)->GetObject()->IsExtenderElement() && !elem->Is(FLOATING_POSITIONER)) {
                     return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 8)
-                        || (*iter)->VerticalContentOverlap(elem);                
+                        || (*iter)->VerticalContentOverlap(elem);
                 }
                 return (*iter)->HorizontalContentOverlap(elem, margin);
             });
@@ -950,6 +950,9 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    const int staffSize = this->GetStaffSize();
+    const int drawingUnit = params->m_doc->GetDrawingUnit(staffSize);
+
     ArrayOfBoundingBoxes::iterator iter;
     // go through all the elements of the top staff that have an overflow below
     for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
@@ -958,11 +961,12 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
             // find all the elements from the bottom staff that have an overflow at the top with an horizontal overlap
-            i = std::find_if(i, end, [iter](BoundingBox *elem) {
+            i = std::find_if(i, end, [iter, drawingUnit](BoundingBox *elem) {
                 if ((*iter)->Is(FLOATING_POSITIONER)) {
                     FloatingPositioner *fp = vrv_cast<FloatingPositioner *>(*iter);
-                    if (fp->GetObject()->Is({ DIR, DYNAM })) {
-                        return (*iter)->HorizontalContentOverlap(elem) || (*iter)->VerticalContentOverlap(elem);
+                    if (fp->GetObject()->Is({ DIR, DYNAM }) && fp->GetObject()->IsExtenderElement()) {
+                        return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 4)
+                            || (*iter)->VerticalContentOverlap(elem);
                     }
                 }
                 return (*iter)->HorizontalContentOverlap(elem);
