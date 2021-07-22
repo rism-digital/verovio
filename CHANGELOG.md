@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.5.0] - 2021-07-22
 * Support for `lv` (@eNote-GmbH)
 * Support for additive meters (@eNote-GmbH)
 * Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)

@@ -89,6 +89,7 @@
 #import <VerovioFramework/staffdef.h>
 #import <VerovioFramework/ending.h>
 #import <VerovioFramework/devicecontext.h>
+#import <VerovioFramework/lv.h>
 #import <VerovioFramework/app.h>
 #import <VerovioFramework/svg.h>
 #import <VerovioFramework/section.h>
@@ -111,6 +112,7 @@
 #import <VerovioFramework/ioabc.h>
 #import <VerovioFramework/fb.h>
 #import <VerovioFramework/iomei.h>
+#import <VerovioFramework/caesura.h>
 #import <VerovioFramework/editortoolkit_cmn.h>
 #import <VerovioFramework/mensur.h>
 #import <VerovioFramework/slur.h>
@@ -118,6 +120,7 @@
 #import <VerovioFramework/io.h>
 #import <VerovioFramework/course.h>
 #import <VerovioFramework/pghead.h>
+#import <VerovioFramework/metersiggrp.h>
 #import <VerovioFramework/custos.h>
 #import <VerovioFramework/mrpt2.h>
 #import <VerovioFramework/attalternates.h>
