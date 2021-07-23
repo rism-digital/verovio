@@ -4,7 +4,7 @@
 
   <groupId>org.rism.verovio</groupId>
   <artifactId>VerovioToolkit</artifactId>
-  <version>3.5.0-dev</version>
+  <version>3.6.0-dev</version>
   <packaging>jar</packaging>
 
   <name>VerovioToolkit</name>
