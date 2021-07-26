@@ -229,12 +229,13 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             startPoint.x += r1 + drawingUnit / 2;
             endPoint.x -= r2 + drawingUnit / 2;
         }
-        if (startParentChord && !isOuterChordNote && startParentChord->HasDots()) {
+        if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
             if ((endPoint.x - startPoint.x) <= 4 * drawingUnit) {
                 startPoint.x += drawingUnit;
             }
             else {
                 Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
+                assert(dots);
                 startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
             }
         }
@@ -256,8 +257,9 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
                 startPoint.x += 2 * drawingUnit * startParentChord->GetDots();
             }
         }
-        if (startParentChord && !isOuterChordNote && startParentChord->HasDots()) {
+        if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
             Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
+            assert(dots);
             startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
         }
         endPoint.x -= (drawingUnit + doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize)) / 2;
