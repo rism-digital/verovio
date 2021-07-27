@@ -29,6 +29,7 @@
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
+#include "tie.h"
 #include "timeinterface.h"
 #include "timestamp.h"
 #include "vrv.h"
@@ -618,6 +619,26 @@ void Measure::SetInvisibleStaffBarlines(
     }
 }
 
+std::vector<LayerElement *> Measure::GetInternalTieEndpoints()
+{
+    ListOfObjects children;
+    ClassIdComparison comp(TIE);
+    this->FindAllDescendantByComparison(&children, &comp);
+
+    std::vector<LayerElement *> endpoints;
+    for (Object *object : children) {
+        Tie *tie = vrv_cast<Tie *>(object);
+        // If both start and end points of the tie are not within current measure - skip it
+        LayerElement *start = tie->GetStart();
+        if (!start || (start->GetFirstAncestor(MEASURE) != this)) continue;
+        LayerElement *end = tie->GetEnd();
+        if (!end || (end->GetFirstAncestor(MEASURE) != this)) continue;
+        endpoints.push_back(end);
+    }
+
+    return endpoints;
+}
+
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
@@ -992,6 +1013,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
+        params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
 

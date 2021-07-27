@@ -1814,6 +1814,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     offset = std::min(offset, selfLeft - params->m_minPos);
+    if ((std::find(params->m_measureTieEndpoints.begin(), params->m_measureTieEndpoints.end(), this)
+            != params->m_measureTieEndpoints.end())
+        && (GetFirstAncestor(CHORD) != NULL) && (offset >= 0)) {
+        offset = -drawingUnit;
+    }
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         // Also move the accumulated x shift and the minimum position for the next alignment accordingly

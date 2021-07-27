@@ -674,6 +674,7 @@ public:
         m_functorEnd = functorEnd;
         m_currentAlignment.Reset();
         m_previousAlignment.Reset();
+        m_measureTieEndpoints.clear();
     }
     int m_minPos;
     int m_upcomingMinPos;
@@ -685,6 +686,7 @@ public:
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
     std::vector<ClassId> m_includes;
     std::vector<ClassId> m_excludes;
+    std::vector<LayerElement *> m_measureTieEndpoints;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
