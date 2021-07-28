@@ -383,7 +383,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (m_object->Is({ DIR, DYNAM })) {
+            if (m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement()) {
                 m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
             }
@@ -410,7 +410,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (m_object->Is({ DIR, DYNAM })) {
+            if (m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement()) {
                 m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
             }
