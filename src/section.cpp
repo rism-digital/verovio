@@ -32,9 +32,10 @@ namespace vrv {
 
 static const ClassRegistrar<Section> s_factory("section", SECTION);
 
-Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNumberLike()
+Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNumberLike(), AttSectionVis()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
+    RegisterAttClass(ATT_SECTIONVIS);
 
     Reset();
 }
@@ -46,6 +47,7 @@ void Section::Reset()
     SystemElement::Reset();
     BoundaryStartInterface::Reset();
     ResetNNumberLike();
+    ResetSectionVis();
 }
 
 bool Section::IsSupportedChild(Object *child)
