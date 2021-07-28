@@ -619,13 +619,13 @@ void Measure::SetInvisibleStaffBarlines(
     }
 }
 
-std::vector<LayerElement *> Measure::GetInternalTieEndpoints()
+std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEndpoints()
 {
     ListOfObjects children;
     ClassIdComparison comp(TIE);
     this->FindAllDescendantByComparison(&children, &comp);
 
-    std::vector<LayerElement *> endpoints;
+    std::vector<std::pair<LayerElement *, LayerElement *>> endpoints;
     for (Object *object : children) {
         Tie *tie = vrv_cast<Tie *>(object);
         // If both start and end points of the tie are not within current measure - skip it
@@ -633,7 +633,7 @@ std::vector<LayerElement *> Measure::GetInternalTieEndpoints()
         if (!start || (start->GetFirstAncestor(MEASURE) != this)) continue;
         LayerElement *end = tie->GetEnd();
         if (!end || (end->GetFirstAncestor(MEASURE) != this)) continue;
-        endpoints.push_back(end);
+        endpoints.emplace_back(start, end);
     }
 
     return endpoints;

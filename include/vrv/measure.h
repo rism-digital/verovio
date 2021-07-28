@@ -249,7 +249,7 @@ public:
     /**
      * Return vector with tie endpoints for ties that start and end in current measure
      */
-    std::vector<LayerElement *> GetInternalTieEndpoints();
+    std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
 
     //----------//
     // Functors //

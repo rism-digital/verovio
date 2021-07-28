@@ -1814,11 +1814,6 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     offset = std::min(offset, selfLeft - params->m_minPos);
-    if ((std::find(params->m_measureTieEndpoints.begin(), params->m_measureTieEndpoints.end(), this)
-            != params->m_measureTieEndpoints.end())
-        && (GetFirstAncestor(CHORD) != NULL) && (offset >= 0)) {
-        offset = -drawingUnit;
-    }
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         // Also move the accumulated x shift and the minimum position for the next alignment accordingly
@@ -1849,6 +1844,20 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
     else {
         params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
+    }
+
+    auto it = std::find_if(params->m_measureTieEndpoints.begin(), params->m_measureTieEndpoints.end(),
+        [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
+    if ((it != params->m_measureTieEndpoints.end()) && (GetFirstAncestor(CHORD) != NULL)) {
+        const int minTiedDistance = 7 * drawingUnit;
+        const int alignmentDistance = it->second->GetAlignment()->GetXRel() - it->first->GetAlignment()->GetXRel();
+        if (alignmentDistance < minTiedDistance) {
+            const int adjust = minTiedDistance - alignmentDistance;
+            this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() + adjust);
+            // Also move the accumulated x shift and the minimum position for the next alignment accordingly
+            params->m_cumulatedXShift += adjust;
+            params->m_upcomingMinPos += adjust;
+        }
     }
 
     return FUNCTOR_SIBLINGS;
