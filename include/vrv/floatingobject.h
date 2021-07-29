@@ -70,7 +70,7 @@ public:
     void SetDrawingGrpId(int drawingGrpId) { m_drawingGrpId = drawingGrpId; }
     int SetDrawingGrpObject(void *drawingGrpObject);
     ///@}
-    
+
     /**
      * @name Get and set maximum drawing yRel that is persistent for the floating object across all its floating
      * positioners, which allows for persisten vertical positioning for some elements
@@ -138,7 +138,7 @@ private:
 
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
-    
+
     int m_maxDrawingYRel;
 
     //----------------//
