@@ -923,28 +923,28 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
         m_infoObject.import("uuid", custos->GetUuid());
     }
-    else if(elementType == "accid"){
-        Accid *accid = new Accid();
-        zone->SetUlx(ulx);
-        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
-        surface->AddChild(zone);
-        accid->SetZone(zone);
-        layer->AddChild(accid);
+    // else if(elementType == "accid"){
+    //     // Accid *accid = new Accid();
+    //     // zone->SetUlx(ulx);
+    //     // Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+    //     // surface->AddChild(zone);
+    //     // accid->SetZone(zone);
+    //     // layer->AddChild(accid);
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+    //     // const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+    //     // const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-        ulx -= noteWidth / 2;
-        uly -= noteHeight / 2;
+    //     // ulx -= noteWidth / 2;
+    //     // uly -= noteHeight / 2;
 
-        zone->SetUlx(ulx);
-        zone->SetUly(uly);
-        zone->SetLrx(ulx + noteWidth);
-        zone->SetLry(uly + noteHeight);
-        layer->ReorderByXPos();
+    //     // zone->SetUlx(ulx);
+    //     // zone->SetUly(uly);
+    //     // zone->SetLrx(ulx + noteWidth);
+    //     // zone->SetLry(uly + noteHeight);
+    //     // layer->ReorderByXPos();
 
-        m_infoObject.import("uuid", accid->GetUuid());
-    }
+    //     // m_infoObject.import("uuid", accid->GetUuid());
+    // }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
         m_infoObject.import("status", "FAILURE");
