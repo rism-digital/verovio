@@ -652,11 +652,14 @@ public:
  * member 5: the list of staffN in the top-level scoreDef
  * member 6: the bounding box in the previous aligner
  * member 7: the upcoming bounding boxes (to be used in the next aligner)
- * member 8: the Doc
- * member 9: the Functor for redirection to the MeasureAligner
- * member 10: the end Functor for redirection
- * member 11: current aligner that is being processed
- * member 12: preceeding aligner that was handled before
+ * member 8: list of types to include
+ * member 9: list of types to exclude
+ * member 10: list of tie endpoints for the current measure
+ * member 11: the Doc
+ * member 12: the Functor for redirection to the MeasureAligner
+ * member 13: the end Functor for redirection
+ * member 14: current aligner that is being processed
+ * member 15: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -674,6 +677,7 @@ public:
         m_functorEnd = functorEnd;
         m_currentAlignment.Reset();
         m_previousAlignment.Reset();
+        m_measureTieEndpoints.clear();
     }
     int m_minPos;
     int m_upcomingMinPos;
@@ -685,6 +689,7 @@ public:
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
     std::vector<ClassId> m_includes;
     std::vector<ClassId> m_excludes;
+    std::vector<std::pair<LayerElement *, LayerElement *>> m_measureTieEndpoints;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
