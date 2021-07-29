@@ -1552,10 +1552,10 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
             isUnisonElement = currentNote->IsUnisonWith(previousNote, true);
+            const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
             // Unisson, look at the duration for the note heads
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
-                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
                 if (isPreviousCoord) {
                     Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
@@ -1640,6 +1640,18 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
                 // Otherwise move the appropriate parent to the right
                 shift -= horizontalMargin
                     - HorizontalRightOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
+            }
+        }
+        else if (Note *currentNote = vrv_cast<Note *>(this);
+                 Is(NOTE) && (currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM)) {
+            const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
+            data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
+            if (this->HorizontalLeftOverlap(otherElements.at(i), doc, 0, 0) != 0) {
+                shift = 3 * horizontalMargin;
+                if (stemDir == STEMDIRECTION_up) {
+                    shift *= -1;
+                }
             }
         }
     }
