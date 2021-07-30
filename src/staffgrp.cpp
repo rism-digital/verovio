@@ -34,12 +34,14 @@ StaffGrp::StaffGrp()
     , ObjectListInterface()
     , AttBasic()
     , AttLabelled()
+    , AttNNumberLike()
     , AttStaffGroupingSym()
     , AttStaffGrpVis()
     , AttTyped()
 {
     RegisterAttClass(ATT_BASIC);
     RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
     RegisterAttClass(ATT_TYPED);
@@ -54,6 +56,7 @@ void StaffGrp::Reset()
     Object::Reset();
     ResetBasic();
     ResetLabelled();
+    ResetNNumberLike();
     ResetStaffGroupingSym();
     ResetStaffGrpVis();
     ResetTyped();
@@ -167,6 +170,50 @@ void StaffGrp::SetGroupSymbol(GrpSym *grpSym)
     if (grpSym) {
         m_groupSymbol = grpSym;
     }
+}
+
+bool StaffGrp::HasLabelInfo()
+{
+    return (this->FindDescendantByType(LABEL, 1));
+}
+
+bool StaffGrp::HasLabelAbbrInfo()
+{
+    return (this->FindDescendantByType(LABELABBR, 1));
+}
+
+Label *StaffGrp::GetLabel()
+{
+    // Always check if HasLabelInfo() is true before asking for it
+    Label *label = vrv_cast<Label *>(this->FindDescendantByType(LABEL, 1));
+    assert(label);
+    return label;
+}
+
+Label *StaffGrp::GetLabelCopy()
+{
+    // Always check if HasClefInfo() is true before asking for a clone
+    Label *clone = dynamic_cast<Label *>(this->GetLabel()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
+}
+
+LabelAbbr *StaffGrp::GetLabelAbbr()
+{
+    // Always check if HasLabelAbbrInfo() is true before asking for it
+    LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR, 1));
+    assert(labelAbbr);
+    return labelAbbr;
+}
+
+LabelAbbr *StaffGrp::GetLabelAbbrCopy()
+{
+    // Always check if HasClefInfo() is true before asking for a clone
+    LabelAbbr *clone = dynamic_cast<LabelAbbr *>(this->GetLabelAbbr()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
 //----------------------------------------------------------------------------

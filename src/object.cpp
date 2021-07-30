@@ -1609,6 +1609,15 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     }
 
     // starting a new staffDef
+    if (this->Is(STAFFGRP)) {
+        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this);
+        assert(staffGrp);
+        if (params->m_restart) {
+            params->m_upcomingScoreDef->ReplaceDrawingLabels(staffGrp);
+        }
+    }
+
+    // starting a new staffDef
     if (this->Is(STAFFDEF)) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(this);
         assert(staffDef);

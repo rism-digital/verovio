@@ -1137,6 +1137,7 @@ void MEIOutput::WriteStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
     WriteXmlId(currentNode, staffGrp);
     staffGrp->WriteBasic(currentNode);
     staffGrp->WriteLabelled(currentNode);
+    staffGrp->WriteNNumberLike(currentNode);
     staffGrp->WriteStaffGroupingSym(currentNode);
     staffGrp->WriteStaffGrpVis(currentNode);
     staffGrp->WriteTyped(currentNode);
@@ -3809,6 +3810,7 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
 
     vrvStaffGrp->ReadBasic(staffGrp);
     vrvStaffGrp->ReadLabelled(staffGrp);
+    vrvStaffGrp->ReadNNumberLike(staffGrp);
     AttStaffGroupingSym groupingSym;
     groupingSym.ReadStaffGroupingSym(staffGrp);
     if (groupingSym.HasSymbol()) {
