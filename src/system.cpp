@@ -153,8 +153,7 @@ int System::GetMinimumSystemSpacing(const Doc *doc) const
 
 int System::GetDrawingLabelsWidth() const
 {
-    assert(m_drawingScoreDef);
-    return m_drawingScoreDef->GetDrawingLabelsWidth();
+    return (m_drawingScoreDef) ? m_drawingScoreDef->GetDrawingLabelsWidth() : 0;
 }
 
 void System::SetDrawingLabelsWidth(int width)
