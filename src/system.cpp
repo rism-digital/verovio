@@ -78,7 +78,6 @@ void System::Reset()
     m_drawingYRel = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
-    m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
     m_drawingIsOptimized = false;
 }
@@ -152,11 +151,16 @@ int System::GetMinimumSystemSpacing(const Doc *doc) const
     return spacingSystem.GetValue() * doc->GetDrawingUnit(100);
 }
 
+int System::GetDrawingLabelsWidth() const
+{
+    assert(m_drawingScoreDef);
+    return m_drawingScoreDef->GetDrawingLabelsWidth();
+}
+
 void System::SetDrawingLabelsWidth(int width)
 {
-    if (m_drawingLabelsWidth < width) {
-        m_drawingLabelsWidth = width;
-    }
+    assert(m_drawingScoreDef);
+    m_drawingScoreDef->SetDrawingLabelsWidth(width);
 }
 
 void System::SetDrawingAbbrLabelsWidth(int width)
@@ -399,7 +403,6 @@ int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     SetDrawingXRel(0);
-    m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
 
     return FUNCTOR_CONTINUE;

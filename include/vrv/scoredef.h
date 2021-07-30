@@ -178,6 +178,9 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
+    void SetDrawingLabelsWidth(int width);
+
     /**
      * @name Getters for running elements
      */
@@ -196,6 +199,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToPageBased
@@ -230,6 +238,8 @@ private:
     bool m_drawLabels;
     /** Store the drawing width (clef and key sig) of the scoreDef */
     int m_drawingWidth;
+    /** Store the label drawing width of the scoreDef */
+    int m_drawingLabelsWidth;
 };
 
 } // namespace vrv

@@ -197,6 +197,7 @@ void ScoreDef::Reset()
 
     m_drawLabels = false;
     m_drawingWidth = 0;
+    m_drawingLabelsWidth = 0;
     m_setAsDrawing = false;
 }
 
@@ -403,6 +404,13 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
     m_drawingWidth = drawingWidth;
 }
 
+void ScoreDef::SetDrawingLabelsWidth(int width)
+{
+    if (m_drawingLabelsWidth < width) {
+        m_drawingLabelsWidth = width;
+    }
+}
+
 PgFoot *ScoreDef::GetPgFoot()
 {
     return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
@@ -432,6 +440,13 @@ int ScoreDef::GetMaxStaffSize()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    m_drawingLabelsWidth = 0;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 {
