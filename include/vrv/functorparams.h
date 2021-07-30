@@ -492,17 +492,20 @@ public:
 
 /**
  * member 0: a pointer to the previous staff alignment
- * member 1: a pointer to the functor for passing it to the system aligner
+ * member 1: the doc
+ * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustStaffOverlapParams : public FunctorParams {
 public:
-    AdjustStaffOverlapParams(Functor *functor)
+    AdjustStaffOverlapParams(Doc *doc, Functor *functor)
     {
         m_previous = NULL;
+        m_doc = doc;
         m_functor = functor;
     }
     StaffAlignment *m_previous;
+    Doc *m_doc;
     Functor *m_functor;
 };
 

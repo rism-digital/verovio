@@ -483,7 +483,7 @@ void Page::LayOutVertically()
 
     // Adjust the overlap of the staff aligments by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
-    AdjustStaffOverlapParams adjustStaffOverlapParams(&adjustStaffOverlap);
+    AdjustStaffOverlapParams adjustStaffOverlapParams(doc, &adjustStaffOverlap);
     this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
 
     // Set the Y position of each StaffAlignment
