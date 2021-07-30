@@ -325,7 +325,9 @@ void View::DrawStaffGrp(
         DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
     // draw the group symbol
+    int staffGrpX = x;
     DrawGrpSym(dc, measure, staffGrp, x);
+    int grpSymSpace = staffGrpX - x;
 
     // recursively draw the children
     StaffGrp *childStaffGrp = NULL;
@@ -341,7 +343,7 @@ void View::DrawStaffGrp(
     const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space);
+    this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
 
     DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
 }
