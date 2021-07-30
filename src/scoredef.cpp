@@ -498,4 +498,25 @@ int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int ScoreDef::AlignMeasures(FunctorParams *functorParams)
+{
+    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
+    assert(params);
+
+    // SetDrawingXRel(m_systemLeftMar + this->GetDrawingWidth());
+    params->m_shift += m_drawingLabelsWidth;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::JustifyX(FunctorParams *functorParams)
+{
+    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
+    assert(params);
+
+    params->m_measureXRel += m_drawingLabelsWidth;
+
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv

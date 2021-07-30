@@ -222,6 +222,16 @@ public:
      */
     virtual int CastOffEncoding(FunctorParams *functorParams);
 
+    /**
+     * See Object::AlignMeasures
+     */
+    virtual int AlignMeasures(FunctorParams *functorParams);
+
+    /**
+     * See Object::JustifyX
+     */
+    virtual int JustifyX(FunctorParams *functorParams);
+
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
