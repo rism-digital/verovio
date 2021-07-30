@@ -1552,10 +1552,10 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
             isUnisonElement = currentNote->IsUnisonWith(previousNote, true);
-            const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
             // Unisson, look at the duration for the note heads
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
+                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
                 if (isPreviousCoord) {
                     Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
