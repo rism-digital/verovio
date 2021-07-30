@@ -68,6 +68,7 @@ public:
     bool HasMensurInfo(int depth = 1);
     bool HasMeterSigInfo(int depth = 1);
     bool HasMeterSigGrpInfo(int depth = 1);
+    bool HasLabelInfo(int depth = 1);
     ///@}
 
     /**

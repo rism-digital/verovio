@@ -79,6 +79,11 @@ bool ScoreDefElement::HasMeterSigGrpInfo(int depth)
     return (this->FindDescendantByType(METERSIGGRP, depth));
 }
 
+bool ScoreDefElement::HasLabelInfo(int depth)
+{
+    return (this->FindDescendantByType(LABEL, depth));
+}
+
 Clef *ScoreDefElement::GetClef()
 {
     // Always check if HasClefInfo() is true before asking for it

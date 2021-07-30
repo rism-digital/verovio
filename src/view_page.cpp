@@ -1503,6 +1503,11 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             // nothing to do, then
             ScoreDef *scoreDef = vrv_cast<ScoreDef *>(current);
             assert(scoreDef);
+
+            Measure *nextMeasure = dynamic_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
+            if (nextMeasure && scoreDef->DrawLabels())
+                DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
+
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
         else if (current->IsSystemElement()) {
