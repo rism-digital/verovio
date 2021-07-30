@@ -1742,13 +1742,28 @@ int View::DrawMeterSigFigures(
     x += width / 2;
 
     if (den) {
-        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator,
-            HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
-        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator,
-            HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+        int yNum = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int yDen = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        // In case when one of the handwritten fonts is used, we need to make sure that meterSig is displayed properly
+        // for it, based on the height of corresponding glyphs
+        FontInfo *fontInfo = dc->GetFont();
+        std::vector<std::string> handwrittenFonts = m_doc->GetOptions()->m_handwrittenFont.GetValue();
+        if (const auto it = std::find(handwrittenFonts.begin(), handwrittenFonts.end(), fontInfo->GetFaceName());
+            it != handwrittenFonts.end()) {
+            TextExtend numExtend;
+            dc->GetSmuflTextExtent(timeSigCombNumerator, &numExtend);
+            yNum = y + numExtend.m_height / 2;
+
+            TextExtend denExtend;
+            dc->GetSmuflTextExtent(timeSigCombDenominator, &denExtend);
+            yDen = y - denExtend.m_height / 2;
+        }
+        DrawSmuflString(dc, x, yNum, timeSigCombNumerator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, yDen, timeSigCombDenominator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
     }
-    else
+    else {
         DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+    }
 
     dc->ResetFont();
 
