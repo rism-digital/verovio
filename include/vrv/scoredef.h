@@ -146,9 +146,20 @@ public:
     void ReplaceDrawingValues(StaffDef *newStaffDef);
 
     /**
+     * Replace the corresponding staffGrp with the labels of the newStaffGrp.
+     * Looks for the staffGrp with the same m_n (@n) and replaces label child
+     */
+    void ReplaceDrawingLabels(StaffGrp *newStaffGrp);
+
+    /**
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
+
+    /**
+     * Get the staffGrp with number n (NULL if not found).
+     */
+    StaffGrp *GetStaffGrp(const std::string &n);
 
     /**
      * Return all the @n values of the staffDef in a scoreDef

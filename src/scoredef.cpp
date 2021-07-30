@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "comparison.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "grpsym.h"
@@ -339,6 +340,27 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     }
 }
 
+void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
+{
+    assert(newStaffGrp);
+
+    // first find the staffGrp with the same @n
+    StaffGrp *staffGrp = this->GetStaffGrp(newStaffGrp->GetN());
+    if (staffGrp) {
+        if (newStaffGrp->HasLabelInfo()) {
+            Label *label = newStaffGrp->GetLabelCopy();
+            if (staffGrp->HasLabelInfo()) {
+                Label *oldLabel = staffGrp->GetLabel();
+                staffGrp->ReplaceChild(oldLabel, label);
+                delete oldLabel;
+            }
+            else {
+                staffGrp->AddChild(label);
+            }
+        }
+    }
+}
+
 void ScoreDef::FilterList(ArrayOfObjects *childList)
 {
     // We want to keep only staffDef
@@ -371,6 +393,22 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     }
 
     return staffDef;
+}
+
+StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
+{
+    // First get all the staffGrps
+    ClassIdComparison matchType(STAFFGRP);
+    ListOfObjects staffGrps;
+    this->FindAllDescendantByComparison(&staffGrps, &matchType);
+
+    // Then the @n of each first staffDef
+    for (auto &item : staffGrps) {
+        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(item);
+        assert(staffGrp);
+        if (staffGrp->GetN() == n) return staffGrp;
+    }
+    return NULL;
 }
 
 std::vector<int> ScoreDef::GetStaffNs()
