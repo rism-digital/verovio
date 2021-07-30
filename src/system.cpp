@@ -397,7 +397,7 @@ int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
 
     if (m_drawingScoreDef) m_drawingScoreDef->Process(params->m_functor, functorParams);
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
