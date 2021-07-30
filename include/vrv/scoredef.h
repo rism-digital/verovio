@@ -197,7 +197,7 @@ public:
      */
     int GetMaxStaffSize();
 
-    bool DrawWithinStaff();
+    bool IsSectionRestart();
 
     //----------//
     // Functors //

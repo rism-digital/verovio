@@ -443,12 +443,14 @@ int ScoreDef::GetMaxStaffSize()
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
 
-bool ScoreDef::DrawWithinStaff()
+bool ScoreDef::IsSectionRestart()
 {
-    if (!this->GetParent() || !this->GetParent()->Is(SECTION)) return false;
-    Section *section = vrv_cast<Section *>(this->GetParent());
-    assert(section);
-    return (section->GetRestart() == BOOLEAN_true);
+    if (!this->GetParent()) return false;
+    // In page-based structure, Section is a sibling to scoreDef
+    // This has limitations: will not work with editorial markup, additional nested sections, and
+    // if the section milestone is in the previous system.
+    Section *section = dynamic_cast<Section *>(this->GetParent()->GetPrevious(this, SECTION));
+    return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
 //----------------------------------------------------------------------------

@@ -1590,7 +1590,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
             params->m_upcomingScoreDef->m_insertScoreDef = true;
         }
-        if (scoreDef->GetType() == "restart") {
+        if (scoreDef->IsSectionRestart()) {
             // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
             params->m_drawLabels = true;
             params->m_restart = true;
