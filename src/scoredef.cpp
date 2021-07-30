@@ -26,6 +26,7 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "section.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "system.h"
@@ -440,6 +441,14 @@ int ScoreDef::GetMaxStaffSize()
 {
     StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
+}
+
+bool ScoreDef::DrawWithinStaff()
+{
+    if (!this->GetParent() || !this->GetParent()->Is(SECTION)) return false;
+    Section *section = vrv_cast<Section *>(this->GetParent());
+    assert(section);
+    return (section->GetRestart() == BOOLEAN_true);
 }
 
 //----------------------------------------------------------------------------

@@ -197,6 +197,8 @@ public:
      */
     int GetMaxStaffSize();
 
+    bool DrawWithinStaff();
+
     //----------//
     // Functors //
     //----------//
