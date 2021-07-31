@@ -1608,7 +1608,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         }
     }
 
-    // starting a new staffDef
+    // starting a new staffGrp
     if (this->Is(STAFFGRP)) {
         StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this);
         assert(staffGrp);

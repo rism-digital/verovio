@@ -1507,8 +1507,9 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             assert(scoreDef);
 
             Measure *nextMeasure = dynamic_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
-            if (nextMeasure && scoreDef->DrawLabels())
+            if (nextMeasure && scoreDef->DrawLabels()) {
                 DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
+            }
 
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
