@@ -1612,6 +1612,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(STAFFGRP)) {
         StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this);
         assert(staffGrp);
+        // For now replace labels only if we have a section@restart
         if (params->m_restart) {
             params->m_upcomingScoreDef->ReplaceDrawingLabels(staffGrp);
         }

@@ -20,6 +20,7 @@
 #include "grpsym.h"
 #include "keysig.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
@@ -347,15 +348,31 @@ void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
     // first find the staffGrp with the same @n
     StaffGrp *staffGrp = this->GetStaffGrp(newStaffGrp->GetN());
     if (staffGrp) {
+        // Replace with thew new label only if we have one
         if (newStaffGrp->HasLabelInfo()) {
             Label *label = newStaffGrp->GetLabelCopy();
+            // Check if we previoulsy had one, and replace it if yes
             if (staffGrp->HasLabelInfo()) {
                 Label *oldLabel = staffGrp->GetLabel();
                 staffGrp->ReplaceChild(oldLabel, label);
                 delete oldLabel;
             }
+            // Otherwise simply add it
             else {
                 staffGrp->AddChild(label);
+            }
+        }
+        if (newStaffGrp->HasLabelAbbrInfo()) {
+            LabelAbbr *labelAbbr = newStaffGrp->GetLabelAbbrCopy();
+            // Check if we previoulsy had one, and replace it if yes
+            if (staffGrp->HasLabelAbbrInfo()) {
+                LabelAbbr *oldLabelAbbr = staffGrp->GetLabelAbbr();
+                staffGrp->ReplaceChild(oldLabelAbbr, labelAbbr);
+                delete oldLabelAbbr;
+            }
+            // Otherwise simply add it
+            else {
+                staffGrp->AddChild(labelAbbr);
             }
         }
     }
