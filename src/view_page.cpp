@@ -505,7 +505,9 @@ void View::DrawLabels(
             dc->GetTextExtent(line, &extend, true);
             maxLength = (extend.m_width > maxLength) ? extend.m_width : maxLength;
         }
-        /// system->SetDrawingAbbrLabelsWidth(maxLength + space);
+        System *system = vrv_cast<System *>(scoreDef->GetFirstAncestor(SYSTEM));
+        assert(system);
+        system->SetDrawingAbbrLabelsWidth(maxLength + space);
     }
 
     dc->ResetFont();
