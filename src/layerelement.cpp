@@ -1407,10 +1407,11 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     assert(params);
 
     // ignore elements that are not in the beam or are direct children of the beam
-    if (!params->m_beam
-        || (!params->m_isOtherLayer && Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam)
-            && !IsGraceNote()))
-        return FUNCTOR_SIBLINGS;
+    if (!params->m_beam) return FUNCTOR_CONTINUE;
+    if (!params->m_isOtherLayer && (Is({ NOTE, CHORD }) || !Is(ACCID)) && (GetFirstAncestor(BEAM) == params->m_beam)
+        && !IsGraceNote())
+        return FUNCTOR_CONTINUE;
+    if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
     if (Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
@@ -1423,23 +1424,19 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     Beam *beam = vrv_cast<Beam *>(params->m_beam);
     const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(GetDrawingX()) - DUR_8;
     if (params->m_directionBias > 0) {
-        leftMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1
-            + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
-        rightMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2
-            + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
+        leftMargin = GetContentTop() - params->m_y1 + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
+        rightMargin = GetContentTop() - params->m_y2 + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
     }
     else {
-        leftMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1
-            - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
-        rightMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2
-            - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
+        leftMargin = GetContentBottom() - params->m_y1 - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
+        rightMargin = GetContentBottom() - params->m_y2 - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
     }
 
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
     if (overlapMargin >= params->m_directionBias * params->m_overlapMargin) {
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         params->m_overlapMargin
-            = (((overlapMargin + staffOffset - 1) / staffOffset + 1.5) * staffOffset) * params->m_directionBias;
+            = (((overlapMargin + staffOffset - 1) / staffOffset + 0.5) * staffOffset) * params->m_directionBias;
     }
 
     return FUNCTOR_CONTINUE;
