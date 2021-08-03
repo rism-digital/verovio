@@ -941,6 +941,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
             }
         }
+        accid->SetAccidGes(accidTypeGes);
         zone->SetUlx(ulx);
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
