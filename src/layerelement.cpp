@@ -1418,21 +1418,18 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     assert(staff);
 
     // check if top/bottom of the element overlaps with beam coordinates
-    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
-    int leftMargin = 0, rightMargin = 0;
-
+    int margin = 0;
     Beam *beam = vrv_cast<Beam *>(params->m_beam);
     const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(GetDrawingX()) - DUR_8;
+    const int currentBeamY = params->m_y1 + params->m_beamSlope * (params->m_x1 - this->GetDrawingX());
     if (params->m_directionBias > 0) {
-        leftMargin = GetContentTop() - params->m_y1 + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
-        rightMargin = GetContentTop() - params->m_y2 + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
+        margin = GetContentTop() - currentBeamY + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
     }
     else {
-        leftMargin = GetContentBottom() - params->m_y1 - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
-        rightMargin = GetContentBottom() - params->m_y2 - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
+        margin = GetContentBottom() - currentBeamY - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
     }
 
-    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
+    const int overlapMargin = margin * params->m_directionBias;
     if (overlapMargin >= params->m_directionBias * params->m_overlapMargin) {
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         params->m_overlapMargin
