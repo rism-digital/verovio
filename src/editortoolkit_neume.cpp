@@ -925,23 +925,20 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     else if(elementType == "accid"){
         Accid *accid = new Accid();
-        data_ACCIDENTAL_GESTURAL accidTypeGes = ACCIDENTAL_GESTURAL_NONE;
         data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
          for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "accid") {
                 if (it->second == "f") {
-                    accidTypeGes = ACCIDENTAL_GESTURAL_f;
                     accidTypeW = ACCIDENTAL_WRITTEN_f;
                     break;
                 }
                 else if (it->second == "n") {
-                    accidTypeGes = ACCIDENTAL_GESTURAL_n;
                     accidTypeW = ACCIDENTAL_WRITTEN_n;
                     break;
                 }
             }
         }
-        accid->SetAccidGes(accidTypeGes);
+        accid->SetAccid(accidTypeW);
         zone->SetUlx(ulx);
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
