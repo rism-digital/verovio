@@ -160,8 +160,11 @@ public:
  * member 0: the beam that should be adjusted
  * member 1: y coordinate of the beam left side
  * member 2: y coordinate of the beam right side
- * member 3: overlap margin that beam needs to be displaced by
- * member 4: the Doc
+ * member 3: x coordinate of the beam left side (starting point)
+ * member 4: slope of the beam
+ * member 5: overlap margin that beam needs to be displaced by
+ * member 6: the Doc
+ * member 7: the flag indicating whether element from different layer is being processed
  **/
 
 class AdjustBeamParams : public FunctorParams {
