@@ -624,7 +624,9 @@ float View::CalcInitialSlur(
     }
     for (FloatingPositioner *positioner : tiePositioners) {
         if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)
-            && (positioner->GetContentLeft() < bezier.p2.x)) {
+            && (positioner->GetContentLeft() < bezier.p2.x)
+            && (vrv_cast<System *>(positioner->GetObject()->GetFirstAncestor(SYSTEM))
+                == curve->GetAlignment()->GetParentSystem())) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = positioner;
             curve->AddSpannedElement(spannedElement);
