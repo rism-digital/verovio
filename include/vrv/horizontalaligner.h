@@ -341,6 +341,7 @@ public:
      * See Object::AdjustLayers
      */
     virtual int AdjustLayers(FunctorParams *functorParams);
+    virtual int AdjustLayersEnd(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustGraceXPos
