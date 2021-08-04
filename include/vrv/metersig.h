@@ -23,7 +23,7 @@ class ScoreDefInterface;
 /**
  * This class models the MEI <meterSig> element.
  */
-class MeterSig : public LayerElement, public AttMeterSigLog, public AttMeterSigVis {
+class MeterSig : public LayerElement, public AttEnclosingChars, public AttMeterSigLog, public AttMeterSigVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -45,6 +45,12 @@ public:
 
     /** Evaluate additive meter counts */
     int GetTotalCount() const;
+
+    /** Retrieves the symbol glyph */
+    wchar_t GetSymbolGlyph() const;
+
+    /** Retrieves parentheses from the enclose attribute */
+    wchar_t GetEnclosingGlyph(bool beforeMeterSig) const;
 
     //----------//
     // Functors //

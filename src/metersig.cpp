@@ -16,6 +16,7 @@
 
 #include "functorparams.h"
 #include "scoredefinterface.h"
+#include "smufl.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -26,8 +27,9 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
-MeterSig::MeterSig() : LayerElement(METERSIG, "msig-"), AttMeterSigLog(), AttMeterSigVis()
+MeterSig::MeterSig() : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis()
 {
+    RegisterAttClass(ATT_ENCLOSINGCHARS);
     RegisterAttClass(ATT_METERSIGLOG);
     RegisterAttClass(ATT_METERSIGVIS);
 
@@ -39,6 +41,7 @@ MeterSig::~MeterSig() {}
 void MeterSig::Reset()
 {
     LayerElement::Reset();
+    ResetEnclosingChars();
     ResetMeterSigLog();
     ResetMeterSigVis();
 }
@@ -47,6 +50,25 @@ int MeterSig::GetTotalCount() const
 {
     const data_SUMMAND_List &summands = this->GetCount();
     return std::accumulate(summands.cbegin(), summands.cend(), 0);
+}
+
+wchar_t MeterSig::GetSymbolGlyph() const
+{
+    wchar_t glyph = 0;
+    switch (this->GetSym()) {
+        case METERSIGN_common: glyph = SMUFL_E08A_timeSigCommon; break;
+        case METERSIGN_cut: glyph = SMUFL_E08B_timeSigCutCommon; break;
+        default: break;
+    }
+    return glyph;
+}
+
+wchar_t MeterSig::GetEnclosingGlyph(bool beforeMeterSig) const
+{
+    if (this->GetEnclose() == ENCLOSURE_paren) {
+        return beforeMeterSig ? SMUFL_E094_timeSigParensLeft : SMUFL_E095_timeSigParensRight;
+    }
+    return 0;
 }
 
 //----------------------------------------------------------------------------

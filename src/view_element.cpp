@@ -1030,27 +1030,40 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     MeterSig *meterSig = vrv_cast<MeterSig *>(element);
     assert(meterSig);
 
+    if (meterSig->GetForm() == METERFORM_invis) return;
+
+    const wchar_t enclosingFront = meterSig->GetEnclosingGlyph(true);
+    const wchar_t enclosingBack = meterSig->GetEnclosingGlyph(false);
+    if (meterSig->HasEnclose() && (meterSig->GetEnclose() != ENCLOSURE_paren)) {
+        LogWarning("Only drawing of enclosing parentheses is supported for metersig.");
+    }
+
     dc->StartGraphic(element, "", element->GetUuid());
 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
 
-    if (meterSig->GetForm() == METERFORM_invis) {
-        // just skip
+    const bool diminEncl = (meterSig->HasSym() || meterSig->GetForm() == METERFORM_num);
+    if (enclosingFront) {
+        const int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, diminEncl);
+        DrawSmuflCode(dc, x - xCorrEncl, y, enclosingFront, staff->m_drawingStaffSize, diminEncl);
     }
-    else if (meterSig->HasSym()) {
-        if (meterSig->GetSym() == METERSIGN_common) {
-            DrawSmuflCode(dc, x, y, SMUFL_E08A_timeSigCommon, staff->m_drawingStaffSize, false);
-        }
-        else if (meterSig->GetSym() == METERSIGN_cut) {
-            DrawSmuflCode(dc, x, y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
-        }
+
+    int contentWidth = 0;
+    if (meterSig->HasSym()) {
+        const wchar_t code = meterSig->GetSymbolGlyph();
+        DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
+        contentWidth = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false);
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
+        contentWidth = DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+        contentWidth = DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+    }
+
+    if (enclosingBack) {
+        DrawSmuflCode(dc, x + contentWidth, y, enclosingBack, staff->m_drawingStaffSize, diminEncl);
     }
 
     dc->EndGraphic(element, this);
@@ -1678,7 +1691,7 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
 }
 
-void View::DrawMeterSigFigures(
+int View::DrawMeterSigFigures(
     DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff)
 {
     assert(dc);
@@ -1698,7 +1711,8 @@ void View::DrawMeterSigFigures(
 
     TextExtend extend;
     dc->GetSmuflTextExtent(widthText, &extend);
-    x += (extend.m_width / 2);
+    const int width = extend.m_width;
+    x += width / 2;
 
     if (den) {
         DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator,
@@ -1710,6 +1724,8 @@ void View::DrawMeterSigFigures(
         DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
 
     dc->ResetFont();
+
+    return width;
 }
 
 void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int num, bool line, Staff *staff)
