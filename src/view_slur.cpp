@@ -623,8 +623,10 @@ float View::CalcInitialSlur(
         std::copy(endTiePositioners.begin(), endTiePositioners.end(), std::back_inserter(tiePositioners));
     }
     for (FloatingPositioner *positioner : tiePositioners) {
+        System *positionerSystem = vrv_cast<System *>(positioner->GetObject()->GetFirstAncestor(SYSTEM));
         if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)
-            && (positioner->GetContentLeft() < bezier.p2.x)) {
+            && (positioner->GetContentLeft() < bezier.p2.x)
+            && (positionerSystem == curve->GetAlignment()->GetParentSystem())) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = positioner;
             curve->AddSpannedElement(spannedElement);
