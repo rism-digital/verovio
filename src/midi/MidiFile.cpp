@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Fri Nov 26 14:12:01 PST 1999
-// Last Modified: Sat Apr 21 10:52:19 PDT 2018 Removed using namespace std;
+// Last Modified: Thu Jun 24 18:35:30 PDT 2021 Added base64 encoding read/write
 // Filename:      midifile/src/MidiFile.cpp
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
@@ -26,6 +26,22 @@
 
 
 namespace smf {
+
+
+const std::string MidiFile::encodeLookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+const std::vector<int> MidiFile::decodeLookup {
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,
+		-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,
+		-1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
+};
+
+
 
 //////////////////////////////
 //
@@ -194,6 +210,28 @@ bool MidiFile::read(std::istream& input) {
 		m_rwstatus = readSmf(input);
 		return m_rwstatus;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::readBase64 -- First decode base64 string and then parse as either a
+//      Standard MIDI File or binasc-encoded Standard MIDI File.
+//
+
+bool MidiFile::readBase64(const std::string& base64data) {
+	std::stringstream stream;
+	stream << MidiFile::base64Decode(base64data);
+	return MidiFile::read(stream);
+}
+
+bool MidiFile::readBase64(std::istream& instream) {
+	std::string base64data((std::istreambuf_iterator<char>(instream)),
+			std::istreambuf_iterator<char>());
+	std::stringstream stream;
+	stream << MidiFile::base64Decode(base64data);
+	return MidiFile::read(stream);
 }
 
 
@@ -609,6 +647,71 @@ bool MidiFile::write(std::ostream& out) {
 	}
 
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::writeBase64 -- Write Standard MIDI file with base64 encoding.
+//    The width parameter can be used to add line breaks.  Zero or negative
+//    width will prevent linebreaks from being added to the data.
+//    Default value: width = 0
+//
+
+bool MidiFile::writeBase64(const std::string& filename, int width) {
+	std::fstream output(filename.c_str(), std::ios::binary | std::ios::out);
+
+	if (!output.is_open()) {
+		std::cerr << "Error: could not write: " << filename << std::endl;
+		return false;
+	}
+	m_rwstatus = writeBase64(output, width);
+	output.close();
+	return m_rwstatus;
+}
+
+
+bool MidiFile::writeBase64(std::ostream& out, int width) {
+	std::stringstream raw;
+	bool status = MidiFile::write(raw);
+	if (!status) {
+		return status;
+	}
+	std::string encoded = MidiFile::base64Encode(raw.str());
+	if (width <= 0) {
+		out << encoded;
+		return status;
+	}
+	int length = (int)encoded.size();
+	for (int i=0; i<length; i++) {
+		out << encoded[i];
+		if ((i + 1) % width == 0) {
+			out << "\n";
+		}
+	}
+	if ((length + 1) % width != 0) {
+		out << "\n";
+	}
+	return status;
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::getBase64 -- Convert the MIDI contents to a base-64 string.
+//     Default value: width = 0
+//
+
+std::string MidiFile::getBase64(int width) {
+	std::stringstream output;
+	bool status = MidiFile::writeBase64(output, width);
+	if (!status) {
+		return "";
+	} else {
+		return output.str();
+	}
 }
 
 
@@ -1408,9 +1511,7 @@ double MidiFile::getAbsoluteTickTime(double starttime) {
 	if (m_timemapvalid == 0) {
 		buildTimeMap();
 		if (m_timemapvalid == 0) {
-			if (m_timemapvalid == 0) {
-				return -1.0;    // something went wrong
-			}
+			return -1.0;    // something went wrong
 		}
 	}
 
@@ -3212,9 +3313,68 @@ std::ostream& MidiFile::writeLittleEndianDouble(std::ostream& out, double value)
 }
 
 
+
+//////////////////////////////
+//
+// MidiFile::base64Encode -- Encode a string as base64.
+//
+
+std::string MidiFile::base64Encode(const std::string& input) {
+	std::string output;
+	output.reserve(((input.size()/3) + (input.size() % 3 > 0)) * 4);
+	int vala = 0;
+	int valb = -6;
+	for (unsigned char c : input) {
+		vala = (vala << 8) + c;
+		valb += 8;
+		while (valb >=0) {
+			output.push_back(MidiFile::encodeLookup[(vala >> valb) & 0x3F]);
+			valb -= 6;
+		}
+	}
+	if (valb > -6) {
+		output.push_back(MidiFile::encodeLookup[((vala << 8) >> (valb + 8)) & 0x3F]);
+	}
+	while (output.size() % 4) {
+		output.push_back(MidiFile::encodeLookup.back());
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::base64Decode -- Decode a base64 string.
+//
+
+std::string MidiFile::base64Decode(const std::string& input) {
+	// vector<int> decodeLookup(256,-1);
+	// for (int i=0; i<64; i++) decodeLookup[encodeLookup[i]] = i;
+
+	std::string output;
+	int vala = 0;
+	int valb = -8;
+	for (unsigned char c : input) {
+		if (c == '=') {
+			break;
+		} else if (MidiFile::decodeLookup[c] == -1) {
+         // Ignore whitespace, for example.
+			continue;
+		}
+		vala = (vala << 6) + MidiFile::decodeLookup[c];
+		valb += 6;
+		if (valb >= 0) {
+			output.push_back(char((vala >> valb) & 0xFF));
+			valb -= 8;
+		}
+	}
+	return output;
+}
+
+
+
 } // end namespace smf
-
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
