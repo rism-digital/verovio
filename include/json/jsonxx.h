@@ -264,6 +264,11 @@ class Value {
     type_ = STRING_;
     *( string_value_ = new String() ) = s;
   }
+  void import( const char* s ) {
+    reset();
+    type_ = STRING_;
+    *( string_value_ = new String() ) = s;
+  }
   void import( const Array &a ) {
     reset();
     type_ = ARRAY_;
