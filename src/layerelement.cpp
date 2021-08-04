@@ -2141,6 +2141,7 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 
     if (!this->GetDurationInterface() || this->Is(MSPACE) || this->Is(SPACE) || this->HasSameasLink())
         return FUNCTOR_CONTINUE;
+    if (this->Is(NOTE) && this->GetParent()->Is(CHORD)) return FUNCTOR_CONTINUE;
 
     double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
     double time = m_alignment->GetTime();
