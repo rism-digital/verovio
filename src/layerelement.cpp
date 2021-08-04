@@ -1642,6 +1642,21 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
                     - HorizontalRightOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
             }
         }
+        else if (this->Is(NOTE)) {
+            Note *currentNote = vrv_cast<Note *>(this);
+            assert(currentNote);
+            if ((currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM)) {
+                const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
+                data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
+                if (this->HorizontalLeftOverlap(otherElements.at(i), doc, 0, 0) != 0) {
+                    shift = 3 * horizontalMargin;
+                    if (stemDir == STEMDIRECTION_up) {
+                        shift *= -1;
+                    }
+                }
+            }
+        }
     }
 
     // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
