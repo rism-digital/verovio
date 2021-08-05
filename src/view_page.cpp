@@ -325,7 +325,9 @@ void View::DrawStaffGrp(
         DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
     // draw the group symbol
+    int staffGrpX = x;
     DrawGrpSym(dc, measure, staffGrp, x);
+    int grpSymSpace = staffGrpX - x;
 
     // recursively draw the children
     StaffGrp *childStaffGrp = NULL;
@@ -337,11 +339,11 @@ void View::DrawStaffGrp(
     }
 
     // DrawStaffGrpLabel
-    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
     const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space);
+    this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
 
     DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
 }
@@ -362,10 +364,10 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
 
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
 
-        if (!staff || !system) {
-            LogDebug("Staff or System missing in View::DrawStaffDefLabels");
+        if (!staff || !scoreDef) {
+            LogDebug("Staff or ScoreDef missing in View::DrawStaffDefLabels");
             continue;
         }
 
@@ -378,7 +380,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
-        this->DrawLabels(dc, system, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
+        this->DrawLabels(dc, scoreDef, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
     }
 }
 
@@ -442,7 +444,7 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
 }
 
 void View::DrawLabels(
-    DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
+    DeviceContext *dc, ScoreDef *scoreDef, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
 {
     assert(dc);
     assert(system);
@@ -492,7 +494,7 @@ void View::DrawLabels(
     dc->EndGraphic(graphic, this);
 
     // keep the widest width for the system - careful: this can be the label OR labelAbbr
-    system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
+    scoreDef->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
     // also store in the system the maximum width with abbreviations for justification
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
@@ -503,6 +505,8 @@ void View::DrawLabels(
             dc->GetTextExtent(line, &extend, true);
             maxLength = (extend.m_width > maxLength) ? extend.m_width : maxLength;
         }
+        System *system = vrv_cast<System *>(scoreDef->GetFirstAncestor(SYSTEM));
+        assert(system);
         system->SetDrawingAbbrLabelsWidth(maxLength + space);
     }
 
@@ -1501,6 +1505,12 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             // nothing to do, then
             ScoreDef *scoreDef = vrv_cast<ScoreDef *>(current);
             assert(scoreDef);
+
+            Measure *nextMeasure = dynamic_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
+            if (nextMeasure && scoreDef->DrawLabels()) {
+                DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
+            }
+
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
         else if (current->IsSystemElement()) {

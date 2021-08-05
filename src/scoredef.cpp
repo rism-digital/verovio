@@ -14,11 +14,13 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "comparison.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "grpsym.h"
 #include "keysig.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
@@ -26,6 +28,7 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "section.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "system.h"
@@ -197,6 +200,7 @@ void ScoreDef::Reset()
 
     m_drawLabels = false;
     m_drawingWidth = 0;
+    m_drawingLabelsWidth = 0;
     m_setAsDrawing = false;
 }
 
@@ -337,6 +341,43 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     }
 }
 
+void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
+{
+    assert(newStaffGrp);
+
+    // first find the staffGrp with the same @n
+    StaffGrp *staffGrp = this->GetStaffGrp(newStaffGrp->GetN());
+    if (staffGrp) {
+        // Replace with thew new label only if we have one
+        if (newStaffGrp->HasLabelInfo()) {
+            Label *label = newStaffGrp->GetLabelCopy();
+            // Check if we previoulsy had one, and replace it if yes
+            if (staffGrp->HasLabelInfo()) {
+                Label *oldLabel = staffGrp->GetLabel();
+                staffGrp->ReplaceChild(oldLabel, label);
+                delete oldLabel;
+            }
+            // Otherwise simply add it
+            else {
+                staffGrp->AddChild(label);
+            }
+        }
+        if (newStaffGrp->HasLabelAbbrInfo()) {
+            LabelAbbr *labelAbbr = newStaffGrp->GetLabelAbbrCopy();
+            // Check if we previoulsy had one, and replace it if yes
+            if (staffGrp->HasLabelAbbrInfo()) {
+                LabelAbbr *oldLabelAbbr = staffGrp->GetLabelAbbr();
+                staffGrp->ReplaceChild(oldLabelAbbr, labelAbbr);
+                delete oldLabelAbbr;
+            }
+            // Otherwise simply add it
+            else {
+                staffGrp->AddChild(labelAbbr);
+            }
+        }
+    }
+}
+
 void ScoreDef::FilterList(ArrayOfObjects *childList)
 {
     // We want to keep only staffDef
@@ -371,6 +412,22 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     return staffDef;
 }
 
+StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
+{
+    // First get all the staffGrps
+    ClassIdComparison matchType(STAFFGRP);
+    ListOfObjects staffGrps;
+    this->FindAllDescendantByComparison(&staffGrps, &matchType);
+
+    // Then the @n of each first staffDef
+    for (auto &item : staffGrps) {
+        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(item);
+        assert(staffGrp);
+        if (staffGrp->GetN() == n) return staffGrp;
+    }
+    return NULL;
+}
+
 std::vector<int> ScoreDef::GetStaffNs()
 {
     this->ResetList(this);
@@ -403,6 +460,13 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
     m_drawingWidth = drawingWidth;
 }
 
+void ScoreDef::SetDrawingLabelsWidth(int width)
+{
+    if (m_drawingLabelsWidth < width) {
+        m_drawingLabelsWidth = width;
+    }
+}
+
 PgFoot *ScoreDef::GetPgFoot()
 {
     return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
@@ -429,9 +493,26 @@ int ScoreDef::GetMaxStaffSize()
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
 
+bool ScoreDef::IsSectionRestart()
+{
+    if (!this->GetParent()) return false;
+    // In page-based structure, Section is a sibling to scoreDef
+    // This has limitations: will not work with editorial markup, additional nested sections, and
+    // if the section milestone is in the previous system.
+    Section *section = dynamic_cast<Section *>(this->GetParent()->GetPrevious(this, SECTION));
+    return (section && (section->GetRestart() == BOOLEAN_true));
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    m_drawingLabelsWidth = 0;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 {
@@ -474,6 +555,27 @@ int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int ScoreDef::AlignMeasures(FunctorParams *functorParams)
+{
+    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
+    assert(params);
+
+    // SetDrawingXRel(m_systemLeftMar + this->GetDrawingWidth());
+    params->m_shift += m_drawingLabelsWidth;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::JustifyX(FunctorParams *functorParams)
+{
+    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
+    assert(params);
+
+    params->m_measureXRel += m_drawingLabelsWidth;
 
     return FUNCTOR_SIBLINGS;
 }

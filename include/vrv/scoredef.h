@@ -146,9 +146,20 @@ public:
     void ReplaceDrawingValues(StaffDef *newStaffDef);
 
     /**
+     * Replace the corresponding staffGrp with the labels of the newStaffGrp.
+     * Looks for the staffGrp with the same m_n (@n) and replaces label child
+     */
+    void ReplaceDrawingLabels(StaffGrp *newStaffGrp);
+
+    /**
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
+
+    /**
+     * Get the staffGrp with number n (NULL if not found).
+     */
+    StaffGrp *GetStaffGrp(const std::string &n);
 
     /**
      * Return all the @n values of the staffDef in a scoreDef
@@ -178,6 +189,9 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
+    void SetDrawingLabelsWidth(int width);
+
     /**
      * @name Getters for running elements
      */
@@ -193,9 +207,16 @@ public:
      */
     int GetMaxStaffSize();
 
+    bool IsSectionRestart();
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToPageBased
@@ -212,6 +233,16 @@ public:
      * See Object::CastOffEncoding
      */
     virtual int CastOffEncoding(FunctorParams *functorParams);
+
+    /**
+     * See Object::AlignMeasures
+     */
+    virtual int AlignMeasures(FunctorParams *functorParams);
+
+    /**
+     * See Object::JustifyX
+     */
+    virtual int JustifyX(FunctorParams *functorParams);
 
 protected:
     /**
@@ -230,6 +261,8 @@ private:
     bool m_drawLabels;
     /** Store the drawing width (clef and key sig) of the scoreDef */
     int m_drawingWidth;
+    /** Store the label drawing width of the scoreDef */
+    int m_drawingLabelsWidth;
 };
 
 } // namespace vrv

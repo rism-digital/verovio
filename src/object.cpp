@@ -1504,11 +1504,17 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(system);
         // This is the only thing we do for now - we need to wait until we reach the first measure
         params->m_currentSystem = system;
+        params->m_hasMeasure = false;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new measure
     if (this->Is(MEASURE)) {
+        // If we have a restart scoreDef before, for redrawing of everything on the measure
+        if (params->m_restart) {
+            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
+        }
+
         Measure *measure = vrv_cast<Measure *>(this);
         assert(measure);
         int drawingFlags = 0;
@@ -1518,7 +1524,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
-            if (params->m_upcomingScoreDef->m_setAsDrawing && params->m_previousMeasure) {
+            // The cautionary scoreDef for restart is already done when hitting the scoreDef
+            if (params->m_upcomingScoreDef->m_setAsDrawing && params->m_previousMeasure && !params->m_restart) {
                 ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
                 SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
                 Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
@@ -1539,6 +1546,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::FORCE_REDRAW);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
+        params->m_drawLabels = false;
 
         // set other flags based on score def change
         if (params->m_upcomingScoreDef->m_insertScoreDef) {
@@ -1564,6 +1572,9 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         measure->SetDrawingBarLines(params->m_previousMeasure, drawingFlags);
 
         params->m_previousMeasure = measure;
+        params->m_restart = false;
+        params->m_hasMeasure = true;
+
         return FUNCTOR_CONTINUE;
     }
 
@@ -1579,7 +1590,32 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
             params->m_upcomingScoreDef->m_insertScoreDef = true;
         }
-        return FUNCTOR_CONTINUE;
+        if (scoreDef->IsSectionRestart()) {
+            // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
+            params->m_drawLabels = true;
+            params->m_restart = true;
+            // Redraw the labels only if we already have a mesure in the system. Otherwise this will be
+            // done through the system scoreDef
+            scoreDef->SetDrawLabels(params->m_hasMeasure);
+            // If we have a previous measure, we need to set the cautionary scoreDef indenpendently from the
+            // presence of a system break
+            if (params->m_previousMeasure) {
+                ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
+                SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
+                Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
+                params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
+            }
+        }
+    }
+
+    // starting a new staffGrp
+    if (this->Is(STAFFGRP)) {
+        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this);
+        assert(staffGrp);
+        // For now replace labels only if we have a section@restart
+        if (params->m_restart) {
+            params->m_upcomingScoreDef->ReplaceDrawingLabels(staffGrp);
+        }
     }
 
     // starting a new staffDef
