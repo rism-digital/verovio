@@ -1923,7 +1923,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     else if (this->Is(ACCID)) {
         Accid const *accid = vrv_cast<Accid *>(this);
         assert(accid);
-        if ((accid->GetFunc() == accidLog_FUNC_edit) && !accid->HasEnclose())
+        if (accid->GetFunc() == accidLog_FUNC_edit)
             m_drawingCueSize = true;
         else {
             Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
