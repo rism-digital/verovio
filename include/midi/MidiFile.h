@@ -54,6 +54,8 @@ class MidiFile {
 		// Auto-detected SMF or ASCII-encoded SMF (decoded with Binasc class):
 		bool           read                        (const std::string& filename);
 		bool           read                        (std::istream& instream);
+		bool           readBase64                  (const std::string& base64data);
+		bool           readBase64                  (std::istream& instream);
 
 		// Only allow Standard MIDI File input:
 		bool           readSmf                     (const std::string& filename);
@@ -61,10 +63,11 @@ class MidiFile {
 
 		bool           write                       (const std::string& filename);
 		bool           write                       (std::ostream& out);
-		bool           writeHex                    (const std::string& filename,
-		                                            int width = 25);
-		bool           writeHex                    (std::ostream& out,
-		                                            int width = 25);
+		bool           writeBase64                 (const std::string& out, int width = 0);
+		bool           writeBase64                 (std::ostream& out, int width = 0);
+		std::string    getBase64                   (int width = 0);
+		bool           writeHex                    (const std::string& filename, int width = 25);
+		bool           writeHex                    (std::ostream& out, int width = 25);
 		bool           writeBinasc                 (const std::string& filename);
 		bool           writeBinasc                 (std::ostream& out);
 		bool           writeBinascWithComments     (const std::string& filename);
@@ -288,21 +291,25 @@ class MidiFile {
 		bool m_linkedEventsQ = false;
 
 	private:
-		int        extractMidiData                 (std::istream& inputfile,
-		                                            std::vector<uchar>& array,
-		                                            uchar& runningCommand);
-		ulong      readVLValue                     (std::istream& inputfile);
-		ulong      unpackVLV                       (uchar a = 0, uchar b = 0,
-		                                            uchar c = 0, uchar d = 0,
-		                                            uchar e = 0);
-		void       writeVLValue                    (long aValue,
-		                                            std::vector<uchar>& data);
-		int        makeVLV                         (uchar *buffer, int number);
-		static int ticksearch                      (const void* A, const void* B);
-		static int secondsearch                    (const void* A, const void* B);
-		void       buildTimeMap                    (void);
-		double     linearTickInterpolationAtSecond (double seconds);
-		double     linearSecondInterpolationAtTick (int ticktime);
+		int         extractMidiData                 (std::istream& inputfile,
+		                                             std::vector<uchar>& array,
+		                                             uchar& runningCommand);
+		ulong       readVLValue                     (std::istream& inputfile);
+		ulong       unpackVLV                       (uchar a = 0, uchar b = 0,
+		                                             uchar c = 0, uchar d = 0,
+		                                             uchar e = 0);
+		void        writeVLValue                    (long aValue,
+		                                             std::vector<uchar>& data);
+		int         makeVLV                         (uchar *buffer, int number);
+		static int  ticksearch                      (const void* A, const void* B);
+		static int  secondsearch                    (const void* A, const void* B);
+		void        buildTimeMap                    (void);
+		double      linearTickInterpolationAtSecond (double seconds);
+		double      linearSecondInterpolationAtTick (int ticktime);
+		std::string base64Encode                    (const std::string &input);
+		std::string base64Decode                    (const std::string &input);
+		static const std::string encodeLookup;
+		static const std::vector<int> decodeLookup;
 };
 
 } // end of namespace smf
