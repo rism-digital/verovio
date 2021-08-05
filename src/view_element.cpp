@@ -256,7 +256,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
+    if (accid->GetFunc() == accidLog_FUNC_edit) {
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
