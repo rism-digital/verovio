@@ -53,7 +53,7 @@ public:
     //
 private:
     /**
-     * Tthe svg stored as pugi::xml_document
+     * The svg stored as pugi::xml_document
      */
     pugi::xml_document m_svg;
 };
