@@ -173,17 +173,6 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     if (layerElement->m_crossStaff) layer = layerElement->m_crossLayer;
     assert(layer);
 
-    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
-        System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
-        assert(system);
-        // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
-        // situations
-        if (system->HasMixedDrawingStemDir(start, end)) {
-            auto curveDir = system->GetPreferredCurveDirection(start, end, slur);
-            slur->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
-        }
-    }
-
     if (start->m_crossStaff != end->m_crossStaff) {
         curve->SetCrossStaff(end->m_crossStaff);
     }
@@ -192,6 +181,22 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
         Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
         if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) curve->SetCrossStaff(endStaff);
+    }
+
+    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
+        System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
+        assert(system);
+        // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
+        // situations
+        if (system->HasMixedDrawingStemDir(start, end)) {
+            if (!curve->IsCrossStaff()) {
+                slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
+            }
+            else {
+                curvature_CURVEDIR curveDir = system->GetPreferredCurveDirection(start, end, slur);
+                slur->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
+            }
+        }
     }
 
     /************** calculate the radius for adjusting the x position **************/
