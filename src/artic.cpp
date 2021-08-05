@@ -289,6 +289,8 @@ bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
         return true;
     else if (code == SMUFL_E630_pluckedSnapPizzicatoBelow)
         return true;
+    else if (code == SMUFL_E614_stringsHarmonic)
+        return true;
     else
         return false;
 }
