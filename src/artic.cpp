@@ -531,7 +531,7 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
 int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIRECTION stemDir) const
 {
     int shift = parent->GetDrawingRadius(doc);
-    if ((parent->GetChildCount(ARTIC) > 1) || (!doc->GetOptions()->m_stemSideStaccato.GetValue())) {
+    if ((parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_centerStaccato.GetValue())) {
         return shift;
     }
     data_ARTICULATION artic = GetArticFirst();
@@ -541,8 +541,7 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
         {
             Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
             assert(staff);
-            const int staffSize = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            const int stemWidth = doc->GetDrawingStemWidth(staffSize);
+            const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
                 shift += shift - stemWidth / 2;
             }

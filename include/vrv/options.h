@@ -602,7 +602,7 @@ public:
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_shrinkToFit;
-    OptionBool m_stemSideStaccato;
+    OptionBool m_centerStaccato;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
