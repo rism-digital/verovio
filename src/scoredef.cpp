@@ -525,6 +525,17 @@ int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int ScoreDef::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_targetSystem);
+    this->MoveItselfTo(params->m_targetSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
