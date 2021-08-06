@@ -1,6 +1,11 @@
 # Changelog
 
 ## [unreleased]
+* Support for `section@restart`
+* Improved ties between chords (@eNote-GmBH)
+* Improved handling of whole notes with multiple layers (@eNote-GmBH)
+* Imnproved support for `engravingDefaults` (@eNote-GmBH)
+* Improved logging for Android (@alpha0010)
 
 ## [3.5.0] - 2021-07-22
 * Support for `lv` (@eNote-GmbH)
