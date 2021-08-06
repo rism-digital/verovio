@@ -1006,7 +1006,8 @@ Options::Options()
     m_shrinkToFit.Init(false);
     this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
 
-    m_centerStaccato.SetInfo("Center staccato", "Align staccato and staccatissimo articulations with center of the note");
+    m_centerStaccato.SetInfo(
+        "Center staccato", "Align staccato and staccatissimo articulations with center of the note");
     m_centerStaccato.Init(false);
     this->Register(&m_centerStaccato, "centerStaccato", &m_general);
 

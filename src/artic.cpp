@@ -537,8 +537,7 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
     data_ARTICULATION artic = GetArticFirst();
     switch (artic) {
         case ARTICULATION_stacc:
-        case ARTICULATION_stacciss: 
-        {
+        case ARTICULATION_stacciss: {
             Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
             assert(staff);
             const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -554,7 +553,7 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
             break;
         }
     }
-    
+
     return shift;
 }
 
