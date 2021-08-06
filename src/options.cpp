@@ -1138,7 +1138,7 @@ Options::Options()
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
 
-    m_handwrittenFont.SetInfo("Handwritten font", "Font that emulate hand writing and require special handling");
+    m_handwrittenFont.SetInfo("Handwritten font", "Fonts that emulate hand writing and require special handling");
     m_handwrittenFont.Init();
     m_handwrittenFont.SetValue("Petaluma");
     this->Register(&m_handwrittenFont, "handwrittenFont", &m_generalLayout);
