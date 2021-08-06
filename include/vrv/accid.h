@@ -62,6 +62,14 @@ public:
     ///@}
 
     /**
+     * @name Set and get drawing unison accid 
+     */
+    ///@{
+    void SetDrawingUnisonAccid(Accid *drawingUnison) { m_drawingUnison = drawingUnison; }
+    Accid *GetDrawingUnisonAccid() const { return m_drawingUnison; }
+    ///@}
+
+    /**
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
@@ -98,6 +106,7 @@ public:
     //
 private:
     Accid *m_drawingOctave;
+    Accid *m_drawingUnison;
     bool m_isDrawingOctave;
 };
 

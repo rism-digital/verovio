@@ -1351,6 +1351,12 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
         }
     }
 
+    // Align accidentals for unison notes if any of them are present
+    for (Accid *accid : m_accidSpace) {
+        if (accid->GetDrawingUnisonAccid() == NULL) continue;
+        accid->SetDrawingXRel(accid->GetDrawingUnisonAccid()->GetDrawingXRel());
+    }
+
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (i = 0, j = count - 1; i < middle; i++, j--) {
