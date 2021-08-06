@@ -447,7 +447,7 @@ void View::DrawLabels(
     DeviceContext *dc, ScoreDef *scoreDef, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
 {
     assert(dc);
-    assert(system);
+    assert(scoreDef);
     assert(object->Is({ STAFFDEF, STAFFGRP }));
 
     Label *label = dynamic_cast<Label *>(object->FindDescendantByType(LABEL, 1));
