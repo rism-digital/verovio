@@ -1172,6 +1172,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
+                    params->m_leftoverSystem = NULL;
                     params->m_shift = firstPendingMesure->m_drawingXRel;
                     // it has to be first measure
                     break;
