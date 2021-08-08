@@ -36,6 +36,8 @@ std::string AttConverter::AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data)
         case ACCIDENTAL_GESTURAL_f: value = "f"; break;
         case ACCIDENTAL_GESTURAL_ss: value = "ss"; break;
         case ACCIDENTAL_GESTURAL_ff: value = "ff"; break;
+        case ACCIDENTAL_GESTURAL_ts: value = "ts"; break;
+        case ACCIDENTAL_GESTURAL_tf: value = "tf"; break;
         case ACCIDENTAL_GESTURAL_n: value = "n"; break;
         case ACCIDENTAL_GESTURAL_su: value = "su"; break;
         case ACCIDENTAL_GESTURAL_sd: value = "sd"; break;
@@ -63,6 +65,8 @@ data_ACCIDENTAL_GESTURAL AttConverter::StrToAccidentalGestural(const std::string
     if (value == "f") return ACCIDENTAL_GESTURAL_f;
     if (value == "ss") return ACCIDENTAL_GESTURAL_ss;
     if (value == "ff") return ACCIDENTAL_GESTURAL_ff;
+    if (value == "ts") return ACCIDENTAL_GESTURAL_ts;
+    if (value == "tf") return ACCIDENTAL_GESTURAL_tf;
     if (value == "n") return ACCIDENTAL_GESTURAL_n;
     if (value == "su") return ACCIDENTAL_GESTURAL_su;
     if (value == "sd") return ACCIDENTAL_GESTURAL_sd;
@@ -89,6 +93,8 @@ std::string AttConverter::AccidentalGesturalBasicToStr(data_ACCIDENTAL_GESTURAL_
         case ACCIDENTAL_GESTURAL_basic_f: value = "f"; break;
         case ACCIDENTAL_GESTURAL_basic_ss: value = "ss"; break;
         case ACCIDENTAL_GESTURAL_basic_ff: value = "ff"; break;
+        case ACCIDENTAL_GESTURAL_basic_ts: value = "ts"; break;
+        case ACCIDENTAL_GESTURAL_basic_tf: value = "tf"; break;
         case ACCIDENTAL_GESTURAL_basic_n: value = "n"; break;
         default:
             LogWarning("Unknown value '%d' for data.ACCIDENTAL.GESTURAL.basic", data);
@@ -104,6 +110,8 @@ data_ACCIDENTAL_GESTURAL_basic AttConverter::StrToAccidentalGesturalBasic(const 
     if (value == "f") return ACCIDENTAL_GESTURAL_basic_f;
     if (value == "ss") return ACCIDENTAL_GESTURAL_basic_ss;
     if (value == "ff") return ACCIDENTAL_GESTURAL_basic_ff;
+    if (value == "ts") return ACCIDENTAL_GESTURAL_basic_ts;
+    if (value == "tf") return ACCIDENTAL_GESTURAL_basic_tf;
     if (value == "n") return ACCIDENTAL_GESTURAL_basic_n;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.GESTURAL.basic", value.c_str());
@@ -338,6 +346,9 @@ std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
     std::string value;
     switch (data) {
         case ARTICULATION_acc: value = "acc"; break;
+        case ARTICULATION_acc_inv: value = "acc-inv"; break;
+        case ARTICULATION_acc_long: value = "acc-long"; break;
+        case ARTICULATION_acc_soft: value = "acc-soft"; break;
         case ARTICULATION_stacc: value = "stacc"; break;
         case ARTICULATION_ten: value = "ten"; break;
         case ARTICULATION_stacciss: value = "stacciss"; break;
@@ -381,6 +392,9 @@ std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
 data_ARTICULATION AttConverter::StrToArticulation(const std::string &value, bool logWarning) const
 {
     if (value == "acc") return ARTICULATION_acc;
+    if (value == "acc-inv") return ARTICULATION_acc_inv;
+    if (value == "acc-long") return ARTICULATION_acc_long;
+    if (value == "acc-soft") return ARTICULATION_acc_soft;
     if (value == "stacc") return ARTICULATION_stacc;
     if (value == "ten") return ARTICULATION_ten;
     if (value == "stacciss") return ARTICULATION_stacciss;
