@@ -1279,10 +1279,62 @@ int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
     if (!this->HasMultipleLayer()) return FUNCTOR_SIBLINGS;
 
     params->m_currentLayerN = VRV_UNSET;
-    params->m_currentNote = NULL;
-    params->m_currentChord = NULL;
     params->m_current.clear();
     params->m_previous.clear();
+    params->m_accumulatedShift = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int AlignmentReference::AdjustLayersEnd(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    // Determine staff
+    if (params->m_current.empty()) return FUNCTOR_CONTINUE;
+    LayerElement *firstElem = params->m_current.at(0);
+    Layer *layer = NULL;
+    Staff *staff = firstElem->GetCrossStaff(layer);
+    if (!staff) {
+        staff = vrv_cast<Staff *>(firstElem->GetFirstAncestor(STAFF));
+    }
+    assert(staff);
+
+    const int extension
+        = params->m_doc->GetDrawingLedgerLineExtension(staff->m_drawingStaffSize, firstElem->GetDrawingCueSize());
+
+    if ((abs(params->m_accumulatedShift) < 2 * extension) && params->m_ignoreDots) {
+        // Check each pair of notes from different layers for possible collisions of ledger lines with note stems
+        const bool handleLedgerLineStemCollision = std::any_of(
+            params->m_current.begin(), params->m_current.end(), [params, staff](LayerElement *currentElem) {
+                if (!currentElem->Is(NOTE)) return false;
+                Note *currentNote = vrv_cast<Note *>(currentElem);
+                assert(currentNote);
+
+                return std::any_of(params->m_previous.begin(), params->m_previous.end(),
+                    [params, staff, currentNote](LayerElement *previousElem) {
+                        if (!previousElem->Is(NOTE)) return false;
+                        Note *previousNote = vrv_cast<Note *>(previousElem);
+                        assert(previousNote);
+
+                        return Note::HandleLedgerLineStemCollision(params->m_doc, staff, currentNote, previousNote);
+                    });
+            });
+
+        // To avoid collisions shift the chord or note to the left
+        if (handleLedgerLineStemCollision) {
+            auto itElem = std::find_if(
+                params->m_current.begin(), params->m_current.end(), [](LayerElement *elem) { return elem->Is(NOTE); });
+            assert(itElem != params->m_current.end());
+
+            LayerElement *chord = vrv_cast<Note *>(*itElem)->IsChordTone();
+            LayerElement *element = chord ? chord : (*itElem);
+
+            const int shift = 2 * extension - abs(params->m_accumulatedShift);
+            element->SetDrawingXRel(element->GetDrawingXRel() - shift);
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }

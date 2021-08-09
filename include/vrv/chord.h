@@ -148,8 +148,9 @@ public:
 
     /**
      * Helper to adjust overlapping layers for chords
+     * Returns the shift of the adjustment
      */
-    virtual void AdjustOverlappingLayers(
+    virtual int AdjustOverlappingLayers(
         Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
 
     //----------//

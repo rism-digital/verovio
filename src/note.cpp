@@ -713,6 +713,61 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     return dotMargin < 0;
 }
 
+//----------------//
+// Static methods //
+//----------------//
+
+bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, Note *note2)
+{
+    assert(doc);
+    assert(staff);
+    assert(note1);
+    assert(note2);
+
+    if (note1->GetDrawingLoc() == note2->GetDrawingLoc()) return false;
+    Note *upperNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note1 : note2;
+    Note *lowerNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note2 : note1;
+
+    if (upperNote->GetDrawingStemDir() != STEMDIRECTION_down) return false;
+    if (lowerNote->GetDrawingStemDir() != STEMDIRECTION_up) return false;
+
+    // Count ledger lines
+    int linesAboveUpper, linesBelowUpper;
+    upperNote->HasLedgerLines(linesAboveUpper, linesBelowUpper, staff);
+    int linesAboveLower, linesBelowLower;
+    lowerNote->HasLedgerLines(linesAboveLower, linesBelowLower, staff);
+
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    // If one note has more ledger lines, then check if the stems tip of the other note is outside of the staff on this
+    // side
+    if (linesBelowLower > linesBelowUpper) {
+        Chord *upperChord = upperNote->IsChordTone();
+        Stem *upperStem = upperChord ? upperChord->GetDrawingStem() : upperNote->GetDrawingStem();
+        if (upperStem) {
+            const int staffBottom = staff->GetDrawingY() - 2 * unit * (staff->m_drawingLines - 1);
+            const int stemBottom = upperStem->GetSelfBottom();
+            if (stemBottom < staffBottom - unit) {
+                return true;
+            }
+        }
+    }
+
+    if (linesAboveUpper > linesAboveLower) {
+        Chord *lowerChord = lowerNote->IsChordTone();
+        Stem *lowerStem = lowerChord ? lowerChord->GetDrawingStem() : lowerNote->GetDrawingStem();
+        if (lowerStem) {
+            const int staffTop = staff->GetDrawingY();
+            const int stemTop = lowerStem->GetSelfTop();
+            if (stemTop > staffTop + unit) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
