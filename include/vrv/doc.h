@@ -302,7 +302,7 @@ public:
 
     /**
      * Convert the doc from score-based to page-based MEI.
-     * Containers will be converted to boundaryStart / boundaryEnd.
+     * Containers will be converted to systemElementStart / systemElementEnd.
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();

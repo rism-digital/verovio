@@ -32,7 +32,7 @@ namespace vrv {
 
 static const ClassRegistrar<Section> s_factory("section", SECTION);
 
-Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNumberLike(), AttSectionVis()
+Section::Section() : SystemElement("section-"), SystemElementStartInterface(), AttNNumberLike(), AttSectionVis()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_SECTIONVIS);
@@ -45,7 +45,7 @@ Section::~Section() {}
 void Section::Reset()
 {
     SystemElement::Reset();
-    BoundaryStartInterface::Reset();
+    SystemElementStartInterface::Reset();
     ResetNNumberLike();
     ResetSectionVis();
 }
@@ -108,7 +108,7 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 int Section::PrepareBoundaries(FunctorParams *functorParams)
 {
     if (this->IsBoundary()) {
-        this->BoundaryStartInterface::InterfacePrepareBoundaries(functorParams);
+        this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -119,7 +119,7 @@ int Section::ResetDrawing(FunctorParams *functorParams)
     FloatingObject::ResetDrawing(functorParams);
 
     if (this->IsBoundary()) {
-        this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
+        this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

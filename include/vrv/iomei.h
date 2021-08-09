@@ -33,7 +33,7 @@ class Artic;
 class BarLine;
 class Beam;
 class BeatRpt;
-class BoundaryEnd;
+class SystemElementEnd;
 class BracketSpan;
 class Breath;
 class BTrem;
@@ -242,7 +242,7 @@ private:
     ///@{
     void WritePage(pugi::xml_node currentNode, Page *page);
     void WriteSystem(pugi::xml_node currentNode, System *system);
-    void WriteBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd);
+    void WriteSystemElementEnd(pugi::xml_node currentNode, SystemElementEnd *elementEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteGrpSym(pugi::xml_node currentNode, GrpSym *grmSym);
     void WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot);
@@ -496,7 +496,7 @@ private:
     bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd);
+    bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);
     bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);

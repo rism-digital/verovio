@@ -149,7 +149,7 @@ enum ClassId {
     RUNNING_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
-    BOUNDARY_END,
+    SYSTEM_ELEMENT_END,
     ENDING,
     EXPANSION,
     PB,

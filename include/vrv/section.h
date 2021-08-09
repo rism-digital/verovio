@@ -25,7 +25,7 @@ class Section;
  * This class represents a MEI section.
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI)
  */
-class Section : public SystemElement, public BoundaryStartInterface, public AttNNumberLike, public AttSectionVis {
+class Section : public SystemElement, public SystemElementStartInterface, public AttNNumberLike, public AttSectionVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

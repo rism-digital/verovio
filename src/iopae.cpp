@@ -155,13 +155,6 @@ bool PAEOutput::WriteObject(Object *object)
     else if (object->Is(TUPLET)) {
         WriteTuplet(dynamic_cast<Tuplet *>(object));
     }
-
-    // Text elements
-
-    // Editorial markup
-
-    // BoundaryEnd - nothing to add - only
-
     else {
         // Log something?
     }

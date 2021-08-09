@@ -1690,10 +1690,10 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
     else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
-    std::string boundaryStart;
-    if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
+    std::string elementStart;
+    if (element->IsBoundaryElement()) elementStart = "systemeElementStart";
 
-    dc->StartGraphic(element, boundaryStart, element->GetUuid());
+    dc->StartGraphic(element, elementStart, element->GetUuid());
     // EditorialElements at the system level that are visible have no children
     // if (element->m_visibility == Visible) {
     //    DrawSystemChildren(dc, element, system);

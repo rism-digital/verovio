@@ -33,7 +33,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement() : Object("ee-"), SystemElementStartInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -42,7 +42,7 @@ EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), 
 }
 
 EditorialElement::EditorialElement(const std::string &classid)
-    : Object(classid), BoundaryStartInterface(), AttLabelled(), AttTyped()
+    : Object(classid), SystemElementStartInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -53,7 +53,7 @@ EditorialElement::EditorialElement(const std::string &classid)
 void EditorialElement::Reset()
 {
     Object::Reset();
-    BoundaryStartInterface::Reset();
+    SystemElementStartInterface::Reset();
     ResetLabelled();
     ResetTyped();
 
@@ -130,7 +130,7 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
 int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 {
     if (this->IsBoundary()) {
-        this->BoundaryStartInterface::InterfacePrepareBoundaries(functorParams);
+        this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -139,7 +139,7 @@ int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 int EditorialElement::ResetDrawing(FunctorParams *functorParams)
 {
     if (this->IsBoundary()) {
-        this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
+        this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

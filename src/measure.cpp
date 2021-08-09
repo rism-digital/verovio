@@ -1248,7 +1248,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    std::vector<BoundaryStartInterface *>::iterator iter;
+    std::vector<SystemElementStartInterface *>::iterator iter;
     for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); ++iter) {
         (*iter)->SetMeasure(this);
     }
@@ -1259,7 +1259,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
         m_drawingEnding = params->m_currentEnding;
     }
 
-    // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)
+    // Keep a pointer to the measure for when we are reaching the end (see SystemElementEnd::PrepareBoundaries)
     params->m_lastMeasure = this;
 
     return FUNCTOR_CONTINUE;

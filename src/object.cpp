@@ -213,7 +213,7 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
 bool Object::IsBoundaryElement()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(this);
+        SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
         assert(interface);
         return (interface->IsBoundary());
     }

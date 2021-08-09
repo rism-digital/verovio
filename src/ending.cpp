@@ -29,7 +29,7 @@ namespace vrv {
 
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
-Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttLineRend(), AttNNumberLike()
+Ending::Ending() : SystemElement("ending-"), SystemElementStartInterface(), AttLineRend(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_NINTEGER);
@@ -42,7 +42,7 @@ Ending::~Ending() {}
 void Ending::Reset()
 {
     SystemElement::Reset();
-    BoundaryStartInterface::Reset();
+    SystemElementStartInterface::Reset();
     ResetLineRend();
     ResetNNumberLike();
 }
@@ -100,10 +100,10 @@ int Ending::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    // Endings should always have an BoundaryEnd
+    // Endings should always have an SystemElementEnd
     assert(this->IsBoundary());
 
-    this->BoundaryStartInterface::InterfacePrepareBoundaries(functorParams);
+    this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
 
     params->m_currentEnding = this;
 
@@ -114,7 +114,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
-    this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
+    this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

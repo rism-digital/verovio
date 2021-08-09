@@ -768,15 +768,15 @@ bool MEIOutput::WriteObject(Object *object)
         WriteUnclear(m_currentNode, dynamic_cast<Unclear *>(object));
     }
 
-    // BoundaryEnd - nothing to add - only
-    else if (object->Is(BOUNDARY_END)) {
+    // SystemElementEnd - nothing to add - only
+    else if (object->Is(SYSTEM_ELEMENT_END)) {
         if (m_scoreBasedMEI) {
             // LogDebug("No piling '%s'", object->GetClassName().c_str());
             return true;
         }
         else {
-            m_currentNode = m_currentNode.append_child("boundaryEnd");
-            WriteBoundaryEnd(m_currentNode, dynamic_cast<BoundaryEnd *>(object));
+            m_currentNode = m_currentNode.append_child("systemElementEnd");
+            WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
         }
     }
 
@@ -999,13 +999,13 @@ void MEIOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *sy
     systemElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WriteBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd)
+void MEIOutput::WriteSystemElementEnd(pugi::xml_node currentNode, SystemElementEnd *elementEnd)
 {
-    assert(boundaryEnd && boundaryEnd->GetStart());
+    assert(elementEnd && elementEnd->GetStart());
 
-    WriteSystemElement(currentNode, boundaryEnd);
-    currentNode.append_attribute("startid") = UuidToMeiStr(boundaryEnd->GetStart()).c_str();
-    std::string meiElementName = boundaryEnd->GetStart()->GetClassName();
+    WriteSystemElement(currentNode, elementEnd);
+    currentNode.append_attribute("startid") = UuidToMeiStr(elementEnd->GetStart()).c_str();
+    std::string meiElementName = elementEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
 }
@@ -3540,9 +3540,9 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (IsEditorialElementName(current.name())) {
             success = ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
-        // boundaryEnd
-        else if (std::string(current.name()) == "boundaryEnd") {
-            success = ReadBoundaryEnd(parent, current);
+        // elementEnd
+        else if (std::string(current.name()) == "systemElementEnd") {
+            success = ReadSystemElementEnd(parent, current);
         }
         // content
         else if (std::string(current.name()) == "scoreDef") {
@@ -3586,25 +3586,25 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
+bool MEIInput::ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd)
 {
     assert(dynamic_cast<System *>(parent));
 
     std::string startUuid;
     Object *start = NULL;
-    if (boundaryEnd.attribute("startid")) {
-        std::string startUuid = boundaryEnd.attribute("startid").value();
+    if (elementEnd.attribute("startid")) {
+        std::string startUuid = elementEnd.attribute("startid").value();
         start = m_doc->FindDescendantByUuid(startUuid);
     }
     if (!start) {
-        LogError("Could not find start element <%s> for boundaryEnd", startUuid.c_str());
+        LogError("Could not find start element <%s> for systemElementEnd", startUuid.c_str());
         return false;
     }
 
-    BoundaryEnd *vrvBoundaryEnd = new BoundaryEnd(start);
-    ReadSystemElement(boundaryEnd, vrvBoundaryEnd);
+    SystemElementEnd *vrvElementEnd = new SystemElementEnd(start);
+    ReadSystemElement(elementEnd, vrvElementEnd);
 
-    parent->AddChild(vrvBoundaryEnd);
+    parent->AddChild(vrvElementEnd);
     return true;
 }
 

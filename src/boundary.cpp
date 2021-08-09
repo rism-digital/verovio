@@ -21,66 +21,66 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BoundaryEnd
+// SystemElementEnd
 //----------------------------------------------------------------------------
 
-BoundaryEnd::BoundaryEnd(Object *start) : SystemElement("bdend-")
+SystemElementEnd::SystemElementEnd(Object *start) : SystemElement("system-element-end-")
 {
     Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
 
-BoundaryEnd::~BoundaryEnd() {}
+SystemElementEnd::~SystemElementEnd() {}
 
-void BoundaryEnd::Reset()
+void SystemElementEnd::Reset()
 {
     m_start = NULL;
     m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
-// BoundaryStartInterface
+// SystemeElementStartInterface
 //----------------------------------------------------------------------------
 
-BoundaryStartInterface::BoundaryStartInterface()
+SystemElementStartInterface::SystemElementStartInterface()
 {
     Reset();
 }
 
-BoundaryStartInterface::~BoundaryStartInterface() {}
+SystemElementStartInterface::~SystemElementStartInterface() {}
 
-void BoundaryStartInterface::Reset()
+void SystemElementStartInterface::Reset()
 {
     m_end = NULL;
     m_drawingMeasure = NULL;
 }
 
-void BoundaryStartInterface::SetEnd(BoundaryEnd *end)
+void SystemElementStartInterface::SetEnd(SystemElementEnd *end)
 {
     assert(!m_end);
     m_end = end;
 }
 
-void BoundaryStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+void SystemElementStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
 {
     assert(object);
     assert(parent);
 
-    // Then add a BoundaryEnd
-    BoundaryEnd *boundaryEnd = new BoundaryEnd(object);
-    this->SetEnd(boundaryEnd);
-    parent->AddChild(boundaryEnd);
+    // Then add a SystemElementEnd
+    SystemElementEnd *systemElementEnd = new SystemElementEnd(object);
+    this->SetEnd(systemElementEnd);
+    parent->AddChild(systemElementEnd);
 
     // Also clear the relinquished children
     object->ClearRelinquishedChildren();
 }
 
 //----------------------------------------------------------------------------
-// BoundaryEnd functor methods
+// SystemElementEnd functor methods
 //----------------------------------------------------------------------------
 
-int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
+int SystemElementEnd::PrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -101,7 +101,7 @@ int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
+int SystemElementEnd::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
@@ -110,7 +110,7 @@ int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
+int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -122,7 +122,8 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    BoundaryEnd *endBoundary = dynamic_cast<BoundaryEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    SystemElementEnd *endBoundary
+        = dynamic_cast<SystemElementEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
     // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
     if (params->m_pendingObjects.empty())
@@ -133,7 +134,7 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
+int SystemElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
@@ -158,7 +159,7 @@ int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int BoundaryStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
+int SystemElementStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -171,7 +172,7 @@ int BoundaryStartInterface::InterfacePrepareBoundaries(FunctorParams *functorPar
     return FUNCTOR_CONTINUE;
 }
 
-int BoundaryStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
+int SystemElementStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 
