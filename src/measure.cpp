@@ -909,7 +909,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
-        m_measureAligner.Process(params->m_functor, params, NULL, &filters);
+        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
 
     return FUNCTOR_SIBLINGS;

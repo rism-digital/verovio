@@ -317,8 +317,9 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
     Functor adjustLayers(&Object::AdjustLayers);
-    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
-    this->Process(&adjustLayers, &adjustLayersParams);
+    Functor adjustLayersEnd(&Object::AdjustLayersEnd);
+    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, &adjustLayersEnd, doc->m_mdivScoreDef.GetStaffNs());
+    this->Process(&adjustLayers, &adjustLayersParams, &adjustLayersEnd);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
@@ -328,9 +329,9 @@ void Page::LayOutHorizontally()
     this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
 
     // adjust Layers again, this time including dots positioning
-    AdjustLayersParams newAdjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustLayersParams newAdjustLayersParams(doc, &adjustLayers, &adjustLayersEnd, doc->m_mdivScoreDef.GetStaffNs());
     newAdjustLayersParams.m_ignoreDots = false;
-    this->Process(&adjustLayers, &newAdjustLayersParams);
+    this->Process(&adjustLayers, &newAdjustLayersParams, &adjustLayersEnd);
 
     // Adjust the X position of the accidentals, including in chords
     Functor adjustAccidX(&Object::AdjustAccidX);

@@ -747,9 +747,12 @@ public:
     ///@}
 
     /**
-     * Adjust the position the outside articulations.
+     * Adjust the position of notes and chords for multiple layers
      */
+    ///@{
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustLayersEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * @name Lay out the X positions of the grace notes looking at the bounding boxes.

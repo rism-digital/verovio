@@ -425,7 +425,7 @@ bool Chord::HasNoteWithDots()
     return false;
 }
 
-void Chord::AdjustOverlappingLayers(
+int Chord::AdjustOverlappingLayers(
     Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
 {
     int margin = 0;
@@ -469,7 +469,9 @@ void Chord::AdjustOverlappingLayers(
     }
     else if (margin) {
         SetDrawingXRel(GetDrawingXRel() + margin);
+        return margin;
     }
+    return 0;
 }
 
 //----------------------------------------------------------------------------
