@@ -1293,7 +1293,7 @@ int AlignmentReference::AdjustLayersEnd(FunctorParams *functorParams)
 
     // Determine staff
     if (params->m_current.empty()) return FUNCTOR_CONTINUE;
-    LayerElement *firstElem = params->m_current[0];
+    LayerElement *firstElem = params->m_current.at(0);
     Layer *layer = NULL;
     Staff *staff = firstElem->GetCrossStaff(layer);
     if (!staff) {
