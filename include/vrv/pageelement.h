@@ -43,7 +43,7 @@ public:
     /**
      * See Object::ConvertToPageBased
      */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    // virtual int ConvertToPageBased(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToCastOffMensural

@@ -50,6 +50,7 @@ void PageElement::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
+/*
 int PageElement::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
@@ -59,6 +60,7 @@ int PageElement::ConvertToPageBased(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+*/
 
 int PageElement::ConvertToCastOffMensural(FunctorParams *functorParams)
 {

@@ -15,8 +15,11 @@
 
 #include "editorial.h"
 #include "ending.h"
+#include "functorparams.h"
+#include "page.h"
 #include "scoredef.h"
 #include "section.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -67,5 +70,29 @@ bool Score::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Score::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    assert(!params->m_currentSystem);
+    this->MoveItselfTo(params->m_page);
+    System *system = new System();
+    params->m_currentSystem = system;
+    params->m_page->AddChild(system);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    ConvertToPageBasedBoundary(this, params->m_page);
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

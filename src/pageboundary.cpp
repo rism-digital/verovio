@@ -15,7 +15,6 @@
 
 #include "ending.h"
 #include "functorparams.h"
-#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -24,7 +23,7 @@ namespace vrv {
 // PageElementEnd
 //----------------------------------------------------------------------------
 
-PageElementEnd::PageElementEnd(Object *start) : SystemElement("system-element-end-")
+PageElementEnd::PageElementEnd(Object *start) : PageElement("page-element-end-")
 {
     Reset();
     m_start = start;
@@ -36,7 +35,7 @@ PageElementEnd::~PageElementEnd() {}
 void PageElementEnd::Reset()
 {
     m_start = NULL;
-    m_drawingMeasure = NULL;
+    // m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -53,7 +52,7 @@ PageElementStartInterface::~PageElementStartInterface() {}
 void PageElementStartInterface::Reset()
 {
     m_end = NULL;
-    m_drawingMeasure = NULL;
+    // m_drawingMeasure = NULL;
 }
 
 void PageElementStartInterface::SetEnd(PageElementEnd *end)
@@ -85,27 +84,14 @@ int PageElementEnd::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    // We set its pointer to the last measure we have encountered - this can be NULL in case no measure exists before
-    // the end boundary
-    // This can happen with a editorial container around a scoreDef at the beginning
-    this->SetMeasure(params->m_lastMeasure);
-
-    // Endings are also set as Measure::m_drawingEnding for all measures in between - when we reach the end boundary of
-    // an ending, we need to set the m_currentEnding to NULL
-    if (params->m_currentEnding && this->GetStart()->Is(ENDING)) {
-        params->m_currentEnding = NULL;
-        // With ending we need the drawing measure - this will crash with en empty ending at the beginning of a score...
-        assert(m_drawingMeasure);
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
 int PageElementEnd::ResetDrawing(FunctorParams *functorParams)
 {
-    FloatingObject::ResetDrawing(functorParams);
+    Object::ResetDrawing(functorParams);
 
-    this->SetMeasure(NULL);
+    // this->SetMeasure(NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -115,6 +101,7 @@ int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
+    /*
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert(dynamic_cast<System *>(this->GetParent()));
 
@@ -129,6 +116,7 @@ int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
         params->m_currentSystem->AddChild(endBoundary);
     else
         params->m_pendingObjects.push_back(endBoundary);
+     */
 
     return FUNCTOR_SIBLINGS;
 }

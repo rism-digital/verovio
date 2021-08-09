@@ -8,7 +8,7 @@
 #ifndef __VRV_PAGE_BOUNDARY_H__
 #define __VRV_PAGE_BOUNDARY_H__
 
-#include "systemelement.h"
+#include "pageelement.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -23,7 +23,7 @@ class Object;
 /**
  * This class models an end milestone element and has no MEI equivalent.
  */
-class PageElementEnd : public SystemElement {
+class PageElementEnd : public PageElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -34,11 +34,11 @@ public:
     virtual ~PageElementEnd();
     virtual void Reset();
     virtual std::string GetClassName() const { return "PageElementEnd"; }
-    virtual ClassId GetClassId() const { return SYSTEM_ELEMENT_END; }
+    virtual ClassId GetClassId() const { return PAGE_ELEMENT_END; }
     ///@}
 
-    void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
-    Measure *GetMeasure() { return m_drawingMeasure; }
+    // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
+    // Measure *GetMeasure() { return m_drawingMeasure; }
 
     /**
      * @name Get the corresponding boundary start
@@ -85,7 +85,7 @@ private:
     /** The class name of the corresponding start */
     std::string m_startClassName;
     /** The last measure child of the element */
-    Measure *m_drawingMeasure;
+    // Measure *m_drawingMeasure;
 };
 
 //----------------------------------------------------------------------------

@@ -147,7 +147,7 @@ enum ClassId {
     RUNNING_ELEMENT_max,
     // Ids for PageElement child classes
     PAGE_ELEMENT,
-    BOUNDARY_PEND,
+    PAGE_ELEMENT_END,
     MDIV,
     SCORE,
     PAGE_ELEMENT_max,
