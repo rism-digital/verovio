@@ -41,16 +41,6 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertToPageBased
-     */
-    // virtual int ConvertToPageBased(FunctorParams *functorParams);
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
-
-    /**
      * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
