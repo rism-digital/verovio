@@ -835,6 +835,12 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
                 Note *note = vrv_cast<Note *>(this);
                 Note *otherNote = vrv_cast<Note *>(other);
                 if (note->IsUnisonWith(otherNote)) {
+                    if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
+                        otherNote->AlignDotsShift(note);
+                    }
+                    else if (otherNote->GetDrawingStemDir() == STEMDIRECTION_up) {
+                        note->AlignDotsShift(otherNote);
+                    }
                     return (currentLayerN < otherLayerN) ? dotLocs1 : dotLocs2;
                 }
             }
@@ -1636,6 +1642,21 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
                     - HorizontalRightOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
             }
         }
+        else if (this->Is(NOTE)) {
+            Note *currentNote = vrv_cast<Note *>(this);
+            assert(currentNote);
+            if ((currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM)) {
+                const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
+                data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
+                if (this->HorizontalLeftOverlap(otherElements.at(i), doc, 0, 0) != 0) {
+                    shift = 3 * horizontalMargin;
+                    if (stemDir == STEMDIRECTION_up) {
+                        shift *= -1;
+                    }
+                }
+            }
+        }
     }
 
     // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
@@ -1789,7 +1810,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                 if (hasOverlap) {
                     // For note to note alignment, make sure there is a standard spacing even if they to not overlap
                     // vertically
-                    if (this->Is(NOTE) and element->Is(NOTE)) {
+                    if (this->Is(NOTE) && element->Is(NOTE)) {
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
                     }
                     else {
@@ -1840,6 +1861,21 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
     }
 
+    auto it = std::find_if(params->m_measureTieEndpoints.begin(), params->m_measureTieEndpoints.end(),
+        [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
+    if (it != params->m_measureTieEndpoints.end()) {
+        const int minTiedDistance = 7 * drawingUnit;
+        const int alignmentDistance = it->second->GetAlignment()->GetXRel() - it->first->GetAlignment()->GetXRel();
+        if ((alignmentDistance < minTiedDistance)
+            && ((this->GetFirstAncestor(CHORD) != NULL) || (it->first->FindDescendantByType(FLAG) != NULL))) {
+            const int adjust = minTiedDistance - alignmentDistance;
+            this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() + adjust);
+            // Also move the accumulated x shift and the minimum position for the next alignment accordingly
+            params->m_cumulatedXShift += adjust;
+            params->m_upcomingMinPos += adjust;
+        }
+    }
+
     return FUNCTOR_SIBLINGS;
 }
 
@@ -1887,7 +1923,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     else if (this->Is(ACCID)) {
         Accid const *accid = vrv_cast<Accid *>(this);
         assert(accid);
-        if ((accid->GetFunc() == accidLog_FUNC_edit) && !accid->HasEnclose())
+        if (accid->GetFunc() == accidLog_FUNC_edit)
             m_drawingCueSize = true;
         else {
             Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
@@ -2120,6 +2156,7 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 
     if (!this->GetDurationInterface() || this->Is(MSPACE) || this->Is(SPACE) || this->HasSameasLink())
         return FUNCTOR_CONTINUE;
+    if (this->Is(NOTE) && this->GetParent()->Is(CHORD)) return FUNCTOR_CONTINUE;
 
     double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
     double time = m_alignment->GetTime();

@@ -39,21 +39,9 @@ const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_a
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
     { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
-constexpr const char *engravingDefaults
-    = "{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
-      "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
-      "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.1,"
-      "'bracketThickness':0.5,'repeatEndingLineThickness':0.075,'textEnclosureThickness':0.1}";
-
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
-
-void Option::CopyTo(Option *option)
-{
-    // Make sure it is overriden
-    assert(false);
-}
 
 void Option::SetInfo(const std::string &title, const std::string &description)
 {
@@ -93,20 +81,6 @@ bool Option::SetValue(const std::string &value)
     // If not overriden
     LogError("Unsupported type string for %s", m_key.c_str());
     return false;
-}
-
-std::string Option::GetStrValue() const
-{
-    // If not overriden
-    assert(false);
-    return "[unspecified]";
-}
-
-std::string Option::GetDefaultStrValue() const
-{
-    // If not overriden
-    assert(false);
-    return "[unspecified]";
 }
 
 jsonxx::Object Option::ToJson() const
@@ -229,6 +203,12 @@ std::string OptionBool::GetDefaultStrValue() const
     return (m_defaultValue) ? "true" : "false";
 }
 
+void OptionBool::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
+}
+
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
@@ -285,6 +265,12 @@ bool OptionDbl::SetValue(double value)
     m_value = value;
     m_isSet = true;
     return true;
+}
+
+void OptionDbl::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -349,6 +335,12 @@ bool OptionInt::SetValue(int value)
     return true;
 }
 
+void OptionInt::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
+}
+
 //----------------------------------------------------------------------------
 // OptionString
 //----------------------------------------------------------------------------
@@ -371,6 +363,12 @@ bool OptionString::SetValue(const std::string &value)
     m_value = value;
     m_isSet = true;
     return true;
+}
+
+void OptionString::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -443,6 +441,12 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
     return true;
+}
+
+void OptionArray::Reset()
+{
+    m_values.clear();
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -545,6 +549,12 @@ std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
     return ss.str();
 }
 
+void OptionIntMap::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
+}
+
 //----------------------------------------------------------------------------
 // OptionStaffrel
 //----------------------------------------------------------------------------
@@ -585,6 +595,12 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 {
     Att converter;
     return converter.StaffrelToStr(m_defaultValue);
+}
+
+void OptionStaffrel::Reset()
+{
+    m_value = m_defaultValue;
+    m_isSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -646,6 +662,12 @@ std::string OptionJson::GetStrValue() const
 std::string OptionJson::GetDefaultStrValue() const
 {
     return m_defaultValues.json();
+}
+
+void OptionJson::Reset()
+{
+    m_values.reset();
+    m_isSet = false;
 }
 
 bool OptionJson::ReadJson(jsonxx::Object &output, const std::string &input) const
@@ -717,6 +739,15 @@ bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, c
     return true;
 }
 
+std::set<std::string> OptionJson::GetKeys() const
+{
+    std::set<std::string> keys;
+    for (const auto &mapEntry : m_values.kv_map()) {
+        keys.insert(mapEntry.first);
+    }
+    return keys;
+}
+
 OptionJson::JsonPath OptionJson::StringPath2NodePath(
     const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
 {
@@ -774,11 +805,11 @@ Options::Options()
     m_help.SetShortOption('h', true);
     m_baseOptions.AddOption(&m_help);
 
-    m_allPpages.SetInfo("All pages", "Output all pages");
-    m_allPpages.Init(false);
-    m_allPpages.SetKey("allPages");
-    m_allPpages.SetShortOption('a', true);
-    m_baseOptions.AddOption(&m_allPpages);
+    m_allPages.SetInfo("All pages", "Output all pages");
+    m_allPages.Init(false);
+    m_allPages.SetKey("allPages");
+    m_allPages.SetShortOption('a', true);
+    m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
         "Select input format from: \"abc\", \"darms\", \"humdrum\", \"mei\", \"pae\", \"xml\" (musicxml)");
@@ -1050,7 +1081,7 @@ Options::Options()
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
 
     m_engravingDefaults.SetInfo("Engraving defaults", "Json describing defaults for engraving SMuFL elements");
-    m_engravingDefaults.Init(JsonSource::String, engravingDefaults);
+    m_engravingDefaults.Init(JsonSource::String, "{}");
     this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
 
     m_engravingDefaultsFile.SetInfo(
@@ -1146,6 +1177,10 @@ Options::Options()
     m_lyricWordSpace.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricWordSpace, "lyricWordSpace", &m_generalLayout);
 
+    m_lyricVerseCollapse.SetInfo("Lyric verse collapse", "Collapse empty verse lines in lyrics");
+    m_lyricVerseCollapse.Init(false);
+    this->Register(&m_lyricVerseCollapse, "lyricVerseCollapse", &m_generalLayout);
+
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
     m_measureMinWidth.Init(15, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
@@ -1158,11 +1193,6 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
-    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
-        "The default horizontal distance between the dots and the inner barline of a repeat barline");
-    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
-    this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
-
     m_octaveAlternativeSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
     m_octaveAlternativeSymbols.Init(false);
     this->Register(&m_octaveAlternativeSymbols, "octaveAlternativeSymbols", &m_generalLayout);
@@ -1170,6 +1200,15 @@ Options::Options()
     m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
     m_octaveLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_octaveLineThickness, "octaveLineThickness", &m_generalLayout);
+
+    m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
+    m_pedalLineThickness.Init(0.20, 0.10, 1.00);
+    this->Register(&m_pedalLineThickness, "pedalLineThickness", &m_generalLayout);
+
+    m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
+        "The default horizontal distance between the dots and the inner barline of a repeat barline");
+    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
     m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
@@ -1558,7 +1597,14 @@ Options::~Options() {}
 void Options::Sync()
 {
     if (!m_engravingDefaults.IsSet() && !m_engravingDefaultsFile.IsSet()) return;
-    // override default or passed engravingDefaults with explicitly set values
+
+    // We track all unmatched keys to generate appropriate errors later on
+    std::set<std::string> unmatchedKeys = m_engravingDefaults.GetKeys();
+    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeys();
+    std::set_union(unmatchedKeys.begin(), unmatchedKeys.end(), otherKeys.begin(), otherKeys.end(),
+        std::inserter(unmatchedKeys, unmatchedKeys.end()));
+
+    // Override default or passed engravingDefaults with explicitly set values
     std::list<std::pair<std::string, OptionDbl *>> engravingDefaults = {
         { "staffLineThickness", &m_staffLineWidth }, //
         { "stemThickness", &m_stemWidth }, //
@@ -1576,6 +1622,7 @@ void Options::Sync()
         { "subBracketThickness", &m_subBracketThickness }, //
         { "hairpinThickness", &m_hairpinThickness }, //
         { "octaveLineThickness", &m_octaveLineThickness }, //
+        { "pedalLineThickness", &m_pedalLineThickness }, //
         { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
         { "lyricLineThickness", &m_lyricLineThickness }, //
         { "tupletBracketThickness", &m_tupletBracketThickness }, //
@@ -1583,18 +1630,30 @@ void Options::Sync()
     };
 
     for (const auto &pair : engravingDefaults) {
-        if (pair.second->IsSet()) continue;
-
         const std::vector<std::string> jsonNodePath = { pair.first };
+        double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
-            const double jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
-            pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
+            jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
         }
         else if (m_engravingDefaults.HasValue(jsonNodePath)) {
-            const double jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
+            jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
+        }
+        else
+            continue;
+
+        if (!pair.second->IsSet()) {
             pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
         }
+        else if (jsonValue * 2.0 != pair.second->GetValue()) {
+            LogWarning(
+                "The engraving default '%s' is skipped because the corresponding option '%s' was set before to %f.",
+                pair.first.c_str(), pair.second->GetKey().c_str(), pair.second->GetValue());
+        }
+        unmatchedKeys.erase(pair.first);
     }
+
+    std::for_each(unmatchedKeys.cbegin(), unmatchedKeys.cend(),
+        [](const std::string &key) { LogError("Unsupported engraving default '%s'", key.c_str()); });
 }
 
 void Options::Register(Option *option, const std::string &key, OptionGrp *grp)

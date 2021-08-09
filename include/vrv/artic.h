@@ -21,6 +21,7 @@ namespace vrv {
 class Artic : public LayerElement,
               public AttArticulation,
               public AttColor,
+              public AttEnclosingChars,
               public AttExtSym,
               public AttPlacementRelEvent {
 public:
@@ -82,16 +83,21 @@ public:
      */
     wchar_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
 
+    /**
+     * Retrieves parentheses / brackets from the enclose attribute
+     */
+    wchar_t GetEnclosingGlyph(bool beforeArtic) const;
+
     //----------------//
     // Static methods //
     //----------------//
 
     /**
-     * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.
+     * Static method that retrieves the vertical correction for a SMuFL code with data_STAFFREL.
      * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
      * See bow indications for an example where is is always above
      */
-    static bool VerticalCorr(wchar_t code, const data_STAFFREL &place);
+    static bool VerticalCorr(wchar_t code, data_STAFFREL place);
 
     /**
      * Static method that returns true if the data_ARTICULATION has to be centered between staff lines
@@ -133,7 +139,8 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
-    //
+    bool IsInsideArtic(data_ARTICULATION artic) const;
+
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;
     std::vector<FloatingCurvePositioner *> m_endSlurPositioners;

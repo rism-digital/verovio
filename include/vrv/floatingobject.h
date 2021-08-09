@@ -71,6 +71,20 @@ public:
     int SetDrawingGrpObject(void *drawingGrpObject);
     ///@}
 
+    /**
+     * @name Get and set maximum drawing yRel that is persistent for the floating object across all its floating
+     * positioners, which allows for persisten vertical positioning for some elements
+     */
+    ///@{
+    void SetMaxDrawingYRel(int maxDrawingYRel);
+    int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
+    ///@}
+
+    /**
+     * Check whether current object represents initial element or extender lines
+     */
+    virtual bool IsExtenderElement() const { return false; }
+
     //----------//
     // Functors //
     //----------//
@@ -124,6 +138,8 @@ private:
 
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
+
+    int m_maxDrawingYRel;
 
     //----------------//
     // Static members //

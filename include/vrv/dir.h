@@ -60,6 +60,11 @@ public:
      */
     virtual bool IsSupportedChild(Object *object);
 
+    /**
+     * See FloatingObject::IsExtenderElement
+     */
+    virtual bool IsExtenderElement() const { return GetExtender() == BOOLEAN_true; }
+
     //----------//
     // Functors //
     //----------//

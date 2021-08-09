@@ -1,6 +1,6 @@
 {
   "name": "verovio",
-  "version": "3.4.0",
+  "version": "3.6.0",
   "description": "This is the stable version of the verovio package",
   "main": "index.js",
   "keywords": [

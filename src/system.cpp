@@ -78,7 +78,6 @@ void System::Reset()
     m_drawingYRel = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
-    m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
     m_drawingIsOptimized = false;
 }
@@ -152,11 +151,15 @@ int System::GetMinimumSystemSpacing(const Doc *doc) const
     return spacingSystem.GetValue() * doc->GetDrawingUnit(100);
 }
 
+int System::GetDrawingLabelsWidth() const
+{
+    return (m_drawingScoreDef) ? m_drawingScoreDef->GetDrawingLabelsWidth() : 0;
+}
+
 void System::SetDrawingLabelsWidth(int width)
 {
-    if (m_drawingLabelsWidth < width) {
-        m_drawingLabelsWidth = width;
-    }
+    assert(m_drawingScoreDef);
+    m_drawingScoreDef->SetDrawingLabelsWidth(width);
 }
 
 void System::SetDrawingAbbrLabelsWidth(int width)
@@ -264,7 +267,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 
 curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, LayerElement *end, Slur *slur)
 {
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
     findSpannedLayerElementsParams.m_minPos = start->GetDrawingX();
     findSpannedLayerElementsParams.m_maxPos = end->GetDrawingX();
     findSpannedLayerElementsParams.m_classIds = { CHORD, NOTE };
@@ -393,13 +396,12 @@ int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
 
     if (m_drawingScoreDef) m_drawingScoreDef->Process(params->m_functor, functorParams);
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     SetDrawingXRel(0);
-    m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
 
     return FUNCTOR_CONTINUE;

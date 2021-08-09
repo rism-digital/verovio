@@ -1,17 +1,23 @@
-h1. Introduction
+# JSON++
+
+[![Build Status](https://travis-ci.org/hjiang/jsonxx.svg?branch=master)](https://travis-ci.org/hjiang/jsonxx)
+
+## Introduction
 
 JSON++ is a light-weight JSON parser, writer and reader written in C++.
 JSON++ can also convert JSON documents into lossless XML documents.
 
-h1. Contributors
+## Contributors
 
-http://github.com/hjiang
-http://github.com/elanthis
-http://github.com/r-lyeh
+* http://github.com/hjiang
+* http://github.com/elanthis
+* http://github.com/r-lyeh
 
-h1. Why another JSON parser?
+If you've made substantial contribution, please add your link here. 
 
-Perhaps because web service clients are usually written in dynamic languages these days, none of the existing C++ JSON parsers suit my needs very well, so I wrote one that I used in another project. My goals for JSON++ are:
+## Why another JSON parser?
+
+Perhaps because web service clients are usually written in dynamic languages these days, none of the existing C++ JSON parsers fitted my needs very well, so I wrote one that I used in another project. My goals for JSON++ were:
 
 * Efficient in both memory and speed.
 * No third party dependencies. JSON++ only depends on the standard C++ library.
@@ -19,41 +25,53 @@ Perhaps because web service clients are usually written in dynamic languages the
 * Robust.
 * Small and convenient API. Most of the time, you only need to call one function and two function templates.
 * Easy to integrate. JSON++ only has one source file and one header file. Just compile the source file and link with your program.
-* Able to construct documents dinamically.
+* Able to construct documents dynamically.
 * JSON writer: write documents in JSON format.
+
+Other contributors have sinced added more functionalities:
+
 * XML writer: convert documents to JSONx format. See http://goo.gl/I3cxs for details.
 * XML writer: convert documents to JXML format. See https://github.com/r-lyeh/JXML for details.
 * XML writer: convert documents to JXMLex format. See https://github.com/r-lyeh/JXMLex for details.
 * XML writer: convert documents to tagged XML format. See https://github.com/hjiang/jsonxx/issues/12 for details.
 
-h1. Configuration
+## Compiler version
 
-h4. Strict/permissive parsing
+You need a modern C++ compiler. For older compilers, please try [legacy branch](https://github.com/hjiang/jsonxx/tree/legacy).
+
+## Configuration
+
+### Strict/permissive parsing
 
 JSONxx can parse JSON documents both in strict or permissive mode.
 
-When <code>jsonxx::Settings::Parser</code> is set to <code>Strict</code>, JSONxx parser will accept:
-* Fully conformant JSON documents *only*
+When `jsonxx::Settings::Parser` is set to `Strict`, JSONxx parser will accept:
+* Fully conformant JSON documents *only*.
 
-When <code>jsonxx::Settings::Parser</code> is set to <code>Permissive</code>, JSONxx parser will accept:
+When `jsonxx::Settings::Parser` is set to `Permissive`, JSONxx parser will accept:
 * Fully conformant JSON documents
-* Ending commas in arrays and objects: <code>{ "array": [0,1,2,], }</code>
-* Single quoted strings: <code>['hello', "world"]</code>
-* C++ style comments: <code>{ "width": 320, "height": 240 } //Picture details</code>
+* Ending commas in arrays and objects: `{ "array": [0,1,2,], }`
+* Single quoted strings: `['hello', "world"]`
+* C++ style comments: `{ "width": 320, "height": 240 } //Picture details`
 
-Default value is <code>Permissive</code>.
+Default value is `Permissive`.
 
-h4. Assertions
+When `jsonxx::Settings::UnquotedKeys` is set to `Enabled`, JSONxx parser will accept:
+* Unquoted keys: `{name: "world"}`
 
-JSONxx uses internally <code>JSONXX_ASSERT(...)</code> macro that works both in debug and release mode. Set <code>jsonxx::Settings::Assertions</code> value to <code>Disabled</code> to disable assertions.
+Default value is `Disabled`.
 
-Default value is <code>Enabled</code>.
+### Assertions
 
-h1. Usage
+JSONxx uses internally `JSONXX_ASSERT(...)` macro that works both in debug and release mode. Set `jsonxx::Settings::Assertions` value to `Disabled` to disable assertions.
+
+Default value is `Enabled`.
+
+## Usage
 
 The following snippets are from one of the unit tests. They are quite self-descriptive.
 
-<pre>
+~~~C++
 using namespace std;
 using namespace jsonxx;
 
@@ -75,18 +93,21 @@ assert(1 == o.get<Number>("foo"));
 assert(o.has<Boolean>("bar"));
 assert(o.has<Object>("person"));
 assert(o.get<Object>("person").has<Number>("age"));
+assert(!o.get<Object>("person").has<Boolean>("old"));
+assert(o.get<Object>("person").get<Boolean>("old", false));
 assert(o.has<Array>("data"));
 assert(o.get<Array>("data").get<Number>(1) == 42);
 assert(o.get<Array>("data").get<String>(0) == "abcd");
+assert(o.get<Array>("data").get<String>(2, "hello") == "hello");
 assert(!o.has<Number>("data"));
 cout << o.json() << endl;                     // JSON output
 cout << o.xml(JSONx) << endl;                 // JSON to XML conversion (JSONx subtype)
 cout << o.xml(JXML) << endl;                  // JSON to XML conversion (JXML subtype)
 cout << o.xml(JXMLex) << endl;                // JSON to XML conversion (JXMLex subtype)
-</pre>
+~~~
 
-<pre>
-// Generate JSON document dinamically
+~~~C++
+// Generate JSON document dynamically
 using namespace std;
 using namespace jsonxx;
 Array a;
@@ -101,8 +122,8 @@ o << "key1" << "value";
 o << "key2" << 123;
 o << "key3" << a;
 cout << o.json() << endl;
-</pre>
+~~~
 
-h1. To do
+## To do
 
 * Custom JSON comments (C style /**/) when permissive parsing is enabled.

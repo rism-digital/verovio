@@ -205,7 +205,8 @@ void Page::LayOutTranscription(bool force)
 
     FunctorDocParams calcLedgerLinesParams(doc);
     Functor calcLedgerLines(&Object::CalcLedgerLines);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams);
+    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
+    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
 
     m_layoutDone = true;
 }
@@ -419,7 +420,8 @@ void Page::LayOutVertically()
 
     FunctorDocParams calcLedgerLinesParams(doc);
     Functor calcLedgerLines(&Object::CalcLedgerLines);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams);
+    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
+    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
 
     // Align the content of the page using system aligners
     // After this:
@@ -481,7 +483,7 @@ void Page::LayOutVertically()
 
     // Adjust the overlap of the staff aligments by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
-    AdjustStaffOverlapParams adjustStaffOverlapParams(&adjustStaffOverlap);
+    AdjustStaffOverlapParams adjustStaffOverlapParams(doc, &adjustStaffOverlap);
     this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
 
     // Set the Y position of each StaffAlignment

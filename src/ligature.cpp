@@ -268,7 +268,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
         // Blindly set the oblique shape without trying to deal with encoding problems
         if (oblique) {
-            m_drawingShapes.at(n1) += LIGATURE_OBLIQUE;
+            m_drawingShapes.at(n1) |= LIGATURE_OBLIQUE;
             if (n1 > 0) {
                 m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
             }

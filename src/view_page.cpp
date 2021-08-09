@@ -325,7 +325,9 @@ void View::DrawStaffGrp(
         DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
     // draw the group symbol
+    int staffGrpX = x;
     DrawGrpSym(dc, measure, staffGrp, x);
+    int grpSymSpace = staffGrpX - x;
 
     // recursively draw the children
     StaffGrp *childStaffGrp = NULL;
@@ -337,11 +339,11 @@ void View::DrawStaffGrp(
     }
 
     // DrawStaffGrpLabel
-    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
     const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space);
+    this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
 
     DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
 }
@@ -362,10 +364,10 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
 
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
 
-        if (!staff || !system) {
-            LogDebug("Staff or System missing in View::DrawStaffDefLabels");
+        if (!staff || !scoreDef) {
+            LogDebug("Staff or ScoreDef missing in View::DrawStaffDefLabels");
             continue;
         }
 
@@ -378,7 +380,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
-        this->DrawLabels(dc, system, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
+        this->DrawLabels(dc, scoreDef, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
     }
 }
 
@@ -442,10 +444,10 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
 }
 
 void View::DrawLabels(
-    DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
+    DeviceContext *dc, ScoreDef *scoreDef, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
 {
     assert(dc);
-    assert(system);
+    assert(scoreDef);
     assert(object->Is({ STAFFDEF, STAFFGRP }));
 
     Label *label = dynamic_cast<Label *>(object->FindDescendantByType(LABEL, 1));
@@ -492,7 +494,7 @@ void View::DrawLabels(
     dc->EndGraphic(graphic, this);
 
     // keep the widest width for the system - careful: this can be the label OR labelAbbr
-    system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
+    scoreDef->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
     // also store in the system the maximum width with abbreviations for justification
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
@@ -503,6 +505,8 @@ void View::DrawLabels(
             dc->GetTextExtent(line, &extend, true);
             maxLength = (extend.m_width > maxLength) ? extend.m_width : maxLength;
         }
+        System *system = vrv_cast<System *>(scoreDef->GetFirstAncestor(SYSTEM));
+        assert(system);
         system->SetDrawingAbbrLabelsWidth(maxLength + space);
     }
 
@@ -963,7 +967,8 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
                 ScoreDef *scoreDef = system->GetDrawingScoreDef();
                 GrpSym *groupSymbol = vrv_cast<GrpSym *>(scoreDef->FindDescendantByType(GRPSYM));
                 if (groupSymbol && (groupSymbol->GetSymbol() == staffGroupingSym_SYMBOL_bracket)) {
-                    symbolOffset += m_doc->GetGlyphHeight(SMUFL_E003_bracketTop, 100, false);                  
+                    symbolOffset
+                        += m_doc->GetGlyphHeight(SMUFL_E003_bracketTop, 100, false) + m_doc->GetDrawingUnit(100) / 6;
                 }
                 // hardcoded offset for the mNum based on the lyric font size
                 const int yOffset = m_doc->GetDrawingLyricFont(60)->GetPointSize();
@@ -1125,16 +1130,16 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffDef(dc, staff, measure);
 
-    if (staff->GetLedgerLinesAbove()) {
+    if (!staff->GetLedgerLinesAbove().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesAbove(), false, false);
     }
-    if (staff->GetLedgerLinesBelow()) {
+    if (!staff->GetLedgerLinesBelow().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelow(), true, false);
     }
-    if (staff->GetLedgerLinesAboveCue()) {
+    if (!staff->GetLedgerLinesAboveCue().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesAboveCue(), false, true);
     }
-    if (staff->GetLedgerLinesBelowCue()) {
+    if (!staff->GetLedgerLinesBelowCue().empty()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelowCue(), true, true);
     }
 
@@ -1215,11 +1220,10 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     return;
 }
 
-void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize)
+void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize)
 {
     assert(dc);
     assert(staff);
-    assert(lines);
 
     std::string gClass = "above";
     int y = staff->GetDrawingY();
@@ -1246,14 +1250,10 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    ArrayOfLedgerLines::iterator iter;
-    std::list<std::pair<int, int>>::iterator iterDashes;
-
-    // First add the dash
-    for (iter = lines->begin(); iter != lines->end(); ++iter) {
-        for (iterDashes = (*iter).m_dashes.begin(); iterDashes != (*iter).m_dashes.end(); ++iterDashes) {
-            dc->DrawLine(ToDeviceContextX(x + iterDashes->first), ToDeviceContextY(y),
-                ToDeviceContextX(x + iterDashes->second), ToDeviceContextY(y));
+    for (const LedgerLine &line : lines) {
+        for (const std::pair<int, int> &dash : line.m_dashes) {
+            dc->DrawLine(ToDeviceContextX(x + dash.first), ToDeviceContextY(y), ToDeviceContextX(x + dash.second),
+                ToDeviceContextY(y));
         }
         y += ySpace;
     }
@@ -1262,8 +1262,6 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->ResetBrush();
 
     dc->EndCustomGraphic();
-
-    return;
 }
 
 void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
@@ -1507,6 +1505,12 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             // nothing to do, then
             ScoreDef *scoreDef = vrv_cast<ScoreDef *>(current);
             assert(scoreDef);
+
+            Measure *nextMeasure = dynamic_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
+            if (nextMeasure && scoreDef->DrawLabels()) {
+                DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
+            }
+
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
         else if (current->IsSystemElement()) {

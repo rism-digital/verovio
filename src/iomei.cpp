@@ -1016,6 +1016,7 @@ void MEIOutput::WriteSection(pugi::xml_node currentNode, Section *section)
 
     WriteSystemElement(currentNode, section);
     section->WriteNNumberLike(currentNode);
+    section->WriteSectionVis(currentNode);
 }
 
 void MEIOutput::WriteEnding(pugi::xml_node currentNode, Ending *ending)
@@ -1136,6 +1137,7 @@ void MEIOutput::WriteStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
     WriteXmlId(currentNode, staffGrp);
     staffGrp->WriteBasic(currentNode);
     staffGrp->WriteLabelled(currentNode);
+    staffGrp->WriteNNumberLike(currentNode);
     staffGrp->WriteStaffGroupingSym(currentNode);
     staffGrp->WriteStaffGrpVis(currentNode);
     staffGrp->WriteTyped(currentNode);
@@ -1331,6 +1333,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     WriteControlElement(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
+    fermata->WriteEnclosingChars(currentNode);
     fermata->WriteExtSym(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacementRelStaff(currentNode);
@@ -1608,6 +1611,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     WriteLayerElement(currentNode, artic);
     artic->WriteArticulation(currentNode);
     artic->WriteColor(currentNode);
+    artic->WriteEnclosingChars(currentNode);
     artic->WriteExtSym(currentNode);
     artic->WritePlacementRelEvent(currentNode);
 }
@@ -3261,6 +3265,7 @@ bool MEIInput::ReadSection(Object *parent, pugi::xml_node section)
     SetMeiUuid(section, vrvSection);
 
     vrvSection->ReadNNumberLike(section);
+    vrvSection->ReadSectionVis(section);
 
     parent->AddChild(vrvSection);
     ReadUnsupportedAttr(section, vrvSection);
@@ -3805,6 +3810,7 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
 
     vrvStaffGrp->ReadBasic(staffGrp);
     vrvStaffGrp->ReadLabelled(staffGrp);
+    vrvStaffGrp->ReadNNumberLike(staffGrp);
     AttStaffGroupingSym groupingSym;
     groupingSym.ReadStaffGroupingSym(staffGrp);
     if (groupingSym.HasSymbol()) {
@@ -4454,6 +4460,7 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
 
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
+    vrvFermata->ReadEnclosingChars(fermata);
     vrvFermata->ReadExtSym(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacementRelStaff(fermata);
@@ -4525,7 +4532,7 @@ bool MEIInput::ReadHarm(Object *parent, pugi::xml_node harm)
     return ReadTextChildren(vrvHarm, harm, vrvHarm);
 }
 
-bool MEIInput::ReadLv(Object* parent, pugi::xml_node lv) 
+bool MEIInput::ReadLv(Object *parent, pugi::xml_node lv)
 {
     Lv *vrvLv = new Lv();
     ReadControlElement(lv, vrvLv);
@@ -5045,6 +5052,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
 
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadColor(artic);
+    vrvArtic->ReadEnclosingChars(artic);
     vrvArtic->ReadExtSym(artic);
     vrvArtic->ReadPlacementRelEvent(artic);
 

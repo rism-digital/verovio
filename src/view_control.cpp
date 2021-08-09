@@ -956,8 +956,8 @@ void View::DrawPedalLine(
         dc->StartGraphic(pedal, "", pedal->GetUuid(), false);
     }
 
-    int bracketSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int bracketSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int lineWidth = m_options->m_pedalLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // Opening bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
@@ -1033,8 +1033,6 @@ void View::DrawControlElementConnector(
     assert(element->GetNextLink() || interface->GetEnd());
     if (!element->GetNextLink() && !interface->GetEnd()) return;
 
-    int y = element->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
-
     // Adjust the x1
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         if (element->GetCurrentFloatingPositioner() && element->GetCurrentFloatingPositioner()->HasContentBB()) {
@@ -1054,6 +1052,7 @@ void View::DrawControlElementConnector(
     }
 
     const int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int y = element->GetDrawingY() + width / 2;
 
     // the length of the dash and the space between them - can be made a parameter
     const int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
@@ -1594,26 +1593,52 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     // Cannot draw a fermata that has no start position
     if (!fermata->GetStart()) return;
 
+    const bool drawingCueSize = false;
+
     dc->StartGraphic(fermata, "", fermata->GetUuid());
 
-    int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
+    const wchar_t code = fermata->GetFermataGlyph();
+    const wchar_t enclosingFront = fermata->GetEnclosingGlyph(true);
+    const wchar_t enclosingBack = fermata->GetEnclosingGlyph(false);
 
-    // for a start always put fermatas up
-    int code = fermata->GetFermataGlyph();
+    const int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
-    std::wstring str;
-    str.push_back(code);
-
-    std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure, fermata);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
-        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter)) {
+    for (Staff *staff : staffList) {
+        if (!system->SetCurrentFloatingPositioner(staff->GetN(), fermata, fermata->GetStart(), staff)) {
             continue;
         }
-        int y = fermata->GetDrawingY();
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, HORIZONTALALIGNMENT_center, (*staffIter)->m_drawingStaffSize);
+        const int y = fermata->GetDrawingY();
+
+        // The correction for centering the glyph
+        const int xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        int yCorr = 0;
+        const int height = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+        const data_VERTICALALIGNMENT yAlignment = Fermata::GetVerticalAlignment(code);
+        if (yAlignment == VERTICALALIGNMENT_top) {
+            yCorr = height / 2;
+        }
+        else if (yAlignment == VERTICALALIGNMENT_bottom) {
+            yCorr = -height / 2;
+        }
+
+        // Draw glyph including possible enclosing brackets
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+
+        if (enclosingFront) {
+            const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3
+                + m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(dc, x - xCorrEncl, y, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+        }
+
+        DrawSmuflCode(dc, x - xCorr, y - yCorr, code, staff->m_drawingStaffSize, drawingCueSize);
+
+        if (enclosingBack) {
+            const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
+            DrawSmuflCode(dc, x + xCorrEncl, y, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
+        }
+
         dc->ResetFont();
     }
 

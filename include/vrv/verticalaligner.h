@@ -158,13 +158,18 @@ public:
     int GetYRel() const { return m_yRel; }
 
     /**
-     * @name Set and get verse count.
+     * @name Methods for managing verse count with / without the collapse option
      * When setting a value of 0, then 1 is assumed. This occurs
      * Typically with one single verse and no @n in <verse>
+     * Without the collapse option, the count is the greatest @n
+     * With the collapse option, the count is number of verses.
+     * The position is calculated from the bottom.
      */
     ///@{
-    void SetVerseCount(int verse_count);
-    int GetVerseCount() const { return m_verseCount; }
+    void AddVerseN(int verseN);
+    int GetVerseCount(bool collapse) const;
+    int GetVersePosition(int verseN, bool collapse) const;
+    ///@}
 
     /**
      * Retrieves or creates the FloatingPositioner for the FloatingObject on this staff.
@@ -176,6 +181,11 @@ public:
      * Return NULL if not found and does not create anything.
      */
     FloatingPositioner *FindFirstFloatingPositioner(ClassId classId);
+
+    /**
+     * Find all FloatingPositioner corresponding to a FloatingObject with given ClassId.
+     */
+    ArrayOfFloatingPositioners FindAllFloatingPositioners(ClassId classId);
 
     /**
      * Look for the FloatingPositioner corresponding to the FloatingObject.
@@ -345,11 +355,10 @@ private:
      * Stores the position relative to the system.
      */
     int m_yRel;
-    // int m_yShift;
     /**
-     * Stores the number of verse of the staves attached to the aligner
+     * Stores the verse@n of the staves attached to the aligner
      */
-    int m_verseCount;
+    std::set<int> m_verseNs;
 
     /**
      * @name values for storing the overlow and overlap

@@ -256,7 +256,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
+    if (accid->GetFunc() == accidLog_FUNC_edit) {
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
@@ -298,46 +298,78 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = artic->GetDrawingX();
     int y = artic->GetDrawingY();
 
-    int xCorr;
-    int baselineCorr;
-
-    bool drawingCueSize = true;
+    const bool drawingCueSize = true;
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
 
-    data_ARTICULATION articValue = artic->GetArticFirst();
+    const data_ARTICULATION articValue = artic->GetArticFirst();
+    const data_STAFFREL place = artic->GetDrawingPlace();
 
-    wchar_t code = artic->GetArticGlyph(articValue, artic->GetDrawingPlace());
+    const wchar_t code = artic->GetArticGlyph(articValue, place);
+    const wchar_t enclosingFront = artic->GetEnclosingGlyph(true);
+    const wchar_t enclosingBack = artic->GetEnclosingGlyph(false);
 
     // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
     if (code == 0) {
         artic->SetEmptyBB();
+        dc->ResetFont();
         return;
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
-
     // The correction for centering the glyph
-    xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
-    // The position of the next glyph (and for correcting the baseline if necessary
-    int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+    const int xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
 
-    // Center the glyh if necessary
-    if (Artic::IsCentered(articValue)) {
-        y += (artic->GetDrawingPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
+    const int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+
+    // The height by which enclosing brackets exceed the artic symbol
+    int exceedingHeight = 0;
+    for (const wchar_t symbol : { enclosingFront, enclosingBack }) {
+        if (symbol == 0) continue;
+        const int symbolHeight = m_doc->GetGlyphHeight(symbol, staff->m_drawingStaffSize, drawingCueSize);
+        exceedingHeight = std::max(exceedingHeight, symbolHeight - glyphHeight);
     }
-    // @glyph.num/name are (usually?) aligned for placement above and needs to be shifted when below
-    else if ((artic->HasGlyphNum() || artic->HasGlyphName()) && artic->GetDrawingPlace() == STAFFREL_below) {
-        y -= glyphHeight;
+
+    // Center the glyph if necessary
+    int yCorr = 0;
+    if (Artic::IsCentered(articValue) && !enclosingFront && !enclosingBack) {
+        y += (place == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
     }
+    else {
+        y += (place == STAFFREL_above) ? (exceedingHeight / 2) : -(exceedingHeight / 2);
+        // @glyph.num/name are (usually?) aligned for placement above and needs to be shifted when below
+        if ((artic->HasGlyphNum() || artic->HasGlyphName()) && (place == STAFFREL_below)) {
+            yCorr += glyphHeight;
+        }
+    }
+
+    // The relative vertical displacement of enclosing brackets
+    int yCorrEncl = (place == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
 
     // Adjust the baseline for glyph above the baseline in SMuFL
-    baselineCorr = 0;
-    if (Artic::VerticalCorr(code, artic->GetDrawingPlace())) baselineCorr = glyphHeight;
+    if (Artic::VerticalCorr(code, place)) {
+        y -= glyphHeight;
+        yCorrEncl = -glyphHeight / 2;
+    }
 
-    DrawSmuflCode(dc, x - xCorr, y - baselineCorr, code, staff->m_drawingStaffSize, drawingCueSize);
+    // Draw glyph including possible enclosing brackets
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    if (enclosingFront) {
+        int xCorrEncl = std::max(xCorr, m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+        xCorrEncl += m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, x - xCorrEncl, y - yCorrEncl, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+    }
+
+    DrawSmuflCode(dc, x - xCorr, y - yCorr, code, staff->m_drawingStaffSize, drawingCueSize);
+
+    if (enclosingBack) {
+        const int xCorrEncl = std::max(xCorr, m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+        DrawSmuflCode(dc, x + xCorrEncl, y - yCorrEncl, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
+    }
 
     dc->EndGraphic(element, this);
+
+    dc->ResetFont();
 }
 
 void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1355,13 +1387,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     DrawSmuflCode(dc, x, y, drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
 
-    // single legder line for half and whole rests
-    if ((drawingDur == DUR_1 || drawingDur == DUR_2)
-        && (y > (int)staff->GetDrawingY()
-            || y < staff->GetDrawingY()
-                    - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
-        dc->DeactivateGraphicX();
-
+    if ((drawingDur == DUR_1 || drawingDur == DUR_2 || drawingDur == DUR_BR)) {
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
         int ledgerLineThickness
             = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1371,9 +1397,30 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
         }
-        DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+        const int topMargin = staff->GetDrawingY();
+        const int bottomMargin = staff->GetDrawingY()
+            - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-        dc->ReactivateGraphic();
+        // single legder line for half and whole rests
+        if ((drawingDur == DUR_1 || drawingDur == DUR_2) && (y > topMargin || y < bottomMargin)) {
+            dc->DeactivateGraphicX();
+            DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+            dc->ReactivateGraphic();
+        }
+        // double ledger line for breve rests
+        else if (drawingDur == DUR_BR && (y >= topMargin || y <= bottomMargin)) {
+            const int height = m_doc->GetGlyphHeight(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
+            dc->DeactivateGraphicX();
+            if (y != topMargin) {
+                DrawHorizontalLine(
+                    dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+            }
+            if (y != bottomMargin - height) {
+                DrawHorizontalLine(
+                    dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y + height, ledgerLineThickness);
+            }
+            dc->ReactivateGraphic();
+        }
     }
 
     /************ Draw children (dots) ************/
@@ -1731,6 +1778,7 @@ int View::GetSylYRel(int verseN, Staff *staff)
 {
     assert(staff);
 
+    const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
     StaffAlignment *alignment = staff->GetAlignment();
     if (alignment) {
@@ -1740,7 +1788,7 @@ int View::GetSylYRel(int verseN, Staff *staff)
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + (alignment->GetVerseCount() - verseN) * (height + descender + margin) + (descender);
+            + alignment->GetVersePosition(verseN, verseCollapse) * (height + descender + margin) + (descender);
     }
     return y;
 }

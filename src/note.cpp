@@ -191,6 +191,16 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
+void Note::AlignDotsShift(Note *otherNote)
+{
+    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *otherDots = vrv_cast<Dots *>(otherNote->FindDescendantByType(DOTS, 1));
+    if (!dots || !otherDots) return;
+    if (otherDots->GetFlagShift()) {
+        dots->SetFlagShift(otherDots->GetFlagShift());
+    }
+}
+
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
@@ -1047,10 +1057,15 @@ int Note::CalcDots(FunctorParams *functorParams)
         const bool isDotShifted = (this->GetDrawingLoc() % 2 == 0);
 
         // Stem up, shorter than 4th and not in beam
-        if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
+        if (const int shift = dots->GetFlagShift(); shift) {
+            flagShift += shift;
+        }
+        else if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
             && (IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
             // HARDCODED
-            flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            flagShift += shift;
+            dots->SetFlagShift(shift);
         }
 
         int xRel = 2 * radius + flagShift;
@@ -1088,36 +1103,23 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     int linesAbove = 0;
     int linesBelow = 0;
 
-    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
+    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
 
-    const int ledgerLineExtension
-        = params->m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * params->m_doc->GetDrawingUnit(staffSize);
-    int leftExtender = ledgerLineExtension;
-    int rightExtender = ledgerLineExtension;
-    if (drawingCueSize || (this->GetDrawingDur() >= DUR_8)) {
-        leftExtender = 0.7 * ledgerLineExtension;
-        rightExtender = 0.5 * ledgerLineExtension;
-    }
-
-    if (drawingCueSize) {
-        leftExtender = params->m_doc->GetCueSize(leftExtender);
-        rightExtender = params->m_doc->GetCueSize(rightExtender);
-    }
-
-    int left = this->GetDrawingX() - leftExtender - staffX;
-    int right = this->GetDrawingX() + 2 * radius + rightExtender - staffX;
+    const int extension = params->m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
+    const int left = this->GetDrawingX() - extension - staffX;
+    int right = this->GetDrawingX() + 2 * radius + extension - staffX;
     if (this->GetDrawingDur() == DUR_MX) {
         right += 2 * radius;
     }
 
     if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, drawingCueSize);
+        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
     }
     else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, drawingCueSize);
+        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
     }
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)

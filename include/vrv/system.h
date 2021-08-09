@@ -76,7 +76,7 @@ public:
      * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
-    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
+    int GetDrawingLabelsWidth() const;
     void SetDrawingLabelsWidth(int width);
     int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; }
     void SetDrawingAbbrLabelsWidth(int width);
@@ -292,11 +292,9 @@ public:
      */
     int m_xAbs;
     /**
-     * The width used by the labels at the left of the system.
+     * The width used by the abbreviated labels at the left of the system.
      * It is used internally when calculating the layout and it is not stored in the file.
      */
-    int m_drawingLabelsWidth;
-    /** The width used by the abbreviated labels */
     int m_drawingAbbrLabelsWidth;
     /**
      * @name The total width of the system.

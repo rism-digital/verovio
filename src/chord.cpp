@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -39,16 +40,19 @@ namespace vrv {
 template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin, Iterator end, bool isReverseOrder)
 {
     // location adjustment that should be applied when looking for optimal position
-    std::vector<int> locAdjust{ 0, 1, -2, 2 };
+    std::vector<int> locAdjust{ 0, 1, -1, -2, 2 };
     if (isReverseOrder) std::transform(locAdjust.begin(), locAdjust.end(), locAdjust.begin(), std::negate<int>());
     std::set<int> dotLocations;
+    Iterator prev = begin;
     for (auto iter = begin; iter != end; ++iter) {
         bool result = false;
         for (int adjust : locAdjust) {
             if ((*iter + adjust) % 2 == 0) continue;
+            if ((prev != iter) && (*prev == *iter) && (adjust == -2)) continue;
             std::tie(std::ignore, result) = dotLocations.insert(*iter + adjust);
             if (result) break;
         }
+        prev = iter;
     }
     return dotLocations;
 }
@@ -814,6 +818,63 @@ int Chord::ResetDrawing(FunctorParams *functorParams)
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::JustifyY(FunctorParams *functorParams)
+{
+    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
+    assert(params);
+    assert(params->m_justificationSum > 0);
+
+    // Check if chord spreads across several staves
+    std::list<Staff *> extremalStaves;
+    for (Note *note : { this->GetTopNote(), this->GetBottomNote() }) {
+        Layer *layer = NULL;
+        Staff *staff = note->GetCrossStaff(layer);
+        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+        extremalStaves.push_back(staff);
+    }
+    assert(extremalStaves.size() == 2);
+
+    const int topStaffN = extremalStaves.front()->GetN();
+    const int bottomStaffN = extremalStaves.back()->GetN();
+    if (topStaffN < bottomStaffN) {
+        // Now calculate the shift due to vertical justification of the involved staves.
+        Object *measure = this->GetFirstAncestor(MEASURE);
+        if (!measure) return FUNCTOR_CONTINUE;
+
+        ListOfObjects staves;
+        ClassIdComparison matchType(STAFF);
+        measure->FindAllDescendantByComparison(&staves, &matchType, 1);
+
+        int shift = 0;
+        for (Object *staff : staves) {
+            Staff *currentStaff = vrv_cast<Staff *>(staff);
+            assert(currentStaff);
+
+            if ((currentStaff->GetN() > topStaffN) && (currentStaff->GetN() <= bottomStaffN)) {
+                const double staffJustificationFactor
+                    = currentStaff->GetAlignment()->GetJustificationFactor(params->m_doc);
+                shift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+            }
+        }
+
+        // Add the shift to the stem length of the chord.
+        Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));
+        if (!stem) return FUNCTOR_CONTINUE;
+
+        const int stemLen = stem->GetDrawingStemLen();
+        if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
+            stem->SetDrawingStemLen(stemLen - shift);
+            stem->SetDrawingYRel(stem->GetDrawingYRel() - shift);
+        }
+        else {
+            stem->SetDrawingStemLen(stemLen + shift);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

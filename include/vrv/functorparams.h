@@ -492,17 +492,20 @@ public:
 
 /**
  * member 0: a pointer to the previous staff alignment
- * member 1: a pointer to the functor for passing it to the system aligner
+ * member 1: the doc
+ * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustStaffOverlapParams : public FunctorParams {
 public:
-    AdjustStaffOverlapParams(Functor *functor)
+    AdjustStaffOverlapParams(Doc *doc, Functor *functor)
     {
         m_previous = NULL;
+        m_doc = doc;
         m_functor = functor;
     }
     StaffAlignment *m_previous;
+    Doc *m_doc;
     Functor *m_functor;
 };
 
@@ -652,11 +655,14 @@ public:
  * member 5: the list of staffN in the top-level scoreDef
  * member 6: the bounding box in the previous aligner
  * member 7: the upcoming bounding boxes (to be used in the next aligner)
- * member 8: the Doc
- * member 9: the Functor for redirection to the MeasureAligner
- * member 10: the end Functor for redirection
- * member 11: current aligner that is being processed
- * member 12: preceeding aligner that was handled before
+ * member 8: list of types to include
+ * member 9: list of types to exclude
+ * member 10: list of tie endpoints for the current measure
+ * member 11: the Doc
+ * member 12: the Functor for redirection to the MeasureAligner
+ * member 13: the end Functor for redirection
+ * member 14: current aligner that is being processed
+ * member 15: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -674,6 +680,7 @@ public:
         m_functorEnd = functorEnd;
         m_currentAlignment.Reset();
         m_previousAlignment.Reset();
+        m_measureTieEndpoints.clear();
     }
     int m_minPos;
     int m_upcomingMinPos;
@@ -685,6 +692,7 @@ public:
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
     std::vector<ClassId> m_includes;
     std::vector<ClassId> m_excludes;
+    std::vector<std::pair<LayerElement *, LayerElement *>> m_measureTieEndpoints;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
@@ -957,14 +965,14 @@ public:
         m_currentRealTimeSeconds = 0.0;
         m_maxCurrentScoreTime = 0.0;
         m_maxCurrentRealTimeSeconds = 0.0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_tempoAdjustment = 1.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     double m_maxCurrentScoreTime;
     double m_maxCurrentRealTimeSeconds;
-    int m_currentTempo;
+    double m_currentTempo;
     double m_tempoAdjustment;
 };
 
@@ -990,14 +998,14 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
     data_NOTATIONTYPE m_notationType;
-    int m_currentTempo;
+    double m_currentTempo;
 };
 
 //----------------------------------------------------------------------------
@@ -1437,26 +1445,21 @@ public:
  * member 2: the maximum position
  * member 3: the timespanning interface
  * member 4: the class Ids to keep
- * member 5: the slur for finding ties (too specific, to be refactored)
- * member 6: the ties we need to consider (too specific, to be refactored)
  **/
 
 class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindSpannedLayerElementsParams(TimeSpanningInterface *interface, Slur *slur)
+    FindSpannedLayerElementsParams(TimeSpanningInterface *interface)
     {
         m_interface = interface;
         m_minPos = 0;
         m_maxPos = 0;
-        m_slur = slur;
     }
     std::vector<LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
     TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
-    Slur *m_slur;
-    std::vector<FloatingPositioner *> m_ties;
 };
 
 //----------------------------------------------------------------------------
@@ -1478,7 +1481,7 @@ using MIDINoteSequence = std::list<MIDINote>;
  * member 1: int: the midi track number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
- * member 5: int with the current tempo
+ * member 5: double with the current tempo
  * member 6: expanded notes due to ornaments and tremolandi
  **/
 
@@ -1491,7 +1494,7 @@ public:
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
@@ -1499,7 +1502,7 @@ public:
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;
-    int m_currentTempo;
+    double m_currentTempo;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
     Functor *m_functor;
 };
@@ -1524,16 +1527,16 @@ public:
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
-        m_currentTempo = 120;
+        m_currentTempo = 120.0;
         m_functor = functor;
     }
     std::map<double, double> realTimeToScoreTime;
     std::map<double, std::vector<std::string>> realTimeToOnElements;
     std::map<double, std::vector<std::string>> realTimeToOffElements;
-    std::map<double, int> realTimeToTempo;
+    std::map<double, double> realTimeToTempo;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
-    int m_currentTempo;
+    double m_currentTempo;
     Functor *m_functor;
 };
 
@@ -2116,7 +2119,9 @@ public:
  * member 3: the previous measure (for setting cautionary scoreDef)
  * member 4: the current system (for setting the system scoreDef)
  * member 5: the flag indicating whereas full labels have to be drawn
- * member 6: the doc
+ * member 6: the flag indicating that the scoreDef restarts (draw brace and label)
+ * member 7: the flag indicating is we already have a measure in the system
+ * member 8: the doc
  **/
 
 class ScoreDefSetCurrentParams : public FunctorParams {
@@ -2129,6 +2134,8 @@ public:
         m_previousMeasure = NULL;
         m_currentSystem = NULL;
         m_drawLabels = false;
+        m_restart = false;
+        m_hasMeasure = false;
         m_doc = doc;
     }
     ScoreDef *m_currentScoreDef;
@@ -2137,6 +2144,8 @@ public:
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;
+    bool m_restart;
+    bool m_hasMeasure;
     Doc *m_doc;
 };
 

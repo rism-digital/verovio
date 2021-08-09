@@ -16,8 +16,9 @@
 
 namespace vrv {
 
-class Ending;
 class ControlElement;
+class Ending;
+class LayerElement;
 class ScoreDef;
 class System;
 class TimestampAttr;
@@ -244,6 +245,11 @@ public:
      * Return the real time offset in millisecond for the repeat (1-based).
      */
     double GetRealTimeOffsetMilliseconds(int repeat) const;
+
+    /**
+     * Return vector with tie endpoints for ties that start and end in current measure
+     */
+    std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
 
     //----------//
     // Functors //
@@ -518,7 +524,7 @@ private:
      */
     std::vector<double> m_scoreTimeOffset;
     std::vector<double> m_realTimeOffsetMilliseconds;
-    int m_currentTempo;
+    double m_currentTempo;
 
     std::map<int, BarlineRenditionPair> m_invisibleStaffBarlines;
 };

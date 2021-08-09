@@ -47,20 +47,12 @@ Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), Att
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    // owned pointers need to be set to NULL;
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
 
     Reset();
     SetN(n);
 }
 
-Staff::~Staff()
-{
-    ClearLedgerLines();
-}
+Staff::~Staff() {}
 
 void Staff::Reset()
 {
@@ -87,11 +79,6 @@ void Staff::CloneReset()
 {
     Object::CloneReset();
 
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
-
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
@@ -108,22 +95,10 @@ const ArrayOfObjects *Staff::GetChildren(bool docChildren) const
 
 void Staff::ClearLedgerLines()
 {
-    if (m_ledgerLinesAbove) {
-        delete m_ledgerLinesAbove;
-        m_ledgerLinesAbove = NULL;
-    }
-    if (m_ledgerLinesBelow) {
-        delete m_ledgerLinesBelow;
-        m_ledgerLinesBelow = NULL;
-    }
-    if (m_ledgerLinesAboveCue) {
-        delete m_ledgerLinesAboveCue;
-        m_ledgerLinesAboveCue = NULL;
-    }
-    if (m_ledgerLinesBelowCue) {
-        delete m_ledgerLinesBelowCue;
-        m_ledgerLinesBelowCue = NULL;
-    }
+    m_ledgerLinesAbove.clear();
+    m_ledgerLinesBelow.clear();
+    m_ledgerLinesAboveCue.clear();
+    m_ledgerLinesBelowCue.clear();
 }
 
 bool Staff::IsSupportedChild(Object *child)
@@ -252,38 +227,91 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
     return (loc - staffLocOffset) * doc->GetDrawingUnit(m_drawingStaffSize);
 }
 
-void Staff::AddLedgerLineAbove(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize)
 {
-    if (cueSize) {
-        if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAboveCue, count, left, right);
-    }
-    else {
-        if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesAbove, count, left, right);
-    }
+    AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension);
 }
 
-void Staff::AddLedgerLineBelow(int count, int left, int right, bool cueSize)
+void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize)
 {
-    if (cueSize) {
-        if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelowCue, count, left, right);
-    }
-    else {
-        if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
-        AddLedgerLines(m_ledgerLinesBelow, count, left, right);
-    }
+    AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension);
 }
 
-void Staff::AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right)
+void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension)
 {
-    assert(lines);
+    assert(left < right);
 
-    if ((int)lines->size() < count) lines->resize(count);
+    if ((int)lines.size() < count) lines.resize(count);
     int i = 0;
     for (i = 0; i < count; ++i) {
-        lines->at(i).AddDash(left, right);
+        lines.at(i).AddDash(left, right, extension);
+    }
+}
+
+void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension)
+{
+    assert(minExtension <= extension);
+    if (lines.empty()) return;
+
+    // By construction, any overlaps or small gaps in outer dash lines must also occur in the most inner dash line.
+    // Thus it suffices to resolve any problems in the inner dash line and apply the adjustments to corresponding
+    // dashes further away from the staff.
+    LedgerLine &innerLine = lines.at(0);
+    struct Adjustment {
+        int left;
+        int right;
+        int delta;
+    };
+    std::list<Adjustment> adjustments;
+
+    const int defaultGap = 100 * extension; // A large value which should not trigger any adjustments
+    int leftGap = defaultGap;
+    int rightGap = defaultGap;
+    using DashType = std::pair<int, int>;
+    using IterType = std::list<DashType>::iterator;
+    for (IterType iterDash = innerLine.m_dashes.begin(); iterDash != innerLine.m_dashes.end(); ++iterDash) {
+        // Calculate the right gap
+        IterType iterNextDash = std::next(iterDash);
+        if (iterNextDash != innerLine.m_dashes.end()) {
+            rightGap = iterNextDash->first - iterDash->second;
+        }
+        else {
+            rightGap = defaultGap;
+        }
+
+        // The gap between successive dashes should be at least one dash extension
+        const int minGap = std::min(leftGap, rightGap);
+        if (minGap < extension) {
+            const int minDistance = minGap + 2 * extension;
+            const int newExtension = std::max(minDistance / 3, minExtension);
+            const int delta = extension - newExtension;
+            assert(delta >= 0);
+
+            // Apply and store the adjustment
+            adjustments.push_back({ iterDash->first, iterDash->second, delta });
+            iterDash->first += delta;
+            iterDash->second -= delta;
+        }
+
+        // The left gap of the next dash is the right gap of the current dash
+        leftGap = rightGap;
+    }
+
+    // Now we transfer the adjustments from the inner dash line to the outer dash lines.
+    // This ensures that all dashes on the same note/chord obtain the same ledger line extension.
+    const int lineCount = static_cast<int>(lines.size());
+    for (const Adjustment &adjustment : adjustments) {
+        for (int index = 1; index < lineCount; ++index) {
+            LedgerLine &outerLine = lines.at(index);
+            IterType iterDash = std::find_if(
+                outerLine.m_dashes.begin(), outerLine.m_dashes.end(), [&adjustment](const DashType &dash) {
+                    return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
+                });
+            if (iterDash != outerLine.m_dashes.end()) {
+                iterDash->first += adjustment.delta;
+                iterDash->second -= adjustment.delta;
+            }
+        }
     }
 }
 
@@ -338,7 +366,7 @@ void LedgerLine::Reset()
     m_dashes.clear();
 }
 
-void LedgerLine::AddDash(int left, int right)
+void LedgerLine::AddDash(int left, int right, int extension)
 {
     assert(left < right);
 
@@ -350,12 +378,14 @@ void LedgerLine::AddDash(int left, int right)
     }
     m_dashes.insert(iter, std::make_pair(left, right));
 
-    // Merge overlapping dashes
+    // Merge dashes which overlap by more than 1.5 extensions
+    // => Dashes belonging to the same chord overlap at least by two extensions and will get merged
+    // => Overlapping dashes of adjacent notes will not get merged
     std::list<std::pair<int, int>>::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
-        if (previous->second > iter->first) {
+        if (previous->second > iter->first + 1.5 * extension) {
             previous->second = std::max(iter->second, previous->second);
             iter = m_dashes.erase(iter);
         }
@@ -500,11 +530,29 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     if (it != m_timeSpanningElements.end()) {
         Verse *v = vrv_cast<Verse *>(*it);
         assert(v);
-        alignment->SetVerseCount(v->GetN());
+        alignment->AddVerseN(v->GetN());
     }
 
     // for next staff
     params->m_staffIdx++;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    int extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, false);
+    int minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, false);
+    AdjustLedgerLines(m_ledgerLinesAbove, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesBelow, extension, minExtension);
+
+    extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, true);
+    minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, true);
+    AdjustLedgerLines(m_ledgerLinesAboveCue, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesBelowCue, extension, minExtension);
 
     return FUNCTOR_CONTINUE;
 }

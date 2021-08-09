@@ -73,6 +73,7 @@ void View::SetPage(int pageIdx, bool doLayout)
 
     if (doLayout) {
         m_doc->ScoreDefSetCurrentDoc();
+        m_doc->ScoreDefSetGrpSymDoc();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
         if (m_doc->GetType() == Transcription || m_doc->GetType() == Facs)

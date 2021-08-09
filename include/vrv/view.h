@@ -195,8 +195,8 @@ protected:
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
     void DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int &x);
-    void DrawLabels(
-        DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
+    void DrawLabels(DeviceContext *dc, ScoreDef *scoreDef, Object *object, int x, int y, bool abbreviations,
+        int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
@@ -204,7 +204,7 @@ protected:
     void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, data_BARRENDITION form,
         bool eraseIntersections = false);
     void DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine);
-    void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
+    void DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
     void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset);

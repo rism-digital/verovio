@@ -10,25 +10,28 @@ on:
       # Push events on ci-test branch (uncomment if needed for testing purposes)
       # - ci-test
     paths-ignore:
-      - '**.md' # ignore changes to markdown files
+      - "**.md" # ignore changes to markdown files
 
 # globals
 env:
   # general settings
-  MAIN_REPO_OWNER: rism-digital # Main repo owner (default: rism-digital; should not be changed)
-                                # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
-                                # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
+  MAIN_REPO_OWNER:
+    rism-digital # Main repo owner (default: rism-digital; should not be changed)
+    # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
+    # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
 
-  DISABLE_DEPLOY_STEPS: true    # Flag used to disable deploy steps at all (default: true).
-                                # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
-                                # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
-                                # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
-                                # Will be programmatically set to 'false' for rism-digital repo.
+  DISABLE_DEPLOY_STEPS:
+    true # Flag used to disable deploy steps at all (default: true).
+    # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
+    # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
+    # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
+    # Will be programmatically set to 'false' for rism-digital repo.
 
-  IS_DRY_RUN: true              # Flag used for dry-run mode in 'git push' command (default: true).
-                                # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
-                                # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
-                                # Will be programmatically set to 'false' for rism-digital repo.
+  IS_DRY_RUN:
+    true # Flag used for dry-run mode in 'git push' command (default: true).
+    # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
+    # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
+    # Will be programmatically set to 'false' for rism-digital repo.
 
   # build artifacts
   CLI_BUILD: cli-build
@@ -41,18 +44,16 @@ env:
 
   # emscripten
   EM_VERSION: latest
-  EM_CACHE_FOLDER: 'emsdk-cache'
+  EM_CACHE_FOLDER: "emsdk-cache"
 
   # gh-pages
-  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org  # works from rism-digital and from forks
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
   GH_PAGES_BRANCH: gh-pages
 
   # temporary directories
   DOXYGEN_DIR: doxygen-dir
   GH_PAGES_DIR: gh-pages-dir
   TEMP_DIR: temp-dir
-
-
 
 jobs:
   ###############################################################################################
@@ -173,7 +174,6 @@ jobs:
           cmake ../cmake
           make -j8
 
-
   ###########################
   # Build the CLI artifacts #
   ###########################
@@ -208,7 +208,6 @@ jobs:
           name: ${{ env.CLI_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
-
   #####################################
   # Set up and cache emscripten build #
   #####################################
@@ -237,7 +236,6 @@ jobs:
 
       - name: Verify emscripten build
         run: emcc -v
-
 
   ##################################
   # Build the JS toolkit artifacts #
@@ -310,7 +308,6 @@ jobs:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
-
   ##################################
   # Check settings for deployment  #
   ##################################
@@ -318,7 +315,7 @@ jobs:
     name: Check settings for deployment
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
-    needs: [ build_cpp, build_cli, build_js ]
+    needs: [build_cpp, build_cli, build_js]
 
     # Github Environment Variables persist only on job level.
     # To transfer values to later jobs, outputs mechanism has to be used.
@@ -332,7 +329,7 @@ jobs:
       - name: Enable deploy steps for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         run: echo "DISABLE_DEPLOY_STEPS=false" >> $GITHUB_ENV
-      
+
       - name: Disable dry-run mode for main repo owner
         if: ${{ github.repository_owner == env.MAIN_REPO_OWNER }}
         run: echo "IS_DRY_RUN=false" >> $GITHUB_ENV
@@ -345,7 +342,6 @@ jobs:
 
           echo "::set-output name=disable::${DISABLE_DEPLOY_STEPS}"
           echo "::set-output name=dry-run::${IS_DRY_RUN}"
-
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
@@ -437,7 +433,6 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
-
   ###################################
   # Build the doxygen documentation #
   ###################################
@@ -473,7 +468,6 @@ jobs:
         with:
           name: ${{ env.DOC_BUILD }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
-
 
   ###############################################
   # Deploy the documentation to verovio-doxygen #
@@ -557,7 +551,6 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
-
   ###############################################
   # Skip deployment steps according to settings #
   ###############################################
@@ -567,7 +560,7 @@ jobs:
     # always() is needed here to meet if-condition even if earlier steps failed
     # cf. https://github.com/actions/runner/issues/491
     if: ${{ always() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
-    needs: [ check_deploy_settings, deploy_toolkit, deploy_docs ]
+    needs: [check_deploy_settings, deploy_toolkit, deploy_docs]
 
     steps:
       - name: Skipped

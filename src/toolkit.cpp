@@ -1003,6 +1003,15 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
     return opt->SetValue(value);
 }
 
+void Toolkit::ResetOptions()
+{
+    std::for_each(m_options->GetItems()->begin(), m_options->GetItems()->end(),
+        [](const MapOfStrOptions::value_type &opt) { opt.second->Reset(); });
+
+    // Set the (default) font
+    Resources::SetFont(m_options->m_font.GetValue());
+}
+
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
@@ -1162,7 +1171,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         deviceContext->SetWidth(width);
         deviceContext->SetHeight(height);
     }
-    
+
     double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
@@ -1438,12 +1447,14 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         // For now ignore repeats and access always the first
         timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
         timeofElement += note->GetRealTimeOnsetMilliseconds();
-    } else if (element->Is(MEASURE)) {
+    }
+    else if (element->Is(MEASURE)) {
         Measure *measure = vrv_cast<Measure *>(element);
         assert(measure);
         // For now ignore repeats and access always the first
         timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
-    } else if (element->Is(CHORD)) {
+    }
+    else if (element->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(element);
         assert(chord);
         Note *note = vrv_cast<Note *>(chord->FindDescendantByType(NOTE));
