@@ -107,7 +107,7 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
 int Section::PrepareBoundaries(FunctorParams *functorParams)
 {
-    if (this->IsBoundary()) {
+    if (this->IsSystemBoundary()) {
         this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
     }
 
@@ -118,7 +118,7 @@ int Section::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
-    if (this->IsBoundary()) {
+    if (this->IsSystemBoundary()) {
         this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
     }
 

@@ -101,7 +101,7 @@ int Ending::PrepareBoundaries(FunctorParams *functorParams)
     assert(params);
 
     // Endings should always have an SystemElementEnd
-    assert(this->IsBoundary());
+    assert(this->IsSystemBoundary());
 
     this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
 

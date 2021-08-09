@@ -1835,6 +1835,10 @@
 		4D79641626C151250026288B /* pageelements */ = {
 			isa = PBXGroup;
 			children = (
+				4D64137D2035F68600BB630E /* mdiv.cpp */,
+				4D64137B2035F67C00BB630E /* mdiv.h */,
+				4D95D4FB1D74551100B2B856 /* score.cpp */,
+				4D95D4FA1D74549700B2B856 /* score.h */,
 				4D79642026C167100026288B /* pageboundary.cpp */,
 				4D79642526C167200026288B /* pageboundary.h */,
 				4D79641726C1522B0026288B /* pageelement.cpp */,
@@ -2229,8 +2233,6 @@
 				40E1CEDC205060E20007C8AF /* labelabbr.h */,
 				8F086EC6188539540037FD8E /* layer.cpp */,
 				8F59291D18854BF800FE51AD /* layer.h */,
-				4D64137D2035F68600BB630E /* mdiv.cpp */,
-				4D64137B2035F67C00BB630E /* mdiv.h */,
 				8F086EC9188539540037FD8E /* measure.cpp */,
 				8F59292018854BF800FE51AD /* measure.h */,
 				8F086ECE188539540037FD8E /* page.cpp */,
@@ -2241,8 +2243,6 @@
 				40C2E41D2052A6E00003625F /* pb.h */,
 				40C2E41A2052A6DF0003625F /* sb.cpp */,
 				40C2E41C2052A6E00003625F /* sb.h */,
-				4D95D4FB1D74551100B2B856 /* score.cpp */,
-				4D95D4FA1D74549700B2B856 /* score.h */,
 				8F086ED2188539540037FD8E /* scoredef.cpp */,
 				8F59292918854BF800FE51AD /* scoredef.h */,
 				4D4FCD111F54570E0009C455 /* staffdef.cpp */,

@@ -102,6 +102,7 @@ public:
     {
         return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
     }
+    bool IsPageElement() const { return (this->GetClassId() > PAGE_ELEMENT && this->GetClassId() < PAGE_ELEMENT_max); }
     bool IsRunningElement() const
     {
         return (this->GetClassId() > RUNNING_ELEMENT && this->GetClassId() < RUNNING_ELEMENT_max);

@@ -117,7 +117,7 @@ public:
     ///@{
     void SetEnd(SystemElementEnd *end);
     SystemElementEnd *GetEnd() { return m_end; }
-    bool IsBoundary() { return (m_end != NULL); }
+    bool IsSystemBoundary() { return (m_end != NULL); }
     ///@}
 
     /**

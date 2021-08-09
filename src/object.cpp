@@ -215,7 +215,12 @@ bool Object::IsBoundaryElement()
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
         assert(interface);
-        return (interface->IsBoundary());
+        return (interface->IsSystemBoundary());
+    }
+    else if (this->Is(MDIV) || this->Is(SCORE)) {
+        PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
+        assert(interface);
+        return (interface->IsPageBoundary());
     }
     return false;
 }

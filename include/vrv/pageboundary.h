@@ -117,7 +117,7 @@ public:
     ///@{
     void SetEnd(PageElementEnd *end);
     PageElementEnd *GetEnd() { return m_end; }
-    bool IsBoundary() { return (m_end != NULL); }
+    bool IsPageBoundary() { return (m_end != NULL); }
     ///@}
 
     /**

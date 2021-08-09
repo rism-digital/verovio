@@ -129,7 +129,7 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
 int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 {
-    if (this->IsBoundary()) {
+    if (this->IsSystemBoundary()) {
         this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
     }
 
@@ -138,7 +138,7 @@ int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 
 int EditorialElement::ResetDrawing(FunctorParams *functorParams)
 {
-    if (this->IsBoundary()) {
+    if (this->IsSystemBoundary()) {
         this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
     }
 
