@@ -15,7 +15,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "boundary.h"
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
@@ -28,6 +27,7 @@
 #include "staffdef.h"
 #include "syl.h"
 #include "system.h"
+#include "systemboundary.h"
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"

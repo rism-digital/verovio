@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        boundary.cpp
+// Name:        systemelementboundary.cpp
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "boundary.h"
+#include "systemboundary.h"
 
 //----------------------------------------------------------------------------
 

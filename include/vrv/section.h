@@ -10,7 +10,7 @@
 
 #include "atts_shared.h"
 #include "atts_visual.h"
-#include "boundary.h"
+#include "systemboundary.h"
 #include "systemelement.h"
 
 namespace vrv {

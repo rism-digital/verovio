@@ -17,7 +17,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "boundary.h"
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
@@ -44,6 +43,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
+#include "systemboundary.h"
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
