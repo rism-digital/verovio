@@ -421,10 +421,11 @@ Object *Object::GetPrevious(const Object *child, const ClassId classId)
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
 }
 
-Object *Object::GetLast() const
+Object *Object::GetLast(const ClassId classId) const
 {
-    if (m_children.empty()) return NULL;
-    return m_children.back();
+    ArrayOfObjects::const_reverse_iterator riter
+        = std::find_if(m_children.rbegin(), m_children.rend(), ObjectComparison(classId));
+    return (riter == m_children.rend()) ? NULL : *riter;
 }
 
 int Object::GetIdx() const

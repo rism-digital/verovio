@@ -301,7 +301,7 @@ public:
     /**
      * Return the last child of the object (if any, NULL otherwise)
      */
-    Object *GetLast() const;
+    Object *GetLast(const ClassId classId = UNSPECIFIED) const;
 
     /**
      * Get the parent of the Object
