@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jul  5 01:28:26 PDT 2021
+// Last Modified: Mon Aug  9 09:41:34 CEST 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1269,6 +1269,7 @@ class HumdrumLine : public std::string, public HumHash {
 		                                    const std::string& indent);
 		std::string   getXmlId             (const std::string& prefix = "") const;
 		std::string   getXmlIdPrefix       (void) const;
+		void          clearTokenLinkInfo   (void);
 		void          createLineFromTokens (void);
 		void          removeExtraTabs      (void);
 		void          addExtraTabs         (std::vector<int>& trackWidths);
@@ -1605,6 +1606,7 @@ class HumdrumToken : public std::string, public HumHash {
 		int      getLinkedParameterSetCount(void);
 		HumParamSet* getLinkedParameterSet (int index);
 		HumParamSet* getParameterSet       (void);
+		void         clearLinkInfo         (void);
 		std::string getSlurLayoutParameter (const std::string& keyname, int subtokenindex = -1);
 		std::string getPhraseLayoutParameter(const std::string& keyname, int subtokenindex = -1);
 		std::string getLayoutParameter     (const std::string& category, const std::string& keyname,
@@ -2021,6 +2023,7 @@ class HumdrumFileBase : public HumHash {
 		HLp           getLineForInterpretationInsertion     (int index);
 		HLp           getLineForInterpretationInsertionAbove(int index);
 
+		void          clearTokenLinkInfo       (void);
 
 		void          deleteLine               (int index);
 //		void          adjustMergeSpineLines    (void);
@@ -2089,7 +2092,6 @@ class HumdrumFileBase : public HumHash {
 		bool          analyzeSpines             (void);
 		bool          analyzeLinks              (void);
 		bool          analyzeTracks             (void);
-		bool          analyzeLines              (void);
 		bool          adjustSpines              (HumdrumLine& line,
 		                                         std::vector<std::string>& datatype,
 		                                         std::vector<std::string>& sinfo);
@@ -2107,6 +2109,7 @@ class HumdrumFileBase : public HumHash {
 		bool          setParseError             (std::stringstream& err);
 		bool          setParseError             (const std::string& err);
 		bool          setParseError             (const char* format, ...);
+		bool          analyzeLines              (void);
 //		void          fixMerges                 (int linei);
 
 	protected:
@@ -6041,6 +6044,30 @@ class Tool_dissonant : public HumTool {
 };
 
 
+class Tool_double : public HumTool {
+	public:
+		         Tool_double     (void);
+		        ~Tool_double     () {};
+
+		bool     run                (HumdrumFileSet& infiles);
+		bool     run                (HumdrumFile& infile);
+		bool     run                (const string& indata, ostream& out);
+		bool     run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize         (HumdrumFile& infile);
+		void     processFile        (HumdrumFile& infile);
+		void     doubleRhythms      (HumdrumFile& infile);
+		void     terminalBreveToTerminalLong(HumdrumFile& infile);
+		void     processBeamsForMeasure(vector<HTp>& notes);
+		void     adjustBeams        (HumdrumFile& infile);
+		void     adjustBeams        (HTp sstart, HTp send);
+
+	private:
+
+};
+
+
 
 #define ND_NOTE 0  /* notes or rests + text and phrase markings */
 #define ND_BAR  1  /* explicit barlines */
@@ -6345,6 +6372,84 @@ class Tool_flipper : public HumTool {
 		std::vector<bool> m_flipState;
 		std::vector<bool> m_fliplines;
 		std::vector<bool> m_strophe;
+
+};
+
+
+class Tool_gasparize : public HumTool {
+	public:
+		         Tool_gasparize     (void);
+		        ~Tool_gasparize     () {};
+
+		bool     run                (HumdrumFileSet& infiles);
+		bool     run                (HumdrumFile& infile);
+		bool     run                (const string& indata, ostream& out);
+		bool     run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize         (HumdrumFile& infile);
+		void     processFile        (HumdrumFile& infile);
+		void     checkDataLine      (HumdrumFile& infile, int lineindex);
+		void     addBibliographicRecords(HumdrumFile& infile);
+		void     fixEditorialAccidentals(HumdrumFile& infile);
+		void     fixInstrumentAbbreviations(HumdrumFile& infile);
+		void     addTerminalLongs   (HumdrumFile& infile);
+		void     deleteDummyTranspositions(HumdrumFile& infile);
+		string   getDate            (void);
+		void     adjustSystemDecoration(HumdrumFile& infile);
+		void     deleteBreaks       (HumdrumFile& infile);
+		void     updateKeySignatures(HumdrumFile& infile, int lineindex);
+		void     convertBreaks      (HumdrumFile& infile);
+		void     clearStates        (void);
+		void     removeArticulations(HumdrumFile& infile);
+		void     fixTies            (HumdrumFile& infile);
+		void     fixTiesForStrand   (HTp sstart, HTp send);
+		void     fixTieToInvisibleRest(HTp first, HTp second);
+		void     fixHangingTie      (HTp first, HTp second);
+		void     addMensurations    (HumdrumFile& infile);
+		void     addMensuration     (int top, HumdrumFile& infile, int i);
+		void     createEditText     (HumdrumFile& infile);
+		bool     addEditStylingForText(HumdrumFile& infile, HTp sstart, HTp send);
+		string   getEditLine        (const string& text, int fieldindex, HLp line);
+		bool     insertEditText     (const string& text, HumdrumFile& infile, int line, int field);
+		void     adjustIntrumentNames(HumdrumFile& infile);
+		void     removeKeyDesignations(HumdrumFile& infile);
+		void     fixBarlines        (HumdrumFile& infile);
+		void     fixFinalBarline    (HumdrumFile& infile);
+		void     removeDoubledAccidentals(HumdrumFile& infile);
+		void     createJEditorialAccidentals(HumdrumFile& infile);
+		void     createJEditorialAccidentals(HTp sstart, HTp send);
+		void     convertNextNoteToJAccidental(HTp current);
+		void     fixTieStartEnd(HumdrumFile& infile);
+		void     fixTiesStartEnd(HTp starts, HTp ends);
+
+	private:
+		vector<vector<int>> m_pstates;
+		vector<vector<int>> m_kstates;
+		vector<vector<bool>> m_estates;
+
+};
+
+
+class Tool_half : public HumTool {
+	public:
+		         Tool_half     (void);
+		        ~Tool_half     () {};
+
+		bool     run           (HumdrumFileSet& infiles);
+		bool     run           (HumdrumFile& infile);
+		bool     run           (const string& indata, ostream& out);
+		bool     run           (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize    (HumdrumFile& infile);
+		void     processFile   (HumdrumFile& infile);
+		void     halfRhythms   (HumdrumFile& infile);
+		void     terminalLongToTerminalBreve(HumdrumFile& infile);
+		void     adjustBeams   (HumdrumFile& infile);
+
+	private:
+		bool     m_lyricBreakQ = false;  // used with -l option
 
 };
 
