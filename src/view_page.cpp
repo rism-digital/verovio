@@ -41,6 +41,8 @@
 #include "note.h"
 #include "options.h"
 #include "page.h"
+#include "pageboundary.h"
+#include "pageelement.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -63,8 +65,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     assert(m_doc);
 
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
-
-    int i;
+    ;
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
@@ -88,10 +89,18 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     dc->StartPage();
 
-    for (i = 0; i < m_currentPage->GetSystemCount(); ++i) {
-        // cast to System check in DrawSystem
-        System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
-        DrawSystem(dc, system);
+    for (auto child : *m_currentPage->GetChildren()) {
+        if (child->IsPageElement()) {
+            // cast to PageElement check in DrawSystemEditorial element
+            DrawPageElement(dc, dynamic_cast<PageElement *>(child));
+        }
+        else if (child->Is(SYSTEM)) {
+            System *system = dynamic_cast<System *>(child);
+            DrawSystem(dc, system);
+        }
+        else {
+            assert(false);
+        }
     }
 
     DrawRunningElements(dc, m_currentPage);
@@ -142,6 +151,31 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     scoreDef->SetDrawingWidth(width);
+}
+
+void View::DrawPageElement(DeviceContext *dc, PageElement *element)
+{
+    assert(dc);
+    assert(element);
+    assert(system);
+
+    if (element->Is(PAGE_ELEMENT_END)) {
+        PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(element);
+        assert(elementEnd);
+        assert(elementEnd->GetStart());
+        dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is(MDIV)) {
+        // When the mdiv is not visible, then there is no start / end element
+        std::string elementStart = (element->IsBoundaryElement()) ? "pageElementStart" : "";
+        dc->StartGraphic(element, elementStart, element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is(SCORE)) {
+        dc->StartGraphic(element, "pageElementStart", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1514,7 +1548,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
         else if (current->IsSystemElement()) {
-            // cast to EditorialElement check in DrawSystemEditorial element
+            // cast to SystemElement check in DrawSystemEditorial element
             DrawSystemElement(dc, dynamic_cast<SystemElement *>(current), system);
         }
         else if (current->IsEditorialElement()) {

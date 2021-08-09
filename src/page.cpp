@@ -17,6 +17,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
@@ -63,7 +64,10 @@ void Page::Reset()
 
 bool Page::IsSupportedChild(Object *child)
 {
-    if (child->Is(SYSTEM)) {
+    if (child->IsPageElement()) {
+        assert(dynamic_cast<PageElement *>(child));
+    }
+    else if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));
     }
     else {
@@ -638,7 +642,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(GetChildren()->back());
+    System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 

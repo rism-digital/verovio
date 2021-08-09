@@ -131,6 +131,9 @@ bool Doc::IsSupportedChild(Object *child)
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));
     }
+    else if (child->Is(PAGES)) {
+        assert(dynamic_cast<Pages *>(child));
+    }
     else {
         return false;
     }
@@ -1030,29 +1033,30 @@ void Doc::CastOffEncodingDoc()
 
 void Doc::ConvertToPageBasedDoc()
 {
-    Score *score = this->GetScore();
-    assert(score);
+    // Score *score = this->GetScore();
+    // assert(score);
 
     Pages *pages = new Pages();
-    pages->ConvertFrom(score);
+    // pages->ConvertFrom(score);
     Page *page = new Page();
     pages->AddChild(page);
-    System *system = new System();
-    page->AddChild(system);
+    // System *system = new System();
+    // page->AddChild(system);
 
-    ConvertToPageBasedParams convertToPageBasedParams(system);
+    ConvertToPageBasedParams convertToPageBasedParams(page);
     Functor convertToPageBased(&Object::ConvertToPageBased);
     Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
-    score->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
+    this->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
 
-    score->ClearRelinquishedChildren();
-    assert(score->GetChildCount() == 0);
+    this->ClearRelinquishedChildren();
+    assert(this->GetChildCount() == 0);
 
-    Mdiv *mdiv = vrv_cast<Mdiv *>(score->GetParent());
-    assert(mdiv);
+    // Mdiv *mdiv = vrv_cast<Mdiv *>(score->GetParent());
+    // assert(mdiv);
 
-    mdiv->ReplaceChild(score, pages);
-    delete score;
+    // mdiv->ReplaceChild(score, pages);
+    // delete score;
+    this->AddChild(pages);
 
     this->ResetDrawingPage();
 }
