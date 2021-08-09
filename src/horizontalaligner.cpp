@@ -1325,9 +1325,13 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
             Note *octave = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
             assert(octave);
             if (!octave) continue;
+            bool sameChordOcatave = true;
+            if (Chord *chord = vrv_cast<Chord *>((*iter)->GetFirstAncestor(CHORD)); chord != NULL) {
+                if ((*octaveIter)->GetFirstAncestor(CHORD) != chord) sameChordOcatave = false;
+            }
             // Same pitch, different octave, same accid - for now?
             if ((note->GetPname() == octave->GetPname()) && (note->GetOct() != octave->GetOct())
-                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid())) {
+                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid()) && sameChordOcatave) {
                 (*iter)->SetDrawingOctaveAccid(*octaveIter);
                 (*octaveIter)->SetDrawingOctave(true);
             }
