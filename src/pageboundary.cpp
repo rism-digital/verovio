@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        systemboundary.cpp
+// Name:        pageboundary.cpp
 // Author:      Laurent Pugin
-// Created:     2016
+// Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "systemboundary.h"
+#include "pageboundary.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,66 +21,66 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// SystemElementEnd
+// PageElementEnd
 //----------------------------------------------------------------------------
 
-SystemElementEnd::SystemElementEnd(Object *start) : SystemElement("system-element-end-")
+PageElementEnd::PageElementEnd(Object *start) : SystemElement("system-element-end-")
 {
     Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
 
-SystemElementEnd::~SystemElementEnd() {}
+PageElementEnd::~PageElementEnd() {}
 
-void SystemElementEnd::Reset()
+void PageElementEnd::Reset()
 {
     m_start = NULL;
     m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
-// SystemElementStartInterface
+// PageElementStartInterface
 //----------------------------------------------------------------------------
 
-SystemElementStartInterface::SystemElementStartInterface()
+PageElementStartInterface::PageElementStartInterface()
 {
     Reset();
 }
 
-SystemElementStartInterface::~SystemElementStartInterface() {}
+PageElementStartInterface::~PageElementStartInterface() {}
 
-void SystemElementStartInterface::Reset()
+void PageElementStartInterface::Reset()
 {
     m_end = NULL;
     m_drawingMeasure = NULL;
 }
 
-void SystemElementStartInterface::SetEnd(SystemElementEnd *end)
+void PageElementStartInterface::SetEnd(PageElementEnd *end)
 {
     assert(!m_end);
     m_end = end;
 }
 
-void SystemElementStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+void PageElementStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
 {
     assert(object);
     assert(parent);
 
-    // Then add a SystemElementEnd
-    SystemElementEnd *systemElementEnd = new SystemElementEnd(object);
-    this->SetEnd(systemElementEnd);
-    parent->AddChild(systemElementEnd);
+    // Then add a PageElementEnd
+    PageElementEnd *pageElementEnd = new PageElementEnd(object);
+    this->SetEnd(pageElementEnd);
+    parent->AddChild(pageElementEnd);
 
     // Also clear the relinquished children
     object->ClearRelinquishedChildren();
 }
 
 //----------------------------------------------------------------------------
-// SystemElementEnd functor methods
+// PageElementEnd functor methods
 //----------------------------------------------------------------------------
 
-int SystemElementEnd::PrepareBoundaries(FunctorParams *functorParams)
+int PageElementEnd::PrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -101,7 +101,7 @@ int SystemElementEnd::PrepareBoundaries(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementEnd::ResetDrawing(FunctorParams *functorParams)
+int PageElementEnd::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
@@ -110,7 +110,7 @@ int SystemElementEnd::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
+int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -122,8 +122,7 @@ int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    SystemElementEnd *endBoundary
-        = dynamic_cast<SystemElementEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    PageElementEnd *endBoundary = dynamic_cast<PageElementEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
     // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
     if (params->m_pendingObjects.empty())
@@ -134,7 +133,7 @@ int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int SystemElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
+int PageElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
@@ -159,7 +158,7 @@ int SystemElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int SystemElementStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
+int PageElementStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -167,12 +166,12 @@ int SystemElementStartInterface::InterfacePrepareBoundaries(FunctorParams *funct
     // We have to be in a boundary start element
     assert(m_end);
 
-    params->m_startBoundaries.push_back(this);
+    // params->m_startBoundaries.push_back(this);
 
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
+int PageElementStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 

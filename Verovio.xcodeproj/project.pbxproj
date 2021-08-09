@@ -373,6 +373,12 @@
 		4D79641D26C152400026288B /* pageelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79641C26C152400026288B /* pageelement.h */; };
 		4D79641E26C152400026288B /* pageelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79641C26C152400026288B /* pageelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D79641F26C1621A0026288B /* pageelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79641726C1522B0026288B /* pageelement.cpp */; };
+		4D79642126C167100026288B /* pageboundary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79642026C167100026288B /* pageboundary.cpp */; };
+		4D79642226C167100026288B /* pageboundary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79642026C167100026288B /* pageboundary.cpp */; };
+		4D79642326C167100026288B /* pageboundary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79642026C167100026288B /* pageboundary.cpp */; };
+		4D79642426C167100026288B /* pageboundary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79642026C167100026288B /* pageboundary.cpp */; };
+		4D79642626C167200026288B /* pageboundary.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79642526C167200026288B /* pageboundary.h */; };
+		4D79642726C167200026288B /* pageboundary.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79642526C167200026288B /* pageboundary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D796B5E1D78641900A15238 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
 		4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
@@ -1417,6 +1423,8 @@
 		4D7927CF20ECCC6D0002A45D /* view_slur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_slur.cpp; path = src/view_slur.cpp; sourceTree = "<group>"; };
 		4D79641726C1522B0026288B /* pageelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pageelement.cpp; path = src/pageelement.cpp; sourceTree = "<group>"; };
 		4D79641C26C152400026288B /* pageelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pageelement.h; path = include/vrv/pageelement.h; sourceTree = "<group>"; };
+		4D79642026C167100026288B /* pageboundary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pageboundary.cpp; path = src/pageboundary.cpp; sourceTree = "<group>"; };
+		4D79642526C167200026288B /* pageboundary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pageboundary.h; path = include/vrv/pageboundary.h; sourceTree = "<group>"; };
 		4D796B5C1D78641200A15238 /* harm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = harm.h; path = include/vrv/harm.h; sourceTree = "<group>"; };
 		4D796B5D1D78641900A15238 /* harm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = harm.cpp; path = src/harm.cpp; sourceTree = "<group>"; };
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
@@ -1827,8 +1835,10 @@
 		4D79641626C151250026288B /* pageelements */ = {
 			isa = PBXGroup;
 			children = (
-				4D79641C26C152400026288B /* pageelement.h */,
+				4D79642026C167100026288B /* pageboundary.cpp */,
+				4D79642526C167200026288B /* pageboundary.h */,
 				4D79641726C1522B0026288B /* pageelement.cpp */,
+				4D79641C26C152400026288B /* pageelement.h */,
 			);
 			name = pageelements;
 			sourceTree = "<group>";
@@ -1847,14 +1857,14 @@
 		4D95D4F31D717CD600B2B856 /* systemelements */ = {
 			isa = PBXGroup;
 			children = (
-				4DF4407C1D511D0200152B7E /* systemboundary.cpp */,
-				4DF4407B1D511CEE00152B7E /* systemboundary.h */,
 				4DF440761D39575500152B7E /* ending.cpp */,
 				4DF440741D39567A00152B7E /* ending.h */,
 				40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */,
 				40ABF1FD1E5DF23B00F32F41 /* expansion.h */,
 				4D95D4F11D6E042400B2B856 /* section.cpp */,
 				4D95D4F01D6E041E00B2B856 /* section.h */,
+				4DF4407C1D511D0200152B7E /* systemboundary.cpp */,
+				4DF4407B1D511CEE00152B7E /* systemboundary.h */,
 				4D95D4F81D718D4A00B2B856 /* systemelement.cpp */,
 				4D95D4F71D718D0200B2B856 /* systemelement.h */,
 			);
@@ -2531,6 +2541,7 @@
 				8F59295318854BF800FE51AD /* svgdevicecontext.h in Headers */,
 				4DB3D8FA1F83D1F000B5FC2B /* boundingbox.h in Headers */,
 				4DA0EABD22BB772C00A7EBEB /* atts_neumes.h in Headers */,
+				4D79642626C167200026288B /* pageboundary.h in Headers */,
 				4D766F0620ACAD74006875D8 /* nc.h in Headers */,
 				8F59295518854BF800FE51AD /* system.h in Headers */,
 				4DB3D8E01F83D15600B5FC2B /* btrem.h in Headers */,
@@ -2654,6 +2665,7 @@
 				BB4C4BC522A93317001F6AF0 /* checked.h in Headers */,
 				BB4C4AF022A932BC001F6AF0 /* lem.h in Headers */,
 				BB4C4AE022A932BC001F6AF0 /* annot.h in Headers */,
+				4D79642726C167200026288B /* pageboundary.h in Headers */,
 				BB4C4B1C22A932CF001F6AF0 /* arpeg.h in Headers */,
 				BB4C4B2A22A932CF001F6AF0 /* harm.h in Headers */,
 				BB4C4AAC22A932A0001F6AF0 /* svgdevicecontext.h in Headers */,
@@ -3004,6 +3016,7 @@
 				4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */,
 				4DEC4DAF21C81F0600D1D273 /* sic.cpp in Sources */,
 				4D81351F2322C41800F59C01 /* keyaccid.cpp in Sources */,
+				4D79642226C167100026288B /* pageboundary.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
 				4D1694061E3A44F300569BF4 /* iomei.cpp in Sources */,
 				4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */,
@@ -3304,6 +3317,7 @@
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
 				4D1BE7851C6A40A80086DC0E /* pugixml.cpp in Sources */,
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
+				4D79642126C167100026288B /* pageboundary.cpp in Sources */,
 				4D2073FB22A3BCE000E0765F /* tabgrp.cpp in Sources */,
 				4DEC4DBA21C8288900D1D273 /* choice.cpp in Sources */,
 				4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */,
@@ -3425,6 +3439,7 @@
 				400FEDD5206FA74D000D3233 /* gracegrp.cpp in Sources */,
 				4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
+				4D79642326C167100026288B /* pageboundary.cpp in Sources */,
 				4DB3D8F51F83D1D600B5FC2B /* view_control.cpp in Sources */,
 				4D8135202322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4D4FCD141F54570E0009C455 /* staffdef.cpp in Sources */,
@@ -3636,6 +3651,7 @@
 				BB4C4ABF22A932B6001F6AF0 /* labelabbr.cpp in Sources */,
 				4DA0EAC622BB779400A7EBEB /* surface.cpp in Sources */,
 				BB4C4ADB22A932BC001F6AF0 /* abbr.cpp in Sources */,
+				4D79642426C167100026288B /* pageboundary.cpp in Sources */,
 				BB4C4A9322A9328F001F6AF0 /* doc.cpp in Sources */,
 				4D8135212322C41800F59C01 /* keyaccid.cpp in Sources */,
 				BB4C4B9922A932E5001F6AF0 /* linkinginterface.cpp in Sources */,
