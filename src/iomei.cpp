@@ -3246,6 +3246,12 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
         else if (elementName == "section") {
             success = ReadSection(vrvScore, current);
         }
+        else if (elementName == "sb") {
+            success = ReadSb(vrvScore, current);
+        }
+        else if (elementName == "pb") {
+            success = ReadPb(vrvScore, current);
+        }
         // xml comment
         else if (std::string(current.name()) == "") {
             success = ReadXMLComment(parent, current);

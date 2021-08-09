@@ -16,7 +16,9 @@
 #include "editorial.h"
 #include "ending.h"
 #include "scoredef.h"
+#include "sb.h"
 #include "section.h"
+#include "pb.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -49,11 +51,17 @@ bool Score::IsSupportedChild(Object *child)
     if (child->Is(SCOREDEF)) {
         assert(dynamic_cast<ScoreDef *>(child));
     }
+    else if (child->Is(SB)) {
+        assert(dynamic_cast<Sb *>(child));
+    }
     else if (child->Is(SECTION)) {
         assert(dynamic_cast<Section *>(child));
     }
     else if (child->Is(ENDING)) {
         assert(dynamic_cast<Ending *>(child));
+    }
+    else if (child->Is(PB)) {
+        assert(dynamic_cast<Pb *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
