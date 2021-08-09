@@ -1227,6 +1227,10 @@ int PAEInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
             if ((incipit[t] - 'A' >= 0) && (incipit[t] - 'A' < 7)) {
                 tuplet_notes++;
             }
+            // count the rests
+            if (incipit[t] == '-') {
+                tuplet_notes++;
+            }
 
             t++;
         }
