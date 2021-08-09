@@ -664,7 +664,8 @@ int Measure::ConvertToPageBased(FunctorParams *functorParams)
     assert(params);
 
     // Move itself to the pageBasedSystem - do not process children
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }

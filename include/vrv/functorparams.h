@@ -1254,8 +1254,13 @@ public:
 
 class ConvertToPageBasedParams : public FunctorParams {
 public:
-    ConvertToPageBasedParams(System *pageBasedSystem) { m_pageBasedSystem = pageBasedSystem; }
-    System *m_pageBasedSystem;
+    ConvertToPageBasedParams(Page *page)
+    {
+        m_currentSystem = NULL;
+        m_page = page;
+    }
+    System *m_currentSystem;
+    Page *m_page;
 };
 
 //----------------------------------------------------------------------------

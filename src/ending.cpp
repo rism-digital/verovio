@@ -80,7 +80,8 @@ int Ending::ConvertToPageBased(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
@@ -90,7 +91,7 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+    ConvertToPageBasedBoundary(this, params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
