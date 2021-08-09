@@ -15,10 +15,10 @@
 
 #include "editorial.h"
 #include "ending.h"
-#include "scoredef.h"
-#include "sb.h"
-#include "section.h"
 #include "pb.h"
+#include "sb.h"
+#include "scoredef.h"
+#include "section.h"
 #include "vrv.h"
 
 namespace vrv {
