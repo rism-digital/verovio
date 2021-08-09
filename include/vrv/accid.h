@@ -62,7 +62,7 @@ public:
     ///@}
 
     /**
-     * @name Set and get drawing unison accid 
+     * @name Set and get drawing unison accid
      */
     ///@{
     void SetDrawingUnisonAccid(Accid *drawingUnison) { m_drawingUnison = drawingUnison; }
