@@ -3678,6 +3678,7 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
 data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
 {
     static const std::map<float, data_ACCIDENTAL_GESTURAL> Alter2Accid{
+        { -3, ACCIDENTAL_GESTURAL_tf }, //
         { -2, ACCIDENTAL_GESTURAL_ff }, //
         { -1.5, ACCIDENTAL_GESTURAL_fd }, //
         { -1, ACCIDENTAL_GESTURAL_f }, //
@@ -3686,7 +3687,8 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
         { 0.5, ACCIDENTAL_GESTURAL_sd }, //
         { 1, ACCIDENTAL_GESTURAL_s }, //
         { 1.5, ACCIDENTAL_GESTURAL_su }, //
-        { 2, ACCIDENTAL_GESTURAL_ss } //
+        { 2, ACCIDENTAL_GESTURAL_ss }, //
+        { 2, ACCIDENTAL_GESTURAL_ts } //
     };
 
     const auto result = Alter2Accid.find(value);
