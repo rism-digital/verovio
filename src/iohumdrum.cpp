@@ -14162,6 +14162,11 @@ void HumdrumInput::addTextElement(
         std::string rawmusictext = hre.getMatch(2);
         std::string musictext = convertMusicSymbolNameToSmuflEntity(rawmusictext);
         std::string posttext = hre.getMatch(3);
+        if (pretext == "\\n") {
+            Lb *lb = new Lb;
+            element->AddChild(lb);
+            pretext = "";
+        }
         if (musictext.empty()) {
             hum::HumRegex hre2;
             std::string newtext = rawmusictext;
@@ -19329,25 +19334,28 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             if (edittype == "") {
                 accid->SetFunc(accidLog_FUNC_edit);
             }
-            else if (edittype == "above") {
+            else if (edittype.find("above") != std::string::npos) {
                 accid->SetFunc(accidLog_FUNC_edit);
             }
             else if (edittype == "a") {
                 accid->SetFunc(accidLog_FUNC_edit);
             }
-            else if (edittype == "brack") {
+            else if (edittype.find("up") != std::string::npos) {
+                accid->SetFunc(accidLog_FUNC_edit);
+            }
+            if (edittype.find("brack") != std::string::npos) {
                 // enclose="brack" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_brack);
             }
-            else if (edittype == "brac") {
+            else if (edittype.find("brac") != std::string::npos) {
                 // enclose="brac" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_brack);
             }
-            else if (edittype == "paren") {
+            if (edittype.find("paren") != std::string::npos) {
                 // enclose="paren" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_paren);
             }
-            else if (edittype == "none") {
+            else if (edittype.find("none") != std::string::npos) {
                 // display as a regular accidental
             }
             if (loaccid.empty()) {
@@ -23895,10 +23903,20 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         if (value.find("editorial accidental", equals) != std::string::npos) {
             m_signifiers.editacc.push_back(signifier);
             if (value.find("brack") != std::string::npos) {
-                m_signifiers.edittype.push_back("brack");
+                if (value.find("up") != std::string::npos) {
+                    m_signifiers.edittype.push_back("brack-up");
+                }
+                else {
+                    m_signifiers.edittype.push_back("brack");
+                }
             }
             else if (value.find("paren") != std::string::npos) {
-                m_signifiers.edittype.push_back("paren");
+                if (value.find("up") != std::string::npos) {
+                    m_signifiers.edittype.push_back("paren-up");
+                }
+                else {
+                    m_signifiers.edittype.push_back("paren");
+                }
             }
             else if (value.find("none") != std::string::npos) {
                 m_signifiers.edittype.push_back("none");
