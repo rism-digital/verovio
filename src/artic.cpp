@@ -531,7 +531,7 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
 int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIRECTION stemDir) const
 {
     int shift = parent->GetDrawingRadius(doc);
-    if ((parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_centerStaccato.GetValue())) {
+    if ((parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_staccatoCenter.GetValue())) {
         return shift;
     }
     data_ARTICULATION artic = GetArticFirst();
