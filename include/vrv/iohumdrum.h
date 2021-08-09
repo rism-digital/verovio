@@ -348,6 +348,7 @@ public:
     char nostem = '\0'; // !!!RDF**kern: N = no stem
     char cuesize = '\0'; // !!!RDF**kern: @ = cue size
     char terminallong = '\0'; // !!!RDF**kern: l = terminal long
+    char terminalbreve = '\0'; // !!!RDF**kern: l = terminal breve
     std::vector<char> editacc; // !!!RDF**kern: i = editorial accidental
     std::vector<std::string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
 
@@ -586,6 +587,7 @@ protected:
     bool setLabelContent(Label *label, const std::string &text);
     std::string convertMusicSymbolNameToSmuflEntity(const std::string &text);
     void processTerminalLong(hum::HTp token);
+    void processTerminalBreve(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);
     bool processStaffDecoration(const std::string &decoration);

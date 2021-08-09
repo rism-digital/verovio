@@ -653,6 +653,9 @@ bool HumdrumInput::convertHumdrum()
     if (m_signifiers.terminallong) {
         hideTerminalBarlines(infile);
     }
+    if (m_signifiers.terminalbreve) {
+        hideTerminalBarlines(infile);
+    }
     checkForColorSpine(infile);
     infile.analyzeRScale();
     infile.analyzeCrossStaffStemDirections();
@@ -1142,6 +1145,9 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         // This is a hanging tie for no apparent reason.  Display it, but make
         // it red. L.v. will be handled differently as an ornament.
         if (m_signifiers.terminallong && (token->find(m_signifiers.terminallong) != std::string::npos)) {
+            // suppress hanging tie (because it was removed)
+        }
+        else if (m_signifiers.terminalbreve && (token->find(m_signifiers.terminalbreve) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
         else {
@@ -11173,6 +11179,61 @@ void HumdrumInput::processTerminalLong(hum::HTp token)
 
 //////////////////////////////
 //
+// processTerminalBreve -- Not set up for chords yet.
+//
+
+void HumdrumInput::processTerminalBreve(hum::HTp token)
+{
+    if (!m_signifiers.terminalbreve) {
+        return;
+    }
+    if (token->find(m_signifiers.terminalbreve) == std::string::npos) {
+        return;
+    }
+    token->setValue("LO", "N", "vis", "0");
+    if ((token->find('[') != std::string::npos) || (token->find('_') != std::string::npos)) {
+        removeCharacter(token, '[');
+        removeCharacter(token, '_');
+
+        int pitch = hum::Convert::kernToBase40(token);
+        hum::HTp testtok = token->getNextToken();
+        while (testtok) {
+            if (testtok->isBarline()) {
+                // make measure invisible:
+                testtok->setText(*testtok + "-");
+            }
+            else if (testtok->isData()) {
+                if (testtok->isNull()) {
+                    testtok = testtok->getNextToken();
+                    continue;
+                }
+                int tpitch = hum::Convert::kernToBase40(testtok);
+                if (tpitch != pitch) {
+                    break;
+                }
+                if ((testtok->find(']') == std::string::npos) && (testtok->find('_') == std::string::npos)) {
+                    break;
+                }
+                // make note invisible:
+                testtok->setText(*testtok + "yy");
+                if (testtok->find("_") != std::string::npos) {
+                    removeCharacter(testtok, '_');
+                    testtok = testtok->getNextToken();
+                    continue;
+                }
+                else if (testtok->find("]") != std::string::npos) {
+                    removeCharacter(testtok, ']');
+                    break;
+                }
+            }
+            testtok = testtok->getNextToken();
+        }
+    }
+    // If token is tied, then follow ties to attached notes and make invisible.
+}
+
+//////////////////////////////
+//
 // HumdrumInput::processOverfillingNotes -- Shorten the gestural duration of notes
 //     that overfill the measure, but keep the visual display of the
 //     duration the same.  The chopped note durations in the succeeding
@@ -11298,6 +11359,7 @@ void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staf
     }
 
     processTerminalLong(token); // Not tested and probably won't work yet on chords.
+    processTerminalBreve(token); // Not tested and probably won't work yet on chords.
 }
 
 //////////////////////////////
@@ -14072,12 +14134,23 @@ void HumdrumInput::addTextElement(
     ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer)
 {
     Text *text = new Text;
+    std::string myfontstyle = fontstyle;
 
     std::string data = content;
+
+    if (data.find("<i>") != std::string::npos) {
+        // Convert <i>..</i> into italic.  Currently only entire syllable
+        // can be italic (no partially italics).
+        myfontstyle = "italic";
+        hum::HumRegex hre;
+        hre.replaceDestructive(data, "", "<i>", "g");
+        hre.replaceDestructive(data, "", "</i>", "g");
+    }
+
     if (element->GetClassName() == "Syl") {
         // Approximate centering of single-letter text on noteheads.
         // currently the text is left justified to the left edge of the notehead.
-        if ((content.size() == 1) && addSpacer) {
+        if ((data.size() == 1) && addSpacer) {
             data = "&#160;" + data;
         }
     }
@@ -14103,16 +14176,17 @@ void HumdrumInput::addTextElement(
             hre.replaceDestructive(pretext, "]", "&#93;", "g");
             Rend *rend = new Rend;
             element->AddChild(rend);
+
             rend->AddChild(text);
             text->SetText(UTF8to16(pretext));
-            setFontStyle(rend, fontstyle);
-            // addTextElement(element, pretext, fontstyle, addSpacer);
+            setFontStyle(rend, myfontstyle);
+            // addTextElement(element, pretext, myfontstyle, addSpacer);
         }
         if (!musictext.empty()) {
             addVerovioTextElement(element, rawmusictext);
         }
         if (!posttext.empty()) {
-            addTextElement(element, posttext, fontstyle, addSpacer);
+            addTextElement(element, posttext, myfontstyle, addSpacer);
             return;
         }
         else {
@@ -14138,7 +14212,7 @@ void HumdrumInput::addTextElement(
         data = pieces[i];
         text->SetText(UTF8to16(data));
 
-        if (fontstyle.empty()) {
+        if (myfontstyle.empty()) {
             if (text != NULL) {
                 element->AddChild(text);
             }
@@ -14148,7 +14222,7 @@ void HumdrumInput::addTextElement(
                 Rend *rend = new Rend;
                 element->AddChild(rend);
                 rend->AddChild(text);
-                setFontStyle(rend, fontstyle);
+                setFontStyle(rend, myfontstyle);
             }
         }
 
@@ -14177,6 +14251,9 @@ void HumdrumInput::setFontStyle(Rend *rend, const string &fontstyle)
     }
     else if (fontstyle == "bold-italic") {
         rend->SetFontweight(FONTWEIGHT_bold);
+    }
+    else if (fontstyle == "italic") {
+        rend->SetFontstyle(FONTSTYLE_italic);
     }
 }
 
@@ -18788,6 +18865,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
     if (!m_mens) {
         processTerminalLong(token); // do this before assigning rhythmic value.
+        processTerminalBreve(token); // do this before assigning rhythmic value.
         processOverfillingNotes(token);
     }
 
@@ -23796,6 +23874,15 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             m_signifiers.terminallong = signifier;
         }
 
+        // terminal breves
+        // !!!RDF**kern: i = terminal breve
+        if (value.find("terminal breve", equals) != std::string::npos) {
+            m_signifiers.terminalbreve = signifier;
+        }
+        else if (value.find("breve note", equals) != std::string::npos) {
+            m_signifiers.terminalbreve = signifier;
+        }
+
         // slur directions
         if (value.find("above", equals) != std::string::npos) {
             m_signifiers.above = signifier;
@@ -24418,7 +24505,11 @@ void HumdrumInput::hideTerminalBarlines(hum::HumdrumFile &infile)
                 tok = tok->getNextToken();
                 continue;
             }
-            if (tok->find(m_signifiers.terminallong) == std::string::npos) {
+            if (m_signifiers.terminallong && (tok->find(m_signifiers.terminallong) == std::string::npos)) {
+                tok = tok->getNextToken();
+                continue;
+            }
+            else if (m_signifiers.terminalbreve && (tok->find(m_signifiers.terminalbreve) == std::string::npos)) {
                 tok = tok->getNextToken();
                 continue;
             }
