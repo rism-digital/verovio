@@ -367,6 +367,12 @@
 		4D7927D020ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
 		4D7927D120ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
 		4D7927D220ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
+		4D79641926C1522B0026288B /* pageelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79641726C1522B0026288B /* pageelement.cpp */; };
+		4D79641A26C1522B0026288B /* pageelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79641726C1522B0026288B /* pageelement.cpp */; };
+		4D79641B26C1522B0026288B /* pageelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79641726C1522B0026288B /* pageelement.cpp */; };
+		4D79641D26C152400026288B /* pageelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79641C26C152400026288B /* pageelement.h */; };
+		4D79641E26C152400026288B /* pageelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79641C26C152400026288B /* pageelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D79641F26C1621A0026288B /* pageelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D79641726C1522B0026288B /* pageelement.cpp */; };
 		4D796B5E1D78641900A15238 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
 		4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
@@ -1409,6 +1415,8 @@
 		4D766EF820ACAD62006875D8 /* view_neume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_neume.cpp; path = src/view_neume.cpp; sourceTree = "<group>"; };
 		4D766EF920ACAD63006875D8 /* neume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = neume.cpp; path = src/neume.cpp; sourceTree = "<group>"; };
 		4D7927CF20ECCC6D0002A45D /* view_slur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_slur.cpp; path = src/view_slur.cpp; sourceTree = "<group>"; };
+		4D79641726C1522B0026288B /* pageelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pageelement.cpp; path = src/pageelement.cpp; sourceTree = "<group>"; };
+		4D79641C26C152400026288B /* pageelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pageelement.h; path = include/vrv/pageelement.h; sourceTree = "<group>"; };
 		4D796B5C1D78641200A15238 /* harm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = harm.h; path = include/vrv/harm.h; sourceTree = "<group>"; };
 		4D796B5D1D78641900A15238 /* harm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = harm.cpp; path = src/harm.cpp; sourceTree = "<group>"; };
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
@@ -1816,6 +1824,15 @@
 			name = zip;
 			sourceTree = "<group>";
 		};
+		4D79641626C151250026288B /* pageelements */ = {
+			isa = PBXGroup;
+			children = (
+				4D79641C26C152400026288B /* pageelement.h */,
+				4D79641726C1522B0026288B /* pageelement.cpp */,
+			);
+			name = pageelements;
+			sourceTree = "<group>";
+		};
 		4D7D8A3C1886E36200D78B62 /* tools */ = {
 			isa = PBXGroup;
 			children = (
@@ -2110,6 +2127,7 @@
 				4DA0EABF22BB775F00A7EBEB /* facselements */,
 				4DC12A761F740089000440E9 /* runningelements */,
 				4D95D4F31D717CD600B2B856 /* systemelements */,
+				4D79641626C151250026288B /* pageelements */,
 				4DF28A011A754DAA00BA9F7D /* controlelements */,
 				8F086F3A18853A540037FD8E /* layerelements */,
 				4DA144881C2AB24400CB7CEE /* textelements */,
@@ -2447,6 +2465,7 @@
 				4D6331F91F46DBF200A0D6BF /* plistinterface.h in Headers */,
 				4DB3D8CB1F83D10A00B5FC2B /* fermata.h in Headers */,
 				8F59294818854BF800FE51AD /* mensur.h in Headers */,
+				4D79641D26C152400026288B /* pageelement.h in Headers */,
 				4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */,
 				4DA0EAD922BB77AF00A7EBEB /* facsimile.h in Headers */,
 				4DEC4DD721C8295700D1D273 /* reg.h in Headers */,
@@ -2753,6 +2772,7 @@
 				BB4C4BC122A932FC001F6AF0 /* MidiMessage.h in Headers */,
 				BB4C4B9222A932DF001F6AF0 /* textelement.h in Headers */,
 				BB4C4B5C22A932D7001F6AF0 /* mensur.h in Headers */,
+				4D79641E26C152400026288B /* pageelement.h in Headers */,
 				BB4C4AEC22A932BC001F6AF0 /* editorial.h in Headers */,
 				BB4C4AA222A9328F001F6AF0 /* verticalaligner.h in Headers */,
 				BB4C4A5C22A9321F001F6AF0 /* attclasses.h in Headers */,
@@ -2974,6 +2994,7 @@
 				4DA0EAEF22BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
 				4D1694021E3A44F300569BF4 /* io.cpp in Sources */,
 				4D1694031E3A44F300569BF4 /* harm.cpp in Sources */,
+				4D79641926C1522B0026288B /* pageelement.cpp in Sources */,
 				4DB3D8DE1F83D15200B5FC2B /* btrem.cpp in Sources */,
 				4D1694041E3A44F300569BF4 /* space.cpp in Sources */,
 				4DEC4D8321C804E000D1D273 /* app.cpp in Sources */,
@@ -3217,6 +3238,7 @@
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
 				4D5572441CF57B5C008D06A0 /* pedal.cpp in Sources */,
+				4D79641F26C1621A0026288B /* pageelement.cpp in Sources */,
 				4DC12A811F741110000440E9 /* pgfoot.cpp in Sources */,
 				403BEFEF206C00B500D022D5 /* mrpt2.cpp in Sources */,
 				8F086EF6188539540037FD8E /* mensur.cpp in Sources */,
@@ -3393,6 +3415,7 @@
 				4DA0EAF022BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
 				4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */,
+				4D79641A26C1522B0026288B /* pageelement.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
 				4DEC4D8021C804C500D1D273 /* add.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
@@ -3603,6 +3626,7 @@
 				BB4C4B2922A932CF001F6AF0 /* harm.cpp in Sources */,
 				4DA0EAF122BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
 				4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */,
+				4D79641B26C1522B0026288B /* pageelement.cpp in Sources */,
 				BB4C4B9722A932E5001F6AF0 /* durationinterface.cpp in Sources */,
 				BB4C4A8222A9321F001F6AF0 /* atts_shared.cpp in Sources */,
 				BB4C4B4F22A932D7001F6AF0 /* elementpart.cpp in Sources */,
