@@ -7,10 +7,10 @@ jobs:
     strategy:
       matrix:
         path:
-          - check: "src"
-            exclude: "(hum|midi|json|pugi)"
           - check: "include"
             exclude: "(hum|midi|json|pugi|utf8|win32|zip)"
+          - check: "src"
+            exclude: "(hum|midi|json|pugi)"
           - check: "tools"
     steps:
       - uses: actions/checkout@v2
