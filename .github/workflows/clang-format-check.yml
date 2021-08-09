@@ -11,6 +11,7 @@ jobs:
             exclude: "(hum|midi|json|pugi)"
           - check: "include"
             exclude: "(hum|midi|json|pugi|utf8|win32|zip)"
+          - check: "tools"
     steps:
       - uses: actions/checkout@v2
       - name: Run clang-format style check for C/C++ programs.
