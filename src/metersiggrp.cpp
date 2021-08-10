@@ -116,8 +116,8 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
             }
             break;
         }
-        // For mixed meterSig group we want to accumulate total count of all child meterSig (and keep the highest meter
-        // count), since it is what counts for the timestamps
+        // For mixed meterSig group we want to accumulate total count of all child meterSig
+        // (and keep the highest meter count), since it is what counts for the timestamps
         case meterSigGrpLog_FUNC_mixed: {
             int maxUnit = 0;
             int currentCount = 0;

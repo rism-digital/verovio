@@ -5,9 +5,9 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include "c_wrapper.h"
 #include "toolkit.h"
 #include "vrv.h"
-#include "c_wrapper.h"
 
 using namespace std;
 using namespace vrv;
@@ -26,7 +26,7 @@ void *vrvToolkit_constructor()
     return new Toolkit();
 }
 
-void *vrvToolkit_constructorResourcePath(const char* resourcePath)
+void *vrvToolkit_constructorResourcePath(const char *resourcePath)
 {
     // set the resource path
     Resources::SetPath(resourcePath);
