@@ -699,11 +699,6 @@ int System::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
-    assert(GetParent());
-    assert(GetParent()->GetParent());
-
-    Object *parent = GetParent();
-
     params->m_measureXRel = 0;
     int margins = m_systemLeftMar + m_systemRightMar;
     int nonJustifiableWidth
