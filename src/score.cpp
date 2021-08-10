@@ -91,6 +91,7 @@ int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
     assert(params);
 
     ConvertToPageBasedBoundary(this, params->m_page);
+    params->m_currentSystem = NULL;
 
     return FUNCTOR_CONTINUE;
 }
