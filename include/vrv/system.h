@@ -143,7 +143,7 @@ public:
     virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::ScoreDefOptimize
+     * @name See Object::ScoreDefOptimize
      */
     ///@{
     virtual int ScoreDefOptimize(FunctorParams *functorParams);
@@ -176,7 +176,7 @@ public:
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
-     * See Object::AdjustXOverflow
+     * @name See Object::AdjustXOverflow
      */
     ///@{
     virtual int AdjustXOverflow(FunctorParams *functorParams);
@@ -184,7 +184,7 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustHarmGrpsSpacing
+     * @name See Object::AdjustHarmGrpsSpacing
      */
     ///@{
     virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
@@ -192,7 +192,7 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustSylSpacing
+     * @name See Object::AdjustSylSpacing
      */
     ///@{
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
@@ -205,7 +205,7 @@ public:
     virtual int AdjustTempo(FunctorParams *functorParams);
 
     /**
-     * See Object::AlignVertically
+     * @name See Object::AlignVertically
      */
     ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
@@ -223,10 +223,12 @@ public:
     virtual int AlignSystems(FunctorParams *functorParams);
 
     /**
-     * See Object::AlignMeasures
+     * @name See Object::AlignMeasures
      */
+    ///@{
     virtual int AlignMeasures(FunctorParams *functorParams);
     virtual int AlignMeasuresEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::JustifyX
