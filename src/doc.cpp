@@ -971,18 +971,15 @@ void Doc::UnCastOffDoc()
     Pages *pages = this->GetPages();
     assert(pages);
 
-    Page *contentPage = new Page();
-    System *contentSystem = new System();
-    contentPage->AddChild(contentSystem);
-
-    UnCastOffParams unCastOffParams(contentSystem);
+    Page *uncastOffPage = new Page();
+    UnCastOffParams unCastOffParams(uncastOffPage);
 
     Functor unCastOff(&Object::UnCastOff);
     this->Process(&unCastOff, &unCastOffParams);
 
     pages->ClearChildren();
 
-    pages->AddChild(contentPage);
+    pages->AddChild(uncastOffPage);
 
     // LogDebug("ContinuousLayout: %d pages", this->GetChildCount());
 

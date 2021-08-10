@@ -2258,12 +2258,18 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the system we are adding system to
+ * member 0: a pointer to the page we are adding system to
+ * member 1: a pointer to the system we are adding content to
  **/
 
 class UnCastOffParams : public FunctorParams {
 public:
-    UnCastOffParams(System *currentSystem) { m_currentSystem = currentSystem; }
+    UnCastOffParams(Page *page)
+    {
+        m_page = page;
+        m_currentSystem = NULL;
+    }
+    Page *m_page;
     System *m_currentSystem;
 };
 

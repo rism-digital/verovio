@@ -55,6 +55,11 @@ public:
      */
     virtual int CastOffEncoding(FunctorParams *functorParams);
 
+    /**
+     * See Object::UnCastOff
+     */
+    virtual int UnCastOff(FunctorParams *functorParams);
+
 private:
     //
 public:
