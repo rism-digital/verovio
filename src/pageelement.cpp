@@ -42,8 +42,6 @@ void PageElement::Reset()
 {
     Object::Reset();
     ResetTyped();
-
-    m_visibility = Visible;
 }
 
 //----------------------------------------------------------------------------

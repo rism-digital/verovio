@@ -35,7 +35,6 @@ PageElementEnd::~PageElementEnd() {}
 void PageElementEnd::Reset()
 {
     m_start = NULL;
-    // m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -79,23 +78,6 @@ void PageElementStartInterface::ConvertToPageBasedBoundary(Object *object, Objec
 // PageElementEnd functor methods
 //----------------------------------------------------------------------------
 
-int PageElementEnd::PrepareBoundaries(FunctorParams *functorParams)
-{
-    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
-    assert(params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int PageElementEnd::ResetDrawing(FunctorParams *functorParams)
-{
-    Object::ResetDrawing(functorParams);
-
-    // this->SetMeasure(NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
@@ -121,49 +103,8 @@ int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    assert(this->GetStart());
-
-    // We are reaching the end of an ending - put it to the param and it will be grouped with the next one if there is
-    // not measure in between
-    if (this->GetStart()->Is(ENDING)) {
-        params->m_previousEnding = vrv_cast<Ending *>(this->GetStart());
-        assert(params->m_previousEnding);
-        // This is the end of the first ending - generate a grpId
-        if (params->m_previousEnding->GetDrawingGrpId() == 0) {
-            params->m_previousEnding->SetDrawingGrpObject(params->m_previousEnding);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
-
-int PageElementStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
-{
-    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
-    assert(params);
-
-    // We have to be in a boundary start element
-    assert(m_end);
-
-    // params->m_startBoundaries.push_back(this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int PageElementStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
-{
-    m_drawingMeasure = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
 
 } // namespace vrv
