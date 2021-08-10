@@ -860,9 +860,9 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     this->ScoreDefSetCurrentDoc();
 
-    Page *uncastOffPage = this->SetDrawingPage(0);
-    assert(uncastOffPage);
-    uncastOffPage->LayOutHorizontally();
+    Page *unCastOffPage = this->SetDrawingPage(0);
+    assert(unCastOffPage);
+    unCastOffPage->LayOutHorizontally();
 
     Page *castOffSinglePage = new Page();
 
@@ -870,7 +870,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     if (useSb && !usePb && !smart) {
         CastOffEncodingParams castOffEncodingParams(this, castOffSinglePage, false);
         Functor castOffEncoding(&Object::CastOffEncoding);
-        uncastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
+        unCastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
         CastOffSystemsParams castOffSystemsParams(castOffSinglePage, this, smart);
@@ -878,14 +878,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
         Functor castOffSystems(&Object::CastOffSystems);
         Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
-        uncastOffPage->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
+        unCastOffPage->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
         leftoverSystem = castOffSystemsParams.m_leftoverSystem;
     }
     // We can now detach and delete the old content page
     pages->DetachChild(0);
-    assert(uncastOffPage && !uncastOffPage->GetParent());
-    delete uncastOffPage;
-    uncastOffPage = NULL;
+    assert(unCastOffPage && !unCastOffPage->GetParent());
+    delete unCastOffPage;
+    unCastOffPage = NULL;
 
     // Replace it with the castOffSinglePage
     pages->AddChild(castOffSinglePage);
@@ -971,15 +971,15 @@ void Doc::UnCastOffDoc()
     Pages *pages = this->GetPages();
     assert(pages);
 
-    Page *uncastOffPage = new Page();
-    UnCastOffParams unCastOffParams(uncastOffPage);
+    Page *unCastOffPage = new Page();
+    UnCastOffParams unCastOffParams(unCastOffPage);
 
     Functor unCastOff(&Object::UnCastOff);
     this->Process(&unCastOff, &unCastOffParams);
 
     pages->ClearChildren();
 
-    pages->AddChild(uncastOffPage);
+    pages->AddChild(unCastOffPage);
 
     // LogDebug("ContinuousLayout: %d pages", this->GetChildCount());
 
@@ -996,13 +996,13 @@ void Doc::CastOffEncodingDoc()
     Pages *pages = this->GetPages();
     assert(pages);
 
-    Page *uncastOffPage = this->SetDrawingPage(0);
-    assert(uncastOffPage);
-    uncastOffPage->LayOutHorizontally();
+    Page *unCastOffPage = this->SetDrawingPage(0);
+    assert(unCastOffPage);
+    unCastOffPage->LayOutHorizontally();
 
     // Detach the contentPage
     pages->DetachChild(0);
-    assert(uncastOffPage && !uncastOffPage->GetParent());
+    assert(unCastOffPage && !unCastOffPage->GetParent());
 
     Page *castOffFirstPage = new Page();
     pages->AddChild(castOffFirstPage);
@@ -1010,8 +1010,8 @@ void Doc::CastOffEncodingDoc()
     CastOffEncodingParams castOffEncodingParams(this, castOffFirstPage);
 
     Functor castOffEncoding(&Object::CastOffEncoding);
-    uncastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
-    delete uncastOffPage;
+    unCastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
+    delete unCastOffPage;
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
