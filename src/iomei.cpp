@@ -276,9 +276,9 @@ bool MEIOutput::WriteObject(Object *object)
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("pages");
         }
-        else {
-            m_currentNode = m_currentNode.append_child("score");
-        }
+        // else {
+        //    m_currentNode = m_currentNode.append_child("score");
+        //}
         WritePages(m_currentNode, dynamic_cast<Pages *>(object));
     }
     else if (object->Is(SCORE)) {
@@ -779,6 +779,17 @@ bool MEIOutput::WriteObject(Object *object)
             WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
         }
     }
+    // SystemElementEnd - nothing to add - only
+    else if (object->Is(PAGE_ELEMENT_END)) {
+        if (m_scoreBasedMEI) {
+            // LogDebug("No piling '%s'", object->GetClassName().c_str());
+            return true;
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("pageElementEnd");
+            // WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
+        }
+    }
 
     else {
         // Missing output method for the class
@@ -791,7 +802,7 @@ bool MEIOutput::WriteObject(Object *object)
 
     if (object->Is(PAGES) && (dynamic_cast<Pages *>(object) == m_doc->GetPages())) {
         // First save the main scoreDef
-        m_doc->m_mdivScoreDef.Save(this);
+        // m_doc->m_mdivScoreDef.Save(this);
     }
     else if (object->Is(SCORE) && (dynamic_cast<Score *>(object) == m_doc->GetScore())) {
         // First save the main scoreDef
@@ -816,6 +827,9 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         return true;
     }
     else if (m_scoreBasedMEI && (object->Is(PAGE))) {
+        return true;
+    }
+    else if (m_scoreBasedMEI && (object->Is(PAGES))) {
         return true;
     }
 
@@ -972,6 +986,25 @@ void MEIOutput::WritePage(pugi::xml_node currentNode, Page *page)
     if (page->m_PPUFactor != 1.0) {
         currentNode.append_attribute("ppu") = StringFormat("%f", page->m_PPUFactor).c_str();
     }
+}
+
+void MEIOutput::WritePageElement(pugi::xml_node currentNode, PageElement *pageElement)
+{
+    assert(pageElement);
+
+    WriteXmlId(currentNode, pageElement);
+    pageElement->WriteTyped(currentNode);
+}
+
+void MEIOutput::WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd)
+{
+    assert(elementEnd && elementEnd->GetStart());
+
+    WritePageElement(currentNode, elementEnd);
+    currentNode.append_attribute("startid") = UuidToMeiStr(elementEnd->GetStart()).c_str();
+    std::string meiElementName = elementEnd->GetStart()->GetClassName();
+    std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+    currentNode.append_attribute("type") = meiElementName.c_str();
 }
 
 void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)

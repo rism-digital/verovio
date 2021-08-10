@@ -99,6 +99,8 @@ class Num;
 class Octave;
 class Orig;
 class Page;
+class PageElement;
+class PageElementEnd;
 class Pages;
 class Pb;
 class Pedal;
@@ -241,6 +243,8 @@ private:
      */
     ///@{
     void WritePage(pugi::xml_node currentNode, Page *page);
+    void WritePageElement(pugi::xml_node element, PageElement *object);
+    void WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd);
     void WriteSystem(pugi::xml_node currentNode, System *system);
     void WriteSystemElementEnd(pugi::xml_node currentNode, SystemElementEnd *elementEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
