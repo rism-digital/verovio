@@ -56,6 +56,11 @@ public:
     virtual int ConvertToPageBased(FunctorParams *functorParams);
     virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
     ///@}
+    
+    /**
+     * See Object::CastOffSystems
+     */
+    virtual int CastOffSystems(FunctorParams *functorParams);
 
 private:
     //

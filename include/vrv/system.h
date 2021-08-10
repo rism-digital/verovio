@@ -269,9 +269,12 @@ public:
     virtual int UnCastOff(FunctorParams *functorParams);
 
     /**
-     * See Object::CastOffSystemsEnd
+     * @name See Object::CastOffSystems
      */
+    ///@{
+    virtual int CastOffSystems(FunctorParams *functorParams);
     virtual int CastOffSystemsEnd(FunctorParams *functorParams);
+    ///@}
 
 public:
     SystemAligner m_systemAligner;

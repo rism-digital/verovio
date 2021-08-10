@@ -96,4 +96,14 @@ int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Score::CastOffSystems(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+
+    PageElement::CastOffSystems(functorParams);
+    
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv

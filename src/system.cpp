@@ -967,6 +967,14 @@ int System::UnCastOff(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::CastOffSystems(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+    
+    return FUNCTOR_SIBLINGS;
+}
+
 int System::CastOffSystemsEnd(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
