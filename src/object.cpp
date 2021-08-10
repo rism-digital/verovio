@@ -1492,14 +1492,23 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
 
     assert(params->m_upcomingScoreDef);
 
+    // starting a new score
+    if (this->Is(SCORE)) {
+        params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
+        params->m_drawLabels = true;
+        params->m_currentScoreDef = NULL;
+        params->m_currentStaffDef = NULL;
+        params->m_previousMeasure = NULL;
+        params->m_currentSystem = NULL;
+        params->m_restart = false;
+        params->m_hasMeasure = false;
+        return FUNCTOR_CONTINUE;
+    }
+
     // starting a new page
     if (this->Is(PAGE)) {
         Page *page = vrv_cast<Page *>(this);
         assert(page);
-        if (page->GetParent()->GetChildIndex(page) == 0) {
-            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
-            params->m_drawLabels = true;
-        }
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }

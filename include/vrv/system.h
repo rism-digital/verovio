@@ -133,6 +133,11 @@ public:
      */
     void AddToDrawingListIfNeccessary(Object *object);
 
+    /**
+     * Check if the system is the last of an mdiv by looking at the next sibling
+     */
+    bool IsLastOfMdiv();
+
     //----------//
     // Functors //
     //----------//
