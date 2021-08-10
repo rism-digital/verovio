@@ -57,6 +57,11 @@ public:
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 
+    /**
+     * See Object::CastOffPages
+     */
+    virtual int CastOffPages(FunctorParams *functorParams);
+
 protected:
     //
 private:

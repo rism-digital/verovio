@@ -162,7 +162,7 @@ int EditorialElement::CastOffSystems(FunctorParams *functorParams)
         = vrv_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(editorialElement);
     // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingObjects.push_back(editorialElement);
+    params->m_pendingElements.push_back(editorialElement);
 
     return FUNCTOR_SIBLINGS;
 }

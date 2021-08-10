@@ -1087,6 +1087,7 @@ public:
  * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
  * members 4-8: the page heights
  * member 9: a pointer to the leftover system (last system with only one measure)
+ * member 10: the current pending elements (Mdiv, Score) to be place at the beginning of a page
  **/
 
 class CastOffPagesParams : public FunctorParams {
@@ -1114,6 +1115,7 @@ public:
     int m_pgHead2Height;
     int m_pgFoot2Height;
     System *m_leftoverSystem;
+    ArrayOfObjects m_pendingPageElements;
 };
 
 //----------------------------------------------------------------------------
@@ -1127,7 +1129,7 @@ public:
  * member 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
  * member 4: the system width
  * member 5: the current scoreDef width
- * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
+ * member 6: the current pending elements (ScoreDef, Endings, etc.) to be place at the beginning of a system
  * member 7: the doc
  * member 8: whether to smartly use encoded system breaks
  * member 9: a pointer to the leftover system (last system with only one measure)
@@ -1135,11 +1137,11 @@ public:
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc, bool smart)
+    CastOffSystemsParams(Page *page, Doc *doc, bool smart)
     {
-        m_contentSystem = contentSystem;
         m_page = page;
-        m_currentSystem = currentSystem;
+        m_contentSystem = NULL;
+        m_currentSystem = NULL;
         m_shift = 0;
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
@@ -1153,7 +1155,7 @@ public:
     int m_shift;
     int m_systemWidth;
     int m_currentScoreDefWidth;
-    ArrayOfObjects m_pendingObjects;
+    ArrayOfObjects m_pendingElements;
     Doc *m_doc;
     bool m_smart;
     System *m_leftoverSystem;

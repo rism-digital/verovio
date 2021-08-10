@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
-#include "system.h"
+#include "page.h"
 
 namespace vrv {
 
@@ -53,23 +53,29 @@ int PageElement::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->GetParent()));
+    assert(params->m_page);
+    this->MoveItselfTo(params->m_page);
 
-    // Special case where we use the Relinquish method.
-    PageElement *element = dynamic_cast<PageElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingObjects.push_back(element);
+    return FUNCTOR_CONTINUE;
+}
 
-    return FUNCTOR_SIBLINGS;
+int PageElement::CastOffPages(FunctorParams *functorParams)
+{
+    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
+    assert(params);
+
+    PageElement *element = dynamic_cast<PageElement *>(params->m_contentPage->Relinquish(this->GetIdx()));
+    assert(element);
+    // move as pending since we want it at the beginning of the page in case of system break coming
+    params->m_pendingPageElements.push_back(element);
+
+    return FUNCTOR_CONTINUE;
 }
 
 int PageElement::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }

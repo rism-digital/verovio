@@ -134,7 +134,7 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     Ending *ending = dynamic_cast<Ending *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingObjects.push_back(ending);
+    params->m_pendingElements.push_back(ending);
 
     return FUNCTOR_SIBLINGS;
 }

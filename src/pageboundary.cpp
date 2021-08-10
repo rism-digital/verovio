@@ -15,6 +15,7 @@
 
 #include "ending.h"
 #include "functorparams.h"
+#include "page.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -83,24 +84,21 @@ int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    /*
-    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->GetParent()));
+    assert(params->m_page);
+    this->MoveItselfTo(params->m_page);
 
-    // Special case where we use the Relinquish method.
-    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
-    // from the content System because this screws up the iterator. Relinquish gives up
-    // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    PageElementEnd *endBoundary = dynamic_cast<PageElementEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
-    // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
-    if (params->m_pendingObjects.empty())
-        params->m_currentSystem->AddChild(endBoundary);
-    else
-        params->m_pendingObjects.push_back(endBoundary);
-     */
+    return FUNCTOR_CONTINUE;
+}
 
-    return FUNCTOR_SIBLINGS;
+int PageElementEnd::CastOffPages(FunctorParams *functorParams)
+{
+    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_currentPage);
+    this->MoveItselfTo(params->m_currentPage);
+
+    return FUNCTOR_CONTINUE;
 }
 
 //----------------------------------------------------------------------------

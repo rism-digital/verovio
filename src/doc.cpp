@@ -860,37 +860,47 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     this->ScoreDefSetCurrentDoc();
 
-    Page *contentPage = this->SetDrawingPage(0);
-    assert(contentPage);
-    contentPage->LayOutHorizontally();
+    Page *uncastOffPage = this->SetDrawingPage(0);
+    assert(uncastOffPage);
+    uncastOffPage->LayOutHorizontally();
 
-    System *contentSystem = vrv_cast<System *>(contentPage->DetachChild(0));
-    assert(contentSystem);
+    Page *castOffSinglePage = new Page();
+
+    // System *contentSystem = vrv_cast<System *>(contentPage->DetachChild(0));
+    // assert(contentSystem);
 
     System *currentSystem = new System();
-    contentPage->AddChild(currentSystem);
+    // contentPage->AddChild(currentSystem);
 
     System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
-        CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
+        // CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
-        Functor castOffEncoding(&Object::CastOffEncoding);
-        contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
+        // Functor castOffEncoding(&Object::CastOffEncoding);
+        // contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
-        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this, smart);
+        CastOffSystemsParams castOffSystemsParams(castOffSinglePage, this, smart);
         castOffSystemsParams.m_systemWidth
             = m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
-        castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
-        castOffSystemsParams.m_currentScoreDefWidth
-            = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
 
         Functor castOffSystems(&Object::CastOffSystems);
         Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
-        contentSystem->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
+        uncastOffPage->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
         leftoverSystem = castOffSystemsParams.m_leftoverSystem;
     }
-    delete contentSystem;
+    // delete contentSystem;
+
+    // We can now detach and delete the old content page
+    pages->DetachChild(0);
+    assert(uncastOffPage && !uncastOffPage->GetParent());
+    delete uncastOffPage;
+    uncastOffPage = NULL;
+
+    // Replace it with the castOffSinglePage
+    pages->AddChild(castOffSinglePage);
+    this->ResetDrawingPage();
+    this->SetDrawingPage(0);
 
     bool optimize = ScoreDefNeedsOptimization();
     // Reset the scoreDef at the beginning of each system
@@ -903,23 +913,26 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
     // Because of the new scoreDef, we need to reset cached drawingX
-    contentPage->ResetCachedDrawingX();
-    contentPage->LayOutVertically();
+    castOffSinglePage->ResetCachedDrawingX();
+    castOffSinglePage->LayOutVertically();
 
-    // Detach the contentPage
+    // Detach the contentPage in order to be able call CastOffRunningElements
     pages->DetachChild(0);
-    assert(contentPage && !contentPage->GetParent());
+    assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDrawingPage();
 
     Page *currentPage = new Page();
-    CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
+    CastOffPagesParams castOffPagesParams(castOffSinglePage, this, currentPage);
+
+    // Fill the page header / footer heights
     CastOffRunningElements(&castOffPagesParams);
+
     castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
     castOffPagesParams.m_leftoverSystem = leftoverSystem;
     Functor castOffPages(&Object::CastOffPages);
     pages->AddChild(currentPage);
-    contentPage->Process(&castOffPages, &castOffPagesParams);
-    delete contentPage;
+    castOffSinglePage->Process(&castOffPages, &castOffPagesParams);
+    delete castOffSinglePage;
 
     this->ScoreDefSetCurrentDoc(true);
     if (optimize) {

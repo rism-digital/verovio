@@ -163,6 +163,11 @@ public:
     virtual int AlignSystemsEnd(FunctorParams *functorParams);
     ///@}
 
+    /**
+     * See Object::CastOffPages
+     */
+    virtual int CastOffPagesEnd(FunctorParams *functorParams);
+
 private:
     /**
      * Adjust the horizontal postition of the syl processing verse by verse

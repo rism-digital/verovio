@@ -943,6 +943,13 @@ int System::CastOffPages(FunctorParams *functorParams)
         }
     }
 
+    // First add all pending objects
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
+        params->m_currentPage->AddChild(*iter);
+    }
+    params->m_pendingPageElements.clear();
+
     // Special case where we use the Relinquish method.
     // We want to move the system to the currentPage. However, we cannot use DetachChild
     // from the contentPage because this screws up the iterator. Relinquish gives up
@@ -971,8 +978,19 @@ int System::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
-    
-    return FUNCTOR_SIBLINGS;
+
+    // We are starting a new system we need to cast off
+    params->m_contentSystem = this;
+    // We also need to create a new target system and add it to the page
+    System *system = new System();
+    params->m_page->AddChild(system);
+    params->m_currentSystem = system;
+
+    params->m_shift = -this->GetDrawingLabelsWidth();
+    params->m_currentScoreDefWidth
+        = params->m_page->m_drawingScoreDef.GetDrawingWidth() + this->GetDrawingAbbrLabelsWidth();
+
+    return FUNCTOR_CONTINUE;
 }
 
 int System::CastOffSystemsEnd(FunctorParams *functorParams)
@@ -980,15 +998,15 @@ int System::CastOffSystemsEnd(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    if (params->m_pendingObjects.empty()) return FUNCTOR_STOP;
+    if (params->m_pendingElements.empty()) return FUNCTOR_CONTINUE;
 
     // Otherwise add all pendings objects
     ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
+    for (iter = params->m_pendingElements.begin(); iter != params->m_pendingElements.end(); ++iter) {
         params->m_currentSystem->AddChild(*iter);
     }
 
-    return FUNCTOR_STOP;
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
