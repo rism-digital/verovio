@@ -77,6 +77,8 @@ int PageElement::CastOffEncoding(FunctorParams *functorParams)
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
+    MoveItselfTo(params->m_currentPage);
+
     return FUNCTOR_SIBLINGS;
 }
 

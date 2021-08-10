@@ -866,31 +866,21 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     Page *castOffSinglePage = new Page();
 
-    // System *contentSystem = vrv_cast<System *>(contentPage->DetachChild(0));
-    // assert(contentSystem);
-
-    System *currentSystem = new System();
-    // contentPage->AddChild(currentSystem);
-
     System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
-        // CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
-
-        // Functor castOffEncoding(&Object::CastOffEncoding);
-        // contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
+        CastOffEncodingParams castOffEncodingParams(this, castOffSinglePage, false);
+        Functor castOffEncoding(&Object::CastOffEncoding);
+        uncastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
         CastOffSystemsParams castOffSystemsParams(castOffSinglePage, this, smart);
-        castOffSystemsParams.m_systemWidth
-            = m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+        castOffSystemsParams.m_systemWidth = m_drawingPageContentWidth;
 
         Functor castOffSystems(&Object::CastOffSystems);
         Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
         uncastOffPage->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
         leftoverSystem = castOffSystemsParams.m_leftoverSystem;
     }
-    // delete contentSystem;
-
     // We can now detach and delete the old content page
     pages->DetachChild(0);
     assert(uncastOffPage && !uncastOffPage->GetParent());
@@ -911,7 +901,6 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     this->ScoreDefSetGrpSymDoc();
 
     // Here we redo the alignment because of the new scoreDefs
-    // We can actually optimise this and have a custom version that does not redo all the calculation
     // Because of the new scoreDef, we need to reset cached drawingX
     castOffSinglePage->ResetCachedDrawingX();
     castOffSinglePage->LayOutVertically();
@@ -921,8 +910,8 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDrawingPage();
 
-    Page *currentPage = new Page();
-    CastOffPagesParams castOffPagesParams(castOffSinglePage, this, currentPage);
+    Page *castOffFirstPage = new Page();
+    CastOffPagesParams castOffPagesParams(castOffSinglePage, this, castOffFirstPage);
 
     // Fill the page header / footer heights
     CastOffRunningElements(&castOffPagesParams);
@@ -930,7 +919,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
     castOffPagesParams.m_leftoverSystem = leftoverSystem;
     Functor castOffPages(&Object::CastOffPages);
-    pages->AddChild(currentPage);
+    pages->AddChild(castOffFirstPage);
     castOffSinglePage->Process(&castOffPages, &castOffPagesParams);
     delete castOffSinglePage;
 
@@ -1010,28 +999,22 @@ void Doc::CastOffEncodingDoc()
     Pages *pages = this->GetPages();
     assert(pages);
 
-    Page *contentPage = this->SetDrawingPage(0);
-    assert(contentPage);
-
-    contentPage->LayOutHorizontally();
-
-    System *contentSystem = vrv_cast<System *>(contentPage->FindDescendantByType(SYSTEM));
-    assert(contentSystem);
+    Page *uncastOffPage = this->SetDrawingPage(0);
+    assert(uncastOffPage);
+    uncastOffPage->LayOutHorizontally();
 
     // Detach the contentPage
     pages->DetachChild(0);
-    assert(contentPage && !contentPage->GetParent());
+    assert(uncastOffPage && !uncastOffPage->GetParent());
 
-    Page *page = new Page();
-    pages->AddChild(page);
-    System *system = new System();
-    page->AddChild(system);
+    Page *castOffFirstPage = new Page();
+    pages->AddChild(castOffFirstPage);
 
-    CastOffEncodingParams castOffEncodingParams(this, page, system, contentSystem);
+    CastOffEncodingParams castOffEncodingParams(this, castOffFirstPage);
 
     Functor castOffEncoding(&Object::CastOffEncoding);
-    contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
-    delete contentPage;
+    uncastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
+    delete uncastOffPage;
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!

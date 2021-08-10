@@ -62,6 +62,11 @@ public:
      */
     virtual int CastOffPages(FunctorParams *functorParams);
 
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
 protected:
     //
 private:

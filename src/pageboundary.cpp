@@ -16,6 +16,7 @@
 #include "ending.h"
 #include "functorparams.h"
 #include "page.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -87,7 +88,7 @@ int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
     assert(params->m_page);
     this->MoveItselfTo(params->m_page);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int PageElementEnd::CastOffPages(FunctorParams *functorParams)
@@ -98,7 +99,25 @@ int PageElementEnd::CastOffPages(FunctorParams *functorParams)
     assert(params->m_currentPage);
     this->MoveItselfTo(params->m_currentPage);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
+}
+
+int PageElementEnd::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    if (this->m_start && this->m_start->Is(SCORE)) {
+        // This is the end of a score, which means that the current system has to be added
+        // to the current page
+        assert(params->m_currentSystem);
+        params->m_currentPage->AddChild(params->m_currentSystem);
+        params->m_currentSystem = NULL;
+    }
+    
+    MoveItselfTo(params->m_currentPage);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 //----------------------------------------------------------------------------

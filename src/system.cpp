@@ -962,19 +962,6 @@ int System::CastOffPages(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    // Just move all the content of the system to the continuous one (parameter)
-    // Use the MoveChildrenFrom method that moves and relinquishes them
-    // See Object::Relinquish
-    params->m_currentSystem->MoveChildrenFrom(this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
@@ -1006,6 +993,34 @@ int System::CastOffSystemsEnd(FunctorParams *functorParams)
     for (iter = params->m_pendingElements.begin(); iter != params->m_pendingElements.end(); ++iter) {
         params->m_currentSystem->AddChild(*iter);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    // We are starting a new system we need to cast off
+    params->m_contentSystem = this;
+    // Create the new system but do not add it to the page yet.
+    // It will be added when reaching a pb / sb or at the end of the score in PageElementEnd::CastOffEncoding
+    assert(!params->m_currentSystem);
+    params->m_currentSystem = new System();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::UnCastOff(FunctorParams *functorParams)
+{
+    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
+    assert(params);
+
+    // Just move all the content of the system to the continuous one (parameter)
+    // Use the MoveChildrenFrom method that moves and relinquishes them
+    // See Object::Relinquish
+    params->m_currentSystem->MoveChildrenFrom(this);
 
     return FUNCTOR_CONTINUE;
 }
