@@ -229,9 +229,11 @@ int main(int argc, char **argv)
         { "help", no_argument, 0, 'h' }, //
         { "outfile", required_argument, 0, 'o' }, //
         { "page", required_argument, 0, 'p' }, //
-        { "resources", required_argument, 0, 'r' }, { "scale", required_argument, 0, 's' }, //
+        { "resources", required_argument, 0, 'r' }, //
+        { "scale", required_argument, 0, 's' }, //
         { "to", required_argument, 0, 't' }, //
-        { "version", no_argument, 0, 'v' }, { "xml-id-seed", required_argument, 0, 'x' }, //
+        { "version", no_argument, 0, 'v' }, //
+        { "xml-id-seed", required_argument, 0, 'x' }, //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
         { 0, 0, 0, 0 }
