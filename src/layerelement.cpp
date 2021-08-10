@@ -1490,25 +1490,27 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
 
-    AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
+    const int shift
+        = AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
+    params->m_accumulatedShift += shift;
 
     return FUNCTOR_SIBLINGS;
 }
 
-void LayerElement::AdjustOverlappingLayers(
+int LayerElement::AdjustOverlappingLayers(
     Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
 {
     if (Is(NOTE) && GetParent()->Is(CHORD))
-        return;
+        return 0;
     else if (Is(STEM) && isUnison) {
         isUnison = false;
-        return;
+        return 0;
     }
 
     auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, areDotsAdjusted, false);
     if (Is(NOTE)) {
         isUnison = isInUnison;
-        if (isUnison) return;
+        if (isUnison) return 0;
     }
 
     if (Is({ DOTS, STEM })) {
@@ -1519,6 +1521,7 @@ void LayerElement::AdjustOverlappingLayers(
     else {
         SetDrawingXRel(GetDrawingXRel() + margin);
     }
+    return margin;
 }
 
 std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,

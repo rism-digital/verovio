@@ -14,7 +14,7 @@ extern "C" {
  ****************************************************************/
 
 void *vrvToolkit_constructor();
-void *vrvToolkit_constructorResourcePath(const char * resourcePath);
+void *vrvToolkit_constructorResourcePath(const char *resourcePath);
 
 void vrvToolkit_destructor(void *tkPtr);
 bool vrvToolkit_edit(void *tkPtr, const char *editorAction);
