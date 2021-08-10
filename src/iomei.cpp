@@ -3037,7 +3037,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
-    if (!xPathQuery.empty()) {
+    // Give priority to mdiv-all - maybe we could give a warning
+    if (!m_doc->GetOptions()->m_mdivAll.GetValue() && !xPathQuery.empty()) {
         pugi::xpath_node selection = body.select_node(xPathQuery.c_str());
         if (selection) {
             m_selectedMdiv = selection.node();
@@ -3070,7 +3071,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         return false;
     }
 
-    success = ReadMdivChildren(m_doc, body, false);
+    const bool allMdivVisible = m_doc->GetOptions()->m_mdivAll.GetValue();
+    success = ReadMdivChildren(m_doc, body, allMdivVisible);
 
     if (success) {
         m_doc->ExpandExpansions();
