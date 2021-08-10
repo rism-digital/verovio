@@ -245,7 +245,8 @@ private:
     /**
      * Shorten ledger lines which overlap with neighbors
      */
-    void AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension);
+    void AdjustLedgerLines(
+        ArrayOfLedgerLines &lines, ArrayOfLedgerLines &cueLines, double cueScaling, int extension, int minExtension);
 
 public:
     /**
