@@ -560,7 +560,7 @@ private:
     int m_pageMarginTop;
 
     /** Facsimile information */
-    Facsimile *m_facsimile = NULL;
+    Facsimile *m_facsimile;
 };
 
 } // namespace vrv

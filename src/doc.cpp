@@ -112,6 +112,8 @@ void Doc::Reset()
     m_isMensuralMusicOnly = false;
 
     // GetCurrentScoreDef()->Reset();
+    
+    m_facsimile = NULL;
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
