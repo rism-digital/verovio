@@ -2128,21 +2128,23 @@ public:
  * member 6: the flag indicating that the scoreDef restarts (draw brace and label)
  * member 7: the flag indicating is we already have a measure in the system
  * member 8: the doc
+ * member 9: the functor to be redirected from Score
  **/
 
 class ScoreDefSetCurrentParams : public FunctorParams {
 public:
-    ScoreDefSetCurrentParams(Doc *doc, ScoreDef *upcomingScoreDef)
+    ScoreDefSetCurrentParams(Doc *doc, Functor *functor)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
-        m_upcomingScoreDef = upcomingScoreDef;
+        m_upcomingScoreDef = NULL;
         m_previousMeasure = NULL;
         m_currentSystem = NULL;
         m_drawLabels = false;
         m_restart = false;
         m_hasMeasure = false;
         m_doc = doc;
+        m_functor = functor;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
@@ -2153,6 +2155,7 @@ public:
     bool m_restart;
     bool m_hasMeasure;
     Doc *m_doc;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------

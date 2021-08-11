@@ -47,9 +47,15 @@ public:
     ///@}
 
     /**
-     *
+     * Getter for the score/scoreDef
      */
     ScoreDef *GetScoreDef() { return &m_scoreDef; }
+
+    /**
+     * Helper looking at the parent Doc and set its scoreDef as current one.
+     * Called from Object::Process
+     */
+    void SetScoreDefAsCurrent();
 
     //----------//
     // Functors //
@@ -70,7 +76,7 @@ public:
 
 private:
     /**
-     *
+     * The score/scoreDef (first child of the score)
      */
     ScoreDef m_scoreDef;
 

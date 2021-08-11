@@ -111,8 +111,8 @@ void Doc::Reset()
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
 
-    // GetCurrentScoreDef()->Reset();
-    
+    m_currentScoreDef = NULL;
+
     m_facsimile = NULL;
 
     m_drawingSmuflFontSize = 0;
@@ -787,12 +787,13 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
         this->Process(&scoreDefUnsetCurrent, &scoreDefUnsetCurrentParams);
     }
 
-    ScoreDef upcomingScoreDef = *this->GetCurrentScoreDef();
-    ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &upcomingScoreDef);
     Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);
+    ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &scoreDefSetCurrent);
 
+    ScoreDef upcomingScoreDef = *this->GetCurrentScoreDef();
+    scoreDefSetCurrentParams.m_upcomingScoreDef = &upcomingScoreDef;
     // First process the current scoreDef in order to fill the staffDef with
-    // the appropriate drawing values
+    // the appropriate drawing values on the first Page::m_drawingScoreDef
     upcomingScoreDef.Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
 
     this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
@@ -1825,9 +1826,18 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
 ScoreDef *Doc::GetCurrentScoreDef()
 {
-    Score *score = vrv_cast<Score *>(this->FindDescendantByType(SCORE));
-    assert(score);
-    return score->GetScoreDef();
+    if (!m_currentScoreDef) {
+        Score *score = vrv_cast<Score *>(this->FindDescendantByType(SCORE));
+        assert(score);
+        m_currentScoreDef = score->GetScoreDef();
+    }
+    return m_currentScoreDef;
+}
+
+void Doc::SetCurrentScoreDef(ScoreDef *scoreDef)
+{
+    assert(scoreDef);
+    m_currentScoreDef = scoreDef;
 }
 
 //----------------------------------------------------------------------------

@@ -398,7 +398,16 @@ public:
     bool HasFacsimile() const { return m_facsimile != NULL; }
     ///@}
 
+    /**
+     * @name Setter and getter for the current Score/ScoreDef.
+     * If not set, then looks for the first Score in the Document and use that.
+     * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
+     * When processing backward, the ScoreDef is changed when reaching the corresponding PageElementEnd
+     */
+    ///@{
     ScoreDef *GetCurrentScoreDef();
+    void SetCurrentScoreDef(ScoreDef *scoreDef);
+    ///@}
 
     //----------//
     // Functors //
@@ -435,12 +444,6 @@ public:
      * A copy of the header tree stored as pugi::xml_document
      */
     pugi::xml_document m_back;
-
-    /**
-     * Holds the top scoreDef.
-     * In a standard MEI file, this is the <scoreDef> encoded before the first <section>.
-     */
-    // ScoreDef m_mdivScoreDef;
 
     /** The current page height */
     int m_drawingPageHeight;
@@ -485,6 +488,12 @@ private:
      * This could be saved somewhere as preferences (todo).
      */
     Options *m_options;
+
+    /**
+     * Holds a pointer to the current Score m_scoreDef.
+     * Set by Doc::GetCurrentScoreDef or explicitly through Doc::SetCurrentScoreDef
+     */
+    ScoreDef *m_currentScoreDef;
 
     /*
      * The following values are set in the Doc::SetDrawingPage.

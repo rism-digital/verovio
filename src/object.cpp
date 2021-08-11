@@ -37,6 +37,7 @@
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
+#include "score.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -805,6 +806,21 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
+    if (direction == FORWARD && this->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(this);
+        assert(score);
+        score->SetScoreDefAsCurrent();
+    }
+    else if (direction == BACKWARD && this->Is(PAGE_ELEMENT_END)) {
+        PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(this);
+        assert(elementEnd);
+        if (elementEnd->GetStart() && elementEnd->Is(SCORE)) {
+            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
+            assert(score);
+            score->SetScoreDefAsCurrent();
+        }
+    }
+
     if (!skipFirst) {
         functor->Call(this, functorParams);
     }
@@ -1492,10 +1508,15 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     ScoreDefSetCurrentParams *params = vrv_params_cast<ScoreDefSetCurrentParams *>(functorParams);
     assert(params);
 
-    assert(params->m_upcomingScoreDef);
+    if (this->Is({ DOC, MDIV, PAGES })) return FUNCTOR_CONTINUE;
 
     // starting a new score
     if (this->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(this);
+        assert(score);
+        *params->m_upcomingScoreDef = *score->GetScoreDef();
+        params->m_upcomingScoreDef->Process(params->m_functor, functorParams);
+
         params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
         params->m_drawLabels = true;
         params->m_currentScoreDef = NULL;
@@ -1507,10 +1528,17 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    assert(params->m_upcomingScoreDef);
+
     // starting a new page
     if (this->Is(PAGE)) {
         Page *page = vrv_cast<Page *>(this);
         assert(page);
+        // This will be reach before we reach the begining of a Score. This is why we need
+        // params->m_upcomingScoreDef to be set already in Doc::ScoreDefSetCurrentDoc
+        // This also mean that when a new Mdiv/Score will start on a new page, the page will also
+        // have as drawing scoreDef the one of the previous score. It will work because the system
+        // will have the right one but can have some side-effect if some score parameters are changed
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }

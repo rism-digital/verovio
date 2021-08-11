@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
@@ -75,6 +76,16 @@ bool Score::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+void Score::SetScoreDefAsCurrent()
+{
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    // The doc can be NULL when doing the castoff and the pages are no attached to the doc
+    // If such cases, it will not matter not to have the current scoreDef in the doc
+    if (doc) {
+        doc->SetCurrentScoreDef(this->GetScoreDef());
+    }
 }
 
 //----------------------------------------------------------------------------
