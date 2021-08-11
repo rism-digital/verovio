@@ -1030,6 +1030,11 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     MeterSig *meterSig = vrv_cast<MeterSig *>(element);
     assert(meterSig);
 
+    DrawMeterSig(dc, meterSig, staff, 0);
+}
+
+void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset)
+{
     if (meterSig->GetForm() == METERFORM_invis) return;
 
     const wchar_t enclosingFront = meterSig->GetEnclosingGlyph(true);
@@ -1038,35 +1043,34 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         LogWarning("Only drawing of enclosing parentheses is supported for metersig.");
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(meterSig, "", meterSig->GetUuid());
 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
-    int x = element->GetDrawingX();
+    int x = meterSig->GetDrawingX() + horizOffset;
 
     const bool diminEncl = (meterSig->HasSym() || meterSig->GetForm() == METERFORM_num);
     if (enclosingFront) {
-        const int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, diminEncl);
-        DrawSmuflCode(dc, x - xCorrEncl, y, enclosingFront, staff->m_drawingStaffSize, diminEncl);
+        DrawSmuflCode(dc, x, y, enclosingFront, staff->m_drawingStaffSize, diminEncl);
+        x += m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, diminEncl);
     }
 
-    int contentWidth = 0;
     if (meterSig->HasSym()) {
         const wchar_t code = meterSig->GetSymbolGlyph();
         DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
-        contentWidth = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false);
+        x += m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false);
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        contentWidth = DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
+        x += DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
-        contentWidth = DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+        x += DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
 
     if (enclosingBack) {
-        DrawSmuflCode(dc, x + contentWidth, y, enclosingBack, staff->m_drawingStaffSize, diminEncl);
+        DrawSmuflCode(dc, x, y, enclosingBack, staff->m_drawingStaffSize, diminEncl);
     }
 
-    dc->EndGraphic(element, this);
+    dc->EndGraphic(meterSig, this);
 }
 
 void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

@@ -1051,25 +1051,21 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
         assert(meterSig);
 
-        dc->StartGraphic(meterSig, "", meterSig->GetUuid());
-        int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
-        int x = meterSig->GetDrawingX() + offset;
-
         if (meterSig->HasCount()) {
-            DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+            DrawMeterSig(dc, meterSig, staff, offset);
         }
 
-        dc->EndGraphic(meterSig, this);
-        int margin = unit / 2;
+        const int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
+        const int x = meterSig->GetDrawingX() + offset;
         const int width = meterSig->GetContentRight() - meterSig->GetContentLeft();
         if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))) {
             // draw plus sign here
-            const int plusX = x + width;
+            const int plusX = x + width + unit / 2;
             DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
-            offset += width + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
+            offset += width + unit + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
         }
         else {
-            offset += width + margin * 2;
+            offset += width + unit;
         }
     }
 
