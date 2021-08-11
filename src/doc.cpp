@@ -1029,15 +1029,9 @@ void Doc::CastOffEncodingDoc()
 
 void Doc::ConvertToPageBasedDoc()
 {
-    // Score *score = this->GetScore();
-    // assert(score);
-
     Pages *pages = new Pages();
-    // pages->ConvertFrom(score);
     Page *page = new Page();
     pages->AddChild(page);
-    // System *system = new System();
-    // page->AddChild(system);
 
     ConvertToPageBasedParams convertToPageBasedParams(page);
     Functor convertToPageBased(&Object::ConvertToPageBased);
@@ -1047,11 +1041,6 @@ void Doc::ConvertToPageBasedDoc()
     this->ClearRelinquishedChildren();
     assert(this->GetChildCount() == 0);
 
-    // Mdiv *mdiv = vrv_cast<Mdiv *>(score->GetParent());
-    // assert(mdiv);
-
-    // mdiv->ReplaceChild(score, pages);
-    // delete score;
     this->AddChild(pages);
 
     this->ResetDrawingPage();
@@ -1090,30 +1079,29 @@ void Doc::ConvertToCastOffMensuralDoc()
     // The means no content? Checking just in case
     if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
 
-    Page *contentPage = this->SetDrawingPage(0);
-    assert(contentPage);
+    Page *unCastOffPage = this->SetDrawingPage(0);
+    assert(unCastOffPage);
+    unCastOffPage->LayOutHorizontally();
 
-    contentPage->LayOutHorizontally();
+    // Detach the contentPage
+    pages->DetachChild(0);
+    assert(unCastOffPage && !unCastOffPage->GetParent());
 
-    Page *page = new Page();
-    pages->AddChild(page);
-    System *system = new System();
-    page->AddChild(system);
+    Page *castOffFirstPage = new Page();
+    pages->AddChild(castOffFirstPage);
 
     ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
-        this, system, &prepareProcessingListsParams.m_layerTree);
+        this, castOffFirstPage, &prepareProcessingListsParams.m_layerTree);
+
     // Store the list of staff N for detecting barLines that are on all systems
     for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
         convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
     }
 
     Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
-    contentPage->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
-
-    // Detach the contentPage
-    pages->DetachChild(0);
-    assert(contentPage && !contentPage->GetParent());
-    delete contentPage;
+    unCastOffPage->Process(
+        &convertToCastOffMensural, &convertToCastOffMensuralParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
+    delete unCastOffPage;
 
     this->PrepareDrawing();
 
@@ -1142,6 +1130,11 @@ void Doc::ConvertToUnCastOffMensuralDoc()
         this->UnCastOffDoc();
     }
 
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+    System *contentSystem = vrv_cast<System *>(contentPage->FindDescendantByType(SYSTEM));
+    assert(contentSystem);
+
     // We need to populate processing lists for processing the document by Layer
     PrepareProcessingListsParams prepareProcessingListsParams;
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
@@ -1165,16 +1158,11 @@ void Doc::ConvertToUnCastOffMensuralDoc()
             convertToUnCastOffMensuralParams.m_contentLayer = NULL;
 
             Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
-            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
+            contentSystem->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
 
             convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
         }
     }
-
-    Page *contentPage = this->SetDrawingPage(0);
-    assert(contentPage);
-    System *contentSystem = vrv_cast<System *>(contentPage->FindDescendantByType(SYSTEM));
-    assert(contentSystem);
 
     // Detach the contentPage
     for (auto &measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
