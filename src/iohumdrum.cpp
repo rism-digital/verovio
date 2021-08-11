@@ -5454,24 +5454,30 @@ void HumdrumInput::setMensurationSymbol(
         setLocationId(vrvmensur, mensurtok);
     }
     if (metersig == "*met(C)" || metersig == "C") {
-        vrvmensur->SetTempus(TEMPUS_2);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         maximodus = 2;
         modus = 2;
         tempus = 2;
         prolatio = 2;
     }
     else if (metersig == "*met(C3)" || metersig == "C3") {
-        vrvmensur->SetTempus(TEMPUS_2);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         maximodus = 2;
         modus = 2;
         tempus = 3;
         prolatio = 2;
     }
     else if (metersig == "*met(C|)" || metersig == "C|") {
-        vrvmensur->SetTempus(TEMPUS_2);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         vrvmensur->SetSlash(1);
         maximodus = 2;
         modus = 2;
@@ -5479,24 +5485,30 @@ void HumdrumInput::setMensurationSymbol(
         prolatio = 2;
     }
     else if (metersig == "*met(O)" || metersig == "O") {
-        vrvmensur->SetTempus(TEMPUS_3);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_3);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         maximodus = 2;
         modus = 2;
         tempus = 3;
         prolatio = 2;
     }
     else if (metersig == "*met(O3)" || metersig == "O3") {
-        vrvmensur->SetTempus(TEMPUS_3);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_3);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         maximodus = 3;
         modus = 3;
         tempus = 3;
         prolatio = 2;
     }
     else if (metersig == "*met(O|)" || metersig == "O|") {
-        vrvmensur->SetTempus(TEMPUS_3);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_3);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         vrvmensur->SetSlash(1);
         maximodus = 2;
         modus = 2;
@@ -5504,8 +5516,10 @@ void HumdrumInput::setMensurationSymbol(
         prolatio = 2;
     }
     else if (metersig == "*met(O|3)" || metersig == "O|3") {
-        vrvmensur->SetTempus(TEMPUS_3);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_3);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         vrvmensur->SetSlash(1);
         maximodus = 3;
         modus = 3;
@@ -5513,16 +5527,20 @@ void HumdrumInput::setMensurationSymbol(
         prolatio = 2;
     }
     else if (metersig == "*met(O.)" || metersig == "O.") {
-        vrvmensur->SetTempus(TEMPUS_3);
-        vrvmensur->SetProlatio(PROLATIO_3);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_3);
+            vrvmensur->SetProlatio(PROLATIO_3);
+        }
         maximodus = 2;
         modus = 2;
         tempus = 3;
         prolatio = 3;
     }
     else if (metersig == "*met(O.|)" || metersig == "O.|") {
-        vrvmensur->SetTempus(TEMPUS_3);
-        vrvmensur->SetProlatio(PROLATIO_3);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_3);
+            vrvmensur->SetProlatio(PROLATIO_3);
+        }
         vrvmensur->SetSlash(1);
         maximodus = 2;
         modus = 2;
@@ -5530,16 +5548,20 @@ void HumdrumInput::setMensurationSymbol(
         prolatio = 3;
     }
     else if (metersig == "*met(C.)" || metersig == "C.") {
-        vrvmensur->SetTempus(TEMPUS_2);
-        vrvmensur->SetProlatio(PROLATIO_3);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_3);
+        }
         maximodus = 2;
         modus = 2;
         tempus = 2;
         prolatio = 3;
     }
     else if (metersig == "*met(C.|)" || metersig == "C.|") {
-        vrvmensur->SetTempus(TEMPUS_2);
-        vrvmensur->SetProlatio(PROLATIO_3);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_3);
+        }
         vrvmensur->SetSlash(1);
         maximodus = 2;
         modus = 2;
@@ -5547,8 +5569,10 @@ void HumdrumInput::setMensurationSymbol(
         prolatio = 3;
     }
     else if (metersig == "*met(C|3/2)" || metersig == "C|3/2") {
-        vrvmensur->SetTempus(TEMPUS_2);
-        vrvmensur->SetProlatio(PROLATIO_2);
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
         vrvmensur->SetNum(3);
         vrvmensur->SetNumbase(2);
         vrvmensur->SetSlash(1);
@@ -5586,6 +5610,10 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (hre.search(metersig, "(\\d+).*\\)")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
+    }
+
+    if (!m_mens) {
+        return;
     }
 
     // Set explicit rhymic level splits:
@@ -15488,7 +15516,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     bool setAllKeySig = false;
     bool setAllTimeSig = false;
 
-    // First insert changes the affect all staves first.
+    // First insert changes that affect all staves first.
     if (hasKeySig && allSameKeySig) {
         // eventually allow decoupling of keysig and key.
         setKeySig(-1, scoreDef, *((string *)keysigtok[0]), keysigtok[0], keytok[0], true);
@@ -15498,6 +15526,9 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         // Disable system-level time signatures for now.
         // setTimeSig(scoreDef, timesigtok[0], metersigtok[0], -1);
         // setAllTimeSig = true;
+    }
+    if (hasMeterSig && allSameMeterSig) {
+        setTimeSig(scoreDef, timesigtok[0], metersigtok[0], -1);
     }
 
     // Need to add individual staffDefs for changes that do not affect all staves.
@@ -15512,7 +15543,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             }
         }
     }
-    if (!setAllTimeSig) {
+    if ((!setAllTimeSig) && (!allSameMeterSig)) {
         for (int i = 0; i < (int)timesigtok.size(); ++i) {
             if (timesigtok[i] != NULL) {
                 need = true;
