@@ -812,7 +812,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
         // Move it up below the last system
         if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
             if (GetChildCount()) {
-                System *last = dynamic_cast<System *>(GetChildren()->back());
+                System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
                 assert(last);
                 footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight());
             }
