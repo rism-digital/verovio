@@ -1031,6 +1031,8 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
+    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
 
     // Skip bottom aligner and first staff
     if (!m_staff || SystemAligner::SpacingType::System == m_spacingType) {
