@@ -342,6 +342,25 @@ void System::AddToDrawingListIfNeccessary(Object *object)
     }
 }
 
+bool System::IsFirstInPage()
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst(SYSTEM) == this);
+}
+
+bool System::IsLastInPage()
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast(SYSTEM) == this);
+}
+
+bool System::IsFirstOfMdiv()
+{
+    assert(this->GetParent());
+    Object *nextSibling = this->GetParent()->GetPrevious(this);
+    return (nextSibling && nextSibling->IsPageElement());
+}
+
 bool System::IsLastOfMdiv()
 {
     assert(this->GetParent());
@@ -672,7 +691,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     assert(params);
     assert(m_systemAligner.GetBottomAlignment());
 
-    int systemMargin = this->GetIdx() ? params->m_systemMargin : 0;
+    int systemMargin = this->IsFirstInPage() ? 0 : params->m_systemMargin;
     if (systemMargin) {
         const int margin
             = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
@@ -684,7 +703,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel();
 
     params->m_justificationSum += m_systemAligner.GetJustificationSum(params->m_doc);
-    if (!this->GetIdx()) {
+    if (this->IsFirstInPage()) {
         // remove extra system justification factor to get exactly (systemsCount-1)*justificationSystem
         params->m_justificationSum -= params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     }
@@ -734,7 +753,7 @@ int System::JustifyY(FunctorParams *functorParams)
     const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
 
-    if (this->GetIdx()) {
+    if (!this->IsFirstInPage()) {
         params->m_cumulatedShift += shift;
     }
 

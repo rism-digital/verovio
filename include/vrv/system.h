@@ -134,9 +134,14 @@ public:
     void AddToDrawingListIfNeccessary(Object *object);
 
     /**
-     * Check if the system is the last of an mdiv by looking at the next sibling
+     * @name Check if the system is the first or last in page or of an mdiv by looking at the next sibling
      */
+    ///@{
+    bool IsFirstInPage();
+    bool IsLastInPage();
+    bool IsFirstOfMdiv();
     bool IsLastOfMdiv();
+    ///@}
 
     //----------//
     // Functors //
