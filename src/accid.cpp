@@ -123,7 +123,7 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
         assert(accid);
         if (this->GetSymbolStr() == accid->GetSymbolStr()) {
             // There is the same accidental, so we leave it a the same place
-            // This works with multiple layers but can create problems with chords and multiple layers
+            // This should also work for the chords on multiple layers by setting unison accidental
             accid->SetDrawingUnisonAccid(this);
             return false;
         }
