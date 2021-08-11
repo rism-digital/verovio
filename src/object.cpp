@@ -153,9 +153,11 @@ Object &Object::operator=(const Object &object)
             for (i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
                 Object *clone = current->Clone();
-                clone->SetParent(this);
-                clone->CloneReset();
-                m_children.push_back(clone);
+                if (clone) {
+                    clone->SetParent(this);
+                    clone->CloneReset();
+                    m_children.push_back(clone);
+                }
             }
         }
     }
