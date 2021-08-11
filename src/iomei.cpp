@@ -2532,7 +2532,6 @@ std::string MEIOutput::DocTypeToStr(DocType type)
 MEIInput::MEIInput(Doc *doc) : Input(doc)
 {
     m_hasScoreDef = false;
-    m_useScoreDefForDoc = false;
     m_readingScoreBased = false;
     m_version = MEI_UNDEFINED;
 }
@@ -3151,7 +3150,6 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         // We make the mdiv visible if already set or if matching the desired selection
         bool makeVisible = (isVisible || (m_selectedMdiv == current));
-        m_useScoreDefForDoc = makeVisible;
         if (!success) break;
         if (std::string(current.name()) == "mdiv") {
             success = ReadMdiv(parent, current, makeVisible);
@@ -3751,11 +3749,15 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 
     ScoreDef *vrvScoreDef;
     // We have not reached the first scoreDef and we have to use if for the doc
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
-        vrvScoreDef = &m_doc->m_mdivScoreDef;
+    if (parent->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(parent);
+        assert(score);
+        vrvScoreDef = score->GetScoreDef();
+        m_hasScoreDef = true;
     }
     else {
         vrvScoreDef = new ScoreDef();
+        parent->AddChild(vrvScoreDef);
     }
     ReadScoreDefElement(scoreDef, vrvScoreDef);
 
@@ -3769,12 +3771,6 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     vrvScoreDef->ReadOptimization(scoreDef);
     vrvScoreDef->ReadTimeBase(scoreDef);
 
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
-        m_hasScoreDef = true;
-    }
-    else {
-        parent->AddChild(vrvScoreDef);
-    }
     ReadUnsupportedAttr(scoreDef, vrvScoreDef);
     return ReadScoreDefChildren(vrvScoreDef, scoreDef);
 }
@@ -6099,7 +6095,7 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
 bool MEIInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
+    if (!m_hasScoreDef) {
         LogError("<app> before any <scoreDef> is not supported");
         return false;
     }
@@ -6168,7 +6164,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
 
 bool MEIInput::ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
+    if (!m_hasScoreDef) {
         LogError("<choice> before any <scoreDef> is not supported");
         return false;
     }

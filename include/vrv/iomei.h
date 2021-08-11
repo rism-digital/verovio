@@ -759,7 +759,7 @@ private:
     bool m_readingScoreBased;
 
     /**
-     * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.
+     * This is used to specify if a scoreDef has been read or not.
      */
     bool m_hasScoreDef;
 
@@ -773,12 +773,6 @@ private:
      * If not specified by --mdiv-x-path query, then it is the first <mdiv> in the body
      */
     pugi::xml_node m_selectedMdiv;
-
-    /**
-     * A flag indicating if the first scoreDef has to be used as Doc scoreDef.
-     * This is not the case when selecting a mDiv that is not the first one with a score in the tree.
-     */
-    bool m_useScoreDefForDoc;
 
     /**
      * The comment to be attached to the next Object
