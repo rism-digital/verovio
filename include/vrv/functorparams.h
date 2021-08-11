@@ -1204,26 +1204,28 @@ public:
 
 /**
  * member 0: a pointer the document we are adding pages to
- * member 1: a vector of all the staff @n for finding spliting bar lines
- * member 2: a pointer to the content Layer from which we are copying the elements
- * member 3: a pointer to the target destination System
- * member 4: a pointer to a sub-system (e.g., section) to add measure segments
+ * member 1: a pointer the page we are adding systems to
+ * member 2: a vector of all the staff @n for finding spliting bar lines
+ * member 3: a pointer to the content Layer from which we are copying the elements
  * member 4: a pointer to the target destination System
- * member 5: a pointer to the target destination Measure
- * member 6: a pointer to the target destination Staff
- * member 7: a pointer to the target destination Layer
- * member 8: a counter for segments in the sub-system (section)
- * member 9  a counter for the total number of segments (previous sections)
- * member 10: a IntTree for precessing by Layer
+ * member 5: a pointer to a sub-system (e.g., section) to add measure segments
+ * member 6: a pointer to the target destination System
+ * member 7: a pointer to the target destination Measure
+ * member 8: a pointer to the target destination Staff
+ * member 9: a pointer to the target destination Layer
+ * member 10: a counter for segments in the sub-system (section)
+ * member 11  a counter for the total number of segments (previous sections)
+ * member 12: a IntTree for precessing by Layer
  **/
 
 class ConvertToCastOffMensuralParams : public FunctorParams {
 public:
-    ConvertToCastOffMensuralParams(Doc *doc, System *targetSystem, IntTree *layerTree)
+    ConvertToCastOffMensuralParams(Doc *doc, Page *page, IntTree *layerTree)
     {
         m_doc = doc;
+        m_page = page;
         m_contentLayer = NULL;
-        m_targetSystem = targetSystem;
+        m_targetSystem = NULL;
         m_targetSubSystem = NULL;
         m_targetMeasure = NULL;
         m_targetStaff = NULL;
@@ -1233,6 +1235,7 @@ public:
         m_layerTree = layerTree;
     }
     Doc *m_doc;
+    Page *m_page;
     std::vector<int> m_staffNs;
     Layer *m_contentLayer;
     System *m_targetSystem;

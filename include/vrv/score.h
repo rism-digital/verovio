@@ -74,6 +74,11 @@ public:
      */
     virtual int UnCastOff(FunctorParams *functorParams);
 
+    /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
 private:
     /**
      * The score/scoreDef (first child of the score)
