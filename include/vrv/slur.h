@@ -13,6 +13,9 @@
 
 namespace vrv {
 
+class Doc;
+class Staff;
+
 //----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
@@ -70,6 +73,9 @@ public:
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
+
+    std::tuple<int, int, int, int> AdjustCoordinates(Doc *doc, Staff *staff, std::tuple<int, int, int, int> coordinates,
+        int spanningType, curvature_CURVEDIR drawingCurveDir);
 
     //----------//
     // Functors //
