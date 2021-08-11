@@ -1909,15 +1909,15 @@ public:
 
 class PrepareRptParams : public FunctorParams {
 public:
-    PrepareRptParams(ScoreDef *currentScoreDef)
+    PrepareRptParams(Doc *doc)
     {
         m_currentMRpt = NULL;
         m_multiNumber = BOOLEAN_NONE;
-        m_currentScoreDef = currentScoreDef;
+        m_doc = doc;
     }
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
-    ScoreDef *m_currentScoreDef;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

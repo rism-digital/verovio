@@ -352,8 +352,8 @@ void View::DrawStaffGrp(
     // draw the system start bar line
     if (topStaffGrp
         && ((((firstDef != lastDef) || staffGrp->GetFirst(GRPSYM))
-                && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
-            || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+                && (m_doc->GetCurrentScoreDef()->GetSystemLeftline() != BOOLEAN_false))
+            || (m_doc->GetCurrentScoreDef()->GetSystemLeftline() == BOOLEAN_true))) {
         // int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
         const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
         DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);

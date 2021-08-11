@@ -47,6 +47,8 @@ void Score::Reset()
     Object::Reset();
     ResetLabelled();
     ResetNNumberLike();
+
+    m_scoreDef.Reset();
 }
 
 bool Score::IsSupportedChild(Object *child)

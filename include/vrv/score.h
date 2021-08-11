@@ -11,6 +11,7 @@
 #include "atts_shared.h"
 #include "pageboundary.h"
 #include "pageelement.h"
+#include "scoredef.h"
 
 namespace vrv {
 
@@ -45,6 +46,11 @@ public:
     virtual bool IsSupportedChild(Object *object);
     ///@}
 
+    /**
+     *
+     */
+    ScoreDef *GetScoreDef() { return &m_scoreDef; }
+
     //----------//
     // Functors //
     //----------//
@@ -63,7 +69,11 @@ public:
     virtual int UnCastOff(FunctorParams *functorParams);
 
 private:
-    //
+    /**
+     *
+     */
+    ScoreDef m_scoreDef;
+
 public:
     //
 private:

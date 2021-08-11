@@ -88,10 +88,10 @@ RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return doc->m_mdivScoreDef.GetPgHead();
+        return doc->GetCurrentScoreDef()->GetPgHead();
     }
     else {
-        return doc->m_mdivScoreDef.GetPgHead2();
+        return doc->GetCurrentScoreDef()->GetPgHead2();
     }
 }
 
@@ -107,10 +107,10 @@ RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return doc->m_mdivScoreDef.GetPgFoot();
+        return doc->GetCurrentScoreDef()->GetPgFoot();
     }
     else {
-        return doc->m_mdivScoreDef.GetPgFoot2();
+        return doc->GetCurrentScoreDef()->GetPgFoot2();
     }
 }
 
@@ -318,18 +318,20 @@ void Page::LayOutHorizontally()
     // For the first iteration align elements without taking dots into consideration
     Functor adjustLayers(&Object::AdjustLayers);
     Functor adjustLayersEnd(&Object::AdjustLayersEnd);
-    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, &adjustLayersEnd, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustLayersParams adjustLayersParams(
+        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     this->Process(&adjustLayers, &adjustLayersParams, &adjustLayersEnd);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
     Functor adjustDots(&Object::AdjustDots);
     Functor adjustDotsEnd(&Object::AdjustDotsEnd);
-    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
 
     // adjust Layers again, this time including dots positioning
-    AdjustLayersParams newAdjustLayersParams(doc, &adjustLayers, &adjustLayersEnd, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustLayersParams newAdjustLayersParams(
+        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     newAdjustLayersParams.m_ignoreDots = false;
     this->Process(&adjustLayers, &newAdjustLayersParams, &adjustLayersEnd);
 
@@ -342,7 +344,7 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustXPos(&Object::AdjustXPos);
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     adjustXPosParams.m_excludes.push_back(TABDURSYM);
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
@@ -359,7 +361,7 @@ void Page::LayOutHorizontally()
     Functor adjustGraceXPos(&Object::AdjustGraceXPos);
     Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
     AdjustGraceXPosParams adjustGraceXPosParams(
-        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
+        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos

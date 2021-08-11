@@ -218,7 +218,7 @@ bool MEIOutput::Export()
                 m_currentNode = m_currentNode.append_child("section");
                 m_nodeStack.push_back(m_currentNode);
                 // First save the main scoreDef
-                m_doc->m_mdivScoreDef.Save(this);
+                m_doc->GetCurrentScoreDef()->Save(this);
             }
             else {
                 m_currentNode = meiDoc.append_child("pages");
@@ -802,11 +802,11 @@ bool MEIOutput::WriteObject(Object *object)
 
     if (object->Is(PAGES) && (dynamic_cast<Pages *>(object) == m_doc->GetPages())) {
         // First save the main scoreDef
-        // m_doc->m_mdivScoreDef.Save(this);
+        // m_doc->GetCurrentScoreDef()->Save(this);
     }
     else if (object->Is(SCORE) && (dynamic_cast<Score *>(object) == m_doc->GetScore())) {
         // First save the main scoreDef
-        m_doc->m_mdivScoreDef.Save(this);
+        m_doc->GetCurrentScoreDef()->Save(this);
     }
 
     WriteUnsupportedAttr(m_currentNode, object);

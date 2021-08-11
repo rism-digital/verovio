@@ -398,6 +398,8 @@ public:
     bool HasFacsimile() const { return m_facsimile != NULL; }
     ///@}
 
+    ScoreDef *GetCurrentScoreDef();
+
     //----------//
     // Functors //
     //----------//
@@ -438,7 +440,7 @@ public:
      * Holds the top scoreDef.
      * In a standard MEI file, this is the <scoreDef> encoded before the first <section>.
      */
-    ScoreDef m_mdivScoreDef;
+    // ScoreDef m_mdivScoreDef;
 
     /** The current page height */
     int m_drawingPageHeight;

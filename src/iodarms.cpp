@@ -521,7 +521,7 @@ bool DarmsInput::Import(const std::string &data_str)
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffGrp->AddChild(staffDef);
-    m_doc->m_mdivScoreDef.AddChild(staffGrp);
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 
