@@ -806,18 +806,23 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
+    // When we are starting a new Score, we need to update to Doc current ScoreDef
+    // Some functor overwrite Functor::OnScoreStart, which has to be call here too
     if (direction == FORWARD && this->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(this);
         assert(score);
-        score->SetScoreDefAsCurrent();
+        score->SetAsCurrent();
+        if (functorParams) functorParams->OnScoreStart();
     }
+    // We need to do the same in backward direction through the PageElementEnd::m_start
     else if (direction == BACKWARD && this->Is(PAGE_ELEMENT_END)) {
         PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(this);
         assert(elementEnd);
-        if (elementEnd->GetStart() && elementEnd->Is(SCORE)) {
+        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
             Score *score = vrv_cast<Score *>(elementEnd->GetStart());
             assert(score);
-            score->SetScoreDefAsCurrent();
+            score->SetAsCurrent();
+            if (functorParams) functorParams->OnScoreStart();
         }
     }
 
@@ -1510,14 +1515,31 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
 
     if (this->Is({ DOC, MDIV, PAGES })) return FUNCTOR_CONTINUE;
 
+    // starting a new page
+    if (this->Is(PAGE)) {
+        Page *page = vrv_cast<Page *>(this);
+        assert(page);
+        // This will be reach before we reach the begining of a first Score.
+        // However, page->m_score has already been set by Page::ScoreDefSetCurrentPage
+        // This must be the first page or a new score is starting on this page
+        assert(page->m_score);
+        if (!params->m_currentScore || (params->m_currentScore != page->m_score)) {
+            params->m_upcomingScoreDef = *page->m_score->GetScoreDef();
+            params->m_upcomingScoreDef.Process(params->m_functor, functorParams);
+        }
+        page->m_drawingScoreDef = params->m_upcomingScoreDef;
+        return FUNCTOR_CONTINUE;
+    }
+
     // starting a new score
     if (this->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(this);
         assert(score);
-        *params->m_upcomingScoreDef = *score->GetScoreDef();
-        params->m_upcomingScoreDef->Process(params->m_functor, functorParams);
-
-        params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
+        params->m_currentScore = score;
+        params->m_upcomingScoreDef = *score->GetScoreDef();
+        params->m_upcomingScoreDef.Process(params->m_functor, functorParams);
+        // Trigger the redraw of everything
+        params->m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
         params->m_drawLabels = true;
         params->m_currentScoreDef = NULL;
         params->m_currentStaffDef = NULL;
@@ -1525,21 +1547,6 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         params->m_currentSystem = NULL;
         params->m_restart = false;
         params->m_hasMeasure = false;
-        return FUNCTOR_CONTINUE;
-    }
-
-    assert(params->m_upcomingScoreDef);
-
-    // starting a new page
-    if (this->Is(PAGE)) {
-        Page *page = vrv_cast<Page *>(this);
-        assert(page);
-        // This will be reach before we reach the begining of a Score. This is why we need
-        // params->m_upcomingScoreDef to be set already in Doc::ScoreDefSetCurrentDoc
-        // This also mean that when a new Mdiv/Score will start on a new page, the page will also
-        // have as drawing scoreDef the one of the previous score. It will work because the system
-        // will have the right one but can have some side-effect if some score parameters are changed
-        page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1557,7 +1564,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(MEASURE)) {
         // If we have a restart scoreDef before, for redrawing of everything on the measure
         if (params->m_restart) {
-            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
+            params->m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
         }
 
         Measure *measure = vrv_cast<Measure *>(this);
@@ -1570,33 +1577,33 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
             // The cautionary scoreDef for restart is already done when hitting the scoreDef
-            if (params->m_upcomingScoreDef->m_setAsDrawing && params->m_previousMeasure && !params->m_restart) {
-                ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
+            if (params->m_upcomingScoreDef.m_setAsDrawing && params->m_previousMeasure && !params->m_restart) {
+                ScoreDef cautionaryScoreDef = params->m_upcomingScoreDef;
                 SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
                 Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
                 params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
             }
             // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-            params->m_upcomingScoreDef->SetRedrawFlags(
+            params->m_upcomingScoreDef.SetRedrawFlags(
                 StaffDefRedrawFlags::REDRAW_CLEF | StaffDefRedrawFlags::REDRAW_KEYSIG);
             // Set it to the current system (used e.g. for endings)
-            params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
+            params->m_currentSystem->SetDrawingScoreDef(&params->m_upcomingScoreDef);
             params->m_currentSystem->GetDrawingScoreDef()->SetDrawLabels(params->m_drawLabels);
             params->m_currentSystem = NULL;
             params->m_drawLabels = false;
         }
-        if (params->m_upcomingScoreDef->m_setAsDrawing) {
-            measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
+        if (params->m_upcomingScoreDef.m_setAsDrawing) {
+            measure->SetDrawingScoreDef(&params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
-            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::FORCE_REDRAW);
-            params->m_upcomingScoreDef->m_setAsDrawing = false;
+            params->m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::FORCE_REDRAW);
+            params->m_upcomingScoreDef.m_setAsDrawing = false;
         }
         params->m_drawLabels = false;
 
         // set other flags based on score def change
-        if (params->m_upcomingScoreDef->m_insertScoreDef) {
+        if (params->m_upcomingScoreDef.m_insertScoreDef) {
             drawingFlags |= Measure::BarlineDrawingFlags::SCORE_DEF_INSERT;
-            params->m_upcomingScoreDef->m_insertScoreDef = false;
+            params->m_upcomingScoreDef.m_insertScoreDef = false;
         }
 
         // check if we need to draw barlines for current/previous measures (in cases when all staves are invisible in
@@ -1632,8 +1639,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
             || scoreDef->HasMensurInfo(UNLIMITED_DEPTH) || scoreDef->HasMeterSigGrpInfo(UNLIMITED_DEPTH)
             || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
-            params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
-            params->m_upcomingScoreDef->m_insertScoreDef = true;
+            params->m_upcomingScoreDef.ReplaceDrawingValues(scoreDef);
+            params->m_upcomingScoreDef.m_insertScoreDef = true;
         }
         if (scoreDef->IsSectionRestart()) {
             // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
@@ -1645,7 +1652,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             // If we have a previous measure, we need to set the cautionary scoreDef indenpendently from the
             // presence of a system break
             if (params->m_previousMeasure) {
-                ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
+                ScoreDef cautionaryScoreDef = params->m_upcomingScoreDef;
                 SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
                 Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
                 params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
@@ -1659,7 +1666,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(staffGrp);
         // For now replace labels only if we have a section@restart
         if (params->m_restart) {
-            params->m_upcomingScoreDef->ReplaceDrawingLabels(staffGrp);
+            params->m_upcomingScoreDef.ReplaceDrawingLabels(staffGrp);
         }
     }
 
@@ -1667,7 +1674,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(STAFFDEF)) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(this);
         assert(staffDef);
-        params->m_upcomingScoreDef->ReplaceDrawingValues(staffDef);
+        params->m_upcomingScoreDef.ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
@@ -1714,10 +1721,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             return FUNCTOR_CONTINUE;
         }
         assert(params->m_currentStaffDef);
-        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
         upcomingStaffDef->SetCurrentClef(clef);
-        params->m_upcomingScoreDef->m_setAsDrawing = true;
+        params->m_upcomingScoreDef.m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1729,10 +1736,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             return FUNCTOR_CONTINUE;
         }
         assert(params->m_currentStaffDef);
-        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
         upcomingStaffDef->SetCurrentKeySig(keySig);
-        params->m_upcomingScoreDef->m_setAsDrawing = true;
+        params->m_upcomingScoreDef.m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 

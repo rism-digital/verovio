@@ -405,8 +405,9 @@ public:
      * When processing backward, the ScoreDef is changed when reaching the corresponding PageElementEnd
      */
     ///@{
+    Score *GetCurrentScore();
     ScoreDef *GetCurrentScoreDef();
-    void SetCurrentScoreDef(ScoreDef *scoreDef);
+    void SetCurrentScore(Score *score);
     ///@}
 
     //----------//
@@ -490,10 +491,13 @@ private:
     Options *m_options;
 
     /**
-     * Holds a pointer to the current Score m_scoreDef.
+     * @name Holds a pointer to the current score/scoreDef.
      * Set by Doc::GetCurrentScoreDef or explicitly through Doc::SetCurrentScoreDef
      */
+    ///@{
+    Score *m_currentScore;
     ScoreDef *m_currentScoreDef;
+    ///@}
 
     /*
      * The following values are set in the Doc::SetDrawingPage.

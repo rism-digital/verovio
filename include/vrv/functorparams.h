@@ -10,6 +10,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "vrvdef.h"
 
 namespace smf {
@@ -73,6 +74,8 @@ class FunctorParams {
 public:
     FunctorParams() {}
     virtual ~FunctorParams() {}
+    // Can be overwritten when some parameters needs to be change for a new Score
+    virtual void OnScoreStart() {}
 };
 
 //----------------------------------------------------------------------------
@@ -243,13 +246,14 @@ public:
 
 class AdjustDotsParams : public FunctorParams {
 public:
-    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
-        m_staffNs = staffNs;
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
+
     std::vector<int> m_staffNs;
     std::vector<LayerElement *> m_elements;
     std::vector<LayerElement *> m_dots;
@@ -282,18 +286,18 @@ public:
 
 class AdjustGraceXPosParams : public FunctorParams {
 public:
-    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_graceMaxPos = 0;
         m_graceUpcomingMaxPos = -VRV_UNSET;
         m_graceCumulatedXShift = 0;
-        m_staffNs = staffNs;
         m_isGraceAlignment = false;
         m_rightDefaultAlignment = NULL;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
 
     int m_graceMaxPos;
     int m_graceUpcomingMaxPos;
@@ -437,17 +441,18 @@ public:
 
 class AdjustLayersParams : public FunctorParams {
 public:
-    AdjustLayersParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    AdjustLayersParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_currentLayerN = VRV_UNSET;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
-        m_staffNs = staffNs;
         m_unison = false;
         m_ignoreDots = true;
         m_accumulatedShift = 0;
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
+
     std::vector<int> m_staffNs;
     int m_currentLayerN;
     std::vector<LayerElement *> m_previous;
@@ -667,13 +672,12 @@ public:
 
 class AdjustXPosParams : public FunctorParams {
 public:
-    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_minPos = 0;
         m_upcomingMinPos = VRV_UNSET;
         m_cumulatedXShift = 0;
         m_staffN = 0;
-        m_staffNs = staffNs;
         m_staffSize = 100;
         m_doc = doc;
         m_functor = functor;
@@ -682,6 +686,8 @@ public:
         m_previousAlignment.Reset();
         m_measureTieEndpoints.clear();
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
+
     int m_minPos;
     int m_upcomingMinPos;
     int m_cumulatedXShift;
@@ -2122,25 +2128,27 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the current scoreDef
- * member 1: the current staffDef
- * member 2: the upcoming scoreDef
- * member 3: the previous measure (for setting cautionary scoreDef)
- * member 4: the current system (for setting the system scoreDef)
- * member 5: the flag indicating whereas full labels have to be drawn
- * member 6: the flag indicating that the scoreDef restarts (draw brace and label)
- * member 7: the flag indicating is we already have a measure in the system
- * member 8: the doc
- * member 9: the functor to be redirected from Score
+ * member 0: the current score
+ * member 1: the current scoreDef
+ * member 2: the current staffDef
+ * member 3: the upcoming scoreDef
+ * member 4: the previous measure (for setting cautionary scoreDef)
+ * member 5: the current system (for setting the system scoreDef)
+ * member 6: the flag indicating whereas full labels have to be drawn
+ * member 7: the flag indicating that the scoreDef restarts (draw brace and label)
+ * member 8: the flag indicating is we already have a measure in the system
+ * member 9: the doc
+ * member 10: the functor to be redirected from Score
  **/
 
 class ScoreDefSetCurrentParams : public FunctorParams {
 public:
     ScoreDefSetCurrentParams(Doc *doc, Functor *functor)
     {
+        m_currentScore = NULL;
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
-        m_upcomingScoreDef = NULL;
+        m_upcomingScoreDef.Reset();
         m_previousMeasure = NULL;
         m_currentSystem = NULL;
         m_drawLabels = false;
@@ -2149,9 +2157,10 @@ public:
         m_doc = doc;
         m_functor = functor;
     }
+    Score *m_currentScore;
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
-    ScoreDef *m_upcomingScoreDef;
+    ScoreDef m_upcomingScoreDef;
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;

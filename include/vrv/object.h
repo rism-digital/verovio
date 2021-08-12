@@ -979,6 +979,9 @@ public:
      */
     virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
 
+    virtual int ScoreDefSetCurrentPage(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     /**
      * Optimize the scoreDef for each system.
      * For automatic breaks, looks for staves with only mRests.

@@ -16,6 +16,7 @@ namespace vrv {
 class DeviceContext;
 class PrepareProcessingListsParams;
 class RunningElement;
+class Score;
 class Staff;
 class System;
 
@@ -138,6 +139,8 @@ public:
     // Functors //
     //----------//
 
+    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams);
+
     /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
@@ -201,6 +204,11 @@ public:
      * The value is initialized by the Object::ScoreDefSetCurrent functor.
      */
     ScoreDef m_drawingScoreDef;
+
+    /**
+     *
+     */
+    Score *m_score;
 
     /**
      * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI

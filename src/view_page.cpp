@@ -65,7 +65,6 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     assert(m_doc);
 
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
-    ;
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);

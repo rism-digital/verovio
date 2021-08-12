@@ -55,7 +55,7 @@ public:
      * Helper looking at the parent Doc and set its scoreDef as current one.
      * Called from Object::Process
      */
-    void SetScoreDefAsCurrent();
+    void SetAsCurrent();
 
     //----------//
     // Functors //

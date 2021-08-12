@@ -105,6 +105,8 @@ void Doc::Reset()
     m_drawingPageMarginTop = 0;
 
     m_drawingPage = NULL;
+    m_currentScore = NULL;
+    m_currentScoreDef = NULL;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_MIDITimemapTempo = 0.0;
@@ -787,15 +789,20 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
         this->Process(&scoreDefUnsetCurrent, &scoreDefUnsetCurrentParams);
     }
 
+    // First we need to set Page::m_score and Page::m_darwingScoreDef
+    // We do it by going backward, with a depth limit of 3 (we want to hit the Score elements)
+    // Object::Process we set the Doc::m_currentScore/ScoreDef, which we can set to the Page in the
+    // end Functor Page::ScoreDefSetCurrentPageEnd
+    Functor scoreDefSetCurrentPage(&Object::ScoreDefSetCurrentPage);
+    Functor scoreDefSetCurrentPageEnd(&Object::ScoreDefSetCurrentPageEnd);
+    FunctorDocParams scoreDefSetCurrentPageParams(this);
+    this->Process(
+        &scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, BACKWARD);
+
+    // ScoreDef upcomingScoreDef;
     Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);
     ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &scoreDefSetCurrent);
-
-    ScoreDef upcomingScoreDef = *this->GetCurrentScoreDef();
-    scoreDefSetCurrentParams.m_upcomingScoreDef = &upcomingScoreDef;
-    // First process the current scoreDef in order to fill the staffDef with
-    // the appropriate drawing values on the first Page::m_drawingScoreDef
-    upcomingScoreDef.Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
-
+    // scoreDefSetCurrentParams.m_upcomingScoreDef = &upcomingScoreDef;
     this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
 
     m_currentScoreDefDone = true;
@@ -1822,20 +1829,34 @@ int Doc::GetAdjustedDrawingPageWidth() const
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
 }
 
+Score *Doc::GetCurrentScore()
+{
+    if (!m_currentScore) {
+        // We should also have no scoreDef
+        assert(!m_currentScoreDef);
+        m_currentScore = vrv_cast<Score *>(this->FindDescendantByType(SCORE));
+        assert(m_currentScore);
+    }
+    return m_currentScore;
+}
+
 ScoreDef *Doc::GetCurrentScoreDef()
 {
     if (!m_currentScoreDef) {
-        Score *score = vrv_cast<Score *>(this->FindDescendantByType(SCORE));
+        // We should also have no score
+        assert(!m_currentScore);
+        Score *score = this->GetCurrentScore();
         assert(score);
         m_currentScoreDef = score->GetScoreDef();
     }
     return m_currentScoreDef;
 }
 
-void Doc::SetCurrentScoreDef(ScoreDef *scoreDef)
+void Doc::SetCurrentScore(Score *score)
 {
-    assert(scoreDef);
-    m_currentScoreDef = scoreDef;
+    assert(score);
+    m_currentScore = score;
+    m_currentScoreDef = score->GetScoreDef();
 }
 
 //----------------------------------------------------------------------------
