@@ -10,6 +10,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "vrvdef.h"
 
 namespace smf {
@@ -73,6 +74,8 @@ class FunctorParams {
 public:
     FunctorParams() {}
     virtual ~FunctorParams() {}
+    // Can be overwritten when some parameters needs to be change for a new Score
+    virtual void OnScoreStart() {}
 };
 
 //----------------------------------------------------------------------------
@@ -243,13 +246,14 @@ public:
 
 class AdjustDotsParams : public FunctorParams {
 public:
-    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
-        m_staffNs = staffNs;
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
+
     std::vector<int> m_staffNs;
     std::vector<LayerElement *> m_elements;
     std::vector<LayerElement *> m_dots;
@@ -282,18 +286,18 @@ public:
 
 class AdjustGraceXPosParams : public FunctorParams {
 public:
-    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_graceMaxPos = 0;
         m_graceUpcomingMaxPos = -VRV_UNSET;
         m_graceCumulatedXShift = 0;
-        m_staffNs = staffNs;
         m_isGraceAlignment = false;
         m_rightDefaultAlignment = NULL;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
 
     int m_graceMaxPos;
     int m_graceUpcomingMaxPos;
@@ -437,17 +441,18 @@ public:
 
 class AdjustLayersParams : public FunctorParams {
 public:
-    AdjustLayersParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    AdjustLayersParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_currentLayerN = VRV_UNSET;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
-        m_staffNs = staffNs;
         m_unison = false;
         m_ignoreDots = true;
         m_accumulatedShift = 0;
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
+
     std::vector<int> m_staffNs;
     int m_currentLayerN;
     std::vector<LayerElement *> m_previous;
@@ -667,13 +672,12 @@ public:
 
 class AdjustXPosParams : public FunctorParams {
 public:
-    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_minPos = 0;
         m_upcomingMinPos = VRV_UNSET;
         m_cumulatedXShift = 0;
         m_staffN = 0;
-        m_staffNs = staffNs;
         m_staffSize = 100;
         m_doc = doc;
         m_functor = functor;
@@ -682,6 +686,8 @@ public:
         m_previousAlignment.Reset();
         m_measureTieEndpoints.clear();
     }
+    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
+
     int m_minPos;
     int m_upcomingMinPos;
     int m_cumulatedXShift;

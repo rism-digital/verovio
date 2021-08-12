@@ -318,20 +318,18 @@ void Page::LayOutHorizontally()
     // For the first iteration align elements without taking dots into consideration
     Functor adjustLayers(&Object::AdjustLayers);
     Functor adjustLayersEnd(&Object::AdjustLayersEnd);
-    AdjustLayersParams adjustLayersParams(
-        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, &adjustLayersEnd);
     this->Process(&adjustLayers, &adjustLayersParams, &adjustLayersEnd);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
     Functor adjustDots(&Object::AdjustDots);
     Functor adjustDotsEnd(&Object::AdjustDotsEnd);
-    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd);
     this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
 
     // adjust Layers again, this time including dots positioning
-    AdjustLayersParams newAdjustLayersParams(
-        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersParams newAdjustLayersParams(doc, &adjustLayers, &adjustLayersEnd);
     newAdjustLayersParams.m_ignoreDots = false;
     this->Process(&adjustLayers, &newAdjustLayersParams, &adjustLayersEnd);
 
@@ -344,7 +342,7 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustXPos(&Object::AdjustXPos);
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd);
     adjustXPosParams.m_excludes.push_back(TABDURSYM);
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
@@ -360,8 +358,7 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustGraceXPos(&Object::AdjustGraceXPos);
     Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
-    AdjustGraceXPosParams adjustGraceXPosParams(
-        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustGraceXPosParams adjustGraceXPosParams(doc, &adjustGraceXPos, &adjustGraceXPosEnd);
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
