@@ -2203,7 +2203,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     if (staffstarts.size() > 0) {
-        addMidiTempo(m_doc->m_mdivScoreDef, staffstarts[0], top, bot);
+        addMidiTempo(m_doc->GetCurrentScoreDef(), staffstarts[0], top, bot);
     }
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
@@ -2268,10 +2268,10 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
 
 void HumdrumInput::promoteInstrumentNamesToGroup()
 {
-    ScoreDef &sdf = m_doc->m_mdivScoreDef;
-    int count = sdf.GetChildCount();
+    ScoreDef *sdf = m_doc->GetCurrentScoreDef();
+    int count = sdf->GetChildCount();
     for (int i = 0; i < count; ++i) {
-        Object *obj = sdf.GetChild(i);
+        Object *obj = sdf->GetChild(i);
         std::string name = obj->GetClassName();
         if (name != "StaffGrp") {
             continue;
@@ -2342,11 +2342,11 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
 
 void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 {
-    ScoreDef &sdf = m_doc->m_mdivScoreDef;
-    int count = sdf.GetChildCount();
+    ScoreDef *sdf = m_doc->GetCurrentScoreDef();
+    int count = sdf->GetChildCount();
 
     for (int i = 0; i < count; ++i) {
-        Object *obj = sdf.GetChild(i);
+        Object *obj = sdf->GetChild(i);
         std::string name = obj->GetClassName();
         if (name != "StaffGrp") {
             continue;
@@ -4199,7 +4199,7 @@ string HumdrumInput::getSystemDecoration(const std::string &tag)
 // HumdrumInput::addMidiTempo --
 //
 
-void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top, int bot)
+void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, int bot)
 {
     if (top <= 0) {
         top = 4;
@@ -4224,7 +4224,7 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top
                 if (::isdigit((*kernpart)[3])) {
                     int tempo = stoi(kernpart->substr(3));
                     // std::string tempostr = to_string(tempo);
-                    m_scoreDef.SetMidiBpm(tempo);
+                    scoreDef->SetMidiBpm(tempo);
                     foundtempo = true;
                 }
             }
@@ -4249,14 +4249,14 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top
         if (omd) {
             int guess = hum::Convert::tempoNameToMm(*omd, bot, top);
             if (guess > 0) {
-                m_scoreDef.SetMidiBpm(guess);
+                scoreDef->SetMidiBpm(guess);
             }
             else {
-                addDefaultTempo(m_scoreDef);
+                addDefaultTempo(scoreDef);
             }
         }
         else {
-            addDefaultTempo(m_scoreDef);
+            addDefaultTempo(scoreDef);
         }
     }
 }
@@ -4267,10 +4267,10 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top
 //    a half note (for basic Renaissance default tempo).
 //
 
-void HumdrumInput::addDefaultTempo(ScoreDef &m_scoreDef)
+void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
 {
     if (m_mens) {
-        m_scoreDef.SetMidiBpm(400);
+        scoreDef->SetMidiBpm(400);
         return;
     }
     double sum = 0.0;
@@ -4285,7 +4285,7 @@ void HumdrumInput::addDefaultTempo(ScoreDef &m_scoreDef)
     }
     double avgdur = sum / count;
     if (avgdur > 2.0) {
-        m_scoreDef.SetMidiBpm(400);
+        scoreDef->SetMidiBpm(400);
     }
 }
 
