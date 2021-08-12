@@ -729,6 +729,8 @@ int System::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
+    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
 
     const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;

@@ -827,7 +827,8 @@ int Chord::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
-    assert(params->m_justificationSum > 0);
+    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
 
     // Check if chord spreads across several staves
     std::list<Staff *> extremalStaves;
