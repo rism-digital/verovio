@@ -1629,10 +1629,13 @@ public:
 
 /**
  * member 0: the cumulated shift
- * member 1: the amount of space for distribution
- * member 2: the sum of justification factors per page
- * member 3: the functor to be redirected to the MeasureAligner
- * member 4: the doc
+ * member 1: the relative shift of the staff w.r.t. the system
+ * member 2: the amount of space for distribution
+ * member 3: the sum of justification factors per page
+ * member 4: a map of calculated shifts per StaffAlignment
+ *  => this is transferred to AdjustCrossStaffContent
+ * member 5: the functor to be redirected to the MeasureAligner
+ * member 6: the doc
  **/
 
 class JustifyYParams : public FunctorParams {
@@ -1640,6 +1643,7 @@ public:
     JustifyYParams(Functor *functor, Doc *doc)
     {
         m_cumulatedShift = 0;
+        m_relativeShift = 0;
         m_spaceToDistribute = 0;
         m_justificationSum = 0.;
         m_functor = functor;
@@ -1647,8 +1651,10 @@ public:
     }
 
     int m_cumulatedShift;
+    int m_relativeShift;
     int m_spaceToDistribute;
     double m_justificationSum;
+    std::map<StaffAlignment *, int> m_shiftForStaff;
     Functor *m_functor;
     Doc *m_doc;
 };
