@@ -1462,6 +1462,9 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
 
     // Draw system divider (from the second one) if scoreDef is optimized
     if (!firstMeasure || (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_none)) return;
+    // No system divider if we are on the first system of a page or of an mdiv
+    if (system->IsFirstInPage() || system->IsFirstOfMdiv()) return;
+
     // initialize to zero, first measure is not supposed to have system divider
     int previousSystemBottomMarginY = 0;
     Object *currentPage = system->GetFirstAncestor(PAGE);
@@ -1483,8 +1486,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
         }
     }
 
-    if ((system->GetIdx() > 0)
-        && (system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
+    if ((system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
         int y = system->GetDrawingY();
         Staff *staff = firstMeasure->GetTopVisibleStaff();
         if (staff) {
