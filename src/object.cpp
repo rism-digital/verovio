@@ -25,6 +25,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "featureextractor.h"
 #include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
@@ -1844,7 +1845,7 @@ int Object::GenerateFeatures(FunctorParams *functorParams)
     GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
     assert(params);
 
-    params->m_extractor->Extract(this, functorParams);
+    params->m_extractor->Extract(this, params);
 
     return FUNCTOR_CONTINUE;
 }
