@@ -823,12 +823,10 @@ int Chord::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::JustifyY(FunctorParams *functorParams)
+int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
 {
-    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
+    AdjustCrossStaffContentParams *params = vrv_params_cast<AdjustCrossStaffContentParams *>(functorParams);
     assert(params);
-    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
-    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
 
     // Check if chord spreads across several staves
     std::list<Staff *> extremalStaves;
@@ -844,25 +842,16 @@ int Chord::JustifyY(FunctorParams *functorParams)
     const int topStaffN = extremalStaves.front()->GetN();
     const int bottomStaffN = extremalStaves.back()->GetN();
     if (topStaffN < bottomStaffN) {
-        // Now calculate the shift due to vertical justification of the involved staves.
-        Object *measure = this->GetFirstAncestor(MEASURE);
-        if (!measure) return FUNCTOR_CONTINUE;
-
-        ListOfObjects staves;
-        ClassIdComparison matchType(STAFF);
-        measure->FindAllDescendantByComparison(&staves, &matchType, 1);
-
-        int shift = 0;
-        for (Object *staff : staves) {
-            Staff *currentStaff = vrv_cast<Staff *>(staff);
-            assert(currentStaff);
-
-            if ((currentStaff->GetN() > topStaffN) && (currentStaff->GetN() <= bottomStaffN)) {
-                const double staffJustificationFactor
-                    = currentStaff->GetAlignment()->GetJustificationFactor(params->m_doc);
-                shift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+        // Now calculate the shift due to vertical justification
+        auto getShift = [params](Staff *staff) {
+            StaffAlignment *alignment = staff->GetAlignment();
+            if (params->m_shiftForStaff.find(alignment) != params->m_shiftForStaff.end()) {
+                return params->m_shiftForStaff.at(alignment);
             }
-        }
+            return 0;
+        };
+
+        const int shift = getShift(extremalStaves.back()) - getShift(extremalStaves.front());
 
         // Add the shift to the stem length of the chord.
         Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));

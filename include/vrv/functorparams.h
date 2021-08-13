@@ -1660,6 +1660,24 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustCrossStaffContentParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a map of calculated shifts per StaffAlignment
+ *  => this is transferred from JustifyY
+ * member 1: the doc
+ **/
+
+class AdjustCrossStaffContentParams : public FunctorParams {
+public:
+    AdjustCrossStaffContentParams(Doc *doc) { m_doc = doc; }
+
+    std::map<StaffAlignment *, int> m_shiftForStaff;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // LayerCountInTimeSpanParams
 //----------------------------------------------------------------------------
 

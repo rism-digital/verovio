@@ -1163,6 +1163,11 @@ public:
      */
     virtual int JustifyY(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Adjust cross staff content after vertical justification
+     */
+    virtual int AdjustCrossStaffContent(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     ///@}
 
     /**

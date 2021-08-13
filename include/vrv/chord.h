@@ -206,9 +206,9 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * See Object::JustifyY
+     * See Object::AdjustCrossStaffContent
      */
-    virtual int JustifyY(FunctorParams *functorParams);
+    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
 
 protected:
     /**
