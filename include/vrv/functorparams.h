@@ -246,11 +246,12 @@ public:
 
 class AdjustDotsParams : public FunctorParams {
 public:
-    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    AdjustDotsParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
     {
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
+        m_staffNs = staffNs;
     }
     virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
 
@@ -286,16 +287,18 @@ public:
 
 class AdjustGraceXPosParams : public FunctorParams {
 public:
-    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
     {
         m_graceMaxPos = 0;
         m_graceUpcomingMaxPos = -VRV_UNSET;
         m_graceCumulatedXShift = 0;
+        m_staffNs = staffNs;
         m_isGraceAlignment = false;
         m_rightDefaultAlignment = NULL;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
+        m_staffNs = staffNs;
     }
     virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
 
@@ -441,12 +444,13 @@ public:
 
 class AdjustLayersParams : public FunctorParams {
 public:
-    AdjustLayersParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    AdjustLayersParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
     {
         m_currentLayerN = VRV_UNSET;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
+        m_staffNs = staffNs;
         m_unison = false;
         m_ignoreDots = true;
         m_accumulatedShift = 0;
@@ -672,12 +676,13 @@ public:
 
 class AdjustXPosParams : public FunctorParams {
 public:
-    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
     {
         m_minPos = 0;
         m_upcomingMinPos = VRV_UNSET;
         m_cumulatedXShift = 0;
         m_staffN = 0;
+        m_staffNs = staffNs;
         m_staffSize = 100;
         m_doc = doc;
         m_functor = functor;
