@@ -52,6 +52,12 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         Note *note = vrv_cast<Note *>(object);
         assert(note);
         note->CalcMIDIPitch(0);
+        
+        std::string pitch = note->AttPitch::PitchnameToStr(note->GetPname());
+        pitch += note->AttPitch::OctaveToStr(note->GetOct());
+        m_pitches << pitch;
+        
+        // We have a previous note, so we can calculate an interval
         if (m_previousNote) {
             std::string interval = StringFormat("%d", m_previousNote->GetMIDIPitch() - note->GetMIDIPitch());
             m_intervals << interval;
@@ -63,6 +69,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
 void FeatureExtractor::ToJson(std::string &output)
 {
     jsonxx::Object o;
+    o << "pitches" << m_pitches;
     o << "intervals" << m_intervals;
     output = o.json();
     LogDebug("%s", output.c_str());
