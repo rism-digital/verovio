@@ -59,7 +59,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
 
         // We have a previous note, so we can calculate an interval
         if (m_previousNote) {
-            std::string interval = StringFormat("%d", m_previousNote->GetMIDIPitch() - note->GetMIDIPitch());
+            std::string interval = StringFormat("%d", note->GetMIDIPitch() - m_previousNote->GetMIDIPitch());
             m_intervals << interval;
         }
         m_previousNote = note;
