@@ -1411,8 +1411,12 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     if (!params->m_isOtherLayer && (Is({ NOTE, CHORD }) || !Is(ACCID)) && (GetFirstAncestor(BEAM) == params->m_beam)
         && !IsGraceNote())
         return FUNCTOR_CONTINUE;
+    // ignore elements that are both on other layer and cross-staff
     if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
+    // ignore specific elemtns, since they should not be influencing beam positiong
     if (Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
+    // ignore elements that start before the beam
+    if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
