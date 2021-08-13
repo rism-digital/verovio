@@ -13,6 +13,10 @@
 #include "functorparams.h"
 #include "options.h"
 
+//----------------------------------------------------------------------------
+
+#include "jsonxx.h"
+
 namespace vrv {
 
 class FeatureExtractor {
@@ -46,9 +50,9 @@ private:
     //
 public:
     Note *m_previousNote;
-    std::vector<std::string> m_pitches;
-    std::vector<std::string> m_pitchesAndDuration;
-    std::vector<std::string> m_intervals;
+    jsonxx::Array m_pitches;
+    jsonxx::Array m_pitchesAndDuration;
+    jsonxx::Array m_intervals;
 
 private:
 };

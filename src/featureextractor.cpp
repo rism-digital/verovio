@@ -34,7 +34,10 @@ namespace vrv {
 // FeatureExtractor
 //----------------------------------------------------------------------------
 
-FeatureExtractor::FeatureExtractor() {}
+FeatureExtractor::FeatureExtractor()
+{
+    Reset();
+}
 
 FeatureExtractor::~FeatureExtractor() {}
 
@@ -45,12 +48,24 @@ void FeatureExtractor::Reset()
 
 void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
 {
-    
+    if (object->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(object);
+        assert(note);
+        note->CalcMIDIPitch(0);
+        if (m_previousNote) {
+            std::string interval = StringFormat("%d", m_previousNote->GetMIDIPitch() - note->GetMIDIPitch());
+            m_intervals << interval;
+        }
+        m_previousNote = note;
+    }
 }
 
 void FeatureExtractor::ToJson(std::string &output)
 {
-    output = "{}";
+    jsonxx::Object o;
+    o << "intervals" << m_intervals;
+    output = o.json();
+    LogDebug("%s", output.c_str());
 }
 
 } // namespace vrv
