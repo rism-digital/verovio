@@ -865,6 +865,13 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
         else {
             stem->SetDrawingStemLen(stemLen + shift);
         }
+
+        // Add the shift to the flag position
+        Flag *flag = vrv_cast<Flag *>(stem->FindDescendantByType(FLAG));
+        if (flag) {
+            const int sign = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
+            flag->SetDrawingYRel(flag->GetDrawingYRel() + sign * shift);
+        }
     }
 
     return FUNCTOR_CONTINUE;
