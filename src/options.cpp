@@ -970,6 +970,11 @@ Options::Options()
     m_outputSmuflXmlEntities.Init(false);
     this->Register(&m_outputSmuflXmlEntities, "outputSmuflXmlEntities", &m_general);
 
+    m_paeFeatures.SetInfo(
+        "Output features in PAE output", "Write a JSON object of features instead of the code in the PAE ouput.");
+    m_paeFeatures.Init(false);
+    this->Register(&m_paeFeatures, "paeFeatures", &m_general);
+
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
     this->Register(&m_pageHeight, "pageHeight", &m_general);

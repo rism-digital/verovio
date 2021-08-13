@@ -1294,10 +1294,15 @@ std::string Toolkit::RenderToPAE()
         return "";
     }
 
-    PAEOutput paeOutput(&m_doc);
     std::string output;
-    if (!paeOutput.Export(output)) {
-        LogError("Export to PAE failed");
+    if (m_options->m_paeFeatures.GetValue()) {
+        m_doc.ExportFeatures(output);
+    }
+    else {
+        PAEOutput paeOutput(&m_doc);
+        if (!paeOutput.Export(output)) {
+            LogError("Export to PAE failed");
+        }
     }
     return output;
 }

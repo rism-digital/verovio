@@ -593,6 +593,7 @@ public:
     OptionInt m_outputIndent;
     OptionBool m_outputIndentTab;
     OptionBool m_outputSmuflXmlEntities;
+    OptionBool m_paeFeatures;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;
     OptionInt m_pageMarginLeft;
