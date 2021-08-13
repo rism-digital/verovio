@@ -1232,6 +1232,13 @@ public:
     ///@}
 
     /**
+     * Export the object to a JSON feature file.
+     */
+    ///@{
+    virtual int GenerateFeatures(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * Calculate the maximum duration of each measure.
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }

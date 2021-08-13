@@ -30,6 +30,7 @@ class Dynam;
 class Ending;
 class Output;
 class Facsimile;
+class FeatureExtractor;
 class Functor;
 class Hairpin;
 class Harm;
@@ -1538,6 +1539,20 @@ public:
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// GenerateFeaturesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the FeatureExtractor to which extraction is delegated
+ **/
+
+class GenerateFeaturesParams : public FunctorParams {
+public:
+    GenerateFeaturesParams(FeatureExtractor *extractor) { m_extractor = extractor; }
+    FeatureExtractor *m_extractor;
 };
 
 //----------------------------------------------------------------------------

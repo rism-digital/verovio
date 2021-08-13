@@ -1839,6 +1839,16 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::GenerateFeatures(FunctorParams *functorParams)
+{
+    GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
+    assert(params);
+
+    params->m_extractor->Extract(this, functorParams);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Object::Save(FunctorParams *functorParams)
 {
     SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);

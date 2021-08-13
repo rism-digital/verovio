@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "comparison.h"
 #include "expansion.h"
+#include "featureextractor.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
@@ -410,6 +411,26 @@ bool Doc::ExportTimemap(std::string &output)
 
     PrepareJsonTimemap(output, generateTimemapParams.realTimeToScoreTime, generateTimemapParams.realTimeToOnElements,
         generateTimemapParams.realTimeToOffElements, generateTimemapParams.realTimeToTempo);
+
+    return true;
+}
+
+bool Doc::ExportFeatures(std::string &output)
+{
+    if (!Doc::HasMidiTimemap()) {
+        // generate MIDI timemap before progressing
+        CalculateMidiTimemap();
+    }
+    if (!Doc::HasMidiTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        output = "";
+        return false;
+    }
+    FeatureExtractor extractor;
+    Functor generateFeatures(&Object::GenerateFeatures);
+    GenerateFeaturesParams generateFeaturesParams(&extractor);
+    this->Process(&generateFeatures, &generateFeaturesParams);
+    extractor.ToJson(output);
 
     return true;
 }
