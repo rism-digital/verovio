@@ -739,15 +739,12 @@ int System::JustifyY(FunctorParams *functorParams)
         params->m_cumulatedShift += shift;
     }
 
-    const int currentSystemShift = params->m_cumulatedShift;
-    this->SetDrawingYRel(this->GetDrawingY() - currentSystemShift);
+    this->SetDrawingYRel(this->GetDrawingY() - params->m_cumulatedShift);
 
-    params->m_cumulatedShift = 0;
+    params->m_relativeShift = 0;
     m_systemAligner.Process(params->m_functor, params);
 
-    params->m_cumulatedShift += currentSystemShift;
-
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int System::AdjustStaffOverlap(FunctorParams *functorParams)
