@@ -266,4 +266,18 @@ int Score::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Score::ScoreDefOptimize(FunctorParams *functorParams)
+{
+    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
+    assert(params);
+
+    params->m_currentScoreDef = NULL;
+    params->m_encoded = false;
+    params->m_firstScoreDef = true;
+    params->m_hasFermata = false;
+    params->m_hasTempo = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

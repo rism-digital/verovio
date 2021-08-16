@@ -117,6 +117,11 @@ public:
      */
     virtual int ConvertToCastOffMensural(FunctorParams *params);
 
+    /**
+     * See Object::ScoreDefOptimize
+     */
+    virtual int ScoreDefOptimize(FunctorParams *functorParams);
+
 private:
     /**
      * The score/scoreDef (first child of the score)
