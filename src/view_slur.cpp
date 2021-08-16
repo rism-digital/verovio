@@ -116,17 +116,6 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         endStemDir = endStemDrawInterface->GetDrawingStemDir();
     }
 
-    Note *startNote = NULL;
-    Chord *startParentChord = NULL;
-    if (start->Is(NOTE)) {
-        startNote = vrv_cast<Note *>(start);
-        assert(startNote);
-        startParentChord = startNote->IsChordTone();
-    }
-
-    bool isGraceToNoteSlur
-        = !start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && start->IsGraceNote() && !end->IsGraceNote();
-
     Layer *layer = NULL;
     LayerElement *layerElement = NULL;
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
@@ -190,46 +179,10 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     /************** direction **************/
 
-    data_STEMDIRECTION layerStemDir;
-    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
-    // first should be the slur @curvedir
-    if (slur->HasCurvedir()) {
-        drawingCurveDir
-            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-    }
-    // grace notes - always below unless we have a drawing stem direction on the layer
-    else if (isGraceToNoteSlur && layer && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
-        drawingCurveDir = curvature_CURVEDIR_below;
-    }
-    // the normal case
-    else if (slur->HasDrawingCurvedir()) {
-        drawingCurveDir = slur->GetDrawingCurvedir();
-    }
-    // then layer direction trumps note direction
-    else if (layer && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
-        drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-    }
-    // look if in a chord
-    else if (startParentChord) {
-        if (startParentChord->PositionInChord(startNote) < 0) {
-            drawingCurveDir = curvature_CURVEDIR_below;
-        }
-        else if (startParentChord->PositionInChord(startNote) > 0) {
-            drawingCurveDir = curvature_CURVEDIR_above;
-        }
-        // away from the stem if odd number (center note)
-        else {
-            drawingCurveDir = (stemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-        }
-    }
-    else if (stemDir == STEMDIRECTION_up) {
-        drawingCurveDir = curvature_CURVEDIR_below;
-    }
-    else if (stemDir == STEMDIRECTION_NONE) {
-        // no information from the note stem directions, look at the position in the notes
-        int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        drawingCurveDir = (start->GetDrawingY() > center) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-    }
+    const int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+    const bool isAboveStaffCenter = start->GetDrawingY() > center;
+    curvature_CURVEDIR drawingCurveDir
+        = slur->GetPreferredCurveDirection(m_doc, layer, layerElement, stemDir, isAboveStaffCenter);
 
     /************** adjusting y position **************/
 

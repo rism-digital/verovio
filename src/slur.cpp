@@ -504,6 +504,112 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVE
     return slurAngle;
 }
 
+curvature_CURVEDIR Slur::GetGraceCurveDirection(Doc *doc)
+{
+    Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
+    assert(staff);
+    const bool overlap = GetStart()->VerticalContentOverlap(GetEnd());
+    const int topDiff = std::abs(GetStart()->GetContentTop() - GetEnd()->GetContentTop());
+    const int bottomDiff = std::abs(GetStart()->GetContentBottom() - GetEnd()->GetContentBottom());
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (overlap) {
+        if (bottomDiff < 1.5 * topDiff) {
+            return curvature_CURVEDIR_below;
+        }
+        else if ((topDiff <= 3 * unit) || (NULL != GetEnd()->IsInBeam())) {
+            return curvature_CURVEDIR_below;
+        }
+        else {
+            return curvature_CURVEDIR_above;
+        }
+    }
+    else {
+        StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(GetStart());
+        StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(GetEnd());
+
+        data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
+        if (startStemDrawInterface) {
+            startStemDir = startStemDrawInterface->GetDrawingStemDir();
+        }
+        data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
+        if (endStemDrawInterface) {
+            endStemDir = endStemDrawInterface->GetDrawingStemDir();
+        }
+
+        if (GetEnd()->GetContentBottom() > GetStart()->GetContentTop()) {
+            if (endStemDir == STEMDIRECTION_up)
+                return curvature_CURVEDIR_above;
+            else {
+                return (bottomDiff < topDiff) ? curvature_CURVEDIR_below : curvature_CURVEDIR_above;
+            }
+        }
+        else if (GetEnd()->GetContentTop() < GetStart()->GetContentBottom()) {
+            if (endStemDir == STEMDIRECTION_down)
+                return curvature_CURVEDIR_below;
+            else {
+                return (bottomDiff < topDiff) ? curvature_CURVEDIR_below : curvature_CURVEDIR_above;
+            }
+        }
+    }
+    return curvature_CURVEDIR_below;
+}
+
+curvature_CURVEDIR Slur::GetPreferredCurveDirection(
+    Doc *doc, Layer *layer, LayerElement *layerElement, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter)
+{
+    const bool isGraceToNoteSlur = !GetStart()->Is(TIMESTAMP_ATTR) && !GetEnd()->Is(TIMESTAMP_ATTR)
+        && GetStart()->IsGraceNote() && !GetEnd()->IsGraceNote();
+    Note *startNote = NULL;
+    Chord *startParentChord = NULL;
+    if (GetStart()->Is(NOTE)) {
+        startNote = vrv_cast<Note *>(GetStart());
+        assert(startNote);
+        startParentChord = startNote->IsChordTone();
+    }
+
+    data_STEMDIRECTION layerStemDir;
+    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
+    // first should be the slur @curvedir
+    if (this->HasCurvedir()) {
+        drawingCurveDir
+            = (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // grace notes - always below unless we have a drawing stem direction on the layer
+    else if (isGraceToNoteSlur && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
+        drawingCurveDir = GetGraceCurveDirection(doc);
+    }
+    // the normal case
+    else if (this->HasDrawingCurvedir()) {
+        drawingCurveDir = this->GetDrawingCurvedir();
+    }
+    // then layer direction trumps note direction
+    else if (layer && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
+        drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // look if in a chord
+    else if (startParentChord) {
+        if (startParentChord->PositionInChord(startNote) < 0) {
+            drawingCurveDir = curvature_CURVEDIR_below;
+        }
+        else if (startParentChord->PositionInChord(startNote) > 0) {
+            drawingCurveDir = curvature_CURVEDIR_above;
+        }
+        // away from the stem if odd number (center note)
+        else {
+            drawingCurveDir = (noteStemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        }
+    }
+    else if (noteStemDir == STEMDIRECTION_up) {
+        drawingCurveDir = curvature_CURVEDIR_below;
+    }
+    else if (noteStemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        drawingCurveDir = (isAboveStaffCenter) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+
+    return drawingCurveDir;
+}
+
 std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
     std::tuple<int, int, int, int> coordinates, int spanningType, curvature_CURVEDIR drawingCurveDir)
 {
@@ -551,7 +657,7 @@ std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
         assert(endChord);
     }
 
-    bool isGraceToNoteSlur = !GetStart()->Is(TIMESTAMP_ATTR) && !GetEnd()->Is(TIMESTAMP_ATTR)
+    const bool isGraceToNoteSlur = !GetStart()->Is(TIMESTAMP_ATTR) && !GetEnd()->Is(TIMESTAMP_ATTR)
         && GetStart()->IsGraceNote() && !GetEnd()->IsGraceNote();
 
     int x1, x2, y1, y2;
@@ -657,10 +763,14 @@ std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
                 y2 = GetEnd()->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             // same but in beam - adjust the x too
-            else if (((parentBeam = GetEnd()->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, GetEnd()))
-                || ((parentFTrem = GetEnd()->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, GetEnd()))
-                || isGraceToNoteSlur) {
-                if (isGraceToNoteSlur && (parentBeam || parentFTrem)) {
+            else if ((((parentBeam = GetEnd()->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, GetEnd()))
+                         || ((parentFTrem = GetEnd()->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, GetEnd())))
+                && !isGraceToNoteSlur) {
+                y2 = GetEnd()->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                x2 += endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            else if (isGraceToNoteSlur) {
+                if (parentBeam || parentFTrem) {
                     y2 = y1;
                     x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
@@ -686,14 +796,26 @@ std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
                 y2 = GetEnd()->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
-            else if (isShortSlur) {
+            else if (isShortSlur && !isGraceToNoteSlur) {
                 y2 = GetEnd()->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // same but in beam
-            else if (((parentBeam = GetEnd()->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, GetEnd()))
-                || ((parentFTrem = GetEnd()->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, GetEnd()))
-                || isGraceToNoteSlur) {
-                if (isGraceToNoteSlur && (parentBeam || parentFTrem)) {
+            else if ((((parentBeam = GetEnd()->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, GetEnd()))
+                         || ((parentFTrem = GetEnd()->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, GetEnd())))
+                && !isGraceToNoteSlur) {
+
+                y2 = GetEnd()->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            else if (isGraceToNoteSlur) {
+                const bool overlap = GetStart()->VerticalContentOverlap(GetEnd());
+                const int botDiff = GetStart()->GetContentBottom() - GetEnd()->GetContentBottom();
+                const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                if (parentBeam || parentFTrem) {
+                    y2 = y1;
+                    x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+                else if (overlap && (botDiff > 3 * unit) && (endStemDir == STEMDIRECTION_down)) {
                     y2 = y1;
                     x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
