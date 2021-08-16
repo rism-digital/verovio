@@ -1377,9 +1377,13 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
             Note *octave = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
             assert(octave);
             if (!octave) continue;
+            bool sameChordOctave = true;
+            if (Chord *chord = vrv_cast<Chord *>((*iter)->GetFirstAncestor(CHORD)); chord != NULL) {
+                if ((*octaveIter)->GetFirstAncestor(CHORD) != chord) sameChordOctave = false;
+            }
             // Same pitch, different octave, same accid - for now?
             if ((note->GetPname() == octave->GetPname()) && (note->GetOct() != octave->GetOct())
-                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid())) {
+                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid()) && sameChordOctave) {
                 (*iter)->SetDrawingOctaveAccid(*octaveIter);
                 (*octaveIter)->SetDrawingOctave(true);
             }
@@ -1401,6 +1405,12 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
                 m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(
                     m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
         }
+    }
+
+    // Align accidentals for unison notes if any of them are present
+    for (Accid *accid : m_accidSpace) {
+        if (accid->GetDrawingUnisonAccid() == NULL) continue;
+        accid->SetDrawingXRel(accid->GetDrawingUnisonAccid()->GetDrawingXRel());
     }
 
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);

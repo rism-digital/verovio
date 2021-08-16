@@ -749,6 +749,8 @@ int System::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
+    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
 
     const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
@@ -757,15 +759,12 @@ int System::JustifyY(FunctorParams *functorParams)
         params->m_cumulatedShift += shift;
     }
 
-    const int currentSystemShift = params->m_cumulatedShift;
-    this->SetDrawingYRel(this->GetDrawingY() - currentSystemShift);
+    this->SetDrawingYRel(this->GetDrawingY() - params->m_cumulatedShift);
 
-    params->m_cumulatedShift = 0;
+    params->m_relativeShift = 0;
     m_systemAligner.Process(params->m_functor, params);
 
-    params->m_cumulatedShift += currentSystemShift;
-
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int System::AdjustStaffOverlap(FunctorParams *functorParams)
