@@ -153,6 +153,30 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: list of above articulations
+ * member 1: list of below articulations
+ * member 2: the parent element to which the articulations refer
+ * member 3: the doc
+ **/
+
+class AdjustArticParams : public FunctorParams {
+public:
+    AdjustArticParams(Doc *doc)
+    {
+        m_parent = NULL;
+        m_doc = doc;
+    }
+    std::list<Artic *> m_articAbove;
+    std::list<Artic *> m_articBelow;
+    LayerElement *m_parent;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustBeamParams
 //----------------------------------------------------------------------------
 
@@ -207,24 +231,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticParams
+// AdjustCrossStaffContentParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the chord dots object when processing chord notes
- * member 7: the doc
+ * member 0: a map of calculated shifts per StaffAlignment
+ *  => this is transferred from JustifyY
+ * member 1: the doc
  **/
 
-class AdjustArticParams : public FunctorParams {
+class AdjustCrossStaffContentParams : public FunctorParams {
 public:
-    AdjustArticParams(Doc *doc)
-    {
-        m_parent = NULL;
-        m_doc = doc;
-    }
-    std::list<Artic *> m_articAbove;
-    std::list<Artic *> m_articBelow;
-    LayerElement *m_parent;
+    AdjustCrossStaffContentParams(Doc *doc) { m_doc = doc; }
+
+    std::map<StaffAlignment *, int> m_shiftForStaff;
     Doc *m_doc;
 };
 
@@ -1656,24 +1676,6 @@ public:
     double m_justificationSum;
     std::map<StaffAlignment *, int> m_shiftForStaff;
     Functor *m_functor;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// AdjustCrossStaffContentParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a map of calculated shifts per StaffAlignment
- *  => this is transferred from JustifyY
- * member 1: the doc
- **/
-
-class AdjustCrossStaffContentParams : public FunctorParams {
-public:
-    AdjustCrossStaffContentParams(Doc *doc) { m_doc = doc; }
-
-    std::map<StaffAlignment *, int> m_shiftForStaff;
     Doc *m_doc;
 };
 
