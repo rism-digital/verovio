@@ -74,8 +74,6 @@ class FunctorParams {
 public:
     FunctorParams() {}
     virtual ~FunctorParams() {}
-    // Can be overwritten when some parameters needs to be change for a new Score
-    virtual void OnScoreStart() {}
 };
 
 //----------------------------------------------------------------------------
@@ -253,8 +251,6 @@ public:
         m_functorEnd = functorEnd;
         m_staffNs = staffNs;
     }
-    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
-
     std::vector<int> m_staffNs;
     std::vector<LayerElement *> m_elements;
     std::vector<LayerElement *> m_dots;
@@ -300,8 +296,6 @@ public:
         m_functorEnd = functorEnd;
         m_staffNs = staffNs;
     }
-    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
-
     int m_graceMaxPos;
     int m_graceUpcomingMaxPos;
     int m_graceCumulatedXShift;
@@ -455,8 +449,6 @@ public:
         m_ignoreDots = true;
         m_accumulatedShift = 0;
     }
-    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
-
     std::vector<int> m_staffNs;
     int m_currentLayerN;
     std::vector<LayerElement *> m_previous;
@@ -691,8 +683,6 @@ public:
         m_previousAlignment.Reset();
         m_measureTieEndpoints.clear();
     }
-    virtual void OnScoreStart() { m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs(); }
-
     int m_minPos;
     int m_upcomingMinPos;
     int m_cumulatedXShift;

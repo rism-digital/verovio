@@ -62,6 +62,26 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustDots
+     */
+    virtual int AdjustDots(FunctorParams *);
+
+    /**
+     * See Object::AdjustLayers
+     */
+    virtual int AdjustLayers(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustXPos
+     */
+    virtual int AdjustXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustGraceXPos
+     */
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertToPageBased
      */
     ///@{

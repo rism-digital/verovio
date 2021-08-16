@@ -807,12 +807,10 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 
     // When we are starting a new Score, we need to update to Doc current ScoreDef
-    // Some functor overwrite Functor::OnScoreStart, which has to be call here too
     if (direction == FORWARD && this->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(this);
         assert(score);
         score->SetAsCurrent();
-        if (functorParams) functorParams->OnScoreStart();
     }
     // We need to do the same in backward direction through the PageElementEnd::m_start
     else if (direction == BACKWARD && this->Is(PAGE_ELEMENT_END)) {
@@ -822,7 +820,6 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
             Score *score = vrv_cast<Score *>(elementEnd->GetStart());
             assert(score);
             score->SetAsCurrent();
-            if (functorParams) functorParams->OnScoreStart();
         }
     }
 
