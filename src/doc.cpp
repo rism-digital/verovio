@@ -786,20 +786,21 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
         this->Process(&scoreDefUnsetCurrent, &scoreDefUnsetCurrentParams);
     }
 
-    // First we need to set Page::m_score and Page::m_darwingScoreDef
-    // We do it by going backward, with a depth limit of 3 (we want to hit the Score elements)
-    // Object::Process we set the Doc::m_currentScore/ScoreDef, which we can set to the Page in the
-    // end Functor Page::ScoreDefSetCurrentPageEnd
+    // First we need to set Page::m_score and Page::m_scoreEnd
+    // We do it by going BACKWARD, with a depth limit of 3 (we want to hit the Score elements)
+    // The Doc::m_currentScore is set by Object::Process
+    // The Page::m_score in Page::ScoreDefSetCurrentPageEnd
     Functor scoreDefSetCurrentPage(&Object::ScoreDefSetCurrentPage);
     Functor scoreDefSetCurrentPageEnd(&Object::ScoreDefSetCurrentPageEnd);
     FunctorDocParams scoreDefSetCurrentPageParams(this);
     this->Process(
         &scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, BACKWARD);
+    // Do it again FORWARD to set Page::m_scoreEnd - relies on Page::m_score not being NULL
+    this->Process(&scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, FORWARD);
 
     // ScoreDef upcomingScoreDef;
     Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);
     ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &scoreDefSetCurrent);
-    // scoreDefSetCurrentParams.m_upcomingScoreDef = &upcomingScoreDef;
     this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
 
     m_currentScoreDefDone = true;
@@ -865,6 +866,9 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         return;
     }
 
+    std::list<Score *> scores = this->GetScores();
+    assert(!scores.empty());
+
     this->ScoreDefSetCurrentDoc();
 
     Page *unCastOffPage = this->SetDrawingPage(0);
@@ -917,14 +921,15 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDrawingPage();
 
+    for (auto const score : scores) {
+        score->CalcRunningElementHeight(this);
+    }
+
     Page *castOffFirstPage = new Page();
     CastOffPagesParams castOffPagesParams(castOffSinglePage, this, castOffFirstPage);
-
-    // Fill the page header / footer heights
-    CastOffRunningElements(&castOffPagesParams);
-
     castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
     castOffPagesParams.m_leftoverSystem = leftoverSystem;
+
     Functor castOffPages(&Object::CastOffPages);
     pages->AddChild(castOffFirstPage);
     castOffSinglePage->Process(&castOffPages, &castOffPagesParams);
@@ -935,42 +940,6 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         this->ScoreDefOptimizeDoc();
     }
     this->ScoreDefSetGrpSymDoc();
-}
-
-void Doc::CastOffRunningElements(CastOffPagesParams *params)
-{
-    Pages *pages = this->GetPages();
-    assert(pages);
-    assert(pages->GetChildCount() == 0);
-
-    Page *page1 = new Page();
-    pages->AddChild(page1);
-    this->SetDrawingPage(0);
-    page1->LayOutVertically();
-
-    if (page1->GetHeader()) {
-        params->m_pgHeadHeight = page1->GetHeader()->GetTotalHeight();
-    }
-    if (page1->GetFooter()) {
-        params->m_pgFootHeight = page1->GetFooter()->GetTotalHeight();
-    }
-
-    Page *page2 = new Page();
-    pages->AddChild(page2);
-    this->SetDrawingPage(1);
-    page2->LayOutVertically();
-
-    if (page2->GetHeader()) {
-        params->m_pgHead2Height = page2->GetHeader()->GetTotalHeight();
-    }
-    if (page2->GetFooter()) {
-        params->m_pgFoot2Height = page2->GetFooter()->GetTotalHeight();
-    }
-
-    pages->DeleteChild(page1);
-    pages->DeleteChild(page2);
-
-    this->ResetDrawingPage();
 }
 
 void Doc::UnCastOffDoc()
@@ -1355,9 +1324,18 @@ bool Doc::HasPage(int pageIdx)
     return ((pageIdx >= 0) && (pageIdx < pages->GetChildCount()));
 }
 
-Score *Doc::GetScore()
+std::list<Score *> Doc::GetScores()
 {
-    return dynamic_cast<Score *>(this->FindDescendantByType(SCORE));
+    std::list<Score *> scores;
+    ListOfObjects objects;
+    ClassIdComparison cmp(SCORE);
+    this->FindAllDescendantByComparison(&objects, &cmp, 3);
+    for (const auto object : objects) {
+        Score *score = vrv_cast<Score *>(object);
+        assert(score);
+        scores.push_back(score);
+    }
+    return scores;
 }
 
 Pages *Doc::GetPages()
@@ -1844,7 +1822,6 @@ ScoreDef *Doc::GetCurrentScoreDef()
 
 void Doc::SetCurrentScore(Score *score)
 {
-    assert(score);
     m_currentScore = score;
 }
 

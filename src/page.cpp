@@ -48,6 +48,7 @@ void Page::Reset()
 
     m_drawingScoreDef.Reset();
     m_score = NULL;
+    m_scoreEnd = NULL;
     m_layoutDone = false;
     this->ResetUuid();
 
@@ -80,6 +81,8 @@ bool Page::IsSupportedChild(Object *child)
 
 RunningElement *Page::GetHeader() const
 {
+    assert(m_score);
+
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
@@ -90,15 +93,17 @@ RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return doc->GetCurrentScoreDef()->GetPgHead();
+        return m_score->GetScoreDef()->GetPgHead();
     }
     else {
-        return doc->GetCurrentScoreDef()->GetPgHead2();
+        return m_score->GetScoreDef()->GetPgHead2();
     }
 }
 
 RunningElement *Page::GetFooter() const
 {
+    assert(m_scoreEnd);
+
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
@@ -109,10 +114,10 @@ RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return doc->GetCurrentScoreDef()->GetPgFoot();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot();
     }
     else {
-        return doc->GetCurrentScoreDef()->GetPgFoot2();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot2();
     }
 }
 
@@ -519,6 +524,8 @@ void Page::LayOutVertically()
         this->Process(&adjustSlurs, &adjustSlursParams);
     }
 
+    doc->SetCurrentScore(this->m_score);
+
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();
     }
@@ -724,7 +731,20 @@ int Page::ScoreDefSetCurrentPageEnd(FunctorParams *functorParams)
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    this->m_score = params->m_doc->GetCurrentScore();
+    if (!this->m_score) {
+        this->m_score = params->m_doc->GetCurrentScore();
+    }
+    else {
+        this->m_scoreEnd = params->m_doc->GetCurrentScore();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::ScoreDefUnsetCurrent(FunctorParams *functorParams)
+{
+    m_score = NULL;
+    m_scoreEnd = NULL;
 
     return FUNCTOR_CONTINUE;
 }

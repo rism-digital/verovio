@@ -18,7 +18,9 @@
 #include "ending.h"
 #include "functorparams.h"
 #include "page.h"
+#include "pages.h"
 #include "pb.h"
+#include "runningelement.h"
 #include "sb.h"
 #include "scoredef.h"
 #include "section.h"
@@ -50,6 +52,11 @@ void Score::Reset()
     ResetNNumberLike();
 
     m_scoreDef.Reset();
+
+    m_drawingPgHeadHeight = 0;
+    m_drawingPgFootHeight = 0;
+    m_drawingPgHead2Height = 0;
+    m_drawingPgFoot2Height = 0;
 }
 
 bool Score::IsSupportedChild(Object *child)
@@ -86,6 +93,46 @@ void Score::SetAsCurrent()
     if (doc) {
         doc->SetCurrentScore(this);
     }
+}
+
+void Score::CalcRunningElementHeight(Doc *doc)
+{
+    assert(doc);
+
+    Pages *pages = doc->GetPages();
+    assert(pages);
+    assert(pages->GetChildCount() == 0);
+
+    Page *page1 = new Page();
+    page1->m_score = this;
+    page1->m_scoreEnd = this;
+    pages->AddChild(page1);
+    doc->SetDrawingPage(0);
+    page1->LayOutVertically();
+
+    RunningElement *page1Header = page1->GetHeader();
+    RunningElement *page1Footer = page1->GetFooter();
+
+    m_drawingPgHeadHeight = (page1Header) ? page1Header->GetTotalHeight() : 0;
+    m_drawingPgFootHeight = (page1Footer) ? page1Footer->GetTotalHeight() : 0;
+
+    Page *page2 = new Page();
+    page2->m_score = this;
+    page2->m_scoreEnd = this;
+    pages->AddChild(page2);
+    doc->SetDrawingPage(1);
+    page2->LayOutVertically();
+
+    RunningElement *page2Header = page2->GetHeader();
+    RunningElement *page2Footer = page2->GetFooter();
+
+    m_drawingPgHead2Height = (page2Header) ? page2Header->GetTotalHeight() : 0;
+    m_drawingPgFoot2Height = (page2Footer) ? page2Footer->GetTotalHeight() : 0;
+
+    pages->DeleteChild(page1);
+    pages->DeleteChild(page2);
+
+    doc->ResetDrawingPage();
 }
 
 //----------------------------------------------------------------------------
@@ -153,6 +200,21 @@ int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
     ConvertToPageBasedBoundary(this, params->m_page);
     params->m_currentSystem = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Score::CastOffPages(FunctorParams *functorParams)
+{
+    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
+    assert(params);
+
+    PageElement::CastOffPages(functorParams);
+
+    params->m_pgHeadHeight = m_drawingPgHeadHeight;
+    params->m_pgFootHeight = m_drawingPgFootHeight;
+    params->m_pgHead2Height = m_drawingPgHead2Height;
+    params->m_pgFoot2Height = m_drawingPgFoot2Height;
 
     return FUNCTOR_CONTINUE;
 }

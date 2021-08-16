@@ -57,6 +57,13 @@ public:
      */
     void SetAsCurrent();
 
+    /**
+     * Calculate the height of the pgHead/pgHead2 and pgFoot/pgFoot2 (if any)
+     * Requires the Doc to have an empty Pages object because it adds temporary pages
+     * Called from Doc::CastOffBase
+     */
+    void CalcRunningElementHeight(Doc *doc);
+
     //----------//
     // Functors //
     //----------//
@@ -90,6 +97,11 @@ public:
     ///@}
 
     /**
+     * See Object::CastOffPages
+     */
+    virtual int CastOffPages(FunctorParams *functorParams);
+
+    /**
      * See Object::UnCastOff
      */
     virtual int UnCastOff(FunctorParams *functorParams);
@@ -106,7 +118,16 @@ private:
     ScoreDef m_scoreDef;
 
 public:
-    //
+    /**
+     * @name Height of headers and footers for the score.
+     * Fill by
+     */
+    ///@{
+    int m_drawingPgHeadHeight;
+    int m_drawingPgFootHeight;
+    int m_drawingPgHead2Height;
+    int m_drawingPgFoot2Height;
+    ///@}
 private:
     //
 };

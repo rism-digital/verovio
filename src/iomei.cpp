@@ -804,7 +804,7 @@ bool MEIOutput::WriteObject(Object *object)
         // First save the main scoreDef
         // m_doc->GetCurrentScoreDef()->Save(this);
     }
-    else if (object->Is(SCORE) && (dynamic_cast<Score *>(object) == m_doc->GetScore())) {
+    else if (object->Is(SCORE)) {
         // First save the main scoreDef
         m_doc->GetCurrentScoreDef()->Save(this);
     }

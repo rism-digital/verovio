@@ -104,10 +104,9 @@ public:
     bool HasPage(int pageIdx);
 
     /**
-     * Get the Score in the visible Mdiv.
-     * Will find it only when having read a score-based MEI file
+     * Get all the Score in the visible Mdiv.
      */
-    Score *GetScore();
+    std::list<Score *> GetScores();
 
     /**
      * Get the Pages in the visible Mdiv.

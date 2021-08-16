@@ -972,15 +972,21 @@ public:
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * @name Set the Page::m_score and Page::m_scoreEnd pointers
+     * Always set a the end of Page (both in BACKWARD and FORWARD directions)
+     */
+    ///@{
+    virtual int ScoreDefSetCurrentPage(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Set the current scoreDef wherever need.
      * This is include a scoreDef for each system.
      * It also includes a scoreDef for each measure where a change occured before.
      * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
     virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
-
-    virtual int ScoreDefSetCurrentPage(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Optimize the scoreDef for each system.
