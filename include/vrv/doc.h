@@ -496,7 +496,6 @@ private:
      */
     ///@{
     Score *m_currentScore;
-    ScoreDef *m_currentScoreDef;
     ///@}
 
     /*

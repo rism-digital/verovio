@@ -106,14 +106,11 @@ void Doc::Reset()
 
     m_drawingPage = NULL;
     m_currentScore = NULL;
-    m_currentScoreDef = NULL;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_MIDITimemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
-
-    m_currentScoreDef = NULL;
 
     m_facsimile = NULL;
 
@@ -1832,8 +1829,6 @@ int Doc::GetAdjustedDrawingPageWidth() const
 Score *Doc::GetCurrentScore()
 {
     if (!m_currentScore) {
-        // We should also have no scoreDef
-        assert(!m_currentScoreDef);
         m_currentScore = vrv_cast<Score *>(this->FindDescendantByType(SCORE));
         assert(m_currentScore);
     }
@@ -1842,21 +1837,15 @@ Score *Doc::GetCurrentScore()
 
 ScoreDef *Doc::GetCurrentScoreDef()
 {
-    if (!m_currentScoreDef) {
-        // We should also have no score
-        assert(!m_currentScore);
-        Score *score = this->GetCurrentScore();
-        assert(score);
-        m_currentScoreDef = score->GetScoreDef();
-    }
-    return m_currentScoreDef;
+    if (!m_currentScore) this->GetCurrentScore();
+
+    return m_currentScore->GetScoreDef();
 }
 
 void Doc::SetCurrentScore(Score *score)
 {
     assert(score);
     m_currentScore = score;
-    m_currentScoreDef = score->GetScoreDef();
 }
 
 //----------------------------------------------------------------------------
