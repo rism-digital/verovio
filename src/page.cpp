@@ -606,14 +606,13 @@ void Page::JustifyVertically()
     justifyYParams.m_spaceToDistribute = m_drawingJustifiableHeight;
     this->Process(&justifyY, &justifyYParams);
 
-    // Shortcut if for some reason no shifts were calculated
-    if (justifyYParams.m_shiftForStaff.empty()) return;
-
-    // Adjust cross staff content which is displaced through vertical justification
-    Functor adjustCrossStaffContent(&Object::AdjustCrossStaffContent);
-    AdjustCrossStaffContentParams adjustCrossStaffContentParams(doc);
-    adjustCrossStaffContentParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
-    this->Process(&adjustCrossStaffContent, &adjustCrossStaffContentParams);
+    if (!justifyYParams.m_shiftForStaff.empty()) {
+        // Adjust cross staff content which is displaced through vertical justification
+        Functor adjustCrossStaffContent(&Object::AdjustCrossStaffContent);
+        AdjustCrossStaffContentParams adjustCrossStaffContentParams(doc);
+        adjustCrossStaffContentParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
+        this->Process(&adjustCrossStaffContent, &adjustCrossStaffContentParams);
+    }
 }
 
 void Page::LayOutPitchPos()
