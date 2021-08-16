@@ -9,6 +9,7 @@
 #define __VRV_SCORE_H__
 
 #include "atts_shared.h"
+#include "options.h"
 #include "pageboundary.h"
 #include "pageelement.h"
 #include "scoredef.h"
@@ -63,6 +64,11 @@ public:
      * Called from Doc::CastOffBase
      */
     void CalcRunningElementHeight(Doc *doc);
+
+    /**
+     * Check whether we need to optimize score based on the condense option
+     */
+    bool ScoreDefNeedsOptimization(int optionCondense);
 
     //----------//
     // Functors //

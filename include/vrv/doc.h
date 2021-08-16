@@ -231,11 +231,6 @@ public:
     void ScoreDefSetCurrentDoc(bool force = false);
 
     /**
-     * Check whether we need to optimize score based on the condense option
-     */
-    bool ScoreDefNeedsOptimization();
-
-    /**
      * Optimize the scoreDef once the document is cast-off.
      */
     void ScoreDefOptimizeDoc();

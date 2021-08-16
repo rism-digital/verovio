@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
@@ -133,6 +134,22 @@ void Score::CalcRunningElementHeight(Doc *doc)
     pages->DeleteChild(page2);
 
     doc->ResetDrawingPage();
+}
+
+bool Score::ScoreDefNeedsOptimization(int optionCondense)
+{
+    if (optionCondense == CONDENSE_none) return false;
+    // optimize scores only if encoded
+    bool optimize = (m_scoreDef.HasOptimize() && m_scoreDef.GetOptimize() == BOOLEAN_true);
+    // if nothing specified, do not if there is only one grpSym
+    if ((optionCondense == CONDENSE_auto) && !m_scoreDef.HasOptimize()) {
+        ListOfObjects symbols;
+        ClassIdComparison matchClassId(GRPSYM);
+        m_scoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
+        optimize = (symbols.size() > 1);
+    }
+
+    return optimize;
 }
 
 //----------------------------------------------------------------------------

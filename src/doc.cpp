@@ -806,22 +806,6 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     m_currentScoreDefDone = true;
 }
 
-bool Doc::ScoreDefNeedsOptimization()
-{
-    if (m_options->m_condense.GetValue() == CONDENSE_none) return false;
-    // optimize scores only if encoded
-    bool optimize = (GetCurrentScoreDef()->HasOptimize() && GetCurrentScoreDef()->GetOptimize() == BOOLEAN_true);
-    // if nothing specified, do not if there is only one grpSym
-    if ((m_options->m_condense.GetValue() == CONDENSE_auto) && !GetCurrentScoreDef()->HasOptimize()) {
-        ListOfObjects symbols;
-        ClassIdComparison matchClassId(GRPSYM);
-        GetCurrentScoreDef()->FindAllDescendantByComparison(&symbols, &matchClassId);
-        optimize = (symbols.size() > 1);
-    }
-
-    return optimize;
-}
-
 void Doc::ScoreDefOptimizeDoc()
 {
     Functor scoreDefOptimize(&Object::ScoreDefOptimize);
@@ -903,7 +887,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     this->ResetDrawingPage();
     this->SetDrawingPage(0);
 
-    bool optimize = ScoreDefNeedsOptimization();
+    bool optimize = false;
+    for (auto const score : scores) {
+        if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
+            optimize = true;
+            break;
+        }
+    }
+
     // Reset the scoreDef at the beginning of each system
     this->ScoreDefSetCurrentDoc(true);
     if (optimize) {
@@ -994,8 +985,12 @@ void Doc::CastOffEncodingDoc()
     this->ResetDrawingPage();
     this->ScoreDefSetCurrentDoc(true);
 
-    if (ScoreDefNeedsOptimization()) {
-        this->ScoreDefOptimizeDoc();
+    // Optimize the doc if one of the score requires optimization
+    for (auto const score : this->GetScores()) {
+        if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
+            this->ScoreDefOptimizeDoc();
+            break;
+        }
     }
     this->ScoreDefSetGrpSymDoc();
 }
