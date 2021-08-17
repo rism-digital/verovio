@@ -143,6 +143,17 @@ public:
     bool IsLastOfMdiv();
     ///@}
 
+    /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    void ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem);
+
+    /**
+     * Reverse of ConvertToCastOffMensural()
+     */
+    void ConvertToUnCastOffMensuralSystem();
+
     //----------//
     // Functors //
     //----------//

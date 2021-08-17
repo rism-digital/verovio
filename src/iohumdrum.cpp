@@ -24193,7 +24193,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
     if (m_mens) {
         doc->SetMensuralMusicOnly(true);
         doc->m_notationType = NOTATIONTYPE_mensural;
-        doc->ConvertToCastOffMensuralDoc();
+        doc->ConvertToCastOffMensuralDoc(true);
     }
 }
 

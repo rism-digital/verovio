@@ -368,6 +368,67 @@ bool System::IsLastOfMdiv()
     return (nextSibling && nextSibling->IsPageElement());
 }
 
+void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
+{
+    assert(doc);
+    assert(targetSystem);
+
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+
+    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
+        doc, targetSystem, &prepareProcessingListsParams.m_layerTree);
+    // Store the list of staff N for detecting barLines that are on all systems
+    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+        convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
+    }
+
+    Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
+    this->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
+}
+
+void System::ConvertToUnCastOffMensuralSystem()
+{
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+
+    ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
+
+    ArrayOfComparisons filters;
+    // Now we can process by layer and move their content to (measure) segments
+    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+        for (auto const &layers : staves.second.child) {
+            // Create ad comparison object for each type / @n
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
+            filters = { &matchStaff, &matchLayer };
+
+            convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
+            convertToUnCastOffMensuralParams.m_contentLayer = NULL;
+
+            Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
+            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
+
+            convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
+        }
+    }
+
+    // Detach the contentPage
+    for (auto &measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+        this->DeleteChild(measure);
+    }
+}
+
 //----------------------------------------------------------------------------
 // System functor methods
 //----------------------------------------------------------------------------

@@ -192,13 +192,13 @@ bool MEIOutput::Export()
             m_mei.append_attribute("meiversion") = "4.0.0";
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
-            m_doc->ConvertToUnCastOffMensuralDoc();
+            m_doc->ConvertToCastOffMensuralDoc(false);
 
             // this starts the call of all the functors
             m_doc->Save(this);
 
             // Redo the mensural segment cast of if necessary
-            m_doc->ConvertToCastOffMensuralDoc();
+            m_doc->ConvertToCastOffMensuralDoc(true);
         }
         else {
             if (m_doc->IsMensuralMusicOnly()) {

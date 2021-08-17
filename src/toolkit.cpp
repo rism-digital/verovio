@@ -667,7 +667,7 @@ bool Toolkit::LoadData(const std::string &data)
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
-        m_doc.ConvertToCastOffMensuralDoc();
+        m_doc.ConvertToCastOffMensuralDoc(true);
     }
 
     // Do the layout? this depends on the options and the file. PAE and
