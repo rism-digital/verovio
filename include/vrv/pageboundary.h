@@ -72,11 +72,6 @@ public:
      */
     virtual int UnCastOff(FunctorParams *functorParams);
 
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
-
 protected:
     //
 private:

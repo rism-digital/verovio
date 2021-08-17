@@ -251,21 +251,6 @@ int Score::UnCastOff(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Score::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    PageElement::ConvertToCastOffMensural(functorParams);
-
-    // assert(!params->m_targetSystem);
-    System *system = new System();
-    params->m_targetSystem = system;
-    params->m_page->AddChild(system);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Score::ScoreDefOptimize(FunctorParams *functorParams)
 {
     ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);

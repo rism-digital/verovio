@@ -1034,11 +1034,6 @@ void Doc::ConvertToCastOffMensuralDoc()
     Pages *pages = this->GetPages();
     assert(pages);
 
-    if (pages->GetChildCount() > 1) {
-        LogWarning("Document has to be un-cast off for MEI output...");
-        this->UnCastOffDoc();
-    }
-
     // We need to populate processing lists for processing the document by Layer
     PrepareProcessingListsParams prepareProcessingListsParams;
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
@@ -1082,11 +1077,6 @@ void Doc::ConvertToCastOffMensuralDoc()
 void Doc::ConvertToUnCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
-
-    // Currently works with one single mdiv selected and needs to be fixed with mutliple mdivs loaded
-    // Both ConvertToCastOffMensural and ConvertToUnCastOffMensural calls can be move to System
-    // Then we can symply iterate over each system (mdiv) in the page and replace them with their
-    // castoff / uncastoff versions
 
     // Do not convert transcription files
     if ((this->GetType() == Transcription) || (this->GetType() == Facs)) return;

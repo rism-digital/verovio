@@ -113,11 +113,6 @@ public:
     virtual int UnCastOff(FunctorParams *functorParams);
 
     /**
-     * See Object::ConvertToCastOffMensural
-     */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
-
-    /**
      * See Object::ScoreDefOptimize
      */
     virtual int ScoreDefOptimize(FunctorParams *functorParams);
