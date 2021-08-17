@@ -262,13 +262,6 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             break;
     }
 
-    // if (accid->GetAccid() == ACCIDENTAL_WRITTEN_f) {
-    //     sym = SMUFL_E260_accidentalFlat;
-    // }
-    // else if (accid->GetAccid() == ACCIDENTAL_WRITTEN_n) {
-    //     sym = SMUFL_E261_accidentalNatural;
-    // }
-
     int x,y;
     if ((m_doc->GetType() == Facs) && (accid->HasFacs())){
         x = accid->GetDrawingX();
@@ -301,8 +294,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
     
 
-    //DrawSmuflString(
-    //    dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+    // DrawSmuflString(
+    //     dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
