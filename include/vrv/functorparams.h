@@ -1546,12 +1546,18 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the FeatureExtractor to which extraction is delegated
+ * member 0: a pointer to the Doc
+ * member 1: a pointer to the FeatureExtractor to which extraction is delegated
  **/
 
 class GenerateFeaturesParams : public FunctorParams {
 public:
-    GenerateFeaturesParams(FeatureExtractor *extractor) { m_extractor = extractor; }
+    GenerateFeaturesParams(Doc *doc, FeatureExtractor *extractor)
+    {
+        m_doc = doc;
+        m_extractor = extractor;
+    }
+    Doc *m_doc;
     FeatureExtractor *m_extractor;
 };
 

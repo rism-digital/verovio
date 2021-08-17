@@ -428,7 +428,7 @@ bool Doc::ExportFeatures(std::string &output)
     }
     FeatureExtractor extractor;
     Functor generateFeatures(&Object::GenerateFeatures);
-    GenerateFeaturesParams generateFeaturesParams(&extractor);
+    GenerateFeaturesParams generateFeaturesParams(this, &extractor);
     this->Process(&generateFeatures, &generateFeaturesParams);
     extractor.ToJson(output);
 
