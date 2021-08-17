@@ -157,6 +157,30 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// SpanningToComparison
+//----------------------------------------------------------------------------
+
+class SpanningToComparison : public ClassIdComparison {
+
+public:
+    SpanningToComparison(ClassId classId, Object *pointingTo) : ClassIdComparison(classId)
+    {
+        m_pointingTo = pointingTo;
+    }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
+        if (!interface) return false;
+        return (interface->GetEnd() == m_pointingTo);
+    }
+
+protected:
+    Object *m_pointingTo;
+};
+
+//----------------------------------------------------------------------------
 // IsEditorialElementComparison
 //----------------------------------------------------------------------------
 
