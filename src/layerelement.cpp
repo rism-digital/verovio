@@ -1425,7 +1425,7 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     int margin = 0;
     Beam *beam = vrv_cast<Beam *>(params->m_beam);
     const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(GetDrawingX()) - DUR_8;
-    const int currentBeamY = params->m_y1 + params->m_beamSlope * (params->m_x1 - this->GetDrawingX());
+    const int currentBeamY = params->m_y1 + params->m_beamSlope * (this->GetDrawingX() - params->m_x1);
     if (params->m_directionBias > 0) {
         margin = GetContentTop() - currentBeamY + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
     }
