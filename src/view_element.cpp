@@ -301,8 +301,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
     
 
-    DrawSmuflString(
-        dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+    //DrawSmuflString(
+    //    dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
