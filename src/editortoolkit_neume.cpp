@@ -958,6 +958,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         layer->ReorderByXPos();
 
         m_infoObject.import("uuid", accid->GetUuid());
+        
     }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
