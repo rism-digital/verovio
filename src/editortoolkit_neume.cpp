@@ -757,8 +757,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         // Set as inclinatum or virga (if necessary), or get contour for grouping
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "tilt") {
-                if (it->second == "n") {
-                    nc->SetTilt(COMPASSDIRECTION_n);
+                if (it->second == "s") {
+                    nc->SetTilt(COMPASSDIRECTION_s);
                 }
                 else if (it->second == "se") {
                     nc->SetTilt(COMPASSDIRECTION_se);

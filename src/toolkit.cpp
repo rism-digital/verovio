@@ -890,9 +890,9 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     SetInputFrom(json.get<jsonxx::String>("format"));
                 }
             }
-            if (iter->first == "from") {
-                if (json.has<jsonxx::String>("from")) {
-                    SetInputFrom(json.get<jsonxx::String>("from"));
+            if (iter->first == "inputFrom") {
+                if (json.has<jsonxx::String>("inputFrom")) {
+                    SetInputFrom(json.get<jsonxx::String>("inputFrom"));
                 }
             }
             else if (iter->first == "scale") {
