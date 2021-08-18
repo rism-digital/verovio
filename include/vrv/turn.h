@@ -60,12 +60,26 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::PrepareDelayedTurns
+     */
+    virtual int PrepareDelayedTurns(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 protected:
     //
 private:
     //
 public:
-    //
+    /**
+     * The end point of a delayed turn when @startid is used
+     */
+    LayerElement *m_drawingEndElement;
+
 private:
     //
 };

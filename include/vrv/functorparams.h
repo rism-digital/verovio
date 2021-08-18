@@ -57,6 +57,7 @@ class System;
 class SystemAligner;
 class Transposer;
 class TupletNum;
+class Turn;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -1762,6 +1763,31 @@ public:
     Measure *m_lastMeasure;
     Ending *m_currentEnding;
     std::vector<SystemElementStartInterface *> m_startBoundaries;
+};
+
+//----------------------------------------------------------------------------
+// PrepareDelayedTurnsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating that we are running a first pass to fill the map
+ * member 1: a pointer to the element to which a turn is pointing to
+ * member 2: a pointer to the turn to which we want to set a m_drawingEndElement
+ * member 3: a map of the delayed turns and the layer element they point to
+ **/
+
+class PrepareDelayedTurnsParams : public FunctorParams {
+public:
+    PrepareDelayedTurnsParams()
+    {
+        m_initMap = true;
+        m_previousElement = NULL;
+        m_currentTurn = NULL;
+    }
+    bool m_initMap;
+    LayerElement *m_previousElement;
+    Turn *m_currentTurn;
+    std::map<LayerElement *, Turn *> m_delayedTurns;
 };
 
 //----------------------------------------------------------------------------
