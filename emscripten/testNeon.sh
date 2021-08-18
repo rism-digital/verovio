@@ -16,9 +16,9 @@ cd build
 # Moves the needed verovio.js into Neon
 cp verovio.js verovio_new.js
 
-mv verovio_new.js ~/Desktop/DDMAL_summer2021/Neon/verovio-util
+mv verovio_new.js [location_of_your_Neon]/Neon/verovio-util
 
-cd ~/Desktop/DDMAL_summer2021/Neon/verovio-util
+cd [location_of_your_Neon]/Neon/verovio-util
 
 rm verovio.js; mv verovio_new.js verovio.js
 
