@@ -181,7 +181,7 @@ bool Slur::AdjustSlurPosition(
     Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides)
 {
     bool isNotAdjustable = false;
-    const int margin = doc->GetDrawingUnit(100);
+    const int margin = (curve->IsCrossStaff() ? 2 : 1) * doc->GetDrawingUnit(100);
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
     std::tie(maxShiftLeft, maxShiftRight)
@@ -196,17 +196,17 @@ bool Slur::AdjustSlurPosition(
             if ((bezierCurve.c1.x < bezierCurve.p1.x) || (bezierCurve.c2.x > bezierCurve.p2.x)) return true;
             bezierCurve.SetLeftControlPointOffset(0.5 * bezierCurve.GetLeftControlPointOffset());
             bezierCurve.SetRightControlPointOffset(0.5 * bezierCurve.GetRightControlPointOffset());
-            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.1 * maxShiftLeft);
-            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.1 * maxShiftRight);
-            if ((maxShiftLeft > maxShiftRight) && (maxShiftRight == 0)) {
-                bezierCurve.SetLeftControlHeight(1.5 * bezierCurve.GetLeftControlHeight());
+            bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + 1.2 * maxShiftLeft);
+            bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + 1.2 * maxShiftRight);
+            if ((maxShiftLeft > 0) && (maxShiftRight == 0)) {
+                bezierCurve.SetLeftControlHeight(2.0 * bezierCurve.GetLeftControlHeight());
                 bezierCurve.SetRightControlPointOffset(2 * bezierCurve.GetRightControlPointOffset());
-                bezierCurve.SetRightControlHeight(0.5 * bezierCurve.GetRightControlHeight());
+                bezierCurve.SetRightControlHeight(0.75 * bezierCurve.GetRightControlHeight());
             }
-            else if ((maxShiftRight > maxShiftLeft) && (maxShiftLeft == 0)) {
-                bezierCurve.SetRightControlHeight(1.5 * bezierCurve.GetRightControlHeight());
+            else if ((maxShiftRight > 0) && (maxShiftLeft == 0)) {
+                bezierCurve.SetRightControlHeight(2.0 * bezierCurve.GetRightControlHeight());
                 bezierCurve.SetLeftControlPointOffset(2 * bezierCurve.GetLeftControlPointOffset());
-                bezierCurve.SetLeftControlHeight(0.5 * bezierCurve.GetLeftControlHeight());
+                bezierCurve.SetLeftControlHeight(0.75 * bezierCurve.GetLeftControlHeight());
             }
             if (std::abs(double(bezierCurve.p2.y - bezierCurve.p1.y) / double(bezierCurve.p2.x - bezierCurve.p1.x))
                 > 2.0) {
@@ -376,13 +376,11 @@ std::pair<int, int> Slur::CalculateAdjustedSlurShift(FloatingCurvePositioner *cu
         if (rightPointMaxHeight + margin < 0) maxShiftRight = 0;
     }
     else {
-        if (leftPointMaxHeight + margin > 0) maxShiftLeft = 0;
-        if (rightPointMaxHeight + margin > 0) maxShiftRight = 0;
+        if (leftPointMaxHeight - margin > 0) maxShiftLeft = 0;
+        if (rightPointMaxHeight - margin > 0) maxShiftRight = 0;
     }
 
     return { maxShiftLeft, maxShiftRight };
-    // Unrotated the slur
-    //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1)
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints)
