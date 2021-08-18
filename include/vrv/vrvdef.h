@@ -182,6 +182,7 @@ enum ClassId {
     KEYSIG,
     KEYACCID,
     LIGATURE,
+    LIQUESCENT,
     MENSUR,
     METERSIG,
     MREST,
