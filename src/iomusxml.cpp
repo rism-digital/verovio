@@ -106,6 +106,8 @@ MusicXmlInput::MusicXmlInput(Doc *doc) : Input(doc) {}
 
 MusicXmlInput::~MusicXmlInput() {}
 
+#ifndef NO_MUSICXML_SUPPORT
+
 bool MusicXmlInput::Import(std::string const &musicxml)
 {
     try {
@@ -4353,5 +4355,7 @@ void MusicXmlInput::SetChordStaff(Layer *layer)
         note->ResetStaffIdent();
     });
 }
+
+#endif // NO_MUSICXML_SUPPORT
 
 } // namespace vrv
