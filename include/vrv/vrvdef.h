@@ -98,7 +98,6 @@ enum ClassId {
     LABEL,
     LABELABBR,
     LAYER,
-    MDIV,
     MEASURE,
     MEASURE_ALIGNER,
     MENSUR_ATTR,
@@ -106,7 +105,6 @@ enum ClassId {
     METERSIGGRP,
     PAGE,
     PAGES,
-    SCORE,
     STAFF,
     STAFF_ALIGNMENT,
     STAFFGRP,
@@ -147,6 +145,12 @@ enum ClassId {
     PGHEAD,
     PGHEAD2,
     RUNNING_ELEMENT_max,
+    // Ids for PageElement child classes
+    PAGE_ELEMENT,
+    PAGE_ELEMENT_END,
+    MDIV,
+    SCORE,
+    PAGE_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
     SYSTEM_ELEMENT_END,

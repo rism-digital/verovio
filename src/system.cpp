@@ -13,7 +13,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "boundary.h"
 #include "comparison.h"
 #include "dir.h"
 #include "doc.h"
@@ -30,6 +29,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "syl.h"
+#include "systemboundary.h"
 #include "trill.h"
 #include "verse.h"
 #include "vrv.h"
@@ -339,6 +339,93 @@ void System::AddToDrawingListIfNeccessary(Object *object)
         if (trill->GetEnd() && (trill->GetExtender() != BOOLEAN_false)) {
             this->AddToDrawingList(trill);
         }
+    }
+}
+
+bool System::IsFirstInPage()
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst(SYSTEM) == this);
+}
+
+bool System::IsLastInPage()
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast(SYSTEM) == this);
+}
+
+bool System::IsFirstOfMdiv()
+{
+    assert(this->GetParent());
+    Object *nextSibling = this->GetParent()->GetPrevious(this);
+    return (nextSibling && nextSibling->IsPageElement());
+}
+
+bool System::IsLastOfMdiv()
+{
+    assert(this->GetParent());
+    Object *nextSibling = this->GetParent()->GetNext(this);
+    return (nextSibling && nextSibling->IsPageElement());
+}
+
+void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
+{
+    assert(doc);
+    assert(targetSystem);
+
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+
+    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
+        doc, targetSystem, &prepareProcessingListsParams.m_layerTree);
+    // Store the list of staff N for detecting barLines that are on all systems
+    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+        convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
+    }
+
+    Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
+    this->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
+}
+
+void System::ConvertToUnCastOffMensuralSystem()
+{
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+
+    ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
+
+    ArrayOfComparisons filters;
+    // Now we can process by layer and move their content to (measure) segments
+    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+        for (auto const &layers : staves.second.child) {
+            // Create ad comparison object for each type / @n
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
+            filters = { &matchStaff, &matchLayer };
+
+            convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
+            convertToUnCastOffMensuralParams.m_contentLayer = NULL;
+
+            Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
+            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
+
+            convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
+        }
+    }
+
+    // Detach the contentPage
+    for (auto &measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+        this->DeleteChild(measure);
     }
 }
 
@@ -665,7 +752,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     assert(params);
     assert(m_systemAligner.GetBottomAlignment());
 
-    int systemMargin = this->GetIdx() ? params->m_systemMargin : 0;
+    int systemMargin = this->IsFirstInPage() ? 0 : params->m_systemMargin;
     if (systemMargin) {
         const int margin
             = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
@@ -677,7 +764,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel();
 
     params->m_justificationSum += m_systemAligner.GetJustificationSum(params->m_doc);
-    if (!this->GetIdx()) {
+    if (this->IsFirstInPage()) {
         // remove extra system justification factor to get exactly (systemsCount-1)*justificationSystem
         params->m_justificationSum -= params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     }
@@ -691,11 +778,6 @@ int System::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
-
-    assert(GetParent());
-    assert(GetParent()->GetParent());
-
-    Object *parent = GetParent();
 
     params->m_measureXRel = 0;
     int margins = m_systemLeftMar + m_systemRightMar;
@@ -712,10 +794,9 @@ int System::JustifyX(FunctorParams *functorParams)
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
     }
 
-    // Check if we are on the last page and on the last system:
-    // do not justify it if the non-justified width is less than a specified percent.
-    if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
-        && (this->GetIdx() == parent->GetChildCount() - 1)) {
+    // Check if we are on the last system of an mdiv.
+    // Do not justify it if the non-justified width is less than a specified percent.
+    if (this->IsLastOfMdiv()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_STOP;
@@ -735,7 +816,7 @@ int System::JustifyY(FunctorParams *functorParams)
     const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
     const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
 
-    if (this->GetIdx()) {
+    if (!this->IsFirstInPage()) {
         params->m_cumulatedShift += shift;
     }
 
@@ -942,6 +1023,13 @@ int System::CastOffPages(FunctorParams *functorParams)
         }
     }
 
+    // First add all pending objects
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
+        params->m_currentPage->AddChild(*iter);
+    }
+    params->m_pendingPageElements.clear();
+
     // Special case where we use the Relinquish method.
     // We want to move the system to the currentPage. However, we cannot use DetachChild
     // from the contentPage because this screws up the iterator. Relinquish gives up
@@ -951,6 +1039,56 @@ int System::CastOffPages(FunctorParams *functorParams)
     params->m_currentPage->AddChild(system);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int System::CastOffSystems(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+
+    // We are starting a new system we need to cast off
+    params->m_contentSystem = this;
+    // We also need to create a new target system and add it to the page
+    System *system = new System();
+    params->m_page->AddChild(system);
+    params->m_currentSystem = system;
+
+    params->m_shift = -this->GetDrawingLabelsWidth();
+    params->m_currentScoreDefWidth
+        = params->m_page->m_drawingScoreDef.GetDrawingWidth() + this->GetDrawingAbbrLabelsWidth();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::CastOffSystemsEnd(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_pendingElements.empty()) return FUNCTOR_CONTINUE;
+
+    // Otherwise add all pendings objects
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_pendingElements.begin(); iter != params->m_pendingElements.end(); ++iter) {
+        params->m_currentSystem->AddChild(*iter);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    // We are starting a new system we need to cast off
+    params->m_contentSystem = this;
+    // Create the new system but do not add it to the page yet.
+    // It will be added when reaching a pb / sb or at the end of the score in PageElementEnd::CastOffEncoding
+    assert(!params->m_currentSystem);
+    params->m_currentSystem = new System();
+
+    return FUNCTOR_CONTINUE;
 }
 
 int System::UnCastOff(FunctorParams *functorParams)
@@ -964,22 +1102,6 @@ int System::UnCastOff(FunctorParams *functorParams)
     params->m_currentSystem->MoveChildrenFrom(this);
 
     return FUNCTOR_CONTINUE;
-}
-
-int System::CastOffSystemsEnd(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_pendingObjects.empty()) return FUNCTOR_STOP;
-
-    // Otherwise add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
-        params->m_currentSystem->AddChild(*iter);
-    }
-
-    return FUNCTOR_STOP;
 }
 
 } // namespace vrv

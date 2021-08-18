@@ -16,6 +16,7 @@ namespace vrv {
 class DeviceContext;
 class PrepareProcessingListsParams;
 class RunningElement;
+class Score;
 class Staff;
 class System;
 
@@ -139,6 +140,16 @@ public:
     //----------//
 
     /**
+     * See Object::ScoreDefSetCurrentPage
+     */
+    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::UnscoreDefSetCurrent
+     */
+    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+
+    /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
     virtual int ApplyPPUFactor(FunctorParams *functorParams);
@@ -162,6 +173,11 @@ public:
     virtual int AlignSystems(FunctorParams *functorParams);
     virtual int AlignSystemsEnd(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::CastOffPages
+     */
+    virtual int CastOffPagesEnd(FunctorParams *functorParams);
 
 private:
     /**
@@ -196,6 +212,15 @@ public:
      * The value is initialized by the Object::ScoreDefSetCurrent functor.
      */
     ScoreDef m_drawingScoreDef;
+
+    /**
+     * @name Pointers to the score at the beginning and end of the page
+     * Set in Page::ScoreDefSetCurrentPageEnd
+     */
+    ///@{
+    Score *m_score;
+    Score *m_scoreEnd;
+    ///@}
 
     /**
      * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI

@@ -54,6 +54,7 @@ class Num;
 class Octave;
 class Options;
 class Page;
+class PageElement;
 class Pedal;
 class PgFoot;
 class PgFoot;
@@ -185,6 +186,7 @@ protected:
      * Defined in view_page.cpp
      */
     ///@{
+    void DrawPageElement(DeviceContext *dc, PageElement *element);
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
     void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL,
