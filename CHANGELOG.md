@@ -2,10 +2,14 @@
 
 ## [unreleased]
 * Support for `section@restart`
+* Support for rendering multiple `mdiv/score`
+* Support for delayed turns using `@startid`
 * Improved ties between chords (@eNote-GmBH)
 * Improved handling of whole notes with multiple layers (@eNote-GmBH)
-* Imnproved support for `engravingDefaults` (@eNote-GmBH)
+* Improved support for `engravingDefaults` (@eNote-GmBH)
 * Improved logging for Android (@alpha0010)
+* Improved spacing for notes on ledger lines (@eNote-GmBH)
+* Option --staccato-center to center staccato on notehead and not the stem (new default)
 
 ## [3.5.0] - 2021-07-22
 * Support for `lv` (@eNote-GmbH)
