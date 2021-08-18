@@ -829,6 +829,8 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &scoreDefSetCurrent);
     this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
 
+    this->ScoreDefSetGrpSymDoc();
+
     m_currentScoreDefDone = true;
 }
 
@@ -839,6 +841,8 @@ void Doc::ScoreDefOptimizeDoc()
     ScoreDefOptimizeParams scoreDefOptimizeParams(this, &scoreDefOptimize, &scoreDefOptimizeEnd);
 
     this->Process(&scoreDefOptimize, &scoreDefOptimizeParams, &scoreDefOptimizeEnd);
+
+    this->ScoreDefSetGrpSymDoc();
 }
 
 void Doc::ScoreDefSetGrpSymDoc()
@@ -926,7 +930,6 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     if (optimize) {
         this->ScoreDefOptimizeDoc();
     }
-    this->ScoreDefSetGrpSymDoc();
 
     // Here we redo the alignment because of the new scoreDefs
     // Because of the new scoreDef, we need to reset cached drawingX
@@ -956,7 +959,6 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     if (optimize) {
         this->ScoreDefOptimizeDoc();
     }
-    this->ScoreDefSetGrpSymDoc();
 }
 
 void Doc::UnCastOffDoc()
@@ -1018,7 +1020,6 @@ void Doc::CastOffEncodingDoc()
             break;
         }
     }
-    this->ScoreDefSetGrpSymDoc();
 }
 
 void Doc::ConvertToPageBasedDoc()
