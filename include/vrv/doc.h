@@ -104,10 +104,9 @@ public:
     bool HasPage(int pageIdx);
 
     /**
-     * Get the Score in the visible Mdiv.
-     * Will find it only when having read a score-based MEI file
+     * Get all the Score in the visible Mdiv.
      */
-    Score *GetScore();
+    std::list<Score *> GetScores();
 
     /**
      * Get the Pages in the visible Mdiv.
@@ -232,11 +231,6 @@ public:
     void ScoreDefSetCurrentDoc(bool force = false);
 
     /**
-     * Check whether we need to optimize score based on the condense option
-     */
-    bool ScoreDefNeedsOptimization();
-
-    /**
      * Optimize the scoreDef once the document is cast-off.
      */
     void ScoreDefOptimizeDoc();
@@ -310,13 +304,9 @@ public:
     /**
      * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
      * Segment positions occur where a barLine is set on all staves.
+     * castOff parameters indicates if we perform cast off (true) or un-cast off
      */
-    void ConvertToCastOffMensuralDoc();
-
-    /**
-     * Reverse of ConvertToCastOffMensuralDoc()
-     */
-    void ConvertToUnCastOffMensuralDoc();
+    void ConvertToCastOffMensuralDoc(bool castOff);
 
     /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
@@ -398,6 +388,18 @@ public:
     bool HasFacsimile() const { return m_facsimile != NULL; }
     ///@}
 
+    /**
+     * @name Setter and getter for the current Score/ScoreDef.
+     * If not set, then looks for the first Score in the Document and use that.
+     * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
+     * When processing backward, the ScoreDef is changed when reaching the corresponding PageElementEnd
+     */
+    ///@{
+    Score *GetCurrentScore();
+    ScoreDef *GetCurrentScoreDef();
+    void SetCurrentScore(Score *score);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -433,12 +435,6 @@ public:
      * A copy of the header tree stored as pugi::xml_document
      */
     pugi::xml_document m_back;
-
-    /**
-     * Holds the top scoreDef.
-     * In a standard MEI file, this is the <scoreDef> encoded before the first <section>.
-     */
-    ScoreDef m_mdivScoreDef;
 
     /** The current page height */
     int m_drawingPageHeight;
@@ -483,6 +479,14 @@ private:
      * This could be saved somewhere as preferences (todo).
      */
     Options *m_options;
+
+    /**
+     * @name Holds a pointer to the current score/scoreDef.
+     * Set by Doc::GetCurrentScoreDef or explicitly through Doc::SetCurrentScoreDef
+     */
+    ///@{
+    Score *m_currentScore;
+    ///@}
 
     /*
      * The following values are set in the Doc::SetDrawingPage.
@@ -558,7 +562,7 @@ private:
     int m_pageMarginTop;
 
     /** Facsimile information */
-    Facsimile *m_facsimile = NULL;
+    Facsimile *m_facsimile;
 };
 
 } // namespace vrv

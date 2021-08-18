@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        boundary.cpp
+// Name:        systemboundary.cpp
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "boundary.h"
+#include "systemboundary.h"
 
 //----------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ void SystemElementEnd::Reset()
 }
 
 //----------------------------------------------------------------------------
-// SystemeElementStartInterface
+// SystemElementStartInterface
 //----------------------------------------------------------------------------
 
 SystemElementStartInterface::SystemElementStartInterface()
@@ -126,10 +126,10 @@ int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
         = dynamic_cast<SystemElementEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
     // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
-    if (params->m_pendingObjects.empty())
+    if (params->m_pendingElements.empty())
         params->m_currentSystem->AddChild(endBoundary);
     else
-        params->m_pendingObjects.push_back(endBoundary);
+        params->m_pendingElements.push_back(endBoundary);
 
     return FUNCTOR_SIBLINGS;
 }

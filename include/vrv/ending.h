@@ -9,7 +9,7 @@
 #define __VRV_ENDING_H__
 
 #include "atts_shared.h"
-#include "boundary.h"
+#include "systemboundary.h"
 #include "systemelement.h"
 
 namespace vrv {
@@ -52,8 +52,10 @@ public:
     /**
      * See Object::ConvertToPageBased
      */
+    ///@{
     virtual int ConvertToPageBased(FunctorParams *functorParams);
     virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::PrepareBoundaries

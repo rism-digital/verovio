@@ -24,7 +24,6 @@
 #include "artic.h"
 #include "beam.h"
 #include "beatrpt.h"
-#include "boundary.h"
 #include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
@@ -122,6 +121,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
+#include "systemboundary.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
 #include "tempo.h"
@@ -192,13 +192,13 @@ bool MEIOutput::Export()
             m_mei.append_attribute("meiversion") = "4.0.0";
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
-            m_doc->ConvertToUnCastOffMensuralDoc();
+            m_doc->ConvertToCastOffMensuralDoc(false);
 
             // this starts the call of all the functors
             m_doc->Save(this);
 
             // Redo the mensural segment cast of if necessary
-            m_doc->ConvertToCastOffMensuralDoc();
+            m_doc->ConvertToCastOffMensuralDoc(true);
         }
         else {
             if (m_doc->IsMensuralMusicOnly()) {
@@ -218,7 +218,7 @@ bool MEIOutput::Export()
                 m_currentNode = m_currentNode.append_child("section");
                 m_nodeStack.push_back(m_currentNode);
                 // First save the main scoreDef
-                m_doc->m_mdivScoreDef.Save(this);
+                m_doc->GetCurrentScoreDef()->Save(this);
             }
             else {
                 m_currentNode = meiDoc.append_child("pages");
@@ -276,9 +276,9 @@ bool MEIOutput::WriteObject(Object *object)
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("pages");
         }
-        else {
-            m_currentNode = m_currentNode.append_child("score");
-        }
+        // else {
+        //    m_currentNode = m_currentNode.append_child("score");
+        //}
         WritePages(m_currentNode, dynamic_cast<Pages *>(object));
     }
     else if (object->Is(SCORE)) {
@@ -779,6 +779,17 @@ bool MEIOutput::WriteObject(Object *object)
             WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
         }
     }
+    // SystemElementEnd - nothing to add - only
+    else if (object->Is(PAGE_ELEMENT_END)) {
+        if (m_scoreBasedMEI) {
+            // LogDebug("No piling '%s'", object->GetClassName().c_str());
+            return true;
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("pageElementEnd");
+            // WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
+        }
+    }
 
     else {
         // Missing output method for the class
@@ -791,11 +802,11 @@ bool MEIOutput::WriteObject(Object *object)
 
     if (object->Is(PAGES) && (dynamic_cast<Pages *>(object) == m_doc->GetPages())) {
         // First save the main scoreDef
-        m_doc->m_mdivScoreDef.Save(this);
+        // m_doc->GetCurrentScoreDef()->Save(this);
     }
-    else if (object->Is(SCORE) && (dynamic_cast<Score *>(object) == m_doc->GetScore())) {
+    else if (object->Is(SCORE)) {
         // First save the main scoreDef
-        m_doc->m_mdivScoreDef.Save(this);
+        m_doc->GetCurrentScoreDef()->Save(this);
     }
 
     WriteUnsupportedAttr(m_currentNode, object);
@@ -816,6 +827,9 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         return true;
     }
     else if (m_scoreBasedMEI && (object->Is(PAGE))) {
+        return true;
+    }
+    else if (m_scoreBasedMEI && (object->Is(PAGES))) {
         return true;
     }
 
@@ -972,6 +986,25 @@ void MEIOutput::WritePage(pugi::xml_node currentNode, Page *page)
     if (page->m_PPUFactor != 1.0) {
         currentNode.append_attribute("ppu") = StringFormat("%f", page->m_PPUFactor).c_str();
     }
+}
+
+void MEIOutput::WritePageElement(pugi::xml_node currentNode, PageElement *pageElement)
+{
+    assert(pageElement);
+
+    WriteXmlId(currentNode, pageElement);
+    pageElement->WriteTyped(currentNode);
+}
+
+void MEIOutput::WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd)
+{
+    assert(elementEnd && elementEnd->GetStart());
+
+    WritePageElement(currentNode, elementEnd);
+    currentNode.append_attribute("startid") = UuidToMeiStr(elementEnd->GetStart()).c_str();
+    std::string meiElementName = elementEnd->GetStart()->GetClassName();
+    std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+    currentNode.append_attribute("type") = meiElementName.c_str();
 }
 
 void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)
@@ -2499,7 +2532,6 @@ std::string MEIOutput::DocTypeToStr(DocType type)
 MEIInput::MEIInput(Doc *doc) : Input(doc)
 {
     m_hasScoreDef = false;
-    m_useScoreDefForDoc = false;
     m_readingScoreBased = false;
     m_version = MEI_UNDEFINED;
 }
@@ -3037,7 +3069,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
-    if (!xPathQuery.empty()) {
+    // Give priority to mdiv-all - maybe we could give a warning
+    if (!m_doc->GetOptions()->m_mdivAll.GetValue() && !xPathQuery.empty()) {
         pugi::xpath_node selection = body.select_node(xPathQuery.c_str());
         if (selection) {
             m_selectedMdiv = selection.node();
@@ -3070,7 +3103,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         return false;
     }
 
-    success = ReadMdivChildren(m_doc, body, false);
+    const bool allMdivVisible = m_doc->GetOptions()->m_mdivAll.GetValue();
+    success = ReadMdivChildren(m_doc, body, allMdivVisible);
 
     if (success) {
         m_doc->ExpandExpansions();
@@ -3116,7 +3150,6 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         // We make the mdiv visible if already set or if matching the desired selection
         bool makeVisible = (isVisible || (m_selectedMdiv == current));
-        m_useScoreDefForDoc = makeVisible;
         if (!success) break;
         if (std::string(current.name()) == "mdiv") {
             success = ReadMdiv(parent, current, makeVisible);
@@ -3716,11 +3749,15 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 
     ScoreDef *vrvScoreDef;
     // We have not reached the first scoreDef and we have to use if for the doc
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
-        vrvScoreDef = &m_doc->m_mdivScoreDef;
+    if (parent->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(parent);
+        assert(score);
+        vrvScoreDef = score->GetScoreDef();
+        m_hasScoreDef = true;
     }
     else {
         vrvScoreDef = new ScoreDef();
+        parent->AddChild(vrvScoreDef);
     }
     ReadScoreDefElement(scoreDef, vrvScoreDef);
 
@@ -3734,12 +3771,6 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     vrvScoreDef->ReadOptimization(scoreDef);
     vrvScoreDef->ReadTimeBase(scoreDef);
 
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
-        m_hasScoreDef = true;
-    }
-    else {
-        parent->AddChild(vrvScoreDef);
-    }
     ReadUnsupportedAttr(scoreDef, vrvScoreDef);
     return ReadScoreDefChildren(vrvScoreDef, scoreDef);
 }
@@ -6064,7 +6095,7 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
 bool MEIInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
+    if (!m_hasScoreDef) {
         LogError("<app> before any <scoreDef> is not supported");
         return false;
     }
@@ -6133,7 +6164,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
 
 bool MEIInput::ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef && m_useScoreDefForDoc) {
+    if (!m_hasScoreDef) {
         LogError("<choice> before any <scoreDef> is not supported");
         return false;
     }

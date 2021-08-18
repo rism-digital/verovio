@@ -1344,6 +1344,10 @@ Options::Options()
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
 
+    m_mdivAll.SetInfo("Mdiv all", "Load and render all <mdiv> elements in the MEI files");
+    m_mdivAll.Init(false);
+    this->Register(&m_mdivAll, "mdivAll", &m_selectors);
+
     m_mdivXPathQuery.SetInfo("Mdiv xPath query",
         "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
     m_mdivXPathQuery.Init("");

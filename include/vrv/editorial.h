@@ -10,8 +10,8 @@
 
 #include "atts_critapp.h"
 #include "atts_shared.h"
-#include "boundary.h"
 #include "object.h"
+#include "systemboundary.h"
 
 namespace vrv {
 

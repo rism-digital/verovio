@@ -79,7 +79,8 @@ int Section::ConvertToPageBased(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
@@ -89,7 +90,7 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+    ConvertToPageBasedBoundary(this, params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
@@ -107,7 +108,7 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
 int Section::PrepareBoundaries(FunctorParams *functorParams)
 {
-    if (this->IsBoundary()) {
+    if (this->IsSystemBoundary()) {
         this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
     }
 
@@ -118,7 +119,7 @@ int Section::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
-    if (this->IsBoundary()) {
+    if (this->IsSystemBoundary()) {
         this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
     }
 
