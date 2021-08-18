@@ -627,6 +627,32 @@ void Doc::PrepareDrawing()
         }
     }
 
+    /************ Resolve delayed turns ************/
+
+    PrepareDelayedTurnsParams prepareDelayedTurnsParams;
+    Functor prepareDelayedTurns(&Object::PrepareDelayedTurns);
+    this->Process(&prepareDelayedTurns, &prepareDelayedTurnsParams);
+
+    if (!prepareDelayedTurnsParams.m_delayedTurns.empty()) {
+        prepareDelayedTurnsParams.m_initMap = false;
+        for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+             staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+            for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+                filters.clear();
+                // Create ad comparison object for each type / @n
+                AttNIntegerComparison matchStaff(STAFF, staves->first);
+                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                filters.push_back(&matchStaff);
+                filters.push_back(&matchLayer);
+
+                prepareDelayedTurnsParams.m_currentTurn = NULL;
+                prepareDelayedTurnsParams.m_previousElement = NULL;
+
+                this->Process(&prepareDelayedTurns, &prepareDelayedTurnsParams, NULL, &filters);
+            }
+        }
+    }
+
     /************ Resolve lyric connectors ************/
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors

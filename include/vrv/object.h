@@ -1121,6 +1121,13 @@ public:
     virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Functor for setting Turn::m_drawingEndNote for delayed turns
+     * Need a first pass to fill the map with m_initMap to true
+     * Processed by staff/layer after that
+     */
+    virtual int PrepareDelayedTurns(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Functor for setting Measure of Ending
      */
     virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }

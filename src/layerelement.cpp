@@ -57,6 +57,7 @@
 #include "timestamp.h"
 #include "tuning.h"
 #include "tuplet.h"
+#include "turn.h"
 #include "verse.h"
 #include "view.h"
 #include "vrv.h"
@@ -2089,6 +2090,31 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
     }
     else if (this->Is({ NOTE, REST })) {
         params->m_currentElement = this;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
+{
+    PrepareDelayedTurnsParams *params = vrv_params_cast<PrepareDelayedTurnsParams *>(functorParams);
+    assert(params);
+
+    // We are initializing the params->m_delayedTurns map
+    if (params->m_initMap) return FUNCTOR_CONTINUE;
+
+    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
+
+    if (params->m_previousElement) {
+        assert(params->m_currentTurn);
+        params->m_currentTurn->m_drawingEndElement = this;
+        params->m_currentTurn = NULL;
+        params->m_previousElement = NULL;
+    }
+
+    if (params->m_delayedTurns.count(this)) {
+        params->m_previousElement = this;
+        params->m_currentTurn = params->m_delayedTurns.at(this);
     }
 
     return FUNCTOR_CONTINUE;

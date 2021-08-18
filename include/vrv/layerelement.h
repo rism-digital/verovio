@@ -317,6 +317,11 @@ public:
     virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
+     * See Object::PrepareDelayedTurns
+     */
+    virtual int PrepareDelayedTurns(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareTimePointing
      */
     virtual int PrepareTimePointing(FunctorParams *functorParams);
