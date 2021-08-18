@@ -93,46 +93,31 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     bezier.Rotate(-slurAngle, points[0]);
     bezier.CalculateControlPointOffset(doc, staff->m_drawingStaffSize);
 
-    GetSpannedPointPositions(doc, spannedElements, bezier.p1, slurAngle, curveDir, staff->m_drawingStaffSize);
-
     bool adjusted = false;
     if (!spannedElements->empty()) {
-
-        // Adjust the curvatur (control points are move)
-        int adjustedHeight
-            = AdjustSlurCurve(doc, spannedElements, bezier, curveDir, slurAngle, staff->m_drawingStaffSize, true);
+        // Bound the height of the control points
+        AdjustControlPointHeight(doc, bezier, staff->m_drawingStaffSize);
+        GetControlPoints(bezier, curveDir);
 
         // The slur is being adjusted
         adjusted = true;
         bezier.Rotate(slurAngle, bezier.p1);
-
-        // The adjustedHeight value is 0 if everything fits within the slur
-        // If not we need to move its position
         bool ignoreAngle = false;
-        if (adjustedHeight != 0) {
-            bezier.SetControlHeight(adjustedHeight);
-            // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-            ignoreAngle = AdjustSlurPosition(doc, curve, bezier, slurAngle, false);
-            // Re-calculate the control points with the new height
-            GetControlPoints(bezier, curveDir, ignoreAngle);
 
-            points[0] = bezier.p1;
-            points[1] = bezier.c1;
-            points[2] = bezier.c2;
-            points[3] = bezier.p2;
-            curve->UpdateCurveParams(points, slurAngle, curve->GetThickness(), curveDir);
-        }
+        // Use the adjusted control points for adjusting the position
+        ignoreAngle = AdjustSlurPosition(doc, curve, bezier, slurAngle, false);
+        // Recalculate the control points and update the bezier curve
+        GetControlPoints(bezier, curveDir, ignoreAngle);
 
-        // If we still have spanning points then move the slur but now by forcing both sides to be move
-        if (!spannedElements->empty()) {
+        points[0] = bezier.p1;
+        points[1] = bezier.c1;
+        points[2] = bezier.c2;
+        points[3] = bezier.p2;
+        curve->UpdateCurveParams(points, slurAngle, curve->GetThickness(), curveDir);
 
-            // First re-calcuate the spanning point positions
-            GetSpannedPointPositions(doc, spannedElements, bezier.p1, slurAngle, curveDir, staff->m_drawingStaffSize);
-
-            // Move it and force both sides to move
-            AdjustSlurPosition(doc, curve, bezier, slurAngle, true);
-            GetControlPoints(bezier, curveDir, ignoreAngle);
-        }
+        // Check again and force both sides to move
+        AdjustSlurPosition(doc, curve, bezier, slurAngle, true);
+        GetControlPoints(bezier, curveDir, ignoreAngle);
     }
 
     if (adjusted) {
@@ -148,33 +133,14 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     return adjusted;
 }
 
-int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve,
-    curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio)
+void Slur::AdjustControlPointHeight(Doc *doc, BezierCurve &bezierCurve, int staffSize)
 {
-    Point bezier[4];
-    bezier[0] = bezierCurve.p1;
-    bezier[1] = bezierCurve.c1;
-    bezier[2] = bezierCurve.c2;
-    bezier[3] = bezierCurve.p2;
+    const int currentHeight = abs(bezierCurve.c1.y - bezierCurve.p1.y);
+    int height = currentHeight * sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 3.0;
 
-    int dist = abs(bezierCurve.p2.x - bezierCurve.p1.x);
-    int currentHeight = abs(bezierCurve.c1.y - bezierCurve.p1.y);
-    int maxHeight = 0;
+    height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
 
-    // 0.2 for avoiding / by 0 (below)
-    float maxHeightFactor = std::max(0.2f, fabsf(angle));
-    maxHeight = dist
-        / (maxHeightFactor
-            * (doc->GetOptions()->m_slurCurveFactor.GetValue()
-                + 5)); // 5 is the minimum - can be increased for limiting curvature
-
-    maxHeight = std::max(maxHeight, currentHeight);
-    maxHeight = std::min(maxHeight, doc->GetDrawingOctaveSize(staffSize));
-
-    maxHeight = currentHeight;
-    if (!spannedElements->empty()) return maxHeight;
-
-    return 0;
+    bezierCurve.SetControlHeight(height);
 }
 
 bool Slur::AdjustSlurPosition(
@@ -437,27 +403,6 @@ void Slur::GetControlPoints(BezierCurve &bezier, curvature_CURVEDIR curveDir, bo
         bezier.c1.y = bezier.p1.y - bezier.GetLeftControlHeight();
         bezier.c2.y = bezier.p2.y - bezier.GetRightControlHeight();
     }
-}
-
-void Slur::GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
-    curvature_CURVEDIR curveDir, int staffSize)
-{
-    /*
-    for (auto &spannedElement : *spannedElements) {
-        int margin = 1;
-        // Not sure if it is better to add the margin before or after the rotation...
-        // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
-        // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
-        itPoint->second.second = BoundingBox::CalcPositionAfterRotation(itPoint->second.first, -angle, p1);
-        // This would add it after
-        if (curveDir == curvature_CURVEDIR_above) {
-            itPoint->second.second.y += doc->GetDrawingUnit(staffSize) * margin;
-        }
-        else {
-            itPoint->second.second.y -= doc->GetDrawingUnit(staffSize) * margin;
-        }
-    }
-    */
 }
 
 //----------------------------------------------------------------------------

@@ -56,8 +56,7 @@ public:
 
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
-    int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve,
-        curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
+    void AdjustControlPointHeight(Doc *doc, BezierCurve &bezierCurve, int staffSize);
 
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
@@ -72,8 +71,6 @@ public:
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
     void GetControlPoints(BezierCurve &curve, curvature_CURVEDIR curveDir, bool ignoreAngle = false);
-    void GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
-        curvature_CURVEDIR curveDir, int staffSize);
 
     //----------//
     // Functors //
