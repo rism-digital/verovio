@@ -254,8 +254,8 @@ jobs:
             options: "-c -H -M"
             filepath: "verovio-toolkit.js*"
           - target: light
-            message: "Building toolkit without humdrum and musicxml as light version"
-            options: "-c -H -l -X -M"
+            message: "Building toolkit without humdrum as light version"
+            options: "-c -H -l -M"
             filepath: "verovio-toolkit-light.js*"
           - target: wasm
             message: "Building toolkit without humdrum as wasm"
