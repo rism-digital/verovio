@@ -332,8 +332,11 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel)
     if (m_place == STAFFREL_above) {
         if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
     }
-    else {
+    else if (m_place == STAFFREL_below) {
         if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
+    }
+    else {
+        m_drawingYRel = drawingYRel;
     }
 }
 

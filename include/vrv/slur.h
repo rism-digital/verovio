@@ -81,6 +81,11 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::AdjustCrossStaffContent
+     */
+    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
+
 private:
     //
 public:

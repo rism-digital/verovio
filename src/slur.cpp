@@ -17,6 +17,7 @@
 
 #include "chord.h"
 #include "doc.h"
+#include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "staff.h"
@@ -417,6 +418,68 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
     // m_isCrossStaff = false;
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Slur::AdjustCrossStaffContent(FunctorParams *functorParams)
+{
+    AdjustCrossStaffContentParams *params = vrv_params_cast<AdjustCrossStaffContentParams *>(functorParams);
+    assert(params);
+
+    FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(this->GetCurrentFloatingPositioner());
+    assert(curve);
+
+    if (curve->IsCrossStaff()) {
+        // Construct list of spanned elements including start and end of slur
+        std::list<LayerElement *> slurElements = { this->GetStart(), this->GetEnd() };
+        const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+        std::for_each(spannedElements->begin(), spannedElements->end(), [&slurElements](CurveSpannedElement *element) {
+            LayerElement *layerElement = dynamic_cast<LayerElement *>(element->m_boundingBox);
+            if (layerElement) slurElements.push_back(layerElement);
+        });
+
+        // Determine top and bottom staff
+        Staff *topStaff = NULL;
+        Staff *bottomStaff = NULL;
+        Staff *startStaff = NULL;
+        for (LayerElement *element : slurElements) {
+            Layer *layer = NULL;
+            Staff *staff = element->GetCrossStaff(layer);
+            if (!staff) staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+            assert(staff);
+
+            if (topStaff && bottomStaff) {
+                if (staff->GetN() < topStaff->GetN()) topStaff = staff;
+                if (staff->GetN() > bottomStaff->GetN()) bottomStaff = staff;
+            }
+            else { // first iteration => initialize everything
+                topStaff = staff;
+                bottomStaff = staff;
+                startStaff = staff;
+            }
+        }
+
+        if (topStaff != bottomStaff) {
+            // Now calculate the shift due to vertical justification
+            auto getShift = [params](Staff *staff) {
+                StaffAlignment *alignment = staff->GetAlignment();
+                if (params->m_shiftForStaff.find(alignment) != params->m_shiftForStaff.end()) {
+                    return params->m_shiftForStaff.at(alignment);
+                }
+                return 0;
+            };
+
+            const int shift = getShift(bottomStaff) - getShift(topStaff);
+
+            // Apply the shift
+            if ((startStaff == topStaff) && (curve->GetDir() == curvature_CURVEDIR_below)) {
+                curve->SetDrawingYRel(curve->GetDrawingYRel() + shift);
+            }
+            if ((startStaff == bottomStaff) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+                curve->SetDrawingYRel(curve->GetDrawingYRel() - shift);
+            }
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 
