@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<Arpeg> s_factory("arpeg", ARPEG);
 
 Arpeg::Arpeg()
-    : ControlElement("arpeg-"), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis(), AttColor()
+    : ControlElement(ARPEG, "arpeg-"), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis(), AttColor()
 {
     RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());

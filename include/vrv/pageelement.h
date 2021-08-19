@@ -30,10 +30,10 @@ public:
      */
     ///@{
     PageElement();
-    PageElement(const std::string &classid);
+    PageElement(ClassId classId);
+    PageElement(ClassId classId, const std::string &classIdStr);
     virtual ~PageElement();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return PAGE_ELEMENT; }
     ///@}
 
     //----------//

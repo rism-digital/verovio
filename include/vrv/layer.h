@@ -47,7 +47,6 @@ public:
     virtual Object *Clone() const { return new Layer(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Layer"; }
-    virtual ClassId GetClassId() const { return LAYER; }
     ///@}
 
     /**

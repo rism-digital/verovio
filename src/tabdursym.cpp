@@ -23,7 +23,7 @@ namespace vrv {
 
 static const ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
 
-TabDurSym::TabDurSym() : LayerElement("tabdursym-"), AttNNumberLike()
+TabDurSym::TabDurSym() : LayerElement(TABDURSYM, "tabdursym-"), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
 

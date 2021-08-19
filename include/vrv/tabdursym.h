@@ -31,7 +31,6 @@ public:
     virtual ~TabDurSym();
     virtual void Reset();
     virtual std::string GetClassName() const { return "TabDurSym"; };
-    virtual ClassId GetClassId() const { return TABDURSYM; };
     ///@}
 
     /** Override the method since alignment is required */

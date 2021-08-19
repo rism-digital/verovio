@@ -43,7 +43,6 @@ public:
     virtual Object *Clone() const { return new Accid(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Accid"; }
-    virtual ClassId GetClassId() const { return ACCID; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }

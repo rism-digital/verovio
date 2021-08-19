@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<F> s_factory("f", FIGURE);
 
-F::F() : TextElement("f-"), TimeSpanningInterface(), AttExtender()
+F::F() : TextElement(FIGURE, "f-"), TimeSpanningInterface(), AttExtender()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_EXTENDER);

@@ -25,7 +25,7 @@ namespace vrv {
 static const ClassRegistrar<Trill> s_factory("trill", TRILL);
 
 Trill::Trill()
-    : ControlElement("trill-")
+    : ControlElement(TRILL, "trill-")
     , TimeSpanningInterface()
     , AttColor()
     , AttExtender()

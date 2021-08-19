@@ -28,7 +28,6 @@ public:
     virtual ~Svg();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Svg"; }
-    virtual ClassId GetClassId() const { return SVG; }
     ///@}
 
     /**

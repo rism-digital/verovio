@@ -29,7 +29,7 @@ namespace vrv {
 
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
-Ending::Ending() : SystemElement("ending-"), SystemElementStartInterface(), AttLineRend(), AttNNumberLike()
+Ending::Ending() : SystemElement(ENDING, "ending-"), SystemElementStartInterface(), AttLineRend(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_NINTEGER);

@@ -37,7 +37,6 @@ public:
     virtual ~Score();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Score"; }
-    virtual ClassId GetClassId() const { return SCORE; }
     ///@}
 
     /**

@@ -35,7 +35,7 @@ namespace vrv {
 // Page
 //----------------------------------------------------------------------------
 
-Page::Page() : Object("page-")
+Page::Page() : Object(PAGE, "page-")
 {
     Reset();
 }

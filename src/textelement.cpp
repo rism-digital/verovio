@@ -19,7 +19,7 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-TextElement::TextElement() : Object("te-"), AttLabelled(), AttTyped()
+TextElement::TextElement() : Object(TEXT_ELEMENT, "te-"), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -27,7 +27,16 @@ TextElement::TextElement() : Object("te-"), AttLabelled(), AttTyped()
     Reset();
 }
 
-TextElement::TextElement(const std::string &classid) : Object(classid), AttLabelled(), AttTyped()
+TextElement::TextElement(ClassId classId) : Object(classId, "te-"), AttLabelled(), AttTyped()
+{
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+TextElement::TextElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);

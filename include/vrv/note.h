@@ -72,7 +72,6 @@ public:
     virtual Object *Clone() const { return new Note(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Note"; }
-    virtual ClassId GetClassId() const { return NOTE; }
     ///@}
 
     /**

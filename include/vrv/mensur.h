@@ -43,7 +43,6 @@ public:
     virtual Object *Clone() const { return new Mensur(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Mensur"; }
-    virtual ClassId GetClassId() const { return MENSUR; }
     ///@}
 
     /** Override the method since alignment is required */

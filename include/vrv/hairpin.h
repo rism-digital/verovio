@@ -40,7 +40,6 @@ public:
     virtual Object *Clone() const { return new Hairpin(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Hairpin"; }
-    virtual ClassId GetClassId() const { return HAIRPIN; }
     ///@}
 
     /**

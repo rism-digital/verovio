@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<StaffGrp> s_factory("staffGrp", STAFFGRP);
 
 StaffGrp::StaffGrp()
-    : Object("staffgrp-")
+    : Object(STAFFGRP, "staffgrp-")
     , ObjectListInterface()
     , AttBasic()
     , AttLabelled()

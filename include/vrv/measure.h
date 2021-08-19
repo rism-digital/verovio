@@ -54,7 +54,6 @@ public:
     virtual Object *Clone() const { return new Measure(*this); };
     virtual void Reset();
     virtual std::string GetClassName() const { return "Measure"; }
-    virtual ClassId GetClassId() const { return MEASURE; }
     ///@}
 
     /**

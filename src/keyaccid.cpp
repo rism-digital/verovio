@@ -30,7 +30,8 @@ namespace vrv {
 
 static const ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
 
-KeyAccid::KeyAccid() : LayerElement("keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
+KeyAccid::KeyAccid()
+    : LayerElement(KEYACCID, "keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
 {
 
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());

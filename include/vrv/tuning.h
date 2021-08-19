@@ -32,7 +32,6 @@ public:
     virtual Object *Clone() const { return new Tuning(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tuning"; };
-    virtual ClassId GetClassId() const { return TUNING; };
     ///@}
 
     /**

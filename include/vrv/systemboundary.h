@@ -34,7 +34,6 @@ public:
     virtual ~SystemElementEnd();
     virtual void Reset();
     virtual std::string GetClassName() const { return "systemElementEnd"; }
-    virtual ClassId GetClassId() const { return SYSTEM_ELEMENT_END; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }

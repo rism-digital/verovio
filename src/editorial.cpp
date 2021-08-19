@@ -33,7 +33,8 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object("ee-"), SystemElementStartInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement()
+    : Object(EDITORIAL_ELEMENT, "ee-"), SystemElementStartInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -41,8 +42,17 @@ EditorialElement::EditorialElement() : Object("ee-"), SystemElementStartInterfac
     Reset();
 }
 
-EditorialElement::EditorialElement(const std::string &classid)
-    : Object(classid), SystemElementStartInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement(ClassId classId)
+    : Object(classId, "ee-"), SystemElementStartInterface(), AttLabelled(), AttTyped()
+{
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+EditorialElement::EditorialElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), SystemElementStartInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);

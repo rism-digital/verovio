@@ -34,7 +34,6 @@ public:
     virtual ~PageElementEnd();
     virtual void Reset();
     virtual std::string GetClassName() const { return "PageElementEnd"; }
-    virtual ClassId GetClassId() const { return PAGE_ELEMENT_END; }
     ///@}
 
     // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }

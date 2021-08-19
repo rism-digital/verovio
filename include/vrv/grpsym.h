@@ -39,7 +39,6 @@ public:
     virtual Object *Clone() const { return new GrpSym(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "GrpSym"; }
-    virtual ClassId GetClassId() const { return GRPSYM; }
     ///@}
 
     /**

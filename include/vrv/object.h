@@ -59,9 +59,10 @@ public:
      */
     ///@{
     Object();
-    Object(const std::string &classid);
+    Object(ClassId classId);
+    Object(ClassId classId, const std::string &classIdStr);
     virtual ~Object();
-    virtual ClassId GetClassId() const;
+    ClassId GetClassId() const final { return m_classId; }
     virtual std::string GetClassName() const { return "[MISSING]"; }
     ///@}
 
@@ -90,32 +91,14 @@ public:
      * See classId enum.
      */
     ///@{
-    bool IsControlElement() const
-    {
-        return (this->GetClassId() > CONTROL_ELEMENT && this->GetClassId() < CONTROL_ELEMENT_max);
-    }
-    bool IsEditorialElement() const
-    {
-        return (this->GetClassId() > EDITORIAL_ELEMENT && this->GetClassId() < EDITORIAL_ELEMENT_max);
-    }
-    bool IsLayerElement() const
-    {
-        return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
-    }
-    bool IsPageElement() const { return (this->GetClassId() > PAGE_ELEMENT && this->GetClassId() < PAGE_ELEMENT_max); }
-    bool IsRunningElement() const
-    {
-        return (this->GetClassId() > RUNNING_ELEMENT && this->GetClassId() < RUNNING_ELEMENT_max);
-    }
-    bool IsScoreDefElement() const
-    {
-        return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);
-    }
-    bool IsSystemElement() const
-    {
-        return (this->GetClassId() > SYSTEM_ELEMENT && this->GetClassId() < SYSTEM_ELEMENT_max);
-    }
-    bool IsTextElement() const { return (this->GetClassId() > TEXT_ELEMENT && this->GetClassId() < TEXT_ELEMENT_max); }
+    bool IsControlElement() const { return ((m_classId > CONTROL_ELEMENT) && (m_classId < CONTROL_ELEMENT_max)); }
+    bool IsEditorialElement() const { return ((m_classId > EDITORIAL_ELEMENT) && (m_classId < EDITORIAL_ELEMENT_max)); }
+    bool IsLayerElement() const { return ((m_classId > LAYER_ELEMENT) && (m_classId < LAYER_ELEMENT_max)); }
+    bool IsPageElement() const { return ((m_classId > PAGE_ELEMENT) && (m_classId < PAGE_ELEMENT_max)); }
+    bool IsRunningElement() const { return ((m_classId > RUNNING_ELEMENT) && (m_classId < RUNNING_ELEMENT_max)); }
+    bool IsScoreDefElement() const { return ((m_classId > SCOREDEF_ELEMENT) && (m_classId < SCOREDEF_ELEMENT_max)); }
+    bool IsSystemElement() const { return ((m_classId > SYSTEM_ELEMENT) && (m_classId < SYSTEM_ELEMENT_max)); }
+    bool IsTextElement() const { return ((m_classId > TEXT_ELEMENT) && (m_classId < TEXT_ELEMENT_max)); }
     ///@}
 
     /**
@@ -540,7 +523,7 @@ public:
      * limit (EditorialElement objects do not count).
      * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
-    virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
         ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
         bool skipFirst = false);
 
@@ -1275,7 +1258,11 @@ public:
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
 protected:
-    //
+    /**
+     * Change the class id
+     */
+    void SetClassId(ClassId classId) { m_classId = classId; }
+
 private:
     /**
      * Method for generating the uuid.
@@ -1283,9 +1270,9 @@ private:
     void GenerateUuid();
 
     /**
-     * Initialisation method taking a uuid prefix argument.
+     * Initialisation method taking the class id and a uuid prefix argument.
      */
-    void Init(const std::string &);
+    void Init(ClassId classId, const std::string &classIdStr);
 
 public:
     /**
@@ -1309,11 +1296,16 @@ private:
     Object *m_parent;
 
     /**
+     * The class id representing the actual (derived) class
+     */
+    ClassId m_classId;
+
+    /**
      * Members for storing / generating uuids
      */
     ///@{
     std::string m_uuid;
-    std::string m_classid;
+    std::string m_classIdStr;
     ///@}
 
     /**

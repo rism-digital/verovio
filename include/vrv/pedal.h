@@ -42,7 +42,6 @@ public:
     virtual Object *Clone() const { return new Pedal(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Pedal"; }
-    virtual ClassId GetClassId() const { return PEDAL; }
     ///@}
 
     /**

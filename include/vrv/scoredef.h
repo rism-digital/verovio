@@ -46,10 +46,11 @@ public:
      * @name Constructors, destructors, and other standard methods.
      */
     ///@{
-    ScoreDefElement(const std::string &classid);
+    ScoreDefElement();
+    ScoreDefElement(ClassId classId);
+    ScoreDefElement(ClassId classId, const std::string &classIdStr);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return SCOREDEF_ELEMENT; }
     ///@}
 
     /**
@@ -128,7 +129,6 @@ public:
     virtual Object *Clone() const { return new ScoreDef(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "ScoreDef"; }
-    virtual ClassId GetClassId() const { return SCOREDEF; }
     ///@}
 
     virtual bool IsSupportedChild(Object *object);

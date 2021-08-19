@@ -37,7 +37,6 @@ public:
     virtual Object *Clone() const { return new Ligature(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Ligature"; }
-    virtual ClassId GetClassId() const { return LIGATURE; }
     ///@}
 
     /** Override the method since alignment is required */

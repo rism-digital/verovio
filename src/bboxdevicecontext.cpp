@@ -24,7 +24,8 @@ namespace vrv {
 // BBoxDeviceContext
 //----------------------------------------------------------------------------
 
-BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned char update) : DeviceContext()
+BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned char update)
+    : DeviceContext(BBOX_DEVICE_CONTEXT)
 {
     m_view = view;
     m_width = width;

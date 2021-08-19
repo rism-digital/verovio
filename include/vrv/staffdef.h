@@ -44,7 +44,6 @@ public:
     virtual Object *Clone() const { return new StaffDef(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "StaffDef"; }
-    virtual ClassId GetClassId() const { return STAFFDEF; }
     ///@}
 
     /**

@@ -31,7 +31,17 @@ namespace vrv {
 
 static const ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
+BarLine::BarLine() : LayerElement(BARLINE, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
+{
+    RegisterAttClass(ATT_BARLINELOG);
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_VISIBILITY);
+
+    Reset();
+}
+
+BarLine::BarLine(ClassId classId)
+    : LayerElement(classId, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
     RegisterAttClass(ATT_BARLINELOG);
     RegisterAttClass(ATT_COLOR);
@@ -69,13 +79,38 @@ bool BarLine::HasRepetitionDots() const
 // BarLineAttr
 //----------------------------------------------------------------------------
 
-BarLineAttr::BarLineAttr() : BarLine()
+BarLineAttr::BarLineAttr() : BarLine(BARLINE_ATTR_RIGHT)
 {
     m_isLeft = false;
     m_noAttr = false;
 }
 
 BarLineAttr::~BarLineAttr() {}
+
+void BarLineAttr::SetLeft()
+{
+    m_isLeft = true;
+    this->UpdateClassId();
+}
+
+void BarLineAttr::SetNoAttr()
+{
+    m_noAttr = true;
+    this->UpdateClassId();
+}
+
+void BarLineAttr::UpdateClassId()
+{
+    if (m_noAttr) {
+        this->SetClassId(BARLINE);
+    }
+    else if (m_isLeft) {
+        this->SetClassId(BARLINE_ATTR_LEFT);
+    }
+    else {
+        this->SetClassId(BARLINE_ATTR_RIGHT);
+    }
+}
 
 //----------------------------------------------------------------------------
 // Functors methods

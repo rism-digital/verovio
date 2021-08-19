@@ -47,7 +47,7 @@ namespace vrv {
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-")
+    : Object(MEASURE, "measure-")
     , AttBarring()
     , AttMeasureLog()
     , AttMeterConformanceBar()

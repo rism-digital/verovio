@@ -25,7 +25,7 @@ namespace vrv {
 // PageElementEnd
 //----------------------------------------------------------------------------
 
-PageElementEnd::PageElementEnd(Object *start) : PageElement("page-element-end-")
+PageElementEnd::PageElementEnd(Object *start) : PageElement(PAGE_ELEMENT_END, "page-element-end-")
 {
     Reset();
     m_start = start;

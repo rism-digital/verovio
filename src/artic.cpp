@@ -37,7 +37,12 @@ const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_d
 static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
 Artic::Artic()
-    : LayerElement("artic-"), AttArticulation(), AttColor(), AttEnclosingChars(), AttExtSym(), AttPlacementRelEvent()
+    : LayerElement(ARTIC, "artic-")
+    , AttArticulation()
+    , AttColor()
+    , AttEnclosingChars()
+    , AttExtSym()
+    , AttPlacementRelEvent()
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);

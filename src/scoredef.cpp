@@ -40,7 +40,24 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(const std::string &classid) : Object(classid), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"), ScoreDefInterface(), AttTyped()
+{
+    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId, "scoredefelement-"), ScoreDefInterface(), AttTyped()
+{
+    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+ScoreDefElement::ScoreDefElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), ScoreDefInterface(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     RegisterAttClass(ATT_TYPED);
@@ -174,7 +191,7 @@ MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy()
 static const ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
 
 ScoreDef::ScoreDef()
-    : ScoreDefElement("scoredef-")
+    : ScoreDefElement(SCOREDEF, "scoredef-")
     , ObjectListInterface()
     , AttDistances()
     , AttEndings()

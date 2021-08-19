@@ -25,7 +25,7 @@ namespace vrv {
 static const ClassRegistrar<MeterSigGrp> s_factory("meterSigGrp", METERSIGGRP);
 
 MeterSigGrp::MeterSigGrp()
-    : Object("metersiggrp-")
+    : Object(METERSIGGRP, "metersiggrp-")
     , ObjectListInterface()
     , LinkingInterface()
     , AttBasic()

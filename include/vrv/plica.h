@@ -29,7 +29,6 @@ public:
     virtual Object *Clone() const { return new Plica(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Plica"; }
-    virtual ClassId GetClassId() const { return PLICA; }
 
     //----------//
     // Functors //

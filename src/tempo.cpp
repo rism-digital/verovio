@@ -32,7 +32,7 @@ namespace vrv {
 static const ClassRegistrar<Tempo> s_factory("tempo", TEMPO);
 
 Tempo::Tempo()
-    : ControlElement("tempo-"), TextDirInterface(), TimePointInterface(), AttLang(), AttMidiTempo(), AttMmTempo()
+    : ControlElement(TEMPO, "tempo-"), TextDirInterface(), TimePointInterface(), AttLang(), AttMidiTempo(), AttMmTempo()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());

@@ -48,7 +48,6 @@ public:
     virtual Object *Clone() const { return new Nc(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Nc"; }
-    virtual ClassId GetClassId() const { return NC; }
     ///@}
 
     /**

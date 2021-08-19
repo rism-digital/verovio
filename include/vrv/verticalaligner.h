@@ -39,7 +39,6 @@ public:
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
-    virtual ClassId GetClassId() const { return SYSTEM_ALIGNER; }
 
     /**
      * Do not copy children for HorizontalAligner
@@ -148,7 +147,6 @@ public:
     ///@{
     StaffAlignment();
     virtual ~StaffAlignment();
-    virtual ClassId GetClassId() const { return STAFF_ALIGNMENT; }
     ///@}
 
     /**

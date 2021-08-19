@@ -28,7 +28,7 @@ namespace vrv {
 static const ClassRegistrar<Nc> s_factory("nc", NC);
 
 Nc::Nc()
-    : LayerElement("nc-")
+    : LayerElement(NC, "nc-")
     , DurationInterface()
     , PitchInterface()
     , PositionInterface()

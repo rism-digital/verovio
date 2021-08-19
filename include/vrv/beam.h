@@ -135,7 +135,6 @@ public:
     virtual Object *Clone() const { return new Beam(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Beam"; }
-    virtual ClassId GetClassId() const { return BEAM; }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }
