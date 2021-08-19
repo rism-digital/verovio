@@ -50,7 +50,7 @@ void TimePointInterface::Reset()
 
 void TimePointInterface::SetStart(LayerElement *start)
 {
-    //assert(!m_start);
+    // assert(!m_start);
     m_start = start;
 }
 
@@ -177,7 +177,7 @@ void TimeSpanningInterface::Reset()
 
 void TimeSpanningInterface::SetEnd(LayerElement *end)
 {
-    //assert(!m_end);
+    // assert(!m_end);
     m_end = end;
 }
 

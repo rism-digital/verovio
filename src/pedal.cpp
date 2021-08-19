@@ -130,10 +130,8 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
     if (!this->HasDir()) return FUNCTOR_CONTINUE;
 
     if (this->GetDir() != pedalLog_DIR_down) {
-        auto pairedWithThis =
-            std::find_if(params->m_pedalLines.begin(), params->m_pedalLines.end(),[this](const Pedal *p) -> bool {
-                return p->GetStaff() == GetStaff();
-            });
+        auto pairedWithThis = std::find_if(params->m_pedalLines.begin(), params->m_pedalLines.end(),
+            [this](const Pedal *p) -> bool { return p->GetStaff() == GetStaff(); });
 
         if (pairedWithThis != params->m_pedalLines.end()) {
             (*pairedWithThis)->SetEnd(GetStart());
@@ -144,8 +142,9 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
                 (*pairedWithThis)->EndsWithBounce(true);
             }
             params->m_pedalLines.erase(pairedWithThis);
-        } else {
-            LogMessage("Pedal %s doesn't have start pair", GetUuid().c_str());
+        }
+        else {
+            LogMessage("Could not find start point for pedal %s", GetUuid().c_str());
         }
     }
 
@@ -156,7 +155,7 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Pedal::ResolveSpanningPedals(FunctorParams *functorParams) 
+int Pedal::ResolveSpanningPedals(FunctorParams *functorParams)
 {
     if (!this->HasDir() || (this->GetDir() != pedalLog_DIR_up)) return FUNCTOR_SIBLINGS;
 

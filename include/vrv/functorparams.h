@@ -1826,10 +1826,7 @@ public:
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams()
-    {
-        m_previousEnding = NULL;
-    }
+    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
     Ending *m_previousEnding;
     std::vector<Pedal *> m_pedalLines;
     std::vector<Dynam *> m_dynams;

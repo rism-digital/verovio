@@ -418,7 +418,7 @@ void Page::LayOutHorizontally()
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
 
-    // Resolve spanning pedals 
+    // Resolve spanning pedals
     // stub, we don't need any params for this call at the moment
     FunctorParams functorParams;
     Functor resolveSpanningPedals(&Object::ResolveSpanningPedals);

@@ -1274,10 +1274,8 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
-    static bool sortByUlx(Object *a, Object *b);
-
     /**
-     * Resolve pedals that are spanning accros several systems 
+     * Resolve pedals that are spanning accros several systems
      */
     ///@{
     virtual int ResolveSpanningPedals(FunctorParams *) { return FUNCTOR_CONTINUE; }

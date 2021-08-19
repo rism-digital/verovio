@@ -733,7 +733,7 @@ void Doc::PrepareDrawing()
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams, &prepareFloatingGrpsEnd);
 
     for (auto notPairedPedal : prepareFloatingGrpsParams.m_pedalLines) {
-        LogMessage("Pedal %s doesn't have the end pair", notPairedPedal->GetUuid().c_str());
+        LogMessage("Could not find end point for pedal %s", notPairedPedal->GetUuid().c_str());
     }
 
     /************ Resolve cue size ************/
