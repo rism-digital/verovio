@@ -458,7 +458,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class evaluates if the object is of a certain ClassId and has a @n of value n.
+ * This class evaluates if the object is a note being played at the given time.
  */
 class NoteOnsetOffsetComparison : public ClassIdComparison {
 

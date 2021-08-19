@@ -1331,7 +1331,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     this->ResetLogBuffer();
 
     jsonxx::Object o;
-    jsonxx::Array a;
+    jsonxx::Array noteArray;
+    jsonxx::Array chordArray;
 
     // Here we need to check that the midi timemap is done
     if (!m_doc.HasMidiTimemap()) {
@@ -1356,15 +1357,25 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ListOfObjects notes;
+    ListOfObjects chords;
 
     measure->FindAllDescendantByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
-    ListOfObjects::iterator iter;
-    for (iter = notes.begin(); iter != notes.end(); ++iter) {
-        a << (*iter)->GetUuid();
+    for (auto const item : notes) {
+        noteArray << item->GetUuid();
+        Note *note = vrv_cast<Note *>(item);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) chords.push_back(chord);
     }
-    o << "notes" << a;
+    chords.unique();
+    for (auto const item : chords) {
+        chordArray << item->GetUuid();
+    }
+
+    o << "notes" << noteArray;
+    o << "chords" << chordArray;
     o << "page" << pageNo;
 
     return o.json();
@@ -1484,15 +1495,16 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Array realTimeOnsetMilliseconds;
     jsonxx::Array realTimeOffsetMilliseconds;
 
+    if (!m_doc.HasMidiTimemap()) {
+        // generate MIDI timemap before progressing
+        m_doc.CalculateMidiTimemap();
+    }
+    if (!m_doc.HasMidiTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+        return o.json();
+    }
     if (element->Is(NOTE)) {
-        if (!m_doc.HasMidiTimemap()) {
-            // generate MIDI timemap before progressing
-            m_doc.CalculateMidiTimemap();
-        }
-        if (!m_doc.HasMidiTimemap()) {
-            LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
-            return o.json();
-        }
+
         Note *note = vrv_cast<Note *>(element);
         assert(note);
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));

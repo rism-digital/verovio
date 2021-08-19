@@ -9,6 +9,7 @@
 * Improved support for `engravingDefaults` (@eNote-GmBH)
 * Improved logging for Android (@alpha0010)
 * Improved spacing for notes on ledger lines (@eNote-GmBH)
+* Function getElementsAtTime includes `chord` elements
 * Option --staccato-center to center staccato on notehead and not the stem (new default)
 
 ## [3.5.0] - 2021-07-22
