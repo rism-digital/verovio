@@ -444,7 +444,6 @@ int Slur::AdjustCrossStaffContent(FunctorParams *functorParams)
         // Determine top and bottom staff
         Staff *topStaff = NULL;
         Staff *bottomStaff = NULL;
-        Staff *startStaff = NULL;
         for (LayerElement *element : slurElements) {
             Layer *layer = NULL;
             Staff *staff = element->GetCrossStaff(layer);
@@ -458,7 +457,6 @@ int Slur::AdjustCrossStaffContent(FunctorParams *functorParams)
             else { // first iteration => initialize everything
                 topStaff = staff;
                 bottomStaff = staff;
-                startStaff = staff;
             }
         }
 
@@ -475,10 +473,11 @@ int Slur::AdjustCrossStaffContent(FunctorParams *functorParams)
             const int shift = getShift(bottomStaff) - getShift(topStaff);
 
             // Apply the shift
-            if ((startStaff == topStaff) && (curve->GetDir() == curvature_CURVEDIR_below)) {
+            if ((curve->GetAlignment() == topStaff->GetAlignment()) && (curve->GetDir() == curvature_CURVEDIR_below)) {
                 curve->SetDrawingYRel(curve->GetDrawingYRel() + shift);
             }
-            if ((startStaff == bottomStaff) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+            if ((curve->GetAlignment() == bottomStaff->GetAlignment())
+                && (curve->GetDir() == curvature_CURVEDIR_above)) {
                 curve->SetDrawingYRel(curve->GetDrawingYRel() - shift);
             }
         }
