@@ -426,7 +426,10 @@ int Slur::AdjustCrossStaffContent(FunctorParams *functorParams)
     AdjustCrossStaffContentParams *params = vrv_params_cast<AdjustCrossStaffContentParams *>(functorParams);
     assert(params);
 
-    FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(this->GetCurrentFloatingPositioner());
+    FloatingPositioner *positioner = this->GetCurrentFloatingPositioner();
+    if (!positioner) return FUNCTOR_CONTINUE;
+
+    FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
 
     if (curve->IsCrossStaff()) {
