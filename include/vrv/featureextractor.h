@@ -51,8 +51,9 @@ private:
 public:
     Note *m_previousNote;
     jsonxx::Array m_pitches;
-    jsonxx::Array m_pitchesAndDuration;
+    jsonxx::Array m_pitchesIds;
     jsonxx::Array m_intervals;
+    jsonxx::Array m_intervalsIds;
 
 private:
 };

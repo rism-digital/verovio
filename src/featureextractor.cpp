@@ -94,11 +94,18 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         pitch << pname;
 
         m_pitches << pitch.str();
+        jsonxx::Array pitchesIds;
+        pitchesIds << note->GetUuid();
+        m_pitchesIds << jsonxx::Value(pitchesIds);
 
         // We have a previous note, so we can calculate an interval
         if (m_previousNote) {
             std::string interval = StringFormat("%d", note->GetMIDIPitch() - m_previousNote->GetMIDIPitch());
             m_intervals << interval;
+            jsonxx::Array intervalsIds;
+            intervalsIds << m_previousNote->GetUuid();
+            intervalsIds << note->GetUuid();
+            m_intervalsIds << jsonxx::Value(intervalsIds);
         }
         m_previousNote = note;
     }
@@ -108,7 +115,9 @@ void FeatureExtractor::ToJson(std::string &output)
 {
     jsonxx::Object o;
     o << "pitches" << m_pitches;
+    o << "pitchesIds" << m_pitchesIds;
     o << "intervals" << m_intervals;
+    o << "intervalsIds" << m_intervalsIds;
     output = o.json();
     LogDebug("%s", output.c_str());
 }
