@@ -2407,8 +2407,8 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <!--<glyph glyph-code="EA23" smufl-name="medRenPlicaCMN"/>-->
             <!--<glyph glyph-code="EA24" smufl-name="medRenGClefCMN"/>-->
             <!--<glyph glyph-code="EA25" smufl-name="medRenPunctumCMN"/>-->
-            <!--<glyph glyph-code="EA26" smufl-name="medRenLiquescentAscCMN"/>-->
-            <!--<glyph glyph-code="EA27" smufl-name="medRenLiquescentDescCMN"/>-->
+            <glyph glyph-code="EA26" smufl-name="medRenLiquescentAscCMN"/>
+            <glyph glyph-code="EA27" smufl-name="medRenLiquescentDescCMN"/>
             <!--<glyph glyph-code="EA28" smufl-name="medRenQuilismaCMN"/>-->
             <!--<glyph glyph-code="EA29" smufl-name="medRenStrophicusCMN"/>-->
             <!--<glyph glyph-code="EA2A" smufl-name="medRenOriscusCMN"/>-->
