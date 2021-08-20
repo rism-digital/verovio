@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "liquescent.h"
 #include "mrpt.h"
 #include "nc.h"
 #include "neume.h"

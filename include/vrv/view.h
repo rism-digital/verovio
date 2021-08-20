@@ -45,6 +45,7 @@ class Harm;
 class Layer;
 class LayerElement;
 class Lb;
+class Liquescent;
 class Measure;
 class MNum;
 class Mordent;
