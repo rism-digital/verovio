@@ -112,7 +112,7 @@ public:
      *
      * This method should be called only if the --xmlIdSeed parameter was set when creating the Toolkit
      */
-    void ResetXmlidSeed();
+    void ResetXmlIdSeed();
 
     ///@}
 

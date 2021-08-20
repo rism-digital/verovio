@@ -1092,7 +1092,7 @@ std::string Toolkit::GetVersion()
     return vrv::GetVersion();
 }
 
-void Toolkit::ResetXmlidSeed()
+void Toolkit::ResetXmlIdSeed()
 {
     int seed = m_options->m_xmlIdSeed.GetValue();
     if (seed == 0) {
