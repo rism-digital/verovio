@@ -62,7 +62,7 @@ public:
     void ClearCoordRefs();
 
     /**
-     * Get longest duration of the elements that are adjustent to the X coordinate passed
+     * Get longest duration of the elements that are adjacent to the X coordinate passed
      */
     int GetAdjacentElementsDuration(int elementX) const;
 
