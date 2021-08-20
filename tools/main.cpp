@@ -614,10 +614,6 @@ int main(int argc, char **argv)
             exit(1);
         }
         else {
-            toolkit.ResetXmlidSeed();
-            toolkit.LoadFile(infile);
-            toolkit.RenderToPAEFile(outfile);
-            
             std::cerr << "Output written to " << outfile << "." << std::endl;
         }
     }
