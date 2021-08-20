@@ -906,7 +906,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
             else if (iter->first == "xmlIdSeed") {
                 if (json.has<jsonxx::Number>("xmlIdSeed")) {
-                    Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
+                    m_options->m_xmlIdSeed.SetValue(json.get<jsonxx::Number>("xmlIdSeed"));
+                    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
                 }
             }
             // Deprecated option
@@ -1089,6 +1090,16 @@ std::string Toolkit::GetLog()
 std::string Toolkit::GetVersion()
 {
     return vrv::GetVersion();
+}
+
+void Toolkit::ResetXmlidSeed()
+{
+    int seed = m_options->m_xmlIdSeed.GetValue();
+    if (seed == 0) {
+        LogWarning("The XML id seed has not been set when creating the Toolkit instance");
+        return;
+    }
+    Object::SeedUuid(seed);
 }
 
 void Toolkit::ResetLogBuffer()

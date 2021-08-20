@@ -107,6 +107,13 @@ public:
      */
     std::string GetVersion();
 
+    /**
+     * Reset the @xml:id seed
+     *
+     * This method should be called only if the --xmlIdSeed parameter was set when creating the Toolkit
+     */
+    void ResetXmlidSeed();
+
     ///@}
 
     /**
