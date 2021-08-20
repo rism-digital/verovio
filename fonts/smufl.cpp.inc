@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        smufl.h
+// Name:        smufl.cpp
 // Author:      Laurent Pugin
-// Created:     2014
+// Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -10,13 +10,14 @@
 // and should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SMUFL_H__
-#define __VRV_SMUFL_H__
+#include "smufl.h"
 
 //----------------------------------------------------------------------------
+
+#include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// SMUFL glyphs available by default in Verovio
+// A map for the SMUFL names and the glyphs available in Verovio
 //----------------------------------------------------------------------------

@@ -1,15 +1,9 @@
 # Fonts
 
-* **Leipzig** is Verovio's own font. 
-* **[Bravura] [1]** is designed by Daniel Spreadbury. 
-* **[Gootville] [2]** is designed by Grzegorz Pruchniakowski and comes with [MuseScore] [3].
-* **[Petaluma] [4]** is designed by [Steinberg] [5].
+*   **[Leipzig](https://github.com/rism-digital/leipzig)** is Verovio's own font. 
+*   **[Bravura](https://github.com/steinbergmedia/bravura)** is designed by Daniel Spreadbury. 
+*   **[Gootville](https://github.com/musescore/MuseScore/tree/master/fonts/gootville)** is designed by Grzegorz Pruchniakowski and comes with [MuseScore](https://musescore.org/).
+*   **[Petaluma](https://github.com/steinbergmedia/petaluma)** is designed by [Steinberg](https://www.steinberg.net/).
+*   **[Leland](https://github.com/MuseScoreFonts/Leland)** is designed by [MuseScore](https://musescore.org/) (3.6).
 
-All fonts included in Verovio are licensed under the [SIL Open Font License] [6].
-
-[1]: https://github.com/steinbergmedia/bravura "Bravura Font"
-[2]: https://github.com/musescore/MuseScore/tree/master/fonts/gootville "Gootville Font"
-[3]: https://musescore.org/ "MuseScore"
-[4]: https://github.com/steinbergmedia/petaluma "Petaluma"
-[5]: https://www.steinberg.net/ "Steinberg"
-[6]: http://scripts.sil.org/cms/scripts/page.php?item_id=OFL "SIL Open Font License"
+All fonts included in Verovio are licensed under the [SIL Open Font License](http://scripts.sil.org/cms/scripts/page.php?item_id=OFL).
