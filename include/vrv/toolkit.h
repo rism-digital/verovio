@@ -20,6 +20,7 @@
 namespace vrv {
 
 class EditorToolkit;
+class RuntimeClock;
 
 enum FileFormat {
     UNKNOWN = 0,
@@ -678,6 +679,18 @@ public:
      */
     int GetOutputTo() { return m_outputTo; }
 
+    /**
+     * Measuring runtime.
+     *
+     * @ingroup nodoc
+     */
+    ///@{
+    void InitClock();
+    void ResetClock();
+    double GetRuntimeInSeconds() const;
+    void LogRuntime() const;
+    ///@}
+
     ///@}
 
 protected:
@@ -715,6 +728,9 @@ private:
     char *m_cString;
 
     EditorToolkit *m_editorToolkit;
+
+    /** Measuring runtime */
+    RuntimeClock *m_runtimeClock;
 
     //----------------//
     // Static members //

@@ -33,6 +33,7 @@
 #include "note.h"
 #include "options.h"
 #include "page.h"
+#include "runtimeclock.h"
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
@@ -81,6 +82,8 @@ Toolkit::Toolkit(bool initFont)
     m_options = m_doc.GetOptions();
 
     m_editorToolkit = NULL;
+
+    m_runtimeClock = NULL;
 }
 
 Toolkit::~Toolkit()
@@ -96,6 +99,10 @@ Toolkit::~Toolkit()
     if (m_editorToolkit) {
         delete m_editorToolkit;
         m_editorToolkit = NULL;
+    }
+    if (m_runtimeClock) {
+        delete m_runtimeClock;
+        m_runtimeClock = NULL;
     }
 }
 
@@ -1745,6 +1752,52 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
 #else
     return "";
 #endif
+}
+
+void Toolkit::InitClock()
+{
+    if (!m_runtimeClock) {
+        m_runtimeClock = new RuntimeClock();
+    }
+}
+
+void Toolkit::ResetClock()
+{
+    if (m_runtimeClock) {
+        m_runtimeClock->Reset();
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+    }
+}
+
+double Toolkit::GetRuntimeInSeconds() const
+{
+    if (m_runtimeClock) {
+        return m_runtimeClock->GetSeconds();
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+        return 0.0;
+    }
+}
+
+void Toolkit::LogRuntime() const
+{
+    if (m_runtimeClock) {
+        double seconds = m_runtimeClock->GetSeconds();
+        const int minutes = seconds / 60.0;
+        if (minutes > 0) {
+            seconds -= 60.0 * minutes;
+            LogMessage("Total runtime is %d min %.3f s.", minutes, seconds);
+        }
+        else {
+            LogMessage("Total runtime is %.3f s.", seconds);
+        }
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+    }
 }
 
 } // namespace vrv

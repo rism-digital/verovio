@@ -601,6 +601,7 @@ public:
     OptionInt m_pageWidth;
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
+    OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
