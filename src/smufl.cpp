@@ -359,6 +359,7 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "mensuralCombStemDownFlagFusa", SMUFL_E94C_mensuralCombStemDownFlagFusa },
     { "chantPunctum", SMUFL_E990_chantPunctum },
     { "chantPunctumInclinatum", SMUFL_E991_chantPunctumInclinatum },
+    { "chantAuctumDesc", SMUFL_E995_chantAuctumDesc },
     { "chantPunctumVirga", SMUFL_E996_chantPunctumVirga },
     { "chantPunctumVirgaReversed", SMUFL_E997_chantPunctumVirgaReversed },
     { "chantQuilisma", SMUFL_E99B_chantQuilisma },
@@ -387,6 +388,7 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "mensuralRestSemifusa", SMUFL_E9F8_mensuralRestSemifusa },
     { "mensuralCustosUp", SMUFL_EA02_mensuralCustosUp },
     { "chantCustosStemUpPosMiddle", SMUFL_EA06_chantCustosStemUpPosMiddle },
+    { "medRenLiquescenceCMN", SMUFL_EA22_medRenLiquescenceCMN },
     { "medRenLiquescentAscCMN", SMUFL_EA26_medRenLiquescentAscCMN },
     { "medRenLiquescentDescCMN", SMUFL_EA27_medRenLiquescentDescCMN },
     { "wiggleArpeggiatoUp", SMUFL_EAA9_wiggleArpeggiatoUp },
@@ -427,6 +429,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 401
+// 403
 
 } // namespace vrv

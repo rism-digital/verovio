@@ -358,6 +358,7 @@ enum {
     SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
     SMUFL_E990_chantPunctum = 0xE990,
     SMUFL_E991_chantPunctumInclinatum = 0xE991,
+    SMUFL_E995_chantAuctumDesc = 0xE995,
     SMUFL_E996_chantPunctumVirga = 0xE996,
     SMUFL_E997_chantPunctumVirgaReversed = 0xE997,
     SMUFL_E99B_chantQuilisma = 0xE99B,
@@ -386,6 +387,7 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA22_medRenLiquescenceCMN = 0xEA22,
     SMUFL_EA26_medRenLiquescentAscCMN = 0xEA26,
     SMUFL_EA27_medRenLiquescentDescCMN = 0xEA27,
     SMUFL_EAA9_wiggleArpeggiatoUp = 0xEAA9,
@@ -426,7 +428,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 401
+#define SMUFL_COUNT 403
 
 } // namespace vrv
 

@@ -2294,7 +2294,7 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <!--<glyph glyph-code="E992" smufl-name="chantPunctumInclinatumAuctum"/>-->
             <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
             <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->
-            <!--<glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>-->
+            <glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>
             <glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>
             <glyph glyph-code="E997" smufl-name="chantPunctumVirgaReversed"/>
             <!--<glyph glyph-code="E998" smufl-name="chantPunctumCavum"/>-->
@@ -2403,7 +2403,7 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <description>Medieval and Renaissance symbols in CMN</description>
             <!--<glyph glyph-code="EA20" smufl-name="ornamentQuilisma"/>-->
             <!--<glyph glyph-code="EA21" smufl-name="ornamentOriscus"/>-->
-            <!--<glyph glyph-code="EA22" smufl-name="medRenLiquescenceCMN"/>-->
+            <glyph glyph-code="EA22" smufl-name="medRenLiquescenceCMN"/>
             <!--<glyph glyph-code="EA23" smufl-name="medRenPlicaCMN"/>-->
             <!--<glyph glyph-code="EA24" smufl-name="medRenGClefCMN"/>-->
             <!--<glyph glyph-code="EA25" smufl-name="medRenPunctumCMN"/>-->

@@ -146,6 +146,9 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
         params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
+    if (nc->GetTilt() == COMPASSDIRECTION_s && nc->GetCurve() == ncForm_CURVE_a){
+        params.at(0).fontNo = SMUFL_E995_chantAuctumDesc;
+    }
 
     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
