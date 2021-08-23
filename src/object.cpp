@@ -170,6 +170,7 @@ Object::~Object()
 
 void Object::Init(const std::string &classid)
 {
+    assert(classid.size());
     m_classid = classid;
     m_parent = NULL;
     // Flags
@@ -586,7 +587,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    m_uuid = m_classid + Object::GenerateRandUuid();
+    m_uuid = m_classid.at(0) + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -921,11 +922,12 @@ void Object::SeedUuid(unsigned int seed)
 std::string Object::GenerateRandUuid()
 {
     int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
 
-    return std::string(str);
+    // char str[17];
+    // snprintf(str, 17, "%016d", nr);
+    // return std::string(str);
+
+    return BaseEncodeInt(nr, 36);
 }
 
 bool Object::sortByUlx(Object *a, Object *b)
