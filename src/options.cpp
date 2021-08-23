@@ -855,7 +855,7 @@ Options::Options()
     m_baseOptions.AddOption(&m_version);
 
     m_xmlIdSeed.SetInfo("XML IDs seed", "Seed the random number generator for XML IDs (default is random)");
-    m_xmlIdSeed.Init(0, 0, 0);
+    m_xmlIdSeed.Init(0, 0, -VRV_UNSET);
     m_xmlIdSeed.SetKey("xmlIdSeed");
     m_xmlIdSeed.SetShortOption('x', false);
     m_baseOptions.AddOption(&m_xmlIdSeed);

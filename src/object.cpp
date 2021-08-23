@@ -24,6 +24,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "featureextractor.h"
 #include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
@@ -1887,6 +1888,16 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
             currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
         }
     }
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::GenerateFeatures(FunctorParams *functorParams)
+{
+    GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
+    assert(params);
+
+    params->m_extractor->Extract(this, params);
+
     return FUNCTOR_CONTINUE;
 }
 

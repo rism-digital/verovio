@@ -223,6 +223,11 @@ public:
         std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, double> &realTimeToTempo);
 
     /**
+     * Extract music features to JSON string.
+     */
+    bool ExportFeatures(std::string &output, const std::string &options);
+
+    /**
      * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.

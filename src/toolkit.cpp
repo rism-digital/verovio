@@ -913,7 +913,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
             else if (iter->first == "xmlIdSeed") {
                 if (json.has<jsonxx::Number>("xmlIdSeed")) {
-                    Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
+                    m_options->m_xmlIdSeed.SetValue(json.get<jsonxx::Number>("xmlIdSeed"));
+                    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
                 }
             }
             // Deprecated option
@@ -1096,6 +1097,12 @@ std::string Toolkit::GetLog()
 std::string Toolkit::GetVersion()
 {
     return vrv::GetVersion();
+}
+
+void Toolkit::ResetXmlIdSeed(int seed)
+{
+    m_options->m_xmlIdSeed.SetValue(seed);
+    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
 }
 
 void Toolkit::ResetLogBuffer()
@@ -1301,8 +1308,8 @@ std::string Toolkit::RenderToPAE()
         return "";
     }
 
-    PAEOutput paeOutput(&m_doc);
     std::string output;
+    PAEOutput paeOutput(&m_doc);
     if (!paeOutput.Export(output)) {
         LogError("Export to PAE failed");
     }
@@ -1420,6 +1427,14 @@ bool Toolkit::RenderToTimemapFile(const std::string &filename)
 int Toolkit::GetPageCount()
 {
     return m_doc.GetPageCount();
+}
+
+std::string Toolkit::GetDescriptiveFeatures(const std::string &options)
+{
+    // For now do not handle any option
+    std::string output;
+    m_doc.ExportFeatures(output, options);
+    return output;
 }
 
 int Toolkit::GetPageWithElement(const std::string &xmlId)
