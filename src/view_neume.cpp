@@ -139,12 +139,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
-    if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
-        params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
-    }
+    // if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
+    //     params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
+    // }
 
-    else if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E996_chantPunctumVirga && nc->GetCurve() == ncForm_CURVE_a) {
-        params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
+    if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
+        params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
 
     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
