@@ -2326,7 +2326,7 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <glyph glyph-code="E9BB" smufl-name="chantLigaturaDesc4th"/>
             <glyph glyph-code="E9BC" smufl-name="chantLigaturaDesc5th"/>
             <!--<glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>-->
-            <!--<glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>-->
+            <glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>
             <!--<glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>-->
             <!--<glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>-->
             <!--<glyph glyph-code="E9C1" smufl-name="chantConnectingLineAsc6th"/>-->
@@ -2751,8 +2751,8 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         <combiningStaffPositions>
             <description>Combining staff positions</description>
             <!--<glyph glyph-code="EB90" smufl-name="staffPosRaise1"/>-->
-            <!--<glyph glyph-code="EB91" smufl-name="staffPosRaise2"/>-->
-            <!--<glyph glyph-code="EB92" smufl-name="staffPosRaise3"/>-->
+            <glyph glyph-code="EB91" smufl-name="staffPosRaise2"/>
+            <glyph glyph-code="EB92" smufl-name="staffPosRaise3"/>
             <!--<glyph glyph-code="EB93" smufl-name="staffPosRaise4"/>-->
             <!--<glyph glyph-code="EB94" smufl-name="staffPosRaise5"/>-->
             <!--<glyph glyph-code="EB95" smufl-name="staffPosRaise6"/>-->

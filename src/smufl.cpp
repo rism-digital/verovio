@@ -373,6 +373,7 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "chantLigaturaDesc3rd", SMUFL_E9BA_chantLigaturaDesc3rd },
     { "chantLigaturaDesc4th", SMUFL_E9BB_chantLigaturaDesc4th },
     { "chantLigaturaDesc5th", SMUFL_E9BC_chantLigaturaDesc5th },
+    { "chantConnectingLineAsc3rd", SMUFL_E9BE_chantConnectingLineAsc3rd },
     { "medRenFlatSoftB", SMUFL_E9E0_medRenFlatSoftB },
     { "medRenFlatHardB", SMUFL_E9E1_medRenFlatHardB },
     { "medRenNatural", SMUFL_E9E2_medRenNatural },
@@ -395,6 +396,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "wiggleArpeggiatoDown", SMUFL_EAAA_wiggleArpeggiatoDown },
     { "wiggleArpeggiatoUpArrow", SMUFL_EAAD_wiggleArpeggiatoUpArrow },
     { "wiggleArpeggiatoDownArrow", SMUFL_EAAE_wiggleArpeggiatoDownArrow },
+    { "staffPosRaise2", SMUFL_EB91_staffPosRaise2 },
+    { "staffPosRaise3", SMUFL_EB92_staffPosRaise3 },
     { "luteDurationWhole", SMUFL_EBA7_luteDurationWhole },
     { "luteDurationHalf", SMUFL_EBA8_luteDurationHalf },
     { "luteDurationQuarter", SMUFL_EBA9_luteDurationQuarter },
@@ -429,6 +432,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 403
+// 406
 
 } // namespace vrv
