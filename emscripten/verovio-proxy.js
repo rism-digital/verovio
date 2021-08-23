@@ -18,6 +18,9 @@ verovio.vrvToolkit.editInfo = Module.cwrap( 'vrvToolkit_editInfo', 'string', ['n
 // char *getAvailableOptions(Toolkit *ic)
 verovio.vrvToolkit.getAvailableOptions = Module.cwrap( 'vrvToolkit_getAvailableOptions', 'string', ['number'] );
 
+// char *getDescriptiveFeatures(Toolkit *ic, const char *options)
+verovio.vrvToolkit.getDescriptiveFeatures = Module.cwrap( 'vrvToolkit_getDescriptiveFeatures', 'string', ['number', 'string'] );
+
 // char *getElementAttr(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getElementAttr = Module.cwrap( 'vrvToolkit_getElementAttr', 'string', ['number', 'string'] );
 
@@ -131,6 +134,11 @@ verovio.toolkit.prototype.editInfo = function ()
 verovio.toolkit.prototype.getAvailableOptions = function ()
 {
     return JSON.parse( verovio.vrvToolkit.getAvailableOptions( this.ptr ) );
+};
+
+verovio.toolkit.prototype.getDescriptiveFeatures = function ( options )
+{
+    return JSON.parse( verovio.vrvToolkit.getDescriptiveFeatures( this.ptr, JSON.stringify( options ) ) );
 };
 
 verovio.toolkit.prototype.getElementAttr = function ( xmlId )

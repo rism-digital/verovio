@@ -160,6 +160,7 @@ $exports .= "'_vrvToolkit_destructor',";
 $exports .= "'_vrvToolkit_edit',";
 $exports .= "'_vrvToolkit_editInfo',";
 $exports .= "'_vrvToolkit_getAvailableOptions',";
+$exports .= "'_vrvToolkit_getDescriptiveFeatures',";
 $exports .= "'_vrvToolkit_getElementAttr',";
 $exports .= "'_vrvToolkit_getElementsAtTime',";
 $exports .= "'_vrvToolkit_getExpansionIdsForElement',";

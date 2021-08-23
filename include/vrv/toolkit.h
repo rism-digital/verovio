@@ -446,6 +446,16 @@ public:
      **************************************************************************
      */
     ///@{
+    
+    /**
+     * Return descriptive features as a JSON string
+     *
+     * The features are tailored for implementing incipit search
+     *
+     * @param options A stringified JSON object with the feature extraction options
+     * @return A stringified JSON object with the requested features
+     */
+    std::string GetDescriptiveFeatures(const std::string &options);
 
     /**
      * Returns array of IDs of elements being currently played

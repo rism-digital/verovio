@@ -65,6 +65,13 @@ const char *vrvToolkit_getAvailableOptions(void *tkPtr)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getDescriptiveFeatures(void *tkPtr, const char *options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetDescriptiveFeatures(options));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_getElementAttr(void *tkPtr, const char *xmlId)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

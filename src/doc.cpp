@@ -415,7 +415,7 @@ bool Doc::ExportTimemap(std::string &output)
     return true;
 }
 
-bool Doc::ExportFeatures(std::string &output)
+bool Doc::ExportFeatures(std::string &output, const std::string &options)
 {
     if (!Doc::HasMidiTimemap()) {
         // generate MIDI timemap before progressing
@@ -426,7 +426,7 @@ bool Doc::ExportFeatures(std::string &output)
         output = "";
         return false;
     }
-    FeatureExtractor extractor;
+    FeatureExtractor extractor(options);
     Functor generateFeatures(&Object::GenerateFeatures);
     GenerateFeaturesParams generateFeaturesParams(this, &extractor);
     this->Process(&generateFeatures, &generateFeaturesParams);

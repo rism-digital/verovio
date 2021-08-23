@@ -27,7 +27,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    FeatureExtractor();
+    FeatureExtractor(const std::string &options);
     virtual ~FeatureExtractor();
     ///@}
 

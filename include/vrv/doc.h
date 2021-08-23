@@ -226,7 +226,7 @@ public:
     /**
      * Extract music features to JSON string.
      */
-    bool ExportFeatures(std::string &output);
+    bool ExportFeatures(std::string &output, const std::string &options);
 
     /**
      * Set the initial scoreDef of each page.

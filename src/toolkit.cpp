@@ -1411,6 +1411,14 @@ int Toolkit::GetPageCount()
     return m_doc.GetPageCount();
 }
 
+std::string Toolkit::GetDescriptiveFeatures(const std::string &options)
+{
+    // For now do not handle any option
+    std::string output;
+    m_doc.ExportFeatures(output, options);
+    return output;
+}
+
 int Toolkit::GetPageWithElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindDescendantByUuid(xmlId);
