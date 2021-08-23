@@ -22,6 +22,7 @@ FILES="$SRCFILES \
  ../../src/midi/MidiMessage.cpp \
  ../../src/hum/humlib.cpp \
  ../../src/json/jsonxx.cc \
+ ../../src/crc/crc.cpp \
  ../../libmei/attconverter.cpp \
  ../../libmei/atts_analytical.cpp \
  ../../libmei/atts_cmn.cpp \
@@ -40,7 +41,7 @@ FILES="$SRCFILES \
  ../../libmei/atts_shared.cpp \
  ../../libmei/atts_visual.cpp"
 
-CXXOPTS="-g -fpic -std=c++17 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/midi -I../../include/pugi -I../../include/utf8 -I../../include/zip -I../../libmei -I/opt/local/include/ "
+CXXOPTS="-g -fpic -std=c++17 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/utf8 -I../../include/zip -I../../libmei -I/opt/local/include/ "
 
 PATHS=""
 unamestr=$(uname)

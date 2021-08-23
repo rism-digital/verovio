@@ -613,6 +613,7 @@ public:
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
     OptionBool m_useBraceGlyph;
+    OptionBool m_xmlIdChecksum;
 
     /**
      * General layout
