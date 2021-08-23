@@ -193,8 +193,6 @@ enum ClassId : uint16_t {
     ACCID,
     ARTIC,
     BARLINE,
-    BARLINE_ATTR_LEFT,
-    BARLINE_ATTR_RIGHT,
     BEAM,
     BEATRPT,
     BTREM,

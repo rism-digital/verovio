@@ -1257,12 +1257,6 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
-protected:
-    /**
-     * Change the class id
-     */
-    void SetClassId(ClassId classId) { m_classId = classId; }
-
 private:
     /**
      * Method for generating the uuid.

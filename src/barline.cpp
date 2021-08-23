@@ -59,6 +59,8 @@ void BarLine::Reset()
     ResetBarLineLog();
     ResetColor();
     ResetVisibility();
+
+    m_position = BarLinePosition::None;
 }
 
 bool BarLine::SetAlignment(Alignment *alignment)
@@ -73,43 +75,6 @@ bool BarLine::HasRepetitionDots() const
         return true;
     }
     return false;
-}
-
-//----------------------------------------------------------------------------
-// BarLineAttr
-//----------------------------------------------------------------------------
-
-BarLineAttr::BarLineAttr() : BarLine(BARLINE_ATTR_RIGHT)
-{
-    m_isLeft = false;
-    m_noAttr = false;
-}
-
-BarLineAttr::~BarLineAttr() {}
-
-void BarLineAttr::SetLeft()
-{
-    m_isLeft = true;
-    this->UpdateClassId();
-}
-
-void BarLineAttr::SetNoAttr()
-{
-    m_noAttr = true;
-    this->UpdateClassId();
-}
-
-void BarLineAttr::UpdateClassId()
-{
-    if (m_noAttr) {
-        this->SetClassId(BARLINE);
-    }
-    else if (m_isLeft) {
-        this->SetClassId(BARLINE_ATTR_LEFT);
-    }
-    else {
-        this->SetClassId(BARLINE_ATTR_RIGHT);
-    }
 }
 
 //----------------------------------------------------------------------------

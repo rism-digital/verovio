@@ -13,6 +13,8 @@
 
 namespace vrv {
 
+enum class BarLinePosition { None, Left, Right };
+
 //----------------------------------------------------------------------------
 // BarLine
 //----------------------------------------------------------------------------
@@ -53,6 +55,12 @@ public:
      */
     bool HasRepetitionDots() const;
 
+    /**
+     * @name Get and set the position
+     */
+    BarLinePosition GetPosition() const { return m_position; }
+    void SetPosition(BarLinePosition position) { m_position = position; }
+
     //----------//
     // Functors //
     //----------//
@@ -67,41 +75,8 @@ private:
 public:
     //
 private:
-};
-
-//----------------------------------------------------------------------------
-// BarLineAttr
-//----------------------------------------------------------------------------
-
-/**
- * This class models the barLine related attributes of a MEI measure.
- */
-class BarLineAttr : public BarLine {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * No Reset() method is required.
-     */
-    ///@{
-    BarLineAttr();
-    virtual ~BarLineAttr();
-    virtual Object *Clone() const { return new BarLineAttr(*this); }
-    virtual std::string GetClassName() const { return "BarLineAttr"; }
-    ///@}
-
-    void SetLeft();
-    void SetNoAttr();
-
-private:
-    /** The class id here depends on the value of the class members */
-    void UpdateClassId();
-
-public:
-    //
-private:
-    /** A flag for left barlines (right if false) */
-    bool m_isLeft;
-    bool m_noAttr;
+    /** The barline position (left/right) */
+    BarLinePosition m_position;
 };
 
 } // namespace vrv
