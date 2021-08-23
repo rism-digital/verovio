@@ -1055,6 +1055,11 @@ Options::Options()
     m_usePgHeaderForAll.Init(false);
     this->Register(&m_usePgHeaderForAll, "usePgHeaderForAll", &m_general);
 
+    m_xmlIdChecksum.SetInfo(
+        "XML IDs based on checksum", "Seed the generator for XML IDs using the checksum of the input data");
+    m_xmlIdChecksum.Init(false);
+    this->Register(&m_xmlIdChecksum, "xmlIdChecksum", &m_general);
+
     /********* General layout *********/
 
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
