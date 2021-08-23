@@ -1092,14 +1092,10 @@ std::string Toolkit::GetVersion()
     return vrv::GetVersion();
 }
 
-void Toolkit::ResetXmlIdSeed()
+void Toolkit::ResetXmlIdSeed(int seed)
 {
-    int seed = m_options->m_xmlIdSeed.GetValue();
-    if (seed == 0) {
-        LogWarning("The XML id seed has not been set when creating the Toolkit instance");
-        return;
-    }
-    Object::SeedUuid(seed);
+    m_options->m_xmlIdSeed.SetValue(seed);
+    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
 }
 
 void Toolkit::ResetLogBuffer()

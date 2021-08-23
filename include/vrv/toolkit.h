@@ -111,8 +111,10 @@ public:
      * Reset the @xml:id seed
      *
      * This method should be called only if the --xmlIdSeed parameter was set when creating the Toolkit
+     *
+     * @param seed The seed value for generating the xml:id values (0 for a time-based random seed)
      */
-    void ResetXmlIdSeed();
+    void ResetXmlIdSeed(int seed);
 
     ///@}
 
