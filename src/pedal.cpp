@@ -129,19 +129,66 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
 
     if (!this->HasDir()) return FUNCTOR_CONTINUE;
 
-    if (params->m_pedalLine && (this->GetDir() != pedalLog_DIR_down)) {
-        params->m_pedalLine->SetEnd(this->GetStart());
-        if (this->GetDir() == pedalLog_DIR_bounce) {
-            params->m_pedalLine->EndsWithBounce(true);
+    if (this->GetDir() != pedalLog_DIR_down) {
+        auto pairedWithThis = std::find_if(params->m_pedalLines.begin(), params->m_pedalLines.end(),
+            [this](const Pedal *p) -> bool { return p->GetStaff() == GetStaff(); });
+
+        if (pairedWithThis != params->m_pedalLines.end()) {
+            (*pairedWithThis)->SetEnd(GetStart());
+
+            SetEnd(GetStart());
+            SetStart((*pairedWithThis)->GetStart());
+            if (this->GetDir() == pedalLog_DIR_bounce) {
+                (*pairedWithThis)->EndsWithBounce(true);
+            }
+            params->m_pedalLines.erase(pairedWithThis);
         }
-        params->m_pedalLine = NULL;
+        else {
+            LogMessage("Could not find start point for pedal %s", GetUuid().c_str());
+        }
     }
 
     if ((this->GetDir() != pedalLog_DIR_up) && (this->GetForm() == pedalVis_FORM_line)) {
-        params->m_pedalLine = this;
+        params->m_pedalLines.push_back(this);
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int Pedal::ResolveSpanningPedals(FunctorParams *functorParams)
+{
+    if (!this->HasDir() || (this->GetDir() != pedalLog_DIR_up)) return FUNCTOR_SIBLINGS;
+
+    LayerElement *startElement = GetStart();
+    LayerElement *endElement = GetEnd();
+    if (!startElement || !endElement) return FUNCTOR_SIBLINGS;
+
+    Object *startSystem = startElement->GetFirstAncestor(SYSTEM);
+    Object *endSystem = endElement->GetFirstAncestor(SYSTEM);
+    assert(startSystem && endSystem);
+
+    const int startSystemIndex = startSystem->GetIdx();
+    const int endSystemIndex = endSystem->GetIdx();
+    // make sure that start and end are not in the neighboring systems or same system
+    if ((startSystem == endSystem) || (startSystemIndex == endSystemIndex - 1)) return FUNCTOR_SIBLINGS;
+
+    Object *pedalPage = startSystem->GetFirstAncestor(PAGE);
+    if (!pedalPage) return FUNCTOR_SIBLINGS;
+
+    // add current pedal as child to all systems in between starting and ending system
+    for (int i = startSystemIndex + 1; i < endSystemIndex; ++i) {
+        Object *system = pedalPage->GetChild(i);
+        if (!system->Is(SYSTEM)) continue;
+
+        Object *systemMeasure = system->GetFirst(MEASURE);
+        if (!systemMeasure) continue;
+
+        Object *pedal = Clone();
+
+        systemMeasure->AddChild(pedal);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

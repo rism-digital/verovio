@@ -198,6 +198,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
     // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
+        if (element->Is(PEDAL) && (static_cast<Pedal *>(element)->GetDir() == pedalLog_DIR_up)) return;
         // we use the start measure
         measure = interface->GetStartMeasure();
         if (!Check(measure)) return;
@@ -968,6 +969,10 @@ void View::DrawPedalLine(
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         DrawFilledRectangle(dc, x2 - bracketSize / 2, y, x2, y + lineWidth);
         DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
+    }
+    if (spanningType == SPANNING_MIDDLE) {
+        const int position = pedal->GetCurrentFloatingPositioner()->GetDrawingYRel() + bracketSize - lineWidth;
+        pedal->GetCurrentFloatingPositioner()->SetDrawingYRel(position);
     }
     DrawFilledRectangle(dc, x1 + bracketSize / 2, y, x2 - bracketSize / 2, y + lineWidth);
 

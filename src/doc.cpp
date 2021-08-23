@@ -40,6 +40,7 @@
 #include "note.h"
 #include "page.h"
 #include "pages.h"
+#include "pedal.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -751,6 +752,10 @@ void Doc::PrepareDrawing()
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     Functor prepareFloatingGrpsEnd(&Object::PrepareFloatingGrpsEnd);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams, &prepareFloatingGrpsEnd);
+
+    for (auto notPairedPedal : prepareFloatingGrpsParams.m_pedalLines) {
+        LogMessage("Could not find end point for pedal %s", notPairedPedal->GetUuid().c_str());
+    }
 
     /************ Resolve cue size ************/
 

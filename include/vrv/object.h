@@ -1281,6 +1281,13 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Resolve pedals that are spanning accros several systems
+     */
+    ///@{
+    virtual int ResolveSpanningPedals(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
 protected:
     //
 private:
