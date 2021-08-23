@@ -15,7 +15,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "boundary.h"
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
@@ -28,6 +27,7 @@
 #include "staffdef.h"
 #include "syl.h"
 #include "system.h"
+#include "systemboundary.h"
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
@@ -664,7 +664,8 @@ int Measure::ConvertToPageBased(FunctorParams *functorParams)
     assert(params);
 
     // Move itself to the pageBasedSystem - do not process children
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1154,7 +1155,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
             assert(measure);
             // move as pending since we want it not to be broken with the next measure
-            params->m_pendingObjects.push_back(measure);
+            params->m_pendingElements.push_back(measure);
             // continue
             return FUNCTOR_SIBLINGS;
         }
@@ -1168,7 +1169,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             if (isLeftoverMeasure) {
                 params->m_leftoverSystem = params->m_currentSystem;
             }
-            for (Object *oneOfPendingObjects : params->m_pendingObjects) {
+            for (Object *oneOfPendingObjects : params->m_pendingElements) {
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
@@ -1183,10 +1184,10 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
 
     // First add all pendings objects
     ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
+    for (iter = params->m_pendingElements.begin(); iter != params->m_pendingElements.end(); ++iter) {
         params->m_currentSystem->AddChild(*iter);
     }
-    params->m_pendingObjects.clear();
+    params->m_pendingElements.clear();
 
     // Special case where we use the Relinquish method.
     Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));

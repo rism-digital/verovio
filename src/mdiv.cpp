@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
+#include "page.h"
 #include "pages.h"
 #include "score.h"
 #include "vrv.h"
@@ -25,7 +27,7 @@ namespace vrv {
 
 static const ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
 
-Mdiv::Mdiv() : Object("mdiv-"), AttLabelled(), AttNNumberLike()
+Mdiv::Mdiv() : PageElement("mdiv-"), PageElementStartInterface(), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -74,5 +76,25 @@ void Mdiv::MakeVisible()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Mdiv::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_page);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Mdiv::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    if (m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_page);
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

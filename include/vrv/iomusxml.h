@@ -58,6 +58,8 @@ class Trill;
 // namespace for local MusicXML classes
 //----------------------------------------------------------------------------
 
+#ifndef NO_MUSICXML_SUPPORT
+
 namespace musicxml {
 
     class OpenSlur {
@@ -159,6 +161,8 @@ namespace musicxml {
 
 } // namespace musicxml
 
+#endif // NO_MUSICXML_SUPPORT
+
 //----------------------------------------------------------------------------
 // MusicXmlInput
 //----------------------------------------------------------------------------
@@ -169,6 +173,7 @@ public:
     MusicXmlInput(Doc *doc);
     virtual ~MusicXmlInput();
 
+#ifndef NO_MUSICXML_SUPPORT
     virtual bool Import(std::string const &musicxml);
 
 private:
@@ -490,6 +495,8 @@ private:
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
+
+#endif // NO_MUSICXML_SUPPORT
 };
 
 } // namespace vrv

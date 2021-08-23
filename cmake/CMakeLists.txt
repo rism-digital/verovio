@@ -14,6 +14,7 @@ option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        O
 option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
+option(NO_MUSICXML_SUPPORT      "Disable MusicXML support"                     OFF)
 option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
@@ -113,6 +114,10 @@ endif()
 
 if(NO_PAE_SUPPORT)
     add_definitions(-DNO_PAE_SUPPORT)
+endif()
+
+if(NO_MUSICXML_SUPPORT)
+    add_definitions(-DNO_MUSICXML_SUPPORT)
 endif()
 
 if(NO_MXL_SUPPORT)

@@ -102,6 +102,7 @@ public:
     {
         return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
     }
+    bool IsPageElement() const { return (this->GetClassId() > PAGE_ELEMENT && this->GetClassId() < PAGE_ELEMENT_max); }
     bool IsRunningElement() const
     {
         return (this->GetClassId() > RUNNING_ELEMENT && this->GetClassId() < RUNNING_ELEMENT_max);
@@ -300,7 +301,7 @@ public:
     /**
      * Return the last child of the object (if any, NULL otherwise)
      */
-    Object *GetLast() const;
+    Object *GetLast(const ClassId classId = UNSPECIFIED) const;
 
     /**
      * Get the parent of the Object
@@ -971,6 +972,15 @@ public:
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * @name Set the Page::m_score and Page::m_scoreEnd pointers
+     * Always set a the end of Page (both in BACKWARD and FORWARD directions)
+     */
+    ///@{
+    virtual int ScoreDefSetCurrentPage(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Set the current scoreDef wherever need.
      * This is include a scoreDef for each system.
      * It also includes a scoreDef for each measure where a change occured before.
@@ -1111,6 +1121,13 @@ public:
     virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Functor for setting Turn::m_drawingEndNote for delayed turns
+     * Need a first pass to fill the map with m_initMap to true
+     * Processed by staff/layer after that
+     */
+    virtual int PrepareDelayedTurns(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Functor for setting Measure of Ending
      */
     virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1162,6 +1179,11 @@ public:
      * Justify the Y positions
      */
     virtual int JustifyY(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust cross staff content after vertical justification
+     */
+    virtual int AdjustCrossStaffContent(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

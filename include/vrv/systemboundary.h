@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        boundary.h
+// Name:        systemboundary.h
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_BOUNDARY_H__
-#define __VRV_BOUNDARY_H__
+#ifndef __VRV_SYSTEM_BOUNDARY_H__
+#define __VRV_SYSTEM_BOUNDARY_H__
 
 #include "systemelement.h"
 #include "vrvdef.h"
@@ -117,7 +117,7 @@ public:
     ///@{
     void SetEnd(SystemElementEnd *end);
     SystemElementEnd *GetEnd() { return m_end; }
-    bool IsBoundary() { return (m_end != NULL); }
+    bool IsSystemBoundary() { return (m_end != NULL); }
     ///@}
 
     /**

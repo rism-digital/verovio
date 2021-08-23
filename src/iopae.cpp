@@ -75,7 +75,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->m_mdivScoreDef.Save(this);
+    m_doc->GetCurrentScoreDef()->Save(this);
 
     m_docScoreDef = false;
 
@@ -1005,20 +1005,20 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->m_mdivScoreDef.AddChild(scoreDefKeySig);
+        m_doc->GetCurrentScoreDef()->AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         // Make it an attribute for now
         scoreDefMeterSig->IsAttribute(true);
-        m_doc->m_mdivScoreDef.AddChild(scoreDefMeterSig);
+        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now
         scoreDefMensur->IsAttribute(true);
-        m_doc->m_mdivScoreDef.AddChild(scoreDefMensur);
+        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMensur);
     }
 
-    m_doc->m_mdivScoreDef.AddChild(staffGrp);
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
 
     if (m_tie != NULL) {
         LogWarning("Open tie will not render because tstamp2 is missing");

@@ -495,7 +495,7 @@ bool BeamSegment::CalcBeamSlope(
 
     // We can keep the current slope but only if curStep is not 0 and smaller than the step
     if ((curStep != 0) && (curStep < step) && (BEAMPLACE_mixed != place)) {
-        LogDebug("Current %d step is lower than max step %d", curStep, step);
+        // LogDebug("Current %d step is lower than max step %d", curStep, step);
         return false;
     }
     // This occurs when the current stem would yield an horizontal beam

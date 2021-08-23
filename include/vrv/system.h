@@ -133,6 +133,27 @@ public:
      */
     void AddToDrawingListIfNeccessary(Object *object);
 
+    /**
+     * @name Check if the system is the first or last in page or of an mdiv by looking at the next sibling
+     */
+    ///@{
+    bool IsFirstInPage();
+    bool IsLastInPage();
+    bool IsFirstOfMdiv();
+    bool IsLastOfMdiv();
+    ///@}
+
+    /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    void ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem);
+
+    /**
+     * Reverse of ConvertToCastOffMensural()
+     */
+    void ConvertToUnCastOffMensuralSystem();
+
     //----------//
     // Functors //
     //----------//
@@ -143,7 +164,7 @@ public:
     virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::ScoreDefOptimize
+     * @name See Object::ScoreDefOptimize
      */
     ///@{
     virtual int ScoreDefOptimize(FunctorParams *functorParams);
@@ -176,7 +197,7 @@ public:
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
-     * See Object::AdjustXOverflow
+     * @name See Object::AdjustXOverflow
      */
     ///@{
     virtual int AdjustXOverflow(FunctorParams *functorParams);
@@ -184,7 +205,7 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustHarmGrpsSpacing
+     * @name See Object::AdjustHarmGrpsSpacing
      */
     ///@{
     virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
@@ -192,7 +213,7 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustSylSpacing
+     * @name See Object::AdjustSylSpacing
      */
     ///@{
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
@@ -205,7 +226,7 @@ public:
     virtual int AdjustTempo(FunctorParams *functorParams);
 
     /**
-     * See Object::AlignVertically
+     * @name See Object::AlignVertically
      */
     ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
@@ -223,10 +244,12 @@ public:
     virtual int AlignSystems(FunctorParams *functorParams);
 
     /**
-     * See Object::AlignMeasures
+     * @name See Object::AlignMeasures
      */
+    ///@{
     virtual int AlignMeasures(FunctorParams *functorParams);
     virtual int AlignMeasuresEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::JustifyX
@@ -264,14 +287,22 @@ public:
     virtual int CastOffPages(FunctorParams *functorParams);
 
     /**
+     * @name See Object::CastOffSystems
+     */
+    ///@{
+    virtual int CastOffSystems(FunctorParams *functorParams);
+    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
+    /**
      * See Object::UnCastOff
      */
     virtual int UnCastOff(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystemsEnd
-     */
-    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
 
 public:
     SystemAligner m_systemAligner;
