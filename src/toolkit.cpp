@@ -1112,7 +1112,7 @@ void Toolkit::RedoLayout()
     else if (m_options->m_breaks.GetValue() == BREAKS_smart) {
         m_doc.CastOffSmartDoc();
     }
-    else {
+    else if (m_options->m_breaks.GetValue() != BREAKS_none) {
         m_doc.CastOffDoc();
     }
 }
