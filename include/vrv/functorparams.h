@@ -186,8 +186,11 @@ public:
  * member 0: the beam that should be adjusted
  * member 1: y coordinate of the beam left side
  * member 2: y coordinate of the beam right side
- * member 3: overlap margin that beam needs to be displaced by
- * member 4: the Doc
+ * member 3: x coordinate of the beam left side (starting point)
+ * member 4: slope of the beam
+ * member 5: overlap margin that beam needs to be displaced by
+ * member 6: the Doc
+ * member 7: the flag indicating whether element from different layer is being processed
  **/
 
 class AdjustBeamParams : public FunctorParams {
@@ -197,6 +200,8 @@ public:
         m_beam = NULL;
         m_y1 = 0;
         m_y2 = 0;
+        m_x1 = 0;
+        m_beamSlope = 0.0;
         m_directionBias = 0;
         m_overlapMargin = 0;
         m_doc = doc;
@@ -206,6 +211,8 @@ public:
     Object *m_beam;
     int m_y1;
     int m_y2;
+    int m_x1;
+    double m_beamSlope;
     int m_directionBias;
     int m_overlapMargin;
     Doc *m_doc;
