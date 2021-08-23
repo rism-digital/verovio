@@ -516,7 +516,7 @@ curvature_CURVEDIR Slur::GetGraceCurveDirection(Doc *doc)
         if (bottomDiff < 1.5 * topDiff) {
             return curvature_CURVEDIR_below;
         }
-        else if ((topDiff <= 3 * unit) || (NULL != GetEnd()->IsInBeam())) {
+        else if ((bottomDiff < 3 * topDiff) && (NULL != GetEnd()->IsInBeam())) {
             return curvature_CURVEDIR_below;
         }
         else {
@@ -718,8 +718,18 @@ std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
         }
         // slur is down
         else {
+            // grace note
+            if (isGraceToNoteSlur) {
+                y1 = GetStart()->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                if (startStemDir != STEMDIRECTION_up) {
+                    x1 -= startRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+                else {
+                    y1 += doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+                }
+            }
             // d(_)
-            if (startStemDir == STEMDIRECTION_up || startStemLen == 0)
+            else if (startStemDir == STEMDIRECTION_up || startStemLen == 0)
                 y1 = GetStart()->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             // P(_)P
             else if (isShortSlur) {
@@ -727,8 +737,7 @@ std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
             }
             // same but in beam
             else if (((parentBeam = GetEnd()->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, GetEnd()))
-                || ((parentFTrem = GetEnd()->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, GetEnd()))
-                || isGraceToNoteSlur) {
+                || ((parentFTrem = GetEnd()->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, GetEnd()))) {
                 y1 = GetStart()->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x1 -= startRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -776,7 +785,7 @@ std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
                 }
                 else {
                     y2 = GetEnd()->GetDrawingTop(doc, staff->m_drawingStaffSize);
-                    x2 += endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
             // (^)d
@@ -815,13 +824,12 @@ std::tuple<int, int, int, int> Slur::AdjustCoordinates(Doc *doc, Staff *staff,
                     y2 = y1;
                     x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
-                else if (overlap && (botDiff > 3 * unit) && (endStemDir == STEMDIRECTION_down)) {
-                    y2 = y1;
-                    x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                else if (GetStart()->IsInBeam()) {
+                    x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
                 else {
                     y2 = GetEnd()->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-                    x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    x2 -= endRadius;
                 }
             }
             // (_)P
