@@ -42,6 +42,7 @@
 
 #include "MidiFile.h"
 #include "checked.h"
+#include "crc.h"
 #include "jsonxx.h"
 #include "unchecked.h"
 
@@ -417,6 +418,12 @@ bool Toolkit::LoadData(const std::string &data)
 {
     std::string newData;
     Input *input = NULL;
+
+    if (m_options->m_xmlIdChecksum.GetValue()) {
+        crcInit();
+        unsigned int cr = crcFast((unsigned char *)data.c_str(), (int)data.size());
+        Object::SeedUuid(cr);
+    }
 
 #ifndef NO_HUMDRUM_SUPPORT
     ClearHumdrumBuffer();
