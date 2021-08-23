@@ -520,6 +520,25 @@ std::string GetVersion()
     return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);
 }
 
+static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+std::string BaseEncodeInt(int value, int base)
+{
+    assert(base > 10);
+    assert(base < 63);
+
+    std::string base62;
+    if (value < base) return std::string(1, base62Chars[value]);
+
+    while (value) {
+        base62 += base62Chars[value % base];
+        value /= base;
+    }
+
+    reverse(base62.begin(), base62.end());
+    return base62;
+}
+
 //----------------------------------------------------------------------------
 // Base64 code borrowed
 //----------------------------------------------------------------------------
