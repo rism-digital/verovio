@@ -9,8 +9,12 @@
 * Improved support for `engravingDefaults` (@eNote-GmBH)
 * Improved logging for Android (@alpha0010)
 * Improved spacing for notes on ledger lines (@eNote-GmBH)
+* Improved placement of beam in order to avoid overlaps (@eNote-GmBH)
 * Function getElementsAtTime includes `chord` elements
+* Function resetXmlIdSeed for resetting the `@xml:id` random generator with a specific value
+* Function getDescriptiveFeatures for basic feature extraction (experimental work)
 * Option --staccato-center to center staccato on notehead and not the stem (new default)
+* Option --xmlIdChecksum to have `@xml:id` generated based on the checksum of the input data
 
 ## [3.5.0] - 2021-07-22
 * Support for `lv` (@eNote-GmbH)
