@@ -49,10 +49,10 @@ public:
      */
     ///@{
     LayerElement();
-    LayerElement(const std::string &classid);
+    LayerElement(ClassId classId);
+    LayerElement(ClassId classId, const std::string &classIdStr);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return LAYER_ELEMENT; }
     ///@}
 
     /**

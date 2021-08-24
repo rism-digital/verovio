@@ -50,12 +50,17 @@ thread_local std::vector<void *> FloatingObject::s_drawingObjectIds;
 // FloatingObject
 //----------------------------------------------------------------------------
 
-FloatingObject::FloatingObject() : Object("fe")
+FloatingObject::FloatingObject() : Object(FLOATING_OBJECT, "fe")
 {
     Reset();
 }
 
-FloatingObject::FloatingObject(const std::string &classid) : Object(classid)
+FloatingObject::FloatingObject(ClassId classId) : Object(classId, "fe")
+{
+    Reset();
+}
+
+FloatingObject::FloatingObject(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr)
 {
     Reset();
 

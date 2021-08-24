@@ -31,7 +31,17 @@ namespace vrv {
 
 static const ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
+BarLine::BarLine() : LayerElement(BARLINE, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
+{
+    RegisterAttClass(ATT_BARLINELOG);
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_VISIBILITY);
+
+    Reset();
+}
+
+BarLine::BarLine(ClassId classId)
+    : LayerElement(classId, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
     RegisterAttClass(ATT_BARLINELOG);
     RegisterAttClass(ATT_COLOR);
@@ -49,6 +59,8 @@ void BarLine::Reset()
     ResetBarLineLog();
     ResetColor();
     ResetVisibility();
+
+    m_position = BarLinePosition::None;
 }
 
 bool BarLine::SetAlignment(Alignment *alignment)
@@ -64,18 +76,6 @@ bool BarLine::HasRepetitionDots() const
     }
     return false;
 }
-
-//----------------------------------------------------------------------------
-// BarLineAttr
-//----------------------------------------------------------------------------
-
-BarLineAttr::BarLineAttr() : BarLine()
-{
-    m_isLeft = false;
-    m_noAttr = false;
-}
-
-BarLineAttr::~BarLineAttr() {}
 
 //----------------------------------------------------------------------------
 // Functors methods

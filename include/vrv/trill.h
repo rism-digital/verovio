@@ -43,7 +43,6 @@ public:
     virtual Object *Clone() const { return new Trill(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Trill"; }
-    virtual ClassId GetClassId() const { return TRILL; }
     ///@}
 
     /**

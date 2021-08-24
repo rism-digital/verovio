@@ -29,7 +29,6 @@ public:
     virtual Object *Clone() const { return new Expan(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Expan"; }
-    virtual ClassId GetClassId() const { return EXPAN; }
     ///@}
 
 private:

@@ -41,7 +41,6 @@ public:
     virtual Object *Clone() const { return new Dynam(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dynam"; }
-    virtual ClassId GetClassId() const { return DYNAM; }
     ///@}
 
     /**

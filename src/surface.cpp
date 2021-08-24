@@ -27,7 +27,7 @@ namespace vrv {
 
 static const ClassRegistrar<Surface> s_factory("surface", SURFACE);
 
-Surface::Surface() : Object("surface-"), AttTyped(), AttCoordinated()
+Surface::Surface() : Object(SURFACE, "surface-"), AttTyped(), AttCoordinated()
 {
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_COORDINATED);

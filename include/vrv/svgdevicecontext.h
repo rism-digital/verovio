@@ -41,7 +41,6 @@ public:
     ///@{
     SvgDeviceContext();
     virtual ~SvgDeviceContext();
-    virtual ClassId GetClassId() const { return SVG_DEVICE_CONTEXT; }
     ///@}
 
     /**

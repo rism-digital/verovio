@@ -34,7 +34,6 @@ public:
     virtual ~Pages();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Pages"; }
-    virtual ClassId GetClassId() const { return PAGES; }
     ///@}
 
     /**

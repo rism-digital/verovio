@@ -21,7 +21,7 @@ namespace vrv {
 
 static const ClassRegistrar<PgHead2> s_factory("pgHead2", PGHEAD2);
 
-PgHead2::PgHead2() : RunningElement("pghead2-")
+PgHead2::PgHead2() : RunningElement(PGHEAD2, "pghead2-")
 {
     Reset();
 }

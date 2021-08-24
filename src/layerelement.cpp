@@ -69,7 +69,8 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement()
+    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -79,8 +80,19 @@ LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInter
     Reset();
 }
 
-LayerElement::LayerElement(const std::string &classid)
-    : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement(ClassId classId)
+    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+{
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -1705,8 +1717,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     }
 
     int selfLeft = this->GetSelfLeft()
-        - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
+        - params->m_doc->GetLeftMargin(this) * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
@@ -1765,6 +1776,13 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // If desired only handle barlines which are right positioned
+    if (params->m_rightBarLinesOnly && this->Is(BARLINE)) {
+        if (vrv_cast<BarLine *>(this)->GetPosition() != BarLinePosition::Right) {
+            return FUNCTOR_CONTINUE;
+        }
+    }
+
     if (this->HasSameasLink()) {
         // nothing to do when the element has a @sameas attribute
         return FUNCTOR_SIBLINGS;
@@ -1787,8 +1805,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
-        // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
-        // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to
+        // This should happen for barline position none but also chords in beam. Otherwise the BB should be set to
         // empty with
         // Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
@@ -1804,12 +1821,12 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
             // If we want the nesting to be reduced, we can set to:
             // selfLeft = this->GetSelfLeft();
             // This could be made an option (--spacing-limited-nesting)
-            int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
+            int selfLeftMargin = params->m_doc->GetLeftMargin(this);
             int overlap = 0;
             for (auto &boundingBox : params->m_boundingBoxes) {
                 LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
                 assert(element);
-                int margin = (params->m_doc->GetRightMargin(element->GetClassId()) + selfLeftMargin) * drawingUnit;
+                int margin = (params->m_doc->GetRightMargin(element) + selfLeftMargin) * drawingUnit;
                 bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
 
                 if (hasOverlap) {
@@ -1829,7 +1846,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // Otherwise only look at the horizontal position
         else {
             selfLeft = this->GetSelfLeft();
-            selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+            selfLeft -= params->m_doc->GetLeftMargin(this) * params->m_doc->GetDrawingUnit(100);
         }
     }
 
@@ -1843,10 +1860,10 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int selfRight = this->GetAlignment()->GetXRel();
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
-        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
+        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this) * drawingUnit;
     }
     else {
-        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
+        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this) * drawingUnit;
     }
 
     // In case of dots/flags we need to hold off of adjusting upcoming min position right away - if it happens that

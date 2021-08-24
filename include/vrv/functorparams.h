@@ -687,12 +687,13 @@ public:
  * member 7: the upcoming bounding boxes (to be used in the next aligner)
  * member 8: list of types to include
  * member 9: list of types to exclude
- * member 10: list of tie endpoints for the current measure
- * member 11: the Doc
- * member 12: the Functor for redirection to the MeasureAligner
- * member 13: the end Functor for redirection
- * member 14: current aligner that is being processed
- * member 15: preceeding aligner that was handled before
+ * member 10: flag to indicate whether only right bar line positions should be considered
+ * member 11: list of tie endpoints for the current measure
+ * member 12: the Doc
+ * member 13: the Functor for redirection to the MeasureAligner
+ * member 14: the end Functor for redirection
+ * member 15: current aligner that is being processed
+ * member 16: preceeding aligner that was handled before
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -705,6 +706,7 @@ public:
         m_staffN = 0;
         m_staffNs = staffNs;
         m_staffSize = 100;
+        m_rightBarLinesOnly = false;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -722,6 +724,7 @@ public:
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
     std::vector<ClassId> m_includes;
     std::vector<ClassId> m_excludes;
+    bool m_rightBarLinesOnly;
     std::vector<std::pair<LayerElement *, LayerElement *>> m_measureTieEndpoints;
     Doc *m_doc;
     Functor *m_functor;

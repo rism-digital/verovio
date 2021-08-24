@@ -719,7 +719,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 // drawn
                 data_BARRENDITION form = barLine->GetForm();
                 if (measure->HasInvisibleStaffBarlines()) {
-                    data_BARRENDITION barlineRend = barLine->Is(BARLINE_ATTR_RIGHT)
+                    data_BARRENDITION barlineRend = (barLine->GetPosition() == BarLinePosition::Right)
                         ? measure->GetDrawingRightBarLineByStaffN(childStaffDef->GetN())
                         : measure->GetDrawingLeftBarLineByStaffN(childStaffDef->GetN());
                     if (barlineRend != BARRENDITION_NONE) form = barlineRend;
@@ -803,7 +803,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // erase intersections only if we have more than one staff
         bool eraseIntersections = (first != last) ? true : false;
         // do not erase intersections with right barline of the last measure of the system
-        if (isLastMeasure && barLine->Is(BARLINE_ATTR_RIGHT)) {
+        if (isLastMeasure && (barLine->GetPosition() == BarLinePosition::Right)) {
             eraseIntersections = false;
         }
         DrawBarLine(dc, yTop, yBottom, barLine, barLine->GetForm(), eraseIntersections);

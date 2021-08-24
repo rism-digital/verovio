@@ -63,15 +63,23 @@ thread_local unsigned long Object::s_objectCounter = 0;
 
 Object::Object() : BoundingBox()
 {
-    Init("m-");
+    Init(OBJECT, "m-");
     if (s_objectCounter++ == 0) {
         SeedUuid();
     }
 }
 
-Object::Object(const std::string &classid) : BoundingBox()
+Object::Object(ClassId classId) : BoundingBox()
 {
-    Init(classid);
+    Init(classId, "m-");
+    if (s_objectCounter++ == 0) {
+        SeedUuid();
+    }
+}
+
+Object::Object(ClassId classId, const std::string &classIdStr) : BoundingBox()
+{
+    Init(classId, classIdStr);
     if (s_objectCounter++ == 0) {
         SeedUuid();
     }
@@ -89,7 +97,8 @@ Object::Object(const Object &object) : BoundingBox(object)
     ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
-    m_classid = object.m_classid;
+    m_classId = object.m_classId;
+    m_classIdStr = object.m_classIdStr;
     m_parent = NULL;
 
     // Flags
@@ -135,7 +144,8 @@ Object &Object::operator=(const Object &object)
         ClearChildren();
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
-        m_classid = object.m_classid;
+        m_classId = object.m_classId;
+        m_classIdStr = object.m_classIdStr;
         m_parent = NULL;
         // Flags
         m_isAttribute = object.m_isAttribute;
@@ -171,10 +181,12 @@ Object::~Object()
     ClearChildren();
 }
 
-void Object::Init(const std::string &classid)
+void Object::Init(ClassId classId, const std::string &classIdStr)
 {
-    assert(classid.size());
-    m_classid = classid;
+    assert(classIdStr.size());
+
+    m_classId = classId;
+    m_classIdStr = classIdStr;
     m_parent = NULL;
     // Flags
     m_isAttribute = false;
@@ -187,13 +199,6 @@ void Object::Init(const std::string &classid)
     this->GenerateUuid();
 
     Reset();
-}
-
-ClassId Object::GetClassId() const
-{
-    // we should always have the method overridden
-    assert(false);
-    return OBJECT;
 }
 
 void Object::SetAsReferenceObject()
@@ -235,7 +240,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     if (this == sourceParent) {
         assert("Object cannot be copied to itself");
     }
-    if (!allowTypeChange && (this->GetClassId() != sourceParent->GetClassId())) {
+    if (!allowTypeChange && (m_classId != sourceParent->m_classId)) {
         assert("Object must be of the same type");
     }
 
@@ -596,7 +601,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    m_uuid = m_classid.at(0) + Object::GenerateRandUuid();
+    m_uuid = m_classIdStr.at(0) + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -712,7 +717,7 @@ Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
         return NULL;
     }
 
-    if (m_parent->GetClassId() == classId) {
+    if (m_parent->m_classId == classId) {
         return m_parent;
     }
     else {
@@ -726,7 +731,7 @@ Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId 
         return NULL;
     }
 
-    if ((m_parent->GetClassId() > classIdMin) && (m_parent->GetClassId() < classIdMax)) {
+    if ((m_parent->m_classId > classIdMin) && (m_parent->m_classId < classIdMax)) {
         return m_parent;
     }
     else {
@@ -740,7 +745,7 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
         return NULL;
     }
 
-    if (m_parent->GetClassId() == classId) {
+    if (m_parent->m_classId == classId) {
         return this;
     }
     else {
@@ -848,7 +853,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         auto filterPredicate = [filters](Object *iter) -> bool {
             if (filters && !filters->empty()) {
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
-                ClassId classId = iter->GetClassId();
+                ClassId classId = iter->m_classId;
                 ArrayOfComparisons::iterator comparisonIter
                     = std::find_if(filters->begin(), filters->end(), [classId](Comparison *iter) -> bool {
                           ClassIdComparison *attComparison = vrv_cast<ClassIdComparison *>(iter);

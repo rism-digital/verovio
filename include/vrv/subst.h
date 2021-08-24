@@ -32,7 +32,6 @@ public:
     virtual Object *Clone() const { return new Subst(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Subst"; }
-    virtual ClassId GetClassId() const { return SUBST; }
     ///@}
 
     /** Getter for level **/

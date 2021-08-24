@@ -21,7 +21,7 @@ namespace vrv {
 
 static const ClassRegistrar<Expansion> s_factory("expansion", EXPANSION);
 
-Expansion::Expansion() : SystemElement("expansion-"), PlistInterface()
+Expansion::Expansion() : SystemElement(EXPANSION, "expansion-"), PlistInterface()
 {
     RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
 

@@ -27,7 +27,7 @@ namespace vrv {
 // ControlElement
 //----------------------------------------------------------------------------
 
-ControlElement::ControlElement() : FloatingObject("ce"), LinkingInterface(), AttLabelled(), AttTyped()
+ControlElement::ControlElement() : FloatingObject(CONTROL_ELEMENT, "ce"), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
@@ -36,8 +36,18 @@ ControlElement::ControlElement() : FloatingObject("ce"), LinkingInterface(), Att
     Reset();
 }
 
-ControlElement::ControlElement(const std::string &classid)
-    : FloatingObject(classid), LinkingInterface(), AttLabelled(), AttTyped()
+ControlElement::ControlElement(ClassId classId)
+    : FloatingObject(classId, "ce"), LinkingInterface(), AttLabelled(), AttTyped()
+{
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+ControlElement::ControlElement(ClassId classId, const std::string &classIdStr)
+    : FloatingObject(classId, classIdStr), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);

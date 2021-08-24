@@ -34,7 +34,7 @@ namespace vrv {
 
 static const ClassRegistrar<BeatRpt> s_factory("beatRpt", BEATRPT);
 
-BeatRpt::BeatRpt() : LayerElement("beatrpt-"), AttColor(), AttBeatRptVis()
+BeatRpt::BeatRpt() : LayerElement(BEATRPT, "beatrpt-"), AttColor(), AttBeatRptVis()
 {
     RegisterAttClass(ATT_BEATRPTVIS);
     RegisterAttClass(ATT_COLOR);

@@ -41,7 +41,7 @@ namespace vrv {
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 
-Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n) : Object(STAFF, "staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);

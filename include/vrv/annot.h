@@ -33,7 +33,6 @@ public:
     // virtual Object *Clone() const { return new Annot(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Annot"; }
-    virtual ClassId GetClassId() const { return ANNOT; }
     ///@}
 
     /**

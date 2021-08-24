@@ -23,7 +23,7 @@ namespace vrv {
 
 static const ClassRegistrar<Custos> s_factory("custos", CUSTOS);
 
-Custos::Custos() : LayerElement("custos-"), PitchInterface(), PositionInterface(), AttColor()
+Custos::Custos() : LayerElement(CUSTOS, "custos-"), PitchInterface(), PositionInterface(), AttColor()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());

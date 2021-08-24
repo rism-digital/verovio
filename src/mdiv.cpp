@@ -27,7 +27,7 @@ namespace vrv {
 
 static const ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
 
-Mdiv::Mdiv() : PageElement("mdiv-"), PageElementStartInterface(), AttLabelled(), AttNNumberLike()
+Mdiv::Mdiv() : PageElement(MDIV, "mdiv-"), PageElementStartInterface(), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);

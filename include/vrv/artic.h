@@ -35,7 +35,6 @@ public:
     virtual Object *Clone() const { return new Artic(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Artic"; }
-    virtual ClassId GetClassId() const { return ARTIC; }
     ///@}
 
     /** Override the method since alignment is required */

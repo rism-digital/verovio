@@ -52,7 +52,6 @@ public:
     virtual Object *Clone() const { return new Chord(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Chord"; }
-    virtual ClassId GetClassId() const { return CHORD; }
     ///@}
 
     /**

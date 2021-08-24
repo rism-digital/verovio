@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
-MeterSig::MeterSig() : LayerElement("msig-"), AttMeterSigLog(), AttMeterSigVis()
+MeterSig::MeterSig() : LayerElement(METERSIG, "msig-"), AttMeterSigLog(), AttMeterSigVis()
 {
     RegisterAttClass(ATT_METERSIGLOG);
     RegisterAttClass(ATT_METERSIGVIS);

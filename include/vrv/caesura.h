@@ -33,7 +33,6 @@ public:
     virtual Object *Clone() const { return new Caesura(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Caesura"; }
-    virtual ClassId GetClassId() const { return CAESURA; }
     ///@}
 
     /**

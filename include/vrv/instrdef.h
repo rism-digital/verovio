@@ -38,7 +38,6 @@ public:
     virtual Object *Clone() const { return new InstrDef(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "InstrDef"; }
-    virtual ClassId GetClassId() const { return INSTRDEF; }
     ///@}
 
     //----------//

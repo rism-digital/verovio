@@ -35,7 +35,7 @@ namespace vrv {
 // Page
 //----------------------------------------------------------------------------
 
-Page::Page() : Object("page-")
+Page::Page() : Object(PAGE, "page-")
 {
     Reset();
 }
@@ -358,9 +358,10 @@ void Page::LayOutHorizontally()
     // Adjust tabRhyhtm separately
     adjustXPosParams.m_excludes.clear();
     adjustXPosParams.m_includes.push_back(TABDURSYM);
-    adjustXPosParams.m_includes.push_back(BARLINE_ATTR_RIGHT);
+    adjustXPosParams.m_includes.push_back(BARLINE);
     adjustXPosParams.m_includes.push_back(METERSIG);
     adjustXPosParams.m_includes.push_back(KEYSIG);
+    adjustXPosParams.m_rightBarLinesOnly = true;
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes

@@ -27,7 +27,8 @@ namespace vrv {
 
 static const ClassRegistrar<Clef> s_factory("clef", CLEF);
 
-Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement(), AttVisibility()
+Clef::Clef()
+    : LayerElement(CLEF, "clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement(), AttVisibility()
 {
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_COLOR);

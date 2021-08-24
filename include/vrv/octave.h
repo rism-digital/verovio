@@ -41,7 +41,6 @@ public:
     virtual Object *Clone() const { return new Octave(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Octave"; }
-    virtual ClassId GetClassId() const { return OCTAVE; }
     ///@}
 
     /**

@@ -245,9 +245,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 
     // Overwrite the spanningType for open ended control events
-    // We can identify them because they end on a right barline attribute
-    if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
-        spanningType = SPANNING_START;
+    // We can identify them because they end on a right barline
+    if ((spanningType == SPANNING_START_END) && end->Is(BARLINE)) {
+        if (vrv_cast<BarLine *>(end)->GetPosition() == BarLinePosition::Right) {
+            spanningType = SPANNING_START;
+        }
     }
 
     int startRadius = 0;

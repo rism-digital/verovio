@@ -24,7 +24,7 @@ namespace vrv {
 // SystemElementEnd
 //----------------------------------------------------------------------------
 
-SystemElementEnd::SystemElementEnd(Object *start) : SystemElement("system-element-end-")
+SystemElementEnd::SystemElementEnd(Object *start) : SystemElement(SYSTEM_ELEMENT_END, "system-element-end-")
 {
     Reset();
     m_start = start;

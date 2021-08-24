@@ -24,7 +24,7 @@ namespace vrv {
 static const ClassRegistrar<Octave> s_factory("octave", OCTAVE);
 
 Octave::Octave()
-    : ControlElement("octave-")
+    : ControlElement(OCTAVE, "octave-")
     , TimeSpanningInterface()
     , AttColor()
     , AttExtender()

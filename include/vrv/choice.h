@@ -30,7 +30,6 @@ public:
     virtual ~Choice();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Choice"; }
-    virtual ClassId GetClassId() const { return CHOICE; }
     ///@}
 
     /** Getter for level **/

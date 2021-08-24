@@ -30,7 +30,7 @@ namespace vrv {
 
 static const ClassRegistrar<BTrem> s_factory("btrem", BTREM);
 
-BTrem::BTrem() : LayerElement("btrem-"), AttBTremLog(), AttTremMeasured()
+BTrem::BTrem() : LayerElement(BTREM, "btrem-"), AttBTremLog(), AttTremMeasured()
 {
     RegisterAttClass(ATT_BTREMLOG);
     RegisterAttClass(ATT_TREMMEASURED);

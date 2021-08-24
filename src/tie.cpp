@@ -32,7 +32,7 @@ namespace vrv {
 
 static const ClassRegistrar<Tie> s_factory("tie", TIE);
 
-Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -42,8 +42,19 @@ Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCur
     Reset();
 }
 
-Tie::Tie(const std::string &classid)
-    : ControlElement(classid), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Tie::Tie(ClassId classId)
+    : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+{
+    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
+
+    Reset();
+}
+
+Tie::Tie(ClassId classId, const std::string &classIdStr)
+    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);

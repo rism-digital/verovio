@@ -37,7 +37,6 @@ public:
     virtual Object *Clone() const { return new Ending(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Ending"; }
-    virtual ClassId GetClassId() const { return ENDING; }
     ///@}
 
     /**

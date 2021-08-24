@@ -46,7 +46,6 @@ public:
     ///@{
     Doc();
     virtual ~Doc();
-    virtual ClassId GetClassId() const { return DOC; }
     ///@}
 
     /**
@@ -182,7 +181,9 @@ public:
      */
     ///@{
     double GetLeftMargin(const ClassId classId) const;
+    double GetLeftMargin(Object *object) const;
     double GetRightMargin(const ClassId classId) const;
+    double GetRightMargin(Object *object) const;
     double GetLeftPosition() const;
     double GetBottomMargin(const ClassId classId) const;
     double GetTopMargin(const ClassId classId) const;

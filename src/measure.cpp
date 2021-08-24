@@ -47,7 +47,7 @@ namespace vrv {
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-")
+    : Object(MEASURE, "measure-")
     , AttBarring()
     , AttMeasureLog()
     , AttMeterConformanceBar()
@@ -74,8 +74,9 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
 
-    // Make the left barLine a left one...
-    m_leftBarLine.SetLeft();
+    // Set the barline positions
+    m_leftBarLine.SetPosition(BarLinePosition::Left);
+    m_rightBarLine.SetPosition(BarLinePosition::Right);
 
     Reset();
 
@@ -574,7 +575,7 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
             if (right != left) {
                 previous->SetDrawingRightBarLine(right);
                 this->SetDrawingLeftBarLine(left);
-                if (this->HasInvisibleStaffBarlines()) vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
+                if (this->HasInvisibleStaffBarlines()) this->GetLeftBarLine()->SetPosition(BarLinePosition::None);
             }
         }
     }
@@ -585,7 +586,7 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
             if (this->GetLeft() == BARRENDITION_NONE) {
                 this->SetLeft(BARRENDITION_single);
             }
-            vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
+            this->GetLeftBarLine()->SetPosition(BarLinePosition::None);
         }
         // with a scoredef inbetween always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());

@@ -36,7 +36,7 @@ namespace vrv {
 // HorizontalAligner
 //----------------------------------------------------------------------------
 
-HorizontalAligner::HorizontalAligner() : Object()
+HorizontalAligner::HorizontalAligner(ClassId classId) : Object(classId)
 {
     Reset();
 }
@@ -93,7 +93,7 @@ void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
 // MeasureAligner
 //----------------------------------------------------------------------------
 
-MeasureAligner::MeasureAligner() : HorizontalAligner()
+MeasureAligner::MeasureAligner() : HorizontalAligner(MEASURE_ALIGNER)
 {
     m_leftAlignment = NULL;
     m_leftBarLineAlignment = NULL;
@@ -299,7 +299,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
 // GraceAligner
 //----------------------------------------------------------------------------
 
-GraceAligner::GraceAligner() : HorizontalAligner()
+GraceAligner::GraceAligner() : HorizontalAligner(GRACE_ALIGNER)
 {
     Reset();
 }
@@ -434,12 +434,12 @@ void GraceAligner::SetGraceAligmentXPos(Doc *doc)
 // Alignment
 //----------------------------------------------------------------------------
 
-Alignment::Alignment() : Object()
+Alignment::Alignment() : Object(ALIGNMENT)
 {
     Reset();
 }
 
-Alignment::Alignment(double time, AlignmentType type) : Object()
+Alignment::Alignment(double time, AlignmentType type) : Object(ALIGNMENT)
 {
     Reset();
     m_time = time;
@@ -544,7 +544,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
             }
             // staffN and layerN remain unused for barLine attributes and timestamps
             else {
-                assert(element->Is({ BARLINE, BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR }));
+                assert(element->Is({ BARLINE, TIMESTAMP_ATTR }));
             }
         }
     }
@@ -668,7 +668,7 @@ void Alignment::AddToAccidSpace(Accid *accid)
 // AlignmentReference
 //----------------------------------------------------------------------------
 
-AlignmentReference::AlignmentReference() : Object(), AttNInteger()
+AlignmentReference::AlignmentReference() : Object(ALIGNMENT_REFERENCE), AttNInteger()
 {
     RegisterAttClass(ATT_NINTEGER);
 
@@ -677,7 +677,7 @@ AlignmentReference::AlignmentReference() : Object(), AttNInteger()
     this->SetAsReferenceObject();
 }
 
-AlignmentReference::AlignmentReference(int staffN) : Object(), AttNInteger()
+AlignmentReference::AlignmentReference(int staffN) : Object(ALIGNMENT_REFERENCE), AttNInteger()
 {
     RegisterAttClass(ATT_NINTEGER);
 
@@ -768,7 +768,7 @@ bool AlignmentReference::HasCrossStaffElements()
 // TimestampAligner
 //----------------------------------------------------------------------------
 
-TimestampAligner::TimestampAligner() : Object()
+TimestampAligner::TimestampAligner() : Object(TIMESTAMP_ALIGNER)
 {
     Reset();
 }

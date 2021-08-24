@@ -31,7 +31,7 @@ namespace vrv {
 
 static const ClassRegistrar<Slur> s_factory("slur", SLUR);
 
-Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Slur::Slur() : ControlElement(SLUR, "slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -41,8 +41,19 @@ Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), Att
     Reset();
 }
 
-Slur::Slur(const std::string &classid)
-    : ControlElement(classid), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Slur::Slur(ClassId classId)
+    : ControlElement(classId, "slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+{
+    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
+
+    Reset();
+}
+
+Slur::Slur(ClassId classId, const std::string &classIdStr)
+    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);

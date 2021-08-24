@@ -40,7 +40,7 @@ namespace vrv {
 // System
 //----------------------------------------------------------------------------
 
-System::System() : Object("system-"), DrawingListInterface(), AttTyped()
+System::System() : Object(SYSTEM, "system-"), DrawingListInterface(), AttTyped()
 {
     RegisterAttClass(ATT_TYPED);
 

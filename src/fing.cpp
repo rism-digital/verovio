@@ -22,7 +22,7 @@ namespace vrv {
 
 static const ClassRegistrar<Fing> s_factory("fing", FING);
 
-Fing::Fing() : ControlElement("fing-"), TimePointInterface(), TextDirInterface(), AttNNumberLike()
+Fing::Fing() : ControlElement(FING, "fing-"), TimePointInterface(), TextDirInterface(), AttNNumberLike()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());

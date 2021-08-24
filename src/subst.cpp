@@ -25,14 +25,14 @@ namespace vrv {
 
 static const ClassRegistrar<Subst> s_factory("subst", SUBST);
 
-Subst::Subst() : EditorialElement("subst-")
+Subst::Subst() : EditorialElement(SUBST, "subst-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
     Reset();
 }
 
-Subst::Subst(EditorialLevel level) : EditorialElement("subst-")
+Subst::Subst(EditorialLevel level) : EditorialElement(SUBST, "subst-")
 {
     m_level = level;
 

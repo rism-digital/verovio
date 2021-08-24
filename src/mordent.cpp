@@ -25,7 +25,7 @@ namespace vrv {
 static const ClassRegistrar<Mordent> s_factory("mordent", MORDENT);
 
 Mordent::Mordent()
-    : ControlElement("mordent-")
+    : ControlElement(MORDENT, "mordent-")
     , TimePointInterface()
     , AttColor()
     , AttExtSym()
