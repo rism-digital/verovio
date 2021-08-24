@@ -3221,6 +3221,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 turn->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
         }
+        if (xmlTurn.node().attribute("slash").as_bool()) {
+            turn->SetExternalsymbols(turn, "glyph.auth", "smufl");
+            turn->SetExternalsymbols(turn, "glyph.num", "U+E569");
+        }
         if (!std::strncmp(xmlTurn.node().name(), "inverted", 8)) {
             turn->SetForm(turnLog_FORM_lower);
             if (std::string(xmlTurn.node().name()).find("vertical") != std::string::npos) {
