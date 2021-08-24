@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.6.0] - 2021-08-24
 * Support for `section@restart`
 * Support for rendering multiple `mdiv/score`
 * Support for delayed turns using `@startid`
