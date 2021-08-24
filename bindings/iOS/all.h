@@ -6,6 +6,7 @@
 #import <VerovioFramework/pghead2.h>
 #import <VerovioFramework/areaposinterface.h>
 #import <VerovioFramework/harm.h>
+#import <VerovioFramework/featureextractor.h>
 #import <VerovioFramework/keyaccid.h>
 #import <VerovioFramework/fing.h>
 #import <VerovioFramework/functorparams.h>
@@ -50,7 +51,6 @@
 #import <VerovioFramework/tie.h>
 #import <VerovioFramework/gracegrp.h>
 #import <VerovioFramework/ligature.h>
-#import <VerovioFramework/boundary.h>
 #import <VerovioFramework/metersig.h>
 #import <VerovioFramework/surface.h>
 #import <VerovioFramework/runningelement.h>
@@ -72,6 +72,7 @@
 #import <VerovioFramework/proport.h>
 #import <VerovioFramework/choice.h>
 #import <VerovioFramework/fermata.h>
+#import <VerovioFramework/systemboundary.h>
 #import <VerovioFramework/facsimile.h>
 #import <VerovioFramework/tabdursym.h>
 #import <VerovioFramework/pgfoot.h>
@@ -134,6 +135,7 @@
 #import <VerovioFramework/pedal.h>
 #import <VerovioFramework/iopae.h>
 #import <VerovioFramework/instrdef.h>
+#import <VerovioFramework/pageboundary.h>
 #import <VerovioFramework/barline.h>
 #import <VerovioFramework/transposition.h>
 #import <VerovioFramework/nc.h>
@@ -152,6 +154,7 @@
 #import <VerovioFramework/del.h>
 #import <VerovioFramework/tuning.h>
 #import <VerovioFramework/smufl.h>
+#import <VerovioFramework/pageelement.h>
 #import <VerovioFramework/tempo.h>
 #import <VerovioFramework/lem.h>
 #import <VerovioFramework/staff.h>
@@ -183,6 +186,7 @@
 #import <VerovioFramework/core.h>
 #import <VerovioFramework/unchecked.h>
 #import <VerovioFramework/checked.h>
+#import <VerovioFramework/crc.h>
 #import <VerovioFramework/jsonxx.h>
 #import <VerovioFramework/humlib.h>
 #endif /* all_h */
