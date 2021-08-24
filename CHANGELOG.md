@@ -14,7 +14,7 @@
 * Function resetXmlIdSeed for resetting the `@xml:id` random generator with a specific value
 * Function getDescriptiveFeatures for basic feature extraction (experimental work)
 * Option --staccato-center to center staccato on notehead and not the stem (new default)
-* Option --xmlIdChecksum to have `@xml:id` generated based on the checksum of the input data
+* Option --xml-id-checksum to have `@xml:id` generated based on the checksum of the input data
 
 ## [3.5.0] - 2021-07-22
 * Support for `lv` (@eNote-GmbH)
