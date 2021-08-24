@@ -110,7 +110,8 @@ public:
     /**
      * Reset the @xml:id seed
      *
-     * This method should be called only if the --xmlIdSeed parameter was set when creating the Toolkit
+     * Passing 0 will seed the xml:id generator with a random (time-based) seed value.
+     * This method will have no effect if the --xml-id-checksum option is set.
      *
      * @param seed The seed value for generating the xml:id values (0 for a time-based random seed)
      */
