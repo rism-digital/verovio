@@ -146,7 +146,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
         params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
-    if (nc->GetTilt() == COMPASSDIRECTION_s && nc->GetCurve() == ncForm_CURVE_a){
+    if (nc->GetCurve() == ncForm_CURVE_a && nc->GetChild(0,LIQUESCENT)){
         // params.at(0).fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
         // params.at(1).fontNo = SMUFL_EB92_staffPosRaise3;
         // params.at(2).fontNo = SMUFL_E995_chantAuctumDesc;
