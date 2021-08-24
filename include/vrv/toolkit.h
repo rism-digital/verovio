@@ -107,6 +107,15 @@ public:
      */
     std::string GetVersion();
 
+    /**
+     * Reset the @xml:id seed
+     *
+     * This method should be called only if the --xmlIdSeed parameter was set when creating the Toolkit
+     *
+     * @param seed The seed value for generating the xml:id values (0 for a time-based random seed)
+     */
+    void ResetXmlIdSeed(int seed);
+
     ///@}
 
     /**
@@ -437,6 +446,16 @@ public:
      **************************************************************************
      */
     ///@{
+
+    /**
+     * Return descriptive features as a JSON string
+     *
+     * The features are tailored for implementing incipit search
+     *
+     * @param options A stringified JSON object with the feature extraction options
+     * @return A stringified JSON object with the requested features
+     */
+    std::string GetDescriptiveFeatures(const std::string &options);
 
     /**
      * Returns array of IDs of elements being currently played

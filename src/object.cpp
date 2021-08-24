@@ -24,6 +24,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "featureextractor.h"
 #include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
@@ -182,6 +183,8 @@ Object::~Object()
 
 void Object::Init(ClassId classId, const std::string &classIdStr)
 {
+    assert(classIdStr.size());
+
     m_classId = classId;
     m_classIdStr = classIdStr;
     m_parent = NULL;
@@ -598,7 +601,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    m_uuid = m_classIdStr + Object::GenerateRandUuid();
+    m_uuid = m_classIdStr.at(0) + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -950,11 +953,12 @@ void Object::SeedUuid(unsigned int seed)
 std::string Object::GenerateRandUuid()
 {
     int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
 
-    return std::string(str);
+    // char str[17];
+    // snprintf(str, 17, "%016d", nr);
+    // return std::string(str);
+
+    return BaseEncodeInt(nr, 36);
 }
 
 bool Object::sortByUlx(Object *a, Object *b)
@@ -1889,6 +1893,16 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
             currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
         }
     }
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::GenerateFeatures(FunctorParams *functorParams)
+{
+    GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
+    assert(params);
+
+    params->m_extractor->Extract(this, params);
+
     return FUNCTOR_CONTINUE;
 }
 

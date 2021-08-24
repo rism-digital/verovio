@@ -19,6 +19,7 @@ void *vrvToolkit_constructorResourcePath(const char *resourcePath);
 void vrvToolkit_destructor(void *tkPtr);
 bool vrvToolkit_edit(void *tkPtr, const char *editorAction);
 const char *vrvToolkit_getAvailableOptions(void *tkPtr);
+const char *vrvToolkit_getDescriptiveFeatures(void *tkPtr, const char *options);
 const char *vrvToolkit_getElementAttr(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getElementsAtTime(void *tkPtr, int millisec);
 const char *vrvToolkit_getExpansionIdsForElement(void *tkPtr, const char *xmlId);
@@ -44,6 +45,7 @@ const char *vrvToolkit_renderToTimemap(void *tkPtr);
 void vrvToolkit_redoLayout(void *tkPtr);
 void vrvToolkit_redoPagePitchPosLayout(void *tkPtr);
 const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options);
+void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed);
 void vrvToolkit_setOptions(void *tkPtr, const char *options);
 
 #ifdef __cplusplus

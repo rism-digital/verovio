@@ -92,6 +92,7 @@ else:
 verovio_module = Extension('verovio._verovio',
                            sources=glob('./src/*.cpp') + glob('./src/hum/*.cpp') +
                            [
+                               './src/crc/crc.cpp',
                                './src/json/jsonxx.cc',
                                './src/pugi/pugixml.cpp',
                                './src/midi/Binasc.cpp',
@@ -119,6 +120,7 @@ verovio_module = Extension('verovio._verovio',
                            swig_opts=['-c++', '-outdir',
                                       './bindings/python', '-py3'],
                            include_dirs=['./include/vrv',
+                                         './include/crc',
                                          './include/json',
                                          './include/midi',
                                          './include/hum',

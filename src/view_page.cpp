@@ -156,7 +156,6 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
 {
     assert(dc);
     assert(element);
-    assert(system);
 
     if (element->Is(PAGE_ELEMENT_END)) {
         PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(element);

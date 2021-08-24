@@ -26,6 +26,7 @@ endif()
 
 include_directories(
     ../include
+    ../include/crc
     ../include/midi
     ../include/hum
     ../include/json
@@ -135,6 +136,7 @@ endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
+file(GLOB crc_SRC "../src/crc/*.cpp")
 
 # Add header files to custom target, otherwise they are not shown in some IDEs (e.g. QtCreator)
 file(GLOB_RECURSE LibFiles "../include/*.h")
@@ -143,6 +145,7 @@ add_custom_target(headers SOURCES ${LibFiles})
 set(all_SRC
     ${verovio_SRC}
     ${hum_SRC}
+    ${crc_SRC}
     ${midi_SRC}
     ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp

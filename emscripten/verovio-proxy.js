@@ -18,6 +18,9 @@ verovio.vrvToolkit.editInfo = Module.cwrap( 'vrvToolkit_editInfo', 'string', ['n
 // char *getAvailableOptions(Toolkit *ic)
 verovio.vrvToolkit.getAvailableOptions = Module.cwrap( 'vrvToolkit_getAvailableOptions', 'string', ['number'] );
 
+// char *getDescriptiveFeatures(Toolkit *ic, const char *options)
+verovio.vrvToolkit.getDescriptiveFeatures = Module.cwrap( 'vrvToolkit_getDescriptiveFeatures', 'string', ['number', 'string'] );
+
 // char *getElementAttr(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getElementAttr = Module.cwrap( 'vrvToolkit_getElementAttr', 'string', ['number', 'string'] );
 
@@ -96,6 +99,9 @@ verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string
 // char *renderToTimemap(Toolkit *ic)
 verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number'] );
 
+// void resetXmlIdSeed(Toolkit *ic, int seed) 
+verovio.vrvToolkit.resetXmlIdSeed = Module.cwrap( 'vrvToolkit_resetXmlIdSeed', null, ['number', 'number'] );
+
 // void setOptions(Toolkit *ic, const char *options) 
 verovio.vrvToolkit.setOptions = Module.cwrap( 'vrvToolkit_setOptions', null, ['number', 'string'] );
 
@@ -131,6 +137,11 @@ verovio.toolkit.prototype.editInfo = function ()
 verovio.toolkit.prototype.getAvailableOptions = function ()
 {
     return JSON.parse( verovio.vrvToolkit.getAvailableOptions( this.ptr ) );
+};
+
+verovio.toolkit.prototype.getDescriptiveFeatures = function ( options )
+{
+    return JSON.parse( verovio.vrvToolkit.getDescriptiveFeatures( this.ptr, JSON.stringify( options ) ) );
 };
 
 verovio.toolkit.prototype.getElementAttr = function ( xmlId )
@@ -297,6 +308,11 @@ verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )
 verovio.toolkit.prototype.renderToTimemap = function ()
 {
     return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr ) );
+};
+
+verovio.toolkit.prototype.resetXmlIdSeed = function ( seed )
+{
+    return verovio.vrvToolkit.resetXmlIdSeed( this.ptr, seed );
 };
 
 verovio.toolkit.prototype.setOptions = function ( options )

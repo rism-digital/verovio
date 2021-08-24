@@ -42,6 +42,7 @@
 
 #include "MidiFile.h"
 #include "checked.h"
+#include "crc.h"
 #include "jsonxx.h"
 #include "unchecked.h"
 
@@ -417,6 +418,12 @@ bool Toolkit::LoadData(const std::string &data)
 {
     std::string newData;
     Input *input = NULL;
+
+    if (m_options->m_xmlIdChecksum.GetValue()) {
+        crcInit();
+        unsigned int cr = crcFast((unsigned char *)data.c_str(), (int)data.size());
+        Object::SeedUuid(cr);
+    }
 
 #ifndef NO_HUMDRUM_SUPPORT
     ClearHumdrumBuffer();
@@ -906,7 +913,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
             else if (iter->first == "xmlIdSeed") {
                 if (json.has<jsonxx::Number>("xmlIdSeed")) {
-                    Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
+                    m_options->m_xmlIdSeed.SetValue(json.get<jsonxx::Number>("xmlIdSeed"));
+                    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
                 }
             }
             // Deprecated option
@@ -1091,6 +1099,12 @@ std::string Toolkit::GetVersion()
     return vrv::GetVersion();
 }
 
+void Toolkit::ResetXmlIdSeed(int seed)
+{
+    m_options->m_xmlIdSeed.SetValue(seed);
+    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
+}
+
 void Toolkit::ResetLogBuffer()
 {
     logBuffer.clear();
@@ -1112,7 +1126,7 @@ void Toolkit::RedoLayout()
     else if (m_options->m_breaks.GetValue() == BREAKS_smart) {
         m_doc.CastOffSmartDoc();
     }
-    else {
+    else if (m_options->m_breaks.GetValue() != BREAKS_none) {
         m_doc.CastOffDoc();
     }
 }
@@ -1294,8 +1308,8 @@ std::string Toolkit::RenderToPAE()
         return "";
     }
 
-    PAEOutput paeOutput(&m_doc);
     std::string output;
+    PAEOutput paeOutput(&m_doc);
     if (!paeOutput.Export(output)) {
         LogError("Export to PAE failed");
     }
@@ -1331,7 +1345,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     this->ResetLogBuffer();
 
     jsonxx::Object o;
-    jsonxx::Array a;
+    jsonxx::Array noteArray;
+    jsonxx::Array chordArray;
 
     // Here we need to check that the midi timemap is done
     if (!m_doc.HasMidiTimemap()) {
@@ -1356,15 +1371,25 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ListOfObjects notes;
+    ListOfObjects chords;
 
     measure->FindAllDescendantByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
-    ListOfObjects::iterator iter;
-    for (iter = notes.begin(); iter != notes.end(); ++iter) {
-        a << (*iter)->GetUuid();
+    for (auto const item : notes) {
+        noteArray << item->GetUuid();
+        Note *note = vrv_cast<Note *>(item);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) chords.push_back(chord);
     }
-    o << "notes" << a;
+    chords.unique();
+    for (auto const item : chords) {
+        chordArray << item->GetUuid();
+    }
+
+    o << "notes" << noteArray;
+    o << "chords" << chordArray;
     o << "page" << pageNo;
 
     return o.json();
@@ -1402,6 +1427,14 @@ bool Toolkit::RenderToTimemapFile(const std::string &filename)
 int Toolkit::GetPageCount()
 {
     return m_doc.GetPageCount();
+}
+
+std::string Toolkit::GetDescriptiveFeatures(const std::string &options)
+{
+    // For now do not handle any option
+    std::string output;
+    m_doc.ExportFeatures(output, options);
+    return output;
 }
 
 int Toolkit::GetPageWithElement(const std::string &xmlId)
@@ -1484,15 +1517,16 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Array realTimeOnsetMilliseconds;
     jsonxx::Array realTimeOffsetMilliseconds;
 
+    if (!m_doc.HasMidiTimemap()) {
+        // generate MIDI timemap before progressing
+        m_doc.CalculateMidiTimemap();
+    }
+    if (!m_doc.HasMidiTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+        return o.json();
+    }
     if (element->Is(NOTE)) {
-        if (!m_doc.HasMidiTimemap()) {
-            // generate MIDI timemap before progressing
-            m_doc.CalculateMidiTimemap();
-        }
-        if (!m_doc.HasMidiTimemap()) {
-            LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
-            return o.json();
-        }
+
         Note *note = vrv_cast<Note *>(element);
         assert(note);
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
