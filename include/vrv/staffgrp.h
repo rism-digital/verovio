@@ -17,6 +17,9 @@
 
 namespace vrv {
 
+class Label;
+class LabelAbbr;
+
 //----------------------------------------------------------------------------
 // StaffGrp
 //----------------------------------------------------------------------------
@@ -29,6 +32,7 @@ class StaffGrp : public Object,
                  public ObjectListInterface,
                  public AttBasic,
                  public AttLabelled,
+                 public AttNNumberLike,
                  public AttStaffGroupingSym,
                  public AttStaffGrpVis,
                  public AttTyped {
@@ -43,7 +47,6 @@ public:
     virtual Object *Clone() const { return new StaffGrp(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "StaffGrp"; }
-    virtual ClassId GetClassId() const { return STAFFGRP; }
     ///@}
 
     /**
@@ -77,6 +80,26 @@ public:
     ///@{
     void SetGroupSymbol(GrpSym *grpSym);
     GrpSym *GetGroupSymbol() const { return m_groupSymbol; }
+    ///@}
+
+    /**
+     * @name Methods for checking the presence of label and labelAbbr information and getting them.
+     */
+    ///@{
+    bool HasLabelInfo();
+    bool HasLabelAbbrInfo();
+
+    ///@}
+
+    /**
+     * @name Get a copy of the label and labelAbbr.
+     * These methods create new objects (heap) that will need to be deleted.
+     */
+    ///@{
+    Label *GetLabel();
+    Label *GetLabelCopy();
+    LabelAbbr *GetLabelAbbr();
+    LabelAbbr *GetLabelAbbrCopy();
     ///@}
 
     //----------//

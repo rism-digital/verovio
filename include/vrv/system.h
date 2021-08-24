@@ -16,7 +16,7 @@
 
 namespace vrv {
 
-class BoundaryEnd;
+class SystemElementEnd;
 class DeviceContext;
 class Ending;
 class Measure;
@@ -44,7 +44,6 @@ public:
     virtual ~System();
     virtual void Reset();
     virtual std::string GetClassName() const { return "System"; }
-    virtual ClassId GetClassId() const { return SYSTEM; }
     ///@}
 
     /**
@@ -76,7 +75,7 @@ public:
      * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
-    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
+    int GetDrawingLabelsWidth() const;
     void SetDrawingLabelsWidth(int width);
     int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; }
     void SetDrawingAbbrLabelsWidth(int width);
@@ -133,6 +132,27 @@ public:
      */
     void AddToDrawingListIfNeccessary(Object *object);
 
+    /**
+     * @name Check if the system is the first or last in page or of an mdiv by looking at the next sibling
+     */
+    ///@{
+    bool IsFirstInPage();
+    bool IsLastInPage();
+    bool IsFirstOfMdiv();
+    bool IsLastOfMdiv();
+    ///@}
+
+    /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    void ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem);
+
+    /**
+     * Reverse of ConvertToCastOffMensural()
+     */
+    void ConvertToUnCastOffMensuralSystem();
+
     //----------//
     // Functors //
     //----------//
@@ -143,7 +163,7 @@ public:
     virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
 
     /**
-     * See Object::ScoreDefOptimize
+     * @name See Object::ScoreDefOptimize
      */
     ///@{
     virtual int ScoreDefOptimize(FunctorParams *functorParams);
@@ -176,7 +196,7 @@ public:
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
-     * See Object::AdjustXOverflow
+     * @name See Object::AdjustXOverflow
      */
     ///@{
     virtual int AdjustXOverflow(FunctorParams *functorParams);
@@ -184,7 +204,7 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustHarmGrpsSpacing
+     * @name See Object::AdjustHarmGrpsSpacing
      */
     ///@{
     virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
@@ -192,7 +212,7 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustSylSpacing
+     * @name See Object::AdjustSylSpacing
      */
     ///@{
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
@@ -205,7 +225,7 @@ public:
     virtual int AdjustTempo(FunctorParams *functorParams);
 
     /**
-     * See Object::AlignVertically
+     * @name See Object::AlignVertically
      */
     ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
@@ -223,10 +243,12 @@ public:
     virtual int AlignSystems(FunctorParams *functorParams);
 
     /**
-     * See Object::AlignMeasures
+     * @name See Object::AlignMeasures
      */
+    ///@{
     virtual int AlignMeasures(FunctorParams *functorParams);
     virtual int AlignMeasuresEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::JustifyX
@@ -264,14 +286,22 @@ public:
     virtual int CastOffPages(FunctorParams *functorParams);
 
     /**
+     * @name See Object::CastOffSystems
+     */
+    ///@{
+    virtual int CastOffSystems(FunctorParams *functorParams);
+    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
+    /**
      * See Object::UnCastOff
      */
     virtual int UnCastOff(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystemsEnd
-     */
-    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
 
 public:
     SystemAligner m_systemAligner;
@@ -292,11 +322,9 @@ public:
      */
     int m_xAbs;
     /**
-     * The width used by the labels at the left of the system.
+     * The width used by the abbreviated labels at the left of the system.
      * It is used internally when calculating the layout and it is not stored in the file.
      */
-    int m_drawingLabelsWidth;
-    /** The width used by the abbreviated labels */
     int m_drawingAbbrLabelsWidth;
     /**
      * @name The total width of the system.

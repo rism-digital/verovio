@@ -31,7 +31,6 @@ public:
     virtual ~TabGrp();
     virtual void Reset();
     virtual std::string GetClassName() const { return "TabGrp"; };
-    virtual ClassId GetClassId() const { return TABGRP; };
     ///@}
 
     /**

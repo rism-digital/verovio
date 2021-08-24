@@ -43,7 +43,6 @@ public:
     virtual Object *Clone() const { return new Accid(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Accid"; }
-    virtual ClassId GetClassId() const { return ACCID; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
@@ -59,6 +58,14 @@ public:
     bool GetDrawingOctave() const { return m_isDrawingOctave; }
     void SetDrawingOctaveAccid(Accid *drawingOctave) { m_drawingOctave = drawingOctave; }
     Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
+    ///@}
+
+    /**
+     * @name Set and get drawing unison accid
+     */
+    ///@{
+    void SetDrawingUnisonAccid(Accid *drawingUnison) { m_drawingUnison = drawingUnison; }
+    Accid *GetDrawingUnisonAccid() const { return m_drawingUnison; }
     ///@}
 
     /**
@@ -98,6 +105,7 @@ public:
     //
 private:
     Accid *m_drawingOctave;
+    Accid *m_drawingUnison;
     bool m_isDrawingOctave;
 };
 

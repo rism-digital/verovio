@@ -25,7 +25,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MNum::MNum()
-    : ControlElement("mnum-")
+    : ControlElement(MNUM, "mnum-")
     , TextListInterface()
     , TextDirInterface()
     , TimePointInterface()

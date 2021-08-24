@@ -35,7 +35,6 @@ public:
     virtual ~Dots();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dots"; }
-    virtual ClassId GetClassId() const { return DOTS; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -117,7 +116,6 @@ public:
     virtual ~Flag();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Flag"; }
-    virtual ClassId GetClassId() const { return FLAG; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -173,7 +171,6 @@ public:
     virtual ~TupletBracket();
     virtual void Reset();
     virtual std::string GetClassName() const { return "TupletBracket"; }
-    virtual ClassId GetClassId() const { return TUPLET_BRACKET; }
     ///@}
 
     /**
@@ -267,7 +264,6 @@ public:
     virtual ~TupletNum();
     virtual void Reset();
     virtual std::string GetClassName() const { return "TupletNum"; }
-    virtual ClassId GetClassId() const { return TUPLET_NUM; }
     ///@}
 
     /**
@@ -339,7 +335,6 @@ public:
     virtual ~Stem();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Stem"; }
-    virtual ClassId GetClassId() const { return STEM; }
     ///@}
 
     /** Override the method since alignment is required */

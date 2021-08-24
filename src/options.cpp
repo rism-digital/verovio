@@ -855,7 +855,7 @@ Options::Options()
     m_baseOptions.AddOption(&m_version);
 
     m_xmlIdSeed.SetInfo("XML IDs seed", "Seed the random number generator for XML IDs (default is random)");
-    m_xmlIdSeed.Init(0, 0, 0);
+    m_xmlIdSeed.Init(0, 0, -VRV_UNSET);
     m_xmlIdSeed.SetKey("xmlIdSeed");
     m_xmlIdSeed.SetShortOption('x', false);
     m_baseOptions.AddOption(&m_xmlIdSeed);
@@ -1006,6 +1006,11 @@ Options::Options()
     m_shrinkToFit.Init(false);
     this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
 
+    m_staccatoCenter.SetInfo(
+        "Center staccato", "Align staccato and staccatissimo articulations with center of the note");
+    m_staccatoCenter.Init(false);
+    this->Register(&m_staccatoCenter, "staccatoCenter", &m_general);
+
     m_svgBoundingBoxes.SetInfo("Svg bounding boxes viewbox on svg root", "Include bounding boxes in SVG output");
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
@@ -1049,6 +1054,11 @@ Options::Options()
     m_usePgHeaderForAll.SetInfo("Use PgHeader for all", "Use the pgHeader for all pages");
     m_usePgHeaderForAll.Init(false);
     this->Register(&m_usePgHeaderForAll, "usePgHeaderForAll", &m_general);
+
+    m_xmlIdChecksum.SetInfo(
+        "XML IDs based on checksum", "Seed the generator for XML IDs using the checksum of the input data");
+    m_xmlIdChecksum.Init(false);
+    this->Register(&m_xmlIdChecksum, "xmlIdChecksum", &m_general);
 
     /********* General layout *********/
 
@@ -1338,6 +1348,10 @@ Options::Options()
         "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
+
+    m_mdivAll.SetInfo("Mdiv all", "Load and render all <mdiv> elements in the MEI files");
+    m_mdivAll.Init(false);
+    this->Register(&m_mdivAll, "mdivAll", &m_selectors);
 
     m_mdivXPathQuery.SetInfo("Mdiv xPath query",
         "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");

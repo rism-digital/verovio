@@ -30,7 +30,6 @@ public:
     virtual ~PgHead2();
     virtual void Reset();
     virtual std::string GetClassName() const { return "PgHead2"; }
-    virtual ClassId GetClassId() const { return PGHEAD2; }
     ///@}
 
     //----------//

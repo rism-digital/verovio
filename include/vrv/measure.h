@@ -16,8 +16,9 @@
 
 namespace vrv {
 
-class Ending;
 class ControlElement;
+class Ending;
+class LayerElement;
 class ScoreDef;
 class System;
 class TimestampAttr;
@@ -53,7 +54,6 @@ public:
     virtual Object *Clone() const { return new Measure(*this); };
     virtual void Reset();
     virtual std::string GetClassName() const { return "Measure"; }
-    virtual ClassId GetClassId() const { return MEASURE; }
     ///@}
 
     /**
@@ -244,6 +244,11 @@ public:
      * Return the real time offset in millisecond for the repeat (1-based).
      */
     double GetRealTimeOffsetMilliseconds(int repeat) const;
+
+    /**
+     * Return vector with tie endpoints for ties that start and end in current measure
+     */
+    std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
 
     //----------//
     // Functors //
@@ -490,8 +495,8 @@ private:
      * @name The measure barlines (left and right) used when drawing
      */
     ///@{
-    BarLineAttr m_leftBarLine;
-    BarLineAttr m_rightBarLine;
+    BarLine m_leftBarLine;
+    BarLine m_rightBarLine;
     ///@}
 
     /**

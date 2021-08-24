@@ -34,7 +34,7 @@ namespace vrv {
 static const ClassRegistrar<Harm> s_factory("harm", HARM);
 
 Harm::Harm()
-    : ControlElement("harm-")
+    : ControlElement(HARM, "harm-")
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()

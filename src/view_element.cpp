@@ -256,7 +256,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
+    if (accid->GetFunc() == accidLog_FUNC_edit) {
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
@@ -1387,13 +1387,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     DrawSmuflCode(dc, x, y, drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
 
-    // single legder line for half and whole rests
-    if ((drawingDur == DUR_1 || drawingDur == DUR_2)
-        && (y > (int)staff->GetDrawingY()
-            || y < staff->GetDrawingY()
-                    - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
-        dc->DeactivateGraphicX();
-
+    if ((drawingDur == DUR_1 || drawingDur == DUR_2 || drawingDur == DUR_BR)) {
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
         int ledgerLineThickness
             = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1403,9 +1397,30 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
         }
-        DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+        const int topMargin = staff->GetDrawingY();
+        const int bottomMargin = staff->GetDrawingY()
+            - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-        dc->ReactivateGraphic();
+        // single legder line for half and whole rests
+        if ((drawingDur == DUR_1 || drawingDur == DUR_2) && (y > topMargin || y < bottomMargin)) {
+            dc->DeactivateGraphicX();
+            DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+            dc->ReactivateGraphic();
+        }
+        // double ledger line for breve rests
+        else if (drawingDur == DUR_BR && (y >= topMargin || y <= bottomMargin)) {
+            const int height = m_doc->GetGlyphHeight(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
+            dc->DeactivateGraphicX();
+            if (y != topMargin) {
+                DrawHorizontalLine(
+                    dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+            }
+            if (y != bottomMargin - height) {
+                DrawHorizontalLine(
+                    dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y + height, ledgerLineThickness);
+            }
+            dc->ReactivateGraphic();
+        }
     }
 
     /************ Draw children (dots) ************/

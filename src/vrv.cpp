@@ -52,6 +52,11 @@
 #include <emscripten.h>
 #endif
 
+#ifdef ANDROID
+#include <android/log.h>
+#define android_log_puts(prio, msg) __android_log_print(prio, "Verovio", "%s", msg)
+#endif
+
 #define STRING_FORMAT_MAX_LEN 2048
 
 namespace vrv {
@@ -402,6 +407,14 @@ void LogString(std::string message, consoleLogLevel level)
             case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
             default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
         }
+#elif defined ANDROID
+        switch (level) {
+            case CONSOLE_DEBUG: android_log_puts(ANDROID_LOG_DEBUG, message.c_str()); break;
+            case CONSOLE_ERROR: android_log_puts(ANDROID_LOG_ERROR, message.c_str()); break;
+            case CONSOLE_WARN: android_log_puts(ANDROID_LOG_WARN, message.c_str()); break;
+            case CONSOLE_INFO:
+            default: android_log_puts(ANDROID_LOG_INFO, message.c_str()); break;
+        }
 #else
         fputs(message.c_str(), stderr);
 #endif
@@ -505,6 +518,25 @@ std::string GetVersion()
     std::string dev;
     if (VERSION_DEV) dev = "-dev";
     return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);
+}
+
+static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+std::string BaseEncodeInt(int value, int base)
+{
+    assert(base > 10);
+    assert(base < 63);
+
+    std::string base62;
+    if (value < base) return std::string(1, base62Chars[value]);
+
+    while (value) {
+        base62 += base62Chars[value % base];
+        value /= base;
+    }
+
+    reverse(base62.begin(), base62.end());
+    return base62;
 }
 
 //----------------------------------------------------------------------------

@@ -54,6 +54,7 @@ class Num;
 class Octave;
 class Options;
 class Page;
+class PageElement;
 class Pedal;
 class PgFoot;
 class PgFoot;
@@ -185,6 +186,7 @@ protected:
      * Defined in view_page.cpp
      */
     ///@{
+    void DrawPageElement(DeviceContext *dc, PageElement *element);
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
     void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL,
@@ -195,8 +197,8 @@ protected:
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
     void DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int &x);
-    void DrawLabels(
-        DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
+    void DrawLabels(DeviceContext *dc, ScoreDef *scoreDef, Object *object, int x, int y, bool abbreviations,
+        int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);

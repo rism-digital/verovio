@@ -32,7 +32,7 @@ namespace vrv {
 
 static const ClassRegistrar<Tie> s_factory("tie", TIE);
 
-Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -42,8 +42,19 @@ Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCur
     Reset();
 }
 
-Tie::Tie(const std::string &classid)
-    : ControlElement(classid), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Tie::Tie(ClassId classId)
+    : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+{
+    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
+
+    Reset();
+}
+
+Tie::Tie(ClassId classId, const std::string &classIdStr)
+    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -229,12 +240,13 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             startPoint.x += r1 + drawingUnit / 2;
             endPoint.x -= r2 + drawingUnit / 2;
         }
-        if (startParentChord && !isOuterChordNote && startParentChord->HasDots()) {
+        if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
             if ((endPoint.x - startPoint.x) <= 4 * drawingUnit) {
                 startPoint.x += drawingUnit;
             }
             else {
                 Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
+                assert(dots);
                 startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
             }
         }
@@ -256,8 +268,9 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
                 startPoint.x += 2 * drawingUnit * startParentChord->GetDots();
             }
         }
-        if (startParentChord && !isOuterChordNote && startParentChord->HasDots()) {
+        if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
             Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
+            assert(dots);
             startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
         }
         endPoint.x -= (drawingUnit + doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize)) / 2;

@@ -182,9 +182,26 @@ bool parse_identifier(std::istream& input, String& value) {
     }
 }
 
+class IOStateMasker {
+    public:
+    explicit IOStateMasker(std::istream& input): stream(input) {
+       mask = input.exceptions();
+       input.exceptions(std::istream::goodbit);
+    }
+
+    ~IOStateMasker() {
+        stream.exceptions(mask);
+    }
+
+    private:
+    std::istream& stream;
+    std::istream::iostate mask;
+};
+
 bool parse_number(std::istream& input, Number& value) {
     input >> std::ws;
     std::streampos rollback = input.tellg();
+    IOStateMasker masker(input);
     input >> value;
     if (input.fail()) {
         input.clear();

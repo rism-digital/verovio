@@ -13,6 +13,8 @@
 
 namespace vrv {
 
+enum class BarLinePosition { None, Left, Right };
+
 //----------------------------------------------------------------------------
 // BarLine
 //----------------------------------------------------------------------------
@@ -32,11 +34,11 @@ public:
      */
     ///@{
     BarLine();
+    BarLine(ClassId classId);
     virtual ~BarLine();
     virtual Object *Clone() const { return new BarLine(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "BarLine"; }
-    virtual ClassId GetClassId() const { return BARLINE; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -53,6 +55,12 @@ public:
      */
     bool HasRepetitionDots() const;
 
+    /**
+     * @name Get and set the position
+     */
+    BarLinePosition GetPosition() const { return m_position; }
+    void SetPosition(BarLinePosition position) { m_position = position; }
+
     //----------//
     // Functors //
     //----------//
@@ -67,44 +75,8 @@ private:
 public:
     //
 private:
-};
-
-//----------------------------------------------------------------------------
-// BarLineAttr
-//----------------------------------------------------------------------------
-
-/**
- * This class models the barLine related attributes of a MEI measure.
- */
-class BarLineAttr : public BarLine {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * No Reset() method is required.
-     */
-    ///@{
-    BarLineAttr();
-    virtual ~BarLineAttr();
-    virtual Object *Clone() const { return new BarLineAttr(*this); }
-    virtual std::string GetClassName() const { return "BarLineAttr"; }
-    virtual ClassId GetClassId() const
-    {
-        if (m_noAttr) return BARLINE;
-        return m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT;
-    }
-    ///@}
-
-    void SetLeft() { m_isLeft = true; }
-    void SetNoAttr() { m_noAttr = true; }
-
-private:
-    //
-public:
-    //
-private:
-    /** A flag for left barlines (right if false) */
-    bool m_isLeft;
-    bool m_noAttr;
+    /** The barline position (left/right) */
+    BarLinePosition m_position;
 };
 
 } // namespace vrv

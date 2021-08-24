@@ -37,7 +37,6 @@ public:
     virtual ~Zone();
     virtual Object *Clone() const { return new Zone(*this); }
     virtual void Reset();
-    ClassId GetClassId() const { return ZONE; }
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly();

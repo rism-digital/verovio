@@ -37,7 +37,12 @@ const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_d
 static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
 Artic::Artic()
-    : LayerElement("artic-"), AttArticulation(), AttColor(), AttEnclosingChars(), AttExtSym(), AttPlacementRelEvent()
+    : LayerElement(ARTIC, "artic-")
+    , AttArticulation()
+    , AttColor()
+    , AttEnclosingChars()
+    , AttExtSym()
+    , AttPlacementRelEvent()
 {
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
@@ -289,6 +294,8 @@ bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
         return true;
     else if (code == SMUFL_E630_pluckedSnapPizzicatoBelow)
         return true;
+    else if (code == SMUFL_E614_stringsHarmonic)
+        return true;
     else
         return false;
 }
@@ -359,8 +366,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     /************** adjust the xRel position **************/
 
-    int xShift = params->m_parent->GetDrawingRadius(params->m_doc);
-    this->SetDrawingXRel(xShift);
+    this->SetDrawingXRel(CalculateHorizontalShift(params->m_doc, params->m_parent, params->m_stemDir));
 
     /************** set cross-staff / layer **************/
 
@@ -525,6 +531,35 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
     m_drawingPlace = STAFFREL_NONE;
 
     return FUNCTOR_CONTINUE;
+}
+
+int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIRECTION stemDir) const
+{
+    int shift = parent->GetDrawingRadius(doc);
+    if ((parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_staccatoCenter.GetValue())) {
+        return shift;
+    }
+    data_ARTICULATION artic = GetArticFirst();
+    switch (artic) {
+        case ARTICULATION_stacc:
+        case ARTICULATION_stacciss: {
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            assert(staff);
+            const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
+                shift += shift - stemWidth / 2;
+            }
+            else if ((stemDir == STEMDIRECTION_down) && (m_drawingPlace == STAFFREL_below)) {
+                shift = stemWidth / 2;
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    return shift;
 }
 
 } // namespace vrv

@@ -29,7 +29,6 @@ public:
     virtual Object *Clone() const { return new Abbr(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Abbr"; }
-    virtual ClassId GetClassId() const { return ABBR; }
     ///@}
 
 private:

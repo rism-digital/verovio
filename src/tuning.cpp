@@ -24,7 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<Tuning> s_factory("tuning", TUNING);
 
-Tuning::Tuning() : Object("tuning-"), AttCourseLog()
+Tuning::Tuning() : Object(TUNING, "tuning-"), AttCourseLog()
 {
     RegisterAttClass(ATT_COURSELOG);
 

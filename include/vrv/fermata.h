@@ -43,7 +43,6 @@ public:
     virtual Object *Clone() const { return new Fermata(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Fermata"; }
-    virtual ClassId GetClassId() const { return FERMATA; }
     ///@}
 
     /**

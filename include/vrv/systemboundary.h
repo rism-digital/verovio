@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        boundary.h
+// Name:        systemboundary.h
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_BOUNDARY_H__
-#define __VRV_BOUNDARY_H__
+#ifndef __VRV_SYSTEM_BOUNDARY_H__
+#define __VRV_SYSTEM_BOUNDARY_H__
 
 #include "systemelement.h"
 #include "vrvdef.h"
@@ -17,24 +17,23 @@ class Measure;
 class Object;
 
 //----------------------------------------------------------------------------
-// BoundaryEnd
+// SystemElementEnd
 //----------------------------------------------------------------------------
 
 /**
  * This class models an end milestone element and has no MEI equivalent.
  */
-class BoundaryEnd : public SystemElement {
+class SystemElementEnd : public SystemElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    BoundaryEnd(Object *start);
-    virtual ~BoundaryEnd();
+    SystemElementEnd(Object *start);
+    virtual ~SystemElementEnd();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "boundaryEnd"; }
-    virtual ClassId GetClassId() const { return BOUNDARY_END; }
+    virtual std::string GetClassName() const { return "systemElementEnd"; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -89,21 +88,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// BoundaryStartInterface
+// SystemElementStartInterface
 //----------------------------------------------------------------------------
 
 /**
  * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
-class BoundaryStartInterface {
+class SystemElementStartInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    BoundaryStartInterface();
-    virtual ~BoundaryStartInterface();
+    SystemElementStartInterface();
+    virtual ~SystemElementStartInterface();
     virtual void Reset();
     ///@}
 
@@ -115,9 +114,9 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetEnd(BoundaryEnd *end);
-    BoundaryEnd *GetEnd() { return m_end; }
-    bool IsBoundary() { return (m_end != NULL); }
+    void SetEnd(SystemElementEnd *end);
+    SystemElementEnd *GetEnd() { return m_end; }
+    bool IsSystemBoundary() { return (m_end != NULL); }
     ///@}
 
     /**
@@ -148,7 +147,7 @@ private:
 public:
     //
 protected:
-    BoundaryEnd *m_end;
+    SystemElementEnd *m_end;
 
 private:
     /** The first measure child of the element */

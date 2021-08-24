@@ -9,7 +9,8 @@
 #define __VRV_SECTION_H__
 
 #include "atts_shared.h"
-#include "boundary.h"
+#include "atts_visual.h"
+#include "systemboundary.h"
 #include "systemelement.h"
 
 namespace vrv {
@@ -24,7 +25,7 @@ class Section;
  * This class represents a MEI section.
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI)
  */
-class Section : public SystemElement, public BoundaryStartInterface, public AttNNumberLike {
+class Section : public SystemElement, public SystemElementStartInterface, public AttNNumberLike, public AttSectionVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -36,7 +37,6 @@ public:
     virtual Object *Clone() const { return new Section(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Section"; }
-    virtual ClassId GetClassId() const { return SECTION; }
     ///@}
 
     /**

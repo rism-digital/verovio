@@ -23,7 +23,7 @@ namespace vrv {
 
 static const ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
 
-Caesura::Caesura() : ControlElement("caesura-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
+Caesura::Caesura() : ControlElement(CAESURA, "caesura-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);

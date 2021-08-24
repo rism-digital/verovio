@@ -14,6 +14,7 @@ option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        O
 option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
+option(NO_MUSICXML_SUPPORT      "Disable MusicXML support"                     OFF)
 option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
@@ -25,6 +26,7 @@ endif()
 
 include_directories(
     ../include
+    ../include/crc
     ../include/midi
     ../include/hum
     ../include/json
@@ -115,6 +117,10 @@ if(NO_PAE_SUPPORT)
     add_definitions(-DNO_PAE_SUPPORT)
 endif()
 
+if(NO_MUSICXML_SUPPORT)
+    add_definitions(-DNO_MUSICXML_SUPPORT)
+endif()
+
 if(NO_MXL_SUPPORT)
     add_definitions(-DNO_MXL_SUPPORT)
 endif()
@@ -130,6 +136,7 @@ endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
+file(GLOB crc_SRC "../src/crc/*.cpp")
 
 # Add header files to custom target, otherwise they are not shown in some IDEs (e.g. QtCreator)
 file(GLOB_RECURSE LibFiles "../include/*.h")
@@ -138,6 +145,7 @@ add_custom_target(headers SOURCES ${LibFiles})
 set(all_SRC
     ${verovio_SRC}
     ${hum_SRC}
+    ${crc_SRC}
     ${midi_SRC}
     ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp

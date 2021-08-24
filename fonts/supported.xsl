@@ -147,14 +147,14 @@
             <glyph glyph-code="E08B" smufl-name="timeSigCutCommon"/>
             <glyph glyph-code="E08C" smufl-name="timeSigPlus"/>
             <glyph glyph-code="E08D" smufl-name="timeSigPlusSmall"/>
-            <!--<glyph glyph-code="E08E" smufl-name="timeSigFractionalSlash"/>-->
-            <!--<glyph glyph-code="E08F" smufl-name="timeSigEquals"/>-->
-            <!--<glyph glyph-code="E090" smufl-name="timeSigMinus"/>-->
-            <!--<glyph glyph-code="E091" smufl-name="timeSigMultiply"/>-->
-            <!--<glyph glyph-code="E092" smufl-name="timeSigParensLeftSmall"/>-->
-            <!--<glyph glyph-code="E093" smufl-name="timeSigParensRightSmall"/>-->
-            <!--<glyph glyph-code="E094" smufl-name="timeSigParensLeft"/>-->
-            <!--<glyph glyph-code="E095" smufl-name="timeSigParensRight"/>-->
+            <glyph glyph-code="E08E" smufl-name="timeSigFractionalSlash"/>
+            <glyph glyph-code="E08F" smufl-name="timeSigEquals"/>
+            <glyph glyph-code="E090" smufl-name="timeSigMinus"/>
+            <glyph glyph-code="E091" smufl-name="timeSigMultiply"/>
+            <glyph glyph-code="E092" smufl-name="timeSigParensLeftSmall"/>
+            <glyph glyph-code="E093" smufl-name="timeSigParensRightSmall"/>
+            <glyph glyph-code="E094" smufl-name="timeSigParensLeft"/>
+            <glyph glyph-code="E095" smufl-name="timeSigParensRight"/>
             <!--<glyph glyph-code="E096" smufl-name="timeSigComma"/>-->
             <!--<glyph glyph-code="E097" smufl-name="timeSigFractionQuarter"/>-->
             <!--<glyph glyph-code="E098" smufl-name="timeSigFractionHalf"/>-->
@@ -2943,5 +2943,18 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <range_end>U+EC6F</range_end>
             <range_start>U+EC60</range_start>
         </miscellaneousSymbols>
+        <articulationSupplement>
+            <description>Articulation supplement</description>
+            <glyph glyph-code="ED40" smufl-name="articSoftAccentAbove"/>
+            <glyph glyph-code="ED41" smufl-name="articSoftAccentBelow"/>
+            <!--<glyph glyph-code="ED42" smufl-name="articSoftAccentStaccatoAbove"/>-->
+            <!--<glyph glyph-code="ED43" smufl-name="articSoftAccentStaccatoBelow"/>-->
+            <!--<glyph glyph-code="ED44" smufl-name="articSoftAccentTenutoAbove"/>-->
+            <!--<glyph glyph-code="ED45" smufl-name="articSoftAccentTenutoBelow"/>-->
+            <!--<glyph glyph-code="ED46" smufl-name="articSoftAccentTenutoStaccatoAbove"/>-->
+            <!--<glyph glyph-code="ED47" smufl-name="articSoftAccentTenutoStaccatoBelow"/>-->
+            <range_end>U+ED40</range_end>
+            <range_start>U+ED4F</range_start>
+        </articulationSupplement>
     </xsl:variable>
 </xsl:stylesheet>

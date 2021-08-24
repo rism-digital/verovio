@@ -495,7 +495,7 @@ bool BeamSegment::CalcBeamSlope(
 
     // We can keep the current slope but only if curStep is not 0 and smaller than the step
     if ((curStep != 0) && (curStep < step) && (BEAMPLACE_mixed != place)) {
-        LogDebug("Current %d step is lower than max step %d", curStep, step);
+        // LogDebug("Current %d step is lower than max step %d", curStep, step);
         return false;
     }
     // This occurs when the current stem would yield an horizontal beam
@@ -1019,13 +1019,26 @@ void BeamSegment::CalcSetValues()
     }
 }
 
+int BeamSegment::GetAdjacentElementsDuration(int elementX) const
+{
+    if ((elementX < m_beamElementCoordRefs.front()->m_x) || (elementX > m_beamElementCoordRefs.back()->m_x)) {
+        return DUR_8;
+    }
+    for (int i = 0; i < int(m_beamElementCoordRefs.size()) - 1; ++i) {
+        if ((m_beamElementCoordRefs.at(i)->m_x < elementX) && (m_beamElementCoordRefs.at(i + 1)->m_x > elementX)) {
+            return std::min(m_beamElementCoordRefs.at(i)->m_dur, m_beamElementCoordRefs.at(i + 1)->m_dur);
+        }
+    }
+    return DUR_8;
+}
+
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
-Beam::Beam() : LayerElement("beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
+Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
@@ -1431,6 +1444,8 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
             params->m_beam = this;
             params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
             params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
+            params->m_x1 = m_beamSegment.m_beamElementCoordRefs.front()->m_x;
+            params->m_beamSlope = m_beamSegment.m_beamSlope;
             params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
             params->m_overlapMargin
                 = CalcLayerOverlap(params->m_doc, params->m_beam, params->m_directionBias, params->m_y1, params->m_y2);

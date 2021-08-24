@@ -41,7 +41,6 @@ public:
     virtual Object *Clone() const { return new Dynam(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dynam"; }
-    virtual ClassId GetClassId() const { return DYNAM; }
     ///@}
 
     /**
@@ -69,6 +68,11 @@ public:
      * Call IsSymbolOnly first to check.
      */
     std::wstring GetSymbolStr() const;
+
+    /**
+     * See FloatingObject::IsExtenderElement
+     */
+    virtual bool IsExtenderElement() const { return GetExtender() == BOOLEAN_true; }
 
     //----------------//
     // Static methods //

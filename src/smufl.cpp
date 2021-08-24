@@ -66,6 +66,14 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "timeSigCutCommon", SMUFL_E08B_timeSigCutCommon },
     { "timeSigPlus", SMUFL_E08C_timeSigPlus },
     { "timeSigPlusSmall", SMUFL_E08D_timeSigPlusSmall },
+    { "timeSigFractionalSlash", SMUFL_E08E_timeSigFractionalSlash },
+    { "timeSigEquals", SMUFL_E08F_timeSigEquals },
+    { "timeSigMinus", SMUFL_E090_timeSigMinus },
+    { "timeSigMultiply", SMUFL_E091_timeSigMultiply },
+    { "timeSigParensLeftSmall", SMUFL_E092_timeSigParensLeftSmall },
+    { "timeSigParensRightSmall", SMUFL_E093_timeSigParensRightSmall },
+    { "timeSigParensLeft", SMUFL_E094_timeSigParensLeft },
+    { "timeSigParensRight", SMUFL_E095_timeSigParensRight },
     { "noteheadWhole", SMUFL_E0A2_noteheadWhole },
     { "noteheadHalf", SMUFL_E0A3_noteheadHalf },
     { "noteheadBlack", SMUFL_E0A4_noteheadBlack },
@@ -411,9 +419,11 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "luteItalianFret7", SMUFL_EBE7_luteItalianFret7 },
     { "luteItalianFret8", SMUFL_EBE8_luteItalianFret8 },
     { "luteItalianFret9", SMUFL_EBE9_luteItalianFret9 },
+    { "articSoftAccentAbove", SMUFL_ED40_articSoftAccentAbove },
+    { "articSoftAccentBelow", SMUFL_ED41_articSoftAccentBelow },
 };
 
 /** The number of glyphs for verification **/
-// 388
+// 398
 
 } // namespace vrv

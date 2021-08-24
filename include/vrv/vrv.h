@@ -91,6 +91,12 @@ std::string GetFilename(std::string fullpath);
 std::string GetVersion();
 
 /**
+ * Encode the integer value using the specified base (max is 62)
+ * Base 36 uses 0-9 and a-z, base 62 also A-Z.
+ */
+std::string BaseEncodeInt(int value, int base);
+
+/**
  *
  */
 extern bool logging;

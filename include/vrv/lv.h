@@ -31,7 +31,6 @@ public:
     virtual Object *Clone() const { return new Lv(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Lv"; }
-    virtual ClassId GetClassId() const { return LV; }
     ///@}
 
     virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);

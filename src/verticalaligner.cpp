@@ -34,7 +34,7 @@ namespace vrv {
 // SystemAligner
 //----------------------------------------------------------------------------
 
-SystemAligner::SystemAligner() : Object(), m_bottomAlignment(NULL), m_system(NULL)
+SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER), m_bottomAlignment(NULL), m_system(NULL)
 {
     Reset();
 }
@@ -246,7 +246,7 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffD
 // StaffAlignment
 //----------------------------------------------------------------------------
 
-StaffAlignment::StaffAlignment() : Object()
+StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
 {
     m_yRel = 0;
     m_verseNs.clear();
@@ -616,7 +616,8 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
     AdjustFloatingPositionersParams *params = vrv_params_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
-    int staffSize = this->GetStaffSize();
+    const int staffSize = this->GetStaffSize();
+    const int drawingUnit = params->m_doc->GetDrawingUnit(staffSize);
 
     const bool verseCollapse = params->m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
     if (params->m_classId == SYL) {
@@ -624,9 +625,8 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             FontInfo *lyricFont = params->m_doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
             int descender = params->m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
             int height = params->m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-            int margin = params->m_doc->GetBottomMargin(SYL) * params->m_doc->GetDrawingUnit(staffSize);
-            int minMargin = std::max((int)(params->m_doc->GetOptions()->m_lyricTopMinMargin.GetValue()
-                                         * params->m_doc->GetDrawingUnit(staffSize)),
+            int margin = params->m_doc->GetBottomMargin(SYL) * drawingUnit;
+            int minMargin = std::max((int)(params->m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
                 this->GetOverflowBelow());
             this->SetOverflowBelow(minMargin + this->GetVerseCount(verseCollapse) * (height - descender + margin));
             // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
@@ -703,12 +703,18 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         auto i = overflowBoxes->begin();
         auto end = overflowBoxes->end();
         while (i != end) {
-            // find all the overflowing elements from the staff that overlap horizontally
+            // find all the overflowing elements from the staff that overlap horizontally (and, in case of extender
+            // elements - vertically)
             const int margin = ((*iter)->GetObject()->Is(DYNAM) && GetFirstAncestor(BEAM))
                 ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize)
                 : 0;
-            i = std::find_if(
-                i, end, [iter, margin](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem, margin); });
+            i = std::find_if(i, end, [iter, drawingUnit, margin](BoundingBox *elem) {
+                if ((*iter)->GetObject()->IsExtenderElement() && !elem->Is(FLOATING_POSITIONER)) {
+                    return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 8)
+                        || (*iter)->VerticalContentOverlap(elem);
+                }
+                return (*iter)->HorizontalContentOverlap(elem, margin);
+            });
             if (i != end) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
@@ -944,6 +950,9 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    const int staffSize = this->GetStaffSize();
+    const int drawingUnit = params->m_doc->GetDrawingUnit(staffSize);
+
     ArrayOfBoundingBoxes::iterator iter;
     // go through all the elements of the top staff that have an overflow below
     for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
@@ -952,7 +961,16 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
             // find all the elements from the bottom staff that have an overflow at the top with an horizontal overlap
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
+            i = std::find_if(i, end, [iter, drawingUnit](BoundingBox *elem) {
+                if ((*iter)->Is(FLOATING_POSITIONER)) {
+                    FloatingPositioner *fp = vrv_cast<FloatingPositioner *>(*iter);
+                    if (fp->GetObject()->Is({ DIR, DYNAM }) && fp->GetObject()->IsExtenderElement()) {
+                        return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 4)
+                            || (*iter)->VerticalContentOverlap(elem);
+                    }
+                }
+                return (*iter)->HorizontalContentOverlap(elem);
+            });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space
                 int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
@@ -1013,18 +1031,22 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
+    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
 
     // Skip bottom aligner and first staff
-    if (!m_staff || SystemAligner::SpacingType::System == m_spacingType) {
-        return FUNCTOR_CONTINUE;
+    if (m_staff && (m_spacingType != SystemAligner::SpacingType::System)) {
+        const int shift
+            = this->GetJustificationFactor(params->m_doc) / params->m_justificationSum * params->m_spaceToDistribute;
+        params->m_relativeShift += shift;
+        params->m_cumulatedShift += shift;
+
+        this->SetYRel(this->GetYRel() - params->m_relativeShift);
     }
 
-    const double staffJustificationFactor = GetJustificationFactor(params->m_doc);
-    params->m_cumulatedShift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+    params->m_shiftForStaff[this] = params->m_cumulatedShift;
 
-    this->SetYRel(this->GetYRel() - params->m_cumulatedShift);
-
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

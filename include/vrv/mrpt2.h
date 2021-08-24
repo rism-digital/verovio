@@ -35,7 +35,6 @@ public:
     virtual Object *Clone() const { return new MRpt2(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MRpt2"; }
-    virtual ClassId GetClassId() const { return MRPT2; }
     ///@}
 
 private:

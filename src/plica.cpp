@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Plica> s_factory("plica", PLICA);
 
-Plica::Plica() : LayerElement("plica-"), AttPlicaVis()
+Plica::Plica() : LayerElement(PLICA, "plica-"), AttPlicaVis()
 {
     RegisterAttClass(ATT_PLICAVIS);
 

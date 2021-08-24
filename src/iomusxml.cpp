@@ -106,6 +106,8 @@ MusicXmlInput::MusicXmlInput(Doc *doc) : Input(doc) {}
 
 MusicXmlInput::~MusicXmlInput() {}
 
+#ifndef NO_MUSICXML_SUPPORT
+
 bool MusicXmlInput::Import(std::string const &musicxml)
 {
     try {
@@ -767,7 +769,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     Section *section = new Section();
     score->AddChild(section);
     // initialize layout
-    if (root.select_node("/score-partwise/part/measure/print")) {
+    if (root.select_node("/score-partwise/part/measure/print[@new-system or @new-page]")) {
         m_hasLayoutInformation = true;
         if (!root.select_node("/score-partwise/part[1]/measure[1]/print[@new-system or @new-page]")) {
             // always start with a new page
@@ -814,23 +816,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
         }
         if (head) {
-            m_doc->m_mdivScoreDef.AddChild(head);
+            m_doc->GetCurrentScoreDef()->AddChild(head);
         }
         if (foot) {
-            m_doc->m_mdivScoreDef.AddChild(foot);
+            m_doc->GetCurrentScoreDef()->AddChild(foot);
         }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
-    m_doc->m_mdivScoreDef.AddChild(staffGrp);
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
     int staffOffset = 0;
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
-    if (scoreMidiBpm) m_doc->m_mdivScoreDef.SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
+    if (scoreMidiBpm) m_doc->GetCurrentScoreDef()->SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -4353,5 +4355,7 @@ void MusicXmlInput::SetChordStaff(Layer *layer)
         note->ResetStaffIdent();
     });
 }
+
+#endif // NO_MUSICXML_SUPPORT
 
 } // namespace vrv

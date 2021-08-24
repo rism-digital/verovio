@@ -34,7 +34,6 @@ public:
     virtual Object *Clone() const { return new BeatRpt(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "BeatRpt"; }
-    virtual ClassId GetClassId() const { return BEATRPT; }
     ///@}
 
     /** Override the method since alignment is required */

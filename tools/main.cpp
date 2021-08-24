@@ -223,21 +223,21 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    static struct option base_options[]
-        = { { "all-pages", no_argument, 0, 'a' },
-            { "from", required_argument, 0, 'f' },
-            { "help", no_argument, 0, 'h' },
-            { "outfile", required_argument, 0, 'o' },
-            { "page", required_argument, 0, 'p' },
-            { "resources", required_argument, 0, 'r' },
-            { "scale", required_argument, 0, 's' },
-            { "to", required_argument, 0, 't' },
-            { "version", no_argument, 0, 'v' },
-            { "xml-id-seed", required_argument, 0, 'x' },
-            // standard input - long options only or - as filename
-            { "stdin", no_argument, 0, 'z' },
-            { 0, 0, 0, 0 }
-        };
+    static struct option base_options[] = { //
+        { "all-pages", no_argument, 0, 'a' }, //
+        { "from", required_argument, 0, 'f' }, //
+        { "help", no_argument, 0, 'h' }, //
+        { "outfile", required_argument, 0, 'o' }, //
+        { "page", required_argument, 0, 'p' }, //
+        { "resources", required_argument, 0, 'r' }, //
+        { "scale", required_argument, 0, 's' }, //
+        { "to", required_argument, 0, 't' }, //
+        { "version", no_argument, 0, 'v' }, //
+        { "xml-id-seed", required_argument, 0, 'x' }, //
+        // standard input - long options only or - as filename
+        { "stdin", no_argument, 0, 'z' }, //
+        { 0, 0, 0, 0 }
+    };
 
     int baseSize = sizeof(base_options) / sizeof(option);
 
@@ -277,6 +277,7 @@ int main(int argc, char **argv)
     }
 
     int c;
+    int seed = 0;
     std::string key;
     int option_index = 0;
     vrv::Option *opt = NULL;
@@ -339,7 +340,11 @@ int main(int argc, char **argv)
 
             case 'v': show_version = 1; break;
 
-            case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
+            case 'x':
+                seed = atoi(optarg);
+                options->m_xmlIdSeed.SetValue(seed);
+                vrv::Object::SeedUuid(seed);
+                break;
 
             case 'z':
                 if (!strcmp(long_options[option_index].name, "stdin")) {
@@ -347,9 +352,15 @@ int main(int argc, char **argv)
                 }
                 break;
 
-            case 'h': display_usage(); exit(0); break;
+            case 'h':
+                display_usage();
+                exit(0);
+                break;
 
-            case '?': display_usage(); exit(1); break;
+            case '?':
+                display_usage();
+                exit(1);
+                break;
 
             default: break;
         }
@@ -399,7 +410,8 @@ int main(int argc, char **argv)
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
         && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae") && (outformat != "pb-mei")) {
-        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
+        std::cerr << "Output format (" << outformat
+                  << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
         exit(1);
     }
 
@@ -414,7 +426,7 @@ int main(int argc, char **argv)
         outfile = removeExtension(infile);
     }
     else if (outfile == "-") {
-        //vrv::EnableLog(false);
+        // vrv::EnableLog(false);
         std_output = true;
     }
     else {
@@ -624,7 +636,8 @@ int main(int argc, char **argv)
             }
         }
         else {
-            std::string params = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, page, removeIds);
+            std::string params
+                = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, page, removeIds);
             if (std_output) {
                 std::cout << toolkit.GetMEI(params);
             }

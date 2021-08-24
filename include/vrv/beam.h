@@ -61,6 +61,11 @@ public:
      */
     void ClearCoordRefs();
 
+    /**
+     * Get longest duration of the elements that are adjacent to the X coordinate passed
+     */
+    int GetAdjacentElementsDuration(int elementX) const;
+
 private:
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
@@ -135,7 +140,6 @@ public:
     virtual Object *Clone() const { return new Beam(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Beam"; }
-    virtual ClassId GetClassId() const { return BEAM; }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }

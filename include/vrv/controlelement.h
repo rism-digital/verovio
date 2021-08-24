@@ -31,10 +31,10 @@ public:
      */
     ///@{
     ControlElement();
-    ControlElement(const std::string &classid);
+    ControlElement(ClassId classId);
+    ControlElement(ClassId classId, const std::string &classIdStr);
     virtual ~ControlElement();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return CONTROL_ELEMENT; }
     ///@}
 
     /**

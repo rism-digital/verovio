@@ -23,7 +23,7 @@ namespace vrv {
 
 static const ClassRegistrar<PgFoot> s_factory("pgFoot", PGFOOT);
 
-PgFoot::PgFoot() : RunningElement("pgfoot-")
+PgFoot::PgFoot() : RunningElement(PGFOOT, "pgfoot-")
 {
     Reset();
 }

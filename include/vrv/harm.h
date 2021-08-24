@@ -41,7 +41,6 @@ public:
     virtual Object *Clone() const { return new Harm(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Harm"; }
-    virtual ClassId GetClassId() const { return HARM; }
     ///@}
 
     /**

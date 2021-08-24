@@ -40,7 +40,6 @@ public:
     virtual Object *Clone() const { return new Reh(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Reh"; }
-    virtual ClassId GetClassId() const { return REH; }
     ///@}
 
     /**

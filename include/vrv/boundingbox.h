@@ -36,7 +36,7 @@ public:
     ///@{
     BoundingBox();
     virtual ~BoundingBox(){};
-    virtual ClassId GetClassId() const;
+    virtual ClassId GetClassId() const = 0;
     bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
     bool Is(const std::vector<ClassId> &classIds) const;
     ///@}

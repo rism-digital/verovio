@@ -10,8 +10,8 @@
 
 #include "atts_critapp.h"
 #include "atts_shared.h"
-#include "boundary.h"
 #include "object.h"
+#include "systemboundary.h"
 
 namespace vrv {
 
@@ -35,7 +35,7 @@ class TextElement;
  * It is not an abstract class but should not be instantiated directly.
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
  */
-class EditorialElement : public Object, public BoundaryStartInterface, public AttLabelled, public AttTyped {
+class EditorialElement : public Object, public SystemElementStartInterface, public AttLabelled, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -43,10 +43,10 @@ public:
      */
     ///@{
     EditorialElement();
-    EditorialElement(const std::string &classid);
+    EditorialElement(ClassId classId);
+    EditorialElement(ClassId classId, const std::string &classIdStr);
     virtual ~EditorialElement();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return EDITORIAL_ELEMENT; }
     ///@}
 
     /**

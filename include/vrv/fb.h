@@ -32,7 +32,6 @@ public:
     virtual Object *Clone() const { return new Fb(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Fb"; }
-    virtual ClassId GetClassId() const { return FB; }
     ///@}
 
     /**

@@ -28,7 +28,6 @@ public:
     virtual ~Svg();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Svg"; }
-    virtual ClassId GetClassId() const { return SVG; }
     ///@}
 
     /**
@@ -53,7 +52,7 @@ public:
     //
 private:
     /**
-     * Tthe svg stored as pugi::xml_document
+     * The svg stored as pugi::xml_document
      */
     pugi::xml_document m_svg;
 };

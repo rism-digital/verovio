@@ -42,7 +42,6 @@ public:
     virtual Object *Clone() const { return new Dir(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dir"; }
-    virtual ClassId GetClassId() const { return DIR; }
     ///@}
 
     /**
@@ -59,6 +58,11 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * See FloatingObject::IsExtenderElement
+     */
+    virtual bool IsExtenderElement() const { return GetExtender() == BOOLEAN_true; }
 
     //----------//
     // Functors //

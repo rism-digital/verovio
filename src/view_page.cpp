@@ -41,6 +41,8 @@
 #include "note.h"
 #include "options.h"
 #include "page.h"
+#include "pageboundary.h"
+#include "pageelement.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -64,8 +66,6 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
-    int i;
-
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
 
@@ -88,10 +88,18 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     dc->StartPage();
 
-    for (i = 0; i < m_currentPage->GetSystemCount(); ++i) {
-        // cast to System check in DrawSystem
-        System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
-        DrawSystem(dc, system);
+    for (auto child : *m_currentPage->GetChildren()) {
+        if (child->IsPageElement()) {
+            // cast to PageElement check in DrawSystemEditorial element
+            DrawPageElement(dc, dynamic_cast<PageElement *>(child));
+        }
+        else if (child->Is(SYSTEM)) {
+            System *system = dynamic_cast<System *>(child);
+            DrawSystem(dc, system);
+        }
+        else {
+            assert(false);
+        }
     }
 
     DrawRunningElements(dc, m_currentPage);
@@ -142,6 +150,30 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     scoreDef->SetDrawingWidth(width);
+}
+
+void View::DrawPageElement(DeviceContext *dc, PageElement *element)
+{
+    assert(dc);
+    assert(element);
+
+    if (element->Is(PAGE_ELEMENT_END)) {
+        PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(element);
+        assert(elementEnd);
+        assert(elementEnd->GetStart());
+        dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is(MDIV)) {
+        // When the mdiv is not visible, then there is no start / end element
+        std::string elementStart = (element->IsBoundaryElement()) ? "pageElementStart" : "";
+        dc->StartGraphic(element, elementStart, element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is(SCORE)) {
+        dc->StartGraphic(element, "pageElementStart", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -318,14 +350,16 @@ void View::DrawStaffGrp(
     // draw the system start bar line
     if (topStaffGrp
         && ((((firstDef != lastDef) || staffGrp->GetFirst(GRPSYM))
-                && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
-            || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+                && (m_doc->GetCurrentScoreDef()->GetSystemLeftline() != BOOLEAN_false))
+            || (m_doc->GetCurrentScoreDef()->GetSystemLeftline() == BOOLEAN_true))) {
         // int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
         const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
         DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
     // draw the group symbol
+    int staffGrpX = x;
     DrawGrpSym(dc, measure, staffGrp, x);
+    int grpSymSpace = staffGrpX - x;
 
     // recursively draw the children
     StaffGrp *childStaffGrp = NULL;
@@ -337,11 +371,11 @@ void View::DrawStaffGrp(
     }
 
     // DrawStaffGrpLabel
-    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
     const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space);
+    this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
 
     DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
 }
@@ -362,10 +396,10 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
 
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
 
-        if (!staff || !system) {
-            LogDebug("Staff or System missing in View::DrawStaffDefLabels");
+        if (!staff || !scoreDef) {
+            LogDebug("Staff or ScoreDef missing in View::DrawStaffDefLabels");
             continue;
         }
 
@@ -378,7 +412,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
-        this->DrawLabels(dc, system, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
+        this->DrawLabels(dc, scoreDef, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
     }
 }
 
@@ -442,10 +476,10 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
 }
 
 void View::DrawLabels(
-    DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
+    DeviceContext *dc, ScoreDef *scoreDef, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
 {
     assert(dc);
-    assert(system);
+    assert(scoreDef);
     assert(object->Is({ STAFFDEF, STAFFGRP }));
 
     Label *label = dynamic_cast<Label *>(object->FindDescendantByType(LABEL, 1));
@@ -492,7 +526,7 @@ void View::DrawLabels(
     dc->EndGraphic(graphic, this);
 
     // keep the widest width for the system - careful: this can be the label OR labelAbbr
-    system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
+    scoreDef->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
     // also store in the system the maximum width with abbreviations for justification
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
@@ -503,6 +537,8 @@ void View::DrawLabels(
             dc->GetTextExtent(line, &extend, true);
             maxLength = (extend.m_width > maxLength) ? extend.m_width : maxLength;
         }
+        System *system = vrv_cast<System *>(scoreDef->GetFirstAncestor(SYSTEM));
+        assert(system);
         system->SetDrawingAbbrLabelsWidth(maxLength + space);
     }
 
@@ -683,7 +719,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 // drawn
                 data_BARRENDITION form = barLine->GetForm();
                 if (measure->HasInvisibleStaffBarlines()) {
-                    data_BARRENDITION barlineRend = barLine->Is(BARLINE_ATTR_RIGHT)
+                    data_BARRENDITION barlineRend = (barLine->GetPosition() == BarLinePosition::Right)
                         ? measure->GetDrawingRightBarLineByStaffN(childStaffDef->GetN())
                         : measure->GetDrawingLeftBarLineByStaffN(childStaffDef->GetN());
                     if (barlineRend != BARRENDITION_NONE) form = barlineRend;
@@ -767,7 +803,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // erase intersections only if we have more than one staff
         bool eraseIntersections = (first != last) ? true : false;
         // do not erase intersections with right barline of the last measure of the system
-        if (isLastMeasure && barLine->Is(BARLINE_ATTR_RIGHT)) {
+        if (isLastMeasure && (barLine->GetPosition() == BarLinePosition::Right)) {
             eraseIntersections = false;
         }
         DrawBarLine(dc, yTop, yBottom, barLine, barLine->GetForm(), eraseIntersections);
@@ -1425,6 +1461,9 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
 
     // Draw system divider (from the second one) if scoreDef is optimized
     if (!firstMeasure || (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_none)) return;
+    // No system divider if we are on the first system of a page or of an mdiv
+    if (system->IsFirstInPage() || system->IsFirstOfMdiv()) return;
+
     // initialize to zero, first measure is not supposed to have system divider
     int previousSystemBottomMarginY = 0;
     Object *currentPage = system->GetFirstAncestor(PAGE);
@@ -1446,8 +1485,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
         }
     }
 
-    if ((system->GetIdx() > 0)
-        && (system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
+    if ((system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
         int y = system->GetDrawingY();
         Staff *staff = firstMeasure->GetTopVisibleStaff();
         if (staff) {
@@ -1501,10 +1539,16 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             // nothing to do, then
             ScoreDef *scoreDef = vrv_cast<ScoreDef *>(current);
             assert(scoreDef);
+
+            Measure *nextMeasure = dynamic_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
+            if (nextMeasure && scoreDef->DrawLabels()) {
+                DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
+            }
+
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
         else if (current->IsSystemElement()) {
-            // cast to EditorialElement check in DrawSystemEditorial element
+            // cast to SystemElement check in DrawSystemEditorial element
             DrawSystemElement(dc, dynamic_cast<SystemElement *>(current), system);
         }
         else if (current->IsEditorialElement()) {
@@ -1680,10 +1724,10 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
     else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
-    std::string boundaryStart;
-    if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
+    std::string elementStart;
+    if (element->IsBoundaryElement()) elementStart = "systemeElementStart";
 
-    dc->StartGraphic(element, boundaryStart, element->GetUuid());
+    dc->StartGraphic(element, elementStart, element->GetUuid());
     // EditorialElements at the system level that are visible have no children
     // if (element->m_visibility == Visible) {
     //    DrawSystemChildren(dc, element, system);

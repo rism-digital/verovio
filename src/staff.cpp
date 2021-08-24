@@ -41,7 +41,7 @@ namespace vrv {
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 
-Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n) : Object(STAFF, "staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
@@ -248,68 +248,87 @@ void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int r
     }
 }
 
-void Staff::AdjustLedgerLines(ArrayOfLedgerLines &lines, int extension, int minExtension)
+void Staff::AdjustLedgerLines(
+    ArrayOfLedgerLines &lines, ArrayOfLedgerLines &cueLines, double cueScaling, int extension, int minExtension)
 {
     assert(minExtension <= extension);
-    if (lines.empty()) return;
 
     // By construction, any overlaps or small gaps in outer dash lines must also occur in the most inner dash line.
     // Thus it suffices to resolve any problems in the inner dash line and apply the adjustments to corresponding
     // dashes further away from the staff.
-    LedgerLine &innerLine = lines.at(0);
+
     struct Adjustment {
-        int left;
-        int right;
-        int delta;
+        int left; // the left boundary of the dash
+        int right; // the right boundary of the dash
+        bool isCue; // whether the dash is cue
+        int delta; // the shortening which will be applied on both sides
     };
-    std::list<Adjustment> adjustments;
 
-    const int defaultGap = 100 * extension; // A large value which should not trigger any adjustments
-    int leftGap = defaultGap;
-    int rightGap = defaultGap;
+    // For each dash on the inner line (both cue and normal) we construct an adjustment with zero delta
+    // and sort them
+    std::vector<Adjustment> adjustments;
     using DashType = std::pair<int, int>;
-    using IterType = std::list<DashType>::iterator;
-    for (IterType iterDash = innerLine.m_dashes.begin(); iterDash != innerLine.m_dashes.end(); ++iterDash) {
-        // Calculate the right gap
-        IterType iterNextDash = std::next(iterDash);
-        if (iterNextDash != innerLine.m_dashes.end()) {
-            rightGap = iterNextDash->first - iterDash->second;
+    if (!lines.empty()) {
+        for (const DashType &dash : lines.at(0).m_dashes) {
+            adjustments.push_back({ dash.first, dash.second, false, 0 });
         }
-        else {
-            rightGap = defaultGap;
+    }
+    if (!cueLines.empty()) {
+        for (const DashType &dash : cueLines.at(0).m_dashes) {
+            adjustments.push_back({ dash.first, dash.second, true, 0 });
         }
-
-        // The gap between successive dashes should be at least one dash extension
-        const int minGap = std::min(leftGap, rightGap);
-        if (minGap < extension) {
-            const int minDistance = minGap + 2 * extension;
-            const int newExtension = std::max(minDistance / 3, minExtension);
-            const int delta = extension - newExtension;
-            assert(delta >= 0);
-
-            // Apply and store the adjustment
-            adjustments.push_back({ iterDash->first, iterDash->second, delta });
-            iterDash->first += delta;
-            iterDash->second -= delta;
-        }
-
-        // The left gap of the next dash is the right gap of the current dash
-        leftGap = rightGap;
     }
 
-    // Now we transfer the adjustments from the inner dash line to the outer dash lines.
-    // This ensures that all dashes on the same note/chord obtain the same ledger line extension.
-    const int lineCount = static_cast<int>(lines.size());
+    std::sort(adjustments.begin(), adjustments.end(), [](const Adjustment &adj1, const Adjustment &adj2) {
+        if (adj1.left < adj2.left) return true;
+        return ((adj1.left == adj2.left) && (adj1.right < adj2.right));
+    });
+
+    // By comparing successive dashes we compute the necessary adjustment (delta) for each of them
+    const int defaultGap = 100 * extension; // A large value which should not trigger any adjustments
+    int leftGapProportion = defaultGap; // The proportion of the left gap belonging to the current dash
+    int rightGapProportion = defaultGap; // The proportion of the right gap belonging to the current dash
+
+    using IterType = std::vector<Adjustment>::iterator;
+    for (IterType iterAdj = adjustments.begin(); iterAdj != adjustments.end(); ++iterAdj) {
+        // Calculate the right gap and whether the next dash is cue
+        IterType iterNextAdj = std::next(iterAdj);
+        const int rightGap = (iterNextAdj != adjustments.end()) ? iterNextAdj->left - iterAdj->right : defaultGap;
+        const bool nextIsCue = (iterNextAdj != adjustments.end()) ? iterNextAdj->isCue : false;
+
+        // Calculate the proportion of the right gap belonging to the current dash and the proportion belonging to the
+        // next dash
+        const double currentCueScale = (iterAdj->isCue) ? cueScaling : 1.0;
+        const double nextCueScale = nextIsCue ? cueScaling : 1.0;
+        rightGapProportion = currentCueScale / (currentCueScale + nextCueScale) * rightGap;
+        const int nextLeftGapProportion = nextCueScale / (currentCueScale + nextCueScale) * rightGap;
+
+        // The gap between successive dashes should be at least one extension
+        const int minGapProportion = std::min(leftGapProportion, rightGapProportion);
+        if (minGapProportion < currentCueScale * extension / 2.0) {
+            const int minTotal = minGapProportion + currentCueScale * extension;
+            const int newExtension = std::max<int>(2 * minTotal / 3, currentCueScale * minExtension);
+            iterAdj->delta = currentCueScale * extension - newExtension;
+            assert(iterAdj->delta >= 0);
+        }
+
+        leftGapProportion = nextLeftGapProportion;
+    }
+
+    // Finally, we transfer the adjustments to all ledger lines
+    // We thus ensure that all dashes on the same note/chord obtain the same ledger line extension
     for (const Adjustment &adjustment : adjustments) {
-        for (int index = 1; index < lineCount; ++index) {
-            LedgerLine &outerLine = lines.at(index);
-            IterType iterDash = std::find_if(
-                outerLine.m_dashes.begin(), outerLine.m_dashes.end(), [&adjustment](const DashType &dash) {
-                    return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
-                });
-            if (iterDash != outerLine.m_dashes.end()) {
-                iterDash->first += adjustment.delta;
-                iterDash->second -= adjustment.delta;
+        if (adjustment.delta > 0) {
+            ArrayOfLedgerLines &linesToAdjust = adjustment.isCue ? cueLines : lines;
+            for (LedgerLine &line : linesToAdjust) {
+                std::list<DashType>::iterator iterDash
+                    = std::find_if(line.m_dashes.begin(), line.m_dashes.end(), [&adjustment](const DashType &dash) {
+                          return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
+                      });
+                if (iterDash != line.m_dashes.end()) {
+                    iterDash->first += adjustment.delta;
+                    iterDash->second -= adjustment.delta;
+                }
             }
         }
     }
@@ -544,15 +563,11 @@ int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    int extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, false);
-    int minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, false);
-    AdjustLedgerLines(m_ledgerLinesAbove, extension, minExtension);
-    AdjustLedgerLines(m_ledgerLinesBelow, extension, minExtension);
-
-    extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, true);
-    minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, true);
-    AdjustLedgerLines(m_ledgerLinesAboveCue, extension, minExtension);
-    AdjustLedgerLines(m_ledgerLinesBelowCue, extension, minExtension);
+    const int extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, false);
+    const int minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, false);
+    const double cueScaling = params->m_doc->GetCueScaling();
+    AdjustLedgerLines(m_ledgerLinesAbove, m_ledgerLinesAboveCue, cueScaling, extension, minExtension);
+    AdjustLedgerLines(m_ledgerLinesBelow, m_ledgerLinesBelowCue, cueScaling, extension, minExtension);
 
     return FUNCTOR_CONTINUE;
 }
@@ -597,7 +612,7 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
     }
 
     // This is happening only for the first staff element of the staff @n
-    if (StaffDef *staffDef = params->m_currentScoreDef->GetStaffDef(this->GetN())) {
+    if (StaffDef *staffDef = params->m_doc->GetCurrentScoreDef()->GetStaffDef(this->GetN())) {
         if ((staffDef->HasMultiNumber()) && (staffDef->GetMultiNumber() == BOOLEAN_false)) {
             // Set it just in case, but stopping the functor should do it for this staff @n
             params->m_multiNumber = BOOLEAN_false;

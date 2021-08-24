@@ -37,7 +37,6 @@ public:
     virtual Object *Clone() const { return new KeyAccid(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "KeyAccid"; }
-    virtual ClassId GetClassId() const { return KEYACCID; }
     ///@}
 
     virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }

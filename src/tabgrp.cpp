@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
 
-TabGrp::TabGrp() : LayerElement("tabgrp-"), DurationInterface()
+TabGrp::TabGrp() : LayerElement(TABGRP, "tabgrp-"), DurationInterface()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
 
