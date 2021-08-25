@@ -474,22 +474,35 @@ private:
 
     bool Parse();
 
-    bool ConvertPitches();
-    bool ConvertOctaves();
-    bool ConvertKeySigs();
-    bool ConvertClefs();
-    bool ConvertMeterSigsOrMensurs();
-    bool ConvertBeams();
+    /**
+     * @name Methods that convert pae::Token::m_char to pae::Token::m_objects
+     *
+     * The order in which they are called is important.
+     * For example, KeySig have to be converted before Pitch, because pitch charachters used
+     * in KeySig needs to be consumed first
+     */
+    ///@{
+    bool ConvertKeySig();
+    bool ConvertClef();
+    bool ConvertMeterSigOrMensur();
+    bool ConvertPitch();
+    bool ConvertOctave();
+    bool ConvertBeam();
+    bool ConvertGrace();
+    bool ConvertGraceGrp();
+    ///@}
 
     bool Is(pae::Token &token, const std::string &map);
 
-    void ConvertKeySig(KeySig *keySig, const std::string &paeStr);
-
-    void ConvertClef(Clef *clef, const std::string &paeStr);
-    
-    void ConvertMeterSig(MeterSig *meterSig, const std::string &paeStr);
-    
-    void ConvertMensur(Mensur *mensur, const std::string &paeStr);
+    /**
+     * @name Methods that parse sub string instantiate corresponding objects
+     */
+    ///@{
+    void ParseKeySig(KeySig *keySig, const std::string &paeStr);
+    void ParseClef(Clef *clef, const std::string &paeStr);
+    void ParseMeterSig(MeterSig *meterSig, const std::string &paeStr);
+    void ParseMensur(Mensur *mensur, const std::string &paeStr);
+    ///@}
 
     void ClearTokenObjects();
 
@@ -499,7 +512,7 @@ private:
     std::list<pae::Token> m_pae;
 
     bool m_isMensural;
-    
+
     int m_measureCount;
 };
 

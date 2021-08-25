@@ -2200,6 +2200,7 @@ namespace pae {
     static const std::string CLEF = "GCFg-+12345";
     static const char METERSIG_START = '@';
     static const std::string METERSIG = "/o.c0123456789";
+    static const std::string GRACE = "qg";
     static const std::string NOTENAME = "ABCDEFG";
 
     Token::Token(char c, Object *object)
@@ -2229,6 +2230,8 @@ PAEInput2::~PAEInput2()
 
 void PAEInput2::ClearTokenObjects()
 {
+    // Before we clear the pae list of tokens, we need to delete all token objects.
+    // Normally, they should be none because they are passed to the doc.
     for (auto &token : m_pae) {
         if (!token.m_object) continue;
         LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
@@ -2276,14 +2279,14 @@ bool PAEInput2::Import(const std::string &input)
     this->ClearTokenObjects();
 
     if (input.size() == 0) {
-        LogError("Input is empty");
+        LogError("PAE: Input is empty");
         return false;
     }
 
     jsonxx::Object jsonInput;
     if (input.at(0) == '{') {
         if (!jsonInput.parse(input)) {
-            LogError("Cannot parse the JSON input");
+            LogError("PAE: Cannot parse the JSON input");
             return false;
         }
     }
@@ -2292,6 +2295,7 @@ bool PAEInput2::Import(const std::string &input)
     }
 
     m_measureCount = 1;
+    // Add a measure at the beginning of the data because there is always at least one measure
     Measure *measure = new Measure(true, m_measureCount);
     m_pae.push_back(pae::Token(0, measure));
 
@@ -2304,12 +2308,14 @@ bool PAEInput2::Import(const std::string &input)
         }
     }
     else {
-        LogError("Not 'data' key in the JSON input");
+        LogError("PAE: No 'data' key in the JSON input");
         return false;
     }
 
+    // Add a token marking the end - special use of the CONTAINER_END with no object
+    // See pae::Token::IsEnd();
     m_pae.push_back(pae::Token(pae::CONTAINER_END));
-    
+
     m_isMensural = false;
 
     return this->Parse();
@@ -2319,17 +2325,21 @@ bool PAEInput2::Parse()
 {
     bool success = true;
 
-    if (success) success = this->ConvertKeySigs();
+    if (success) success = this->ConvertKeySig();
 
-    if (success) success = this->ConvertClefs();
-    
-    if (success) success = this->ConvertMeterSigsOrMensurs();
+    if (success) success = this->ConvertClef();
 
-    if (success) success = this->ConvertPitches();
+    if (success) success = this->ConvertMeterSigOrMensur();
 
-    if (success) success = this->ConvertOctaves();
+    if (success) success = this->ConvertPitch();
 
-    if (success) success = this->ConvertBeams();
+    if (success) success = this->ConvertOctave();
+
+    if (success) success = this->ConvertBeam();
+
+    if (success) success = this->ConvertGraceGrp();
+
+    if (success) success = this->ConvertGrace();
 
     m_doc->Reset();
     m_doc->SetType(Raw);
@@ -2350,26 +2360,32 @@ bool PAEInput2::Parse()
     staffDef->SetN(1);
     staffDef->SetLines(5);
     staffGrp->AddChild(staffDef);
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
 
-    ListOfObjects layerStack;
+    // A stack to which layer element are added. At least a Layer, but then Beam, GraceGrp, Chord, etc.
+    ListOfObjects layerElementContainers;
+    // If we have a meterSig or a keySig change, we will add a new ScoreDef before the current measure
     ScoreDef *scoreDefChange = NULL;
+    // The current measure, used to know where to  add a scoreDef change
     Measure *currentMeasure = NULL;
 
     for (auto &token : m_pae) {
+        // Double check that we don't have more than the layer on the layerStack
         if (token.IsEnd()) {
-            if (layerStack.size() > 1) {
-                LogDebug("The layer stack should not have more than one element");
+            if (layerElementContainers.size() > 1) {
+                LogDebug("PAE: The layer element container stack should not have more than one element");
             }
+            continue;
         }
 
-        if (!token.m_object) continue;
+        // No object to add to the doc - we whould also have no char left
+        if (!token.m_object) {
+            if (token.m_char != 0) LogDebug("Remaining unprocessed char '%c'", token.m_char);
+            continue;
+        }
 
+        // Everytime we have a Measure, we need to add it to the section and fill it with a Staff and Layer
         if (token.Is(MEASURE)) {
-            if (layerStack.size() > 1) {
-                LogDebug("The layer stack should not have more than one element");
-            }
-            layerStack.clear();
-
             currentMeasure = dynamic_cast<Measure *>(token.m_object);
             assert(currentMeasure);
             token.m_object = NULL;
@@ -2380,21 +2396,36 @@ bool PAEInput2::Parse()
             Layer *layer = new Layer();
             layer->SetN(1);
             staff->AddChild(layer);
-            layerStack.push_back(layer);
+            // Clear the layer element container stack (only max 1 should be left) and the new layer
+            if (layerElementContainers.size() > 1) {
+                LogDebug("PAE: The layer element container stack should not have more than one element");
+            }
+            layerElementContainers.clear();
+            layerElementContainers.push_back(layer);
+            // Reset the scoreDefChange pointer - a new one will be created if necessary
             scoreDefChange = NULL;
         }
-        else if (token.m_object->Is({KEYSIG, MENSUR, METERSIG})) {
+        // Place the keySig, mensur or meterSig to the scoreDefChange - create it if necessary
+        else if (token.m_object->Is({ KEYSIG, MENSUR, METERSIG })) {
             if (!scoreDefChange) {
                 scoreDefChange = new ScoreDef();
                 section->InsertBefore(currentMeasure, scoreDefChange);
             }
+            // For now ignore additional changes - not sure how these should be handled in MEI anyway
             if (scoreDefChange->FindDescendantByType(token.m_object->GetClassId())) {
-                LogDebug("%s change cannot occur more than once in a measure", token.m_object->GetClassName().c_str());
+                LogDebug(
+                    "PAE: %s change cannot occur more than once in a measure", token.m_object->GetClassName().c_str());
                 delete token.m_object;
             }
             else {
                 scoreDefChange->AddChild(token.m_object);
+                // For the meterSig and mensur, we can have them as attribute. KeySig not because of the enclose
+                // attributes
+                if (token.m_object->Is({ MENSUR, METERSIG })) {
+                    token.m_object->IsAttribute(true);
+                }
             }
+            // Object are own by the scoreDef
             token.m_object = NULL;
             continue;
         }
@@ -2402,39 +2433,143 @@ bool PAEInput2::Parse()
 
             LayerElement *element = dynamic_cast<LayerElement *>(token.m_object);
             assert(element);
+            // The object is either a container end, or will be added to the layerElementContainers.back()
             token.m_object = NULL;
 
+            // For a container end, no object to add to the doc.
             if (token.m_char == pae::CONTAINER_END) {
-                if (layerStack.size() < 2) {
-                    LogDebug("The layer stack should have a least two elements");
+                // Do check that we still have more than the layer before poping it from the stack
+                if (layerElementContainers.size() < 2) {
+                    LogDebug("PAE: The layer element container stack should have a least two elements");
                     continue;
                 }
-                layerStack.pop_back();
+                // Also double check that the open / close element is actually the same
+                if (layerElementContainers.back() != element) {
+                    LogDebug("PAE: The layer element container stack top and the container end should match");
+                }
+                // Simply pop it and continue
+                layerElementContainers.pop_back();
                 continue;
             }
 
-            if (layerStack.empty()) {
-                LogDebug("The layer stack should have a least one element");
+            // Something when really wrong... Still delete the element to avoid a memory leak
+            if (layerElementContainers.empty()) {
+                LogDebug("PAE: The layer element container stack should have a least one element");
                 delete element;
                 continue;
             }
-            layerStack.back()->AddChild(element);
+            layerElementContainers.back()->AddChild(element);
 
-            if (element->Is(BEAM)) {
-                layerStack.push_back(element);
+            // Add to the stack the layer element that are containers
+            if (element->Is({ BEAM, GRACEGRP })) {
+                layerElementContainers.push_back(element);
             }
         }
     }
 
+    // We should have not object left, just in case they need to be delete.
     this->ClearTokenObjects();
 
-    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
     m_doc->ConvertToPageBasedDoc();
 
     return success;
 }
 
-bool PAEInput2::ConvertPitches()
+bool PAEInput2::ConvertKeySig()
+{
+    pae::Token *keySigToken = NULL;
+    std::string paeStr;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == pae::KEYSIG_START) {
+            keySigToken = &token;
+            paeStr.clear();
+        }
+        else if (keySigToken) {
+            if (this->Is(token, pae::KEYSIG)) {
+                paeStr.push_back(token.m_char);
+                token.m_char = 0;
+            }
+            else {
+                keySigToken->m_char = 0;
+                // LogDebug("Keysig %s", paeStr.c_str());
+                KeySig *keySig = new KeySig();
+                this->ParseKeySig(keySig, paeStr);
+                keySigToken->m_object = keySig;
+                keySigToken = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertClef()
+{
+    pae::Token *clefToken = NULL;
+    std::string paeStr;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == pae::CLEF_START) {
+            clefToken = &token;
+            paeStr.clear();
+        }
+        else if (clefToken) {
+            if (this->Is(token, pae::CLEF)) {
+                paeStr.push_back(token.m_char);
+                token.m_char = 0;
+            }
+            else {
+                clefToken->m_char = 0;
+                // LogDebug("Clef %s", paeStr.c_str());
+                Clef *clef = new Clef();
+                this->ParseClef(clef, paeStr);
+                clefToken->m_object = clef;
+                clefToken = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertMeterSigOrMensur()
+{
+    pae::Token *meterSigOfMensurToken = NULL;
+    std::string paeStr;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == pae::METERSIG_START) {
+            meterSigOfMensurToken = &token;
+            paeStr.clear();
+        }
+        else if (meterSigOfMensurToken) {
+            if (this->Is(token, pae::METERSIG)) {
+                paeStr.push_back(token.m_char);
+                token.m_char = 0;
+            }
+            else {
+                meterSigOfMensurToken->m_char = 0;
+                // LogDebug("MeterSig %s", paeStr.c_str());
+                if (m_isMensural) {
+                    Mensur *mensur = new Mensur();
+                    this->ParseMensur(mensur, paeStr);
+                    meterSigOfMensurToken->m_object = mensur;
+                }
+                else {
+                    MeterSig *meterSig = new MeterSig();
+                    this->ParseMeterSig(meterSig, paeStr);
+                    meterSigOfMensurToken->m_object = meterSig;
+                }
+                meterSigOfMensurToken = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertPitch()
 {
     for (auto &token : m_pae) {
         if (Is(token, pae::NOTENAME)) {
@@ -2459,13 +2594,14 @@ bool PAEInput2::ConvertPitches()
     return true;
 }
 
-bool PAEInput2::ConvertOctaves()
+bool PAEInput2::ConvertOctave()
 {
     int oct = 4;
     char readingOct = 0;
 
     for (auto &token : m_pae) {
         if (token.m_char == pae::OCTAVEUP) {
+            // Init to 4 when starting to read octave '
             if (readingOct != pae::OCTAVEUP) {
                 oct = 4;
                 readingOct = pae::OCTAVEUP;
@@ -2476,6 +2612,7 @@ bool PAEInput2::ConvertOctaves()
             token.m_char = 0;
         }
         else if (token.m_char == pae::OCTAVEDOWN) {
+            // Init to 3 when starting to read octave ,
             if (readingOct != pae::OCTAVEDOWN) {
                 oct = 3;
                 readingOct = pae::OCTAVEDOWN;
@@ -2486,9 +2623,11 @@ bool PAEInput2::ConvertOctaves()
             token.m_char = 0;
         }
         else {
+            // We are not reading octave signs anymore
             readingOct = 0;
         }
 
+        // Simply set is to the notes
         if (token.Is(NOTE)) {
             Note *note = dynamic_cast<Note *>(token.m_object);
             assert(note);
@@ -2499,110 +2638,17 @@ bool PAEInput2::ConvertOctaves()
     return true;
 }
 
-bool PAEInput2::ConvertKeySigs()
-{
-    pae::Token *keySigToken = NULL;
-    std::string paeStr;
-
-    for (auto &token : m_pae) {
-        if (token.m_char == pae::KEYSIG_START) {
-            keySigToken = &token;
-            paeStr.clear();
-        }
-        else if (keySigToken) {
-            if (this->Is(token, pae::KEYSIG)) {
-                paeStr.push_back(token.m_char);
-                token.m_char = 0;
-            }
-            else {
-                keySigToken->m_char = 0;
-                // LogDebug("Keysig %s", paeStr.c_str());
-                KeySig *keySig = new KeySig();
-                this->ConvertKeySig(keySig, paeStr);
-                keySigToken->m_object = keySig;
-                keySigToken = NULL;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool PAEInput2::ConvertClefs()
-{
-    pae::Token *clefToken = NULL;
-    std::string paeStr;
-
-    for (auto &token : m_pae) {
-        if (token.m_char == pae::CLEF_START) {
-            clefToken = &token;
-            paeStr.clear();
-        }
-        else if (clefToken) {
-            if (this->Is(token, pae::CLEF)) {
-                paeStr.push_back(token.m_char);
-                token.m_char = 0;
-            }
-            else {
-                clefToken->m_char = 0;
-                // LogDebug("Clef %s", paeStr.c_str());
-                Clef *clef = new Clef();
-                this->ConvertClef(clef, paeStr);
-                clefToken->m_object = clef;
-                clefToken = NULL;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool PAEInput2::ConvertMeterSigsOrMensurs()
-{
-    pae::Token *meterSigOfMensurToken = NULL;
-    std::string paeStr;
-
-    for (auto &token : m_pae) {
-        if (token.m_char == pae::METERSIG_START) {
-            meterSigOfMensurToken = &token;
-            paeStr.clear();
-        }
-        else if (meterSigOfMensurToken) {
-            if (this->Is(token, pae::METERSIG)) {
-                paeStr.push_back(token.m_char);
-                token.m_char = 0;
-            }
-            else {
-                meterSigOfMensurToken->m_char = 0;
-                // LogDebug("MeterSig %s", paeStr.c_str());
-                if (m_isMensural) {
-                    Mensur *mensur = new Mensur();
-                    this->ConvertMensur(mensur, paeStr);
-                    meterSigOfMensurToken->m_object = mensur;
-                }
-                else {
-                    MeterSig *meterSig = new MeterSig();
-                    this->ConvertMeterSig(meterSig, paeStr);
-                    meterSigOfMensurToken->m_object = meterSig;
-                }
-                meterSigOfMensurToken = NULL;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool PAEInput2::ConvertBeams()
+bool PAEInput2::ConvertBeam()
 {
     Beam *beam = NULL;
 
+    // Here we need an iterator because we might have to add a missing closing tag
     std::list<pae::Token>::iterator token = m_pae.begin();
     while (token != m_pae.end()) {
         if (token->m_char == '{') {
             token->m_char = 0;
             if (beam) {
-                LogDebug("Nested beams are not supported and will be ignored");
+                LogDebug("PAE: Nested beams are not supported and will be ignored");
                 ++token;
                 continue;
             }
@@ -2612,7 +2658,7 @@ bool PAEInput2::ConvertBeams()
         else if (token->m_char == '}') {
             token->m_char = 0;
             if (!beam) {
-                LogDebug("Irrelevant closing beam ignored");
+                LogDebug("PAE: Irrelevant closing beam ignored");
                 ++token;
                 continue;
             }
@@ -2622,7 +2668,7 @@ bool PAEInput2::ConvertBeams()
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (beam) {
-                LogDebug("Unclose beam at the end of a measure");
+                LogDebug("PAE: Unclose beam at the end of a measure");
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, beam));
                 beam = NULL;
             }
@@ -2633,7 +2679,80 @@ bool PAEInput2::ConvertBeams()
     return true;
 }
 
-void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeStr)
+bool PAEInput2::ConvertGraceGrp()
+{
+    pae::Token *graceGrpToken = NULL;
+
+    // Do a first loop to change 'qq' to 'Q' for eaiser grace groups detection
+    for (auto &token : m_pae) {
+        if (token.m_char == 'q') {
+            if (!graceGrpToken) {
+                graceGrpToken = &token;
+                continue;
+            }
+            else {
+                graceGrpToken->m_char = 0;
+                token.m_char = 'Q';
+            }
+        }
+        graceGrpToken = NULL;
+    }
+
+    GraceGrp *graceGrp = NULL;
+
+    // Here we need an iterator because we might have to add a missing closing tag
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->m_char == 'Q') {
+            token->m_char = 0;
+            if (graceGrp) {
+                LogDebug("PAE: Nested grace groups are not supported and will be ignored");
+                ++token;
+                continue;
+            }
+            graceGrp = new GraceGrp();
+            token->m_object = graceGrp;
+        }
+        else if (token->m_char == 'r') {
+            token->m_char = 0;
+            if (!graceGrp) {
+                LogDebug("PAE: Irrelevant closing grace group ignored");
+                ++token;
+                continue;
+            }
+            token->m_object = graceGrp;
+            token->m_char = pae::CONTAINER_END;
+            graceGrp = NULL;
+        }
+        else if (this->Is(*token, pae::GRACE)) {
+            if (graceGrp) {
+                LogDebug("PAE: Grace within a grace group is not supported and will be ignored");
+                token->m_char = 0;
+            }
+        }
+        else if (token->IsEnd() || token->Is(MEASURE)) {
+            if (graceGrp) {
+                LogDebug("PAE: Unclose grace group at the end of a measure");
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, graceGrp));
+                graceGrp = NULL;
+            }
+        }
+        ++token;
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertGrace()
+{
+    pae::Token *graceGrpToken = NULL;
+
+    // TODO
+
+    return true;
+}
+
+void PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr)
 {
     assert(keySig);
 
@@ -2712,14 +2831,14 @@ void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeStr)
     }
 }
 
-void PAEInput2::ConvertClef(Clef *clef, const std::string &paeStr)
+void PAEInput2::ParseClef(Clef *clef, const std::string &paeStr)
 {
     assert(clef);
 
     clef->Reset();
 
     if (paeStr.size() < 3) {
-        LogDebug("Clef content cannot be parsed and will be set to G-2");
+        LogDebug("PAE: Clef content cannot be parsed and will be set to G-2");
         clef->SetLine(2);
         clef->SetShape(CLEFSHAPE_G);
         return;
@@ -2748,24 +2867,23 @@ void PAEInput2::ConvertClef(Clef *clef, const std::string &paeStr)
         clef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogDebug("Plaine & Easie import: undefined clef '%s'", paeStr.c_str());
+        LogDebug("PAE: undefined clef '%s'", paeStr.c_str());
     }
 }
 
-
-void PAEInput2::ConvertMeterSig(MeterSig *meterSig, const std::string &paeStr)
+void PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr)
 {
     assert(meterSig);
 
     meterSig->Reset();
 
     if (paeStr.size() < 1) {
-        LogDebug("MeterSig content cannot be parsed and will be set to 4/4");
+        LogDebug("PAE: MeterSig content cannot be parsed and will be set to 4/4");
         meterSig->SetCount({ 4 });
         meterSig->SetUnit(4);
         return;
     }
-    
+
     std::cmatch matches;
     if (regex_match(paeStr.c_str(), matches, std::regex("(\\d+)/(\\d+)"))) {
         meterSig->SetCount({ std::stoi(matches[1]) });
@@ -2796,22 +2914,22 @@ void PAEInput2::ConvertMeterSig(MeterSig *meterSig, const std::string &paeStr)
         meterSig->SetUnit(2);
     }
     else {
-        LogWarning("Plaine & Easie import: unsupported time signature %s", paeStr.c_str());
+        LogWarning("PAE: unsupported time signature %s", paeStr.c_str());
     }
 }
 
-void PAEInput2::ConvertMensur(Mensur *mensur, const std::string &paeStr)
+void PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr)
 {
     assert(mensur);
 
     mensur->Reset();
 
     if (paeStr.size() < 1) {
-        LogDebug("Mensur content cannot be parsed and will be set to O");
+        LogDebug("PAE: Mensur content cannot be parsed and will be set to O");
         mensur->SetSign(MENSURATIONSIGN_O);
         return;
     }
-    
+
     std::cmatch matches;
     if (regex_match(paeStr.c_str(), matches, std::regex("(\\d+)/(\\d+)"))) {
         mensur->SetNum(std::stoi(matches[1]));
@@ -2847,9 +2965,8 @@ void PAEInput2::ConvertMensur(Mensur *mensur, const std::string &paeStr)
         }
     }
     else {
-        LogWarning("Plaine & Easie import: unsupported time signature: %s", paeStr.c_str());
+        LogWarning("PAE: unsupported time signature: %s", paeStr.c_str());
     }
-    
 }
 
 } // namespace vrv
