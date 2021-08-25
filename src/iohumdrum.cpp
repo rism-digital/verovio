@@ -18937,8 +18937,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         if (showInAccidGes) {
             if (loaccid.empty()) {
                 switch (accidCount) {
-                    // case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
-                    // case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
+                    case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
+                    case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
                     case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
                     case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
                     case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;

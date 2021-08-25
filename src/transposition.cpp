@@ -92,6 +92,7 @@ TransPitch::TransPitch(const TransPitch &pitch)
 int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW)
 {
     switch (accidG) {
+        case ACCIDENTAL_GESTURAL_tf: return -3;
         case ACCIDENTAL_GESTURAL_ff: return -2;
         // case ACCIDENTAL_GESTURAL_fd: return -1.5;
         case ACCIDENTAL_GESTURAL_f: return -1;
@@ -101,6 +102,7 @@ int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACC
         case ACCIDENTAL_GESTURAL_s: return 1;
         // case ACCIDENTAL_GESTURAL_su: return 1.5;
         case ACCIDENTAL_GESTURAL_ss: return 2;
+        case ACCIDENTAL_GESTURAL_ts: return 3;
         default: break;
     }
     switch (accidW) {
