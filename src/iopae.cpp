@@ -2194,6 +2194,8 @@ namespace pae {
     static const char CONTAINER_END = '~';
     static const char OCTAVEUP = '\'';
     static const char OCTAVEDOWN = ',';
+    static const char KEYSIG_START = '$';
+    static const std::string KEYSIG = "xnb[]ABCDEFG";
     static const std::string NOTENAME = "ABCDEFG";
 
     Token::Token(char c, Object *object)
@@ -2310,7 +2312,9 @@ bool PAEInput2::Parse()
 {
     bool success = true;
 
-    success = this->ConvertPitches();
+    if (success) success = this->ConvertKeySigs();
+
+    if (success) success = this->ConvertPitches();
 
     if (success) success = this->ConvertOctaves();
 
@@ -2347,7 +2351,7 @@ bool PAEInput2::Parse()
 
         if (!token.m_object) continue;
 
-        if (token.m_object->Is(MEASURE)) {
+        if (token.Is(MEASURE)) {
             if (layerStack.size() > 1) {
                 LogDebug("The layer stack should not have more than one element");
             }
@@ -2364,6 +2368,11 @@ bool PAEInput2::Parse()
             layer->SetN(1);
             staff->AddChild(layer);
             layerStack.push_back(layer);
+        }
+        else if (token.Is(KEYSIG)) {
+            staffDef->AddChild(token.m_object);
+            token.m_object = NULL;
+            continue;
         }
         else if (token.m_object->IsLayerElement()) {
 
@@ -2466,6 +2475,35 @@ bool PAEInput2::ConvertOctaves()
     return true;
 }
 
+bool PAEInput2::ConvertKeySigs()
+{
+    pae::Token *keySigToken = NULL;
+    std::string paeKeySigStr;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == pae::KEYSIG_START) {
+            keySigToken = &token;
+            paeKeySigStr.clear();
+        }
+        else if (keySigToken) {
+            if (this->Is(token, pae::KEYSIG)) {
+                paeKeySigStr.push_back(token.m_char);
+                token.m_char = 0;
+            }
+            else {
+                keySigToken->m_char = 0;
+                // LogDebug("Keysig %s", paeKeysig.c_str());
+                KeySig *keySig = new KeySig();
+                this->ConvertKeySig(keySig, paeKeySigStr);
+                keySigToken->m_object = keySig;
+                keySigToken = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool PAEInput2::ConvertBeams()
 {
     Beam *beam = NULL;
@@ -2504,6 +2542,85 @@ bool PAEInput2::ConvertBeams()
     }
 
     return true;
+}
+
+void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeKeySigStr)
+{
+    assert(keySig);
+
+    keySig->Reset();
+
+    int altNumber = 0;
+    bool endOfKeysig = false;
+    bool enclosed = false;
+    bool hasEnclosed = false;
+    std::vector<bool> enclosedAccids;
+    enclosedAccids.resize(7);
+    bool cancel = false;
+    data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
+    for (auto c : paeKeySigStr) {
+        switch (c) {
+            case 'b':
+                altNumber = 0;
+                alterationType = ACCIDENTAL_WRITTEN_f;
+                break;
+            case 'x':
+                altNumber = 0;
+                alterationType = ACCIDENTAL_WRITTEN_s;
+                break;
+            case 'n':
+                altNumber = 0;
+                cancel = true;
+                break;
+            case '[':
+                enclosed = true;
+                hasEnclosed = true;
+                break;
+            case ']': enclosed = false; break;
+            case 'F':
+            case 'C':
+            case 'G':
+            case 'D':
+            case 'A':
+            case 'E':
+            case 'B': altNumber++; break;
+            default: endOfKeysig = true; break;
+        }
+        if (!endOfKeysig) {
+            if (altNumber < 7) {
+                enclosedAccids.at(altNumber) = enclosed;
+            }
+        }
+    }
+
+    // Just in case
+    altNumber = std::min(6, altNumber);
+
+    if (alterationType != ACCIDENTAL_WRITTEN_NONE) {
+        if (hasEnclosed == true) {
+            keySig->IsAttribute(false);
+            for (int i = 0; i < altNumber; ++i) {
+                KeyAccid *keyAccid = new KeyAccid();
+                data_PITCHNAME pname = (alterationType == ACCIDENTAL_WRITTEN_f) ? KeySig::s_pnameForFlats[i]
+                                                                                : KeySig::s_pnameForSharps[i];
+                keyAccid->SetPname(pname);
+                keyAccid->SetAccid(alterationType);
+                keySig->AddChild(keyAccid);
+                if (enclosedAccids.at(i)) {
+                    keyAccid->SetEnclose(ENCLOSURE_brack);
+                }
+            }
+        }
+        else {
+            keySig->SetSig(std::make_pair(altNumber, alterationType));
+        }
+        if (cancel) {
+            keySig->SetSigShowchange(BOOLEAN_true);
+        }
+    }
+    else {
+        keySig->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+    }
 }
 
 } // namespace vrv

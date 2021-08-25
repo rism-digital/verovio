@@ -478,9 +478,12 @@ private:
 
     bool ConvertPitches();
     bool ConvertOctaves();
+    bool ConvertKeySigs();
     bool ConvertBeams();
 
     bool Is(pae::Token &token, const std::string &map);
+
+    void ConvertKeySig(KeySig *keySig, const std::string &paeKeysig);
 
     void ClearTokenObjects();
 
