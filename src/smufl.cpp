@@ -359,6 +359,7 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "mensuralCombStemDownFlagFusa", SMUFL_E94C_mensuralCombStemDownFlagFusa },
     { "chantPunctum", SMUFL_E990_chantPunctum },
     { "chantPunctumInclinatum", SMUFL_E991_chantPunctumInclinatum },
+    { "chantAuctumAsc", SMUFL_E994_chantAuctumAsc },
     { "chantAuctumDesc", SMUFL_E995_chantAuctumDesc },
     { "chantPunctumVirga", SMUFL_E996_chantPunctumVirga },
     { "chantPunctumVirgaReversed", SMUFL_E997_chantPunctumVirgaReversed },
@@ -396,8 +397,11 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "wiggleArpeggiatoDown", SMUFL_EAAA_wiggleArpeggiatoDown },
     { "wiggleArpeggiatoUpArrow", SMUFL_EAAD_wiggleArpeggiatoUpArrow },
     { "wiggleArpeggiatoDownArrow", SMUFL_EAAE_wiggleArpeggiatoDownArrow },
+    { "staffPosRaise1", SMUFL_EB90_staffPosRaise1 },
     { "staffPosRaise2", SMUFL_EB91_staffPosRaise2 },
     { "staffPosRaise3", SMUFL_EB92_staffPosRaise3 },
+    { "staffPosLower1", SMUFL_EB98_staffPosLower1 },
+    { "staffPosLower2", SMUFL_EB99_staffPosLower2 },
     { "luteDurationWhole", SMUFL_EBA7_luteDurationWhole },
     { "luteDurationHalf", SMUFL_EBA8_luteDurationHalf },
     { "luteDurationQuarter", SMUFL_EBA9_luteDurationQuarter },
@@ -432,6 +436,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 406
+// 410
 
 } // namespace vrv

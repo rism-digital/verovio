@@ -2293,7 +2293,7 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <glyph glyph-code="E991" smufl-name="chantPunctumInclinatum"/>
             <!--<glyph glyph-code="E992" smufl-name="chantPunctumInclinatumAuctum"/>-->
             <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
-            <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->
+            <glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>
             <glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>
             <glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>
             <glyph glyph-code="E997" smufl-name="chantPunctumVirgaReversed"/>
@@ -2750,7 +2750,7 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
         </arrowsAndArrowheads>
         <combiningStaffPositions>
             <description>Combining staff positions</description>
-            <!--<glyph glyph-code="EB90" smufl-name="staffPosRaise1"/>-->
+            <glyph glyph-code="EB90" smufl-name="staffPosRaise1"/>
             <glyph glyph-code="EB91" smufl-name="staffPosRaise2"/>
             <glyph glyph-code="EB92" smufl-name="staffPosRaise3"/>
             <!--<glyph glyph-code="EB93" smufl-name="staffPosRaise4"/>-->
@@ -2758,8 +2758,8 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <!--<glyph glyph-code="EB95" smufl-name="staffPosRaise6"/>-->
             <!--<glyph glyph-code="EB96" smufl-name="staffPosRaise7"/>-->
             <!--<glyph glyph-code="EB97" smufl-name="staffPosRaise8"/>-->
-            <!--<glyph glyph-code="EB98" smufl-name="staffPosLower1"/>-->
-            <!--<glyph glyph-code="EB99" smufl-name="staffPosLower2"/>-->
+            <glyph glyph-code="EB98" smufl-name="staffPosLower1"/>
+            <glyph glyph-code="EB99" smufl-name="staffPosLower2"/>
             <!--<glyph glyph-code="EB9A" smufl-name="staffPosLower3"/>-->
             <!--<glyph glyph-code="EB9B" smufl-name="staffPosLower4"/>-->
             <!--<glyph glyph-code="EB9C" smufl-name="staffPosLower5"/>-->
