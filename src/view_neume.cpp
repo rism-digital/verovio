@@ -168,8 +168,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).fontNoLiq[3] = SMUFL_EB99_staffPosLower2;
         params.at(0).fontNoLiq[4] = SMUFL_E9BE_chantConnectingLineAsc3rd;
         params.at(0).xOffsetLiq[4] = 0.8;
-        params.at(0).yOffsetLiq[0] = 1;
-        params.at(0).yOffsetLiq[4] = 1.25;
+        params.at(0).yOffsetLiq[0] = 0.5;
+        params.at(0).yOffsetLiq[4] = 0.75;
     }
 
     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
