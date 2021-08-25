@@ -612,7 +612,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
             return 0;
         }
         // Return the maximum adjustment required
-        return std::max(boundingBox->GetTopBy(type) - leftY, boundingBox->GetBottomBy(type) - rightY);
+        return std::max(boundingBox->GetTopBy(type) - leftY, boundingBox->GetTopBy(type) - rightY);
     }
     else {
         // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.

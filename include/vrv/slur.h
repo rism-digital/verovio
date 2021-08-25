@@ -14,6 +14,15 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// CPInequality
+//----------------------------------------------------------------------------
+struct CPInequality {
+    double a;
+    double b;
+    double c;
+};
+
+//----------------------------------------------------------------------------
 // Slur
 //----------------------------------------------------------------------------
 
@@ -56,18 +65,17 @@ public:
 
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
-    void AdjustControlPointHeight(Doc *doc, BezierCurve &bezierCurve, int staffSize);
+    void AdjustControlPointHeight(Doc *doc, BezierCurve &bezierCurve, float angle, int staffSize);
 
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
      */
-    bool AdjustSlurPosition(
-        Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides);
-    /**
-     * Calculate slur left/right maximum shifts required for slur not to overlap with other objects
-     */
-    std::pair<int, int> CalculateAdjustedSlurShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
-        int margin, bool forceBothSides, bool &isNotAdjustable);
+    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve);
+
+    std::pair<int, int> CalcEndShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+    std::tuple<bool, int, int> CalcCPOffset(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve);
+    std::pair<int, int> CalcCPVerticalShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+    std::pair<int, int> SolveCPConstraints(const std::list<CPInequality> &constraints);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
     void GetControlPoints(BezierCurve &curve, curvature_CURVEDIR curveDir, bool ignoreAngle = false);

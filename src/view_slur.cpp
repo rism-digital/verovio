@@ -532,7 +532,7 @@ float View::CalcInitialSlur(
     BezierCurve bezier;
     bezier.p1 = points[0];
     bezier.p2 = points[3];
-    bezier.CalculateControlPointOffset(m_doc, staff->m_drawingStaffSize);
+    bezier.CalculateControlPointOffset(m_doc);
 
     /************** height **************/
 
