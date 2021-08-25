@@ -2189,7 +2189,26 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 // PAEInput2
 //----------------------------------------------------------------------------
 
-static const char CONTAINER_END = '~';
+namespace pae {
+
+    static const char CONTAINER_END = '~';
+    static const std::string NOTENAME = "ABCDEFG";
+
+    Token::Token(char c)
+    {
+        m_char = c;
+        m_object = NULL;
+    }
+
+    Token::~Token()
+    {
+        if (m_object) {
+            LogDebug("Delete token %s", m_object->GetClassName().c_str());
+            delete m_object;
+        }
+    }
+
+} // namespace pae
 
 PAEInput2::PAEInput2(Doc *doc)
     : // This is pretty bad. We open a bad fileoinputstream as we don't use it
@@ -2198,6 +2217,11 @@ PAEInput2::PAEInput2(Doc *doc)
 }
 
 PAEInput2::~PAEInput2() {}
+
+bool PAEInput2::Is(pae::Token &token, const std::string &map)
+{
+    return (map.find(token.m_char) != std::string::npos);
+}
 
 jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
 {
@@ -2249,13 +2273,47 @@ bool PAEInput2::Import(const std::string &input)
         std::string data = jsonInput.get<jsonxx::String>("data");
         for (char c : data) {
             // Ignore the charcter that is use internally as container end Token
-            if (c == CONTAINER_END) continue;
+            if (c == pae::CONTAINER_END) continue;
             m_pae.push_back(pae::Token(c));
         }
     }
     else {
         LogError("Not 'data' key in the JSON input");
         return false;
+    }
+
+    return this->Parse();
+}
+
+bool PAEInput2::Parse()
+{
+    bool success = true;
+
+    success = this->ConvertPitches();
+
+    return success;
+}
+
+bool PAEInput2::ConvertPitches()
+{
+    for (auto &token : m_pae) {
+        if (Is(token, pae::NOTENAME)) {
+            Note *note = new Note();
+            data_PITCHNAME pitch = PITCHNAME_c;
+            switch (token.m_char) {
+                case 'A': pitch = PITCHNAME_a; break;
+                case 'B': pitch = PITCHNAME_b; break;
+                case 'C': pitch = PITCHNAME_c; break;
+                case 'D': pitch = PITCHNAME_d; break;
+                case 'E': pitch = PITCHNAME_e; break;
+                case 'F': pitch = PITCHNAME_f; break;
+                case 'G': pitch = PITCHNAME_g; break;
+                default: break;
+            }
+            note->SetPname(pitch);
+            token.m_object = note;
+            token.m_char = 0;
+        }
     }
 
     return false;

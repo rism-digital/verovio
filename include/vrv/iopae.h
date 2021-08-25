@@ -451,12 +451,8 @@ namespace pae {
 
     class Token {
     public:
-        Token(char c)
-        {
-            m_char = c;
-            m_object = NULL;
-        }
-        virtual ~Token(){};
+        Token(char c);
+        virtual ~Token();
 
         char m_char;
         Object *m_object;
@@ -475,6 +471,12 @@ public:
 private:
     // function declarations:
     jsonxx::Object InputKeysToJson(const std::string &inputKeys);
+
+    bool Parse();
+
+    bool ConvertPitches();
+
+    bool Is(pae::Token &token, const std::string &map);
 
 public:
     //
