@@ -206,7 +206,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // to be checked before PAE identification.
         return MUSEDATAHUM;
     }
-    if (data[0] == '@') {
+    if (data[0] == '@' || data[0] == '{') {
         return PAE;
     }
     if (data[0] == '*' || data[0] == '!') {
@@ -443,7 +443,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     else if (inputFormat == PAE) {
 #ifndef NO_PAE_SUPPORT
-        input = new PAEInput(&m_doc);
+        input = new PAEInput2(&m_doc);
 #else
         LogError("Plaine & Easie import is not supported in this build.");
         return false;

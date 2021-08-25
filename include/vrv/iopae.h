@@ -18,6 +18,10 @@
 #include "io.h"
 #include "vrvdef.h"
 
+//----------------------------------------------------------------------------
+
+#include "jsonxx.h"
+
 namespace vrv {
 
 class Beam;
@@ -435,6 +439,47 @@ private:
     std::pair<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> m_tieAccid;
 
     std::vector<LayerElement *> m_nested_objects;
+};
+
+//----------------------------------------------------------------------------
+// PAEInput2
+//----------------------------------------------------------------------------
+
+namespace pae {
+
+    // static char keySigFlats[7];
+
+    class Token {
+    public:
+        Token(char c)
+        {
+            m_char = c;
+            m_object = NULL;
+        }
+        virtual ~Token(){};
+
+        char m_char;
+        Object *m_object;
+    };
+
+}; // namespace pae
+
+class PAEInput2 : public Input {
+public:
+    // constructors and destructors
+    PAEInput2(Doc *doc);
+    virtual ~PAEInput2();
+
+    virtual bool Import(const std::string &input);
+
+private:
+    // function declarations:
+    jsonxx::Object InputKeysToJson(const std::string &inputKeys);
+
+public:
+    //
+private:
+    std::list<pae::Token> m_pae;
 };
 
 } // namespace vrv

@@ -2185,4 +2185,80 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 
 #endif // NO_PAE_SUPPORT
 
+//----------------------------------------------------------------------------
+// PAEInput2
+//----------------------------------------------------------------------------
+
+static const char CONTAINER_END = '~';
+
+PAEInput2::PAEInput2(Doc *doc)
+    : // This is pretty bad. We open a bad fileoinputstream as we don't use it
+    Input(doc)
+{
+}
+
+PAEInput2::~PAEInput2() {}
+
+jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
+{
+    jsonxx::Object jsonInput;
+
+    std::istringstream iss(inputKeys);
+    std::string line;
+    while (std::getline(iss, line)) {
+        if (line.rfind("@clef:", 0) != std::string::npos) {
+            jsonInput << "clef" << line.substr(line.find(":") + 1);
+        }
+        else if (line.rfind("@key:", 0) != std::string::npos) {
+            jsonInput << "key" << line.substr(line.find(":") + 1);
+        }
+        else if (line.rfind("@keysig:", 0) != std::string::npos) {
+            jsonInput << "keysig" << line.substr(line.find(":") + 1);
+        }
+        else if (line.rfind("@timesig:", 0) != std::string::npos) {
+            jsonInput << "timesig" << line.substr(line.find(":") + 1);
+        }
+        else if (line.rfind("@data:", 0) != std::string::npos) {
+            jsonInput << "data" << line.substr(line.find(":") + 1);
+        }
+    }
+    // LogDebug("%s", jsonInput.json().c_str());
+
+    return jsonInput;
+}
+
+bool PAEInput2::Import(const std::string &input)
+{
+    if (input.size() == 0) {
+        LogError("Input is empty");
+        return false;
+    }
+
+    jsonxx::Object jsonInput;
+    if (input.at(0) == '{') {
+        if (!jsonInput.parse(input)) {
+            LogError("Cannot parse the JSON input");
+            return false;
+        }
+    }
+    else {
+        jsonInput = this->InputKeysToJson(input);
+    }
+
+    if (jsonInput.has<jsonxx::String>("data")) {
+        std::string data = jsonInput.get<jsonxx::String>("data");
+        for (char c : data) {
+            // Ignore the charcter that is use internally as container end Token
+            if (c == CONTAINER_END) continue;
+            m_pae.push_back(pae::Token(c));
+        }
+    }
+    else {
+        LogError("Not 'data' key in the JSON input");
+        return false;
+    }
+
+    return false;
+}
+
 } // namespace vrv
