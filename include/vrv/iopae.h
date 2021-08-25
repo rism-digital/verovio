@@ -451,8 +451,10 @@ namespace pae {
 
     class Token {
     public:
-        Token(char c);
+        Token(char c, Object *object = NULL);
         virtual ~Token();
+        bool Is(ClassId);
+        bool IsEnd();
 
         char m_char;
         Object *m_object;
@@ -475,13 +477,19 @@ private:
     bool Parse();
 
     bool ConvertPitches();
+    bool ConvertOctaves();
+    bool ConvertBeams();
 
     bool Is(pae::Token &token, const std::string &map);
+
+    void ClearTokenObjects();
 
 public:
     //
 private:
     std::list<pae::Token> m_pae;
+
+    int m_measureCount;
 };
 
 } // namespace vrv

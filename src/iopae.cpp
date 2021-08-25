@@ -2192,21 +2192,21 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 namespace pae {
 
     static const char CONTAINER_END = '~';
+    static const char OCTAVEUP = '\'';
+    static const char OCTAVEDOWN = ',';
     static const std::string NOTENAME = "ABCDEFG";
 
-    Token::Token(char c)
+    Token::Token(char c, Object *object)
     {
         m_char = c;
-        m_object = NULL;
+        m_object = object;
     }
 
-    Token::~Token()
-    {
-        if (m_object) {
-            LogDebug("Delete token %s", m_object->GetClassName().c_str());
-            delete m_object;
-        }
-    }
+    Token::~Token() {}
+
+    bool Token::Is(ClassId classId) { return (m_object && m_object->Is(classId)); }
+
+    bool Token::IsEnd() { return (!m_object && (m_char == pae::CONTAINER_END)); }
 
 } // namespace pae
 
@@ -2216,7 +2216,20 @@ PAEInput2::PAEInput2(Doc *doc)
 {
 }
 
-PAEInput2::~PAEInput2() {}
+PAEInput2::~PAEInput2()
+{
+    this->ClearTokenObjects();
+}
+
+void PAEInput2::ClearTokenObjects()
+{
+    for (auto &token : m_pae) {
+        if (!token.m_object) continue;
+        LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
+        delete token.m_object;
+        token.m_object = NULL;
+    }
+}
 
 bool PAEInput2::Is(pae::Token &token, const std::string &map)
 {
@@ -2253,6 +2266,8 @@ jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
 
 bool PAEInput2::Import(const std::string &input)
 {
+    this->ClearTokenObjects();
+
     if (input.size() == 0) {
         LogError("Input is empty");
         return false;
@@ -2269,6 +2284,10 @@ bool PAEInput2::Import(const std::string &input)
         jsonInput = this->InputKeysToJson(input);
     }
 
+    m_measureCount = 1;
+    Measure *measure = new Measure(true, m_measureCount);
+    m_pae.push_back(pae::Token(0, measure));
+
     if (jsonInput.has<jsonxx::String>("data")) {
         std::string data = jsonInput.get<jsonxx::String>("data");
         for (char c : data) {
@@ -2282,6 +2301,8 @@ bool PAEInput2::Import(const std::string &input)
         return false;
     }
 
+    m_pae.push_back(pae::Token(pae::CONTAINER_END));
+
     return this->Parse();
 }
 
@@ -2290,6 +2311,92 @@ bool PAEInput2::Parse()
     bool success = true;
 
     success = this->ConvertPitches();
+
+    if (success) success = this->ConvertOctaves();
+
+    if (success) success = this->ConvertBeams();
+
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
+    // add minimal scoreDef
+    StaffGrp *staffGrp = new StaffGrp();
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(5);
+    staffGrp->AddChild(staffDef);
+
+    ListOfObjects layerStack;
+
+    for (auto &token : m_pae) {
+        if (token.IsEnd()) {
+            if (layerStack.size() > 1) {
+                LogDebug("The layer stack should not have more than one element");
+            }
+        }
+
+        if (!token.m_object) continue;
+
+        if (token.m_object->Is(MEASURE)) {
+            if (layerStack.size() > 1) {
+                LogDebug("The layer stack should not have more than one element");
+            }
+            layerStack.clear();
+
+            Measure *measure = dynamic_cast<Measure *>(token.m_object);
+            assert(measure);
+            token.m_object = NULL;
+
+            section->AddChild(measure);
+            Staff *staff = new Staff(1);
+            measure->AddChild(staff);
+            Layer *layer = new Layer();
+            layer->SetN(1);
+            staff->AddChild(layer);
+            layerStack.push_back(layer);
+        }
+        else if (token.m_object->IsLayerElement()) {
+
+            LayerElement *element = dynamic_cast<LayerElement *>(token.m_object);
+            assert(element);
+            token.m_object = NULL;
+
+            if (token.m_char == pae::CONTAINER_END) {
+                if (layerStack.size() < 2) {
+                    LogDebug("The layer stack should have a least two elements");
+                    continue;
+                }
+                layerStack.pop_back();
+                continue;
+            }
+
+            if (layerStack.empty()) {
+                LogDebug("The layer stack should have a least one element");
+                delete element;
+                continue;
+            }
+            layerStack.back()->AddChild(element);
+
+            if (element->Is(BEAM)) {
+                layerStack.push_back(element);
+            }
+        }
+    }
+
+    this->ClearTokenObjects();
+
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+    m_doc->ConvertToPageBasedDoc();
 
     return success;
 }
@@ -2316,7 +2423,87 @@ bool PAEInput2::ConvertPitches()
         }
     }
 
-    return false;
+    return true;
+}
+
+bool PAEInput2::ConvertOctaves()
+{
+    int oct = 4;
+    char readingOct = 0;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == pae::OCTAVEUP) {
+            if (readingOct != pae::OCTAVEUP) {
+                oct = 4;
+                readingOct = pae::OCTAVEUP;
+            }
+            else {
+                oct++;
+            }
+            token.m_char = 0;
+        }
+        else if (token.m_char == pae::OCTAVEDOWN) {
+            if (readingOct != pae::OCTAVEDOWN) {
+                oct = 3;
+                readingOct = pae::OCTAVEDOWN;
+            }
+            else {
+                oct--;
+            }
+            token.m_char = 0;
+        }
+        else {
+            readingOct = 0;
+        }
+
+        if (token.Is(NOTE)) {
+            Note *note = dynamic_cast<Note *>(token.m_object);
+            assert(note);
+            note->SetOct(oct);
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertBeams()
+{
+    Beam *beam = NULL;
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->m_char == '{') {
+            token->m_char = 0;
+            if (beam) {
+                LogDebug("Nested beams are not supported and will be ignored");
+                ++token;
+                continue;
+            }
+            beam = new Beam();
+            token->m_object = beam;
+        }
+        else if (token->m_char == '}') {
+            token->m_char = 0;
+            if (!beam) {
+                LogDebug("Irrelevant closing beam ignored");
+                ++token;
+                continue;
+            }
+            token->m_object = beam;
+            token->m_char = pae::CONTAINER_END;
+            beam = NULL;
+        }
+        else if (token->IsEnd() || token->Is(MEASURE)) {
+            if (beam) {
+                LogDebug("Unclose beam at the end of a measure");
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, beam));
+                beam = NULL;
+            }
+        }
+        ++token;
+    }
+
+    return true;
 }
 
 } // namespace vrv
