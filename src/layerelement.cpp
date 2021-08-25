@@ -1871,8 +1871,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     AlignmentReference *currentReference = GetAlignment()->GetReferenceWithElement(this, params->m_staffN);
     Alignment *nextAlignment = vrv_cast<Alignment *>(GetAlignment()->GetParent()->GetNext(GetAlignment(), ALIGNMENT));
     AlignmentType next = nextAlignment ? nextAlignment->GetType() : ALIGNMENT_DEFAULT;
-    if (Is({ DOTS, FLAG }) && (currentReference->HasMultipleLayer() || currentReference->HasCrossStaffElements())
-        && (next != ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
+    if (Is({ DOTS, FLAG }) && currentReference->HasMultipleLayer() && (next != ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
         const int additionalOffset = selfRight - params->m_upcomingMinPos;
         if (additionalOffset > params->m_currentAlignment.m_offset) {
             params->m_currentAlignment.m_offset = additionalOffset;
