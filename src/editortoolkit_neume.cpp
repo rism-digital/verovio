@@ -778,6 +778,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     curve = ncForm_CURVE_a;
                     nc->SetCurve(curve);
                 }
+                else if (it->second == "c") {
+                    curve = ncForm_CURVE_c;
+                    nc->SetCurve(curve);
+                }
                 nc->AddChild(liquescent);
 
             }
