@@ -2198,6 +2198,8 @@ namespace pae {
     static const std::string KEYSIG = "xnb[]ABCDEFG";
     static const char CLEF_START = '%';
     static const std::string CLEF = "GCFg-+12345";
+    static const char METERSIG_START = '@';
+    static const std::string METERSIG = "/o.c0123456789";
     static const std::string NOTENAME = "ABCDEFG";
 
     Token::Token(char c, Object *object)
@@ -2233,6 +2235,7 @@ void PAEInput2::ClearTokenObjects()
         delete token.m_object;
         token.m_object = NULL;
     }
+    m_pae.clear();
 }
 
 bool PAEInput2::Is(pae::Token &token, const std::string &map)
@@ -2306,6 +2309,8 @@ bool PAEInput2::Import(const std::string &input)
     }
 
     m_pae.push_back(pae::Token(pae::CONTAINER_END));
+    
+    m_isMensural = false;
 
     return this->Parse();
 }
@@ -2317,6 +2322,8 @@ bool PAEInput2::Parse()
     if (success) success = this->ConvertKeySigs();
 
     if (success) success = this->ConvertClefs();
+    
+    if (success) success = this->ConvertMeterSigsOrMensurs();
 
     if (success) success = this->ConvertPitches();
 
@@ -2345,6 +2352,8 @@ bool PAEInput2::Parse()
     staffGrp->AddChild(staffDef);
 
     ListOfObjects layerStack;
+    ScoreDef *scoreDefChange = NULL;
+    Measure *currentMeasure = NULL;
 
     for (auto &token : m_pae) {
         if (token.IsEnd()) {
@@ -2361,20 +2370,31 @@ bool PAEInput2::Parse()
             }
             layerStack.clear();
 
-            Measure *measure = dynamic_cast<Measure *>(token.m_object);
-            assert(measure);
+            currentMeasure = dynamic_cast<Measure *>(token.m_object);
+            assert(currentMeasure);
             token.m_object = NULL;
 
-            section->AddChild(measure);
+            section->AddChild(currentMeasure);
             Staff *staff = new Staff(1);
-            measure->AddChild(staff);
+            currentMeasure->AddChild(staff);
             Layer *layer = new Layer();
             layer->SetN(1);
             staff->AddChild(layer);
             layerStack.push_back(layer);
+            scoreDefChange = NULL;
         }
-        else if (token.Is(KEYSIG)) {
-            staffDef->AddChild(token.m_object);
+        else if (token.m_object->Is({KEYSIG, MENSUR, METERSIG})) {
+            if (!scoreDefChange) {
+                scoreDefChange = new ScoreDef();
+                section->InsertBefore(currentMeasure, scoreDefChange);
+            }
+            if (scoreDefChange->FindDescendantByType(token.m_object->GetClassId())) {
+                LogDebug("%s change cannot occur more than once in a measure", token.m_object->GetClassName().c_str());
+                delete token.m_object;
+            }
+            else {
+                scoreDefChange->AddChild(token.m_object);
+            }
             token.m_object = NULL;
             continue;
         }
@@ -2482,23 +2502,23 @@ bool PAEInput2::ConvertOctaves()
 bool PAEInput2::ConvertKeySigs()
 {
     pae::Token *keySigToken = NULL;
-    std::string paeKeySigStr;
+    std::string paeStr;
 
     for (auto &token : m_pae) {
         if (token.m_char == pae::KEYSIG_START) {
             keySigToken = &token;
-            paeKeySigStr.clear();
+            paeStr.clear();
         }
         else if (keySigToken) {
             if (this->Is(token, pae::KEYSIG)) {
-                paeKeySigStr.push_back(token.m_char);
+                paeStr.push_back(token.m_char);
                 token.m_char = 0;
             }
             else {
                 keySigToken->m_char = 0;
-                // LogDebug("Keysig %s", paeKeySigStr.c_str());
+                // LogDebug("Keysig %s", paeStr.c_str());
                 KeySig *keySig = new KeySig();
-                this->ConvertKeySig(keySig, paeKeySigStr);
+                this->ConvertKeySig(keySig, paeStr);
                 keySigToken->m_object = keySig;
                 keySigToken = NULL;
             }
@@ -2511,25 +2531,61 @@ bool PAEInput2::ConvertKeySigs()
 bool PAEInput2::ConvertClefs()
 {
     pae::Token *clefToken = NULL;
-    std::string paeClefStr;
+    std::string paeStr;
 
     for (auto &token : m_pae) {
         if (token.m_char == pae::CLEF_START) {
             clefToken = &token;
-            paeClefStr.clear();
+            paeStr.clear();
         }
         else if (clefToken) {
             if (this->Is(token, pae::CLEF)) {
-                paeClefStr.push_back(token.m_char);
+                paeStr.push_back(token.m_char);
                 token.m_char = 0;
             }
             else {
                 clefToken->m_char = 0;
-                // LogDebug("Clef %s", paeClefStr.c_str());
+                // LogDebug("Clef %s", paeStr.c_str());
                 Clef *clef = new Clef();
-                this->ConvertClef(clef, paeClefStr);
+                this->ConvertClef(clef, paeStr);
                 clefToken->m_object = clef;
                 clefToken = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertMeterSigsOrMensurs()
+{
+    pae::Token *meterSigOfMensurToken = NULL;
+    std::string paeStr;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == pae::METERSIG_START) {
+            meterSigOfMensurToken = &token;
+            paeStr.clear();
+        }
+        else if (meterSigOfMensurToken) {
+            if (this->Is(token, pae::METERSIG)) {
+                paeStr.push_back(token.m_char);
+                token.m_char = 0;
+            }
+            else {
+                meterSigOfMensurToken->m_char = 0;
+                // LogDebug("MeterSig %s", paeStr.c_str());
+                if (m_isMensural) {
+                    Mensur *mensur = new Mensur();
+                    this->ConvertMensur(mensur, paeStr);
+                    meterSigOfMensurToken->m_object = mensur;
+                }
+                else {
+                    MeterSig *meterSig = new MeterSig();
+                    this->ConvertMeterSig(meterSig, paeStr);
+                    meterSigOfMensurToken->m_object = meterSig;
+                }
+                meterSigOfMensurToken = NULL;
             }
         }
     }
@@ -2577,7 +2633,7 @@ bool PAEInput2::ConvertBeams()
     return true;
 }
 
-void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeKeySigStr)
+void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeStr)
 {
     assert(keySig);
 
@@ -2591,7 +2647,7 @@ void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeKeySigStr)
     enclosedAccids.resize(7);
     bool cancel = false;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
-    for (auto c : paeKeySigStr) {
+    for (auto c : paeStr) {
         switch (c) {
             case 'b':
                 altNumber = 0;
@@ -2656,22 +2712,22 @@ void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeKeySigStr)
     }
 }
 
-void PAEInput2::ConvertClef(Clef *clef, const std::string &paeClefStr)
+void PAEInput2::ConvertClef(Clef *clef, const std::string &paeStr)
 {
     assert(clef);
 
     clef->Reset();
 
-    if (paeClefStr.size() < 3) {
+    if (paeStr.size() < 3) {
         LogDebug("Clef content cannot be parsed and will be set to G-2");
         clef->SetLine(2);
         clef->SetShape(CLEFSHAPE_G);
         return;
     }
 
-    char clefShape = paeClefStr.at(0);
-    bool isMensural = (paeClefStr.at(1) == '+');
-    char clefLine = paeClefStr.at(2);
+    char clefShape = paeStr.at(0);
+    bool isMensural = (paeStr.at(1) == '+');
+    char clefLine = paeStr.at(2);
 
     if (clefShape == 'G') {
         clef->SetShape(CLEFSHAPE_G);
@@ -2692,8 +2748,108 @@ void PAEInput2::ConvertClef(Clef *clef, const std::string &paeClefStr)
         clef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogDebug("Plaine & Easie import: undefined clef '%s'", paeClefStr.c_str());
+        LogDebug("Plaine & Easie import: undefined clef '%s'", paeStr.c_str());
     }
+}
+
+
+void PAEInput2::ConvertMeterSig(MeterSig *meterSig, const std::string &paeStr)
+{
+    assert(meterSig);
+
+    meterSig->Reset();
+
+    if (paeStr.size() < 1) {
+        LogDebug("MeterSig content cannot be parsed and will be set to 4/4");
+        meterSig->SetCount({ 4 });
+        meterSig->SetUnit(4);
+        return;
+    }
+    
+    std::cmatch matches;
+    if (regex_match(paeStr.c_str(), matches, std::regex("(\\d+)/(\\d+)"))) {
+        meterSig->SetCount({ std::stoi(matches[1]) });
+        meterSig->SetUnit(std::stoi(matches[2]));
+    }
+    else if (regex_match(paeStr.c_str(), matches, std::regex("\\d+"))) {
+        meterSig->SetCount({ std::stoi(paeStr.c_str()) });
+        meterSig->SetUnit(1);
+        meterSig->SetForm(METERFORM_num);
+    }
+    else if (paeStr == "c") {
+        // C
+        meterSig->SetSym(METERSIGN_common);
+    }
+    else if (paeStr == "c/") {
+        // C|
+        meterSig->SetSym(METERSIGN_cut);
+    }
+    else if (paeStr == "c3") {
+        // C3
+        meterSig->SetSym(METERSIGN_common);
+        meterSig->SetCount({ 3 });
+    }
+    else if (paeStr == "c3/2") {
+        // C3/2
+        meterSig->SetSym(METERSIGN_common); // ??
+        meterSig->SetCount({ 3 });
+        meterSig->SetUnit(2);
+    }
+    else {
+        LogWarning("Plaine & Easie import: unsupported time signature %s", paeStr.c_str());
+    }
+}
+
+void PAEInput2::ConvertMensur(Mensur *mensur, const std::string &paeStr)
+{
+    assert(mensur);
+
+    mensur->Reset();
+
+    if (paeStr.size() < 1) {
+        LogDebug("Mensur content cannot be parsed and will be set to O");
+        mensur->SetSign(MENSURATIONSIGN_O);
+        return;
+    }
+    
+    std::cmatch matches;
+    if (regex_match(paeStr.c_str(), matches, std::regex("(\\d+)/(\\d+)"))) {
+        mensur->SetNum(std::stoi(matches[1]));
+        mensur->SetNumbase(std::stoi(matches[2]));
+    }
+    else if (regex_match(paeStr.c_str(), matches, std::regex("\\d+"))) {
+        mensur->SetNum(std::stoi(paeStr.c_str()));
+    }
+    else if (regex_match(paeStr.c_str(), matches, std::regex("([co])([\\./]?)([\\./]?)(\\d*)/?(\\d*)"))) {
+        // C
+        if (matches[1] == "c") {
+            mensur->SetSign(MENSURATIONSIGN_C);
+        }
+        // O
+        else {
+            mensur->SetSign(MENSURATIONSIGN_O);
+        }
+        // Dot (second or third match since order between . and / is not defined in PAE)
+        if ((matches[2] == ".") || (matches[3] == ".")) {
+            mensur->SetDot(BOOLEAN_true);
+        }
+        // Slash (second or third match, ditto)
+        if ((matches[2] == "/") || (matches[3] == "/")) {
+            mensur->SetSlash(1);
+        }
+        // Num
+        if (matches[4] != "") {
+            mensur->SetNum(std::stoi(matches[4]));
+        }
+        // Numbase (but only if Num is given)
+        if ((matches[4] != "") && (matches[5] != "")) {
+            mensur->SetNumbase(std::stoi(matches[5]));
+        }
+    }
+    else {
+        LogWarning("Plaine & Easie import: unsupported time signature: %s", paeStr.c_str());
+    }
+    
 }
 
 } // namespace vrv

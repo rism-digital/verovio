@@ -447,8 +447,6 @@ private:
 
 namespace pae {
 
-    // static char keySigFlats[7];
-
     class Token {
     public:
         Token(char c, Object *object = NULL);
@@ -480,14 +478,18 @@ private:
     bool ConvertOctaves();
     bool ConvertKeySigs();
     bool ConvertClefs();
-    bool ConvertMeterSigs();
+    bool ConvertMeterSigsOrMensurs();
     bool ConvertBeams();
 
     bool Is(pae::Token &token, const std::string &map);
 
-    void ConvertKeySig(KeySig *keySig, const std::string &paeKeySigStr);
+    void ConvertKeySig(KeySig *keySig, const std::string &paeStr);
 
-    void ConvertClef(Clef *clef, const std::string &paeClefStr);
+    void ConvertClef(Clef *clef, const std::string &paeStr);
+    
+    void ConvertMeterSig(MeterSig *meterSig, const std::string &paeStr);
+    
+    void ConvertMensur(Mensur *mensur, const std::string &paeStr);
 
     void ClearTokenObjects();
 
@@ -496,6 +498,8 @@ public:
 private:
     std::list<pae::Token> m_pae;
 
+    bool m_isMensural;
+    
     int m_measureCount;
 };
 
