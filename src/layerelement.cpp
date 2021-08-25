@@ -1886,11 +1886,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     auto it = std::find_if(params->m_measureTieEndpoints.begin(), params->m_measureTieEndpoints.end(),
         [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
     if (it != params->m_measureTieEndpoints.end()) {
-        const int minTiedDistance = 7 * drawingUnit;
-        const int alignmentDistance = it->second->GetAlignment()->GetXRel() - it->first->GetAlignment()->GetXRel();
-        if ((alignmentDistance < minTiedDistance)
+        const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
+        const int currentTieLength = it->second->GetContentLeft() - it->first->GetContentRight() - drawingUnit;
+        if ((currentTieLength < minTieLength)
             && ((this->GetFirstAncestor(CHORD) != NULL) || (it->first->FindDescendantByType(FLAG) != NULL))) {
-            const int adjust = minTiedDistance - alignmentDistance;
+            const int adjust = minTieLength - currentTieLength;
             this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() + adjust);
             // Also move the accumulated x shift and the minimum position for the next alignment accordingly
             params->m_cumulatedXShift += adjust;

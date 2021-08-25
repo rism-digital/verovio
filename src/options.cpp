@@ -1323,6 +1323,10 @@ Options::Options()
     m_tieMidpointThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieMidpointThickness, "tieMidpointThickness", &m_generalLayout);
 
+    m_tieMinLength.SetInfo("Tie minimum length", "The minimum length of tie in MEI units");
+    m_tieMinLength.Init(2.0, 0.0, 10.0);
+    this->Register(&m_tieMinLength, "tieMinimumLength", &m_generalLayout);    
+
     m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
     m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_tupletBracketThickness, "tupletBracketThickness", &m_generalLayout);
