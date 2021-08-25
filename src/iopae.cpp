@@ -2196,6 +2196,8 @@ namespace pae {
     static const char OCTAVEDOWN = ',';
     static const char KEYSIG_START = '$';
     static const std::string KEYSIG = "xnb[]ABCDEFG";
+    static const char CLEF_START = '%';
+    static const std::string CLEF = "GCFg-+12345";
     static const std::string NOTENAME = "ABCDEFG";
 
     Token::Token(char c, Object *object)
@@ -2313,6 +2315,8 @@ bool PAEInput2::Parse()
     bool success = true;
 
     if (success) success = this->ConvertKeySigs();
+
+    if (success) success = this->ConvertClefs();
 
     if (success) success = this->ConvertPitches();
 
@@ -2492,11 +2496,40 @@ bool PAEInput2::ConvertKeySigs()
             }
             else {
                 keySigToken->m_char = 0;
-                // LogDebug("Keysig %s", paeKeysig.c_str());
+                // LogDebug("Keysig %s", paeKeySigStr.c_str());
                 KeySig *keySig = new KeySig();
                 this->ConvertKeySig(keySig, paeKeySigStr);
                 keySigToken->m_object = keySig;
                 keySigToken = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertClefs()
+{
+    pae::Token *clefToken = NULL;
+    std::string paeClefStr;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == pae::CLEF_START) {
+            clefToken = &token;
+            paeClefStr.clear();
+        }
+        else if (clefToken) {
+            if (this->Is(token, pae::CLEF)) {
+                paeClefStr.push_back(token.m_char);
+                token.m_char = 0;
+            }
+            else {
+                clefToken->m_char = 0;
+                // LogDebug("Clef %s", paeClefStr.c_str());
+                Clef *clef = new Clef();
+                this->ConvertClef(clef, paeClefStr);
+                clefToken->m_object = clef;
+                clefToken = NULL;
             }
         }
     }
@@ -2620,6 +2653,46 @@ void PAEInput2::ConvertKeySig(KeySig *keySig, const std::string &paeKeySigStr)
     }
     else {
         keySig->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+    }
+}
+
+void PAEInput2::ConvertClef(Clef *clef, const std::string &paeClefStr)
+{
+    assert(clef);
+
+    clef->Reset();
+
+    if (paeClefStr.size() < 3) {
+        LogDebug("Clef content cannot be parsed and will be set to G-2");
+        clef->SetLine(2);
+        clef->SetShape(CLEFSHAPE_G);
+        return;
+    }
+
+    char clefShape = paeClefStr.at(0);
+    bool isMensural = (paeClefStr.at(1) == '+');
+    char clefLine = paeClefStr.at(2);
+
+    if (clefShape == 'G') {
+        clef->SetShape(CLEFSHAPE_G);
+        clef->SetLine(clefLine - 48);
+    }
+    else if (clefShape == 'C') {
+        clef->SetShape(CLEFSHAPE_C);
+        clef->SetLine(clefLine - 48);
+    }
+    else if (clefShape == 'F') {
+        clef->SetShape(CLEFSHAPE_F);
+        clef->SetLine(clefLine - 48);
+    }
+    else if (clefShape == 'g') {
+        clef->SetShape(CLEFSHAPE_G);
+        clef->SetLine(clefLine - 48);
+        clef->SetDis(OCTAVE_DIS_8);
+        clef->SetDisPlace(STAFFREL_basic_below);
+    }
+    else {
+        LogDebug("Plaine & Easie import: undefined clef '%s'", paeClefStr.c_str());
     }
 }
 

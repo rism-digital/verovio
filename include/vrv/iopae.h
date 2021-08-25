@@ -479,11 +479,15 @@ private:
     bool ConvertPitches();
     bool ConvertOctaves();
     bool ConvertKeySigs();
+    bool ConvertClefs();
+    bool ConvertMeterSigs();
     bool ConvertBeams();
 
     bool Is(pae::Token &token, const std::string &map);
 
-    void ConvertKeySig(KeySig *keySig, const std::string &paeKeysig);
+    void ConvertKeySig(KeySig *keySig, const std::string &paeKeySigStr);
+
+    void ConvertClef(Clef *clef, const std::string &paeClefStr);
 
     void ClearTokenObjects();
 
