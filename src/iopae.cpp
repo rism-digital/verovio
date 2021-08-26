@@ -2359,6 +2359,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertOctave();
 
+    if (success) success = this->ConvertRest();
+
     if (success) success = this->ConvertBeam();
 
     if (success) success = this->ConvertGraceGrp();
@@ -2686,6 +2688,18 @@ bool PAEInput2::ConvertOctave()
     return true;
 }
 
+bool PAEInput2::ConvertRest()
+{
+    for (auto &token : m_pae) {
+        if (token.m_char == '-') {
+            token.m_object = new Rest();
+            token.m_char = 0;
+        }
+    }
+
+    return true;
+}
+
 bool PAEInput2::ConvertBeam()
 {
     Beam *beam = NULL;
@@ -2735,7 +2749,7 @@ bool PAEInput2::ConvertGraceGrp()
     /*
     // This is now commented and not necessary anymore because qq are replaced by Q in the input
     // Left here for documentation
-     
+
     // Do a first loop to change 'qq' to 'Q' for eaiser grace groups detection
     pae::Token *graceGrpToken = NULL;
 
