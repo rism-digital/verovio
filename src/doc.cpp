@@ -907,12 +907,12 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         return;
     }
 
-    std::list<Score *> scores = this->GetScores();
-    assert(!scores.empty());
-
     if (this->AbortRequested()) {
         return;
     }
+
+    std::list<Score *> scores = this->GetScores();
+    assert(!scores.empty());
 
     this->ScoreDefSetCurrentDoc();
 
@@ -920,11 +920,11 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(unCastOffPage);
     unCastOffPage->LayOutHorizontally();
 
-    Page *castOffSinglePage = new Page();
     if (this->AbortRequested()) {
         return;
     }
 
+    Page *castOffSinglePage = new Page();
 
     System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
@@ -952,16 +952,16 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     this->ResetDrawingPage();
     this->SetDrawingPage(0);
 
+    if (this->AbortRequested()) {
+        return;
+    }
+
     bool optimize = false;
     for (auto const score : scores) {
         if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             optimize = true;
             break;
         }
-    }
-
-    if (this->AbortRequested()) {
-        return;
     }
 
     // Reset the scoreDef at the beginning of each system
