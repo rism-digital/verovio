@@ -74,8 +74,8 @@ public:
     /**
      * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
      */
-    std::tuple<int, int, int, int> AdjustCoordinates(Doc *doc, Staff *staff, std::tuple<int, int, int, int> coordinates,
-        int spanningType, curvature_CURVEDIR drawingCurveDir);
+    std::pair<Point, Point> AdjustCoordinates(
+        Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir);
 
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 

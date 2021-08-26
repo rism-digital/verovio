@@ -179,7 +179,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     /************** direction **************/
 
-    const int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+    const int center = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
     const bool isAboveStaffCenter = start->GetDrawingY() > center;
     curvature_CURVEDIR drawingCurveDir
         = slur->GetPreferredCurveDirection(m_doc, layer, layerElement, stemDir, isAboveStaffCenter);
@@ -188,22 +188,23 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
-    std::tie(x1, x2, y1, y2) = slur->AdjustCoordinates(m_doc, staff, { x1, x2, y1, y2 }, spanningType, drawingCurveDir);
+    std::pair<Point, Point> adjustedPoints = slur->AdjustCoordinates(
+        m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType, drawingCurveDir);
 
     /************** y position **************/
 
     if (drawingCurveDir == curvature_CURVEDIR_above) {
-        y1 += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y2 += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        adjustedPoints.first.y += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        adjustedPoints.second.y += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
-        y1 -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y2 -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        adjustedPoints.first.y -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        adjustedPoints.second.y -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     Point points[4];
-    points[0] = Point(x1, y1);
-    points[3] = Point(x2, y2);
+    points[0] = adjustedPoints.first;
+    points[3] = adjustedPoints.second;
 
     float angle = CalcInitialSlur(curve, slur, staff, drawingCurveDir, points);
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurMidpointThickness.GetValue();
