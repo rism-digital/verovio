@@ -652,7 +652,7 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
 
-        //}
+        // }
     }
 
     bool adjustPageHeight = m_options->m_adjustPageHeight.GetValue();

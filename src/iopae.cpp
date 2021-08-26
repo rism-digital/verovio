@@ -2312,11 +2312,19 @@ bool PAEInput2::Import(const std::string &input)
 
     if (jsonInput.has<jsonxx::String>("data")) {
         std::string data = jsonInput.get<jsonxx::String>("data");
+
+        // Remove non PAE internal characters
+        for (char c : pae::INTERNAL_CHARS) {
+            data.erase(std::remove(data.begin(), data.end(), c), data.end());
+        }
+
+        data = std::regex_replace(data, std::regex("qq"), "Q");
+        data = std::regex_replace(data, std::regex("xx"), "X");
+        data = std::regex_replace(data, std::regex("bb"), "Y");
+
         for (char c : data) {
             // Ignore the charcter that is use internally as container end Token
             if (c == pae::CONTAINER_END) continue;
-            // Ignore some additional internal characters
-            if (pae::INTERNAL_CHARS.find(c) != std::string::npos) continue;
             // Otherwise go ahead
             m_pae.push_back(pae::Token(c));
         }
@@ -2724,9 +2732,13 @@ bool PAEInput2::ConvertBeam()
 
 bool PAEInput2::ConvertGraceGrp()
 {
+    /*
+    // This is now commented and not necessary anymore because qq are replaced by Q in the input
+    // Left here for documentation
+     
+    // Do a first loop to change 'qq' to 'Q' for eaiser grace groups detection
     pae::Token *graceGrpToken = NULL;
 
-    // Do a first loop to change 'qq' to 'Q' for eaiser grace groups detection
     for (auto &token : m_pae) {
         if (token.m_char == 'q') {
             if (!graceGrpToken) {
@@ -2740,6 +2752,7 @@ bool PAEInput2::ConvertGraceGrp()
         }
         graceGrpToken = NULL;
     }
+    */
 
     GraceGrp *graceGrp = NULL;
 
