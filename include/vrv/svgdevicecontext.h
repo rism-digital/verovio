@@ -215,7 +215,8 @@ public:
     void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
 
     /**
-     *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute" (e.g., "note@pname")
+     *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
+     * (e.g., "note@pname")
      */
     void SetAdditionalAttributes(std::vector<std::string> additionalAttributes)
     {
