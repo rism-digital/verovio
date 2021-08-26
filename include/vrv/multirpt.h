@@ -34,7 +34,6 @@ public:
     virtual Object *Clone() const { return new MultiRpt(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MultiRpt"; }
-    virtual ClassId GetClassId() const { return MULTIRPT; }
     ///@}
 
 private:

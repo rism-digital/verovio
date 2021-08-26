@@ -40,7 +40,6 @@ public:
     virtual Object *Clone() const { return new MultiRest(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MultiRest"; }
-    virtual ClassId GetClassId() const { return MULTIREST; }
     ///@}
 
     /**

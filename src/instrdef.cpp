@@ -24,7 +24,8 @@ namespace vrv {
 
 static const ClassRegistrar<InstrDef> s_factory("instrDef", INSTRDEF);
 
-InstrDef::InstrDef() : Object("instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
+InstrDef::InstrDef()
+    : Object(INSTRDEF, "instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
 {
     RegisterAttClass(ATT_CHANNELIZED);
     RegisterAttClass(ATT_LABELLED);

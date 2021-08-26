@@ -29,7 +29,6 @@ public:
     virtual Object *Clone() const { return new Reg(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Reg"; }
-    virtual ClassId GetClassId() const { return REG; }
     ///@}
 
 private:

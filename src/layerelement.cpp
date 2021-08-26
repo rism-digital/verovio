@@ -57,6 +57,7 @@
 #include "timestamp.h"
 #include "tuning.h"
 #include "tuplet.h"
+#include "turn.h"
 #include "verse.h"
 #include "view.h"
 #include "vrv.h"
@@ -68,7 +69,8 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement()
+    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -78,8 +80,19 @@ LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInter
     Reset();
 }
 
-LayerElement::LayerElement(const std::string &classid)
-    : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement(ClassId classId)
+    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+{
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -1407,38 +1420,39 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     assert(params);
 
     // ignore elements that are not in the beam or are direct children of the beam
-    if (!params->m_beam
-        || (!params->m_isOtherLayer && Is({ NOTE, CHORD }) && (GetFirstAncestor(BEAM) == params->m_beam)
-            && !IsGraceNote()))
-        return FUNCTOR_SIBLINGS;
+    if (!params->m_beam) return FUNCTOR_CONTINUE;
+    if (!params->m_isOtherLayer && !Is(ACCID) && (GetFirstAncestor(BEAM) == params->m_beam) && !IsGraceNote())
+        return FUNCTOR_CONTINUE;
+    // ignore elements that are both on other layer and cross-staff
+    if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
+    // ignore specific elements, since they should not be influencing beam positioning
     if (Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
+    // ignore elements that start before the beam
+    if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
 
     // check if top/bottom of the element overlaps with beam coordinates
-    // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
     int leftMargin = 0, rightMargin = 0;
-
     Beam *beam = vrv_cast<Beam *>(params->m_beam);
+    const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(GetDrawingX()) - DUR_8;
+    const int currentBeamYLeft = params->m_y1 + params->m_beamSlope * (this->GetContentLeft() - params->m_x1);
+    const int currentBeamYRight = params->m_y1 + params->m_beamSlope * (this->GetContentRight() - params->m_x1);
     if (params->m_directionBias > 0) {
-        leftMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1
-            + (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
-        rightMargin = GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2
-            + (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
+        leftMargin = GetContentTop() - currentBeamYLeft + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
+        rightMargin = GetContentTop() - currentBeamYRight + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
     }
     else {
-        leftMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y1
-            - (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
-        rightMargin = GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, true) - params->m_y2
-            - (beam->m_shortestDur - DUR_8) * beam->m_beamWidth;
+        leftMargin = GetContentBottom() - currentBeamYLeft - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
+        rightMargin = GetContentBottom() - currentBeamYRight - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
     }
 
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
     if (overlapMargin >= params->m_directionBias * params->m_overlapMargin) {
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         params->m_overlapMargin
-            = (((overlapMargin + staffOffset - 1) / staffOffset + 1.5) * staffOffset) * params->m_directionBias;
+            = (((overlapMargin + staffOffset - 1) / staffOffset + 0.5) * staffOffset) * params->m_directionBias;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1490,25 +1504,27 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
 
-    AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
+    const int shift
+        = AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
+    params->m_accumulatedShift += shift;
 
     return FUNCTOR_SIBLINGS;
 }
 
-void LayerElement::AdjustOverlappingLayers(
+int LayerElement::AdjustOverlappingLayers(
     Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
 {
     if (Is(NOTE) && GetParent()->Is(CHORD))
-        return;
+        return 0;
     else if (Is(STEM) && isUnison) {
         isUnison = false;
-        return;
+        return 0;
     }
 
     auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, areDotsAdjusted, false);
     if (Is(NOTE)) {
         isUnison = isInUnison;
-        if (isUnison) return;
+        if (isUnison) return 0;
     }
 
     if (Is({ DOTS, STEM })) {
@@ -1519,6 +1535,7 @@ void LayerElement::AdjustOverlappingLayers(
     else {
         SetDrawingXRel(GetDrawingXRel() + margin);
     }
+    return margin;
 }
 
 std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
@@ -1700,8 +1717,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     }
 
     int selfLeft = this->GetSelfLeft()
-        - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
+        - params->m_doc->GetLeftMargin(this) * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
@@ -1760,6 +1776,13 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // If desired only handle barlines which are right positioned
+    if (params->m_rightBarLinesOnly && this->Is(BARLINE)) {
+        if (vrv_cast<BarLine *>(this)->GetPosition() != BarLinePosition::Right) {
+            return FUNCTOR_CONTINUE;
+        }
+    }
+
     if (this->HasSameasLink()) {
         // nothing to do when the element has a @sameas attribute
         return FUNCTOR_SIBLINGS;
@@ -1782,8 +1805,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
-        // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
-        // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to
+        // This should happen for barline position none but also chords in beam. Otherwise the BB should be set to
         // empty with
         // Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
@@ -1799,12 +1821,12 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
             // If we want the nesting to be reduced, we can set to:
             // selfLeft = this->GetSelfLeft();
             // This could be made an option (--spacing-limited-nesting)
-            int selfLeftMargin = params->m_doc->GetLeftMargin(this->GetClassId());
+            int selfLeftMargin = params->m_doc->GetLeftMargin(this);
             int overlap = 0;
             for (auto &boundingBox : params->m_boundingBoxes) {
                 LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
                 assert(element);
-                int margin = (params->m_doc->GetRightMargin(element->GetClassId()) + selfLeftMargin) * drawingUnit;
+                int margin = (params->m_doc->GetRightMargin(element) + selfLeftMargin) * drawingUnit;
                 bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
 
                 if (hasOverlap) {
@@ -1824,7 +1846,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // Otherwise only look at the horizontal position
         else {
             selfLeft = this->GetSelfLeft();
-            selfLeft -= params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+            selfLeft -= params->m_doc->GetLeftMargin(this) * params->m_doc->GetDrawingUnit(100);
         }
     }
 
@@ -1838,10 +1860,10 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int selfRight = this->GetAlignment()->GetXRel();
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
-        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
+        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this) * drawingUnit;
     }
     else {
-        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * drawingUnit;
+        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this) * drawingUnit;
     }
 
     // In case of dots/flags we need to hold off of adjusting upcoming min position right away - if it happens that
@@ -2086,6 +2108,31 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
     }
     else if (this->Is({ NOTE, REST })) {
         params->m_currentElement = this;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
+{
+    PrepareDelayedTurnsParams *params = vrv_params_cast<PrepareDelayedTurnsParams *>(functorParams);
+    assert(params);
+
+    // We are initializing the params->m_delayedTurns map
+    if (params->m_initMap) return FUNCTOR_CONTINUE;
+
+    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
+
+    if (params->m_previousElement) {
+        assert(params->m_currentTurn);
+        params->m_currentTurn->m_drawingEndElement = this;
+        params->m_currentTurn = NULL;
+        params->m_previousElement = NULL;
+    }
+
+    if (params->m_delayedTurns.count(this)) {
+        params->m_previousElement = this;
+        params->m_currentTurn = params->m_delayedTurns.at(this);
     }
 
     return FUNCTOR_CONTINUE;

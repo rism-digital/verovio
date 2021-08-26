@@ -38,7 +38,6 @@ public:
     virtual Object *Clone() const { return new Gliss(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Gliss"; }
-    virtual ClassId GetClassId() const { return GLISS; }
     ///@}
 
     /**

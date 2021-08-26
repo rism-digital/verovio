@@ -31,7 +31,8 @@ namespace vrv {
 // RunningElement
 //----------------------------------------------------------------------------
 
-RunningElement::RunningElement() : Object("re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement()
+    : Object(RUNNING_ELEMENT, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
 {
     RegisterAttClass(ATT_HORIZONTALALIGN);
     RegisterAttClass(ATT_TYPED);
@@ -39,7 +40,17 @@ RunningElement::RunningElement() : Object("re"), ObjectListInterface(), AttHoriz
     Reset();
 }
 
-RunningElement::RunningElement(const std::string &classid) : Object(classid), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement(ClassId classId)
+    : Object(classId, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
+{
+    RegisterAttClass(ATT_HORIZONTALALIGN);
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), AttHorizontalAlign(), AttTyped()
 {
     RegisterAttClass(ATT_HORIZONTALALIGN);
     RegisterAttClass(ATT_TYPED);

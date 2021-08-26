@@ -41,13 +41,6 @@ void BezierCurve::CalculateControlPointOffset(Doc *doc, int staffSize)
 // DeviceContext
 //----------------------------------------------------------------------------
 
-ClassId DeviceContext::GetClassId() const
-{
-    // we should always have the method overridden
-    assert(false);
-    return DEVICE_CONTEXT;
-}
-
 void DeviceContext::SetPen(int colour, int width, int opacity, int dashLength, int lineCap)
 {
     float opacityValue;

@@ -33,7 +33,6 @@ public:
     virtual Object *Clone() const { return new Num(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Num"; }
-    virtual ClassId GetClassId() const { return NUM; }
     ///@}
 
     /**

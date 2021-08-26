@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Lb> s_factory("lb", LB);
 
-Lb::Lb() : TextElement("lb-")
+Lb::Lb() : TextElement(LB, "lb-")
 {
     Reset();
 }

@@ -35,7 +35,6 @@ public:
     virtual Object *Clone() const { return new MeterSig(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MeterSig"; }
-    virtual ClassId GetClassId() const { return METERSIG; }
     ///@}
 
     /** Override the method since alignment is required */

@@ -28,7 +28,6 @@ public:
     virtual Object *Clone() const { return new Phrase(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Phrase"; }
-    virtual ClassId GetClassId() const { return PHRASE; }
     ///@}
 
     //----------//

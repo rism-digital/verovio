@@ -602,6 +602,7 @@ public:
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_shrinkToFit;
+    OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
@@ -612,6 +613,7 @@ public:
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
     OptionBool m_useBraceGlyph;
+    OptionBool m_xmlIdChecksum;
 
     /**
      * General layout
@@ -690,6 +692,7 @@ public:
 
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
+    OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
     OptionString m_transpose;

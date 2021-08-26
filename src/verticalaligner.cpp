@@ -34,7 +34,7 @@ namespace vrv {
 // SystemAligner
 //----------------------------------------------------------------------------
 
-SystemAligner::SystemAligner() : Object(), m_bottomAlignment(NULL), m_system(NULL)
+SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER), m_bottomAlignment(NULL), m_system(NULL)
 {
     Reset();
 }
@@ -246,7 +246,7 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffD
 // StaffAlignment
 //----------------------------------------------------------------------------
 
-StaffAlignment::StaffAlignment() : Object()
+StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
 {
     m_yRel = 0;
     m_verseNs.clear();
@@ -1031,18 +1031,22 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
     assert(params);
+    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
 
     // Skip bottom aligner and first staff
-    if (!m_staff || SystemAligner::SpacingType::System == m_spacingType) {
-        return FUNCTOR_CONTINUE;
+    if (m_staff && (m_spacingType != SystemAligner::SpacingType::System)) {
+        const int shift
+            = this->GetJustificationFactor(params->m_doc) / params->m_justificationSum * params->m_spaceToDistribute;
+        params->m_relativeShift += shift;
+        params->m_cumulatedShift += shift;
+
+        this->SetYRel(this->GetYRel() - params->m_relativeShift);
     }
 
-    const double staffJustificationFactor = GetJustificationFactor(params->m_doc);
-    params->m_cumulatedShift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+    params->m_shiftForStaff[this] = params->m_cumulatedShift;
 
-    this->SetYRel(this->GetYRel() - params->m_cumulatedShift);
-
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

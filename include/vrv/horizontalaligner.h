@@ -76,7 +76,6 @@ public:
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
 
     /**
@@ -300,7 +299,6 @@ public:
     AlignmentReference(int staffN);
     virtual ~AlignmentReference();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
 
     /**
@@ -341,6 +339,7 @@ public:
      * See Object::AdjustLayers
      */
     virtual int AdjustLayers(FunctorParams *functorParams);
+    virtual int AdjustLayersEnd(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustGraceXPos
@@ -389,7 +388,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@(
-    HorizontalAligner();
+    HorizontalAligner(ClassId classId);
     virtual ~HorizontalAligner();
     virtual void Reset();
     ///@}
@@ -441,7 +440,6 @@ public:
     ///@(
     MeasureAligner();
     virtual ~MeasureAligner();
-    virtual ClassId GetClassId() const { return MEASURE_ALIGNER; }
     virtual void Reset();
     ///@}
 
@@ -578,7 +576,6 @@ public:
     ///@(
     GraceAligner();
     virtual ~GraceAligner();
-    virtual ClassId GetClassId() const { return GRACE_ALIGNER; }
     virtual void Reset();
     ///@}
 
@@ -659,7 +656,6 @@ public:
     // constructors and destructors
     TimestampAligner();
     virtual ~TimestampAligner();
-    virtual ClassId GetClassId() const { return TIMESTAMP_ALIGNER; }
 
     /**
      * Reset the aligner (clear the content)

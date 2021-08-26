@@ -17,11 +17,13 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "score.h"
 #include "staff.h"
 #include "system.h"
 #include "view.h"
@@ -33,7 +35,7 @@ namespace vrv {
 // Page
 //----------------------------------------------------------------------------
 
-Page::Page() : Object("page-")
+Page::Page() : Object(PAGE, "page-")
 {
     Reset();
 }
@@ -45,6 +47,8 @@ void Page::Reset()
     Object::Reset();
 
     m_drawingScoreDef.Reset();
+    m_score = NULL;
+    m_scoreEnd = NULL;
     m_layoutDone = false;
     this->ResetUuid();
 
@@ -63,7 +67,10 @@ void Page::Reset()
 
 bool Page::IsSupportedChild(Object *child)
 {
-    if (child->Is(SYSTEM)) {
+    if (child->IsPageElement()) {
+        assert(dynamic_cast<PageElement *>(child));
+    }
+    else if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));
     }
     else {
@@ -74,6 +81,8 @@ bool Page::IsSupportedChild(Object *child)
 
 RunningElement *Page::GetHeader() const
 {
+    assert(m_score);
+
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
@@ -84,15 +93,17 @@ RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return doc->m_mdivScoreDef.GetPgHead();
+        return m_score->GetScoreDef()->GetPgHead();
     }
     else {
-        return doc->m_mdivScoreDef.GetPgHead2();
+        return m_score->GetScoreDef()->GetPgHead2();
     }
 }
 
 RunningElement *Page::GetFooter() const
 {
+    assert(m_scoreEnd);
+
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
@@ -103,10 +114,10 @@ RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return doc->m_mdivScoreDef.GetPgFoot();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot();
     }
     else {
-        return doc->m_mdivScoreDef.GetPgFoot2();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot2();
     }
 }
 
@@ -313,20 +324,23 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
     Functor adjustLayers(&Object::AdjustLayers);
-    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
-    this->Process(&adjustLayers, &adjustLayersParams);
+    Functor adjustLayersEnd(&Object::AdjustLayersEnd);
+    AdjustLayersParams adjustLayersParams(
+        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
+    this->Process(&adjustLayers, &adjustLayersParams, &adjustLayersEnd);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
     Functor adjustDots(&Object::AdjustDots);
     Functor adjustDotsEnd(&Object::AdjustDotsEnd);
-    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
 
     // adjust Layers again, this time including dots positioning
-    AdjustLayersParams newAdjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustLayersParams newAdjustLayersParams(
+        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     newAdjustLayersParams.m_ignoreDots = false;
-    this->Process(&adjustLayers, &newAdjustLayersParams);
+    this->Process(&adjustLayers, &newAdjustLayersParams, &adjustLayersEnd);
 
     // Adjust the X position of the accidentals, including in chords
     Functor adjustAccidX(&Object::AdjustAccidX);
@@ -337,16 +351,17 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustXPos(&Object::AdjustXPos);
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     adjustXPosParams.m_excludes.push_back(TABDURSYM);
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust tabRhyhtm separately
     adjustXPosParams.m_excludes.clear();
     adjustXPosParams.m_includes.push_back(TABDURSYM);
-    adjustXPosParams.m_includes.push_back(BARLINE_ATTR_RIGHT);
+    adjustXPosParams.m_includes.push_back(BARLINE);
     adjustXPosParams.m_includes.push_back(METERSIG);
     adjustXPosParams.m_includes.push_back(KEYSIG);
+    adjustXPosParams.m_rightBarLinesOnly = true;
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
@@ -354,7 +369,7 @@ void Page::LayOutHorizontally()
     Functor adjustGraceXPos(&Object::AdjustGraceXPos);
     Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
     AdjustGraceXPosParams adjustGraceXPosParams(
-        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
+        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
@@ -510,6 +525,8 @@ void Page::LayOutVertically()
         this->Process(&adjustSlurs, &adjustSlursParams);
     }
 
+    doc->SetCurrentScore(this->m_score);
+
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();
     }
@@ -604,6 +621,14 @@ void Page::JustifyVertically()
     justifyYParams.m_justificationSum = m_justificationSum;
     justifyYParams.m_spaceToDistribute = m_drawingJustifiableHeight;
     this->Process(&justifyY, &justifyYParams);
+
+    if (!justifyYParams.m_shiftForStaff.empty()) {
+        // Adjust cross staff content which is displaced through vertical justification
+        Functor adjustCrossStaffContent(&Object::AdjustCrossStaffContent);
+        AdjustCrossStaffContentParams adjustCrossStaffContentParams(doc);
+        adjustCrossStaffContentParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
+        this->Process(&adjustCrossStaffContent, &adjustCrossStaffContentParams);
+    }
 }
 
 void Page::LayOutPitchPos()
@@ -638,7 +663,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(GetChildren()->back());
+    System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
@@ -709,6 +734,29 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Page::ScoreDefSetCurrentPageEnd(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    if (!this->m_score) {
+        this->m_score = params->m_doc->GetCurrentScore();
+    }
+    else {
+        this->m_scoreEnd = params->m_doc->GetCurrentScore();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::ScoreDefUnsetCurrent(FunctorParams *functorParams)
+{
+    m_score = NULL;
+    m_scoreEnd = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
 {
@@ -805,7 +853,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
         // Move it up below the last system
         if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
             if (GetChildCount()) {
-                System *last = dynamic_cast<System *>(GetChildren()->back());
+                System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
                 assert(last);
                 footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight());
             }
@@ -813,6 +861,22 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
         else {
             footer->SetDrawingYRel(footer->GetTotalHeight());
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::CastOffPagesEnd(FunctorParams *functorParams)
+{
+    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
+    assert(params);
+
+    if (params->m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
+
+    // Otherwise add all pendings objects
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
+        params->m_currentPage->AddChild(*iter);
     }
 
     return FUNCTOR_CONTINUE;

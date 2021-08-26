@@ -61,6 +61,18 @@ public:
     ///@{
     DeviceContext()
     {
+        m_classId = DEVICE_CONTEXT;
+        m_isDeactivatedX = false;
+        m_isDeactivatedY = false;
+        m_width = 0;
+        m_height = 0;
+        m_contentHeight = 0;
+        m_userScaleX = 1.0;
+        m_userScaleY = 1.0;
+    }
+    DeviceContext(ClassId classId)
+    {
+        m_classId = classId;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
         m_width = 0;
@@ -70,8 +82,8 @@ public:
         m_userScaleY = 1.0;
     }
     virtual ~DeviceContext(){};
-    virtual ClassId GetClassId() const;
-    bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
+    ClassId GetClassId() const { return m_classId; }
+    bool Is(ClassId classId) const { return (m_classId == classId); }
     ///@}
 
     /**
@@ -294,6 +306,9 @@ protected:
     Zone *m_facsimile = NULL;
 
 private:
+    /** The class id representing the actual (derived) class */
+    ClassId m_classId;
+
     /** stores the width and height of the device context */
     int m_width;
     int m_height;

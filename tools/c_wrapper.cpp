@@ -5,9 +5,9 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include "c_wrapper.h"
 #include "toolkit.h"
 #include "vrv.h"
-#include "c_wrapper.h"
 
 using namespace std;
 using namespace vrv;
@@ -26,7 +26,7 @@ void *vrvToolkit_constructor()
     return new Toolkit();
 }
 
-void *vrvToolkit_constructorResourcePath(const char* resourcePath)
+void *vrvToolkit_constructorResourcePath(const char *resourcePath)
 {
     // set the resource path
     Resources::SetPath(resourcePath);
@@ -62,6 +62,13 @@ const char *vrvToolkit_getAvailableOptions(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->GetAvailableOptions());
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_getDescriptiveFeatures(void *tkPtr, const char *options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetDescriptiveFeatures(options));
     return tk->GetCString();
 }
 
@@ -248,6 +255,12 @@ const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *opt
     vrvToolkit_loadData(tk, data);
 
     return vrvToolkit_renderToSVG(tk, 1, options);
+}
+
+void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->ResetXmlIdSeed(seed);
 }
 
 void vrvToolkit_setOptions(void *tkPtr, const char *options)

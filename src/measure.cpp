@@ -15,7 +15,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "boundary.h"
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
@@ -28,6 +27,7 @@
 #include "staffdef.h"
 #include "syl.h"
 #include "system.h"
+#include "systemboundary.h"
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
@@ -47,7 +47,7 @@ namespace vrv {
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-")
+    : Object(MEASURE, "measure-")
     , AttBarring()
     , AttMeasureLog()
     , AttMeterConformanceBar()
@@ -74,8 +74,9 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
 
-    // Make the left barLine a left one...
-    m_leftBarLine.SetLeft();
+    // Set the barline positions
+    m_leftBarLine.SetPosition(BarLinePosition::Left);
+    m_rightBarLine.SetPosition(BarLinePosition::Right);
 
     Reset();
 
@@ -574,7 +575,7 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
             if (right != left) {
                 previous->SetDrawingRightBarLine(right);
                 this->SetDrawingLeftBarLine(left);
-                if (this->HasInvisibleStaffBarlines()) vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
+                if (this->HasInvisibleStaffBarlines()) this->GetLeftBarLine()->SetPosition(BarLinePosition::None);
             }
         }
     }
@@ -585,7 +586,7 @@ void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
             if (this->GetLeft() == BARRENDITION_NONE) {
                 this->SetLeft(BARRENDITION_single);
             }
-            vrv_cast<BarLineAttr *>(this->GetLeftBarLine())->SetNoAttr();
+            this->GetLeftBarLine()->SetPosition(BarLinePosition::None);
         }
         // with a scoredef inbetween always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
@@ -664,7 +665,8 @@ int Measure::ConvertToPageBased(FunctorParams *functorParams)
     assert(params);
 
     // Move itself to the pageBasedSystem - do not process children
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -908,7 +910,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
-        m_measureAligner.Process(params->m_functor, params, NULL, &filters);
+        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
 
     return FUNCTOR_SIBLINGS;
@@ -1154,7 +1156,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
             assert(measure);
             // move as pending since we want it not to be broken with the next measure
-            params->m_pendingObjects.push_back(measure);
+            params->m_pendingElements.push_back(measure);
             // continue
             return FUNCTOR_SIBLINGS;
         }
@@ -1168,7 +1170,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             if (isLeftoverMeasure) {
                 params->m_leftoverSystem = params->m_currentSystem;
             }
-            for (Object *oneOfPendingObjects : params->m_pendingObjects) {
+            for (Object *oneOfPendingObjects : params->m_pendingElements) {
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
@@ -1183,10 +1185,10 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
 
     // First add all pendings objects
     ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
+    for (iter = params->m_pendingElements.begin(); iter != params->m_pendingElements.end(); ++iter) {
         params->m_currentSystem->AddChild(*iter);
     }
-    params->m_pendingObjects.clear();
+    params->m_pendingElements.clear();
 
     // Special case where we use the Relinquish method.
     Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
@@ -1248,7 +1250,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    std::vector<BoundaryStartInterface *>::iterator iter;
+    std::vector<SystemElementStartInterface *>::iterator iter;
     for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); ++iter) {
         (*iter)->SetMeasure(this);
     }
@@ -1259,7 +1261,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
         m_drawingEnding = params->m_currentEnding;
     }
 
-    // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)
+    // Keep a pointer to the measure for when we are reaching the end (see SystemElementEnd::PrepareBoundaries)
     params->m_lastMeasure = this;
 
     return FUNCTOR_CONTINUE;

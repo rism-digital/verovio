@@ -17,7 +17,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "boundary.h"
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
@@ -25,6 +24,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "featureextractor.h"
 #include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
@@ -38,12 +38,14 @@
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
+#include "score.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
+#include "systemboundary.h"
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
@@ -61,15 +63,23 @@ thread_local unsigned long Object::s_objectCounter = 0;
 
 Object::Object() : BoundingBox()
 {
-    Init("m-");
+    Init(OBJECT, "m-");
     if (s_objectCounter++ == 0) {
         SeedUuid();
     }
 }
 
-Object::Object(const std::string &classid) : BoundingBox()
+Object::Object(ClassId classId) : BoundingBox()
 {
-    Init(classid);
+    Init(classId, "m-");
+    if (s_objectCounter++ == 0) {
+        SeedUuid();
+    }
+}
+
+Object::Object(ClassId classId, const std::string &classIdStr) : BoundingBox()
+{
+    Init(classId, classIdStr);
     if (s_objectCounter++ == 0) {
         SeedUuid();
     }
@@ -87,7 +97,8 @@ Object::Object(const Object &object) : BoundingBox(object)
     ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
-    m_classid = object.m_classid;
+    m_classId = object.m_classId;
+    m_classIdStr = object.m_classIdStr;
     m_parent = NULL;
 
     // Flags
@@ -133,7 +144,8 @@ Object &Object::operator=(const Object &object)
         ClearChildren();
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
-        m_classid = object.m_classid;
+        m_classId = object.m_classId;
+        m_classIdStr = object.m_classIdStr;
         m_parent = NULL;
         // Flags
         m_isAttribute = object.m_isAttribute;
@@ -153,9 +165,11 @@ Object &Object::operator=(const Object &object)
             for (i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
                 Object *clone = current->Clone();
-                clone->SetParent(this);
-                clone->CloneReset();
-                m_children.push_back(clone);
+                if (clone) {
+                    clone->SetParent(this);
+                    clone->CloneReset();
+                    m_children.push_back(clone);
+                }
             }
         }
     }
@@ -167,9 +181,12 @@ Object::~Object()
     ClearChildren();
 }
 
-void Object::Init(const std::string &classid)
+void Object::Init(ClassId classId, const std::string &classIdStr)
 {
-    m_classid = classid;
+    assert(classIdStr.size());
+
+    m_classId = classId;
+    m_classIdStr = classIdStr;
     m_parent = NULL;
     // Flags
     m_isAttribute = false;
@@ -182,13 +199,6 @@ void Object::Init(const std::string &classid)
     this->GenerateUuid();
 
     Reset();
-}
-
-ClassId Object::GetClassId() const
-{
-    // we should always have the method overridden
-    assert(false);
-    return OBJECT;
 }
 
 void Object::SetAsReferenceObject()
@@ -213,9 +223,14 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
 bool Object::IsBoundaryElement()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(this);
+        SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
         assert(interface);
-        return (interface->IsBoundary());
+        return (interface->IsSystemBoundary());
+    }
+    else if (this->Is(MDIV) || this->Is(SCORE)) {
+        PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
+        assert(interface);
+        return (interface->IsPageBoundary());
     }
     return false;
 }
@@ -225,7 +240,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     if (this == sourceParent) {
         assert("Object cannot be copied to itself");
     }
-    if (!allowTypeChange && (this->GetClassId() != sourceParent->GetClassId())) {
+    if (!allowTypeChange && (m_classId != sourceParent->m_classId)) {
         assert("Object must be of the same type");
     }
 
@@ -416,10 +431,11 @@ Object *Object::GetPrevious(const Object *child, const ClassId classId)
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
 }
 
-Object *Object::GetLast() const
+Object *Object::GetLast(const ClassId classId) const
 {
-    if (m_children.empty()) return NULL;
-    return m_children.back();
+    ArrayOfObjects::const_reverse_iterator riter
+        = std::find_if(m_children.rbegin(), m_children.rend(), ObjectComparison(classId));
+    return (riter == m_children.rend()) ? NULL : *riter;
 }
 
 int Object::GetIdx() const
@@ -585,7 +601,7 @@ bool Object::DeleteChild(Object *child)
 
 void Object::GenerateUuid()
 {
-    m_uuid = m_classid + Object::GenerateRandUuid();
+    m_uuid = m_classIdStr.at(0) + Object::GenerateRandUuid();
 }
 
 void Object::ResetUuid()
@@ -701,7 +717,7 @@ Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
         return NULL;
     }
 
-    if (m_parent->GetClassId() == classId) {
+    if (m_parent->m_classId == classId) {
         return m_parent;
     }
     else {
@@ -715,7 +731,7 @@ Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId 
         return NULL;
     }
 
-    if ((m_parent->GetClassId() > classIdMin) && (m_parent->GetClassId() < classIdMax)) {
+    if ((m_parent->m_classId > classIdMin) && (m_parent->m_classId < classIdMax)) {
         return m_parent;
     }
     else {
@@ -729,7 +745,7 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
         return NULL;
     }
 
-    if (m_parent->GetClassId() == classId) {
+    if (m_parent->m_classId == classId) {
         return this;
     }
     else {
@@ -797,6 +813,23 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
     }
 
+    // When we are starting a new Score, we need to update to Doc current ScoreDef
+    if (direction == FORWARD && this->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(this);
+        assert(score);
+        score->SetAsCurrent();
+    }
+    // We need to do the same in backward direction through the PageElementEnd::m_start
+    else if (direction == BACKWARD && this->Is(PAGE_ELEMENT_END)) {
+        PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(this);
+        assert(elementEnd);
+        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
+            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
+            assert(score);
+            score->SetAsCurrent();
+        }
+    }
+
     if (!skipFirst) {
         functor->Call(this, functorParams);
     }
@@ -820,7 +853,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         auto filterPredicate = [filters](Object *iter) -> bool {
             if (filters && !filters->empty()) {
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
-                ClassId classId = iter->GetClassId();
+                ClassId classId = iter->m_classId;
                 ArrayOfComparisons::iterator comparisonIter
                     = std::find_if(filters->begin(), filters->end(), [classId](Comparison *iter) -> bool {
                           ClassIdComparison *attComparison = vrv_cast<ClassIdComparison *>(iter);
@@ -920,11 +953,12 @@ void Object::SeedUuid(unsigned int seed)
 std::string Object::GenerateRandUuid()
 {
     int nr = std::rand();
-    char str[17];
-    // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
 
-    return std::string(str);
+    // char str[17];
+    // snprintf(str, 17, "%016d", nr);
+    // return std::string(str);
+
+    return BaseEncodeInt(nr, 36);
 }
 
 bool Object::sortByUlx(Object *a, Object *b)
@@ -1484,17 +1518,40 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     ScoreDefSetCurrentParams *params = vrv_params_cast<ScoreDefSetCurrentParams *>(functorParams);
     assert(params);
 
-    assert(params->m_upcomingScoreDef);
+    if (this->Is({ DOC, MDIV, PAGES })) return FUNCTOR_CONTINUE;
 
     // starting a new page
     if (this->Is(PAGE)) {
         Page *page = vrv_cast<Page *>(this);
         assert(page);
-        if (page->GetParent()->GetChildIndex(page) == 0) {
-            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
-            params->m_drawLabels = true;
+        // This will be reach before we reach the begining of a first Score.
+        // However, page->m_score has already been set by Page::ScoreDefSetCurrentPage
+        // This must be the first page or a new score is starting on this page
+        assert(page->m_score);
+        if (!params->m_currentScore || (params->m_currentScore != page->m_score)) {
+            params->m_upcomingScoreDef = *page->m_score->GetScoreDef();
+            params->m_upcomingScoreDef.Process(params->m_functor, functorParams);
         }
-        page->m_drawingScoreDef = *params->m_upcomingScoreDef;
+        page->m_drawingScoreDef = params->m_upcomingScoreDef;
+        return FUNCTOR_CONTINUE;
+    }
+
+    // starting a new score
+    if (this->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(this);
+        assert(score);
+        params->m_currentScore = score;
+        params->m_upcomingScoreDef = *score->GetScoreDef();
+        params->m_upcomingScoreDef.Process(params->m_functor, functorParams);
+        // Trigger the redraw of everything
+        params->m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
+        params->m_drawLabels = true;
+        params->m_currentScoreDef = NULL;
+        params->m_currentStaffDef = NULL;
+        params->m_previousMeasure = NULL;
+        params->m_currentSystem = NULL;
+        params->m_restart = false;
+        params->m_hasMeasure = false;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1512,7 +1569,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(MEASURE)) {
         // If we have a restart scoreDef before, for redrawing of everything on the measure
         if (params->m_restart) {
-            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
+            params->m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
         }
 
         Measure *measure = vrv_cast<Measure *>(this);
@@ -1525,33 +1582,33 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
             // The cautionary scoreDef for restart is already done when hitting the scoreDef
-            if (params->m_upcomingScoreDef->m_setAsDrawing && params->m_previousMeasure && !params->m_restart) {
-                ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
+            if (params->m_upcomingScoreDef.m_setAsDrawing && params->m_previousMeasure && !params->m_restart) {
+                ScoreDef cautionaryScoreDef = params->m_upcomingScoreDef;
                 SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
                 Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
                 params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
             }
             // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-            params->m_upcomingScoreDef->SetRedrawFlags(
+            params->m_upcomingScoreDef.SetRedrawFlags(
                 StaffDefRedrawFlags::REDRAW_CLEF | StaffDefRedrawFlags::REDRAW_KEYSIG);
             // Set it to the current system (used e.g. for endings)
-            params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
+            params->m_currentSystem->SetDrawingScoreDef(&params->m_upcomingScoreDef);
             params->m_currentSystem->GetDrawingScoreDef()->SetDrawLabels(params->m_drawLabels);
             params->m_currentSystem = NULL;
             params->m_drawLabels = false;
         }
-        if (params->m_upcomingScoreDef->m_setAsDrawing) {
-            measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
+        if (params->m_upcomingScoreDef.m_setAsDrawing) {
+            measure->SetDrawingScoreDef(&params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
-            params->m_upcomingScoreDef->SetRedrawFlags(StaffDefRedrawFlags::FORCE_REDRAW);
-            params->m_upcomingScoreDef->m_setAsDrawing = false;
+            params->m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::FORCE_REDRAW);
+            params->m_upcomingScoreDef.m_setAsDrawing = false;
         }
         params->m_drawLabels = false;
 
         // set other flags based on score def change
-        if (params->m_upcomingScoreDef->m_insertScoreDef) {
+        if (params->m_upcomingScoreDef.m_insertScoreDef) {
             drawingFlags |= Measure::BarlineDrawingFlags::SCORE_DEF_INSERT;
-            params->m_upcomingScoreDef->m_insertScoreDef = false;
+            params->m_upcomingScoreDef.m_insertScoreDef = false;
         }
 
         // check if we need to draw barlines for current/previous measures (in cases when all staves are invisible in
@@ -1587,8 +1644,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
             || scoreDef->HasMensurInfo(UNLIMITED_DEPTH) || scoreDef->HasMeterSigGrpInfo(UNLIMITED_DEPTH)
             || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
-            params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
-            params->m_upcomingScoreDef->m_insertScoreDef = true;
+            params->m_upcomingScoreDef.ReplaceDrawingValues(scoreDef);
+            params->m_upcomingScoreDef.m_insertScoreDef = true;
         }
         if (scoreDef->IsSectionRestart()) {
             // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
@@ -1600,7 +1657,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             // If we have a previous measure, we need to set the cautionary scoreDef indenpendently from the
             // presence of a system break
             if (params->m_previousMeasure) {
-                ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
+                ScoreDef cautionaryScoreDef = params->m_upcomingScoreDef;
                 SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
                 Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
                 params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
@@ -1614,7 +1671,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(staffGrp);
         // For now replace labels only if we have a section@restart
         if (params->m_restart) {
-            params->m_upcomingScoreDef->ReplaceDrawingLabels(staffGrp);
+            params->m_upcomingScoreDef.ReplaceDrawingLabels(staffGrp);
         }
     }
 
@@ -1622,7 +1679,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(STAFFDEF)) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(this);
         assert(staffDef);
-        params->m_upcomingScoreDef->ReplaceDrawingValues(staffDef);
+        params->m_upcomingScoreDef.ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
@@ -1669,10 +1726,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             return FUNCTOR_CONTINUE;
         }
         assert(params->m_currentStaffDef);
-        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
         upcomingStaffDef->SetCurrentClef(clef);
-        params->m_upcomingScoreDef->m_setAsDrawing = true;
+        params->m_upcomingScoreDef.m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1684,10 +1741,10 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             return FUNCTOR_CONTINUE;
         }
         assert(params->m_currentStaffDef);
-        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
         upcomingStaffDef->SetCurrentKeySig(keySig);
-        params->m_upcomingScoreDef->m_setAsDrawing = true;
+        params->m_upcomingScoreDef.m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1836,6 +1893,16 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
             currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
         }
     }
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::GenerateFeatures(FunctorParams *functorParams)
+{
+    GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
+    assert(params);
+
+    params->m_extractor->Extract(this, params);
+
     return FUNCTOR_CONTINUE;
 }
 

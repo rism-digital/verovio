@@ -29,7 +29,7 @@ namespace vrv {
 static const ClassRegistrar<Rend> s_factory("rend", REND);
 
 Rend::Rend()
-    : TextElement("rend-")
+    : TextElement(REND, "rend-")
     , AreaPosInterface()
     , AttColor()
     , AttLang()

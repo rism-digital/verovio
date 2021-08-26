@@ -27,10 +27,10 @@ public:
      */
     ///@{
     TextElement();
-    TextElement(const std::string &classid);
+    TextElement(ClassId classId);
+    TextElement(ClassId classId, const std::string &classIdStr);
     virtual ~TextElement();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return TEXT_ELEMENT; }
     ///@}
 
     /**

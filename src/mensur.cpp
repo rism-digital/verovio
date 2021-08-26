@@ -30,7 +30,7 @@ const int Mensur::s_numBase = 2;
 static const ClassRegistrar<Mensur> s_factory("mensur", MENSUR);
 
 Mensur::Mensur()
-    : LayerElement("mensur-")
+    : LayerElement(MENSUR, "mensur-")
     , AttColor()
     , AttCue()
     , AttDurationRatio()

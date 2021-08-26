@@ -31,7 +31,6 @@ public:
     virtual Object *Clone() const { return new MSpace(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MSpace"; }
-    virtual ClassId GetClassId() const { return MSPACE; }
     ///@}
 
     //----------//

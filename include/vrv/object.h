@@ -59,9 +59,10 @@ public:
      */
     ///@{
     Object();
-    Object(const std::string &classid);
+    Object(ClassId classId);
+    Object(ClassId classId, const std::string &classIdStr);
     virtual ~Object();
-    virtual ClassId GetClassId() const;
+    ClassId GetClassId() const final { return m_classId; }
     virtual std::string GetClassName() const { return "[MISSING]"; }
     ///@}
 
@@ -90,31 +91,14 @@ public:
      * See classId enum.
      */
     ///@{
-    bool IsControlElement() const
-    {
-        return (this->GetClassId() > CONTROL_ELEMENT && this->GetClassId() < CONTROL_ELEMENT_max);
-    }
-    bool IsEditorialElement() const
-    {
-        return (this->GetClassId() > EDITORIAL_ELEMENT && this->GetClassId() < EDITORIAL_ELEMENT_max);
-    }
-    bool IsLayerElement() const
-    {
-        return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
-    }
-    bool IsRunningElement() const
-    {
-        return (this->GetClassId() > RUNNING_ELEMENT && this->GetClassId() < RUNNING_ELEMENT_max);
-    }
-    bool IsScoreDefElement() const
-    {
-        return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);
-    }
-    bool IsSystemElement() const
-    {
-        return (this->GetClassId() > SYSTEM_ELEMENT && this->GetClassId() < SYSTEM_ELEMENT_max);
-    }
-    bool IsTextElement() const { return (this->GetClassId() > TEXT_ELEMENT && this->GetClassId() < TEXT_ELEMENT_max); }
+    bool IsControlElement() const { return ((m_classId > CONTROL_ELEMENT) && (m_classId < CONTROL_ELEMENT_max)); }
+    bool IsEditorialElement() const { return ((m_classId > EDITORIAL_ELEMENT) && (m_classId < EDITORIAL_ELEMENT_max)); }
+    bool IsLayerElement() const { return ((m_classId > LAYER_ELEMENT) && (m_classId < LAYER_ELEMENT_max)); }
+    bool IsPageElement() const { return ((m_classId > PAGE_ELEMENT) && (m_classId < PAGE_ELEMENT_max)); }
+    bool IsRunningElement() const { return ((m_classId > RUNNING_ELEMENT) && (m_classId < RUNNING_ELEMENT_max)); }
+    bool IsScoreDefElement() const { return ((m_classId > SCOREDEF_ELEMENT) && (m_classId < SCOREDEF_ELEMENT_max)); }
+    bool IsSystemElement() const { return ((m_classId > SYSTEM_ELEMENT) && (m_classId < SYSTEM_ELEMENT_max)); }
+    bool IsTextElement() const { return ((m_classId > TEXT_ELEMENT) && (m_classId < TEXT_ELEMENT_max)); }
     ///@}
 
     /**
@@ -300,7 +284,7 @@ public:
     /**
      * Return the last child of the object (if any, NULL otherwise)
      */
-    Object *GetLast() const;
+    Object *GetLast(const ClassId classId = UNSPECIFIED) const;
 
     /**
      * Get the parent of the Object
@@ -539,7 +523,7 @@ public:
      * limit (EditorialElement objects do not count).
      * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
-    virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
         ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
         bool skipFirst = false);
 
@@ -746,9 +730,12 @@ public:
     ///@}
 
     /**
-     * Adjust the position the outside articulations.
+     * Adjust the position of notes and chords for multiple layers
      */
+    ///@{
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustLayersEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * @name Lay out the X positions of the grace notes looking at the bounding boxes.
@@ -968,6 +955,15 @@ public:
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * @name Set the Page::m_score and Page::m_scoreEnd pointers
+     * Always set a the end of Page (both in BACKWARD and FORWARD directions)
+     */
+    ///@{
+    virtual int ScoreDefSetCurrentPage(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Set the current scoreDef wherever need.
      * This is include a scoreDef for each system.
      * It also includes a scoreDef for each measure where a change occured before.
@@ -1108,6 +1104,13 @@ public:
     virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Functor for setting Turn::m_drawingEndNote for delayed turns
+     * Need a first pass to fill the map with m_initMap to true
+     * Processed by staff/layer after that
+     */
+    virtual int PrepareDelayedTurns(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Functor for setting Measure of Ending
      */
     virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1159,6 +1162,11 @@ public:
      * Justify the Y positions
      */
     virtual int JustifyY(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust cross staff content after vertical justification
+     */
+    virtual int AdjustCrossStaffContent(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1229,6 +1237,13 @@ public:
     ///@}
 
     /**
+     * Export the object to a JSON feature file.
+     */
+    ///@{
+    virtual int GenerateFeatures(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * Calculate the maximum duration of each measure.
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1249,8 +1264,6 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
-protected:
-    //
 private:
     /**
      * Method for generating the uuid.
@@ -1258,9 +1271,9 @@ private:
     void GenerateUuid();
 
     /**
-     * Initialisation method taking a uuid prefix argument.
+     * Initialisation method taking the class id and a uuid prefix argument.
      */
-    void Init(const std::string &);
+    void Init(ClassId classId, const std::string &classIdStr);
 
 public:
     /**
@@ -1284,11 +1297,16 @@ private:
     Object *m_parent;
 
     /**
+     * The class id representing the actual (derived) class
+     */
+    ClassId m_classId;
+
+    /**
      * Members for storing / generating uuids
      */
     ///@{
     std::string m_uuid;
-    std::string m_classid;
+    std::string m_classIdStr;
     ///@}
 
     /**

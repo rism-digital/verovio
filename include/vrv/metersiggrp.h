@@ -45,7 +45,6 @@ public:
     virtual Object *Clone() const { return new MeterSigGrp(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MeterSigGrp"; }
-    virtual ClassId GetClassId() const { return METERSIGGRP; }
     ///@}
 
     /**

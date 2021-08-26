@@ -33,10 +33,10 @@ public:
      */
     ///@{
     RunningElement();
-    RunningElement(const std::string &classid);
+    RunningElement(ClassId classId);
+    RunningElement(ClassId classId, const std::string &classIdStr);
     virtual ~RunningElement();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return RUNNING_ELEMENT; }
     ///@}
 
     /**

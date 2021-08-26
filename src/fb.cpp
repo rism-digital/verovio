@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Fb> s_factory("fb", FB);
 
-Fb::Fb() : Object("fb-")
+Fb::Fb() : Object(FB, "fb-")
 {
 
     Reset();

@@ -29,7 +29,8 @@ namespace vrv {
 
 static const ClassRegistrar<MRest> s_factory("mRest", MREST);
 
-MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
+MRest::MRest()
+    : LayerElement(MREST, "mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);

@@ -9,7 +9,8 @@
 #define __VRV_MDIV_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "pageboundary.h"
+#include "pageelement.h"
 
 namespace vrv {
 
@@ -18,9 +19,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <pages> in page-based MEI.
+ * This class represent a <mdiv> in page-based MEI.
  */
-class Mdiv : public Object, public AttLabelled, public AttNNumberLike {
+class Mdiv : public PageElement, public PageElementStartInterface, public AttLabelled, public AttNNumberLike {
 
 public:
     /**
@@ -33,7 +34,6 @@ public:
     virtual Object *Clone() const { return new Mdiv(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Mdiv"; }
-    virtual ClassId GetClassId() const { return MDIV; }
     ///@}
 
     /**
@@ -51,6 +51,14 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertToPageBased
+     */
+    ///@{
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    ///@}
 
 private:
     //

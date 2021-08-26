@@ -36,7 +36,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 6
+#define VERSION_MINOR 7
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -71,12 +71,12 @@ enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, 
 
 /**
  * The ClassIds are used to identify Object child classes through the Object::Is virtual method.
- * Each Object child class has to have its own id and has to override the GetClassId() method.
+ * Each Object child class has to have its own id which is stored in the member variable m_classId.
  * Base classes (e.g., LayerElement) that are never instanciated have boundary ids
  * used for checking if an Object is child of a base class. See for example
  * Object::IsLayerElement.
  */
-enum ClassId {
+enum ClassId : uint16_t {
     BOUNDING_BOX = 0, // Should not be instanciated as is
     OBJECT, // Should not be instanciated as is
     DEVICE_CONTEXT, // Should not be instanciated as is,
@@ -98,7 +98,6 @@ enum ClassId {
     LABEL,
     LABELABBR,
     LAYER,
-    MDIV,
     MEASURE,
     MEASURE_ALIGNER,
     MENSUR_ATTR,
@@ -106,7 +105,6 @@ enum ClassId {
     METERSIGGRP,
     PAGE,
     PAGES,
-    SCORE,
     STAFF,
     STAFF_ALIGNMENT,
     STAFFGRP,
@@ -147,9 +145,15 @@ enum ClassId {
     PGHEAD,
     PGHEAD2,
     RUNNING_ELEMENT_max,
+    // Ids for PageElement child classes
+    PAGE_ELEMENT,
+    PAGE_ELEMENT_END,
+    MDIV,
+    SCORE,
+    PAGE_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
-    BOUNDARY_END,
+    SYSTEM_ELEMENT_END,
     ENDING,
     EXPANSION,
     PB,
@@ -189,8 +193,6 @@ enum ClassId {
     ACCID,
     ARTIC,
     BARLINE,
-    BARLINE_ATTR_LEFT,
-    BARLINE_ATTR_RIGHT,
     BEAM,
     BEATRPT,
     BTREM,

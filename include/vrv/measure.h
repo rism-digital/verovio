@@ -54,7 +54,6 @@ public:
     virtual Object *Clone() const { return new Measure(*this); };
     virtual void Reset();
     virtual std::string GetClassName() const { return "Measure"; }
-    virtual ClassId GetClassId() const { return MEASURE; }
     ///@}
 
     /**
@@ -496,8 +495,8 @@ private:
      * @name The measure barlines (left and right) used when drawing
      */
     ///@{
-    BarLineAttr m_leftBarLine;
-    BarLineAttr m_rightBarLine;
+    BarLine m_leftBarLine;
+    BarLine m_rightBarLine;
     ///@}
 
     /**

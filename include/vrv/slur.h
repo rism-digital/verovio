@@ -29,12 +29,12 @@ public:
      */
     ///@{
     Slur();
-    Slur(const std::string &classid);
+    Slur(ClassId classId);
+    Slur(ClassId classId, const std::string &classIdStr);
     virtual ~Slur();
     virtual Object *Clone() const { return new Slur(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Slur"; }
-    virtual ClassId GetClassId() const { return SLUR; }
     ///@}
 
     /**

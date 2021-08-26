@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Zone> s_factory("zone", ZONE);
 
-Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated()
+Zone::Zone() : Object(ZONE, "zone-"), AttTyped(), AttCoordinated()
 {
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_COORDINATED);

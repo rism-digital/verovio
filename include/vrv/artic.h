@@ -35,7 +35,6 @@ public:
     virtual Object *Clone() const { return new Artic(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Artic"; }
-    virtual ClassId GetClassId() const { return ARTIC; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -140,6 +139,8 @@ public:
 
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;
+    // Calculate shift for the articulation based on its type and presence of other articulations
+    int CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIRECTION stemDir) const;
 
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;

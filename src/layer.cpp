@@ -42,7 +42,7 @@ namespace vrv {
 static const ClassRegistrar<Layer> s_factory("layer", LAYER);
 
 Layer::Layer()
-    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
+    : Object(LAYER, "layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);

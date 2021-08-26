@@ -40,7 +40,24 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(const std::string &classid) : Object(classid), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"), ScoreDefInterface(), AttTyped()
+{
+    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId, "scoredefelement-"), ScoreDefInterface(), AttTyped()
+{
+    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+ScoreDefElement::ScoreDefElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), ScoreDefInterface(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     RegisterAttClass(ATT_TYPED);
@@ -174,7 +191,7 @@ MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy()
 static const ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
 
 ScoreDef::ScoreDef()
-    : ScoreDefElement("scoredef-")
+    : ScoreDefElement(SCOREDEF, "scoredef-")
     , ObjectListInterface()
     , AttDistances()
     , AttEndings()
@@ -520,7 +537,8 @@ int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
     assert(params);
 
     // Move itself to the pageBasedSystem - do not process children
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -550,7 +568,7 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingObjects.push_back(scoreDef);
+    params->m_pendingElements.push_back(scoreDef);
     // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDefs (and not
     // the initial one - for this to be corrected, we would need two parameters, one for the current initial
     // scoreDef and one for the current that will be the initial one at the next system

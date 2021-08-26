@@ -72,7 +72,6 @@ public:
     virtual Object *Clone() const { return new Note(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Note"; }
-    virtual ClassId GetClassId() const { return NOTE; }
     ///@}
 
     /**
@@ -226,6 +225,16 @@ public:
     ///@}
 
 public:
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Assume that two notes from different layers are given occuring at the same time
+     * Returns true if one note has a ledger line that collides (or is quite close) to the other note's stem
+     */
+    static bool HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, Note *note2);
+
     //----------//
     // Functors //
     //----------//

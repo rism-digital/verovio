@@ -52,7 +52,6 @@ public:
     virtual Object *Clone() const { return new Chord(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Chord"; }
-    virtual ClassId GetClassId() const { return CHORD; }
     ///@}
 
     /**
@@ -148,8 +147,9 @@ public:
 
     /**
      * Helper to adjust overlapping layers for chords
+     * Returns the shift of the adjustment
      */
-    virtual void AdjustOverlappingLayers(
+    virtual int AdjustOverlappingLayers(
         Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
 
     //----------//
@@ -205,9 +205,9 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * See Object::JustifyY
+     * See Object::AdjustCrossStaffContent
      */
-    virtual int JustifyY(FunctorParams *functorParams);
+    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
 
 protected:
     /**

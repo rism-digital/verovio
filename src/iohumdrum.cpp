@@ -2448,7 +2448,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     if (staffstarts.size() > 0) {
-        addMidiTempo(m_doc->m_mdivScoreDef, staffstarts[0], top, bot);
+        addMidiTempo(m_doc->GetCurrentScoreDef(), staffstarts[0], top, bot);
     }
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
@@ -2477,7 +2477,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
         // If there is one staff, then no extra decoration.
         else if (staffstarts.size() == 1) {
             StaffGrp *sg = new StaffGrp();
-            m_doc->m_mdivScoreDef.AddChild(sg);
+            m_doc->GetCurrentScoreDef()->AddChild(sg);
             sg->AddChild(m_staffdef[0]);
         }
         // do something if there is no staff in the score?
@@ -2486,7 +2486,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
         bool status = processStaffDecoration(decoration);
         if (!status) {
             StaffGrp *sg = new StaffGrp();
-            m_doc->m_mdivScoreDef.AddChild(sg);
+            m_doc->GetCurrentScoreDef()->AddChild(sg);
             sg->SetBarThru(BOOLEAN_false);
             // setGroupSymbol(sg, staffGroupingSym_SYMBOL_bracket);
             for (int i = 0; i < (int)m_staffdef.size(); ++i) {
@@ -2513,10 +2513,10 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
 
 void HumdrumInput::promoteInstrumentNamesToGroup()
 {
-    ScoreDef &sdf = m_doc->m_mdivScoreDef;
-    int count = sdf.GetChildCount();
+    ScoreDef *sdf = m_doc->GetCurrentScoreDef();
+    int count = sdf->GetChildCount();
     for (int i = 0; i < count; ++i) {
-        Object *obj = sdf.GetChild(i);
+        Object *obj = sdf->GetChild(i);
         std::string name = obj->GetClassName();
         if (name != "StaffGrp") {
             continue;
@@ -2587,11 +2587,11 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
 
 void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 {
-    ScoreDef &sdf = m_doc->m_mdivScoreDef;
-    int count = sdf.GetChildCount();
+    ScoreDef *sdf = m_doc->GetCurrentScoreDef();
+    int count = sdf->GetChildCount();
 
     for (int i = 0; i < count; ++i) {
-        Object *obj = sdf.GetChild(i);
+        Object *obj = sdf->GetChild(i);
         std::string name = obj->GetClassName();
         if (name != "StaffGrp") {
             continue;
@@ -3039,14 +3039,14 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
         // There is no barline across the staves in this case.
         root = new StaffGrp();
         root->SetBarThru(BOOLEAN_false);
-        m_doc->m_mdivScoreDef.AddChild(root);
+        m_doc->GetCurrentScoreDef()->AddChild(root);
     }
     else if (d[0] == '(') {
         // The outer group is not bracketed, but bar goes all of
         // the way through system.
         root = new StaffGrp();
         root->SetBarThru(BOOLEAN_true);
-        m_doc->m_mdivScoreDef.AddChild(root);
+        m_doc->GetCurrentScoreDef()->AddChild(root);
     }
     else if (pairing.back() == 0) {
         skipfirst = true;
@@ -3062,7 +3062,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
         else if (d[0] == '[') {
             setGroupSymbol(root, staffGroupingSym_SYMBOL_bracket);
         }
-        m_doc->m_mdivScoreDef.AddChild(root);
+        m_doc->GetCurrentScoreDef()->AddChild(root);
     }
 
     vector<int> spine; // kernstart index
@@ -3303,7 +3303,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
             root->AddChild(sg);
         }
         else {
-            m_doc->m_mdivScoreDef.AddChild(sg);
+            m_doc->GetCurrentScoreDef()->AddChild(sg);
         }
         for (int i = 0; i < (int)m_staffdef.size(); ++i) {
             sg->AddChild(m_staffdef[i]);
@@ -3326,7 +3326,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
                 root->AddChild(sg);
             }
             else {
-                m_doc->m_mdivScoreDef.AddChild(sg);
+                m_doc->GetCurrentScoreDef()->AddChild(sg);
             }
         }
 
@@ -3403,7 +3403,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
         }
         else {
             root_sg = new StaffGrp();
-            m_doc->m_mdivScoreDef.AddChild(root_sg);
+            m_doc->GetCurrentScoreDef()->AddChild(root_sg);
             root_sg->SetBarThru(BOOLEAN_false);
         }
         for (int i = 0; i < (int)newgroups.size(); ++i) {
@@ -3872,7 +3872,7 @@ bool HumdrumInput::prepareFooter(
     // std::string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pgfoot = tempdoc.m_mdivScoreDef.FindDescendantByType(ClassId::PGFOOT);
+    Object *pgfoot = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGFOOT);
     if (pgfoot == NULL) {
         return false;
     }
@@ -3890,9 +3890,9 @@ bool HumdrumInput::prepareFooter(
         return false;
     }
 
-    m_doc->m_mdivScoreDef.AddChild(pgfoot);
+    m_doc->GetCurrentScoreDef()->AddChild(pgfoot);
 
-    Object *pgfoot2 = tempdoc.m_mdivScoreDef.FindDescendantByType(ClassId::PGFOOT2);
+    Object *pgfoot2 = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGFOOT2);
     if (pgfoot2 == NULL) {
         return true;
     }
@@ -3910,7 +3910,7 @@ bool HumdrumInput::prepareFooter(
         return true;
     }
 
-    m_doc->m_mdivScoreDef.AddChild(pgfoot2);
+    m_doc->GetCurrentScoreDef()->AddChild(pgfoot2);
 
     return true;
 }
@@ -4046,7 +4046,7 @@ bool HumdrumInput::prepareHeader(
     // std::string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pghead = tempdoc.m_mdivScoreDef.FindDescendantByType(ClassId::PGHEAD);
+    Object *pghead = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGHEAD);
     if (pghead == NULL) {
         return false;
     }
@@ -4064,7 +4064,7 @@ bool HumdrumInput::prepareHeader(
         return false;
     }
 
-    m_doc->m_mdivScoreDef.AddChild(pghead);
+    m_doc->GetCurrentScoreDef()->AddChild(pghead);
 
     return true;
 }
@@ -4444,7 +4444,7 @@ string HumdrumInput::getSystemDecoration(const std::string &tag)
 // HumdrumInput::addMidiTempo --
 //
 
-void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top, int bot)
+void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, int bot)
 {
     if (top <= 0) {
         top = 4;
@@ -4469,7 +4469,7 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top
                 if (::isdigit((*kernpart)[3])) {
                     int tempo = stoi(kernpart->substr(3));
                     // std::string tempostr = to_string(tempo);
-                    m_scoreDef.SetMidiBpm(tempo);
+                    scoreDef->SetMidiBpm(tempo);
                     foundtempo = true;
                 }
             }
@@ -4494,14 +4494,14 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top
         if (omd) {
             int guess = hum::Convert::tempoNameToMm(*omd, bot, top);
             if (guess > 0) {
-                m_scoreDef.SetMidiBpm(guess);
+                scoreDef->SetMidiBpm(guess);
             }
             else {
-                addDefaultTempo(m_scoreDef);
+                addDefaultTempo(scoreDef);
             }
         }
         else {
-            addDefaultTempo(m_scoreDef);
+            addDefaultTempo(scoreDef);
         }
     }
 }
@@ -4512,10 +4512,10 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart, int top
 //    a half note (for basic Renaissance default tempo).
 //
 
-void HumdrumInput::addDefaultTempo(ScoreDef &m_scoreDef)
+void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
 {
     if (m_mens) {
-        m_scoreDef.SetMidiBpm(400);
+        scoreDef->SetMidiBpm(400);
         return;
     }
     double sum = 0.0;
@@ -4530,7 +4530,7 @@ void HumdrumInput::addDefaultTempo(ScoreDef &m_scoreDef)
     }
     double avgdur = sum / count;
     if (avgdur > 2.0) {
-        m_scoreDef.SetMidiBpm(400);
+        scoreDef->SetMidiBpm(400);
     }
 }
 
@@ -24728,7 +24728,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
     if (m_mens) {
         doc->SetMensuralMusicOnly(true);
         doc->m_notationType = NOTATIONTYPE_mensural;
-        doc->ConvertToCastOffMensuralDoc();
+        doc->ConvertToCastOffMensuralDoc(true);
     }
 }
 

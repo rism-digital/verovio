@@ -35,7 +35,6 @@ public:
     virtual Object *Clone() const { return new Syllable(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Syllable"; }
-    virtual ClassId GetClassId() const { return SYLLABLE; }
     ///@}
 
     /**

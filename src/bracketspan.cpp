@@ -28,7 +28,7 @@ namespace vrv {
 static const ClassRegistrar<BracketSpan> s_factory("bracketSpan", BRACKETSPAN);
 
 BracketSpan::BracketSpan()
-    : ControlElement("bspan-")
+    : ControlElement(BRACKETSPAN, "bspan-")
     , TimeSpanningInterface()
     , AttBracketSpanLog()
     , AttColor()

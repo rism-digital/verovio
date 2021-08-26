@@ -25,14 +25,14 @@ namespace vrv {
 
 static const ClassRegistrar<App> s_factory("app", APP);
 
-App::App() : EditorialElement("app-")
+App::App() : EditorialElement(APP, "app-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
     Reset();
 }
 
-App::App(EditorialLevel level) : EditorialElement("app-")
+App::App(EditorialLevel level) : EditorialElement(APP, "app-")
 {
     m_level = level;
 

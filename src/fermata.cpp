@@ -26,7 +26,12 @@ namespace vrv {
 static const ClassRegistrar<Fermata> s_factory("fermata", FERMATA);
 
 Fermata::Fermata()
-    : ControlElement("fermata-"), TimePointInterface(), AttColor(), AttExtSym(), AttFermataVis(), AttPlacementRelStaff()
+    : ControlElement(FERMATA, "fermata-")
+    , TimePointInterface()
+    , AttColor()
+    , AttExtSym()
+    , AttFermataVis()
+    , AttPlacementRelStaff()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
