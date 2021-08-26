@@ -2192,6 +2192,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 namespace pae {
 
     static const char CONTAINER_END = '~';
+    static const std::string INTERNAL_CHARS = "QXY";
     static const char OCTAVEUP = '\'';
     static const char OCTAVEDOWN = ',';
     static const char KEYSIG_START = '$';
@@ -2213,15 +2214,15 @@ namespace pae {
 
     bool Token::Is(ClassId classId) { return (m_object && m_object->Is(classId)); }
 
+    bool Token::IsContainerEnd() { return (m_object && (m_char == pae::CONTAINER_END)); }
+
     bool Token::IsEnd() { return (!m_object && (m_char == pae::CONTAINER_END)); }
+
+    bool Token::IsSpace() { return m_char == ' '; }
 
 } // namespace pae
 
-PAEInput2::PAEInput2(Doc *doc)
-    : // This is pretty bad. We open a bad fileoinputstream as we don't use it
-    Input(doc)
-{
-}
+PAEInput2::PAEInput2(Doc *doc) : Input(doc) {}
 
 PAEInput2::~PAEInput2()
 {
@@ -2233,12 +2234,22 @@ void PAEInput2::ClearTokenObjects()
     // Before we clear the pae list of tokens, we need to delete all token objects.
     // Normally, they should be none because they are passed to the doc.
     for (auto &token : m_pae) {
-        if (!token.m_object) continue;
+        if (!token.m_object || token.IsContainerEnd()) continue;
         LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
         delete token.m_object;
         token.m_object = NULL;
     }
     m_pae.clear();
+}
+
+void PAEInput2::LogPAE(const char *fmt)
+{
+    if (m_pedanticMode) {
+        LogError(StringFormat("PAE: %s", fmt).c_str());
+    }
+    else {
+        LogWarning(StringFormat("PAE: %s", fmt).c_str());
+    }
 }
 
 bool PAEInput2::Is(pae::Token &token, const std::string &map)
@@ -2304,6 +2315,9 @@ bool PAEInput2::Import(const std::string &input)
         for (char c : data) {
             // Ignore the charcter that is use internally as container end Token
             if (c == pae::CONTAINER_END) continue;
+            // Ignore some additional internal characters
+            if (pae::INTERNAL_CHARS.find(c) != std::string::npos) continue;
+            // Otherwise go ahead
             m_pae.push_back(pae::Token(c));
         }
     }
@@ -2317,6 +2331,8 @@ bool PAEInput2::Import(const std::string &input)
     m_pae.push_back(pae::Token(pae::CONTAINER_END));
 
     m_isMensural = false;
+
+    m_pedanticMode = false;
 
     return this->Parse();
 }
@@ -2340,6 +2356,11 @@ bool PAEInput2::Parse()
     if (success) success = this->ConvertGraceGrp();
 
     if (success) success = this->ConvertGrace();
+
+    if (m_pedanticMode && !success) {
+        this->ClearTokenObjects();
+        return false;
+    }
 
     m_doc->Reset();
     m_doc->SetType(Raw);
@@ -2373,7 +2394,7 @@ bool PAEInput2::Parse()
         // Double check that we don't have more than the layer on the layerStack
         if (token.IsEnd()) {
             if (layerElementContainers.size() > 1) {
-                LogDebug("PAE: The layer element container stack should not have more than one element");
+                LogDebug("The layer element container stack should not have more than one element");
             }
             continue;
         }
@@ -2398,7 +2419,7 @@ bool PAEInput2::Parse()
             staff->AddChild(layer);
             // Clear the layer element container stack (only max 1 should be left) and the new layer
             if (layerElementContainers.size() > 1) {
-                LogDebug("PAE: The layer element container stack should not have more than one element");
+                LogDebug("The layer element container stack should not have more than one element");
             }
             layerElementContainers.clear();
             layerElementContainers.push_back(layer);
@@ -2413,8 +2434,10 @@ bool PAEInput2::Parse()
             }
             // For now ignore additional changes - not sure how these should be handled in MEI anyway
             if (scoreDefChange->FindDescendantByType(token.m_object->GetClassId())) {
-                LogDebug(
-                    "PAE: %s change cannot occur more than once in a measure", token.m_object->GetClassName().c_str());
+                LogPAE(StringFormat(
+                    "%s change cannot occur more than once in a measure", token.m_object->GetClassName().c_str())
+                           .c_str());
+                if (m_pedanticMode) return false;
                 delete token.m_object;
             }
             else {
@@ -2440,21 +2463,21 @@ bool PAEInput2::Parse()
             if (token.m_char == pae::CONTAINER_END) {
                 // Do check that we still have more than the layer before poping it from the stack
                 if (layerElementContainers.size() < 2) {
-                    LogDebug("PAE: The layer element container stack should have a least two elements");
+                    LogDebug("The layer element container stack should have a least two elements");
                     continue;
                 }
                 // Also double check that the open / close element is actually the same
                 if (layerElementContainers.back() != element) {
-                    LogDebug("PAE: The layer element container stack top and the container end should match");
+                    LogDebug("The layer element container stack top and the container end should match");
                 }
                 // Simply pop it and continue
                 layerElementContainers.pop_back();
                 continue;
             }
 
-            // Something when really wrong... Still delete the element to avoid a memory leak
+            // Something went really wrong... Still delete the element to avoid a memory leak
             if (layerElementContainers.empty()) {
-                LogDebug("PAE: The layer element container stack should have a least one element");
+                LogDebug("The layer element container stack should have a least one element");
                 delete element;
                 continue;
             }
@@ -2467,7 +2490,7 @@ bool PAEInput2::Parse()
         }
     }
 
-    // We should have not object left, just in case they need to be delete.
+    // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
 
     m_doc->ConvertToPageBasedDoc();
@@ -2490,12 +2513,17 @@ bool PAEInput2::ConvertKeySig()
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
             }
+            else if (!token.IsSpace()) {
+                LogPAE("Missig ' ' after a key signature change");
+                if (m_pedanticMode) return false;
+            }
             else {
                 keySigToken->m_char = 0;
                 // LogDebug("Keysig %s", paeStr.c_str());
                 KeySig *keySig = new KeySig();
-                this->ParseKeySig(keySig, paeStr);
                 keySigToken->m_object = keySig;
+                // Will fail in pedantic mode
+                if (!this->ParseKeySig(keySig, paeStr)) return false;
                 keySigToken = NULL;
             }
         }
@@ -2519,12 +2547,17 @@ bool PAEInput2::ConvertClef()
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
             }
+            else if (!token.IsSpace()) {
+                LogPAE("Missig ' ' after a clef change");
+                if (m_pedanticMode) return false;
+            }
             else {
                 clefToken->m_char = 0;
                 // LogDebug("Clef %s", paeStr.c_str());
                 Clef *clef = new Clef();
-                this->ParseClef(clef, paeStr);
                 clefToken->m_object = clef;
+                // Will fail in pedantic mode
+                if (!this->ParseClef(clef, paeStr)) return false;
                 clefToken = NULL;
             }
         }
@@ -2548,18 +2581,24 @@ bool PAEInput2::ConvertMeterSigOrMensur()
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
             }
+            else if (!token.IsSpace()) {
+                LogPAE("Missig ' ' after a meter signature change");
+                if (m_pedanticMode) return false;
+            }
             else {
                 meterSigOfMensurToken->m_char = 0;
                 // LogDebug("MeterSig %s", paeStr.c_str());
                 if (m_isMensural) {
                     Mensur *mensur = new Mensur();
-                    this->ParseMensur(mensur, paeStr);
                     meterSigOfMensurToken->m_object = mensur;
+                    // Will fail in pedantic mode
+                    if (!this->ParseMensur(mensur, paeStr)) return false;
                 }
                 else {
                     MeterSig *meterSig = new MeterSig();
-                    this->ParseMeterSig(meterSig, paeStr);
                     meterSigOfMensurToken->m_object = meterSig;
+                    // Will fail in pedantic mode
+                    if (!this->ParseMeterSig(meterSig, paeStr)) return false;
                 }
                 meterSigOfMensurToken = NULL;
             }
@@ -2632,6 +2671,7 @@ bool PAEInput2::ConvertOctave()
             Note *note = dynamic_cast<Note *>(token.m_object);
             assert(note);
             note->SetOct(oct);
+            note->SetDur(DURATION_8);
         }
     }
 
@@ -2648,7 +2688,8 @@ bool PAEInput2::ConvertBeam()
         if (token->m_char == '{') {
             token->m_char = 0;
             if (beam) {
-                LogDebug("PAE: Nested beams are not supported and will be ignored");
+                LogPAE("Nested beams are not supported");
+                if (m_pedanticMode) return false;
                 ++token;
                 continue;
             }
@@ -2658,7 +2699,8 @@ bool PAEInput2::ConvertBeam()
         else if (token->m_char == '}') {
             token->m_char = 0;
             if (!beam) {
-                LogDebug("PAE: Irrelevant closing beam ignored");
+                LogPAE("Irrelevant closing beam");
+                if (m_pedanticMode) return false;
                 ++token;
                 continue;
             }
@@ -2668,7 +2710,8 @@ bool PAEInput2::ConvertBeam()
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (beam) {
-                LogDebug("PAE: Unclose beam at the end of a measure");
+                LogPAE("Unclose beam at the end of a measure");
+                if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, beam));
                 beam = NULL;
             }
@@ -2706,7 +2749,8 @@ bool PAEInput2::ConvertGraceGrp()
         if (token->m_char == 'Q') {
             token->m_char = 0;
             if (graceGrp) {
-                LogDebug("PAE: Nested grace groups are not supported and will be ignored");
+                LogPAE("Nested grace groups are not supported");
+                if (m_pedanticMode) return false;
                 ++token;
                 continue;
             }
@@ -2716,7 +2760,8 @@ bool PAEInput2::ConvertGraceGrp()
         else if (token->m_char == 'r') {
             token->m_char = 0;
             if (!graceGrp) {
-                LogDebug("PAE: Irrelevant closing grace group ignored");
+                LogPAE("Irrelevant closing grace group");
+                if (m_pedanticMode) return false;
                 ++token;
                 continue;
             }
@@ -2726,13 +2771,15 @@ bool PAEInput2::ConvertGraceGrp()
         }
         else if (this->Is(*token, pae::GRACE)) {
             if (graceGrp) {
-                LogDebug("PAE: Grace within a grace group is not supported and will be ignored");
+                LogPAE("Grace within a grace group is not supported");
+                if (m_pedanticMode) return false;
                 token->m_char = 0;
             }
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (graceGrp) {
-                LogDebug("PAE: Unclose grace group at the end of a measure");
+                LogPAE("Unclose grace group at the end of a measure");
+                if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, graceGrp));
                 graceGrp = NULL;
             }
@@ -2752,7 +2799,7 @@ bool PAEInput2::ConvertGrace()
     return true;
 }
 
-void PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr)
+bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr)
 {
     assert(keySig);
 
@@ -2829,19 +2876,21 @@ void PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr)
     else {
         keySig->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
     }
+    return true;
 }
 
-void PAEInput2::ParseClef(Clef *clef, const std::string &paeStr)
+bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr)
 {
     assert(clef);
 
     clef->Reset();
 
     if (paeStr.size() < 3) {
-        LogDebug("PAE: Clef content cannot be parsed and will be set to G-2");
+        LogPAE("Clef content cannot be parsed (G-2 in non pedantic mode)");
+        if (m_pedanticMode) return false;
         clef->SetLine(2);
         clef->SetShape(CLEFSHAPE_G);
-        return;
+        return true;
     }
 
     char clefShape = paeStr.at(0);
@@ -2867,21 +2916,24 @@ void PAEInput2::ParseClef(Clef *clef, const std::string &paeStr)
         clef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogDebug("PAE: undefined clef '%s'", paeStr.c_str());
+        LogPAE(StringFormat("Undefined clef '%s'", paeStr.c_str()).c_str());
+        if (m_pedanticMode) return false;
     }
+    return true;
 }
 
-void PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr)
+bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr)
 {
     assert(meterSig);
 
     meterSig->Reset();
 
     if (paeStr.size() < 1) {
-        LogDebug("PAE: MeterSig content cannot be parsed and will be set to 4/4");
+        LogPAE("MeterSig content cannot be parsed (4/4 in non pedantic mode)");
+        if (m_pedanticMode) return false;
         meterSig->SetCount({ 4 });
         meterSig->SetUnit(4);
-        return;
+        return true;
     }
 
     std::cmatch matches;
@@ -2914,20 +2966,23 @@ void PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr)
         meterSig->SetUnit(2);
     }
     else {
-        LogWarning("PAE: unsupported time signature %s", paeStr.c_str());
+        LogPAE(StringFormat("Unsupported time signature %s", paeStr.c_str()).c_str());
+        if (m_pedanticMode) return false;
     }
+    return true;
 }
 
-void PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr)
+bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr)
 {
     assert(mensur);
 
     mensur->Reset();
 
     if (paeStr.size() < 1) {
-        LogDebug("PAE: Mensur content cannot be parsed and will be set to O");
+        LogPAE("Mensur content cannot be parsed (O in non pedantic mode");
+        if (m_pedanticMode) return false;
         mensur->SetSign(MENSURATIONSIGN_O);
-        return;
+        return true;
     }
 
     std::cmatch matches;
@@ -2965,8 +3020,10 @@ void PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr)
         }
     }
     else {
-        LogWarning("PAE: unsupported time signature: %s", paeStr.c_str());
+        LogPAE(StringFormat("Unsupported time signature: %s", paeStr.c_str()).c_str());
+        if (m_pedanticMode) return false;
     }
+    return true;
 }
 
 } // namespace vrv

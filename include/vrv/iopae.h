@@ -452,7 +452,9 @@ namespace pae {
         Token(char c, Object *object = NULL);
         virtual ~Token();
         bool Is(ClassId);
+        bool IsContainerEnd();
         bool IsEnd();
+        bool IsSpace();
 
         char m_char;
         Object *m_object;
@@ -498,13 +500,15 @@ private:
      * @name Methods that parse sub string instantiate corresponding objects
      */
     ///@{
-    void ParseKeySig(KeySig *keySig, const std::string &paeStr);
-    void ParseClef(Clef *clef, const std::string &paeStr);
-    void ParseMeterSig(MeterSig *meterSig, const std::string &paeStr);
-    void ParseMensur(Mensur *mensur, const std::string &paeStr);
+    bool ParseKeySig(KeySig *keySig, const std::string &paeStr);
+    bool ParseClef(Clef *clef, const std::string &paeStr);
+    bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr);
+    bool ParseMensur(Mensur *mensur, const std::string &paeStr);
     ///@}
 
     void ClearTokenObjects();
+
+    void LogPAE(const char *fmt);
 
 public:
     //
@@ -514,6 +518,8 @@ private:
     bool m_isMensural;
 
     int m_measureCount;
+
+    bool m_pedanticMode;
 };
 
 } // namespace vrv
