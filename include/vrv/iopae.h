@@ -458,6 +458,8 @@ namespace pae {
 
         char m_char;
         Object *m_object;
+        /** the input char preserved for debugging purposes */
+        char m_inputChar;
     };
 
 }; // namespace pae
@@ -489,6 +491,7 @@ private:
     bool ConvertMeterSigOrMensur();
     bool ConvertPitch();
     bool ConvertOctave();
+    bool ConvertFermata();
     bool ConvertAccidental();
     bool ConvertRest();
     bool ConvertBeam();
@@ -511,6 +514,8 @@ private:
     void ClearTokenObjects();
 
     void LogPAE(const char *fmt);
+
+    void LogDebugTokens(bool vertical = false);
 
 public:
     //

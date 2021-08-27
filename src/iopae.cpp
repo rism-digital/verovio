@@ -2210,6 +2210,7 @@ namespace pae {
     Token::Token(char c, Object *object)
     {
         m_char = c;
+        m_inputChar = c;
         m_object = object;
     }
 
@@ -2252,6 +2253,39 @@ void PAEInput2::LogPAE(const char *fmt)
     }
     else {
         LogWarning(StringFormat("PAE: %s", fmt).c_str());
+    }
+}
+
+void PAEInput2::LogDebugTokens(bool vertical)
+{
+    // For long incipits or to see full class name
+    if (vertical) {
+        for (auto &token : m_pae) {
+            char c1 = (token.m_char) ? token.m_char : ' ';
+            char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
+            std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
+            LogDebug(" %c | %c | %s", c1, c2, className.c_str());
+        }
+    }
+    else {
+        std::string row;
+        for (auto &token : m_pae) {
+            char c = (token.m_inputChar) ? token.m_inputChar : ' ';
+            row.push_back(c);
+        }
+        LogDebug(row.c_str());
+        row.clear();
+        for (auto &token : m_pae) {
+            std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
+            row.push_back(className.at(0));
+        }
+        LogDebug(row.c_str());
+        row.clear();
+        for (auto &token : m_pae) {
+            char c = (token.m_char) ? token.m_char : ' ';
+            row.push_back(c);
+        }
+        LogDebug(row.c_str());
     }
 }
 
@@ -2362,6 +2396,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertOctave();
 
+    if (success) success = this->ConvertFermata();
+
     if (success) success = this->ConvertAccidental();
 
     if (success) success = this->ConvertRest();
@@ -2371,6 +2407,8 @@ bool PAEInput2::Parse()
     if (success) success = this->ConvertGraceGrp();
 
     if (success) success = this->ConvertGrace();
+
+    LogDebugTokens();
 
     if (m_pedanticMode && !success) {
         this->ClearTokenObjects();
@@ -2502,6 +2540,11 @@ bool PAEInput2::Parse()
             if (element->Is({ BEAM, GRACEGRP })) {
                 layerElementContainers.push_back(element);
             }
+        }
+        else if (token.m_object->IsControlElement()) {
+            assert(currentMeasure);
+            currentMeasure->AddChild(token.m_object);
+            token.m_object = NULL;
         }
     }
 
@@ -2693,6 +2736,43 @@ bool PAEInput2::ConvertOctave()
     return true;
 }
 
+bool PAEInput2::ConvertFermata()
+{
+    pae::Token *fermataToken = NULL;
+    std::string noteUuid;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == '(') {
+            // Weird case - could be a
+            if (fermataToken) {
+                LogPAE("Invalid ( after a (");
+                if (m_pedanticMode) return false;
+            }
+            fermataToken = &token;
+        }
+        else if (fermataToken) {
+            if (token.Is(NOTE)) {
+                noteUuid = token.m_object->GetUuid();
+                continue;
+            }
+            else if (token.m_char == ')') {
+                Fermata *fermata = new Fermata();
+                fermataToken->m_object = fermata;
+                fermata->SetStartid("#" + noteUuid);
+                fermataToken->m_char = 0;
+                token.m_char = 0;
+                fermataToken = NULL;
+            }
+            else {
+                // Leave everything as is - the ( should be a tuplet start
+                fermataToken = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool PAEInput2::ConvertAccidental()
 {
     data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
@@ -2718,8 +2798,8 @@ bool PAEInput2::ConvertAccidental()
                 note->AddChild(accid);
                 accidental = ACCIDENTAL_WRITTEN_NONE;
             }
-            // Potentially a fermata - this is OK
-            else if (token.m_char == '(') {
+            // The note has a fermata, one more step to get it
+            else if (token.Is(FERMATA)) {
                 continue;
             }
             else {
