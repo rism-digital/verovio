@@ -2345,6 +2345,8 @@ bool PAEInput2::Import(const std::string &input)
 
     // Add a measure at the beginning of the data because there is always at least one measure
     Measure *measure = new Measure(true, 1);
+    // By default there is no end barline on an incipit
+    measure->SetRight(BARRENDITION_invis);
     m_pae.push_back(pae::Token(0, measure));
 
     if (jsonInput.has<jsonxx::String>("data")) {
@@ -2634,9 +2636,9 @@ bool PAEInput2::ConvertMeasure()
     int measureCount = 1;
 
     for (auto &token : m_pae) {
+        // This is the first (default) measure added to the tokens ::Import
         if (token.Is(MEASURE)) {
             currentMeasure = dynamic_cast<Measure *>(token.m_object);
-            currentMeasure->SetRight(BARRENDITION_invis);
             assert(currentMeasure);
         }
         if (this->Is(token, pae::MEASURE)) {
@@ -2649,7 +2651,7 @@ bool PAEInput2::ConvertMeasure()
         else if (measureToken) {
             // When reaching a barline, we need to set it to the previous measure (@right)
             if (!this->ParseMeasure(currentMeasure, paeStr)) return false;
-            // We can not create a new measure
+            // We can now create a new measure
             measureCount++;
             currentMeasure = new Measure(true, measureCount);
             currentMeasure->SetRight(BARRENDITION_invis);
