@@ -489,6 +489,7 @@ private:
     bool ConvertMeterSigOrMensur();
     bool ConvertPitch();
     bool ConvertOctave();
+    bool ConvertAccidental();
     bool ConvertRest();
     bool ConvertBeam();
     bool ConvertGrace();

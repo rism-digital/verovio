@@ -651,7 +651,6 @@ bool Toolkit::LoadData(const std::string &data)
             delete input;
             return false;
         }
-
         // }
     }
 
