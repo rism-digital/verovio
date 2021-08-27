@@ -2628,42 +2628,6 @@ bool PAEInput2::ConvertClef()
     return true;
 }
 
-bool PAEInput2::ConvertMeasure()
-{
-    Measure *currentMeasure;
-    pae::Token *measureToken = NULL;
-    std::string paeStr;
-    int measureCount = 1;
-
-    for (auto &token : m_pae) {
-        // This is the first (default) measure added to the tokens ::Import
-        if (token.Is(MEASURE)) {
-            currentMeasure = dynamic_cast<Measure *>(token.m_object);
-            assert(currentMeasure);
-        }
-        if (this->Is(token, pae::MEASURE)) {
-            if (!measureToken) {
-                measureToken = &token;
-            }
-            paeStr.push_back(token.m_char);
-            token.m_char = 0;
-        }
-        else if (measureToken) {
-            // When reaching a barline, we need to set it to the previous measure (@right)
-            if (!this->ParseMeasure(currentMeasure, paeStr)) return false;
-            // We can now create a new measure
-            measureCount++;
-            currentMeasure = new Measure(true, measureCount);
-            currentMeasure->SetRight(BARRENDITION_invis);
-            measureToken->m_object = currentMeasure;
-            measureToken = NULL;
-            paeStr.clear();
-        }
-    }
-
-    return true;
-}
-
 bool PAEInput2::ConvertMeterSigOrMensur()
 {
     pae::Token *meterSigOrMensurToken = NULL;
@@ -2700,6 +2664,42 @@ bool PAEInput2::ConvertMeterSigOrMensur()
                 }
                 meterSigOrMensurToken = NULL;
             }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertMeasure()
+{
+    Measure *currentMeasure;
+    pae::Token *measureToken = NULL;
+    std::string paeStr;
+    int measureCount = 1;
+
+    for (auto &token : m_pae) {
+        // This is the first (default) measure added to the tokens ::Import
+        if (token.Is(MEASURE)) {
+            currentMeasure = dynamic_cast<Measure *>(token.m_object);
+            assert(currentMeasure);
+        }
+        if (this->Is(token, pae::MEASURE)) {
+            if (!measureToken) {
+                measureToken = &token;
+            }
+            paeStr.push_back(token.m_char);
+            token.m_char = 0;
+        }
+        else if (measureToken) {
+            // When reaching a barline, we need to set it to the previous measure (@right)
+            if (!this->ParseMeasure(currentMeasure, paeStr)) return false;
+            // We can now create a new measure
+            measureCount++;
+            currentMeasure = new Measure(true, measureCount);
+            currentMeasure->SetRight(BARRENDITION_invis);
+            measureToken->m_object = currentMeasure;
+            measureToken = NULL;
+            paeStr.clear();
         }
     }
 
