@@ -75,6 +75,8 @@ Doc::Doc() : Object(DOC, "doc-")
 {
     m_options = new Options();
 
+    m_abort = false;
+
     Reset();
 }
 
@@ -511,6 +513,10 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &real
 
 void Doc::PrepareDrawing()
 {
+    if (this->AbortRequested()) {
+        return;
+    }
+
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
         this->Process(&resetDrawing, NULL);
@@ -901,6 +907,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         return;
     }
 
+    if (this->AbortRequested()) {
+        return;
+    }
+
     std::list<Score *> scores = this->GetScores();
     assert(!scores.empty());
 
@@ -909,6 +919,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     Page *unCastOffPage = this->SetDrawingPage(0);
     assert(unCastOffPage);
     unCastOffPage->LayOutHorizontally();
+
+    if (this->AbortRequested()) {
+        return;
+    }
 
     Page *castOffSinglePage = new Page();
 
@@ -937,6 +951,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     pages->AddChild(castOffSinglePage);
     this->ResetDrawingPage();
     this->SetDrawingPage(0);
+
+    if (this->AbortRequested()) {
+        return;
+    }
 
     bool optimize = false;
     for (auto const score : scores) {

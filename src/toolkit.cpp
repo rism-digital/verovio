@@ -1105,6 +1105,16 @@ void Toolkit::ResetXmlIdSeed(int seed)
     Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
 }
 
+void Toolkit::CancelLayout()
+{
+    m_doc.SetAbortMode(true);
+}
+
+void Toolkit::ContinueLayout()
+{
+    m_doc.SetAbortMode(false);
+}
+
 void Toolkit::ResetLogBuffer()
 {
     logBuffer.clear();
@@ -1152,11 +1162,16 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         return false;
     }
 
+    if (m_doc.AbortRequested()) {
+        return true;
+    }
+
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
     // Get the current system for the SVG clipping size
     m_view.SetPage(pageNo);
+    if (m_doc.AbortRequested()) return true;
 
     // Adjusting page width and height according to the options
     int width = m_options->m_pageWidth.GetUnfactoredValue();
@@ -1284,6 +1299,10 @@ void Toolkit::GetHumdrum(std::ostream &output)
 
 std::string Toolkit::RenderToMIDI()
 {
+    if (m_doc.AbortRequested()) {
+        return "";
+    }
+
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
@@ -1301,6 +1320,10 @@ std::string Toolkit::RenderToMIDI()
 
 std::string Toolkit::RenderToPAE()
 {
+    if (m_doc.AbortRequested()) {
+        return "";
+    }
+
     this->ResetLogBuffer();
 
     if (GetPageCount() == 0) {
@@ -1318,6 +1341,10 @@ std::string Toolkit::RenderToPAE()
 
 bool Toolkit::RenderToPAEFile(const std::string &filename)
 {
+    if (m_doc.AbortRequested()) {
+        return true;
+    }
+
     this->ResetLogBuffer();
 
     std::string outputString = this->RenderToPAE();
@@ -1333,6 +1360,10 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
 
 std::string Toolkit::RenderToTimemap()
 {
+    if (m_doc.AbortRequested()) {
+        return "";
+    }
+
     this->ResetLogBuffer();
 
     std::string output;
@@ -1397,6 +1428,10 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
+    if (m_doc.AbortRequested()) {
+        return true;
+    }
+
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
@@ -1410,6 +1445,10 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
 
 bool Toolkit::RenderToTimemapFile(const std::string &filename)
 {
+    if (m_doc.AbortRequested()) {
+        return true;
+    }
+
     this->ResetLogBuffer();
 
     std::string outputString;

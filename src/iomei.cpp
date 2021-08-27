@@ -4195,6 +4195,10 @@ bool MEIInput::ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
 
 bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
 {
+    if (m_doc->AbortRequested()) {
+        return true;
+    }
+
     Measure *vrvMeasure = new Measure();
     if (m_doc->IsMensuralMusicOnly()) {
         LogWarning("Mixing mensural and non mensural music is not supported. Trying to go ahead...");

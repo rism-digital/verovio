@@ -574,6 +574,26 @@ public:
     ///@{
 
     /**
+     * Cancel the layout process
+     *
+     * This aborts (shortcuts) subsequent calls to the toolkit instance.
+     *
+     * Should be called from another thread.
+     *
+     * @ingroup nodoc
+     */
+    void CancelLayout();
+
+    /**
+     * Continue without aborting (shortcutting) subsequent calls to the toolkit instance.
+     *
+     * May be called from another thread.
+     *
+     * @ingroup nodoc
+     */
+    void ContinueLayout();
+
+    /**
      * Render the page to the deviceContext
      *
      * Page number is 1-based.
