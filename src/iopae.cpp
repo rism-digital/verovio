@@ -2206,6 +2206,7 @@ namespace pae {
     static const std::string MREST = "=0123456789";
     // preprocessing of the data replaces xx with X and bb with Y
     static const std::string ACCIDENTAL_INTERNAL = "xbnXY";
+    static const std::string MEASURE = ":/";
 
     Token::Token(char c, Object *object)
     {
@@ -2342,9 +2343,8 @@ bool PAEInput2::Import(const std::string &input)
         jsonInput = this->InputKeysToJson(input);
     }
 
-    m_measureCount = 1;
     // Add a measure at the beginning of the data because there is always at least one measure
-    Measure *measure = new Measure(true, m_measureCount);
+    Measure *measure = new Measure(true, 1);
     m_pae.push_back(pae::Token(0, measure));
 
     if (jsonInput.has<jsonxx::String>("data")) {
@@ -2391,6 +2391,8 @@ bool PAEInput2::Parse()
     if (success) success = this->ConvertClef();
 
     if (success) success = this->ConvertMeterSigOrMensur();
+
+    if (success) success = this->ConvertMeasure();
 
     if (success) success = this->ConvertPitch();
 
@@ -2618,6 +2620,42 @@ bool PAEInput2::ConvertClef()
                 if (!this->ParseClef(clef, paeStr)) return false;
                 clefToken = NULL;
             }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertMeasure()
+{
+    Measure *currentMeasure;
+    pae::Token *measureToken = NULL;
+    std::string paeStr;
+    int measureCount = 1;
+
+    for (auto &token : m_pae) {
+        if (token.Is(MEASURE)) {
+            currentMeasure = dynamic_cast<Measure *>(token.m_object);
+            currentMeasure->SetRight(BARRENDITION_invis);
+            assert(currentMeasure);
+        }
+        if (this->Is(token, pae::MEASURE)) {
+            if (!measureToken) {
+                measureToken = &token;
+            }
+            paeStr.push_back(token.m_char);
+            token.m_char = 0;
+        }
+        else if (measureToken) {
+            // When reaching a barline, we need to set it to the previous measure (@right)
+            if (!this->ParseMeasure(currentMeasure, paeStr)) return false;
+            // We can not create a new measure
+            measureCount++;
+            currentMeasure = new Measure(true, measureCount);
+            currentMeasure->SetRight(BARRENDITION_invis);
+            measureToken->m_object = currentMeasure;
+            measureToken = NULL;
+            paeStr.clear();
         }
     }
 
@@ -3174,6 +3212,35 @@ bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr)
         LogPAE(StringFormat("Unsupported time signature: %s", paeStr.c_str()).c_str());
         if (m_pedanticMode) return false;
     }
+    return true;
+}
+
+bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr)
+{
+    assert(measure);
+
+    if (paeStr == "/") {
+        measure->SetRight(BARRENDITION_single);
+    }
+    else if (paeStr == "//") {
+        measure->SetRight(BARRENDITION_dbl);
+    }
+    else if (paeStr == "://") {
+        measure->SetRight(BARRENDITION_rptend);
+    }
+    else if (paeStr == "//:") {
+        measure->SetRight(BARRENDITION_rptstart);
+    }
+    else if (paeStr == "://:") {
+        measure->SetRight(BARRENDITION_rptboth);
+    }
+    else {
+        LogPAE(StringFormat("Unsupported barline: %s", paeStr.c_str()).c_str());
+        if (m_pedanticMode) return false;
+        // Put a single line by default in non pedantic mode
+        measure->SetRight(BARRENDITION_single);
+    }
+
     return true;
 }
 

@@ -489,6 +489,7 @@ private:
     bool ConvertKeySig();
     bool ConvertClef();
     bool ConvertMeterSigOrMensur();
+    bool ConvertMeasure();
     bool ConvertPitch();
     bool ConvertOctave();
     bool ConvertFermata();
@@ -509,6 +510,7 @@ private:
     bool ParseClef(Clef *clef, const std::string &paeStr);
     bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr);
     bool ParseMensur(Mensur *mensur, const std::string &paeStr);
+    bool ParseMeasure(Measure *measure, const std::string &paeStr);
     ///@}
 
     void ClearTokenObjects();
@@ -523,8 +525,6 @@ private:
     std::list<pae::Token> m_pae;
 
     bool m_isMensural;
-
-    int m_measureCount;
 
     bool m_pedanticMode;
 };
