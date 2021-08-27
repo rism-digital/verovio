@@ -618,8 +618,8 @@ void Object::SetParent(Object *parent)
 bool Object::IsSupportedChild(Object *child)
 {
     // This should never happen because the method should be overridden
-    LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
-    assert(false);
+    LogDebug("Method for adding %s to %s should be overridden", child->GetClassName().c_str(), this->GetClassName().c_str());
+    // assert(false);
     return false;
 }
 
