@@ -490,6 +490,7 @@ private:
     bool ConvertClef();
     bool ConvertMeterSigOrMensur();
     bool ConvertMeasure();
+    bool ConvertMRestOrMultiRest();
     bool ConvertPitch();
     bool ConvertOctave();
     bool ConvertFermata();

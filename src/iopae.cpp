@@ -2203,7 +2203,6 @@ namespace pae {
     static const std::string METERSIG = "/o.c0123456789";
     static const std::string GRACE = "qg";
     static const std::string NOTENAME = "ABCDEFG";
-    static const std::string MREST = "=0123456789";
     // preprocessing of the data replaces xx with X and bb with Y
     static const std::string ACCIDENTAL_INTERNAL = "xbnXY";
     static const std::string MEASURE = ":/";
@@ -2395,6 +2394,8 @@ bool PAEInput2::Parse()
     if (success) success = this->ConvertMeterSigOrMensur();
 
     if (success) success = this->ConvertMeasure();
+
+    if (success) success = this->ConvertMRestOrMultiRest();
 
     if (success) success = this->ConvertPitch();
 
@@ -2700,6 +2701,43 @@ bool PAEInput2::ConvertMeasure()
             measureToken->m_object = currentMeasure;
             measureToken = NULL;
             paeStr.clear();
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertMRestOrMultiRest()
+{
+    pae::Token *mRestOrMultiRestToken = NULL;
+    std::string paeStr;
+
+    for (auto &token : m_pae) {
+        if (token.m_char == '=') {
+            if (mRestOrMultiRestToken) {
+                LogPAE("Invalid = after a =");
+                if (m_pedanticMode) return false;
+            }
+            mRestOrMultiRestToken = &token;
+            token.m_char = 0;
+        }
+        else if (mRestOrMultiRestToken) {
+            if (isdigit(token.m_char)) {
+                paeStr.push_back(token.m_char);
+                token.m_char = 0;
+            }
+            else {
+                if (paeStr.empty() || paeStr == "1") {
+                    mRestOrMultiRestToken->m_object = new MRest();
+                }
+                else {
+                    MultiRest *multiRest = new MultiRest();
+                    multiRest->SetNum(atoi(paeStr.c_str()));
+                    mRestOrMultiRestToken->m_object = multiRest;
+                }
+                mRestOrMultiRestToken = NULL;
+                paeStr.clear();
+            }
         }
     }
 
