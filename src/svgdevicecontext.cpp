@@ -183,6 +183,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     }
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, object->GetClassName(), gClass, primary);
+    AppendAdditionalAttributes(object);
 
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
@@ -292,6 +293,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
     m_currentNode = AppendChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, object->GetClassName(), gClass);
+    AppendAdditionalAttributes(object);
 
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
@@ -972,6 +974,33 @@ void SvgDeviceContext::AppendIdAndClass(std::string gId, std::string baseClass, 
         baseClass.append(" " + addedClasses);
     }
     m_currentNode.append_attribute("class") = baseClass.c_str();
+}
+
+void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
+{
+    std::string baseClass = object->GetClassName();
+    std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
+    for (std::string attributeLine : m_svgAdditionalAttributes) {
+        std::string className
+            = attributeLine.substr(0, attributeLine.find("@")); // parse element@attribute: "note@pname"
+        if (className == baseClass) { // if appropriate class name...
+            std::string attributeName = attributeLine.substr(attributeLine.find("@") + 1);
+            ArrayOfStrAttr attributes;
+            object->GetAttributes(&attributes);
+            ArrayOfStrAttr::iterator iter;
+            bool found = false;
+            for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
+                if (attributeName == (*iter).first) // ...and attribute exists, add it to SVG element
+                {
+                    m_currentNode.append_attribute(("data-" + attributeName).c_str()) = (*iter).second.c_str();
+                    found = true;
+                }
+            }
+            if (!found)
+                LogWarning(
+                    "No attribute '%s' in '%s', nothing added to SVG.", attributeName.c_str(), className.c_str());
+        }
+    }
 }
 
 std::string SvgDeviceContext::GetColour(int colour)

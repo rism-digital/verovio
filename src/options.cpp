@@ -1020,19 +1020,25 @@ Options::Options()
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
 
     m_svgHtml5.SetInfo("Output SVG for HTML5 embedding",
-        "Write data-id and data-class attributes for JS usage and id clash avoidance.");
+        "Write data-id and data-class attributes for JS usage and id clash avoidance");
     m_svgHtml5.Init(false);
     this->Register(&m_svgHtml5, "svgHtml5", &m_general);
 
     m_svgFormatRaw.SetInfo(
-        "Raw formatting for SVG output", "Writes SVG out with no line indenting or non-content newlines.");
+        "Raw formatting for SVG output", "Writes SVG out with no line indenting or non-content newlines");
     m_svgFormatRaw.Init(false);
     this->Register(&m_svgFormatRaw, "svgFormatRaw", &m_general);
 
     m_svgRemoveXlink.SetInfo("Remove xlink: from href attributes",
-        "Removes the xlink: prefix on href attributes for compatibility with some newer browsers.");
+        "Removes the xlink: prefix on href attributes for compatibility with some newer browsers");
     m_svgRemoveXlink.Init(false);
     this->Register(&m_svgRemoveXlink, "svgRemoveXlink", &m_general);
+
+    m_svgAdditionalAttribute.SetInfo("Add additional attribute in SVG",
+        "Add additional attribute for graphical elements in SVG as \"data-*\", for "
+        "example, \"note@pname\" would add a \"data-pname\" to all note elements");
+    m_svgAdditionalAttribute.Init();
+    this->Register(&m_svgAdditionalAttribute, "svgAdditionalAttribute", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
