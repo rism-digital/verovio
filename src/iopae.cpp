@@ -2666,15 +2666,15 @@ bool PAEInput2::ConvertMeasure()
 
 bool PAEInput2::ConvertMeterSigOrMensur()
 {
-    pae::Token *meterSigOfMensurToken = NULL;
+    pae::Token *meterSigOrMensurToken = NULL;
     std::string paeStr;
 
     for (auto &token : m_pae) {
         if (token.m_char == pae::METERSIG_START) {
-            meterSigOfMensurToken = &token;
+            meterSigOrMensurToken = &token;
             paeStr.clear();
         }
-        else if (meterSigOfMensurToken) {
+        else if (meterSigOrMensurToken) {
             if (this->Is(token, pae::METERSIG)) {
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
@@ -2684,21 +2684,21 @@ bool PAEInput2::ConvertMeterSigOrMensur()
                 if (m_pedanticMode) return false;
             }
             else {
-                meterSigOfMensurToken->m_char = 0;
+                meterSigOrMensurToken->m_char = 0;
                 // LogDebug("MeterSig %s", paeStr.c_str());
                 if (m_isMensural) {
                     Mensur *mensur = new Mensur();
-                    meterSigOfMensurToken->m_object = mensur;
+                    meterSigOrMensurToken->m_object = mensur;
                     // Will fail in pedantic mode
                     if (!this->ParseMensur(mensur, paeStr)) return false;
                 }
                 else {
                     MeterSig *meterSig = new MeterSig();
-                    meterSigOfMensurToken->m_object = meterSig;
+                    meterSigOrMensurToken->m_object = meterSig;
                     // Will fail in pedantic mode
                     if (!this->ParseMeterSig(meterSig, paeStr)) return false;
                 }
-                meterSigOfMensurToken = NULL;
+                meterSigOrMensurToken = NULL;
             }
         }
     }
