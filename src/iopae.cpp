@@ -2676,6 +2676,7 @@ bool PAEInput2::ConvertMeasure()
     Measure *currentMeasure;
     pae::Token *measureToken = NULL;
     std::string paeStr;
+    // measureCount is currently ignored by the Measure constructor
     int measureCount = 1;
 
     for (auto &token : m_pae) {
@@ -2694,11 +2695,13 @@ bool PAEInput2::ConvertMeasure()
         else if (measureToken) {
             // When reaching a barline, we need to set it to the previous measure (@right)
             if (!this->ParseMeasure(currentMeasure, paeStr)) return false;
-            // We can now create a new measure
-            measureCount++;
-            currentMeasure = new Measure(true, measureCount);
-            currentMeasure->SetRight(BARRENDITION_invis);
-            measureToken->m_object = currentMeasure;
+            // We can now create a new measure but not if we have reached the end of the data
+            if (!token.IsEnd()) {
+                measureCount++;
+                currentMeasure = new Measure(true, measureCount);
+                currentMeasure->SetRight(BARRENDITION_invis);
+                measureToken->m_object = currentMeasure;
+            }
             measureToken = NULL;
             paeStr.clear();
         }
