@@ -832,6 +832,9 @@ bool MEIOutput::WriteObjectEnd(Object *object)
     else if (m_scoreBasedMEI && (object->Is(PAGES))) {
         return true;
     }
+    else if (m_scoreBasedMEI && (object->Is(PAGE_ELEMENT_END)) && m_nodeStack.empty()) {
+        return true;
+    }
 
     if (object->HasClosingComment()) {
         m_currentNode.append_child(pugi::node_comment).set_value(object->GetClosingComment().c_str());
