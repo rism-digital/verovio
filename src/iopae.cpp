@@ -2203,6 +2203,9 @@ namespace pae {
     static const std::string METERSIG = "/o.c0123456789";
     static const std::string GRACE = "qg";
     static const std::string NOTENAME = "ABCDEFG";
+    static const std::string MREST = "=0123456789";
+    // preprocessing of the data replaces xx with X and bb with Y
+    static const std::string ACCIDENTAL_INTERNAL = "xbnXY";
 
     Token::Token(char c, Object *object)
     {
@@ -2358,6 +2361,8 @@ bool PAEInput2::Parse()
     if (success) success = this->ConvertPitch();
 
     if (success) success = this->ConvertOctave();
+
+    if (success) success = this->ConvertAccidental();
 
     if (success) success = this->ConvertRest();
 
@@ -2685,6 +2690,45 @@ bool PAEInput2::ConvertOctave()
         }
     }
 
+    return true;
+}
+
+bool PAEInput2::ConvertAccidental()
+{
+    data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
+
+    for (auto &token : m_pae) {
+        if (Is(token, pae::ACCIDENTAL_INTERNAL)) {
+            switch (token.m_char) {
+                case 'x': accidental = ACCIDENTAL_WRITTEN_s; break;
+                case 'b': accidental = ACCIDENTAL_WRITTEN_f; break;
+                case 'n': accidental = ACCIDENTAL_WRITTEN_n; break;
+                case 'X': accidental = ACCIDENTAL_WRITTEN_x; break;
+                case 'Y': accidental = ACCIDENTAL_WRITTEN_ff; break;
+                default: break;
+            }
+            token.m_char = 0;
+        }
+        else if (accidental != ACCIDENTAL_WRITTEN_NONE) {
+            if (token.Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(token.m_object);
+                assert(note);
+                Accid *accid = new Accid();
+                accid->SetAccid(accidental);
+                note->AddChild(accid);
+                accidental = ACCIDENTAL_WRITTEN_NONE;
+            }
+            // Potentially a fermata - this is OK
+            else if (token.m_char == '(') {
+                continue;
+            }
+            else {
+                LogPAE("Missing note after an accidental");
+                if (m_pedanticMode) return false;
+                accidental = ACCIDENTAL_WRITTEN_NONE;
+            }
+        }
+    }
     return true;
 }
 
