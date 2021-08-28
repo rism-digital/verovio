@@ -456,6 +456,8 @@ namespace pae {
         bool IsEnd();
         bool IsSpace();
 
+        std::string GetName();
+
         char m_char;
         Object *m_object;
         /** the input char preserved for debugging purposes */

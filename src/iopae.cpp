@@ -2224,6 +2224,14 @@ namespace pae {
 
     bool Token::IsSpace() { return m_char == ' '; }
 
+    std::string Token::GetName()
+    {
+        if (!m_object) return "?";
+        std::string name = m_object->GetClassName();
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        return name;
+    }
+
 } // namespace pae
 
 PAEInput2::PAEInput2(Doc *doc) : Input(doc) {}
@@ -2492,8 +2500,7 @@ bool PAEInput2::Parse()
             }
             // For now ignore additional changes - not sure how these should be handled in MEI anyway
             if (scoreDefChange->FindDescendantByType(token.m_object->GetClassId())) {
-                LogPAE(StringFormat(
-                    "%s change cannot occur more than once in a measure", token.m_object->GetClassName().c_str())
+                LogPAE(StringFormat("%s change cannot occur more than once in a measure", token.GetName().c_str())
                            .c_str());
                 if (m_pedanticMode) return false;
                 delete token.m_object;
