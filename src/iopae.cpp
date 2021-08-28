@@ -2260,7 +2260,7 @@ void PAEInput2::LogPAE(const char *fmt)
         LogError(StringFormat("PAE: %s", fmt).c_str());
     }
     else {
-        LogWarning(StringFormat("PAE: %s", fmt).c_str());
+        // LogWarning(StringFormat("PAE: %s", fmt).c_str());
     }
 }
 
@@ -2863,7 +2863,8 @@ bool PAEInput2::ConvertFermata()
                 mRest = false;
             }
             else {
-                // PAE guidelines
+                // PAE guidelines are ambiguous because they say fermata should contain only a single rest sign (=)
+                // but at the same time allow =1 for a mrest - in non pendantic mode we want to support (=1)
                 if (mRest && isdigit(token.m_inputChar)) {
                     LogPAE(StringFormat("Fermata on measure rest with extraneous %c", token.m_inputChar).c_str());
                     if (m_pedanticMode) return false;
