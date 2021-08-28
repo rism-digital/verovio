@@ -2423,6 +2423,8 @@ bool PAEInput2::Parse()
 
     LogDebugTokens();
 
+    if (success) success = this->CheckHierarchy();
+
     if (m_pedanticMode && !success) {
         this->ClearTokenObjects();
         return false;
@@ -3048,11 +3050,102 @@ bool PAEInput2::ConvertGraceGrp()
 
 bool PAEInput2::ConvertGrace()
 {
-    pae::Token *graceGrpToken = NULL;
+    pae::Token *graceToken = NULL;
 
     // TODO
 
     return true;
+}
+
+bool PAEInput2::CheckHierarchy()
+{
+    std::list<pae::Token *> stack;
+    // A reference layer to test with
+    Layer layer;
+    pae::Token layerToken('_', &layer);
+
+    bool isValid = false;
+
+    while (!isValid) {
+        isValid = true;
+        for (auto &token : m_pae) {
+            if (!token.m_object) continue;
+
+            if (token.m_object->Is(MEASURE)) {
+                stack.clear();
+                stack.push_back(&layerToken);
+            }
+
+            if (!token.m_object->IsLayerElement()) continue;
+
+            // These will be added to a scoreDef
+            if (token.m_object->Is({ KEYSIG, METERSIG, MENSUR })) continue;
+
+            // Test is the element is supported by the current top container
+            if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object)) {
+                LogPAE(StringFormat("Invalid %s within %s", token.GetName().c_str(), stack.back()->GetName().c_str())
+                           .c_str());
+                if (m_pedanticMode) return false;
+                // Indicate that the data was not valid in this pass so we will check it again
+                isValid = false;
+                // Remove it and continue (do not add it to the stack anymore)
+                this->RemoveContainerToken(token.m_object);
+                continue;
+            }
+
+            // Add to the stack the layer element that are containers
+            if (token.m_object->Is({ BEAM, GRACEGRP })) {
+                // Begining of a container - simply push it to the stack
+                if (token.m_char != pae::CONTAINER_END) {
+                    stack.push_back(&token);
+                }
+                // End of a container - check for staggered opening and closing tags
+                else {
+                    // The object is not the same on top of the stack and the one we are popping - the hierarchy is
+                    // staggerred
+                    if (stack.back()->m_object != token.m_object) {
+                        LogPAE(StringFormat("Staggered %s / %s opening and closing tags", token.GetName().c_str(),
+                            stack.back()->GetName().c_str())
+                                   .c_str());
+                        if (m_pedanticMode) return false;
+                        // Indicate that the data was not valid in this pass so we will check it again
+                        isValid = false;
+                        // If we want ot continue, we should remove the  last one added from the tokens
+                        this->RemoveContainerToken(stack.back()->m_object);
+                        stack.pop_back();
+                        // We should also remove from the stack the object we were expecting
+                        auto it = std::remove_if(stack.begin(), stack.end(),
+                            [&token](const pae::Token *tokenIt) { return (tokenIt->m_object == token.m_object); });
+                        stack.erase(it, stack.end());
+                    }
+                    // This is all good, simply pop it
+                    else {
+                        stack.pop_back();
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+void PAEInput2::RemoveContainerToken(Object *object)
+{
+    bool deleted = false;
+    for (auto &token : m_pae) {
+        if (!token.m_object) continue;
+        if (token.m_object == object) {
+            if (!token.IsContainerEnd()) {
+                // Make sure we delete it only once - even though it should never be there more than once
+                LogDebug("Deleting %s", object->GetClassName().c_str());
+                if (!deleted) delete token.m_object;
+                deleted = true;
+            }
+            token.m_char = 0;
+            token.m_object = NULL;
+        }
+    }
 }
 
 bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr)

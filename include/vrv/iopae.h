@@ -516,7 +516,11 @@ private:
     bool ParseMeasure(Measure *measure, const std::string &paeStr);
     ///@}
 
+    bool CheckHierarchy();
+
     void ClearTokenObjects();
+
+    void RemoveContainerToken(Object *);
 
     void LogPAE(const char *fmt);
 
