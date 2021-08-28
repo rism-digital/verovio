@@ -2737,6 +2737,11 @@ bool PAEInput2::ConvertMRestOrMultiRest()
                 token.m_char = 0;
             }
             else {
+                if (!paeStr.empty() && paeStr.at(0) == '0') {
+                    LogPAE("Invalid (multi) measure rest number starting with 0");
+                    if (m_pedanticMode) return false;
+                    paeStr.erase(0, paeStr.find_first_not_of('0'));
+                }
                 if (paeStr.empty() || paeStr == "1") {
                     mRestOrMultiRestToken->m_object = new MRest();
                 }
@@ -2828,6 +2833,8 @@ bool PAEInput2::ConvertFermata()
 {
     pae::Token *fermataToken = NULL;
     std::string noteUuid;
+    // Flag for handling (=1) cases
+    bool mRest = false;
 
     for (auto &token : m_pae) {
         if (token.m_char == '(') {
@@ -2839,8 +2846,9 @@ bool PAEInput2::ConvertFermata()
             fermataToken = &token;
         }
         else if (fermataToken) {
-            if (token.Is(NOTE)) {
+            if (token.m_object && token.m_object->Is({ MREST, NOTE, REST })) {
                 noteUuid = token.m_object->GetUuid();
+                if (token.m_object->Is(MREST)) mRest = true;
                 continue;
             }
             else if (token.m_char == ')') {
@@ -2850,10 +2858,19 @@ bool PAEInput2::ConvertFermata()
                 fermataToken->m_char = 0;
                 token.m_char = 0;
                 fermataToken = NULL;
+                mRest = false;
             }
             else {
-                // Leave everything as is - the ( should be a tuplet start
-                fermataToken = NULL;
+                // PAE guidelines
+                if (mRest && isdigit(token.m_inputChar)) {
+                    LogPAE(StringFormat("Fermata on measure rest with extraneous %c", token.m_inputChar).c_str());
+                    if (m_pedanticMode) return false;
+                }
+                else {
+                    // Leave everything as is - the ( could be a tuplet start
+                    fermataToken = NULL;
+                    mRest = false;
+                }
             }
         }
     }
