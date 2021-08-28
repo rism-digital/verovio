@@ -504,6 +504,7 @@ private:
     ///@}
 
     bool Is(pae::Token &token, const std::string &map);
+    bool Was(pae::Token &token, const std::string &map);
 
     /**
      * @name Methods that parse sub string instantiate corresponding objects

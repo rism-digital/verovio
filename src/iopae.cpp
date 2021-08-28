@@ -2203,6 +2203,7 @@ namespace pae {
     static const std::string METERSIG = "/o.c0123456789";
     static const std::string GRACE = "qg";
     static const std::string NOTENAME = "ABCDEFG";
+    static const std::string DURATION = "0123456789.";
     // preprocessing of the data replaces xx with X and bb with Y
     static const std::string ACCIDENTAL_INTERNAL = "xbnXY";
     static const std::string MEASURE = ":/";
@@ -2260,7 +2261,7 @@ void PAEInput2::LogPAE(const char *fmt)
         LogError(StringFormat("PAE: %s", fmt).c_str());
     }
     else {
-        // LogWarning(StringFormat("PAE: %s", fmt).c_str());
+        LogWarning(StringFormat("PAE: %s", fmt).c_str());
     }
 }
 
@@ -2300,6 +2301,11 @@ void PAEInput2::LogDebugTokens(bool vertical)
 bool PAEInput2::Is(pae::Token &token, const std::string &map)
 {
     return (map.find(token.m_char) != std::string::npos);
+}
+
+bool PAEInput2::Was(pae::Token &token, const std::string &map)
+{
+    return (map.find(token.m_inputChar) != std::string::npos);
 }
 
 jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
@@ -3052,9 +3058,53 @@ bool PAEInput2::ConvertGraceGrp()
 bool PAEInput2::ConvertGrace()
 {
     pae::Token *graceToken = NULL;
+    bool isAcciaccatura = false;
 
-    // TODO
-
+    for (auto &token : m_pae) {
+        if (this->Is(token, pae::GRACE)) {
+            // Keep a flag for distinguishing them
+            isAcciaccatura = (token.m_char == 'g');
+            if (graceToken) {
+                LogPAE("Invalid q after an unresolved q");
+                if (m_pedanticMode) return false;
+            }
+            graceToken = &token;
+            token.m_char = 0;
+        }
+        else if (graceToken) {
+            // Having an accidental is fine
+            if (this->Was(token, pae::ACCIDENTAL_INTERNAL)) {
+                continue;
+            }
+            // Having a duration is fine for appogiatura
+            if (this->Is(token, pae::DURATION)) {
+                // For acciaccature, not in pedantic mode
+                if (isAcciaccatura) {
+                    LogPAE("Extraneous duration for acciaccatura g");
+                    if (m_pedanticMode) return false;
+                }
+                continue;
+            }
+            if (token.Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(token.m_object);
+                assert(note);
+                if (isAcciaccatura) {
+                    note->SetDur(DURATION_8);
+                    note->SetGrace(GRACE_unacc);
+                }
+                else {
+                    note->SetGrace(GRACE_acc);
+                }
+                note->SetStemDir(STEMDIRECTION_up);
+            }
+            else {
+                LogPAE("Grace q or g not followed by a note");
+                if (m_pedanticMode) return false;
+            }
+            graceToken = NULL;
+            isAcciaccatura = false;
+        }
+    }
     return true;
 }
 
