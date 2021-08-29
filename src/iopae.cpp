@@ -2891,31 +2891,43 @@ bool PAEInput2::ConvertFermata()
             fermataToken = &token;
         }
         else if (fermataToken) {
-            if (token.m_object && token.m_object->Is({ MREST, NOTE, REST })) {
-                noteUuid = token.m_object->GetUuid();
-                if (token.m_object->Is(MREST)) mRest = true;
-                continue;
-            }
-            else if (token.m_char == ')') {
-                Fermata *fermata = new Fermata();
-                fermataToken->m_object = fermata;
-                fermata->SetStartid("#" + noteUuid);
-                fermataToken->m_char = 0;
-                token.m_char = 0;
-                fermataToken = NULL;
-                mRest = false;
+            // We have an open fermata signed but have not reached a fermata target
+            if (!fermataTarget) {
+                if (token.m_object && token.m_object->Is({ MREST, NOTE, REST })) {
+                    fermataTarget = token.m_object;
+                    continue;
+                }
+                // This was probably not a fermata sign but a tuplet one
+                else {
+                    fermataToken = NULL;
+                    continue;
+                }
             }
             else {
+                if (token.m_char == ')') {
+                    Fermata *fermata = new Fermata();
+                    fermataToken->m_object = fermata;
+                    fermata->SetStartid("#" + fermataTarget->GetUuid());
+                    fermataToken->m_char = 0;
+                    token.m_char = 0;
+                    fermataToken = NULL;
+                    fermataTarget = NULL;
+                }
+                // A trill before the closing fermata ) is valid
+                else if (fermataTarget->Is(NOTE) && token.Is(TRILL)) {
+                    continue;
+                }
                 // PAE guidelines are ambiguous because they say fermata should contain only a single rest sign (=)
                 // but at the same time allow =1 for a mrest - in non pendantic mode we want to support (=1)
-                if (mRest && isdigit(token.m_inputChar)) {
+                else if (fermataTarget->Is(MREST) && isdigit(token.m_inputChar)) {
                     LogPAE(StringFormat("Fermata on measure rest with extraneous %c", token.m_inputChar).c_str());
                     if (m_pedanticMode) return false;
+                    continue;
                 }
                 else {
                     // Leave everything as is - the ( could be a tuplet start
                     fermataToken = NULL;
-                    mRest = false;
+                    fermataTarget = NULL;
                 }
             }
         }
