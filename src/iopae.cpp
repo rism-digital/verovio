@@ -2192,6 +2192,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 namespace pae {
 
     static const char CONTAINER_END = '~';
+    static const char VOID = '_';
     static const std::string INTERNAL_CHARS = "QXY";
     static const char OCTAVEUP = '\'';
     static const char OCTAVEDOWN = ',';
@@ -2208,10 +2209,11 @@ namespace pae {
     static const std::string ACCIDENTAL_INTERNAL = "xbnXY";
     static const std::string MEASURE = ":/";
 
-    Token::Token(char c, Object *object)
+    Token::Token(char c, int position, Object *object)
     {
         m_char = c;
         m_inputChar = c;
+        m_position = position;
         m_object = object;
     }
 
@@ -2223,7 +2225,9 @@ namespace pae {
 
     bool Token::IsEnd() { return (!m_object && (m_char == pae::CONTAINER_END)); }
 
-    bool Token::IsSpace() { return m_char == ' '; }
+    bool Token::IsSpace() { return (m_char == ' '); }
+
+    bool Token::IsVoid() { return (m_char == pae::VOID); }
 
     std::string Token::GetName()
     {
@@ -2308,6 +2312,32 @@ bool PAEInput2::Was(pae::Token &token, const std::string &map)
     return (map.find(token.m_inputChar) != std::string::npos);
 }
 
+void PAEInput2::AddToken(char c, int &position)
+{
+    m_pae.push_back(pae::Token(c, position));
+    // Internal characters are used to replace double letters for easier processing
+    // When we add them as token, we want to store the original letters and their position
+    // This means converting the internal characters back and stored as m_inputChar
+    // The second letter is also marked as pae::VOID so it can be skipped during parsing
+    if (this->Is(m_pae.back(), pae::INTERNAL_CHARS)) {
+        // The position is incremented because these are actually input chars
+        position++;
+        if (c == 'Q') {
+            m_pae.back().m_inputChar = 'q';
+            m_pae.push_back(pae::Token('q', position));
+        }
+        if (c == 'X') {
+            m_pae.back().m_inputChar = 'x';
+            m_pae.push_back(pae::Token('x', position));
+        }
+        if (c == 'Y') {
+            m_pae.back().m_inputChar = 'b';
+            m_pae.push_back(pae::Token('b', position));
+        }
+        m_pae.back().m_char = pae::VOID;
+    }
+}
+
 jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
 {
     jsonxx::Object jsonInput;
@@ -2360,7 +2390,7 @@ bool PAEInput2::Import(const std::string &input)
     Measure *measure = new Measure(true, 1);
     // By default there is no end barline on an incipit
     measure->SetRight(BARRENDITION_invis);
-    m_pae.push_back(pae::Token(0, measure));
+    m_pae.push_back(pae::Token(0, -1, measure));
 
     if (jsonInput.has<jsonxx::String>("data")) {
         std::string data = jsonInput.get<jsonxx::String>("data");
@@ -2374,11 +2404,12 @@ bool PAEInput2::Import(const std::string &input)
         data = std::regex_replace(data, std::regex("xx"), "X");
         data = std::regex_replace(data, std::regex("bb"), "Y");
 
+        int i = 0;
         for (char c : data) {
             // Ignore the charcter that is use internally as container end Token
             if (c == pae::CONTAINER_END) continue;
             // Otherwise go ahead
-            m_pae.push_back(pae::Token(c));
+            this->AddToken(c, i);
         }
     }
     else {
@@ -2388,7 +2419,7 @@ bool PAEInput2::Import(const std::string &input)
 
     // Add a token marking the end - special use of the CONTAINER_END with no object
     // See pae::Token::IsEnd();
-    m_pae.push_back(pae::Token(pae::CONTAINER_END));
+    m_pae.push_back(pae::Token(pae::CONTAINER_END, -1));
 
     m_isMensural = false;
 
@@ -2467,6 +2498,8 @@ bool PAEInput2::Parse()
     Measure *currentMeasure = NULL;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         // Double check that we don't have more than the layer on the layerStack
         if (token.IsEnd()) {
             if (layerElementContainers.size() > 1) {
@@ -2584,6 +2617,8 @@ bool PAEInput2::ConvertKeySig()
     std::string paeStr;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == pae::KEYSIG_START) {
             keySigToken = &token;
             paeStr.clear();
@@ -2618,6 +2653,8 @@ bool PAEInput2::ConvertClef()
     std::string paeStr;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == pae::CLEF_START) {
             clefToken = &token;
             paeStr.clear();
@@ -2652,6 +2689,8 @@ bool PAEInput2::ConvertMeterSigOrMensur()
     std::string paeStr;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == pae::METERSIG_START) {
             meterSigOrMensurToken = &token;
             paeStr.clear();
@@ -2697,6 +2736,8 @@ bool PAEInput2::ConvertMeasure()
     int measureCount = 1;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         // This is the first (default) measure added to the tokens ::Import
         if (token.Is(MEASURE)) {
             currentMeasure = dynamic_cast<Measure *>(token.m_object);
@@ -2733,6 +2774,8 @@ bool PAEInput2::ConvertMRestOrMultiRest()
     std::string paeStr;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == '=') {
             if (mRestOrMultiRestToken) {
                 LogPAE("Invalid = after a =");
@@ -2772,6 +2815,8 @@ bool PAEInput2::ConvertMRestOrMultiRest()
 bool PAEInput2::ConvertPitch()
 {
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (Is(token, pae::NOTENAME)) {
             Note *note = new Note();
             data_PITCHNAME pitch = PITCHNAME_c;
@@ -2800,6 +2845,8 @@ bool PAEInput2::ConvertOctave()
     char readingOct = 0;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == pae::OCTAVEUP) {
             // Init to 4 when starting to read octave '
             if (readingOct != pae::OCTAVEUP) {
@@ -2844,6 +2891,8 @@ bool PAEInput2::ConvertTrill()
     Object *note = NULL;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         // Keep a pointer and simply continue
         if (token.Is(NOTE)) {
             note = token.m_object;
@@ -2882,6 +2931,8 @@ bool PAEInput2::ConvertFermata()
     Object *fermataTarget = NULL;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == '(') {
             // Weird case - could be a
             if (fermataToken) {
@@ -2941,6 +2992,8 @@ bool PAEInput2::ConvertAccidental()
     data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (Is(token, pae::ACCIDENTAL_INTERNAL)) {
             switch (token.m_char) {
                 case 'x': accidental = ACCIDENTAL_WRITTEN_s; break;
@@ -2978,6 +3031,8 @@ bool PAEInput2::ConvertAccidental()
 bool PAEInput2::ConvertRest()
 {
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == '-') {
             token.m_object = new Rest();
             token.m_char = 0;
@@ -2994,6 +3049,11 @@ bool PAEInput2::ConvertBeam()
     // Here we need an iterator because we might have to add a missing closing tag
     std::list<pae::Token>::iterator token = m_pae.begin();
     while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
         if (token->m_char == '{') {
             token->m_char = 0;
             if (beam) {
@@ -3021,7 +3081,7 @@ bool PAEInput2::ConvertBeam()
             if (beam) {
                 LogPAE("Unclose beam at the end of a measure");
                 if (m_pedanticMode) return false;
-                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, beam));
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, beam));
                 beam = NULL;
             }
         }
@@ -3041,6 +3101,8 @@ bool PAEInput2::ConvertGraceGrp()
     pae::Token *graceGrpToken = NULL;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (token.m_char == 'q') {
             if (!graceGrpToken) {
                 graceGrpToken = &token;
@@ -3060,6 +3122,11 @@ bool PAEInput2::ConvertGraceGrp()
     // Here we need an iterator because we might have to add a missing closing tag
     std::list<pae::Token>::iterator token = m_pae.begin();
     while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
         if (token->m_char == 'Q') {
             token->m_char = 0;
             if (graceGrp) {
@@ -3094,7 +3161,7 @@ bool PAEInput2::ConvertGraceGrp()
             if (graceGrp) {
                 LogPAE("Unclose grace group at the end of a measure");
                 if (m_pedanticMode) return false;
-                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, graceGrp));
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, graceGrp));
                 graceGrp = NULL;
             }
         }
@@ -3110,6 +3177,8 @@ bool PAEInput2::ConvertGrace()
     bool isAcciaccatura = false;
 
     for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
         if (this->Is(token, pae::GRACE)) {
             // Keep a flag for distinguishing them
             isAcciaccatura = (token.m_char == 'g');
@@ -3162,13 +3231,15 @@ bool PAEInput2::CheckHierarchy()
     std::list<pae::Token *> stack;
     // A reference layer to test with
     Layer layer;
-    pae::Token layerToken('_', &layer);
+    pae::Token layerToken('_', -1, &layer);
 
     bool isValid = false;
 
     while (!isValid) {
         isValid = true;
         for (auto &token : m_pae) {
+            if (token.IsVoid()) continue;
+
             if (!token.m_object) continue;
 
             if (token.m_object->Is(MEASURE)) {
@@ -3234,7 +3305,8 @@ void PAEInput2::RemoveContainerToken(Object *object)
 {
     bool deleted = false;
     for (auto &token : m_pae) {
-        if (!token.m_object) continue;
+        if (token.IsVoid() || !token.m_object) continue;
+
         if (token.m_object == object) {
             if (!token.IsContainerEnd()) {
                 // Make sure we delete it only once - even though it should never be there more than once

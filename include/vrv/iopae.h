@@ -449,12 +449,13 @@ namespace pae {
 
     class Token {
     public:
-        Token(char c, Object *object = NULL);
+        Token(char c, int position, Object *object = NULL);
         virtual ~Token();
         bool Is(ClassId);
         bool IsContainerEnd();
         bool IsEnd();
         bool IsSpace();
+        bool IsVoid();
 
         std::string GetName();
 
@@ -462,6 +463,8 @@ namespace pae {
         Object *m_object;
         /** the input char preserved for debugging purposes */
         char m_inputChar;
+        /** the position in the original input string for debuggin purposes */
+        int m_position;
     };
 
 }; // namespace pae
@@ -477,6 +480,8 @@ public:
 private:
     // function declarations:
     jsonxx::Object InputKeysToJson(const std::string &inputKeys);
+
+    void AddToken(char c, int &position);
 
     bool Parse();
 
