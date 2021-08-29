@@ -495,6 +495,7 @@ private:
     bool ConvertMRestOrMultiRest();
     bool ConvertPitch();
     bool ConvertOctave();
+    bool ConvertTrill();
     bool ConvertFermata();
     bool ConvertAccidental();
     bool ConvertRest();

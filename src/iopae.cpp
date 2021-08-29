@@ -2415,6 +2415,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertOctave();
 
+    if (success) success = this->ConvertTrill();
+
     if (success) success = this->ConvertFermata();
 
     if (success) success = this->ConvertAccidental();
@@ -2837,12 +2839,47 @@ bool PAEInput2::ConvertOctave()
     return true;
 }
 
+bool PAEInput2::ConvertTrill()
+{
+    Object *note = NULL;
+
+    for (auto &token : m_pae) {
+        // Keep a pointer and simply continue
+        if (token.Is(NOTE)) {
+            note = token.m_object;
+            continue;
+        }
+        if (token.m_char == 't') {
+            token.m_char = 0;
+            if (note) {
+                Trill *trill = new Trill();
+                trill->SetStartid("#" + note->GetUuid());
+                token.m_object = trill;
+            }
+            else {
+                LogPAE("Invalid t not after a note");
+                if (m_pedanticMode) return false;
+            }
+            note = NULL;
+            continue;
+        }
+        // A trill can be placed after the closing fermata ) or after a tie +
+        if (note && (token.m_char == ')' || token.m_char == '+')) {
+            continue;
+        }
+        // Anything else that is not a fermata or tie means that a previous note is no longer a target
+        else {
+            note = NULL;
+        }
+    }
+
+    return true;
+}
+
 bool PAEInput2::ConvertFermata()
 {
     pae::Token *fermataToken = NULL;
-    std::string noteUuid;
-    // Flag for handling (=1) cases
-    bool mRest = false;
+    Object *fermataTarget = NULL;
 
     for (auto &token : m_pae) {
         if (token.m_char == '(') {
