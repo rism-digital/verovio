@@ -17,6 +17,7 @@
 
 #include "boundingbox.h"
 #include "doc.h"
+#include "floatingobject.h"
 #include "glyph.h"
 #include "vrv.h"
 
@@ -32,17 +33,36 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
 
 void BezierCurve::CalculateControlPointOffset(Doc *doc)
 {
-    m_rightControlPointOffset = abs(p2.x - p1.x) / (2.0 + doc->GetOptions()->m_slurControlPoints.GetValue() / 5.0);
+    m_rightControlPointOffset = std::abs(p2.x - p1.x) / (2.0 + doc->GetOptions()->m_slurControlPoints.GetValue() / 5.0);
     m_leftControlPointOffset = m_rightControlPointOffset;
 }
 
-void BezierCurve::UpdateControlPointParameters(curvature_CURVEDIR dir)
+void BezierCurve::UpdateControlPointParams(curvature_CURVEDIR dir)
 {
     m_leftControlPointOffset = c1.x - p1.x;
     m_rightControlPointOffset = p2.x - c2.x;
     const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
     m_leftControlHeight = sign * (c1.y - p1.y);
     m_rightControlHeight = sign * (c2.y - p2.y);
+}
+
+void BezierCurve::UpdateControlPoints(curvature_CURVEDIR dir)
+{
+    c1.x = p1.x + m_leftControlPointOffset;
+    c2.x = p2.x - m_rightControlPointOffset;
+    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    c1.y = p1.y + sign * m_leftControlHeight;
+    c2.y = p2.y + sign * m_rightControlHeight;
+}
+
+void BezierCurve::CopyPointsTo(FloatingCurvePositioner *curve) const
+{
+    Point points[4];
+    points[0] = p1;
+    points[1] = c1;
+    points[2] = c2;
+    points[3] = p2;
+    curve->UpdateCurveParams(points, curve->GetAngle(), curve->GetThickness(), curve->GetDir());
 }
 
 //----------------------------------------------------------------------------

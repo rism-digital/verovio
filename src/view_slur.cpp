@@ -654,7 +654,7 @@ float View::CalcInitialSlur(
 
     Point rotatedC1, rotatedC2;
     bezier.SetControlHeight(height);
-    slur->GetControlPoints(bezier, curveDir);
+    bezier.UpdateControlPoints(curveDir);
     bezier.Rotate(slurAngle, bezier.p1);
 
     points[0] = bezier.p1;

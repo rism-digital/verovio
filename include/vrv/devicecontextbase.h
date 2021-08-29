@@ -18,6 +18,7 @@
 namespace vrv {
 
 class Doc;
+class FloatingCurvePositioner;
 
 #define AxNONE -1
 #define AxWHITE 255 << 16 | 255 << 8 | 255
@@ -252,8 +253,16 @@ public:
     int GetRightControlHeight() const { return m_rightControlHeight; }
     ///@}
 
-    // Calculate control point offset and height from points
-    void UpdateControlPointParameters(curvature_CURVEDIR dir);
+    /**
+     * Calculate control point offset and height from points or vice versa
+     */
+    ///@{
+    void UpdateControlPointParams(curvature_CURVEDIR dir);
+    void UpdateControlPoints(curvature_CURVEDIR dir);
+    ///@}
+
+    // Copy points from bezier curve to floating positioner
+    void CopyPointsTo(FloatingCurvePositioner *curve) const;
 
 private:
     // Control point X-axis offset for both start/end points

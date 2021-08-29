@@ -14,9 +14,13 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CPInequality
+// ControlPointConstraint
 //----------------------------------------------------------------------------
-struct CPInequality {
+/**
+ * This represents a constraint ax + by >= c where x and y are
+ * vertical control point adjustments
+ */
+struct ControlPointConstraint {
     double a;
     double b;
     double c;
@@ -67,18 +71,7 @@ public:
 
     void AdjustControlPointHeight(Doc *doc, BezierCurve &bezierCurve, float angle, int staffSize);
 
-    /**
-     * Adjust slur position based on overlapping objects within its spanning elements
-     */
-    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve);
-
-    std::pair<int, int> CalcEndShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
-    std::tuple<bool, int, int> CalcCPOffset(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve);
-    std::pair<int, int> CalcCPVerticalShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
-    std::pair<int, int> SolveCPConstraints(const std::list<CPInequality> &constraints);
-
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
-    void GetControlPoints(BezierCurve &curve, curvature_CURVEDIR curveDir, bool ignoreAngle = false);
 
     //----------//
     // Functors //
@@ -95,7 +88,26 @@ public:
     virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
 
 private:
-    //
+    /**
+     * Adjust slur position based on overlapping objects within its spanning elements
+     */
+    ///@{
+    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve);
+
+    // Calculate the vertical shift of the slur end points
+    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Calculate the horizontal control point offset
+    std::tuple<bool, int, int> CalcControlPointOffset(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve);
+
+    // Calculate the vertical control point shift
+    std::pair<int, int> CalcControlPointVerticalShift(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Solve the constraints for vertical control point adjustment
+    std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
+    ///@}
+
 public:
     //
 private:
