@@ -106,6 +106,9 @@ private:
 
     // Solve the constraints for vertical control point adjustment
     std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
+
+    // Improve the slur shape by adjusting the control point heights
+    void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
     ///@}
 
 public:
