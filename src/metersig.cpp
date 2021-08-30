@@ -63,12 +63,17 @@ wchar_t MeterSig::GetSymbolGlyph() const
     return glyph;
 }
 
-wchar_t MeterSig::GetEnclosingGlyph(bool beforeMeterSig) const
+std::pair<wchar_t, wchar_t> MeterSig::GetEnclosingGlyphs(bool small) const
 {
     if (this->GetEnclose() == ENCLOSURE_paren) {
-        return beforeMeterSig ? SMUFL_E094_timeSigParensLeft : SMUFL_E095_timeSigParensRight;
+        if (small) {
+            return { SMUFL_E092_timeSigParensLeftSmall, SMUFL_E093_timeSigParensRightSmall };
+        }
+        else {
+            return { SMUFL_E094_timeSigParensLeft, SMUFL_E095_timeSigParensRight };
+        }
     }
-    return 0;
+    return { 0, 0 };
 }
 
 //----------------------------------------------------------------------------

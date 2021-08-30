@@ -49,8 +49,8 @@ public:
     /** Retrieves the symbol glyph */
     wchar_t GetSymbolGlyph() const;
 
-    /** Retrieves parentheses from the enclose attribute */
-    wchar_t GetEnclosingGlyph(bool beforeMeterSig) const;
+    /** Retrieve parentheses from the enclose attribute */
+    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs(bool small) const;
 
     //----------//
     // Functors //
