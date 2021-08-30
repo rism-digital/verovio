@@ -2299,6 +2299,7 @@ void PAEInput2::LogDebugTokens(bool vertical)
             char c = (token.m_inputChar) ? token.m_inputChar : ' ';
             row.push_back(c);
         }
+        row = std::regex_replace(row, std::regex("%"), "%%");
         LogDebug(row.c_str());
         if (m_hasErrors) {
             row.clear();
@@ -3292,10 +3293,11 @@ bool PAEInput2::CheckHierarchy()
                 }
                 // End of a container - check for invalid nesting of opening and closing tags
                 else {
-                    // The object is not the same on top of the stack and the one we are popping - the hierarchy is invalid
+                    // The object is not the same on top of the stack and the one we are popping
+                    // This means that the hierarchy is invalid
                     if (stack.back()->m_object != token.m_object) {
-                        LogPAE(StringFormat("Invalid nesting of %s / %s opening and closing tags", token.GetName().c_str(),
-                                   stack.back()->GetName().c_str()),
+                        LogPAE(StringFormat("Invalid nesting of %s / %s opening and closing tags",
+                                   token.GetName().c_str(), stack.back()->GetName().c_str()),
                             token);
                         if (m_pedanticMode) return false;
                         // Indicate that the data was not valid in this pass so we will check it again
