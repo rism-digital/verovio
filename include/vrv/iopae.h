@@ -516,11 +516,11 @@ private:
      * @name Methods that parse sub string instantiate corresponding objects
      */
     ///@{
-    bool ParseKeySig(KeySig *keySig, const std::string &paeStr);
-    bool ParseClef(Clef *clef, const std::string &paeStr);
-    bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr);
-    bool ParseMensur(Mensur *mensur, const std::string &paeStr);
-    bool ParseMeasure(Measure *measure, const std::string &paeStr);
+    bool ParseKeySig(KeySig *keySig, const std::string &paeStr, const pae::Token &token);
+    bool ParseClef(Clef *clef, const std::string &paeStr, const pae::Token &token);
+    bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, const pae::Token &token);
+    bool ParseMensur(Mensur *mensur, const std::string &paeStr, const pae::Token &token);
+    bool ParseMeasure(Measure *measure, const std::string &paeStr, const pae::Token &token);
     ///@}
 
     bool CheckHierarchy();
@@ -529,7 +529,7 @@ private:
 
     void RemoveContainerToken(Object *);
 
-    void LogPAE(const char *fmt);
+    void LogPAE(std::string msg, const pae::Token &token);
 
     void LogDebugTokens(bool vertical = false);
 

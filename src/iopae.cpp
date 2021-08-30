@@ -2259,13 +2259,22 @@ void PAEInput2::ClearTokenObjects()
     m_pae.clear();
 }
 
-void PAEInput2::LogPAE(const char *fmt)
+void PAEInput2::LogPAE(std::string msg, const pae::Token &token)
 {
-    if (m_pedanticMode) {
-        LogError(StringFormat("PAE: %s", fmt).c_str());
+    std::string posStr;
+    if (token.m_position == -1) {
+        posStr = "(unknown position)";
     }
     else {
-        LogWarning(StringFormat("PAE: %s", fmt).c_str());
+        posStr = StringFormat("(character %d)", token.m_position);
+    }
+    std::string fullMsg = StringFormat("PAE: %s %s", msg.c_str(), posStr.c_str());
+
+    if (m_pedanticMode) {
+        LogError(fullMsg.c_str());
+    }
+    else {
+        LogWarning(fullMsg.c_str());
     }
 }
 
@@ -2410,6 +2419,7 @@ bool PAEInput2::Import(const std::string &input)
             if (c == pae::CONTAINER_END) continue;
             // Otherwise go ahead
             this->AddToken(c, i);
+            i++;
         }
     }
     else {
@@ -2543,8 +2553,8 @@ bool PAEInput2::Parse()
             }
             // For now ignore additional changes - not sure how these should be handled in MEI anyway
             if (scoreDefChange->FindDescendantByType(token.m_object->GetClassId())) {
-                LogPAE(StringFormat("%s change cannot occur more than once in a measure", token.GetName().c_str())
-                           .c_str());
+                LogPAE(
+                    StringFormat("%s change cannot occur more than once in a measure", token.GetName().c_str()), token);
                 if (m_pedanticMode) return false;
                 delete token.m_object;
             }
@@ -2629,7 +2639,7 @@ bool PAEInput2::ConvertKeySig()
                 token.m_char = 0;
             }
             else if (!token.IsSpace()) {
-                LogPAE("Missig ' ' after a key signature change");
+                LogPAE("Missig ' ' after a key signature change", token);
                 if (m_pedanticMode) return false;
             }
             else {
@@ -2638,7 +2648,7 @@ bool PAEInput2::ConvertKeySig()
                 KeySig *keySig = new KeySig();
                 keySigToken->m_object = keySig;
                 // Will fail in pedantic mode
-                if (!this->ParseKeySig(keySig, paeStr)) return false;
+                if (!this->ParseKeySig(keySig, paeStr, token)) return false;
                 keySigToken = NULL;
             }
         }
@@ -2665,7 +2675,7 @@ bool PAEInput2::ConvertClef()
                 token.m_char = 0;
             }
             else if (!token.IsSpace()) {
-                LogPAE("Missig ' ' after a clef change");
+                LogPAE("Missig ' ' after a clef change", token);
                 if (m_pedanticMode) return false;
             }
             else {
@@ -2674,7 +2684,7 @@ bool PAEInput2::ConvertClef()
                 Clef *clef = new Clef();
                 clefToken->m_object = clef;
                 // Will fail in pedantic mode
-                if (!this->ParseClef(clef, paeStr)) return false;
+                if (!this->ParseClef(clef, paeStr, token)) return false;
                 clefToken = NULL;
             }
         }
@@ -2701,7 +2711,7 @@ bool PAEInput2::ConvertMeterSigOrMensur()
                 token.m_char = 0;
             }
             else if (!token.IsSpace()) {
-                LogPAE("Missig ' ' after a meter signature change");
+                LogPAE("Missig ' ' after a meter signature change", token);
                 if (m_pedanticMode) return false;
             }
             else {
@@ -2711,13 +2721,13 @@ bool PAEInput2::ConvertMeterSigOrMensur()
                     Mensur *mensur = new Mensur();
                     meterSigOrMensurToken->m_object = mensur;
                     // Will fail in pedantic mode
-                    if (!this->ParseMensur(mensur, paeStr)) return false;
+                    if (!this->ParseMensur(mensur, paeStr, token)) return false;
                 }
                 else {
                     MeterSig *meterSig = new MeterSig();
                     meterSigOrMensurToken->m_object = meterSig;
                     // Will fail in pedantic mode
-                    if (!this->ParseMeterSig(meterSig, paeStr)) return false;
+                    if (!this->ParseMeterSig(meterSig, paeStr, token)) return false;
                 }
                 meterSigOrMensurToken = NULL;
             }
@@ -2752,7 +2762,7 @@ bool PAEInput2::ConvertMeasure()
         }
         else if (measureToken) {
             // When reaching a barline, we need to set it to the previous measure (@right)
-            if (!this->ParseMeasure(currentMeasure, paeStr)) return false;
+            if (!this->ParseMeasure(currentMeasure, paeStr, token)) return false;
             // We can now create a new measure but not if we have reached the end of the data
             if (!token.IsEnd()) {
                 measureCount++;
@@ -2778,7 +2788,7 @@ bool PAEInput2::ConvertMRestOrMultiRest()
 
         if (token.m_char == '=') {
             if (mRestOrMultiRestToken) {
-                LogPAE("Invalid = after a =");
+                LogPAE("Invalid = after a =", token);
                 if (m_pedanticMode) return false;
             }
             mRestOrMultiRestToken = &token;
@@ -2791,7 +2801,7 @@ bool PAEInput2::ConvertMRestOrMultiRest()
             }
             else {
                 if (!paeStr.empty() && paeStr.at(0) == '0') {
-                    LogPAE("Invalid (multi) measure rest number starting with 0");
+                    LogPAE("Invalid (multi) measure rest number starting with 0", token);
                     if (m_pedanticMode) return false;
                     paeStr.erase(0, paeStr.find_first_not_of('0'));
                 }
@@ -2906,7 +2916,7 @@ bool PAEInput2::ConvertTrill()
                 token.m_object = trill;
             }
             else {
-                LogPAE("Invalid t not after a note");
+                LogPAE("Invalid t not after a note", token);
                 if (m_pedanticMode) return false;
             }
             note = NULL;
@@ -2936,7 +2946,7 @@ bool PAEInput2::ConvertFermata()
         if (token.m_char == '(') {
             // Weird case - could be a
             if (fermataToken) {
-                LogPAE("Invalid ( after a (");
+                LogPAE("Invalid ( after a (", token);
                 if (m_pedanticMode) return false;
             }
             fermataToken = &token;
@@ -2971,7 +2981,7 @@ bool PAEInput2::ConvertFermata()
                 // PAE guidelines are ambiguous because they say fermata should contain only a single rest sign (=)
                 // but at the same time allow =1 for a mrest - in non pendantic mode we want to support (=1)
                 else if (fermataTarget->Is(MREST) && isdigit(token.m_inputChar)) {
-                    LogPAE(StringFormat("Fermata on measure rest with extraneous %c", token.m_inputChar).c_str());
+                    LogPAE(StringFormat("Fermata on measure rest with extraneous %c", token.m_inputChar), token);
                     if (m_pedanticMode) return false;
                     continue;
                 }
@@ -3019,7 +3029,7 @@ bool PAEInput2::ConvertAccidental()
                 continue;
             }
             else {
-                LogPAE("Missing note after an accidental");
+                LogPAE("Missing note after an accidental", token);
                 if (m_pedanticMode) return false;
                 accidental = ACCIDENTAL_WRITTEN_NONE;
             }
@@ -3057,7 +3067,7 @@ bool PAEInput2::ConvertBeam()
         if (token->m_char == '{') {
             token->m_char = 0;
             if (beam) {
-                LogPAE("Nested beams are not supported");
+                LogPAE("Nested beams are not supported", *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -3068,7 +3078,7 @@ bool PAEInput2::ConvertBeam()
         else if (token->m_char == '}') {
             token->m_char = 0;
             if (!beam) {
-                LogPAE("Irrelevant closing beam");
+                LogPAE("Irrelevant closing beam", *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -3079,7 +3089,7 @@ bool PAEInput2::ConvertBeam()
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (beam) {
-                LogPAE("Unclose beam at the end of a measure");
+                LogPAE("Unclose beam at the end of a measure", *token);
                 if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, beam));
                 beam = NULL;
@@ -3130,7 +3140,7 @@ bool PAEInput2::ConvertGraceGrp()
         if (token->m_char == 'Q') {
             token->m_char = 0;
             if (graceGrp) {
-                LogPAE("Nested grace groups are not supported");
+                LogPAE("Nested grace groups are not supported", *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -3141,7 +3151,7 @@ bool PAEInput2::ConvertGraceGrp()
         else if (token->m_char == 'r') {
             token->m_char = 0;
             if (!graceGrp) {
-                LogPAE("Irrelevant closing grace group");
+                LogPAE("Irrelevant closing grace group", *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -3152,14 +3162,14 @@ bool PAEInput2::ConvertGraceGrp()
         }
         else if (this->Is(*token, pae::GRACE)) {
             if (graceGrp) {
-                LogPAE("Grace within a grace group is not supported");
+                LogPAE("Grace within a grace group is not supported", *token);
                 if (m_pedanticMode) return false;
                 token->m_char = 0;
             }
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (graceGrp) {
-                LogPAE("Unclose grace group at the end of a measure");
+                LogPAE("Unclose grace group at the end of a measure", *token);
                 if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, graceGrp));
                 graceGrp = NULL;
@@ -3183,7 +3193,7 @@ bool PAEInput2::ConvertGrace()
             // Keep a flag for distinguishing them
             isAcciaccatura = (token.m_char == 'g');
             if (graceToken) {
-                LogPAE("Invalid q after an unresolved q");
+                LogPAE("Invalid q after an unresolved q", token);
                 if (m_pedanticMode) return false;
             }
             graceToken = &token;
@@ -3198,7 +3208,7 @@ bool PAEInput2::ConvertGrace()
             if (this->Is(token, pae::DURATION)) {
                 // For acciaccature, not in pedantic mode
                 if (isAcciaccatura) {
-                    LogPAE("Extraneous duration for acciaccatura g");
+                    LogPAE("Extraneous duration for acciaccatura g", token);
                     if (m_pedanticMode) return false;
                 }
                 continue;
@@ -3216,7 +3226,7 @@ bool PAEInput2::ConvertGrace()
                 note->SetStemDir(STEMDIRECTION_up);
             }
             else {
-                LogPAE("Grace q or g not followed by a note");
+                LogPAE("Grace q or g not followed by a note", token);
                 if (m_pedanticMode) return false;
             }
             graceToken = NULL;
@@ -3254,8 +3264,8 @@ bool PAEInput2::CheckHierarchy()
 
             // Test is the element is supported by the current top container
             if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object)) {
-                LogPAE(StringFormat("Invalid %s within %s", token.GetName().c_str(), stack.back()->GetName().c_str())
-                           .c_str());
+                LogPAE(StringFormat("Invalid %s within %s", token.GetName().c_str(), stack.back()->GetName().c_str()),
+                    token);
                 if (m_pedanticMode) return false;
                 // Indicate that the data was not valid in this pass so we will check it again
                 isValid = false;
@@ -3276,8 +3286,8 @@ bool PAEInput2::CheckHierarchy()
                     // staggerred
                     if (stack.back()->m_object != token.m_object) {
                         LogPAE(StringFormat("Staggered %s / %s opening and closing tags", token.GetName().c_str(),
-                            stack.back()->GetName().c_str())
-                                   .c_str());
+                                   stack.back()->GetName().c_str()),
+                            token);
                         if (m_pedanticMode) return false;
                         // Indicate that the data was not valid in this pass so we will check it again
                         isValid = false;
@@ -3320,7 +3330,7 @@ void PAEInput2::RemoveContainerToken(Object *object)
     }
 }
 
-bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr)
+bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr, const pae::Token &token)
 {
     assert(keySig);
 
@@ -3400,14 +3410,14 @@ bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr)
     return true;
 }
 
-bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr)
+bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr, const pae::Token &token)
 {
     assert(clef);
 
     clef->Reset();
 
     if (paeStr.size() < 3) {
-        LogPAE("Clef content cannot be parsed (G-2 in non pedantic mode)");
+        LogPAE("Clef content cannot be parsed (G-2 in non pedantic mode)", token);
         if (m_pedanticMode) return false;
         clef->SetLine(2);
         clef->SetShape(CLEFSHAPE_G);
@@ -3437,20 +3447,20 @@ bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr)
         clef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogPAE(StringFormat("Undefined clef '%s'", paeStr.c_str()).c_str());
+        LogPAE(StringFormat("Undefined clef '%s'", paeStr.c_str()), token);
         if (m_pedanticMode) return false;
     }
     return true;
 }
 
-bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr)
+bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, const pae::Token &token)
 {
     assert(meterSig);
 
     meterSig->Reset();
 
     if (paeStr.size() < 1) {
-        LogPAE("MeterSig content cannot be parsed (4/4 in non pedantic mode)");
+        LogPAE("MeterSig content cannot be parsed (4/4 in non pedantic mode)", token);
         if (m_pedanticMode) return false;
         meterSig->SetCount({ 4 });
         meterSig->SetUnit(4);
@@ -3487,20 +3497,20 @@ bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr)
         meterSig->SetUnit(2);
     }
     else {
-        LogPAE(StringFormat("Unsupported time signature %s", paeStr.c_str()).c_str());
+        LogPAE(StringFormat("Unsupported time signature %s", paeStr.c_str()), token);
         if (m_pedanticMode) return false;
     }
     return true;
 }
 
-bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr)
+bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr, const pae::Token &token)
 {
     assert(mensur);
 
     mensur->Reset();
 
     if (paeStr.size() < 1) {
-        LogPAE("Mensur content cannot be parsed (O in non pedantic mode");
+        LogPAE("Mensur content cannot be parsed (O in non pedantic mode", token);
         if (m_pedanticMode) return false;
         mensur->SetSign(MENSURATIONSIGN_O);
         return true;
@@ -3541,13 +3551,13 @@ bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr)
         }
     }
     else {
-        LogPAE(StringFormat("Unsupported time signature: %s", paeStr.c_str()).c_str());
+        LogPAE(StringFormat("Unsupported time signature: %s", paeStr.c_str()), token);
         if (m_pedanticMode) return false;
     }
     return true;
 }
 
-bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr)
+bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr, const pae::Token &token)
 {
     assert(measure);
 
@@ -3567,7 +3577,7 @@ bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr)
         measure->SetRight(BARRENDITION_rptboth);
     }
     else {
-        LogPAE(StringFormat("Unsupported barline: %s", paeStr.c_str()).c_str());
+        LogPAE(StringFormat("Unsupported barline: %s", paeStr.c_str()), token);
         if (m_pedanticMode) return false;
         // Put a single line by default in non pedantic mode
         measure->SetRight(BARRENDITION_single);
