@@ -2262,7 +2262,7 @@ void PAEInput2::ClearTokenObjects()
 
 void PAEInput2::LogPAE(std::string msg, pae::Token &token)
 {
-    m_hasError = true;
+    m_hasErrors = true;
     token.m_isError = true;
     std::string posStr;
     if (token.m_position == -1) {
@@ -2300,7 +2300,7 @@ void PAEInput2::LogDebugTokens(bool vertical)
             row.push_back(c);
         }
         LogDebug(row.c_str());
-        if (m_hasError) {
+        if (m_hasErrors) {
             row.clear();
             for (auto &token : m_pae) {
                 char c = (token.m_isError) ? '^' : ' ';
@@ -2390,7 +2390,7 @@ bool PAEInput2::Import(const std::string &input)
 {
     this->ClearTokenObjects();
 
-    m_hasError = false;
+    m_hasErrors = false;
 
     if (input.size() == 0) {
         LogError("PAE: Input is empty");
