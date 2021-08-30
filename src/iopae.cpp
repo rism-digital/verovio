@@ -2688,7 +2688,7 @@ bool PAEInput2::ConvertClef()
                 continue;
             }
             if (!token.IsSpace()) {
-                LogPAE("Missig ' ' after a clef change", token);
+                LogPAE("Missing ' ' after a clef change", token);
                 if (m_pedanticMode) return false;
             }
             clefToken->m_char = 0;
@@ -2723,7 +2723,7 @@ bool PAEInput2::ConvertMeterSigOrMensur()
                 continue;
             }
             if (!token.IsSpace()) {
-                LogPAE("Missig ' ' after a meter signature change", token);
+                LogPAE("Missing ' ' after a meter signature change", token);
                 if (m_pedanticMode) return false;
             }
             meterSigOrMensurToken->m_char = 0;
@@ -3290,12 +3290,11 @@ bool PAEInput2::CheckHierarchy()
                 if (token.m_char != pae::CONTAINER_END) {
                     stack.push_back(&token);
                 }
-                // End of a container - check for staggered opening and closing tags
+                // End of a container - check for invalid nesting of opening and closing tags
                 else {
-                    // The object is not the same on top of the stack and the one we are popping - the hierarchy is
-                    // staggerred
+                    // The object is not the same on top of the stack and the one we are popping - the hierarchy is invalid
                     if (stack.back()->m_object != token.m_object) {
-                        LogPAE(StringFormat("Staggered %s / %s opening and closing tags", token.GetName().c_str(),
+                        LogPAE(StringFormat("Invalid nesting of %s / %s opening and closing tags", token.GetName().c_str(),
                                    stack.back()->GetName().c_str()),
                             token);
                         if (m_pedanticMode) return false;
