@@ -750,20 +750,6 @@ void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int s
     }
 }
 
-bool AlignmentReference::HasCrossStaffElements()
-{
-    ListOfObjects children;
-    ClassIdComparison classId(LAYER_ELEMENT);
-    FindAllDescendantByComparison(&children, &classId);
-
-    for (auto child : children) {
-        LayerElement *layerElement = vrv_cast<LayerElement *>(child);
-        if (layerElement && layerElement->m_crossStaff) return true;
-    }
-
-    return false;
-}
-
 //----------------------------------------------------------------------------
 // TimestampAligner
 //----------------------------------------------------------------------------
