@@ -544,7 +544,7 @@ private:
 
     bool m_pedanticMode;
 
-    bool m_hasError;
+    bool m_hasErrors;
 };
 
 } // namespace vrv
