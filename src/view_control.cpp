@@ -1365,14 +1365,14 @@ void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wch
     assert(arpeg);
     assert(staff);
 
-    if (arpeg->GetEnclose() == ENCLOSURE_brack) {
+    if ((arpeg->GetEnclose() == ENCLOSURE_brack) || (arpeg->GetEnclose() == ENCLOSURE_box)) {
+        // Calculate position and width
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         int width = m_doc->GetGlyphHeight(fillGlyph, staff->m_drawingStaffSize, cueSize);
-        int xCorr = width;
-        int yCorr = 0;
+        int exceedingWidth = std::max(unit - width, 0);
         if (arpeg->GetArrow() == BOOLEAN_true) {
             height += 2 * unit;
-            yCorr += unit;
+            y -= unit;
             int arrowWidth = 0;
             if (arpeg->GetOrder() == arpegLog_ORDER_down) {
                 arrowWidth = m_doc->GetGlyphHeight(startGlyph, staff->m_drawingStaffSize, cueSize);
@@ -1380,20 +1380,26 @@ void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wch
             else {
                 arrowWidth = m_doc->GetGlyphHeight(endGlyph, staff->m_drawingStaffSize, cueSize);
             }
-            const int exceedingWidth = std::max(arrowWidth - width, 0);
-            width += exceedingWidth;
-            xCorr += exceedingWidth / 2;
+            exceedingWidth = std::max(exceedingWidth, arrowWidth - width);
         }
-        const int bracketWidth = width / 2;
-        const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        x -= (width + exceedingWidth / 2);
+        width += exceedingWidth;
 
+        // We use overlapping brackets to draw boxes :)
+        // Set params for offset, bracket width and line thickness
+        const int offset = 3 * unit / 4;
+        const int bracketWidth = (arpeg->GetEnclose() == ENCLOSURE_brack) ? unit : (width + offset);
+        const int verticalThickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        const int horizontalThickness = ((arpeg->GetEnclose() == ENCLOSURE_brack) ? 2 : 1) * verticalThickness;
+
+        // Draw the brackets
         dc->StartGraphic(arpeg, "", arpeg->GetUuid());
         this->DrawEnclosingBrackets(
-            dc, x - xCorr, y - yCorr, height, width, unit / 2, bracketWidth, thickness, thickness);
+            dc, x, y, height, width, offset, bracketWidth, horizontalThickness, verticalThickness);
         dc->EndGraphic(arpeg, this);
     }
-    else if (arpeg->HasEnclose()) {
-        LogWarning("Only drawing of enclosing brackets is supported for arpeggio.");
+    else if (arpeg->HasEnclose() && (arpeg->GetEnclose() != ENCLOSURE_none)) {
+        LogWarning("Only drawing of enclosing brackets and boxes is supported for arpeggio.");
     }
 }
 
