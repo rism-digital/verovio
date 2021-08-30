@@ -2650,20 +2650,19 @@ bool PAEInput2::ConvertKeySig()
             if (this->Is(token, pae::KEYSIG)) {
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
+                continue;
             }
-            else if (!token.IsSpace()) {
-                LogPAE("Missig ' ' after a key signature change", token);
+            if (!token.IsSpace()) {
+                LogPAE("Missing ' ' after a key signature change", token);
                 if (m_pedanticMode) return false;
             }
-            else {
-                keySigToken->m_char = 0;
-                // LogDebug("Keysig %s", paeStr.c_str());
-                KeySig *keySig = new KeySig();
-                keySigToken->m_object = keySig;
-                // Will fail in pedantic mode
-                if (!this->ParseKeySig(keySig, paeStr, token)) return false;
-                keySigToken = NULL;
-            }
+            keySigToken->m_char = 0;
+            // LogDebug("Keysig %s", paeStr.c_str());
+            KeySig *keySig = new KeySig();
+            keySigToken->m_object = keySig;
+            // Will fail in pedantic mode
+            if (!this->ParseKeySig(keySig, paeStr, *keySigToken)) return false;
+            keySigToken = NULL;
         }
     }
 
@@ -2686,20 +2685,19 @@ bool PAEInput2::ConvertClef()
             if (this->Is(token, pae::CLEF)) {
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
+                continue;
             }
-            else if (!token.IsSpace()) {
+            if (!token.IsSpace()) {
                 LogPAE("Missig ' ' after a clef change", token);
                 if (m_pedanticMode) return false;
             }
-            else {
-                clefToken->m_char = 0;
-                // LogDebug("Clef %s", paeStr.c_str());
-                Clef *clef = new Clef();
-                clefToken->m_object = clef;
-                // Will fail in pedantic mode
-                if (!this->ParseClef(clef, paeStr, token)) return false;
-                clefToken = NULL;
-            }
+            clefToken->m_char = 0;
+            // LogDebug("Clef %s", paeStr.c_str());
+            Clef *clef = new Clef();
+            clefToken->m_object = clef;
+            // Will fail in pedantic mode
+            if (!this->ParseClef(clef, paeStr, *clefToken)) return false;
+            clefToken = NULL;
         }
     }
 
@@ -2722,28 +2720,27 @@ bool PAEInput2::ConvertMeterSigOrMensur()
             if (this->Is(token, pae::METERSIG)) {
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
+                continue;
             }
-            else if (!token.IsSpace()) {
+            if (!token.IsSpace()) {
                 LogPAE("Missig ' ' after a meter signature change", token);
                 if (m_pedanticMode) return false;
             }
-            else {
-                meterSigOrMensurToken->m_char = 0;
-                // LogDebug("MeterSig %s", paeStr.c_str());
-                if (m_isMensural) {
-                    Mensur *mensur = new Mensur();
-                    meterSigOrMensurToken->m_object = mensur;
-                    // Will fail in pedantic mode
-                    if (!this->ParseMensur(mensur, paeStr, token)) return false;
-                }
-                else {
-                    MeterSig *meterSig = new MeterSig();
-                    meterSigOrMensurToken->m_object = meterSig;
-                    // Will fail in pedantic mode
-                    if (!this->ParseMeterSig(meterSig, paeStr, token)) return false;
-                }
-                meterSigOrMensurToken = NULL;
+            meterSigOrMensurToken->m_char = 0;
+            // LogDebug("MeterSig %s", paeStr.c_str());
+            if (m_isMensural) {
+                Mensur *mensur = new Mensur();
+                meterSigOrMensurToken->m_object = mensur;
+                // Will fail in pedantic mode
+                if (!this->ParseMensur(mensur, paeStr, *meterSigOrMensurToken)) return false;
             }
+            else {
+                MeterSig *meterSig = new MeterSig();
+                meterSigOrMensurToken->m_object = meterSig;
+                // Will fail in pedantic mode
+                if (!this->ParseMeterSig(meterSig, paeStr, *meterSigOrMensurToken)) return false;
+            }
+            meterSigOrMensurToken = NULL;
         }
     }
 
@@ -2775,7 +2772,7 @@ bool PAEInput2::ConvertMeasure()
         }
         else if (measureToken) {
             // When reaching a barline, we need to set it to the previous measure (@right)
-            if (!this->ParseMeasure(currentMeasure, paeStr, token)) return false;
+            if (!this->ParseMeasure(currentMeasure, paeStr, *measureToken)) return false;
             // We can now create a new measure but not if we have reached the end of the data
             if (!token.IsEnd()) {
                 measureCount++;
