@@ -2215,6 +2215,7 @@ namespace pae {
         m_inputChar = c;
         m_position = position;
         m_object = object;
+        m_isError = false;
     }
 
     Token::~Token() {}
@@ -2259,8 +2260,10 @@ void PAEInput2::ClearTokenObjects()
     m_pae.clear();
 }
 
-void PAEInput2::LogPAE(std::string msg, const pae::Token &token)
+void PAEInput2::LogPAE(std::string msg, pae::Token &token)
 {
+    m_hasError = true;
+    token.m_isError = true;
     std::string posStr;
     if (token.m_position == -1) {
         posStr = "(unknown position)";
@@ -2286,6 +2289,7 @@ void PAEInput2::LogDebugTokens(bool vertical)
             char c1 = (token.m_char) ? token.m_char : ' ';
             char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
             std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
+            if (token.m_isError) className += " <";
             LogDebug(" %c | %c | %s", c1, c2, className.c_str());
         }
     }
@@ -2296,6 +2300,14 @@ void PAEInput2::LogDebugTokens(bool vertical)
             row.push_back(c);
         }
         LogDebug(row.c_str());
+        if (m_hasError) {
+            row.clear();
+            for (auto &token : m_pae) {
+                char c = (token.m_isError) ? '^' : ' ';
+                row.push_back(c);
+            }
+            LogDebug(row.c_str());
+        }
         row.clear();
         for (auto &token : m_pae) {
             std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
@@ -2307,7 +2319,6 @@ void PAEInput2::LogDebugTokens(bool vertical)
             char c = (token.m_char) ? token.m_char : ' ';
             row.push_back(c);
         }
-        LogDebug(row.c_str());
     }
 }
 
@@ -2378,6 +2389,8 @@ jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
 bool PAEInput2::Import(const std::string &input)
 {
     this->ClearTokenObjects();
+
+    m_hasError = false;
 
     if (input.size() == 0) {
         LogError("PAE: Input is empty");
@@ -2470,9 +2483,9 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertGrace();
 
-    LogDebugTokens();
-
     if (success) success = this->CheckHierarchy();
+
+    LogDebugTokens();
 
     if (m_pedanticMode && !success) {
         this->ClearTokenObjects();
@@ -3330,7 +3343,7 @@ void PAEInput2::RemoveContainerToken(Object *object)
     }
 }
 
-bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr, const pae::Token &token)
+bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token)
 {
     assert(keySig);
 
@@ -3410,7 +3423,7 @@ bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr, const pae
     return true;
 }
 
-bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr, const pae::Token &token)
+bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token)
 {
     assert(clef);
 
@@ -3453,7 +3466,7 @@ bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr, const pae::Toke
     return true;
 }
 
-bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, const pae::Token &token)
+bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token)
 {
     assert(meterSig);
 
@@ -3503,7 +3516,7 @@ bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, con
     return true;
 }
 
-bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr, const pae::Token &token)
+bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token)
 {
     assert(mensur);
 
@@ -3557,7 +3570,7 @@ bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr, const pae
     return true;
 }
 
-bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr, const pae::Token &token)
+bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token)
 {
     assert(measure);
 

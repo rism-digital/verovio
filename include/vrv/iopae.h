@@ -465,6 +465,8 @@ namespace pae {
         char m_inputChar;
         /** the position in the original input string for debuggin purposes */
         int m_position;
+        /** a flag indicating the we and error at this position */
+        bool m_isError;
     };
 
 }; // namespace pae
@@ -516,11 +518,11 @@ private:
      * @name Methods that parse sub string instantiate corresponding objects
      */
     ///@{
-    bool ParseKeySig(KeySig *keySig, const std::string &paeStr, const pae::Token &token);
-    bool ParseClef(Clef *clef, const std::string &paeStr, const pae::Token &token);
-    bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, const pae::Token &token);
-    bool ParseMensur(Mensur *mensur, const std::string &paeStr, const pae::Token &token);
-    bool ParseMeasure(Measure *measure, const std::string &paeStr, const pae::Token &token);
+    bool ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token);
+    bool ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token);
+    bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token);
+    bool ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token);
+    bool ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token);
     ///@}
 
     bool CheckHierarchy();
@@ -529,7 +531,7 @@ private:
 
     void RemoveContainerToken(Object *);
 
-    void LogPAE(std::string msg, const pae::Token &token);
+    void LogPAE(std::string msg, pae::Token &token);
 
     void LogDebugTokens(bool vertical = false);
 
@@ -541,6 +543,8 @@ private:
     bool m_isMensural;
 
     bool m_pedanticMode;
+
+    bool m_hasError;
 };
 
 } // namespace vrv
