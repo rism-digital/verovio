@@ -2464,6 +2464,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertMeasure();
 
+    if (success) success = this->ConvertRepeatedFigure();
+
     if (success) success = this->ConvertMRestOrMultiRest();
 
     if (success) success = this->ConvertPitch();
@@ -2635,11 +2637,6 @@ bool PAEInput2::Parse()
     return success;
 }
 
-bool PAEInput2::ConvertRepeatedFigure()
-{
-    return true;
-}
-
 bool PAEInput2::ConvertKeySig()
 {
     pae::Token *keySigToken = NULL;
@@ -2789,6 +2786,103 @@ bool PAEInput2::ConvertMeasure()
             measureToken = NULL;
             paeStr.clear();
         }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertRepeatedFigure()
+{
+    // A flag indicating that we are in figure that will be repeated
+    bool isFigure = false;
+    bool isRepeat = false;
+    int repeatCount = 0;
+    // A map of 'f' tokens where we need to insert a figure (list)
+    std::map<pae::Token *, std::list<pae::Token>> repeats;
+    // The figure that will be repeated and to which we copy tokens
+    std::list<pae::Token> figure;
+    // A pointer to the beginning of the figure (for debugging purposes)
+    pae::Token *figureToken = NULL;
+
+    for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
+        // We are within a figure to be repeated
+        if (isFigure) {
+            // This is the end of the figure
+            if (token.m_char == '!') {
+                // The list should not be empty
+                if (figure.empty()) {
+                    LogPAE("Empty repeated figure", token);
+                    if (m_pedanticMode) return false;
+                }
+                token.m_char = 0;
+                isFigure = false;
+                isRepeat = true;
+            }
+            // We should not have a repeat sign before the end
+            else if (token.m_char == 'f') {
+                LogPAE("Repetition marker f not after a figure end !", token);
+                if (m_pedanticMode) return false;
+                token.m_char = 0;
+            }
+            // We should not reach the end or the end of a measure
+            else if (token.IsEnd() || token.Is(MEASURE)) {
+                LogPAE("Unclose repetition figure at the end of a measure", token);
+                if (m_pedanticMode) return false;
+                figure.clear();
+                isFigure = false;
+                figureToken = NULL;
+            }
+            // All good - add it to the figure
+            else {
+                figure.push_back(token);
+            }
+        }
+        // We have completed a figure and will be repeating it
+        else if (isRepeat) {
+            // Repeat the figure. That is simply add it to the map
+            if (token.m_char == 'f') {
+                token.m_char = 0;
+                repeats[&token] = figure;
+                repeatCount++;
+            }
+            // End of repetitions - this includes the end of a measure
+            else {
+                // Make sure we repeated the figure at least once (is this too pedantic?)
+                if (!repeatCount) {
+                    LogPAE("Repeated figure never repeated", *figureToken);
+                    if (m_pedanticMode) return false;
+                }
+                isRepeat = false;
+                figureToken = NULL;
+                figure.clear();
+                repeatCount = 0;
+            }
+        }
+        // We are starting a new figure to be repeated
+        else if (token.m_char == '!') {
+            token.m_char = 0;
+            figureToken = &token;
+            figure.clear();
+            isFigure = true;
+            isRepeat = false;
+            repeatCount = 0;
+        }
+        // We should not have a repeat sign not after a figure end
+        else if (token.m_char == 'f') {
+            LogPAE("Repetition marker f not after a figure end !", token);
+            if (m_pedanticMode) return false;
+            // ignore it
+            token.m_char = 0;
+        }
+        else {
+            continue;
+        }
+    }
+
+    for (auto it = repeats.begin(); it != repeats.end(); ++it) {
+        for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) std::cout << it2->m_char << std::endl;
     }
 
     return true;
@@ -3338,7 +3432,7 @@ bool PAEInput2::CheckContent()
     // * mRest or multiRest should be unique child of layer
     // * beam should have more than two children
     // * graceGrp should not be empty
-    
+
     return true;
 }
 

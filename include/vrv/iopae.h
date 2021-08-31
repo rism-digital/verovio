@@ -495,11 +495,11 @@ private:
      * in KeySig needs to be consumed first
      */
     ///@{
-    bool ConvertRepeatedFigure();
     bool ConvertKeySig();
     bool ConvertClef();
     bool ConvertMeterSigOrMensur();
     bool ConvertMeasure();
+    bool ConvertRepeatedFigure();
     bool ConvertRepeatedMeasure();
     bool ConvertMRestOrMultiRest();
     bool ConvertPitch();
@@ -528,7 +528,7 @@ private:
     ///@}
 
     bool CheckHierarchy();
-    
+
     bool CheckContent();
 
     void ClearTokenObjects();
