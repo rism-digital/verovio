@@ -18,6 +18,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "assert.h"
 #include "devicecontext.h"
 #include "object.h"
 
