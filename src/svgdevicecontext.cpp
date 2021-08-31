@@ -980,26 +980,22 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
 {
     std::string baseClass = object->GetClassName();
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
-    for (std::string attributeLine : m_svgAdditionalAttributes) {
-        std::string className
-            = attributeLine.substr(0, attributeLine.find("@")); // parse element@attribute: "note@pname"
-        if (className == baseClass) { // if appropriate class name...
-            std::string attributeName = attributeLine.substr(attributeLine.find("@") + 1);
-            ArrayOfStrAttr attributes;
-            object->GetAttributes(&attributes);
-            ArrayOfStrAttr::iterator iter;
-            bool found = false;
-            for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
-                if (attributeName == (*iter).first) // ...and attribute exists, add it to SVG element
-                {
-                    m_currentNode.append_attribute(("data-" + attributeName).c_str()) = (*iter).second.c_str();
-                    found = true;
-                }
+
+    std::pair<std::multimap<ClassId, std::string>::iterator, std::multimap<ClassId, std::string>::iterator> range;
+    range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
+    for (std::multimap<ClassId, std::string>::iterator it = range.first; it != range.second; ++it) {
+        bool found = false;
+        ArrayOfStrAttr attributes;
+        object->GetAttributes(&attributes);
+        for (ArrayOfStrAttr::iterator iter = attributes.begin(); iter != attributes.end(); ++iter) {
+            if (it->second == (*iter).first) // ...and attribute exists, add it to SVG element
+            {
+                m_currentNode.append_attribute(("data-" + it->second).c_str()) = (*iter).second.c_str();
+                found = true;
             }
-            if (!found)
-                LogWarning(
-                    "No attribute '%s' in '%s', nothing added to SVG.", attributeName.c_str(), className.c_str());
         }
+        if (!found)
+            LogWarning("No attribute '%s' in '%s', nothing added to SVG.", it->second.c_str(), baseClass.c_str());
     }
 }
 

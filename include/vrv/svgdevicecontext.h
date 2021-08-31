@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "object.h"
 
 //----------------------------------------------------------------------------
 
@@ -220,7 +221,12 @@ public:
      */
     void SetAdditionalAttributes(std::vector<std::string> additionalAttributes)
     {
-        for (std::string s : additionalAttributes) m_svgAdditionalAttributes.push_back(s);
+        for (std::string s : additionalAttributes) {
+            std::string className = s.substr(0, s.find("@")); // parse <element@attribute>, e.g., "note@pname"
+            std::string attributeName = s.substr(s.find("@") + 1);
+            ClassId classId = ObjectFactory::GetInstance()->GetClassId(className);
+            m_svgAdditionalAttributes.insert({ classId, attributeName });
+        }
     }
 
 private:
@@ -297,7 +303,7 @@ private:
     // output HTML5 data-* attributes
     bool m_html5;
     // copy additional attributes of given elements to the SVG, in the form "note@pname; layer@n"
-    std::vector<std::string> m_svgAdditionalAttributes;
+    std::multimap<ClassId, std::string> m_svgAdditionalAttributes;
     // format output as raw, stripping extraneous whitespace and non-content newlines
     bool m_formatRaw;
     // remove xlink from href attributes
