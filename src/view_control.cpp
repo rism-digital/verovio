@@ -1370,18 +1370,6 @@ void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wch
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         int width = m_doc->GetGlyphHeight(fillGlyph, staff->m_drawingStaffSize, cueSize);
         int exceedingWidth = std::max(unit - width, 0);
-        if (arpeg->GetArrow() == BOOLEAN_true) {
-            height += 2 * unit;
-            y -= unit;
-            int arrowWidth = 0;
-            if (arpeg->GetOrder() == arpegLog_ORDER_down) {
-                arrowWidth = m_doc->GetGlyphHeight(startGlyph, staff->m_drawingStaffSize, cueSize);
-            }
-            else {
-                arrowWidth = m_doc->GetGlyphHeight(endGlyph, staff->m_drawingStaffSize, cueSize);
-            }
-            exceedingWidth = std::max(exceedingWidth, arrowWidth - width);
-        }
         x -= (width + exceedingWidth / 2);
         width += exceedingWidth;
 
