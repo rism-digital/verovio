@@ -988,7 +988,7 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
         ArrayOfStrAttr attributes;
         object->GetAttributes(&attributes);
         for (ArrayOfStrAttr::iterator iter = attributes.begin(); iter != attributes.end(); ++iter) {
-            if (it->second == (*iter).first) // ...and attribute exists, add it to SVG element
+            if (it->second == (*iter).first) // ...and attribute exists in class name, add it to SVG element
             {
                 m_currentNode.append_attribute(("data-" + it->second).c_str()) = (*iter).second.c_str();
                 found = true;
