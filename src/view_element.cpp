@@ -306,8 +306,8 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     const data_STAFFREL place = artic->GetDrawingPlace();
 
     const wchar_t code = artic->GetArticGlyph(articValue, place);
-    const wchar_t enclosingFront = artic->GetEnclosingGlyph(true);
-    const wchar_t enclosingBack = artic->GetEnclosingGlyph(false);
+    wchar_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = artic->GetEnclosingGlyphs();
 
     // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
     if (code == 0) {
