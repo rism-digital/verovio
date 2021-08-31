@@ -2635,6 +2635,11 @@ bool PAEInput2::Parse()
     return success;
 }
 
+bool PAEInput2::ConvertRepeatedFigure()
+{
+    return true;
+}
+
 bool PAEInput2::ConvertKeySig()
 {
     pae::Token *keySigToken = NULL;
@@ -2786,6 +2791,11 @@ bool PAEInput2::ConvertMeasure()
         }
     }
 
+    return true;
+}
+
+bool PAEInput2::ConvertRepeatedMeasure()
+{
     return true;
 }
 
@@ -3319,6 +3329,16 @@ bool PAEInput2::CheckHierarchy()
         }
     }
 
+    return true;
+}
+
+bool PAEInput2::CheckContent()
+{
+    // Additional checks to do here
+    // * mRest or multiRest should be unique child of layer
+    // * beam should have more than two children
+    // * graceGrp should not be empty
+    
     return true;
 }
 
