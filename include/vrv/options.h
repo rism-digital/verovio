@@ -683,6 +683,7 @@ public:
     OptionDbl m_thickBarlineThickness;
     OptionDbl m_tieEndpointThickness;
     OptionDbl m_tieMidpointThickness;
+    OptionDbl m_tieMinLength;
     OptionDbl m_tupletBracketThickness;
     OptionBool m_tupletNumHead;
 
