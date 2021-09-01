@@ -269,21 +269,31 @@ bool MEIOutput::WriteObject(Object *object)
     }
 
     if (object->Is(MDIV)) {
-        m_currentNode = m_currentNode.append_child("mdiv");
-        WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
+        if (m_page < 0) {
+            m_currentNode = m_currentNode.append_child("mdiv");
+            WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
+        }
+        else {
+            return true;
+        }
     }
     else if (object->Is(PAGES)) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("pages");
+            WritePages(m_currentNode, dynamic_cast<Pages *>(object));
         }
-        // else {
-        //    m_currentNode = m_currentNode.append_child("score");
-        //}
-        WritePages(m_currentNode, dynamic_cast<Pages *>(object));
+        else {
+            return true;
+        }
     }
     else if (object->Is(SCORE)) {
-        m_currentNode = m_currentNode.append_child("score");
-        WriteScore(m_currentNode, dynamic_cast<Score *>(object));
+        if (m_page < 0) {
+            m_currentNode = m_currentNode.append_child("score");
+            WriteScore(m_currentNode, dynamic_cast<Score *>(object));
+        }
+        else {
+            return true;
+        }
     }
 
     // Page and content
@@ -779,9 +789,9 @@ bool MEIOutput::WriteObject(Object *object)
             WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
         }
     }
-    // SystemElementEnd - nothing to add - only
+    // PageElementEnd - nothing to add - only
     else if (object->Is(PAGE_ELEMENT_END)) {
-        if (m_scoreBasedMEI) {
+        if (m_scoreBasedMEI || (m_page >= 0)) {
             // LogDebug("No piling '%s'", object->GetClassName().c_str());
             return true;
         }
@@ -800,11 +810,7 @@ bool MEIOutput::WriteObject(Object *object)
     // Object representing an attribute have no node to push
     if (!object->IsAttribute()) m_nodeStack.push_back(m_currentNode);
 
-    if (object->Is(PAGES) && (dynamic_cast<Pages *>(object) == m_doc->GetPages())) {
-        // First save the main scoreDef
-        // m_doc->GetCurrentScoreDef()->Save(this);
-    }
-    else if (object->Is(SCORE)) {
+    if (object->Is(SCORE)) {
         // First save the main scoreDef
         m_doc->GetCurrentScoreDef()->Save(this);
     }
@@ -816,23 +822,21 @@ bool MEIOutput::WriteObject(Object *object)
 
 bool MEIOutput::WriteObjectEnd(Object *object)
 {
-    if (m_scoreBasedMEI && object->IsBoundaryElement()) {
-        return true;
-    }
     // Object representing an attribute have no node to pop
-    else if (object->IsAttribute()) {
+    if (object->IsAttribute()) {
         return true;
     }
-    else if (m_scoreBasedMEI && (object->Is(SYSTEM))) {
-        return true;
+
+    if (m_scoreBasedMEI) {
+        if (object->IsBoundaryElement()) {
+            return true;
+        }
+        if (object->Is({ PAGE, PAGES, PAGE_ELEMENT_END, SYSTEM, SYSTEM_ELEMENT_END })) {
+            return true;
+        }
     }
-    else if (m_scoreBasedMEI && (object->Is(PAGE))) {
-        return true;
-    }
-    else if (m_scoreBasedMEI && (object->Is(PAGES))) {
-        return true;
-    }
-    else if (m_scoreBasedMEI && (object->Is(PAGE_ELEMENT_END)) && m_nodeStack.empty()) {
+
+    if ((m_page >= 0) && (object->Is({ MDIV, PAGE_ELEMENT_END, SCORE }))) {
         return true;
     }
 
