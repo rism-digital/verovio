@@ -831,7 +831,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         if (object->IsBoundaryElement()) {
             return true;
         }
-        if (object->Is({ PAGE, PAGES, PAGE_ELEMENT_END, SYSTEM, SYSTEM_ELEMENT_END })) {
+        if (object->Is({ PAGE, PAGES, SYSTEM, SYSTEM_ELEMENT_END })) {
             return true;
         }
     }
