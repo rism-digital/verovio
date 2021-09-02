@@ -527,6 +527,13 @@ private:
     bool ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token);
     ///@}
 
+    /**
+     * When repeated content is inserted we set the position of all token
+     * to the one of the repetition marker (f or i).
+     * We also need to clone all objects in the tokens
+     */
+    void PrepareInsertion(int position, std::list<pae::Token> &insertion);
+
     bool CheckHierarchy();
 
     bool CheckContent();

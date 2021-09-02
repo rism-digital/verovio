@@ -2359,6 +2359,16 @@ void PAEInput2::AddToken(char c, int &position)
     }
 }
 
+void PAEInput2::PrepareInsertion(int position, std::list<pae::Token> &insertion)
+{
+    for (auto &token : insertion) {
+        token.m_position = position;
+        if (token.m_object) {
+            token.m_object = token.m_object->Clone();
+        }
+    }
+}
+
 jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
 {
     jsonxx::Object jsonInput;
@@ -2797,38 +2807,37 @@ bool PAEInput2::ConvertRepeatedFigure()
     bool isFigure = false;
     bool isRepeat = false;
     int repeatCount = 0;
-    // A map of 'f' tokens where we need to insert a figure (list)
-    std::map<pae::Token *, std::list<pae::Token>> repeats;
     // The figure that will be repeated and to which we copy tokens
     std::list<pae::Token> figure;
     // A pointer to the beginning of the figure (for debugging purposes)
     pae::Token *figureToken = NULL;
 
-    for (auto &token : m_pae) {
-        if (token.IsVoid()) continue;
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) continue;
 
         // We are within a figure to be repeated
         if (isFigure) {
             // This is the end of the figure
-            if (token.m_char == '!') {
+            if (token->m_char == '!') {
                 // The list should not be empty
                 if (figure.empty()) {
-                    LogPAE("Empty repeated figure", token);
+                    LogPAE("Empty repeated figure", *token);
                     if (m_pedanticMode) return false;
                 }
-                token.m_char = 0;
+                token->m_char = 0;
                 isFigure = false;
                 isRepeat = true;
             }
             // We should not have a repeat sign before the end
-            else if (token.m_char == 'f') {
-                LogPAE("Repetition marker f not after a figure end !", token);
+            else if (token->m_char == 'f') {
+                LogPAE("Repetition marker f not after a figure end !", *token);
                 if (m_pedanticMode) return false;
-                token.m_char = 0;
+                token->m_char = 0;
             }
             // We should not reach the end or the end of a measure
-            else if (token.IsEnd() || token.Is(MEASURE)) {
-                LogPAE("Unclose repetition figure at the end of a measure", token);
+            else if (token->IsEnd() || token->Is(MEASURE)) {
+                LogPAE("Unclose repetition figure at the end of a measure", *token);
                 if (m_pedanticMode) return false;
                 figure.clear();
                 isFigure = false;
@@ -2836,15 +2845,21 @@ bool PAEInput2::ConvertRepeatedFigure()
             }
             // All good - add it to the figure
             else {
-                figure.push_back(token);
+                figure.push_back(*token);
             }
         }
         // We have completed a figure and will be repeating it
         else if (isRepeat) {
             // Repeat the figure. That is simply add it to the map
-            if (token.m_char == 'f') {
-                token.m_char = 0;
-                repeats[&token] = figure;
+            if (token->m_char == 'f') {
+                token->m_char = 0;
+                // Set position and clone objects
+                PrepareInsertion(token->m_position, figure);
+                // Move to the next token because we insert before it
+                ++token;
+                m_pae.insert(token, figure.begin(), figure.end());
+                // Move back to the previous token (now the end of the figure)
+                --token;
                 repeatCount++;
             }
             // End of repetitions - this includes the end of a measure
@@ -2861,28 +2876,25 @@ bool PAEInput2::ConvertRepeatedFigure()
             }
         }
         // We are starting a new figure to be repeated
-        else if (token.m_char == '!') {
-            token.m_char = 0;
-            figureToken = &token;
+        else if (token->m_char == '!') {
+            token->m_char = 0;
+            figureToken = &(*token);
             figure.clear();
             isFigure = true;
             isRepeat = false;
             repeatCount = 0;
         }
         // We should not have a repeat sign not after a figure end
-        else if (token.m_char == 'f') {
-            LogPAE("Repetition marker f not after a figure end !", token);
+        else if (token->m_char == 'f') {
+            LogPAE("Repetition marker f not after a figure end !", *token);
             if (m_pedanticMode) return false;
             // ignore it
-            token.m_char = 0;
+            token->m_char = 0;
         }
         else {
-            continue;
+            // continue;
         }
-    }
-
-    for (auto it = repeats.begin(); it != repeats.end(); ++it) {
-        for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) std::cout << it2->m_char << std::endl;
+        ++token;
     }
 
     return true;
