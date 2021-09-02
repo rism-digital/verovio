@@ -2333,6 +2333,13 @@ bool PAEInput2::Was(pae::Token &token, const std::string &map)
     return (map.find(token.m_inputChar) != std::string::npos);
 }
 
+bool PAEInput2::HasInput(char inputChar)
+{
+    auto it = std::find_if(
+        m_pae.begin(), m_pae.end(), [inputChar](pae::Token token) { return (token.m_inputChar == inputChar); });
+    return (it != m_pae.end());
+}
+
 void PAEInput2::AddToken(char c, int &position)
 {
     m_pae.push_back(pae::Token(c, position));
@@ -2475,6 +2482,8 @@ bool PAEInput2::Parse()
     if (success) success = this->ConvertMeasure();
 
     if (success) success = this->ConvertRepeatedFigure();
+
+    if (success) success = this->ConvertRepeatedMeasure();
 
     if (success) success = this->ConvertMRestOrMultiRest();
 
@@ -2814,7 +2823,10 @@ bool PAEInput2::ConvertRepeatedFigure()
 
     std::list<pae::Token>::iterator token = m_pae.begin();
     while (token != m_pae.end()) {
-        if (token->IsVoid()) continue;
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
 
         // We are within a figure to be repeated
         if (isFigure) {
@@ -2902,6 +2914,63 @@ bool PAEInput2::ConvertRepeatedFigure()
 
 bool PAEInput2::ConvertRepeatedMeasure()
 {
+    if (!this->HasInput('i')) return true;
+
+    // The measure that will be repeated and to which we copy tokens
+    std::list<pae::Token> measure;
+    bool measureStart = false;
+    bool repeat = false;
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
+        if (token->Is(MEASURE)) {
+            measureStart = true;
+            repeat = false;
+        }
+        else if (token->m_char == 'i') {
+            token->m_char = 0;
+            if (!measureStart) {
+                LogPAE("Repetition marker i not at the beginning of a measure", *token);
+                if (m_pedanticMode) return false;
+            }
+            else if (measure.empty()) {
+                LogPAE("Repetition marker i but no content to repeat", *token);
+                if (m_pedanticMode) return false;
+            }
+            else {
+                // Set position and clone objects
+                PrepareInsertion(token->m_position, measure);
+                // Move to the next token because we insert before it
+                ++token;
+                m_pae.insert(token, measure.begin(), measure.end());
+                // Move back to the previous token (now the end of the measure)
+                --token;
+                repeat = true;
+            }
+        }
+        // Something else
+        else if (!this->Was(*token, pae::MEASURE) && !token->IsEnd()) {
+            // We had a i in the current measure, we should have nothing else
+            if (repeat) {
+                LogPAE("Repetition marker i not followed by a barline", *token);
+                if (m_pedanticMode) return false;
+            }
+            // We did not, this is content that will potentially be repeated
+            else if (measureStart) {
+                // This is the first token in the measure, clear the previous one
+                measure.clear();
+                measureStart = false;
+            }
+            measure.push_back(*token);
+        }
+        ++token;
+    }
+
     return true;
 }
 
@@ -3444,6 +3513,7 @@ bool PAEInput2::CheckContent()
     // * mRest or multiRest should be unique child of layer
     // * beam should have more than two children
     // * graceGrp should not be empty
+    // * keySig / meterSig change more than once in a measure
 
     return true;
 }
