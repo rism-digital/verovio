@@ -1812,8 +1812,8 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
     // set norm as default
-    int code = SMUFL_E56D_ornamentMordentInverted;
-    if (mordent->GetForm() == mordentLog_FORM_upper) code = SMUFL_E56C_ornamentMordent;
+    int code = SMUFL_E568_ornamentTurnInverted;
+    if (mordent->GetForm() == mordentLog_FORM_upper) code = SMUFL_E56D_ornamentMordent;
     if (mordent->GetLong() == BOOLEAN_true) code = SMUFL_E56E_ornamentTremblement;
 
     std::wstring str;

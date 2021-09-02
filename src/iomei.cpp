@@ -63,6 +63,7 @@
 #include "lb.h"
 #include "lem.h"
 #include "ligature.h"
+#include "liquescent.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
@@ -525,6 +526,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(LIGATURE)) {
         m_currentNode = m_currentNode.append_child("ligature");
         WriteLigature(m_currentNode, dynamic_cast<Ligature *>(object));
+    }
+    else if (object->Is(LIQUESCENT)) {
+        m_currentNode = m_currentNode.append_child("liquescent");
+        WriteLiquescent(m_currentNode, dynamic_cast<Liquescent *>(object));
     }
     else if (object->Is(MENSUR)) {
         if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("mensur");
@@ -1628,6 +1633,16 @@ void MEIOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
 
     WriteLayerElement(currentNode, ligature);
     ligature->WriteLigatureLog(currentNode);
+}
+
+void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquescent)
+{
+    assert(liquescent);
+
+    WriteLayerElement(currentNode, liquescent);
+    WritePositionInterface(currentNode, liquescent);
+    // liquescent->WriteAccidLog(currentNode);
+    // liquescent->WriteEnclosingChars(currentNode);
 }
 
 void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)

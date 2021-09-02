@@ -19,6 +19,7 @@ class Alignment;
 class Beam;
 class BeamElementCoord;
 class Layer;
+class Liquescent;
 class Mensur;
 class MeterSig;
 class Staff;

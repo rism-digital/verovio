@@ -30,6 +30,7 @@
 #include "keysig.h"
 #include "layer.h"
 #include "ligature.h"
+#include "liquescent.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"

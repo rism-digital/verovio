@@ -182,6 +182,7 @@ enum ClassId {
     KEYSIG,
     KEYACCID,
     LIGATURE,
+    LIQUESCENT,
     MENSUR,
     METERSIG,
     MREST,
@@ -264,6 +265,7 @@ class InterfaceComparison;
 class LayerElement;
 class LedgerLine;
 class LinkingInterface;
+class Liquescent;
 class Nc;
 class Note;
 class Neume;

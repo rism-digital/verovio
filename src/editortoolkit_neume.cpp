@@ -22,6 +22,7 @@
 #include "comparison.h"
 #include "custos.h"
 #include "layer.h"
+#include "liquescent.h"
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
@@ -754,7 +755,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             return false;
         }
 
-        // Set as inclinatum or virga (if necessary), or get contour for grouping
+        // Set as inclinatum or virga or liquescent (if necessary), or get contour for grouping
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "tilt") {
                 if (it->second == "s") {
@@ -763,11 +764,29 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 else if (it->second == "se") {
                     nc->SetTilt(COMPASSDIRECTION_se);
                 }
+                else if (it->second == "n") {
+                    nc->SetTilt(COMPASSDIRECTION_n);
+                }
             }
             else if (it->first == "contour") {
                 contour = it->second;
             }
+            else if (it->first == "curve") {
+                Liquescent *liquescent = new Liquescent();
+                ncForm_CURVE curve = ncForm_CURVE_NONE;
+                if (it->second == "a") {
+                    curve = ncForm_CURVE_a;
+                    nc->SetCurve(curve);
+                }
+                else if (it->second == "c") {
+                    curve = ncForm_CURVE_c;
+                    nc->SetCurve(curve);
+                }
+                nc->AddChild(liquescent);
+
+            }
         }
+        
 
         // If inserting grouping, add the remaining nc children to the neume.
         if (contour != "") {
