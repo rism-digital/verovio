@@ -269,7 +269,7 @@ bool MEIOutput::WriteObject(Object *object)
     }
 
     if (object->Is(MDIV)) {
-        if (m_page < 0) {
+        if (!m_scoreBasedMEI || (m_page < 0)) {
             m_currentNode = m_currentNode.append_child("mdiv");
             WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
         }
@@ -287,7 +287,7 @@ bool MEIOutput::WriteObject(Object *object)
         }
     }
     else if (object->Is(SCORE)) {
-        if (m_page < 0) {
+        if (!m_scoreBasedMEI || (m_page < 0)) {
             m_currentNode = m_currentNode.append_child("score");
             WriteScore(m_currentNode, dynamic_cast<Score *>(object));
         }
@@ -780,24 +780,22 @@ bool MEIOutput::WriteObject(Object *object)
 
     // SystemElementEnd - nothing to add - only
     else if (object->Is(SYSTEM_ELEMENT_END)) {
-        if (m_scoreBasedMEI) {
-            // LogDebug("No piling '%s'", object->GetClassName().c_str());
-            return true;
-        }
-        else {
+        if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("systemElementEnd");
             WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
+        }
+        else {
+            return true;
         }
     }
     // PageElementEnd - nothing to add - only
     else if (object->Is(PAGE_ELEMENT_END)) {
-        if (m_scoreBasedMEI || (m_page >= 0)) {
-            // LogDebug("No piling '%s'", object->GetClassName().c_str());
-            return true;
+        if (!m_scoreBasedMEI) {
+            m_currentNode = m_currentNode.append_child("pageElementEnd");
+            WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
         }
         else {
-            m_currentNode = m_currentNode.append_child("pageElementEnd");
-            // WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
+            return true;
         }
     }
 
@@ -828,16 +826,28 @@ bool MEIOutput::WriteObjectEnd(Object *object)
     }
 
     if (m_scoreBasedMEI) {
-        if (object->IsBoundaryElement()) {
+        if (object->Is({ PAGE, PAGES, SYSTEM })) {
             return true;
         }
-        if (object->Is({ PAGE, PAGES, SYSTEM, SYSTEM_ELEMENT_END })) {
-            return true;
+        if (object->Is({ MDIV, SCORE })) {
+            if (m_page >= 0) {
+                return true;
+            }
         }
-    }
 
-    if ((m_page >= 0) && (object->Is({ MDIV, PAGE_ELEMENT_END, SCORE }))) {
-        return true;
+        // Merging boundaries into one xml element
+        if (object->IsBoundaryElement()) {
+            m_boundaries.push(object->GetBoundaryEnd());
+            return true;
+        }
+        if (object->Is({ PAGE_ELEMENT_END, SYSTEM_ELEMENT_END })) {
+            if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
+                m_boundaries.pop();
+            }
+            else {
+                return true;
+            }
+        }
     }
 
     if (object->HasClosingComment()) {

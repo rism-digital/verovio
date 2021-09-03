@@ -83,7 +83,10 @@ public:
     /**
      * Wrapper for checking if an element has a boundary start interface and also if is set as a boundary element
      */
+    ///@{
     bool IsBoundaryElement();
+    Object *GetBoundaryEnd();
+    ///@}
 
     /**
      * @name Methods for checking if an object is part of a group of classId's.

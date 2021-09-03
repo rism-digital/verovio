@@ -235,6 +235,21 @@ bool Object::IsBoundaryElement()
     return false;
 }
 
+Object *Object::GetBoundaryEnd()
+{
+    if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
+        SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
+        assert(interface);
+        return (interface->GetEnd());
+    }
+    else if (this->Is(MDIV) || this->Is(SCORE)) {
+        PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
+        assert(interface);
+        return (interface->GetEnd());
+    }
+    return NULL;
+}
+
 void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChange)
 {
     if (this == sourceParent) {
