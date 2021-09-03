@@ -585,6 +585,16 @@ void PAEOutput::WriteGrace(AttGraced *attGraced)
     }
 }
 
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+#ifdef USE_PAE_OLD_PARSER
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// PAEInput
+//----------------------------------------------------------------------------
+
 #ifndef NO_PAE_SUPPORT
 
 #define BEAM_INITIAL 0x01
@@ -2186,7 +2196,13 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 #endif // NO_PAE_SUPPORT
 
 //----------------------------------------------------------------------------
-// PAEInput2
+//----------------------------------------------------------------------------
+#else // USE_USE_PAE_OLD_PARSER
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// PAEInput
 //----------------------------------------------------------------------------
 
 namespace pae {
@@ -2244,14 +2260,14 @@ namespace pae {
 
 } // namespace pae
 
-PAEInput2::PAEInput2(Doc *doc) : Input(doc) {}
+PAEInput::PAEInput(Doc *doc) : Input(doc) {}
 
-PAEInput2::~PAEInput2()
+PAEInput::~PAEInput()
 {
     this->ClearTokenObjects();
 }
 
-void PAEInput2::ClearTokenObjects()
+void PAEInput::ClearTokenObjects()
 {
     // Before we clear the pae list of tokens, we need to delete all token objects.
     // Normally, they should be none because they are passed to the doc.
@@ -2264,7 +2280,7 @@ void PAEInput2::ClearTokenObjects()
     m_pae.clear();
 }
 
-void PAEInput2::LogPAE(std::string msg, pae::Token &token)
+void PAEInput::LogPAE(std::string msg, pae::Token &token)
 {
     m_hasErrors = true;
     token.m_isError = true;
@@ -2285,7 +2301,7 @@ void PAEInput2::LogPAE(std::string msg, pae::Token &token)
     }
 }
 
-void PAEInput2::LogDebugTokens(bool vertical)
+void PAEInput::LogDebugTokens(bool vertical)
 {
     // For long incipits or to see full class name
     if (vertical) {
@@ -2327,24 +2343,24 @@ void PAEInput2::LogDebugTokens(bool vertical)
     }
 }
 
-bool PAEInput2::Is(pae::Token &token, const std::string &map)
+bool PAEInput::Is(pae::Token &token, const std::string &map)
 {
     return (map.find(token.m_char) != std::string::npos);
 }
 
-bool PAEInput2::Was(pae::Token &token, const std::string &map)
+bool PAEInput::Was(pae::Token &token, const std::string &map)
 {
     return (map.find(token.m_inputChar) != std::string::npos);
 }
 
-bool PAEInput2::HasInput(char inputChar)
+bool PAEInput::HasInput(char inputChar)
 {
     auto it = std::find_if(
         m_pae.begin(), m_pae.end(), [inputChar](pae::Token token) { return (token.m_inputChar == inputChar); });
     return (it != m_pae.end());
 }
 
-void PAEInput2::AddToken(char c, int &position)
+void PAEInput::AddToken(char c, int &position)
 {
     m_pae.push_back(pae::Token(c, position));
     // Internal characters are used to replace double letters for easier processing
@@ -2370,7 +2386,7 @@ void PAEInput2::AddToken(char c, int &position)
     }
 }
 
-void PAEInput2::PrepareInsertion(int position, std::list<pae::Token> &insertion)
+void PAEInput::PrepareInsertion(int position, std::list<pae::Token> &insertion)
 {
     for (auto &token : insertion) {
         token.m_position = position;
@@ -2380,7 +2396,7 @@ void PAEInput2::PrepareInsertion(int position, std::list<pae::Token> &insertion)
     }
 }
 
-jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
+jsonxx::Object PAEInput::InputKeysToJson(const std::string &inputKeys)
 {
     jsonxx::Object jsonInput;
 
@@ -2408,7 +2424,7 @@ jsonxx::Object PAEInput2::InputKeysToJson(const std::string &inputKeys)
     return jsonInput;
 }
 
-bool PAEInput2::Import(const std::string &input)
+bool PAEInput::Import(const std::string &input)
 {
     this->ClearTokenObjects();
 
@@ -2473,7 +2489,7 @@ bool PAEInput2::Import(const std::string &input)
     return this->Parse();
 }
 
-bool PAEInput2::Parse()
+bool PAEInput::Parse()
 {
     bool success = true;
 
@@ -2687,7 +2703,7 @@ bool PAEInput2::Parse()
     return success;
 }
 
-bool PAEInput2::ConvertKeySig()
+bool PAEInput::ConvertKeySig()
 {
     pae::Token *keySigToken = NULL;
     std::string paeStr;
@@ -2725,7 +2741,7 @@ bool PAEInput2::ConvertKeySig()
     return true;
 }
 
-bool PAEInput2::ConvertClef()
+bool PAEInput::ConvertClef()
 {
     pae::Token *clefToken = NULL;
     std::string paeStr;
@@ -2763,7 +2779,7 @@ bool PAEInput2::ConvertClef()
     return true;
 }
 
-bool PAEInput2::ConvertMeterSigOrMensur()
+bool PAEInput::ConvertMeterSigOrMensur()
 {
     pae::Token *meterSigOrMensurToken = NULL;
     std::string paeStr;
@@ -2809,7 +2825,7 @@ bool PAEInput2::ConvertMeterSigOrMensur()
     return true;
 }
 
-bool PAEInput2::ConvertMeasure()
+bool PAEInput::ConvertMeasure()
 {
     Measure *currentMeasure;
     pae::Token *measureToken = NULL;
@@ -2850,7 +2866,7 @@ bool PAEInput2::ConvertMeasure()
     return true;
 }
 
-bool PAEInput2::ConvertRepeatedFigure()
+bool PAEInput::ConvertRepeatedFigure()
 {
     if (!this->HasInput('!')) return true;
 
@@ -2945,7 +2961,7 @@ bool PAEInput2::ConvertRepeatedFigure()
     return true;
 }
 
-bool PAEInput2::ConvertRepeatedMeasure()
+bool PAEInput::ConvertRepeatedMeasure()
 {
     if (!this->HasInput('i')) return true;
 
@@ -3007,7 +3023,7 @@ bool PAEInput2::ConvertRepeatedMeasure()
     return true;
 }
 
-bool PAEInput2::ConvertMRestOrMultiRest()
+bool PAEInput::ConvertMRestOrMultiRest()
 {
     pae::Token *mRestOrMultiRestToken = NULL;
     std::string paeStr;
@@ -3051,7 +3067,7 @@ bool PAEInput2::ConvertMRestOrMultiRest()
     return true;
 }
 
-bool PAEInput2::ConvertPitch()
+bool PAEInput::ConvertPitch()
 {
     for (auto &token : m_pae) {
         if (token.IsVoid()) continue;
@@ -3078,7 +3094,7 @@ bool PAEInput2::ConvertPitch()
     return true;
 }
 
-bool PAEInput2::ConvertOctave()
+bool PAEInput::ConvertOctave()
 {
     int oct = 4;
     char readingOct = 0;
@@ -3124,7 +3140,7 @@ bool PAEInput2::ConvertOctave()
     return true;
 }
 
-bool PAEInput2::ConvertTrill()
+bool PAEInput::ConvertTrill()
 {
     Object *note = NULL;
 
@@ -3163,7 +3179,7 @@ bool PAEInput2::ConvertTrill()
     return true;
 }
 
-bool PAEInput2::ConvertFermata()
+bool PAEInput::ConvertFermata()
 {
     pae::Token *fermataToken = NULL;
     Object *fermataTarget = NULL;
@@ -3225,7 +3241,7 @@ bool PAEInput2::ConvertFermata()
     return true;
 }
 
-bool PAEInput2::ConvertAccidental()
+bool PAEInput::ConvertAccidental()
 {
     data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
 
@@ -3266,7 +3282,7 @@ bool PAEInput2::ConvertAccidental()
     return true;
 }
 
-bool PAEInput2::ConvertRest()
+bool PAEInput::ConvertRest()
 {
     for (auto &token : m_pae) {
         if (token.IsVoid()) continue;
@@ -3280,7 +3296,7 @@ bool PAEInput2::ConvertRest()
     return true;
 }
 
-bool PAEInput2::ConvertChord()
+bool PAEInput::ConvertChord()
 {
     if (!this->HasInput('^')) return true;
 
@@ -3353,7 +3369,7 @@ bool PAEInput2::ConvertChord()
     return true;
 }
 
-bool PAEInput2::ConvertBeam()
+bool PAEInput::ConvertBeam()
 {
     Beam *beam = NULL;
 
@@ -3402,7 +3418,7 @@ bool PAEInput2::ConvertBeam()
     return true;
 }
 
-bool PAEInput2::ConvertGraceGrp()
+bool PAEInput::ConvertGraceGrp()
 {
     /*
     // This is now commented and not necessary anymore because qq are replaced by Q in the input
@@ -3482,7 +3498,7 @@ bool PAEInput2::ConvertGraceGrp()
     return true;
 }
 
-bool PAEInput2::ConvertGrace()
+bool PAEInput::ConvertGrace()
 {
     pae::Token *graceToken = NULL;
     bool isAcciaccatura = false;
@@ -3537,7 +3553,7 @@ bool PAEInput2::ConvertGrace()
     return true;
 }
 
-bool PAEInput2::ConvertTuplet()
+bool PAEInput::ConvertTuplet()
 {
     Tuplet *tuplet = NULL;
     std::string tupletNumStr;
@@ -3620,7 +3636,7 @@ bool PAEInput2::ConvertTuplet()
     return true;
 }
 
-bool PAEInput2::ConvertDuration()
+bool PAEInput::ConvertDuration()
 {
     // The stack of durations for handling patterns
     std::list<std::pair<data_DURATION, int>> durations;
@@ -3686,7 +3702,7 @@ bool PAEInput2::ConvertDuration()
     return true;
 }
 
-bool PAEInput2::ConvertTie()
+bool PAEInput::ConvertTie()
 {
     Note *note = NULL;
     Tie *tie = NULL;
@@ -3738,7 +3754,7 @@ bool PAEInput2::ConvertTie()
     return true;
 }
 
-bool PAEInput2::CheckHierarchy()
+bool PAEInput::CheckHierarchy()
 {
     std::list<pae::Token *> stack;
     // A reference layer to test with
@@ -3813,7 +3829,7 @@ bool PAEInput2::CheckHierarchy()
     return true;
 }
 
-bool PAEInput2::CheckContent()
+bool PAEInput::CheckContent()
 {
     // Additional checks to do here
     // * mRest or multiRest should be unique child of layer
@@ -3824,7 +3840,7 @@ bool PAEInput2::CheckContent()
     return true;
 }
 
-void PAEInput2::RemoveContainerToken(Object *object)
+void PAEInput::RemoveContainerToken(Object *object)
 {
     bool deleted = false;
     for (auto &token : m_pae) {
@@ -3843,7 +3859,7 @@ void PAEInput2::RemoveContainerToken(Object *object)
     }
 }
 
-bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token)
+bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token)
 {
     assert(keySig);
 
@@ -3923,7 +3939,7 @@ bool PAEInput2::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Toke
     return true;
 }
 
-bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token)
+bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token)
 {
     assert(clef);
 
@@ -3966,7 +3982,7 @@ bool PAEInput2::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &tok
     return true;
 }
 
-bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token)
+bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token)
 {
     assert(meterSig);
 
@@ -4016,7 +4032,7 @@ bool PAEInput2::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae
     return true;
 }
 
-bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token)
+bool PAEInput::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token)
 {
     assert(mensur);
 
@@ -4070,7 +4086,7 @@ bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Toke
     return true;
 }
 
-bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token)
+bool PAEInput::ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token)
 {
     assert(measure);
 
@@ -4099,7 +4115,7 @@ bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr, pae::T
     return true;
 }
 
-bool PAEInput2::ParseDuration(
+bool PAEInput::ParseDuration(
     std::list<std::pair<data_DURATION, int>> &durations, const std::string &paeStr, pae::Token &token)
 {
     durations.clear();
@@ -4168,5 +4184,11 @@ bool PAEInput2::ParseDuration(
 
     return true;
 }
+
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+#endif // USE_USE_PAE_OLD_PARSER
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 } // namespace vrv

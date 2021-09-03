@@ -443,7 +443,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     else if (inputFormat == PAE) {
 #ifndef NO_PAE_SUPPORT
-        input = new PAEInput2(&m_doc);
+        input = new PAEInput(&m_doc);
 #else
         LogError("Plaine & Easie import is not supported in this build.");
         return false;
