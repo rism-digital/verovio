@@ -508,6 +508,7 @@ private:
     bool ConvertFermata();
     bool ConvertAccidental();
     bool ConvertRest();
+    bool ConvertChord();
     bool ConvertBeam();
     bool ConvertGrace();
     bool ConvertGraceGrp();

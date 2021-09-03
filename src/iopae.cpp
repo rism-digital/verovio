@@ -2194,6 +2194,7 @@ namespace pae {
     static const char CONTAINER_END = '~';
     static const char VOID = '_';
     static const std::string INTERNAL_CHARS = "QXY";
+    static const std::string OCTAVE = "\',";
     static const char OCTAVEUP = '\'';
     static const char OCTAVEDOWN = ',';
     static const char KEYSIG_START = '$';
@@ -2208,6 +2209,8 @@ namespace pae {
     // preprocessing of the data replaces xx with X and bb with Y
     static const std::string ACCIDENTAL_INTERNAL = "xbnXY";
     static const std::string MEASURE = ":/";
+
+    enum status_CHORD { CHORD_NONE = 0, CHORD_MARKER, CHORD_NOTE };
 
     Token::Token(char c, int position, Object *object)
     {
@@ -2499,6 +2502,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertRest();
 
+    if (success) success = this->ConvertChord();
+
     if (success) success = this->ConvertBeam();
 
     if (success) success = this->ConvertGraceGrp();
@@ -2637,7 +2642,7 @@ bool PAEInput2::Parse()
             layerElementContainers.back()->AddChild(element);
 
             // Add to the stack the layer element that are containers
-            if (element->Is({ BEAM, GRACEGRP })) {
+            if (element->Is({ BEAM, CHORD, GRACEGRP })) {
                 layerElementContainers.push_back(element);
             }
         }
@@ -2821,6 +2826,8 @@ bool PAEInput2::ConvertMeasure()
 
 bool PAEInput2::ConvertRepeatedFigure()
 {
+    if (!this->HasInput('!')) return true;
+
     // A flag indicating that we are in figure that will be repeated
     bool isFigure = false;
     bool isRepeat = false;
@@ -3254,6 +3261,79 @@ bool PAEInput2::ConvertRest()
     return true;
 }
 
+bool PAEInput2::ConvertChord()
+{
+    if (!this->HasInput('^')) return true;
+
+    // A flag for the chord status NONE|MARKER|NOTE
+    pae::status_CHORD status = pae::CHORD_NONE;
+    // The iterator of the last note that can become the first note of a chord
+    std::list<pae::Token>::iterator note = m_pae.end();
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
+        // We encounter a chord marker - change the status if we have a note previously
+        if (token->m_char == '^') {
+            token->m_char = 0;
+            if (note == m_pae.end()) {
+                LogPAE("A chord marker ^ should be preceeded by a note", *token);
+                if (m_pedanticMode) return false;
+            }
+            else {
+                status = pae::CHORD_MARKER;
+            }
+            ++token;
+            continue;
+        }
+
+        // We expect a note
+        if (status == pae::CHORD_MARKER) {
+            // If we have a note, we change the status - we will be able to decide to close the chord on the next token
+            if (token->Is(NOTE)) {
+                status = pae::CHORD_NOTE;
+            }
+            // After a marker, we should allow octave or accidental markers, but nothing else
+            else if (!this->Was(*token, pae::ACCIDENTAL_INTERNAL) && !this->Was(*token, pae::OCTAVE)) {
+                LogPAE("A chord marker ^ should be followed by a note", *token);
+                if (m_pedanticMode) return false;
+                status = pae::CHORD_NONE;
+                note = m_pae.end();
+            }
+            ++token;
+            continue;
+        }
+
+        // We passed the last note of the chord - create it
+        if (status == pae::CHORD_NOTE) {
+            Chord *chord = new Chord();
+            m_pae.insert(note, pae::Token(0, -1, chord));
+            m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, chord));
+        }
+
+        status = pae::CHORD_NONE;
+        if (token->Is(NOTE)) {
+            note = token;
+        }
+        // Previous token was already a note - we allow fermata or trill on the first note of a chord
+        else if (note != m_pae.end() && ((token->m_char == 0 && token->m_inputChar == ')') || token->Is(TRILL))) {
+            ++token;
+            continue;
+        }
+        else {
+            note = m_pae.end();
+        }
+
+        ++token;
+    }
+
+    return true;
+}
+
 bool PAEInput2::ConvertBeam()
 {
     Beam *beam = NULL;
@@ -3477,7 +3557,7 @@ bool PAEInput2::CheckHierarchy()
             }
 
             // Add to the stack the layer element that are containers
-            if (token.m_object->Is({ BEAM, GRACEGRP })) {
+            if (token.m_object->Is({ BEAM, CHORD, GRACEGRP })) {
                 // Begining of a container - simply push it to the stack
                 if (token.m_char != pae::CONTAINER_END) {
                     stack.push_back(&token);
