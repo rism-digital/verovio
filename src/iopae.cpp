@@ -2912,9 +2912,6 @@ bool PAEInput2::ConvertRepeatedFigure()
             // ignore it
             token->m_char = 0;
         }
-        else {
-            // continue;
-        }
         ++token;
     }
 
