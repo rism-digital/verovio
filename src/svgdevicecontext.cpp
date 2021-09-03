@@ -984,18 +984,12 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
     std::pair<std::multimap<ClassId, std::string>::iterator, std::multimap<ClassId, std::string>::iterator> range;
     range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
     for (std::multimap<ClassId, std::string>::iterator it = range.first; it != range.second; ++it) {
-        bool found = false;
         ArrayOfStrAttr attributes;
         object->GetAttributes(&attributes);
         for (ArrayOfStrAttr::iterator iter = attributes.begin(); iter != attributes.end(); ++iter) {
             if (it->second == (*iter).first) // ...and attribute exists in class name, add it to SVG element
-            {
                 m_currentNode.append_attribute(("data-" + it->second).c_str()) = (*iter).second.c_str();
-                found = true;
-            }
         }
-        if (!found)
-            LogWarning("No attribute '%s' in '%s', nothing added to SVG.", it->second.c_str(), baseClass.c_str());
     }
 }
 

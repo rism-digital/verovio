@@ -18,7 +18,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "assert.h"
 #include "devicecontext.h"
 #include "object.h"
 
@@ -220,13 +219,12 @@ public:
      *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
      * (e.g., "note@pname")
      */
-    void SetAdditionalAttributes(std::vector<std::string> additionalAttributes)
+    void SetAdditionalAttributes(const std::vector<std::string> &additionalAttributes)
     {
         for (std::string s : additionalAttributes) {
             std::string className = s.substr(0, s.find("@")); // parse <element@attribute>, e.g., "note@pname"
             std::string attributeName = s.substr(s.find("@") + 1);
             ClassId classId = ObjectFactory::GetInstance()->GetClassId(className);
-            assert(classId);
             m_svgAdditionalAttributes.insert({ classId, attributeName });
         }
     }
