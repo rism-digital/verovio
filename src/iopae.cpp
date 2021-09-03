@@ -2210,6 +2210,7 @@ namespace pae {
     static const std::string ACCIDENTAL_INTERNAL = "xbnXY";
     static const std::string MEASURE = ":/";
 
+    enum status_FIGURE { FIGURE_NONE = 0, FIGURE_START, FIGURE_END, FIGURE_REPEAT };
     enum status_CHORD { CHORD_NONE = 0, CHORD_MARKER, CHORD_NOTE };
 
     Token::Token(char c, int position, Object *object)
@@ -2828,10 +2829,8 @@ bool PAEInput2::ConvertRepeatedFigure()
 {
     if (!this->HasInput('!')) return true;
 
-    // A flag indicating that we are in figure that will be repeated
-    bool isFigure = false;
-    bool isRepeat = false;
-    int repeatCount = 0;
+    // A status flag indicating that we are in figure of in a repetition of a figure
+    pae::status_FIGURE status = pae::FIGURE_NONE;
     // The figure that will be repeated and to which we copy tokens
     std::list<pae::Token> figure;
     // A pointer to the beginning of the figure (for debugging purposes)
@@ -2845,7 +2844,7 @@ bool PAEInput2::ConvertRepeatedFigure()
         }
 
         // We are within a figure to be repeated
-        if (isFigure) {
+        if (status == pae::FIGURE_START) {
             // This is the end of the figure
             if (token->m_char == '!') {
                 // The list should not be empty
@@ -2854,8 +2853,7 @@ bool PAEInput2::ConvertRepeatedFigure()
                     if (m_pedanticMode) return false;
                 }
                 token->m_char = 0;
-                isFigure = false;
-                isRepeat = true;
+                status = pae::FIGURE_END;
             }
             // We should not have a repeat sign before the end
             else if (token->m_char == 'f') {
@@ -2868,7 +2866,7 @@ bool PAEInput2::ConvertRepeatedFigure()
                 LogPAE("Unclose repetition figure at the end of a measure", *token);
                 if (m_pedanticMode) return false;
                 figure.clear();
-                isFigure = false;
+                status = pae::FIGURE_NONE;
                 figureToken = NULL;
             }
             // All good - add it to the figure
@@ -2877,7 +2875,7 @@ bool PAEInput2::ConvertRepeatedFigure()
             }
         }
         // We have completed a figure and will be repeating it
-        else if (isRepeat) {
+        else if (status == pae::FIGURE_END || status == pae::FIGURE_REPEAT) {
             // Repeat the figure. That is simply add it to the map
             if (token->m_char == 'f') {
                 token->m_char = 0;
@@ -2888,19 +2886,18 @@ bool PAEInput2::ConvertRepeatedFigure()
                 m_pae.insert(token, figure.begin(), figure.end());
                 // Move back to the previous token (now the end of the figure)
                 --token;
-                repeatCount++;
+                status = pae::FIGURE_REPEAT;
             }
             // End of repetitions - this includes the end of a measure
             else {
                 // Make sure we repeated the figure at least once (is this too pedantic?)
-                if (!repeatCount) {
+                if (status == pae::FIGURE_END) {
                     LogPAE("Repeated figure never repeated", *figureToken);
                     if (m_pedanticMode) return false;
                 }
-                isRepeat = false;
+                status = pae::FIGURE_NONE;
                 figureToken = NULL;
                 figure.clear();
-                repeatCount = 0;
             }
         }
         // We are starting a new figure to be repeated
@@ -2908,9 +2905,7 @@ bool PAEInput2::ConvertRepeatedFigure()
             token->m_char = 0;
             figureToken = &(*token);
             figure.clear();
-            isFigure = true;
-            isRepeat = false;
-            repeatCount = 0;
+            status = pae::FIGURE_START;
         }
         // We should not have a repeat sign not after a figure end
         else if (token->m_char == 'f') {
