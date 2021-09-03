@@ -513,6 +513,7 @@ private:
     bool ConvertGrace();
     bool ConvertGraceGrp();
     bool ConvertTuplet();
+    bool ConvertDuration();
     ///@}
 
     bool Is(pae::Token &token, const std::string &map);
@@ -528,6 +529,8 @@ private:
     bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token);
     bool ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token);
     bool ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token);
+    bool ParseDuration(
+        std::list<std::pair<data_DURATION, int>> &durations, const std::string &paeStr, pae::Token &token);
     ///@}
 
     /**

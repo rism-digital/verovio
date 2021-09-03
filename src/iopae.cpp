@@ -2513,6 +2513,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertTuplet();
 
+    if (success) success = this->ConvertDuration();
+
     if (success) success = this->CheckHierarchy();
 
     LogDebugTokens();
@@ -3095,7 +3097,6 @@ bool PAEInput2::ConvertOctave()
             Note *note = dynamic_cast<Note *>(token.m_object);
             assert(note);
             note->SetOct(oct);
-            note->SetDur(DURATION_8);
         }
     }
 
@@ -3598,6 +3599,72 @@ bool PAEInput2::ConvertTuplet()
     return true;
 }
 
+bool PAEInput2::ConvertDuration()
+{
+    // The stack of durations for handling patterns
+    std::list<std::pair<data_DURATION, int>> durations;
+    // Add a default quarter note duration
+    durations.push_back(std::make_pair(DURATION_4, 0));
+    // Point to it
+    std::list<std::pair<data_DURATION, int>>::iterator currentDur = durations.begin();
+
+    pae::Token *durationToken = NULL;
+    std::string paeStr;
+    bool isChord = false;
+
+    for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
+        // Extract duration string we can then convert in one go
+        if (this->Is(token, pae::DURATION)) {
+            if (!durationToken) {
+                durationToken = &token;
+                paeStr.clear();
+            }
+            paeStr.push_back(token.m_char);
+            token.m_char = 0;
+            continue;
+        }
+        // We have reach the end of a duration string - convert it, including patterns
+        else if (durationToken) {
+            // Will fail in pedantic mode
+            if (!this->ParseDuration(durations, paeStr, *durationToken)) return false;
+            durationToken = NULL;
+            // ParseDuration makes sure we have at least one duration on the stack - point ot it
+            currentDur = durations.begin();
+        }
+        // For chords we don't want to set the duration on the child notes so we need to keep a flag
+        if (token.Is(CHORD)) {
+            isChord = !token.IsContainerEnd();
+            if (token.IsContainerEnd()) continue;
+        }
+        // Apply the current duration
+        if ((token.Is(NOTE) && !isChord) || token.Is(CHORD) || token.Is(REST)) {
+            // We should also skip acciaccature
+            if (token.Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(token.m_object);
+                assert(note);
+                if (note->GetGrace() == GRACE_unacc) continue;
+            }
+            // Set the duration to the note, chord or rest
+            DurationInterface *interface = dynamic_cast<DurationInterface *>(token.m_object);
+            assert(interface);
+            interface->SetDur(currentDur->first);
+            if (currentDur->second) {
+                interface->SetDots(currentDur->second);
+            }
+            // Move to the next on the stack - but this is meanless if we have a single value
+            if (durations.size() > 1) {
+                currentDur = std::next(currentDur);
+                // Return to the beginning once we have reached the end
+                if (currentDur == durations.end()) currentDur = durations.begin();
+            }
+        }
+    }
+
+    return true;
+}
+
 bool PAEInput2::CheckHierarchy()
 {
     std::list<pae::Token *> stack;
@@ -3883,7 +3950,7 @@ bool PAEInput2::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Toke
     mensur->Reset();
 
     if (paeStr.size() < 1) {
-        LogPAE("Mensur content cannot be parsed (O in non pedantic mode", token);
+        LogPAE("Mensur content cannot be parsed (O in non pedantic mode)", token);
         if (m_pedanticMode) return false;
         mensur->SetSign(MENSURATIONSIGN_O);
         return true;
@@ -3954,6 +4021,76 @@ bool PAEInput2::ParseMeasure(Measure *measure, const std::string &paeStr, pae::T
         if (m_pedanticMode) return false;
         // Put a single line by default in non pedantic mode
         measure->SetRight(BARRENDITION_single);
+    }
+
+    return true;
+}
+
+bool PAEInput2::ParseDuration(
+    std::list<std::pair<data_DURATION, int>> &durations, const std::string &paeStr, pae::Token &token)
+{
+    durations.clear();
+
+    if (paeStr.size() < 1 || paeStr.at(0) == '.') {
+        LogPAE("Duration content cannot be parsed (quarter note in non pedantic mode)", token);
+        // Default to quarter note
+        if (m_pedanticMode) return false;
+        durations.push_back(std::make_pair(DURATION_4, 0));
+        return true;
+    }
+
+    for (char c : paeStr) {
+        if (isdigit(c)) {
+            data_DURATION duration = DURATION_4;
+            if (m_isMensural) {
+                switch (c) {
+                    case '0': duration = DURATION_longa; break;
+                    case '1': duration = DURATION_semibrevis; break;
+                    case '2': duration = DURATION_minima; break;
+                    case '3':
+                        duration = DURATION_breve;
+                        // Ideally we should pass an offset toe LogPAE because this is going to show the position in
+                        // token However, using rythmic pattern in mensural notation is probably not very common...
+                        LogPAE("Duration 3 unsupported with mensural notation (breve in non pedantic mode)", token);
+                        if (m_pedanticMode) return false;
+                        break;
+                    case '4': duration = DURATION_semiminima; break;
+                    case '5':
+                        duration = DURATION_breve;
+                        LogPAE("Duration 5 unsupported with mensural notation (breve in non pedantic mode)", token);
+                        if (m_pedanticMode) return false;
+                        break;
+                    case '6': duration = DURATION_semifusa; break;
+                    case '7': duration = DURATION_breve; break;
+                    case '8': duration = DURATION_fusa; break;
+                    case '9': duration = DURATION_brevis; break;
+                }
+            }
+            else {
+                switch (c) {
+                    case '0': duration = DURATION_long; break;
+                    case '1': duration = DURATION_1; break;
+                    case '2': duration = DURATION_2; break;
+                    case '3': duration = DURATION_32; break;
+                    case '4': duration = DURATION_4; break;
+                    case '5': duration = DURATION_64; break;
+                    case '6': duration = DURATION_16; break;
+                    case '7': duration = DURATION_128; break;
+                    case '8': duration = DURATION_8; break;
+                    case '9': duration = DURATION_breve; break;
+                }
+            }
+            durations.push_back(std::make_pair(duration, 0));
+        }
+        else {
+            durations.back().second += 1;
+        }
+    }
+
+    // just in case not to screw up iterators in ConvertDuration
+    if (durations.empty()) {
+        LogDebug("Something went wrong with the parsing of durations");
+        durations.push_back(std::make_pair(DURATION_4, 0));
     }
 
     return true;
