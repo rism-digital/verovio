@@ -2678,6 +2678,9 @@ bool PAEInput2::ConvertKeySig()
                 LogPAE("Missing ' ' after a key signature change", token);
                 if (m_pedanticMode) return false;
             }
+            else {
+                token.m_char = 0;
+            }
             keySigToken->m_char = 0;
             // LogDebug("Keysig %s", paeStr.c_str());
             KeySig *keySig = new KeySig();
@@ -2713,6 +2716,9 @@ bool PAEInput2::ConvertClef()
                 LogPAE("Missing ' ' after a clef change", token);
                 if (m_pedanticMode) return false;
             }
+            else {
+                token.m_char = 0;
+            }
             clefToken->m_char = 0;
             // LogDebug("Clef %s", paeStr.c_str());
             Clef *clef = new Clef();
@@ -2747,6 +2753,9 @@ bool PAEInput2::ConvertMeterSigOrMensur()
             if (!token.IsSpace()) {
                 LogPAE("Missing ' ' after a meter signature change", token);
                 if (m_pedanticMode) return false;
+            }
+            else {
+                token.m_char = 0;
             }
             meterSigOrMensurToken->m_char = 0;
             // LogDebug("MeterSig %s", paeStr.c_str());
