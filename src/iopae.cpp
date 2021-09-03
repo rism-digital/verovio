@@ -2515,6 +2515,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertDuration();
 
+    if (success) success = this->ConvertTie();
+
     if (success) success = this->CheckHierarchy();
 
     LogDebugTokens();
@@ -2551,6 +2553,11 @@ bool PAEInput2::Parse()
     ScoreDef *scoreDefChange = NULL;
     // The current measure, used to know where to  add a scoreDef change
     Measure *currentMeasure = NULL;
+    // The current meterSig, used to calculate the tstamp2 for open ties
+    MeterSig defaultMeterSig;
+    defaultMeterSig.SetUnit(4);
+    defaultMeterSig.SetCount({ 4 });
+    MeterSig *currentMeterSig = &defaultMeterSig;
 
     for (auto &token : m_pae) {
         if (token.IsVoid()) continue;
@@ -2609,6 +2616,10 @@ bool PAEInput2::Parse()
                 // attributes
                 if (token.m_object->Is({ MENSUR, METERSIG })) {
                     token.m_object->IsAttribute(true);
+                    if (token.m_object->Is(METERSIG)) {
+                        currentMeterSig = dynamic_cast<MeterSig *>(token.m_object);
+                        assert(currentMeterSig);
+                    }
                 }
             }
             // Object are own by the scoreDef
@@ -2654,6 +2665,16 @@ bool PAEInput2::Parse()
         else if (token.m_object->IsControlElement()) {
             assert(currentMeasure);
             currentMeasure->AddChild(token.m_object);
+            // Find open ties
+            if (token.m_object->Is(TIE)) {
+                Tie *tie = dynamic_cast<Tie *>(token.m_object);
+                assert(tie);
+                if (!tie->HasEndid()) {
+                    assert(currentMeterSig);
+                    double tstamp2 = currentMeterSig->GetTotalCount() + 1;
+                    tie->SetTstamp2(std::make_pair(0, tstamp2));
+                }
+            }
             token.m_object = NULL;
         }
     }
@@ -3659,6 +3680,58 @@ bool PAEInput2::ConvertDuration()
                 // Return to the beginning once we have reached the end
                 if (currentDur == durations.end()) currentDur = durations.begin();
             }
+        }
+    }
+
+    return true;
+}
+
+bool PAEInput2::ConvertTie()
+{
+    Note *note = NULL;
+    Tie *tie = NULL;
+
+    for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
+        if (token.Is(NOTE)) {
+            Note *tokenNote = dynamic_cast<Note *>(token.m_object);
+            assert(tokenNote);
+            if (tie && note) {
+                if (note->GetOct() != tokenNote->GetOct() || note->GetPname() != tokenNote->GetPname()) {
+                    LogPAE("Invalid tie betwenn two notes with not the same octave or pichname", token);
+                    if (m_pedanticMode) return false;
+                }
+                tie->SetEndid("#" + tokenNote->GetUuid());
+                tie = NULL;
+            }
+            note = tokenNote;
+            continue;
+        }
+        if (token.m_char == '+') {
+            token.m_char = 0;
+            if (tie) {
+                LogPAE("Invalid tie + sign occuring when previous tie has not been resolved", token);
+                if (m_pedanticMode) return false;
+                continue;
+            }
+            if (note) {
+                tie = new Tie();
+                tie->SetStartid("#" + note->GetUuid());
+                token.m_object = tie;
+            }
+            else {
+                LogPAE("Invalid + not after a note", token);
+                if (m_pedanticMode) return false;
+            }
+            continue;
+        }
+        // A tie can be placed after the closing fermata ) or after a trill t
+        if (note && (token.m_inputChar == ')' || token.Is(TRILL))) {
+            continue;
+        }
+        else if (!tie) {
+            note = NULL;
         }
     }
 

@@ -514,6 +514,7 @@ private:
     bool ConvertGraceGrp();
     bool ConvertTuplet();
     bool ConvertDuration();
+    bool ConvertTie();
     ///@}
 
     bool Is(pae::Token &token, const std::string &map);
