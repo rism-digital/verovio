@@ -512,6 +512,7 @@ private:
     bool ConvertBeam();
     bool ConvertGrace();
     bool ConvertGraceGrp();
+    bool ConvertTuplet();
     ///@}
 
     bool Is(pae::Token &token, const std::string &map);

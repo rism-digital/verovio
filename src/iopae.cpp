@@ -2511,6 +2511,8 @@ bool PAEInput2::Parse()
 
     if (success) success = this->ConvertGrace();
 
+    if (success) success = this->ConvertTuplet();
+
     if (success) success = this->CheckHierarchy();
 
     LogDebugTokens();
@@ -2643,7 +2645,7 @@ bool PAEInput2::Parse()
             layerElementContainers.back()->AddChild(element);
 
             // Add to the stack the layer element that are containers
-            if (element->Is({ BEAM, CHORD, GRACEGRP })) {
+            if (element->Is({ BEAM, CHORD, GRACEGRP, TUPLET })) {
                 layerElementContainers.push_back(element);
             }
         }
@@ -3513,6 +3515,89 @@ bool PAEInput2::ConvertGrace()
     return true;
 }
 
+bool PAEInput2::ConvertTuplet()
+{
+    Tuplet *tuplet = NULL;
+    std::string tupletNumStr;
+    bool isNumPart = false;
+
+    auto GetNum = [](std::string numStr) {
+        if (numStr.empty()) return 3;
+        return atoi(numStr.c_str());
+    };
+
+    // Here we need an iterator because we might have to add a missing closing tag
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
+        if (token->m_char == '(') {
+            token->m_char = 0;
+            if (tuplet) {
+                LogPAE("Nested tuplets are not supported", *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            isNumPart = false;
+            tuplet = new Tuplet();
+            tuplet->SetNumbase(2);
+            token->m_object = tuplet;
+        }
+        else if (token->m_char == ')') {
+            token->m_char = 0;
+            if (!tuplet) {
+                LogPAE("Irrelevant closing tuplet )", *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            token->m_object = tuplet;
+            token->m_char = pae::CONTAINER_END;
+            tuplet->SetNum(GetNum(tupletNumStr));
+            isNumPart = false;
+            tuplet = NULL;
+        }
+        else if (token->m_char == ';') {
+            token->m_char = 0;
+            if (!tuplet || isNumPart) {
+                LogPAE("Irrelevant tuplet numerator ; marker", *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            tupletNumStr = "";
+            isNumPart = true;
+        }
+        else if (isNumPart) {
+            if (token->m_char && !isdigit(token->m_char)) {
+                LogPAE("Invalid number within tuplet numerator", *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            tupletNumStr.push_back(token->m_char);
+            token->m_char = 0;
+        }
+        else if (token->IsEnd() || token->Is(MEASURE)) {
+            if (tuplet) {
+                LogPAE("Unclose tuplet at the end of a measure", *token);
+                if (m_pedanticMode) return false;
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, tuplet));
+                tuplet->SetNum(GetNum(tupletNumStr));
+                isNumPart = false;
+                tuplet = NULL;
+            }
+        }
+        ++token;
+    }
+
+    return true;
+}
+
 bool PAEInput2::CheckHierarchy()
 {
     std::list<pae::Token *> stack;
@@ -3552,7 +3637,7 @@ bool PAEInput2::CheckHierarchy()
             }
 
             // Add to the stack the layer element that are containers
-            if (token.m_object->Is({ BEAM, CHORD, GRACEGRP })) {
+            if (token.m_object->Is({ BEAM, CHORD, GRACEGRP, TUPLET })) {
                 // Begining of a container - simply push it to the stack
                 if (token.m_char != pae::CONTAINER_END) {
                     stack.push_back(&token);
