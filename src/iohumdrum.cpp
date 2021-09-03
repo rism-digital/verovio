@@ -10462,10 +10462,10 @@ void HumdrumInput::addPlicaUp(Note *note)
 template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hum::HTp token)
 {
     // store artics in random access grid, along with their staff positions:
-    vector<int> articloc(256, 0);
-    vector<int> articpos(256, 0);
-    vector<bool> showpos(256, 0);
-    vector<int> articges(256, 0); // is it a gestural articulation?
+    vector<int> articloc(128, 0);
+    vector<int> articpos(128, 0);
+    vector<bool> showpos(128, 0);
+    vector<int> articges(128, 0); // is it a gestural articulation?
     bool textTenuto = false;
     bool textTenutoBelow = false;
     char ch;
@@ -10475,6 +10475,15 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     int tsize = (int)((string *)token)->size();
     for (int i = 0; i < tsize; ++i) {
         ch = token->at(i);
+        int intch = (unsigned char)ch;
+        if (intch < 0) {
+            // ignore UTF-8 characters
+            continue;
+        }
+        if (intch > 127) {
+            // ignore UTF-8 characters
+            continue;
+        }
         if (isdigit(ch)) {
             continue;
         }
@@ -10505,7 +10514,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             // use 7 slot in array for vertical strokes
             ch = 7;
         }
-        articloc.at(ch) = i + 1;
+        articloc.at(intch) = i + 1;
 
         if (posch) {
             // check for gestural articulations
@@ -10523,15 +10532,15 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         }
 
         if ((posch != 0) && (posch == m_signifiers.above)) {
-            articpos.at(ch) = 1;
-            showpos.at(ch) = true;
+            articpos.at(intch) = 1;
+            showpos.at(intch) = true;
         }
         else if ((posch != 0) && (posch == m_signifiers.below)) {
-            articpos.at(ch) = -1;
-            showpos.at(ch) = true;
+            articpos.at(intch) = -1;
+            showpos.at(intch) = true;
         }
         else {
-            articpos.at(ch) = 0;
+            articpos.at(intch) = 0;
         }
     }
 
@@ -21172,9 +21181,13 @@ int HumdrumInput::getHighestDiatonicPitch(hum::HTp token, const std::string &req
 
 void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 {
-    vector<bool> chartable(256, false);
+    vector<bool> chartable(128, false);
     for (int i = 0; i < (int)token->size(); ++i) {
-        chartable[token->at(i)] = true;
+        int intch = (unsigned char)token->at(i);
+        if (intch < 0 || intch > 127) {
+            continue;
+        }
+        chartable[intch] = true;
     }
 
     if (chartable['T'] || chartable['t']) {
