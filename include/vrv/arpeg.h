@@ -28,7 +28,8 @@ class Arpeg : public ControlElement,
               public TimePointInterface,
               public AttArpegLog,
               public AttArpegVis,
-              public AttColor {
+              public AttColor,
+              public AttEnclosingChars {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

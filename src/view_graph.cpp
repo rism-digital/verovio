@@ -218,6 +218,32 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
     dc->ResetBrush();
 }
 
+void View::DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, int height, int width,
+    int horizontalThickness, int verticalThickness)
+{
+    assert(dc);
+
+    const int sign = leftBracket ? 1 : -1;
+
+    DrawFilledRectangle(dc, x, y - horizontalThickness / 2, x + sign * verticalThickness,
+        y + height + horizontalThickness / 2); // vertical
+    DrawFilledRectangle(
+        dc, x, y - horizontalThickness / 2, x + sign * width, y + horizontalThickness / 2); // horizontal bottom
+    DrawFilledRectangle(dc, x, y + height - horizontalThickness / 2, x + sign * width,
+        y + height + horizontalThickness / 2); // horizontal top
+}
+
+void View::DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
+    int horizontalThickness, int verticalThickness)
+{
+    assert(dc);
+
+    this->DrawSquareBracket(
+        dc, true, x - offset, y - offset, height + 2 * offset, bracketWidth, horizontalThickness, verticalThickness);
+    this->DrawSquareBracket(dc, false, x + width + offset, y - offset, height + 2 * offset, bracketWidth,
+        horizontalThickness, verticalThickness);
+}
+
 void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
