@@ -31,10 +31,24 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
     c2 = BoundingBox::CalcPositionAfterRotation(c2, angle, rotationPoint);
 }
 
-void BezierCurve::CalculateControlPointOffset(Doc *doc)
+void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
 {
-    m_rightControlPointOffset = std::abs(p2.x - p1.x) / (2.0 + doc->GetOptions()->m_slurControlPoints.GetValue() / 5.0);
-    m_leftControlPointOffset = m_rightControlPointOffset;
+    const int dist = abs(p2.x - p1.x);
+    const int unit = doc->GetDrawingUnit(staffSize);
+
+    // Initialize offset
+    const int offset = dist / (2.0 + doc->GetOptions()->m_slurControlPoints.GetValue() / 5.0);
+    m_leftControlPointOffset = offset;
+    m_rightControlPointOffset = offset;
+
+    // Initialize height
+    int height = std::max<int>(
+        doc->GetOptions()->m_slurMinHeight.GetValue() * unit, dist / doc->GetOptions()->m_slurHeightFactor.GetValue());
+    height = std::min<int>(doc->GetOptions()->m_slurMaxHeight.GetValue() * unit, height);
+    height *= sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 3.0;
+    height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
+    height = std::min<int>(height, offset * cos(angle));
+    this->SetControlHeight(height);
 }
 
 void BezierCurve::UpdateControlPointParams(curvature_CURVEDIR dir)

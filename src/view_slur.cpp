@@ -528,24 +528,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 float View::CalcInitialSlur(
     FloatingCurvePositioner *curve, Slur *slur, Staff *staff, curvature_CURVEDIR curveDir, Point points[4])
 {
-    // For readability makes them p1 and p2
-    BezierCurve bezier;
-    bezier.p1 = points[0];
-    bezier.p2 = points[3];
-    bezier.CalculateControlPointOffset(m_doc);
-
-    /************** height **************/
-
-    // the 'height' of the bezier
-    int height;
-    int dist = abs(bezier.p2.x - bezier.p1.x);
-    height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
-        dist / m_options->m_slurHeightFactor.GetValue());
-    height = std::min(
-        int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
-
-    // the height of the control points
-    height = height * 4 / 3;
+    // For now we pick C1 = P1 and C2 = P2
+    BezierCurve bezier(points[0], points[0], points[3], points[3]);
 
     /************** content **************/
 
@@ -652,8 +636,7 @@ float View::CalcInitialSlur(
 
     /************** control points **************/
 
-    Point rotatedC1, rotatedC2;
-    bezier.SetControlHeight(height);
+    bezier.CalcInitialControlPointParams(m_doc, slurAngle, staff->m_drawingStaffSize);
     bezier.UpdateControlPoints(curveDir);
     bezier.Rotate(slurAngle, bezier.p1);
 

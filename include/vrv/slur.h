@@ -67,9 +67,7 @@ public:
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
 
-    bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
-
-    void AdjustControlPointHeight(Doc *doc, BezierCurve &bezierCurve, float angle, int staffSize);
+    void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
 
@@ -92,8 +90,6 @@ private:
      * Adjust slur position based on overlapping objects within its spanning elements
      */
     ///@{
-    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve);
-
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 

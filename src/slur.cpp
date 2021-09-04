@@ -78,85 +78,36 @@ void Slur::Reset()
     // m_isCrossStaff = false;
 }
 
-bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
+void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 {
     assert(doc);
     assert(curve);
     assert(staff);
 
-    float slurAngle = curve->GetAngle();
-    curvature_CURVEDIR curveDir = curve->GetDir();
     Point points[4];
     curve->GetPoints(points);
-    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
-    bezier.Rotate(-slurAngle, points[0]);
-    bezier.CalculateControlPointOffset(doc);
+    bezier.UpdateControlPointParams(curve->GetDir());
 
-    bool adjusted = false;
-    if (!spannedElements->empty()) {
-        // Bound the height of the control points
-        this->AdjustControlPointHeight(doc, bezier, curve->GetAngle(), staff->m_drawingStaffSize);
-        bezier.UpdateControlPoints(curveDir);
-
-        // The slur is being adjusted
-        adjusted = true;
-        bezier.Rotate(slurAngle, bezier.p1);
-        bezier.UpdateControlPointParams(curveDir);
-
-        // Use the adjusted control points for adjusting the position
-        this->AdjustSlurPosition(doc, curve, bezier);
-        // Recalculate the control points and update the bezier curve
-        bezier.UpdateControlPoints(curveDir);
-    }
-
-    if (adjusted) {
-        points[0] = bezier.p1;
-        points[1] = bezier.c1;
-        points[2] = bezier.c2;
-        points[3] = bezier.p2;
-        curve->UpdateCurveParams(points, slurAngle, curve->GetThickness(), curveDir);
-        // Since we are going to redraw-it reset its bounding box
-        curve->BoundingBox::ResetBoundingBox();
-    }
-
-    return adjusted;
-}
-
-void Slur::AdjustControlPointHeight(Doc *doc, BezierCurve &bezierCurve, float angle, int staffSize)
-{
-    int height
-        = std::abs(bezierCurve.c1.y - bezierCurve.p1.y) * sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 3.0;
-
-    height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
-    height = std::min<int>(height, bezierCurve.GetLeftControlPointOffset() * cos(angle) / 3.0);
-
-    bezierCurve.SetControlHeight(height);
-}
-
-void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve)
-{
     const int margin = doc->GetDrawingUnit(100);
-    bezierCurve.CopyPointsTo(curve);
 
     // STEP 1: Calculate the vertical adjustment of end points. This shifts the slur vertically.
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
-    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezierCurve, margin);
+    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
         const int sign = (curve->GetDir() == curvature_CURVEDIR_above) ? 1 : -1;
-        bezierCurve.p1.y += sign * endPointShiftLeft;
-        bezierCurve.p2.y += sign * endPointShiftRight;
-        if (bezierCurve.p1.x != bezierCurve.p2.x) {
-            double lambda = double(bezierCurve.c1.x - bezierCurve.p1.x) / double(bezierCurve.p2.x - bezierCurve.p1.x);
-            bezierCurve.c1.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
-            lambda = double(bezierCurve.c2.x - bezierCurve.p1.x) / double(bezierCurve.p2.x - bezierCurve.p1.x);
-            bezierCurve.c2.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
+        bezier.p1.y += sign * endPointShiftLeft;
+        bezier.p2.y += sign * endPointShiftRight;
+        if (bezier.p1.x != bezier.p2.x) {
+            double lambda = double(bezier.c1.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
+            bezier.c1.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
+            lambda = double(bezier.c2.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
+            bezier.c2.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
         }
-        bezierCurve.UpdateControlPointParams(curve->GetDir());
-        bezierCurve.CopyPointsTo(curve);
+        bezier.UpdateControlPointParams(curve->GetDir());
+        bezier.CopyPointsTo(curve);
     }
 
     // STEP 2: Calculate the horizontal offset of the control points.
@@ -166,12 +117,12 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, BezierCu
     bool ok = false;
     int controlPointOffsetLeft = 0;
     int controlPointOffsetRight = 0;
-    std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight) = this->CalcControlPointOffset(curve, bezierCurve);
+    std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight) = this->CalcControlPointOffset(curve, bezier);
     if (ok) {
-        bezierCurve.SetLeftControlPointOffset(controlPointOffsetLeft);
-        bezierCurve.SetRightControlPointOffset(controlPointOffsetRight);
-        bezierCurve.UpdateControlPoints(curve->GetDir());
-        bezierCurve.CopyPointsTo(curve);
+        bezier.SetLeftControlPointOffset(controlPointOffsetLeft);
+        bezier.SetRightControlPointOffset(controlPointOffsetRight);
+        bezier.UpdateControlPoints(curve->GetDir());
+        bezier.CopyPointsTo(curve);
     }
 
     // STEP 3: Calculate the vertical shift of the control points.
@@ -182,25 +133,30 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, BezierCu
     int controlPointShiftLeft = 0;
     int controlPointShiftRight = 0;
     std::tie(controlPointShiftLeft, controlPointShiftRight)
-        = this->CalcControlPointVerticalShift(curve, bezierCurve, margin);
-    bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + controlPointShiftLeft);
-    bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + controlPointShiftRight);
-    bezierCurve.UpdateControlPoints(curve->GetDir());
-    bezierCurve.CopyPointsTo(curve);
+        = this->CalcControlPointVerticalShift(curve, bezier, margin);
+    bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + controlPointShiftLeft);
+    bezier.SetRightControlHeight(bezier.GetRightControlHeight() + controlPointShiftRight);
+    bezier.UpdateControlPoints(curve->GetDir());
+    bezier.CopyPointsTo(curve);
 
     // STEP 4: Adjust the slur shape
     // Through the control point adjustments in step 2 and 3 it can happen that the slur looses its desired shape.
     // We correct the shape if the slur is too flat or not convex.
-    this->AdjustSlurShape(bezierCurve, curve->GetDir(), doc->GetDrawingUnit(100));
-    bezierCurve.CopyPointsTo(curve);
+    this->AdjustSlurShape(bezier, curve->GetDir(), doc->GetDrawingUnit(100));
+    bezier.CopyPointsTo(curve);
+
+    // Since we are going to redraw-it reset its bounding box
+    curve->BoundingBox::ResetBoundingBox();
 }
 
 std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
 {
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
+
     int shiftLeft = 0;
     int shiftRight = 0;
 
-    const int dist = std::abs(bezierCurve.p2.x - bezierCurve.p1.x);
+    const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
     for (auto spannedElement : *spannedElements) {
@@ -217,7 +173,7 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
             continue;
         }
 
-        if ((intersection > 0) && (dist > 0)) {
+        if (intersection > 0) {
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             const int xMiddle = (xLeft + xRight) / 2;
@@ -314,9 +270,11 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(FloatingCurvePositioner 
 std::pair<int, int> Slur::CalcControlPointVerticalShift(
     FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
 {
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
+
     std::list<ControlPointConstraint> constraints;
 
-    const int dist = std::abs(bezierCurve.p2.x - bezierCurve.p1.x);
+    const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
@@ -358,7 +316,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
             continue;
         }
 
-        if ((intersection > 0) && (dist > 0)) {
+        if (intersection > 0) {
             Point points[4];
             points[0] = bezierCurve.p1;
             points[1] = bezierCurve.c1;
