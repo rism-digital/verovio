@@ -2594,7 +2594,7 @@ bool PAEInput::Parse()
 
         // Everytime we have a Measure, we need to add it to the section and fill it with a Staff and Layer
         if (token.Is(MEASURE)) {
-            currentMeasure = dynamic_cast<Measure *>(token.m_object);
+            currentMeasure = vrv_cast<Measure *>(token.m_object);
             assert(currentMeasure);
             token.m_object = NULL;
 
@@ -2633,7 +2633,7 @@ bool PAEInput::Parse()
                 if (token.m_object->Is({ MENSUR, METERSIG })) {
                     token.m_object->IsAttribute(true);
                     if (token.m_object->Is(METERSIG)) {
-                        currentMeterSig = dynamic_cast<MeterSig *>(token.m_object);
+                        currentMeterSig = vrv_cast<MeterSig *>(token.m_object);
                         assert(currentMeterSig);
                     }
                 }
@@ -2644,7 +2644,7 @@ bool PAEInput::Parse()
         }
         else if (token.m_object->IsLayerElement()) {
 
-            LayerElement *element = dynamic_cast<LayerElement *>(token.m_object);
+            LayerElement *element = vrv_cast<LayerElement *>(token.m_object);
             assert(element);
             // The object is either a container end, or will be added to the layerElementContainers.back()
             token.m_object = NULL;
@@ -2683,7 +2683,7 @@ bool PAEInput::Parse()
             currentMeasure->AddChild(token.m_object);
             // Find open ties
             if (token.m_object->Is(TIE)) {
-                Tie *tie = dynamic_cast<Tie *>(token.m_object);
+                Tie *tie = vrv_cast<Tie *>(token.m_object);
                 assert(tie);
                 if (!tie->HasEndid()) {
                     assert(currentMeterSig);
@@ -2838,7 +2838,7 @@ bool PAEInput::ConvertMeasure()
 
         // This is the first (default) measure added to the tokens ::Import
         if (token.Is(MEASURE)) {
-            currentMeasure = dynamic_cast<Measure *>(token.m_object);
+            currentMeasure = vrv_cast<Measure *>(token.m_object);
             assert(currentMeasure);
         }
         if (this->Is(token, pae::MEASURE)) {
@@ -3131,7 +3131,7 @@ bool PAEInput::ConvertOctave()
 
         // Simply set is to the notes
         if (token.Is(NOTE)) {
-            Note *note = dynamic_cast<Note *>(token.m_object);
+            Note *note = vrv_cast<Note *>(token.m_object);
             assert(note);
             note->SetOct(oct);
         }
@@ -3261,7 +3261,7 @@ bool PAEInput::ConvertAccidental()
         }
         else if (accidental != ACCIDENTAL_WRITTEN_NONE) {
             if (token.Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(token.m_object);
+                Note *note = vrv_cast<Note *>(token.m_object);
                 assert(note);
                 Accid *accid = new Accid();
                 accid->SetAccid(accidental);
@@ -3531,7 +3531,7 @@ bool PAEInput::ConvertGrace()
                 continue;
             }
             if (token.Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(token.m_object);
+                Note *note = vrv_cast<Note *>(token.m_object);
                 assert(note);
                 if (isAcciaccatura) {
                     note->SetDur(DURATION_8);
@@ -3679,12 +3679,12 @@ bool PAEInput::ConvertDuration()
         if ((token.Is(NOTE) && !isChord) || token.Is(CHORD) || token.Is(REST)) {
             // We should also skip acciaccature
             if (token.Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(token.m_object);
+                Note *note = vrv_cast<Note *>(token.m_object);
                 assert(note);
                 if (note->GetGrace() == GRACE_unacc) continue;
             }
             // Set the duration to the note, chord or rest
-            DurationInterface *interface = dynamic_cast<DurationInterface *>(token.m_object);
+            DurationInterface *interface = vrv_cast<DurationInterface *>(token.m_object);
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {
@@ -3711,7 +3711,7 @@ bool PAEInput::ConvertTie()
         if (token.IsVoid()) continue;
 
         if (token.Is(NOTE)) {
-            Note *tokenNote = dynamic_cast<Note *>(token.m_object);
+            Note *tokenNote = vrv_cast<Note *>(token.m_object);
             assert(tokenNote);
             if (tie && note) {
                 if (note->GetOct() != tokenNote->GetOct() || note->GetPname() != tokenNote->GetPname()) {
