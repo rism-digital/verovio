@@ -978,9 +978,6 @@ void SvgDeviceContext::AppendIdAndClass(std::string gId, std::string baseClass, 
 
 void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
 {
-    std::string baseClass = object->GetClassName();
-    std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
-
     std::pair<std::multimap<ClassId, std::string>::iterator, std::multimap<ClassId, std::string>::iterator> range;
     range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
     for (std::multimap<ClassId, std::string>::iterator it = range.first; it != range.second; ++it) {
