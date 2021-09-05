@@ -91,7 +91,10 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 
     const int margin = doc->GetDrawingUnit(100);
 
-    // STEP 1: Calculate the vertical adjustment of end points. This shifts the slur vertically.
+    // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
+    this->FilterSpannedElements(curve, bezier, margin);
+
+    // STEP 2: Calculate the vertical adjustment of end points. This shifts the slur vertically.
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
@@ -110,7 +113,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         bezier.CopyPointsTo(curve);
     }
 
-    // STEP 2: Calculate the horizontal offset of the control points.
+    // STEP 3: Calculate the horizontal offset of the control points.
     // The idea is to shift control points to the outside if there is an obstacle in the vicinity of the corresponding
     // endpoint. For C1 we consider the largest angle <)BP1P2 where B is a colliding left bounding box corner and choose
     // C1 in this direction. Similar for C2.
@@ -125,7 +128,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         bezier.CopyPointsTo(curve);
     }
 
-    // STEP 3: Calculate the vertical shift of the control points.
+    // STEP 4: Calculate the vertical shift of the control points.
     // For each colliding bounding box we formulate a constraint ax + by >= c
     // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
     // The coefficients a, b are calculated from the Bezier curve equation.
@@ -139,14 +142,59 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     bezier.UpdateControlPoints(curve->GetDir());
     bezier.CopyPointsTo(curve);
 
-    // STEP 4: Adjust the slur shape
+    // STEP 5: Adjust the slur shape
     // Through the control point adjustments in step 2 and 3 it can happen that the slur looses its desired shape.
     // We correct the shape if the slur is too flat or not convex.
     this->AdjustSlurShape(bezier, curve->GetDir(), doc->GetDrawingUnit(100));
     bezier.CopyPointsTo(curve);
 
-    // Since we are going to redraw-it reset its bounding box
+    // Since we are going to redraw it, reset its bounding box
     curve->BoundingBox::ResetBoundingBox();
+}
+
+void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
+{
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
+
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+
+    // Find max/min value for the spanning elements within the slur
+    int extremeY = VRV_UNSET;
+    std::for_each(spannedElements->begin(), spannedElements->end(),
+        [dir = curve->GetDir(), &extremeY](CurveSpannedElement *element) {
+            if (dir == curvature_CURVEDIR_above) {
+                const int y = element->m_boundingBox->GetSelfTop();
+                extremeY = (extremeY == VRV_UNSET) ? y : std::max(y, extremeY);
+            }
+            else {
+                const int y = element->m_boundingBox->GetSelfBottom();
+                extremeY = (extremeY == VRV_UNSET) ? y : std::min(y, extremeY);
+            }
+        });
+    const int leftPointMaxHeight = extremeY - bezierCurve.p1.y;
+    const int rightPointMaxHeight = extremeY - bezierCurve.p2.y;
+
+    for (auto spannedElement : *spannedElements) {
+
+        if (spannedElement->m_discarded) {
+            continue;
+        }
+
+        bool discard = false;
+        const int intersection = curve->CalcAdjustment(spannedElement->m_boundingBox, discard, margin);
+
+        // In case of cross-staff, intersection with the note that is in the staff directly under the start/end point
+        // might result in too big curve or strange slurs. If intersection is bigger than maximum height of the
+        // cross-staff slur, we should ignore it.
+        if (curve->IsCrossStaff()
+            && (intersection > std::max(std::abs(rightPointMaxHeight), std::abs(leftPointMaxHeight)))) {
+            discard = true;
+        }
+
+        if (discard) {
+            spannedElement->m_discarded = true;
+        }
+    }
 }
 
 std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
@@ -278,22 +326,6 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
-    // Find max/min value for the spanning elements within the slur
-    int extremeY = VRV_UNSET;
-    std::for_each(spannedElements->begin(), spannedElements->end(),
-        [dir = curve->GetDir(), &extremeY](CurveSpannedElement *element) {
-            if (dir == curvature_CURVEDIR_above) {
-                const int y = element->m_boundingBox->GetSelfTop();
-                extremeY = (extremeY == VRV_UNSET) ? y : std::max(y, extremeY);
-            }
-            else {
-                const int y = element->m_boundingBox->GetSelfBottom();
-                extremeY = (extremeY == VRV_UNSET) ? y : std::min(y, extremeY);
-            }
-        });
-    const int leftPointMaxHeight = extremeY - bezierCurve.p1.y;
-    const int rightPointMaxHeight = extremeY - bezierCurve.p2.y;
-
     for (auto spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
@@ -305,14 +337,6 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
 
         if (discard) {
             spannedElement->m_discarded = true;
-            continue;
-        }
-
-        // In case of cross-staff, intersection with the note that is in the staff directly under the start/end point
-        // might result in too big curve or strange slurs. If intersection is bigger than maximum height of the
-        // cross-staff slur, we should ignore it.
-        if (curve->IsCrossStaff()
-            && (intersection > std::max(std::abs(rightPointMaxHeight), std::abs(leftPointMaxHeight)))) {
             continue;
         }
 

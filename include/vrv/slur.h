@@ -90,6 +90,9 @@ private:
      * Adjust slur position based on overlapping objects within its spanning elements
      */
     ///@{
+    // Discard certain spanned elements
+    void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
