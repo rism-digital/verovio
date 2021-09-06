@@ -2450,9 +2450,10 @@ bool PAEInput::Import(const std::string &input)
         jsonInput = this->InputKeysToJson(input);
     }
 
-    m_isMensural = false;
-
+    // Eventually this should be made a --pae-pedantic option
     m_pedanticMode = false;
+
+    m_isMensural = false;
 
     bool success = true;
 
