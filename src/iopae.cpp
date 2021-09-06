@@ -3715,7 +3715,7 @@ bool PAEInput::ConvertDuration()
                 if (note->GetGrace() == GRACE_unacc) continue;
             }
             // Set the duration to the note, chord or rest
-            DurationInterface *interface = vrv_cast<DurationInterface *>(token.m_object);
+            DurationInterface *interface = dynamic_cast<DurationInterface *>(token.m_object);
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {
