@@ -12,12 +12,9 @@
 #include <assert.h>
 #include <cctype>
 #include <fstream>
+#include <regex>
 #include <sstream>
 #include <string>
-
-#ifndef NO_PAE_SUPPORT
-#include <regex>
-#endif /* NO_PAE_SUPPORT */
 
 //----------------------------------------------------------------------------
 
@@ -2283,6 +2280,8 @@ void PAEInput::ClearTokenObjects()
     m_pae.clear();
 }
 
+#ifndef NO_PAE_SUPPORT
+
 void PAEInput::LogPAE(std::string msg, pae::Token &token)
 {
     m_hasErrors = true;
@@ -4322,6 +4321,8 @@ bool PAEInput::ParseDuration(
 
     return true;
 }
+
+#endif // NO_PAE_SUPPORT
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------

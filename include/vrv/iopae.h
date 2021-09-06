@@ -493,7 +493,7 @@ namespace pae {
         bool m_isError;
     };
 
-}; // namespace pae
+} // namespace pae
 
 class PAEInput : public Input {
 public:
@@ -501,6 +501,7 @@ public:
     PAEInput(Doc *doc);
     virtual ~PAEInput();
 
+#ifndef NO_PAE_SUPPORT
     virtual bool Import(const std::string &input);
 
 private:
@@ -570,14 +571,16 @@ private:
 
     bool CheckContent();
 
-    void ClearTokenObjects();
-
     void RemoveContainerToken(Object *);
 
     void LogPAE(std::string msg, pae::Token &token);
 
     void LogDebugTokens(bool vertical = false);
 
+#endif // NO_PAE_SUPPORT
+    
+    void ClearTokenObjects();
+    
 public:
     //
 private:
