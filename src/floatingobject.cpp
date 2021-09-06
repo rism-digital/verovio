@@ -548,6 +548,15 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 
 int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
 {
+    int leftAdjustment, rightAdjustment;
+    std::tie(leftAdjustment, rightAdjustment)
+        = CalcLeftRightAdjustment(boundingBox, discard, margin, horizontalOverlap);
+    return std::max(leftAdjustment, rightAdjustment);
+}
+
+std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
+    BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
+{
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
 
@@ -569,17 +578,21 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
 
     // first check if they overlap at all
     if (horizontalOverlap) {
-        if (p2.x < boundingBox->GetLeftBy(type) + margin) return 0;
-        if (p1.x > boundingBox->GetRightBy(type) + margin) return 0;
+        if (p2.x < boundingBox->GetLeftBy(type) + margin) return { 0, 0 };
+        if (p1.x > boundingBox->GetRightBy(type) + margin) return { 0, 0 };
     }
 
     Point topBezier[4], bottomBezier[4];
     BoundingBox::CalcThickBezier(points, this->GetThickness(), this->GetAngle(), topBezier, bottomBezier);
 
+    // Now calculate the left and right adjustments
+    int leftAdjustment = 0;
+    int rightAdjustment = 0;
+
     if (this->GetDir() == curvature_CURVEDIR_above) {
         // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.
         if (((this->GetTopBy(type) + margin) < boundingBox->GetBottomBy(type)) && !keepInside) {
-            return 0;
+            return { 0, 0 };
         }
         int leftY = 0;
         int rightY = 0;
@@ -591,13 +604,13 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
         }
         // The curve overflows on the left
         else if ((p1.x < boundingBox->GetLeftBy(type)) && p2.x <= boundingBox->GetRightBy(type)) {
-            leftY = BoundingBox::CalcBezierAtPosition(topBezier, boundingBox->GetLeftBy(type)) - margin;
+            leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, boundingBox->GetLeftBy(type)) - margin;
             rightY = p2.y - margin;
         }
         // The curve overflows on the right
         else if ((p1.x >= boundingBox->GetLeftBy(type)) && p2.x > boundingBox->GetRightBy(type)) {
             leftY = p1.y - margin;
-            rightY = BoundingBox::CalcBezierAtPosition(topBezier, boundingBox->GetRightBy(type)) - margin;
+            rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, boundingBox->GetRightBy(type)) - margin;
         }
         // The curve is inside the left and right side of the content
         else {
@@ -605,19 +618,13 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
             rightY = p2.y - margin;
         }
 
-        // Now check what to do
-        // Everything is underneath - we can discard the element
-        if ((leftY >= boundingBox->GetTopBy(type)) && (rightY >= boundingBox->GetTopBy(type))) {
-            discard = true;
-            return 0;
-        }
-        // Return the maximum adjustment required
-        return std::max(boundingBox->GetTopBy(type) - leftY, boundingBox->GetTopBy(type) - rightY);
+        leftAdjustment = std::max(boundingBox->GetTopBy(type) - leftY, 0);
+        rightAdjustment = std::max(boundingBox->GetTopBy(type) - rightY, 0);
     }
     else {
         // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.
         if (((this->GetTopBy(type) + margin) < boundingBox->GetBottomBy(type)) && !keepInside) {
-            return 0;
+            return { 0, 0 };
         }
         int leftY = 0;
         int rightY = 0;
@@ -643,15 +650,16 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
             rightY = p2.y + margin;
         }
 
-        // Now check what to do
-        // Everything is above - we can discard the element
-        if ((leftY <= boundingBox->GetBottomBy(type)) && (rightY <= boundingBox->GetBottomBy(type))) {
-            discard = true;
-            return 0;
-        }
-        // Return the maximum adjustment required
-        return std::max(leftY - boundingBox->GetBottomBy(type), rightY - boundingBox->GetBottomBy(type));
+        leftAdjustment = std::max(leftY - boundingBox->GetBottomBy(type), 0);
+        rightAdjustment = std::max(rightY - boundingBox->GetBottomBy(type), 0);
     }
+
+    if ((leftAdjustment == 0) && (rightAdjustment == 0)) {
+        // Everything is above or below - we can discard the element
+        discard = true;
+    }
+
+    return { leftAdjustment, rightAdjustment };
 }
 
 void FloatingCurvePositioner::GetPoints(Point points[4]) const

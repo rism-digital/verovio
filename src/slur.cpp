@@ -214,38 +214,47 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
         }
 
         bool discard = false;
-        int intersection = curve->CalcAdjustment(spannedElement->m_boundingBox, discard, margin);
+        int intersectionLeft, intersectionRight;
+        std::tie(intersectionLeft, intersectionRight)
+            = curve->CalcLeftRightAdjustment(spannedElement->m_boundingBox, discard, margin);
 
         if (discard) {
             spannedElement->m_discarded = true;
             continue;
         }
 
-        if (intersection > 0) {
-            const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
-            const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
-            const int xMiddle = (xLeft + xRight) / 2;
-            const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
+        if ((intersectionLeft > 0) || (intersectionRight > 0)) {
+            // Define function which applies an intersection at a given distance ratio to the shifts
+            auto applyIntersection = [&shiftLeft, &shiftRight](double ratio, int intersection) {
+                // Filter collisions near the endpoints
+                // Collisions with 0.15 <= ratio <= 0.85 do not contribute to shifts
+                // They are compensated later by shifting the control points
+                if (ratio < 0.15) {
+                    if (ratio > 0.05) {
+                        // For 0.05 <= ratio <= 0.15 collisions only partially contribute to shifts
+                        // We multiply with a function that interpolates between 1 and 0
+                        intersection *= pow(1.5 - 10.0 * ratio, 2.0);
+                    }
+                    shiftLeft = std::max(shiftLeft, intersection);
+                }
+                else if (ratio > 0.85) {
+                    if (ratio < 0.95) {
+                        // For 0.85 <= ratio <= 0.95 collisions only partially contribute to shifts
+                        // We multiply with a function that interpolates between 0 and 1
+                        intersection *= pow(10.0 * ratio - 8.5, 2.0);
+                    }
+                    shiftRight = std::max(shiftRight, intersection);
+                }
+            };
 
-            // Filter collisions near the endpoints
-            // Collisions with 0.15 <= distanceRatio <= 0.85 do not contribute to shifts
-            // They are compensated later by shifting the control points
-            if (distanceRatio < 0.15) {
-                if (distanceRatio > 0.05) {
-                    // For 0.05 <= distanceRatio <= 0.15 collisions only partially contribute to shifts
-                    // We muliply with a function that interpolates between 1 and 0
-                    intersection *= pow(1.5 - 10.0 * distanceRatio, 2.0);
-                }
-                shiftLeft = std::max(shiftLeft, intersection);
-            }
-            else if (distanceRatio > 0.85) {
-                if (distanceRatio < 0.95) {
-                    // For 0.85 <= distanceRatio <= 0.95 collisions only partially contribute to shifts
-                    // We muliply with a function that interpolates between 0 and 1
-                    intersection *= pow(10.0 * distanceRatio - 8.5, 2.0);
-                }
-                shiftRight = std::max(shiftRight, intersection);
-            }
+            // Now apply the intersections on the left and right hand side of the bounding box
+            const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
+            const float distanceRatioLeft = float(xLeft - bezierCurve.p1.x) / float(dist);
+            applyIntersection(distanceRatioLeft, intersectionLeft);
+
+            const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
+            const float distanceRatioRight = float(xRight - bezierCurve.p1.x) / float(dist);
+            applyIntersection(distanceRatioRight, intersectionRight);
         }
     }
     return { shiftLeft, shiftRight };
@@ -333,14 +342,16 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
         }
 
         bool discard = false;
-        int intersection = curve->CalcAdjustment(spannedElement->m_boundingBox, discard, margin);
+        int intersectionLeft, intersectionRight;
+        std::tie(intersectionLeft, intersectionRight)
+            = curve->CalcLeftRightAdjustment(spannedElement->m_boundingBox, discard, margin);
 
         if (discard) {
             spannedElement->m_discarded = true;
             continue;
         }
 
-        if (intersection > 0) {
+        if ((intersectionLeft > 0) || (intersectionRight > 0)) {
             Point points[4];
             points[0] = bezierCurve.p1;
             points[1] = bezierCurve.c1;
@@ -354,7 +365,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
             if (std::abs(0.5 - distanceRatio) < 0.45) {
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xLeft);
                 constraints.push_back(
-                    { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersection) });
+                    { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionLeft) });
             }
 
             // Add constraint for the right boundary of the colliding bounding box
@@ -364,7 +375,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
             if (std::abs(0.5 - distanceRatio) < 0.45) {
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xRight);
                 constraints.push_back(
-                    { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersection) });
+                    { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionRight) });
             }
         }
     }
