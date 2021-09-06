@@ -3414,6 +3414,12 @@ bool PAEInput::ConvertBeam()
 
         if (token->m_char == '{') {
             token->m_char = 0;
+            if (m_isMensural) {
+                LogPAE("Beam are not supported with mensural notation", *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
             if (beam) {
                 LogPAE("Nested beams are not supported", *token);
                 if (m_pedanticMode) return false;
@@ -3425,6 +3431,11 @@ bool PAEInput::ConvertBeam()
         }
         else if (token->m_char == '}') {
             token->m_char = 0;
+            if (m_isMensural) {
+                // Not warning necessary here because we must had one before already
+                ++token;
+                continue;
+            }
             if (!beam) {
                 LogPAE("Irrelevant closing beam", *token);
                 if (m_pedanticMode) return false;
