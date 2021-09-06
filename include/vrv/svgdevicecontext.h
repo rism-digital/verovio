@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "object.h"
 
 //----------------------------------------------------------------------------
 
@@ -167,6 +168,11 @@ public:
     void AppendIdAndClass(std::string gId, std::string baseClass, std::string addedClasses, bool primary = true);
 
     /**
+     * Append additional attributes, as given in m_svgAdditionalAttributes
+     */
+    void AppendAdditionalAttributes(Object *object);
+
+    /**
      * In SVG use global styling but not with mm output (for pdf generation)
      */
     virtual bool UseGlobalStyling() { return !m_mmOutput; }
@@ -208,6 +214,20 @@ public:
      * Removes the xlink: prefex on href attributes, necessary for some newer browsers.
      */
     void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
+
+    /**
+     *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
+     * (e.g., "note@pname")
+     */
+    void SetAdditionalAttributes(const std::vector<std::string> &additionalAttributes)
+    {
+        for (std::string s : additionalAttributes) {
+            std::string className = s.substr(0, s.find("@")); // parse <element@attribute>, e.g., "note@pname"
+            std::string attributeName = s.substr(s.find("@") + 1);
+            ClassId classId = ObjectFactory::GetInstance()->GetClassId(className);
+            m_svgAdditionalAttributes.insert({ classId, attributeName });
+        }
+    }
 
 private:
     /**
@@ -282,6 +302,8 @@ private:
     bool m_svgViewBox;
     // output HTML5 data-* attributes
     bool m_html5;
+    // copy additional attributes of given elements to the SVG, in the form "note@pname; layer@n"
+    std::multimap<ClassId, std::string> m_svgAdditionalAttributes;
     // format output as raw, stripping extraneous whitespace and non-content newlines
     bool m_formatRaw;
     // remove xlink from href attributes

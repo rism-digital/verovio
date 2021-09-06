@@ -673,7 +673,33 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
     }
 
+    // Possibly draw enclosing brackets
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, clefSizeFactor);
+
     dc->EndGraphic(element, this);
+}
+
+void View::DrawClefEnclosing(
+    DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor)
+{
+    if ((clef->GetEnclose() == ENCLOSURE_brack) || (clef->GetEnclose() == ENCLOSURE_box)) {
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        x += sizeFactor * m_doc->GetGlyphLeft(glyph, staff->m_drawingStaffSize, false);
+        y += sizeFactor * m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, false);
+        const int height = sizeFactor * m_doc->GetGlyphHeight(glyph, staff->m_drawingStaffSize, false);
+        const int width = sizeFactor * m_doc->GetGlyphWidth(glyph, staff->m_drawingStaffSize, false);
+        const int offset = 3 * unit / 4;
+        // We use overlapping brackets to draw boxes :)
+        const int bracketWidth = (clef->GetEnclose() == ENCLOSURE_brack) ? unit : (width + offset);
+        const int verticalThickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        const int horizontalThickness = ((clef->GetEnclose() == ENCLOSURE_brack) ? 2 : 1) * verticalThickness;
+
+        this->DrawEnclosingBrackets(
+            dc, x, y, height, width, offset, bracketWidth, horizontalThickness, verticalThickness);
+    }
+    else if (clef->HasEnclose() && (clef->GetEnclose() != ENCLOSURE_none)) {
+        LogWarning("Only drawing of enclosing brackets and boxes is supported for clef.");
+    }
 }
 
 void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

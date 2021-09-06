@@ -26,6 +26,7 @@ class ScoreDefInterface;
 class Clef : public LayerElement,
              public AttClefShape,
              public AttColor,
+             public AttEnclosingChars,
              public AttExtSym,
              public AttLineLoc,
              public AttOctaveDisplacement,
