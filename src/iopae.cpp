@@ -3788,9 +3788,8 @@ bool PAEInput::ConvertTie()
 bool PAEInput::ConvertAccidGes()
 {
     MapOfPitchAccid currentAccids;
-
-    Note *note = NULL;
-    Tie *tie = NULL;
+    m_keySig.FillMap(currentAccids);
+    Note *lastNote = NULL;
     std::map<std::string, data_ACCIDENTAL_WRITTEN> ties;
 
     for (auto &token : m_pae) {
@@ -3800,6 +3799,59 @@ bool PAEInput::ConvertAccidGes()
             KeySig *keySig = vrv_cast<KeySig *>(token.m_object);
             assert(keySig);
             keySig->FillMap(currentAccids);
+        }
+        else if (token.Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(token.m_object);
+            assert(note);
+            Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
+
+            std::string noteUuid = note->GetUuid();
+            if (!accid) {
+                // Enc tied note with a prevous note with an accidental
+                if (ties.count(noteUuid)) {
+                    Accid *tieAccid = new Accid();
+                    note->AddChild(tieAccid);
+                    tieAccid->SetAccidGes(Att::AccidentalWrittenToGestural(ties[noteUuid]));
+                    ties.erase(noteUuid);
+                }
+                // Nothing in front of the note, but something in the list - make it an accid.ges
+                else if ((currentAccids.count(note->GetPname()) != 0)) {
+                    Accid *gesAccid = new Accid();
+                    note->AddChild(gesAccid);
+                    data_ACCIDENTAL_WRITTEN accidWritten = currentAccids.at(note->GetPname());
+                    gesAccid->SetAccidGes(Att::AccidentalWrittenToGestural(accidWritten));
+                }
+            }
+            else {
+                data_ACCIDENTAL_WRITTEN noteAccid = accid->GetAccid();
+                // Natural in front of the note, remove it from the current list
+                if (noteAccid == ACCIDENTAL_WRITTEN_n) {
+                    if (currentAccids.count(note->GetPname()) != 0) {
+                        currentAccids.erase(note->GetPname());
+                    }
+                }
+                // Not a natural in front of the note, add it to the current list
+                else if (noteAccid != ACCIDENTAL_WRITTEN_NONE) {
+                    currentAccids[note->GetPname()] = noteAccid;
+                }
+            }
+            lastNote = note;
+        }
+        else if (token.Is(TIE) && lastNote) {
+            Accid *accid = vrv_cast<Accid *>(lastNote->FindDescendantByType(ACCID));
+            // The note before had an accidental - we assume it to be the @startid of the tie
+            if (accid) {
+                data_ACCIDENTAL_WRITTEN accidWritten = ACCIDENTAL_WRITTEN_NONE;
+                accidWritten
+                    = (accid->HasAccid()) ? accid->GetAccid() : Att::AccidentalGesturalToWritten(accid->GetAccidGes());
+                Tie *tie = vrv_cast<Tie *>(token.m_object);
+                assert(tie);
+                ties[ExtractUuidFragment(tie->GetEndid())] = accidWritten;
+            }
+        }
+        // Reset the last note unless we have a fermata or a trill
+        else if (!token.Is(FERMATA) && !token.Is(TRILL)) {
+            lastNote = NULL;
         }
     }
 
