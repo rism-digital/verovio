@@ -3652,16 +3652,6 @@ bool PAEInput::ConvertTuplet()
             tupletNumStr = "";
             isNumPart = true;
         }
-        else if (isNumPart) {
-            if (token->m_char && !isdigit(token->m_char)) {
-                LogPAE("Invalid number within tuplet numerator", *token);
-                if (m_pedanticMode) return false;
-                ++token;
-                continue;
-            }
-            tupletNumStr.push_back(token->m_char);
-            token->m_char = 0;
-        }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (tuplet) {
                 LogPAE("Unclose tuplet at the end of a measure", *token);
@@ -3671,6 +3661,16 @@ bool PAEInput::ConvertTuplet()
                 isNumPart = false;
                 tuplet = NULL;
             }
+        }
+        else if (isNumPart) {
+            if (token->m_char && !isdigit(token->m_char)) {
+                LogPAE("Invalid number within tuplet numerator", *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            tupletNumStr.push_back(token->m_char);
+            token->m_char = 0;
         }
         ++token;
     }
