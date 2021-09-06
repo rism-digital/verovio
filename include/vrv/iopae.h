@@ -578,9 +578,9 @@ private:
     void LogDebugTokens(bool vertical = false);
 
 #endif // NO_PAE_SUPPORT
-    
+
     void ClearTokenObjects();
-    
+
 public:
     //
 private:
