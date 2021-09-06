@@ -3708,6 +3708,7 @@ data_ARTICULATION MusicXmlInput::ConvertArticulations(const std::string &value)
         { "falloff", ARTICULATION_fall }, //
         { "plop", ARTICULATION_plop }, //
         { "scoop", ARTICULATION_scoop }, //
+        { "soft-accent", ARTICULATION_acc_soft }, //
         { "spiccato", ARTICULATION_spicc }, //
         { "staccatissimo", ARTICULATION_stacciss }, //
         { "staccato", ARTICULATION_stacc }, //
