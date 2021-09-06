@@ -26,7 +26,11 @@
 //----------------------------------------------------------------------------
 
 #include "atts_cmn.h"
+#include "clef.h"
 #include "io.h"
+#include "keysig.h"
+#include "mensur.h"
+#include "metersig.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -37,7 +41,6 @@ namespace vrv {
 
 class Beam;
 class Chord;
-class Clef;
 class DurationInterface;
 class GraceGrp;
 class KeyAccid;
@@ -45,8 +48,6 @@ class Layer;
 class LayerElement;
 class Mdiv;
 class Measure;
-class MeterSig;
-class Mensur;
 class MRest;
 class MultiRest;
 class Note;
@@ -538,6 +539,7 @@ private:
     bool ConvertTuplet();
     bool ConvertDuration();
     bool ConvertTie();
+    bool ConvertAccidGes();
     ///@}
 
     bool Is(pae::Token &token, const std::string &map);
@@ -549,7 +551,7 @@ private:
      */
     ///@{
     bool ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token);
-    bool ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token);
+    bool ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool *mensuralScoreDef = NULL);
     bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token);
     bool ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token);
     bool ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token);
@@ -586,6 +588,11 @@ private:
     bool m_pedanticMode;
 
     bool m_hasErrors;
+
+    Clef m_clef;
+    KeySig m_keySig;
+    Mensur m_mensur;
+    MeterSig m_meterSig;
 };
 
 //----------------------------------------------------------------------------

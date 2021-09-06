@@ -2229,6 +2229,9 @@ namespace pae {
     enum status_FIGURE { FIGURE_NONE = 0, FIGURE_START, FIGURE_END, FIGURE_REPEAT };
     enum status_CHORD { CHORD_NONE = 0, CHORD_MARKER, CHORD_NOTE };
 
+    // specific positions with negative numbers
+    enum { UNKOWN_POS = -1, KEYSIG_POS = -2, CLEF_POS = -3, TIMESIG_POS = -4 };
+
     Token::Token(char c, int position, Object *object)
     {
         m_char = c;
@@ -2285,11 +2288,12 @@ void PAEInput::LogPAE(std::string msg, pae::Token &token)
     m_hasErrors = true;
     token.m_isError = true;
     std::string posStr;
-    if (token.m_position == -1) {
-        posStr = "(unknown position)";
-    }
-    else {
-        posStr = StringFormat("(character %d)", token.m_position);
+    switch (token.m_position) {
+        case pae::KEYSIG_POS: posStr = posStr = "(keysig input key)"; break;
+        case pae::CLEF_POS: posStr = "(clef input key)"; break;
+        case pae::TIMESIG_POS: posStr = "(timesig input key)"; break;
+        case pae::UNKOWN_POS: posStr = "(unspecified position)"; break;
+        default: posStr = StringFormat("(character %d)", token.m_position);
     }
     std::string fullMsg = StringFormat("PAE: %s %s", msg.c_str(), posStr.c_str());
 
@@ -2446,45 +2450,73 @@ bool PAEInput::Import(const std::string &input)
         jsonInput = this->InputKeysToJson(input);
     }
 
-    // Add a measure at the beginning of the data because there is always at least one measure
-    Measure *measure = new Measure(true, 1);
-    // By default there is no end barline on an incipit
-    measure->SetRight(BARRENDITION_invis);
-    m_pae.push_back(pae::Token(0, -1, measure));
+    m_isMensural = false;
 
-    if (jsonInput.has<jsonxx::String>("data")) {
-        std::string data = jsonInput.get<jsonxx::String>("data");
+    m_pedanticMode = false;
 
-        // Remove non PAE internal characters
-        for (char c : pae::INTERNAL_CHARS) {
-            data.erase(std::remove(data.begin(), data.end(), c), data.end());
-        }
+    bool success = true;
 
-        data = std::regex_replace(data, std::regex("qq"), "Q");
-        data = std::regex_replace(data, std::regex("xx"), "X");
-        data = std::regex_replace(data, std::regex("bb"), "Y");
+    std::string keySigStr;
+    if (jsonInput.has<jsonxx::String>("keysig")) keySigStr = jsonInput.get<jsonxx::String>("keysig");
 
-        int i = 0;
-        for (char c : data) {
-            // Ignore the charcter that is use internally as container end Token
-            if (c == pae::CONTAINER_END) continue;
-            // Otherwise go ahead
-            this->AddToken(c, i);
-            i++;
-        }
+    std::string clefStr;
+    if (jsonInput.has<jsonxx::String>("clef")) clefStr = jsonInput.get<jsonxx::String>("clef");
+
+    std::string meterSigOrMensurStr;
+    if (jsonInput.has<jsonxx::String>("timesig")) meterSigOrMensurStr = jsonInput.get<jsonxx::String>("timesig");
+
+    pae::Token staffDefToken(0, pae::KEYSIG_POS);
+    if (success) success = this->ParseKeySig(&m_keySig, keySigStr, staffDefToken);
+
+    staffDefToken.m_position = pae::CLEF_POS;
+    if (success) success = this->ParseClef(&m_clef, clefStr, staffDefToken, &m_isMensural);
+
+    staffDefToken.m_position = pae::TIMESIG_POS;
+    if (m_isMensural) {
+        if (success) success = this->ParseMensur(&m_mensur, meterSigOrMensurStr, staffDefToken);
     }
     else {
+        if (success) success = this->ParseMeterSig(&m_meterSig, meterSigOrMensurStr, staffDefToken);
+    }
+
+    // Something when wrong when parsing the scoreDef clef / keySig / mensur / meterSig
+    if (!success) return false;
+
+    // No data - we can stop here
+    if (!jsonInput.has<jsonxx::String>("data")) {
         LogError("PAE: No 'data' key in the JSON input");
         return false;
     }
 
+    // Add a measure at the beginning of the data because there is always at least one measure
+    Measure *measure = new Measure(true, 1);
+    // By default there is no end barline on an incipit
+    measure->SetRight(BARRENDITION_invis);
+    m_pae.push_back(pae::Token(0, pae::UNKOWN_POS, measure));
+
+    std::string data = jsonInput.get<jsonxx::String>("data");
+
+    // Remove non PAE internal characters
+    for (char c : pae::INTERNAL_CHARS) {
+        data.erase(std::remove(data.begin(), data.end(), c), data.end());
+    }
+
+    data = std::regex_replace(data, std::regex("qq"), "Q");
+    data = std::regex_replace(data, std::regex("xx"), "X");
+    data = std::regex_replace(data, std::regex("bb"), "Y");
+
+    int i = 0;
+    for (char c : data) {
+        // Ignore the charcter that is use internally as container end Token
+        if (c == pae::CONTAINER_END) continue;
+        // Otherwise go ahead
+        this->AddToken(c, i);
+        i++;
+    }
+
     // Add a token marking the end - special use of the CONTAINER_END with no object
     // See pae::Token::IsEnd();
-    m_pae.push_back(pae::Token(pae::CONTAINER_END, -1));
-
-    m_isMensural = false;
-
-    m_pedanticMode = false;
+    m_pae.push_back(pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS));
 
     return this->Parse();
 }
@@ -2533,6 +2565,8 @@ bool PAEInput::Parse()
 
     if (success) success = this->ConvertTie();
 
+    if (success) success = this->ConvertAccidGes();
+
     if (success) success = this->CheckHierarchy();
 
     LogDebugTokens();
@@ -2570,10 +2604,7 @@ bool PAEInput::Parse()
     // The current measure, used to know where to  add a scoreDef change
     Measure *currentMeasure = NULL;
     // The current meterSig, used to calculate the tstamp2 for open ties
-    MeterSig defaultMeterSig;
-    defaultMeterSig.SetUnit(4);
-    defaultMeterSig.SetCount({ 4 });
-    MeterSig *currentMeterSig = &defaultMeterSig;
+    MeterSig *currentMeterSig = &m_meterSig;
 
     for (auto &token : m_pae) {
         if (token.IsVoid()) continue;
@@ -3346,8 +3377,8 @@ bool PAEInput::ConvertChord()
         // We passed the last note of the chord - create it
         if (status == pae::CHORD_NOTE) {
             Chord *chord = new Chord();
-            m_pae.insert(note, pae::Token(0, -1, chord));
-            m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, chord));
+            m_pae.insert(note, pae::Token(0, pae::UNKOWN_POS, chord));
+            m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, chord));
         }
 
         status = pae::CHORD_NONE;
@@ -3408,7 +3439,7 @@ bool PAEInput::ConvertBeam()
             if (beam) {
                 LogPAE("Unclose beam at the end of a measure", *token);
                 if (m_pedanticMode) return false;
-                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, beam));
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, beam));
                 beam = NULL;
             }
         }
@@ -3488,7 +3519,7 @@ bool PAEInput::ConvertGraceGrp()
             if (graceGrp) {
                 LogPAE("Unclose grace group at the end of a measure", *token);
                 if (m_pedanticMode) return false;
-                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, graceGrp));
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, graceGrp));
                 graceGrp = NULL;
             }
         }
@@ -3624,7 +3655,7 @@ bool PAEInput::ConvertTuplet()
             if (tuplet) {
                 LogPAE("Unclose tuplet at the end of a measure", *token);
                 if (m_pedanticMode) return false;
-                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, -1, tuplet));
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, tuplet));
                 tuplet->SetNum(GetNum(tupletNumStr));
                 isNumPart = false;
                 tuplet = NULL;
@@ -3754,12 +3785,33 @@ bool PAEInput::ConvertTie()
     return true;
 }
 
+bool PAEInput::ConvertAccidGes()
+{
+    MapOfPitchAccid currentAccids;
+
+    Note *note = NULL;
+    Tie *tie = NULL;
+    std::map<std::string, data_ACCIDENTAL_WRITTEN> ties;
+
+    for (auto &token : m_pae) {
+        if (token.IsVoid()) continue;
+
+        if (token.Is(KEYSIG)) {
+            KeySig *keySig = vrv_cast<KeySig *>(token.m_object);
+            assert(keySig);
+            keySig->FillMap(currentAccids);
+        }
+    }
+
+    return true;
+}
+
 bool PAEInput::CheckHierarchy()
 {
     std::list<pae::Token *> stack;
     // A reference layer to test with
     Layer layer;
-    pae::Token layerToken('_', -1, &layer);
+    pae::Token layerToken('_', pae::UNKOWN_POS, &layer);
 
     bool isValid = false;
 
@@ -3939,7 +3991,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     return true;
 }
 
-bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token)
+bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool *mensuralScoreDef)
 {
     assert(clef);
 
@@ -3950,13 +4002,35 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
         if (m_pedanticMode) return false;
         clef->SetLine(2);
         clef->SetShape(CLEFSHAPE_G);
+        if (mensuralScoreDef) *mensuralScoreDef = false;
         return true;
     }
 
     char clefShape = paeStr.at(0);
+
+    // Second character - or +
+    if (paeStr.at(1) != '+' && paeStr.at(1) != '-') {
+        LogPAE("Unexpected second character in clef sign", token);
+        if (m_pedanticMode) return false;
+    }
     bool isMensural = (paeStr.at(1) == '+');
+
+    if (mensuralScoreDef) {
+        *mensuralScoreDef = isMensural;
+    }
+    else if (m_isMensural != isMensural) {
+        LogPAE("Mixing non-mensural and mensural clefs within the incipit", token);
+        if (m_pedanticMode) return false;
+    }
+
+    // Third character a digit
+    if (!isdigit(paeStr.at(2))) {
+        LogPAE("Unexpected third character in clef sign", token);
+        if (m_pedanticMode) return false;
+    }
     char clefLine = paeStr.at(2);
 
+    // Building the clef
     if (clefShape == 'G') {
         clef->SetShape(CLEFSHAPE_G);
         clef->SetLine(clefLine - 48);
