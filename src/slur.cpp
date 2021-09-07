@@ -120,7 +120,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     bool ok = false;
     int controlPointOffsetLeft = 0;
     int controlPointOffsetRight = 0;
-    std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight) = this->CalcControlPointOffset(curve, bezier);
+    std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight) = this->CalcControlPointOffset(curve, bezier, margin);
     if (ok) {
         bezier.SetLeftControlPointOffset(controlPointOffsetLeft);
         bezier.SetRightControlPointOffset(controlPointOffsetRight);
@@ -260,7 +260,8 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
     return { shiftLeft, shiftRight };
 }
 
-std::tuple<bool, int, int> Slur::CalcControlPointOffset(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve)
+std::tuple<bool, int, int> Slur::CalcControlPointOffset(
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return { false, 0, 0 };
 
@@ -293,22 +294,26 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(FloatingCurvePositioner 
 
         // Prefer the (increased) slope of P1-B1, if larger
         // B1 is the upper left bounding box corner of a colliding obstacle
-        double slope = BoundingBox::CalcSlope(bezierCurve.p1, pLeft);
-        if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
-            leftSlopeMax = std::max(leftSlopeMax, adjustSlope(slope));
-        }
-        if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
-            leftSlopeMax = std::max(leftSlopeMax, adjustSlope(slope));
+        if (pLeft.x > bezierCurve.p1.x + margin) {
+            const double slope = BoundingBox::CalcSlope(bezierCurve.p1, pLeft);
+            if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+                leftSlopeMax = std::max(leftSlopeMax, adjustSlope(slope));
+            }
+            if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
+                leftSlopeMax = std::max(leftSlopeMax, adjustSlope(slope));
+            }
         }
 
         // Prefer the (increased) slope of P2-B2, if larger
         // B2 is the upper right bounding box corner of a colliding obstacle
-        slope = BoundingBox::CalcSlope(bezierCurve.p2, pRight);
-        if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
-            rightSlopeMax = std::max(rightSlopeMax, adjustSlope(slope));
-        }
-        if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
-            rightSlopeMax = std::max(rightSlopeMax, adjustSlope(slope));
+        if (pRight.x < bezierCurve.p2.x - margin) {
+            const double slope = BoundingBox::CalcSlope(bezierCurve.p2, pRight);
+            if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+                rightSlopeMax = std::max(rightSlopeMax, adjustSlope(slope));
+            }
+            if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
+                rightSlopeMax = std::max(rightSlopeMax, adjustSlope(slope));
+            }
         }
     }
 

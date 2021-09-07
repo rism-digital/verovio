@@ -97,7 +97,8 @@ private:
     std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the horizontal control point offset
-    std::tuple<bool, int, int> CalcControlPointOffset(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve);
+    std::tuple<bool, int, int> CalcControlPointOffset(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the vertical control point shift
     std::pair<int, int> CalcControlPointVerticalShift(
