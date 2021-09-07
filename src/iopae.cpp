@@ -2454,6 +2454,11 @@ bool PAEInput::Import(const std::string &input)
 
     m_isMensural = false;
 
+    m_hasClef = false;
+    m_hasKeySig = false;
+    m_hasMeterSig = false;
+    m_hasMensur = false;
+
     bool success = true;
 
     std::string keySigStr;
@@ -2465,18 +2470,28 @@ bool PAEInput::Import(const std::string &input)
     std::string meterSigOrMensurStr;
     if (jsonInput.has<jsonxx::String>("timesig")) meterSigOrMensurStr = jsonInput.get<jsonxx::String>("timesig");
 
-    pae::Token staffDefToken(0, pae::KEYSIG_POS);
-    if (success) success = this->ParseKeySig(&m_keySig, keySigStr, staffDefToken);
-
-    staffDefToken.m_position = pae::CLEF_POS;
-    if (success) success = this->ParseClef(&m_clef, clefStr, staffDefToken, &m_isMensural);
-
-    staffDefToken.m_position = pae::TIMESIG_POS;
-    if (m_isMensural) {
-        if (success) success = this->ParseMensur(&m_mensur, meterSigOrMensurStr, staffDefToken);
+    if (!keySigStr.empty()) {
+        pae::Token staffDefToken(0, pae::KEYSIG_POS);
+        m_hasKeySig = true;
+        if (success) success = this->ParseKeySig(&m_keySig, keySigStr, staffDefToken);
     }
-    else {
-        if (success) success = this->ParseMeterSig(&m_meterSig, meterSigOrMensurStr, staffDefToken);
+
+    if (!clefStr.empty()) {
+        pae::Token staffDefToken(0, pae::CLEF_POS);
+        m_hasClef = true;
+        if (success) success = this->ParseClef(&m_clef, clefStr, staffDefToken, &m_isMensural);
+    }
+
+    if (!meterSigOrMensurStr.empty()) {
+        pae::Token staffDefToken(0, pae::TIMESIG_POS);
+        if (m_isMensural) {
+            m_hasMensur = true;
+            if (success) success = this->ParseMensur(&m_mensur, meterSigOrMensurStr, staffDefToken);
+        }
+        else {
+            m_hasMeterSig = true;
+            if (success) success = this->ParseMeterSig(&m_meterSig, meterSigOrMensurStr, staffDefToken);
+        }
     }
 
     // Something when wrong when parsing the scoreDef clef / keySig / mensur / meterSig
@@ -2596,6 +2611,28 @@ bool PAEInput::Parse()
     staffDef->SetLines(5);
     staffGrp->AddChild(staffDef);
     m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+
+    if (m_isMensural) {
+        staffDef->SetNotationtype(NOTATIONTYPE_mensural);
+    }
+    if (m_hasClef) {
+        // Make it an attribute for now
+        m_clef.IsAttribute(true);
+        staffDef->AddChild(m_clef.Clone());
+    }
+    if (m_hasKeySig) {
+        m_doc->GetCurrentScoreDef()->AddChild(m_keySig.Clone());
+    }
+    if (m_hasMeterSig) {
+        // Make it an attribute for now
+        m_meterSig.IsAttribute(true);
+        m_doc->GetCurrentScoreDef()->AddChild(m_meterSig.Clone());
+    }
+    if (m_hasMensur) {
+        // Make it an attribute for now
+        m_mensur.IsAttribute(true);
+        m_doc->GetCurrentScoreDef()->AddChild(m_mensur.Clone());
+    }
 
     // A stack to which layer element are added. At least a Layer, but then Beam, GraceGrp, Chord, etc.
     ListOfObjects layerElementContainers;
