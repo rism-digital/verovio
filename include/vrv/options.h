@@ -66,7 +66,7 @@ enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_symbols
 };
 
-enum option_PEDALSTILE { PEDALSTILE_none = 0, PEDALSTILE_line, PEDALSTILE_pedstar, PEDALSTILE_altpedstar };
+enum option_PEDALSTYLE { PEDALSTYLE_none = 0, PEDALSTYLE_line, PEDALSTYLE_pedstar, PEDALSTYLE_altpedstar };
 
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 

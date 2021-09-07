@@ -747,7 +747,7 @@ void Doc::PrepareDrawing()
     /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
-    PrepareFloatingGrpsParams prepareFloatingGrpsParams;
+    PrepareFloatingGrpsParams prepareFloatingGrpsParams(this);
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     Functor prepareFloatingGrpsEnd(&Object::PrepareFloatingGrpsEnd);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams, &prepareFloatingGrpsEnd);

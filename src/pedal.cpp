@@ -17,6 +17,7 @@
 #include "horizontalaligner.h"
 #include "layerelement.h"
 #include "smufl.h"
+#include "system.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -84,6 +85,32 @@ wchar_t Pedal::GetPedalGlyph() const
     return (GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
 }
 
+pedalVis_FORM Pedal::GetPedalForm(Doc *doc, System *system) const 
+{
+    const std::map<pedalVis_FORM, std::pair<option_PEDALSTYLE, pianoPedals_PEDALSTYLE>> pedalStyleValues
+        = { { pedalVis_FORM_line, { PEDALSTYLE_line, pianoPedals_PEDALSTYLE_line } },
+              { pedalVis_FORM_pedstar, { PEDALSTYLE_pedstar, pianoPedals_PEDALSTYLE_pedstar } },
+              { pedalVis_FORM_altpedstar, { PEDALSTYLE_altpedstar, pianoPedals_PEDALSTYLE_altpedstar } } };
+
+    pedalVis_FORM style = pedalVis_FORM_NONE;
+    if (int option = doc->GetOptions()->m_pedalStyle.GetValue(); option != PEDALSTYLE_none) {
+        auto iter = std::find_if(pedalStyleValues.begin(), pedalStyleValues.end(),
+            [option](const auto &optionStylePair) { return option == optionStylePair.second.first; });
+        if (iter != pedalStyleValues.end()) style = iter->first;
+    }
+    else if (this->HasForm()) {
+        style = this->GetForm();
+    }
+    else if (const ScoreDef *scoreDef = system->GetDrawingScoreDef(); scoreDef && scoreDef->HasPedalStyle()) {
+        pianoPedals_PEDALSTYLE scoreDefStyle = scoreDef->GetPedalStyle();
+        auto iter = std::find_if(pedalStyleValues.begin(), pedalStyleValues.end(),
+            [scoreDefStyle](const auto &optionStylePair) { return scoreDefStyle == optionStylePair.second.second; });
+        if (iter != pedalStyleValues.end()) style = iter->first;
+    }
+
+    return style;
+}
+
 //----------------------------------------------------------------------------
 // Pedal functor methods
 //----------------------------------------------------------------------------
@@ -137,7 +164,10 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
         params->m_pedalLine = NULL;
     }
 
-    if ((this->GetDir() != pedalLog_DIR_up) && (this->GetForm() == pedalVis_FORM_line)) {
+    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    assert(system);
+    pedalVis_FORM form = this->GetPedalForm(params->m_doc, system);
+    if ((this->GetDir() != pedalLog_DIR_up) && (form == pedalVis_FORM_line)) {
         params->m_pedalLine = this;
     }
 
