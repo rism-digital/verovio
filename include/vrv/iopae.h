@@ -675,6 +675,10 @@ private:
     KeySig m_keySig;
     Mensur m_mensur;
     MeterSig m_meterSig;
+    bool m_hasClef;
+    bool m_hasKeySig;
+    bool m_hasMeterSig;
+    bool m_hasMensur;
     ///@}
 };
 
