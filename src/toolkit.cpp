@@ -206,7 +206,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // to be checked before PAE identification.
         return MUSEDATAHUM;
     }
-    if (data[0] == '@') {
+    if (data[0] == '@' || data[0] == '{') {
         return PAE;
     }
     if (data[0] == '*' || data[0] == '!') {
@@ -643,11 +643,15 @@ bool Toolkit::LoadData(const std::string &data)
 
     // load the file
     if (inputFormat != HUMDRUM) {
+        // DO NOT COMMIT!
+        // for (int i = 0; i < 10000; i++) {
+
         if (!input->Import(newData.size() ? newData : data)) {
             LogError("Error importing data");
             delete input;
             return false;
         }
+        // }
     }
 
     bool adjustPageHeight = m_options->m_adjustPageHeight.GetValue();

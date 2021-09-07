@@ -8,6 +8,17 @@
 #ifndef __VRV_IOPAE_H__
 #define __VRV_IOPAE_H__
 
+/**
+ * There are two implementation of the Plaine and Easie parser.
+ * The new one was introduced in Verovio 3.7.
+ * In order to build with the old parser, the following define needs to be uncommented
+ */
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//#define USE_PAE_OLD_PARSER
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
 #include <sstream>
 #include <string>
 #include <vector>
@@ -15,14 +26,21 @@
 //----------------------------------------------------------------------------
 
 #include "atts_cmn.h"
+#include "clef.h"
 #include "io.h"
+#include "keysig.h"
+#include "mensur.h"
+#include "metersig.h"
 #include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
+#include "jsonxx.h"
 
 namespace vrv {
 
 class Beam;
 class Chord;
-class Clef;
 class DurationInterface;
 class GraceGrp;
 class KeyAccid;
@@ -30,8 +48,6 @@ class Layer;
 class LayerElement;
 class Mdiv;
 class Measure;
-class MeterSig;
-class Mensur;
 class MRest;
 class MultiRest;
 class Note;
@@ -44,6 +60,137 @@ class Tie;
 class Tuplet;
 class KeySig;
 class BarLine;
+
+//----------------------------------------------------------------------------
+// PAEOutput
+//----------------------------------------------------------------------------
+
+/**
+ * This class is a file output stream for writing PAE files.
+ */
+class PAEOutput : public Output {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    PAEOutput(Doc *doc);
+    virtual ~PAEOutput();
+    ///@}
+
+    /**
+     * The main method for exporting to PAE.
+     */
+    bool Export(std::string &output);
+
+    /**
+     * The main method for write objects.
+     */
+    virtual bool WriteObject(Object *object);
+
+    /**
+     * Writing object method that must be overridden in the child class.
+     */
+    virtual bool WriteObjectEnd(Object *object);
+
+private:
+    bool WriteDoc(Doc *doc);
+
+    /**
+     * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
+     */
+    ///@{
+    void WriteMdiv(Mdiv *mDiv);
+    void WriteScoreDef(ScoreDef *scoreDef);
+    void WriteStaffDef(StaffDef *staffDef);
+    void WriteMeasure(Measure *measure);
+    void WriteMeasureEnd(Measure *measure);
+    void WriteStaff(Staff *staff);
+    void WriteLayer(Layer *layer);
+    ///@}
+
+    /**
+     * @name Methods for writing LayerElement children.
+     * Called from WriteLayerElement.
+     */
+    ///@{
+    void WriteBarLine(BarLine *barLine);
+    void WriteBeam(Beam *beam);
+    void WriteBeamEnd(Beam *beam);
+    void WriteChord(Chord *chord);
+    void WriteClef(Clef *clef);
+    void WriteGraceGrp(GraceGrp *graceGrp);
+    void WriteKeyAccid(KeyAccid *keyAccid);
+    void WriteKeySig(KeySig *keySig);
+    void WriteMensur(Mensur *mensur);
+    void WriteMeterSig(MeterSig *meterSig);
+    void WriteMRest(MRest *mRest);
+    void WriteMultiRest(MultiRest *multiRest);
+    void WriteNote(Note *note);
+    void WriteRest(Rest *rest);
+    void WriteSpace(Space *space);
+    void WriteTuplet(Tuplet *tuplet);
+    void WriteTupletEnd(Tuplet *tuplet);
+    ///@}
+
+    /**
+     * @name Methods for writing ControlElement
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing text and figure elements
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing editorial markup
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing other mei elements
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing LayerElement, EditorialElement and interfaces.
+     * Call WriteDurationInferface from WriteNote, for example.
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Other private methods
+     */
+    ///@{
+    void WriteDur(DurationInterface *interface);
+    void WriteGrace(AttGraced *attGraced);
+    ///@}
+
+public:
+    //
+private:
+    std::ostringstream m_streamStringOutput;
+    bool m_docScoreDef; // Indicates that we are writing the document scoreDef
+    bool m_mensural; // Indicates that the incipit is mensural (initial staffDef)
+    bool m_skip; // Processing a staff or a layer to skip
+    int m_layerN; // The @n of the first layer within the first staff
+    int m_staffN; // The @n of the first staff (initial staffDef)
+    int m_currentOct; // The current octave
+    int m_currentDur; // The current duration
+    int m_currentDots;
+    bool m_grace;
+    Measure *m_currentMeasure;
+};
+
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+#ifdef USE_PAE_OLD_PARSER
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // namespace for local Plain and Easy classes
@@ -248,131 +395,6 @@ namespace pae {
 } // namespace pae
 
 //----------------------------------------------------------------------------
-// PAEOutput
-//----------------------------------------------------------------------------
-
-/**
- * This class is a file output stream for writing PAE files.
- */
-class PAEOutput : public Output {
-public:
-    /** @name Constructors and destructor */
-    ///@{
-    PAEOutput(Doc *doc);
-    virtual ~PAEOutput();
-    ///@}
-
-    /**
-     * The main method for exporting to PAE.
-     */
-    bool Export(std::string &output);
-
-    /**
-     * The main method for write objects.
-     */
-    virtual bool WriteObject(Object *object);
-
-    /**
-     * Writing object method that must be overridden in the child class.
-     */
-    virtual bool WriteObjectEnd(Object *object);
-
-private:
-    bool WriteDoc(Doc *doc);
-
-    /**
-     * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
-     */
-    ///@{
-    void WriteMdiv(Mdiv *mDiv);
-    void WriteScoreDef(ScoreDef *scoreDef);
-    void WriteStaffDef(StaffDef *staffDef);
-    void WriteMeasure(Measure *measure);
-    void WriteMeasureEnd(Measure *measure);
-    void WriteStaff(Staff *staff);
-    void WriteLayer(Layer *layer);
-    ///@}
-
-    /**
-     * @name Methods for writing LayerElement children.
-     * Called from WriteLayerElement.
-     */
-    ///@{
-    void WriteBarLine(BarLine *barLine);
-    void WriteBeam(Beam *beam);
-    void WriteBeamEnd(Beam *beam);
-    void WriteChord(Chord *chord);
-    void WriteClef(Clef *clef);
-    void WriteGraceGrp(GraceGrp *graceGrp);
-    void WriteKeyAccid(KeyAccid *keyAccid);
-    void WriteKeySig(KeySig *keySig);
-    void WriteMensur(Mensur *mensur);
-    void WriteMeterSig(MeterSig *meterSig);
-    void WriteMRest(MRest *mRest);
-    void WriteMultiRest(MultiRest *multiRest);
-    void WriteNote(Note *note);
-    void WriteRest(Rest *rest);
-    void WriteSpace(Space *space);
-    void WriteTuplet(Tuplet *tuplet);
-    void WriteTupletEnd(Tuplet *tuplet);
-    ///@}
-
-    /**
-     * @name Methods for writing ControlElement
-     */
-    ///@{
-    ///@}
-
-    /**
-     * @name Methods for writing text and figure elements
-     */
-    ///@{
-    ///@}
-
-    /**
-     * @name Methods for writing editorial markup
-     */
-    ///@{
-    ///@}
-
-    /**
-     * @name Methods for writing other mei elements
-     */
-    ///@{
-    ///@}
-
-    /**
-     * @name Methods for writing LayerElement, EditorialElement and interfaces.
-     * Call WriteDurationInferface from WriteNote, for example.
-     */
-    ///@{
-    ///@}
-
-    /**
-     * @name Other private methods
-     */
-    ///@{
-    void WriteDur(DurationInterface *interface);
-    void WriteGrace(AttGraced *attGraced);
-    ///@}
-
-public:
-    //
-private:
-    std::ostringstream m_streamStringOutput;
-    bool m_docScoreDef; // Indicates that we are writing the document scoreDef
-    bool m_mensural; // Indicates that the incipit is mensural (initial staffDef)
-    bool m_skip; // Processing a staff or a layer to skip
-    int m_layerN; // The @n of the first layer within the first staff
-    int m_staffN; // The @n of the first staff (initial staffDef)
-    int m_currentOct; // The current octave
-    int m_currentDur; // The current duration
-    int m_currentDots;
-    bool m_grace;
-    Measure *m_currentMeasure;
-};
-
-//----------------------------------------------------------------------------
 // PAEInput
 //----------------------------------------------------------------------------
 
@@ -436,6 +458,151 @@ private:
 
     std::vector<LayerElement *> m_nested_objects;
 };
+
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+#else // USE_PAE_OLD_PARSER
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// PAEInput
+//----------------------------------------------------------------------------
+
+namespace pae {
+
+    class Token {
+    public:
+        Token(char c, int position, Object *object = NULL);
+        virtual ~Token();
+        bool Is(ClassId);
+        bool IsContainerEnd();
+        bool IsEnd();
+        bool IsSpace();
+        bool IsVoid();
+
+        std::string GetName();
+
+        char m_char;
+        Object *m_object;
+        /** the input char preserved for debugging purposes */
+        char m_inputChar;
+        /** the position in the original input string for debuggin purposes */
+        int m_position;
+        /** a flag indicating the we and error at this position */
+        bool m_isError;
+    };
+
+} // namespace pae
+
+class PAEInput : public Input {
+public:
+    // constructors and destructors
+    PAEInput(Doc *doc);
+    virtual ~PAEInput();
+
+#ifndef NO_PAE_SUPPORT
+    virtual bool Import(const std::string &input);
+
+private:
+    // function declarations:
+    jsonxx::Object InputKeysToJson(const std::string &inputKeys);
+
+    void AddToken(char c, int &position);
+
+    bool Parse();
+
+    /**
+     * @name Methods that convert pae::Token::m_char to pae::Token::m_objects
+     *
+     * The order in which they are called is important.
+     * For example, KeySig have to be converted before Pitch, because pitch charachters used
+     * in KeySig needs to be consumed first
+     */
+    ///@{
+    bool ConvertKeySig();
+    bool ConvertClef();
+    bool ConvertMeterSigOrMensur();
+    bool ConvertMeasure();
+    bool ConvertRepeatedFigure();
+    bool ConvertRepeatedMeasure();
+    bool ConvertMRestOrMultiRest();
+    bool ConvertPitch();
+    bool ConvertOctave();
+    bool ConvertTrill();
+    bool ConvertFermata();
+    bool ConvertAccidental();
+    bool ConvertRest();
+    bool ConvertChord();
+    bool ConvertBeam();
+    bool ConvertGrace();
+    bool ConvertGraceGrp();
+    bool ConvertTuplet();
+    bool ConvertDuration();
+    bool ConvertTie();
+    bool ConvertAccidGes();
+    ///@}
+
+    bool Is(pae::Token &token, const std::string &map);
+    bool Was(pae::Token &token, const std::string &map);
+    bool HasInput(char inputChar);
+
+    /**
+     * @name Methods that parse sub string instantiate corresponding objects
+     */
+    ///@{
+    bool ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token);
+    bool ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool *mensuralScoreDef = NULL);
+    bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token);
+    bool ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token);
+    bool ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token);
+    bool ParseDuration(
+        std::list<std::pair<data_DURATION, int>> &durations, const std::string &paeStr, pae::Token &token);
+    ///@}
+
+    /**
+     * When repeated content is inserted we set the position of all token
+     * to the one of the repetition marker (f or i).
+     * We also need to clone all objects in the tokens
+     */
+    void PrepareInsertion(int position, std::list<pae::Token> &insertion);
+
+    bool CheckHierarchy();
+
+    bool CheckContent();
+
+    void RemoveContainerToken(Object *);
+
+    void LogPAE(std::string msg, pae::Token &token);
+
+    void LogDebugTokens(bool vertical = false);
+
+#endif // NO_PAE_SUPPORT
+
+    void ClearTokenObjects();
+
+public:
+    //
+private:
+    std::list<pae::Token> m_pae;
+
+    bool m_isMensural;
+
+    bool m_pedanticMode;
+
+    bool m_hasErrors;
+
+    Clef m_clef;
+    KeySig m_keySig;
+    Mensur m_mensur;
+    MeterSig m_meterSig;
+};
+
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+#endif // USE_PAE_OLD_PARSER
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 } // namespace vrv
 
