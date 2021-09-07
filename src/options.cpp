@@ -36,6 +36,9 @@ const std::map<int, std::string> Option::s_header
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
+const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTILE_none, "none" }, { PEDALSTILE_line, "line" },
+    { PEDALSTILE_pedstar, "pedstar" }, { PEDALSTILE_altpedstar, "altpedstar" } };
+
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
     { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
@@ -993,6 +996,10 @@ Options::Options()
     m_pageWidth.SetInfo("Page width", "The page width");
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
+
+    m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
+    m_pedalStyle.Init(PEDALSTILE_none, &Option::s_pedalStyle);
+    this->Register(&m_pedalStyle, "pedalStyle", &m_general);
 
     m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
     m_preserveAnalyticalMarkup.Init(false);

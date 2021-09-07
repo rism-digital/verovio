@@ -9,6 +9,7 @@
 #define __VRV_SCOREDEF_INTERFACE_H__
 
 #include "atts_analytical.h"
+#include "atts_cmn.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
