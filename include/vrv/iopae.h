@@ -475,21 +475,30 @@ namespace pae {
     public:
         Token(char c, int position, Object *object = NULL);
         virtual ~Token();
+
+        /** Return true if the token has an Object and its classId is ClassId */
         bool Is(ClassId);
+        /** Return true if the token if the end of a container (e.g., Beam) */
         bool IsContainerEnd();
+        /** Return true if the token is that end sentinel of the list */
         bool IsEnd();
+        /** Return true if the input char is '_' */
         bool IsSpace();
+        /** Return true is the token has to be ignore during parsing */
         bool IsVoid();
 
+        /* Helper to the a lowercase version of the Object classname (if any) */
         std::string GetName();
 
+        /** The character to process - 0 once done */
         char m_char;
+        /** The Object to be added to the tree */
         Object *m_object;
         /** the input char preserved for debugging purposes */
         char m_inputChar;
         /** the position in the original input string for debuggin purposes */
         int m_position;
-        /** a flag indicating the we and error at this position */
+        /** a flag indicating the an error occured at this position */
         bool m_isError;
     };
 
@@ -505,11 +514,26 @@ public:
     virtual bool Import(const std::string &input);
 
 private:
-    // function declarations:
+    /**
+     * Convert the old-style @clef:... @keysig:... @data:... to a JSON input
+     */
     jsonxx::Object InputKeysToJson(const std::string &inputKeys);
 
+    /**
+     * Helper to add a token to the list.
+     * Performs re-expansion of internal characters (e.g., Q back to qq in the inputChar)
+     * Re-expansion of internal characters inserts void tokens ignored during parsing.
+     * The are added only for debug purposes.
+     */
     void AddToken(char c, int &position);
 
+    /**
+     * Main method that calls the converting methods.
+     * A the end of the converting process, the token list is essentially a list of Objects.
+     * The method then performs a check of the hierachy.
+     * Once this is done, it builds the MEI tree.
+     * The method then performs some additional checks of the content (to be implemented)
+     */
     bool Parse();
 
     /**
@@ -543,9 +567,15 @@ private:
     bool ConvertAccidGes();
     ///@}
 
+    /**
+     * @name Helpers to check what a token is or was.
+     *
+     */
+    ///@{
     bool Is(pae::Token &token, const std::string &map);
     bool Was(pae::Token &token, const std::string &map);
     bool HasInput(char inputChar);
+    ///@}
 
     /**
      * @name Methods that parse sub string instantiate corresponding objects
@@ -567,35 +597,85 @@ private:
      */
     void PrepareInsertion(int position, std::list<pae::Token> &insertion);
 
+    /**
+     * Check that the token list is a valid opening / closing tag successing.
+     * Also check that every element is supported by is containing element.
+     * Remove invalid opening / closing successions or invalid elements in non pedantic mode.
+     */
     bool CheckHierarchy();
 
+    /**
+     * Some additional checked to be performed one the MEI tree has been build.
+     * Unimplemented
+     */
     bool CheckContent();
 
+    /**
+     * A helper to remove a token when checking the hierarchy and it is not valid
+     */
     void RemoveContainerToken(Object *);
 
+    /**
+     * @name Some logging methods specific to the PAE parser
+     */
+    ///@{
     void LogPAE(std::string msg, pae::Token &token);
-
     void LogDebugTokens(bool vertical = false);
+    ///@}
 
 #endif // NO_PAE_SUPPORT
 
+    /**
+     * Verify that no object remains in the token list before clearing the list.
+     * Remaining objects are deleted.
+     */
     void ClearTokenObjects();
 
 public:
     //
 private:
+    /**
+     * The list of tokens representing the incipit
+     * Each token is a characther that needs to be processed.
+     * When processing the tokens, the token can be assigned an Object.
+     * When processed, the token::m_char is set to 0.
+     * The orignal input value remains in token::m_inputChar
+     * Whenever necessary, some tokens can be added. For example when:
+     * - repeated figures or measures are used
+     * - closing tags are missing (in non-pendantic modes)
+     * - opening tags are not part of the PAE syntax (e.g., a chord)
+     * Each token also stores the original position in the PAE string.
+     */
     std::list<pae::Token> m_pae;
 
+    /**
+     * A flag indicating the incipit is mensural.
+     * Based on the @clef of the input.
+     */
     bool m_isMensural;
 
+    /**
+     * A flag that makes parsing fails when an error is encountered.
+     * Parsing will stop there in pedantic mode.
+     * Currently hard-coded and will require an option to be added.
+     */
     bool m_pedanticMode;
 
+    /**
+     * A flag indicating we had errors when parsing the incipit in non pedantic mode.
+     */
     bool m_hasErrors;
 
+    /**
+     * @name The scoreDef clef, keysig and timesig.
+     * Mensur is used with mensural incipits (i.e., with clefs with a + second sign.
+     */
+    ///@{
     Clef m_clef;
     KeySig m_keySig;
     Mensur m_mensur;
     MeterSig m_meterSig;
+    ///@}
 };
 
 //----------------------------------------------------------------------------
