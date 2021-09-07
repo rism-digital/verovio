@@ -620,7 +620,6 @@ float View::CalcInitialSlur(
 
     /************** angle **************/
 
-    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
     bool dontAdjustAngle = curve->IsCrossStaff();
     // If slur is cross-staff (where we don't want to adjust angle) but x distance is too small - adjust angle anyway
     if ((bezier.p2.x - bezier.p1.x) != 0 && curve->IsCrossStaff()) {
@@ -629,9 +628,8 @@ float View::CalcInitialSlur(
 
     const float nonAdjustedAngle
         = (bezier.p2 == bezier.p1) ? 0 : atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x);
-    const float slurAngle = dontAdjustAngle
-        ? nonAdjustedAngle
-        : slur->GetAdjustedSlurAngle(m_doc, bezier.p1, bezier.p2, curveDir, (spannedElements->size() > 0));
+    const float slurAngle
+        = dontAdjustAngle ? nonAdjustedAngle : slur->GetAdjustedSlurAngle(m_doc, bezier.p1, bezier.p2, curveDir);
     bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
 
     /************** control points **************/

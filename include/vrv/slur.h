@@ -69,7 +69,7 @@ public:
 
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
-    float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
+    float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
 
     //----------//
     // Functors //

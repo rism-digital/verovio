@@ -488,31 +488,27 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     bezierCurve.UpdateControlPoints(dir);
 }
 
-float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints)
+float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir)
 {
     float slurAngle = (p1 == p2) ? 0 : atan2(p2.y - p1.y, p2.x - p1.x);
-    float maxSlope = (float)doc->GetOptions()->m_slurMaxSlope.GetValue() * M_PI / 180.0;
-
-    // For slurs without spanning points allow for double angle
-    // This normally looks better with slurs with two notes and high ambitus
-    if (!withPoints) maxSlope *= 2.0;
+    const float maxAngle = (float)doc->GetOptions()->m_slurMaxSlope.GetValue() * M_PI / 180.0;
 
     // the slope of the slur is high and needs to be corrected
-    if (fabs(slurAngle) > maxSlope) {
-        int side = (p2.x - p1.x) * sin(maxSlope) / sin(M_PI / 2 - maxSlope);
+    if (fabs(slurAngle) > maxAngle) {
+        int side = (p2.x - p1.x) * tan(maxAngle);
         if (p2.y > p1.y) {
             if (curveDir == curvature_CURVEDIR_above)
                 p1.y = p2.y - side;
             else
                 p2.y = p1.y + side;
-            slurAngle = maxSlope;
+            slurAngle = maxAngle;
         }
         else {
             if (curveDir == curvature_CURVEDIR_above)
                 p2.y = p1.y - side;
             else
                 p1.y = p2.y + side;
-            slurAngle = -maxSlope;
+            slurAngle = -maxAngle;
         }
     }
 
