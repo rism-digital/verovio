@@ -166,20 +166,20 @@ bool MEIOutput::Export()
             // schema processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = "https://music-encoding.org/schema/dev/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
             // schematron processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = "https://music-encoding.org/schema/dev/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
 
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "4.0.0";
+            m_mei.append_attribute("meiversion") = "5.0.0-dev";
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
             m_doc->ConvertToUnCastOffMensuralDoc();
@@ -2737,6 +2737,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
                 m_version = MEI_3_0_0;
             else if (version == "2013")
                 m_version = MEI_2013;
+            // else if (version == "5.0.0-dev")
+            //     m_version = MEI_5_0_0;
         }
     }
 
