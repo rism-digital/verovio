@@ -110,7 +110,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
             bezier.c2.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
         }
         bezier.UpdateControlPointParams(curve->GetDir());
-        bezier.CopyPointsTo(curve);
+        curve->UpdatePoints(bezier);
     }
 
     // STEP 3: Calculate the horizontal offset of the control points.
@@ -125,7 +125,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         bezier.SetLeftControlPointOffset(controlPointOffsetLeft);
         bezier.SetRightControlPointOffset(controlPointOffsetRight);
         bezier.UpdateControlPoints(curve->GetDir());
-        bezier.CopyPointsTo(curve);
+        curve->UpdatePoints(bezier);
     }
 
     // STEP 4: Calculate the vertical shift of the control points.
@@ -140,13 +140,13 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + controlPointShiftLeft);
     bezier.SetRightControlHeight(bezier.GetRightControlHeight() + controlPointShiftRight);
     bezier.UpdateControlPoints(curve->GetDir());
-    bezier.CopyPointsTo(curve);
+    curve->UpdatePoints(bezier);
 
     // STEP 5: Adjust the slur shape
-    // Through the control point adjustments in step 2 and 3 it can happen that the slur looses its desired shape.
+    // Through the control point adjustments in step 3 and 4 it can happen that the slur looses its desired shape.
     // We correct the shape if the slur is too flat or not convex.
     this->AdjustSlurShape(bezier, curve->GetDir(), doc->GetDrawingUnit(100));
-    bezier.CopyPointsTo(curve);
+    curve->UpdatePoints(bezier);
 
     // Since we are going to redraw it, reset its bounding box
     curve->BoundingBox::ResetBoundingBox();
@@ -224,40 +224,40 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
         }
 
         if ((intersectionLeft > 0) || (intersectionRight > 0)) {
-            // Define function which applies an intersection at a given distance ratio to the shifts
-            auto applyIntersection = [&shiftLeft, &shiftRight](double ratio, int intersection) {
-                // Filter collisions near the endpoints
-                // Collisions with 0.15 <= ratio <= 0.85 do not contribute to shifts
-                // They are compensated later by shifting the control points
-                if (ratio < 0.15) {
-                    if (ratio > 0.05) {
-                        // For 0.05 <= ratio <= 0.15 collisions only partially contribute to shifts
-                        // We multiply with a function that interpolates between 1 and 0
-                        intersection *= pow(1.5 - 10.0 * ratio, 2.0);
-                    }
-                    shiftLeft = std::max(shiftLeft, intersection);
-                }
-                else if (ratio > 0.85) {
-                    if (ratio < 0.95) {
-                        // For 0.85 <= ratio <= 0.95 collisions only partially contribute to shifts
-                        // We multiply with a function that interpolates between 0 and 1
-                        intersection *= pow(10.0 * ratio - 8.5, 2.0);
-                    }
-                    shiftRight = std::max(shiftRight, intersection);
-                }
-            };
-
             // Now apply the intersections on the left and right hand side of the bounding box
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             const float distanceRatioLeft = float(xLeft - bezierCurve.p1.x) / float(dist);
-            applyIntersection(distanceRatioLeft, intersectionLeft);
+            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft);
 
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             const float distanceRatioRight = float(xRight - bezierCurve.p1.x) / float(dist);
-            applyIntersection(distanceRatioRight, intersectionRight);
+            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioRight, intersectionRight);
         }
     }
     return { shiftLeft, shiftRight };
+}
+
+void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection) const
+{
+    // Filter collisions near the endpoints
+    // Collisions with 0.15 <= ratio <= 0.85 do not contribute to shifts
+    // They are compensated later by shifting the control points
+    if (ratio < 0.15) {
+        if (ratio > 0.05) {
+            // For 0.05 <= ratio <= 0.15 collisions only partially contribute to shifts
+            // We multiply with a function that interpolates between 1 and 0
+            intersection *= pow(1.5 - 10.0 * ratio, 2.0);
+        }
+        shiftLeft = std::max(shiftLeft, intersection);
+    }
+    else if (ratio > 0.85) {
+        if (ratio < 0.95) {
+            // For 0.85 <= ratio <= 0.95 collisions only partially contribute to shifts
+            // We multiply with a function that interpolates between 0 and 1
+            intersection *= pow(10.0 * ratio - 8.5, 2.0);
+        }
+        shiftRight = std::max(shiftRight, intersection);
+    }
 }
 
 std::tuple<bool, int, int> Slur::CalcControlPointOffset(
@@ -280,27 +280,17 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
         const Point pLeft = { spannedElement->m_boundingBox->GetSelfLeft(), bbY };
         const Point pRight = { spannedElement->m_boundingBox->GetSelfRight(), bbY };
 
-        // This function takes the abs value and increases the slope a bit
-        auto adjustSlope = [](double slope) {
-            double value = std::abs(slope);
-            if (value < 2.5) {
-                value = tan(atan(value) + M_PI / 18.0); // rotate by 10 degree towards the y axis
-            }
-            else {
-                value *= 2.0;
-            }
-            return value;
-        };
-
         // Prefer the (increased) slope of P1-B1, if larger
         // B1 is the upper left bounding box corner of a colliding obstacle
         if (pLeft.x > bezierCurve.p1.x + margin) {
             const double slope = BoundingBox::CalcSlope(bezierCurve.p1, pLeft);
             if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
-                leftSlopeMax = std::max(leftSlopeMax, adjustSlope(slope));
+                const double adjustedSlope = this->RotateSlope(slope, 10.0, 2.5, true);
+                leftSlopeMax = std::max(leftSlopeMax, adjustedSlope);
             }
             if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
-                leftSlopeMax = std::max(leftSlopeMax, adjustSlope(slope));
+                const double adjustedSlope = this->RotateSlope(-slope, 10.0, 2.5, true);
+                leftSlopeMax = std::max(leftSlopeMax, adjustedSlope);
             }
         }
 
@@ -309,10 +299,12 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
         if (pRight.x < bezierCurve.p2.x - margin) {
             const double slope = BoundingBox::CalcSlope(bezierCurve.p2, pRight);
             if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
-                rightSlopeMax = std::max(rightSlopeMax, adjustSlope(slope));
+                const double adjustedSlope = this->RotateSlope(-slope, 10.0, 2.5, true);
+                rightSlopeMax = std::max(rightSlopeMax, adjustedSlope);
             }
             if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
-                rightSlopeMax = std::max(rightSlopeMax, adjustSlope(slope));
+                const double adjustedSlope = this->RotateSlope(slope, 10.0, 2.5, true);
+                rightSlopeMax = std::max(rightSlopeMax, adjustedSlope);
             }
         }
     }
@@ -420,14 +412,6 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
-    // This function rotates the slope by 20 degree, but chooses smaller angles if already close to the vertical axis
-    auto rotateBy20Deg = [](double slope, bool upwards) {
-        if (upwards && (slope >= 1.0)) return slope * 2.0;
-        if (!upwards && (slope <= -1.0)) return slope * 2.0;
-        const int sign = upwards ? 1 : -1;
-        return tan(atan(slope) + sign * M_PI / 9.0);
-    };
-
     // *** STEP 1: Ensure MINIMAL HEIGHT ***
     // <)C1P1P2 should be at least 20 degree, but allow smaller angles if the midpoint would be lifted more than 6 MEI
     // units
@@ -443,18 +427,18 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     const double slopeBase = BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.p2);
 
     if (dir == curvature_CURVEDIR_above) {
-        double minSlopeLeft = rotateBy20Deg(slopeBase, true);
+        double minSlopeLeft = this->RotateSlope(slopeBase, 20.0, 1.0, true);
         minSlopeLeft = std::min(minSlopeLeft, BoundingBox::CalcSlope(bezierCurve.p1, shiftedMidpoint));
         slopeLeft = std::max(slopeLeft, minSlopeLeft);
-        double minSlopeRight = rotateBy20Deg(slopeBase, false);
+        double minSlopeRight = this->RotateSlope(slopeBase, 20.0, 1.0, false);
         minSlopeRight = std::max(minSlopeRight, BoundingBox::CalcSlope(bezierCurve.p2, shiftedMidpoint));
         slopeRight = std::min(slopeRight, minSlopeRight);
     }
     else if (dir == curvature_CURVEDIR_below) {
-        double minSlopeLeft = rotateBy20Deg(slopeBase, false);
+        double minSlopeLeft = this->RotateSlope(slopeBase, 20.0, 1.0, false);
         minSlopeLeft = std::max(minSlopeLeft, BoundingBox::CalcSlope(bezierCurve.p1, shiftedMidpoint));
         if (!ignoreLeft) slopeLeft = std::min(slopeLeft, minSlopeLeft);
-        double minSlopeRight = rotateBy20Deg(slopeBase, true);
+        double minSlopeRight = this->RotateSlope(slopeBase, 20.0, 1.0, true);
         minSlopeRight = std::min(minSlopeRight, BoundingBox::CalcSlope(bezierCurve.p2, shiftedMidpoint));
         if (!ignoreRight) slopeRight = std::max(slopeRight, minSlopeRight);
     }
@@ -464,26 +448,22 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlPointOffset());
     bezierCurve.UpdateControlPoints(dir);
 
-    // This function rotates the slope by 3 degree, but chooses smaller angles if already close to the vertical axis
-    auto rotateBy3Deg = [](double slope, bool upwards) {
-        if (upwards && (slope >= 10.0)) return slope * 2.0;
-        if (!upwards && (slope <= -10.0)) return slope * 2.0;
-        const int sign = upwards ? 1 : -1;
-        return tan(atan(slope) + sign * M_PI / 60.0);
-    };
-
     // *** STEP 2: Ensure CONVEXITY ***
     // <)C1P1C2 and <)C1P2C2 should be at least 3 degree
     if (dir == curvature_CURVEDIR_above) {
-        const double minSlopeLeft = rotateBy3Deg(BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.c2), true);
+        const double minSlopeLeft
+            = this->RotateSlope(BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.c2), 3.0, 10.0, true);
         slopeLeft = std::max(slopeLeft, minSlopeLeft);
-        const double minSlopeRight = rotateBy3Deg(BoundingBox::CalcSlope(bezierCurve.p2, bezierCurve.c1), false);
+        const double minSlopeRight
+            = this->RotateSlope(BoundingBox::CalcSlope(bezierCurve.p2, bezierCurve.c1), 3.0, 10.0, false);
         slopeRight = std::min(slopeRight, minSlopeRight);
     }
     else if (dir == curvature_CURVEDIR_below) {
-        const double minSlopeLeft = rotateBy3Deg(BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.c2), false);
+        const double minSlopeLeft
+            = this->RotateSlope(BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.c2), 3.0, 10.0, false);
         slopeLeft = std::min(slopeLeft, minSlopeLeft);
-        const double minSlopeRight = rotateBy3Deg(BoundingBox::CalcSlope(bezierCurve.p2, bezierCurve.c1), true);
+        const double minSlopeRight
+            = this->RotateSlope(BoundingBox::CalcSlope(bezierCurve.p2, bezierCurve.c1), 3.0, 10.0, true);
         slopeRight = std::max(slopeRight, minSlopeRight);
     }
 
@@ -491,6 +471,17 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlPointOffset());
     if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlPointOffset());
     bezierCurve.UpdateControlPoints(dir);
+}
+
+double Slur::RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const
+{
+    assert(degrees >= 0.0);
+    assert(doublingBound >= 0.0);
+
+    if (upwards && (slope >= doublingBound)) return slope * 2.0;
+    if (!upwards && (slope <= -doublingBound)) return slope * 2.0;
+    const int sign = upwards ? 1 : -1;
+    return tan(atan(slope) + sign * M_PI * degrees / 180.0);
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir)

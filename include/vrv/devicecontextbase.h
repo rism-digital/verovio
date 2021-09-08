@@ -18,7 +18,6 @@
 namespace vrv {
 
 class Doc;
-class FloatingCurvePositioner;
 
 #define AxNONE -1
 #define AxWHITE 255 << 16 | 255 << 8 | 255
@@ -264,9 +263,6 @@ public:
     void UpdateControlPointParams(curvature_CURVEDIR dir);
     void UpdateControlPoints(curvature_CURVEDIR dir);
     ///@}
-
-    // Copy points from bezier curve to floating positioner
-    void CopyPointsTo(FloatingCurvePositioner *curve) const;
 
 private:
     // Control point X-axis offset for both start/end points

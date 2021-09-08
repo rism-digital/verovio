@@ -517,6 +517,16 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_cachedMinMaxY = VRV_UNSET;
 }
 
+void FloatingCurvePositioner::UpdatePoints(const BezierCurve &bezier)
+{
+    Point points[4];
+    points[0] = bezier.p1;
+    points[1] = bezier.c1;
+    points[2] = bezier.c2;
+    points[3] = bezier.p2;
+    this->UpdateCurveParams(points, m_angle, m_thickness, m_dir);
+}
+
 void FloatingCurvePositioner::MoveFrontVertical(int distance)
 {
     m_points[0].y += distance;

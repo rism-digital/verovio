@@ -111,6 +111,19 @@ private:
     void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
     ///@}
 
+    /**
+     * Low level helper functions for slur adjustment
+     */
+    ///@{
+    // Shift end points for collisions nearby
+    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection) const;
+
+    // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
+    // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
+    // tan(atan(doublingBound) + degrees * PI / 180.0) ≈ 2.0 * doublingBound
+    double RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const;
+    ///@}
+
 public:
     //
 private:

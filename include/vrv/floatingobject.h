@@ -282,9 +282,12 @@ public:
 
     /**
      * Update the curve parameters.
-     * Stored points are made relative to the curve darwingY.
+     * Stored points are made relative to the curve drawingY.
      */
+    ///@{
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+    void UpdatePoints(const BezierCurve &bezier);
+    ///@}
 
     /**
      * Moves bounding points vertically by a specified distance downward

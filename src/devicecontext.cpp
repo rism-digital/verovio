@@ -17,7 +17,6 @@
 
 #include "boundingbox.h"
 #include "doc.h"
-#include "floatingobject.h"
 #include "glyph.h"
 #include "vrv.h"
 
@@ -67,16 +66,6 @@ void BezierCurve::UpdateControlPoints(curvature_CURVEDIR dir)
     const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
     c1.y = p1.y + sign * m_leftControlHeight;
     c2.y = p2.y + sign * m_rightControlHeight;
-}
-
-void BezierCurve::CopyPointsTo(FloatingCurvePositioner *curve) const
-{
-    Point points[4];
-    points[0] = p1;
-    points[1] = c1;
-    points[2] = c2;
-    points[3] = p2;
-    curve->UpdateCurveParams(points, curve->GetAngle(), curve->GetThickness(), curve->GetDir());
 }
 
 //----------------------------------------------------------------------------
