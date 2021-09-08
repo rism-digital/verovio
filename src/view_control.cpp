@@ -1646,8 +1646,8 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     dc->StartGraphic(fermata, "", fermata->GetUuid());
 
     const wchar_t code = fermata->GetFermataGlyph();
-    const wchar_t enclosingFront = fermata->GetEnclosingGlyph(true);
-    const wchar_t enclosingBack = fermata->GetEnclosingGlyph(false);
+    wchar_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = fermata->GetEnclosingGlyphs();
 
     const int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 

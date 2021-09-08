@@ -53,6 +53,10 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         Note *note = vrv_cast<Note *>(object);
         assert(note);
 
+        // Check if the note is part of a chord and return if it is not its top one
+        Chord *chord = note->IsChordTone();
+        if (chord && note != chord->GetTopNote()) return;
+
         // Check if the note is tied to a previous one and skip it if yes
         if (note->GetScoreTimeTiedDuration() == -1.0) return;
 

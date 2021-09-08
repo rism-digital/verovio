@@ -83,9 +83,9 @@ public:
     wchar_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
 
     /**
-     * Retrieves parentheses / brackets from the enclose attribute
+     * Retrieve parentheses / brackets from the enclose attribute
      */
-    wchar_t GetEnclosingGlyph(bool beforeArtic) const;
+    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs() const;
 
     //----------------//
     // Static methods //
