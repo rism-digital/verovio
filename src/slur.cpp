@@ -786,7 +786,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     else {
                         y2 = y1;
                         x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }                    
+                    }
                 }
                 else {
                     y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
@@ -833,7 +833,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     else {
                         y2 = y1;
                         x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }                    
+                    }
                 }
                 else {
                     y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
