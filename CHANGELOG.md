@@ -1,6 +1,11 @@
 # Changelog
 
 ## [unreleased]
+* Support for `arpeg@enclose` (@eNote-GmBH)
+* Support for `clef@enclose` (@eNote-GmBH)
+* Support for `metersig@enclose` (@eNote-GmBH)
+* Option --tie-min-length to control the minimum length of ties (@eNote-GmBH)
+* Option --svg-additional-attribute to make MEI attributes appear in the SVG (@wergo)
 
 ## [3.6.0] - 2021-08-24
 * Support for `section@restart`
