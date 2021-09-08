@@ -780,8 +780,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
                 else if (parentBeam || parentFTrem) {
-                    y2 = y1;
-                    x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    if (end->GetDrawingY() > y1) {
+                        y2 = end->GetDrawingY() + unit * 3;
+                    }
+                    else {
+                        y2 = y1;
+                        x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    }                    
                 }
                 else {
                     y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
@@ -821,8 +826,14 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
                 else if (parentBeam || parentFTrem) {
-                    y2 = y1;
-                    x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    if (end->GetDrawingY() < y1) {
+                        y2 = end->GetDrawingY();
+                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    }
+                    else {
+                        y2 = y1;
+                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    }                    
                 }
                 else {
                     y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
