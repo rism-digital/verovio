@@ -1883,6 +1883,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     }
 
     WriteLayerElement(currentNode, meterSig);
+    meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
 }
@@ -5389,6 +5390,7 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     MeterSig *vrvMeterSig = new MeterSig();
     ReadLayerElement(meterSig, vrvMeterSig);
 
+    vrvMeterSig->ReadEnclosingChars(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
 
