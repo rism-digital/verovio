@@ -739,7 +739,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
                 || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-                x1 -= startRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // P(_)
             else {
@@ -773,7 +773,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                          || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end)))
                 && !isGraceToNoteSlur) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
-                x2 += endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
                 if (start->IsInBeam()) {
