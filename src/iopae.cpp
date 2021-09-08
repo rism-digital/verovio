@@ -1709,486 +1709,487 @@ int PAEInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             }
         }
         else {
-            key->SetSig(std::make_pair(alt_nr, alterationType));
+            key->SetSig({alt_nr, alterationType));
         }
         if (cancel) {
-            key->SetSigShowchange(BOOLEAN_true);
+                key->SetSigShowchange(BOOLEAN_true);
         }
-    }
-    else {
-        key->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+        }
+        else
+        {
+        key->SetSig({0, ACCIDENTAL_WRITTEN_n));
     }
 
     m_currentKeySig = key;
     key->FillMap(m_currentAccids);
 
     return i - index;
-}
-
-//////////////////////////////
-//
-// getNote --
-//
-
-int PAEInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
-{
-    int oct;
-    int i = index;
-    int app;
-    int tuplet_num;
-
-    if (note->acciaccatura) {
-        // acciaccaturas are always eights regardless
-        // and have no dots
-        note->duration = DURATION_8;
-    }
-    else {
-        if (measure->durations.size() == 0) {
-            note->duration = DURATION_4;
-            note->dots = 0;
-            LogWarning("Plaine & Easie import: found note before duration was specified");
-        }
-        else {
-            note->duration = measure->durations.at(measure->durations_offset);
-            note->dots = measure->dots.at(measure->durations_offset);
-        }
-    }
-    note->pitch = getPitch(incipit[i]);
-
-    // If necessary pass the accid from the tied note (could be from the previous measure)
-    if (m_tieAccid.first != PITCHNAME_NONE) {
-        if (m_tieAccid.second == ACCIDENTAL_WRITTEN_n) {
-            if (m_currentAccids.count(m_tieAccid.first) != 0) {
-                m_currentAccids.erase(m_tieAccid.first);
-            }
-        }
-        else if (m_tieAccid.second != ACCIDENTAL_WRITTEN_NONE) {
-            m_currentAccids[m_tieAccid.first] = m_tieAccid.second;
-        }
-    }
-    m_tieAccid.first = PITCHNAME_NONE;
-    m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
-
-    // Natural in front of the note, remove it from the current list
-    if (note->accidental == ACCIDENTAL_WRITTEN_n) {
-        if (m_currentAccids.count(note->pitch) != 0) {
-            m_currentAccids.erase(note->pitch);
-        }
-    }
-    // Not a natural in front of the note, add it to the current list
-    else if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
-        m_currentAccids[note->pitch] = note->accidental;
-    }
-
-    // Nothing in front of the note, but something in the list - make it an accid.ges
-    if ((note->accidental == ACCIDENTAL_WRITTEN_NONE) && (m_currentAccids.count(note->pitch) != 0)) {
-        note->accidental = m_currentAccids.at(note->pitch);
-        note->accidGes = true;
-    }
-
-    // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
-    // it will be added instead of the note
-    if (note->pitch == PITCHNAME_NONE) {
-        note->rest = true;
-    }
-
-    // chord
-    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\^"))) {
-        note->chord = true;
-    }
-
-    // tie
-    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
-        note->tie = true;
-        if (note->accidental) {
-            m_tieAccid.first = note->pitch;
-            m_tieAccid.second = note->accidental;
-        }
-    }
-    else {
-        m_tieAccid.first = PITCHNAME_NONE;
-        m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
-    }
-
-    // trills
-    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*t"))) {
-        note->trill = true;
-    }
-
-    oct = note->octave;
-    measure->notes.push_back(*note);
-
-    app = note->appoggiatura;
-    tuplet_num = note->tuplet_note;
-
-    // Reset note to defaults
-    note->clear();
-
-    // write back the values we need to save
-    note->octave = oct; // save octave
-
-    // tuplets. Decrease the current number if we are in a tuplet
-    // i.e. tuplet_num > 0
-    // al the other values just need to be in the first note
-    if (tuplet_num > 0) {
-        note->tuplet_note = --tuplet_num;
-    }
-
-    // grace notes
-    note->acciaccatura = false;
-    if (app > 0) {
-        note->appoggiatura = --app;
-    }
-    // durations
-    if (measure->durations.size() > 0) {
-        measure->durations_offset++;
-        if (measure->durations_offset >= (int)measure->durations.size()) {
-            measure->durations_offset = 0;
-        }
-    }
-
-    note->fermata = false; // only one note per fermata;
-    note->trill = false;
-
-    return i - index;
-}
-
-//////////////////////////////
-//
-// convertMeasure --
-//
-
-void PAEInput::convertMeasure(pae::Measure *measure)
-{
-    if (measure->clef != NULL) {
-        m_layer->AddChild(measure->clef);
-    }
-
-    if (measure->wholerest > 0) {
-        if (measure->wholerest == 1) {
-            MRest *mRest = new MRest;
-            m_layer->AddChild(mRest);
-        }
-        else {
-            MultiRest *multiRest = new MultiRest();
-            multiRest->SetNum(measure->wholerest);
-            m_layer->AddChild(multiRest);
-        }
-    }
-
-    m_nested_objects.clear();
-
-    for (unsigned int i = 0; i < measure->notes.size(); ++i) {
-        pae::Note *note = &measure->notes.at(i);
-        parseNote(note);
-    }
-
-    // Set barLine
-    m_measure->SetRight(measure->barLine);
-}
-
-void PAEInput::parseNote(pae::Note *note)
-{
-
-    LayerElement *element;
-
-    if (note->rest) {
-        Rest *rest = new Rest();
-
-        rest->SetDur(note->duration);
-
-        if (!m_is_mensural && note->dots != 0) {
-            rest->SetDots(note->dots);
         }
 
-        if (note->fermata) {
-            Fermata *fermata = new Fermata();
-            fermata->SetStartid("#" + rest->GetUuid());
-            m_measure->AddChild(fermata);
-        }
+        //////////////////////////////
+        //
+        // getNote --
+        //
 
-        element = rest;
-    }
-    else {
-        Note *mnote = new Note();
+        int PAEInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
+        {
+            int oct;
+            int i = index;
+            int app;
+            int tuplet_num;
 
-        mnote->SetPname(note->pitch);
-        mnote->SetOct(note->octave);
-        if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
-            Accid *accid = new Accid();
-            if (note->accidGes) {
-                accid->SetAccidGes(Att::AccidentalWrittenToGestural(note->accidental));
+            if (note->acciaccatura) {
+                // acciaccaturas are always eights regardless
+                // and have no dots
+                note->duration = DURATION_8;
             }
             else {
-                accid->SetAccid(note->accidental);
+                if (measure->durations.size() == 0) {
+                    note->duration = DURATION_4;
+                    note->dots = 0;
+                    LogWarning("Plaine & Easie import: found note before duration was specified");
+                }
+                else {
+                    note->duration = measure->durations.at(measure->durations_offset);
+                    note->dots = measure->dots.at(measure->durations_offset);
+                }
             }
-            mnote->AddChild(accid);
+            note->pitch = getPitch(incipit[i]);
+
+            // If necessary pass the accid from the tied note (could be from the previous measure)
+            if (m_tieAccid.first != PITCHNAME_NONE) {
+                if (m_tieAccid.second == ACCIDENTAL_WRITTEN_n) {
+                    if (m_currentAccids.count(m_tieAccid.first) != 0) {
+                        m_currentAccids.erase(m_tieAccid.first);
+                    }
+                }
+                else if (m_tieAccid.second != ACCIDENTAL_WRITTEN_NONE) {
+                    m_currentAccids[m_tieAccid.first] = m_tieAccid.second;
+                }
+            }
+            m_tieAccid.first = PITCHNAME_NONE;
+            m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
+
+            // Natural in front of the note, remove it from the current list
+            if (note->accidental == ACCIDENTAL_WRITTEN_n) {
+                if (m_currentAccids.count(note->pitch) != 0) {
+                    m_currentAccids.erase(note->pitch);
+                }
+            }
+            // Not a natural in front of the note, add it to the current list
+            else if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
+                m_currentAccids[note->pitch] = note->accidental;
+            }
+
+            // Nothing in front of the note, but something in the list - make it an accid.ges
+            if ((note->accidental == ACCIDENTAL_WRITTEN_NONE) && (m_currentAccids.count(note->pitch) != 0)) {
+                note->accidental = m_currentAccids.at(note->pitch);
+                note->accidGes = true;
+            }
+
+            // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
+            // it will be added instead of the note
+            if (note->pitch == PITCHNAME_NONE) {
+                note->rest = true;
+            }
+
+            // chord
+            if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\^"))) {
+                note->chord = true;
+            }
+
+            // tie
+            if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
+                note->tie = true;
+                if (note->accidental) {
+                    m_tieAccid.first = note->pitch;
+                    m_tieAccid.second = note->accidental;
+                }
+            }
+            else {
+                m_tieAccid.first = PITCHNAME_NONE;
+                m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
+            }
+
+            // trills
+            if (regex_search(incipit + i + 1, std::regex("^[^A-G]*t"))) {
+                note->trill = true;
+            }
+
+            oct = note->octave;
+            measure->notes.push_back(*note);
+
+            app = note->appoggiatura;
+            tuplet_num = note->tuplet_note;
+
+            // Reset note to defaults
+            note->clear();
+
+            // write back the values we need to save
+            note->octave = oct; // save octave
+
+            // tuplets. Decrease the current number if we are in a tuplet
+            // i.e. tuplet_num > 0
+            // al the other values just need to be in the first note
+            if (tuplet_num > 0) {
+                note->tuplet_note = --tuplet_num;
+            }
+
+            // grace notes
+            note->acciaccatura = false;
+            if (app > 0) {
+                note->appoggiatura = --app;
+            }
+            // durations
+            if (measure->durations.size() > 0) {
+                measure->durations_offset++;
+                if (measure->durations_offset >= (int)measure->durations.size()) {
+                    measure->durations_offset = 0;
+                }
+            }
+
+            note->fermata = false; // only one note per fermata;
+            note->trill = false;
+
+            return i - index;
         }
 
-        mnote->SetDur(note->duration);
+        //////////////////////////////
+        //
+        // convertMeasure --
+        //
 
-        if (!m_is_mensural && note->dots != 0) {
-            mnote->SetDots(note->dots);
+        void PAEInput::convertMeasure(pae::Measure * measure)
+        {
+            if (measure->clef != NULL) {
+                m_layer->AddChild(measure->clef);
+            }
+
+            if (measure->wholerest > 0) {
+                if (measure->wholerest == 1) {
+                    MRest *mRest = new MRest;
+                    m_layer->AddChild(mRest);
+                }
+                else {
+                    MultiRest *multiRest = new MultiRest();
+                    multiRest->SetNum(measure->wholerest);
+                    m_layer->AddChild(multiRest);
+                }
+            }
+
+            m_nested_objects.clear();
+
+            for (unsigned int i = 0; i < measure->notes.size(); ++i) {
+                pae::Note *note = &measure->notes.at(i);
+                parseNote(note);
+            }
+
+            // Set barLine
+            m_measure->SetRight(measure->barLine);
         }
 
-        // pseudo chant notation with 7. in PAE - make quater notes without stem
-        if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
-            mnote->SetDur(DURATION_4);
-            mnote->SetDots(0);
-            mnote->SetStemLen(0);
-            mnote->SetStemVisible(BOOLEAN_false);
-        }
+        void PAEInput::parseNote(pae::Note * note)
+        {
 
-        if (note->fermata) {
-            Fermata *fermata = new Fermata();
-            fermata->SetStartid("#" + mnote->GetUuid());
-            m_measure->AddChild(fermata);
-        }
+            LayerElement *element;
 
-        if (note->trill) {
-            Trill *trill = new Trill();
-            trill->SetStartid("#" + mnote->GetUuid());
-            m_measure->AddChild(trill);
-        }
+            if (note->rest) {
+                Rest *rest = new Rest();
 
-        if (m_tie != NULL) {
-            m_tie->SetEndid("#" + mnote->GetUuid());
-            m_tie = NULL;
-        }
+                rest->SetDur(note->duration);
 
-        if (note->tie) {
-            m_tie = new Tie();
-            m_tie->SetStartid("#" + mnote->GetUuid());
-            m_measure->AddChild(m_tie);
-        }
+                if (!m_is_mensural && note->dots != 0) {
+                    rest->SetDots(note->dots);
+                }
 
-        element = mnote;
-    }
+                if (note->fermata) {
+                    Fermata *fermata = new Fermata();
+                    fermata->SetStartid("#" + rest->GetUuid());
+                    m_measure->AddChild(fermata);
+                }
 
-    // Does this note have a clef change? push it before everything else
-    if (note->clef) {
-        addLayerElement(note->clef);
-        note->clef = NULL;
-    }
+                element = rest;
+            }
+            else {
+                Note *mnote = new Note();
 
-    // Same thing for time changes
-    // You can find this sometimes
-    if (note->meter) {
-        addLayerElement(note->meter);
-        note->meter = NULL;
-    }
-    if (note->mensur) {
-        addLayerElement(note->mensur);
-        note->mensur = NULL;
-    }
+                mnote->SetPname(note->pitch);
+                mnote->SetOct(note->octave);
+                if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
+                    Accid *accid = new Accid();
+                    if (note->accidGes) {
+                        accid->SetAccidGes(Att::AccidentalWrittenToGestural(note->accidental));
+                    }
+                    else {
+                        accid->SetAccid(note->accidental);
+                    }
+                    mnote->AddChild(accid);
+                }
 
-    // Handle key change. Evil if done in a beam
-    if (note->key) {
-        addLayerElement(note->key);
-        note->key = NULL;
-    }
+                mnote->SetDur(note->duration);
 
-    // Acciaccaturas are similar but do not get beamed (do they)
-    // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
-    // Acciaccatura rests do not exist
-    if (note->acciaccatura && (element->Is(NOTE))) {
-        Note *mnote = vrv_cast<Note *>(element);
-        assert(mnote);
-        mnote->SetDur(DURATION_8);
-        mnote->SetGrace(GRACE_unacc);
-        mnote->SetStemDir(STEMDIRECTION_up);
-    }
+                if (!m_is_mensural && note->dots != 0) {
+                    mnote->SetDots(note->dots);
+                }
 
-    if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
-        Note *mnote = vrv_cast<Note *>(element);
-        assert(mnote);
-        mnote->SetGrace(GRACE_acc);
-        mnote->SetStemDir(STEMDIRECTION_up);
-    }
+                // pseudo chant notation with 7. in PAE - make quater notes without stem
+                if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
+                    mnote->SetDur(DURATION_4);
+                    mnote->SetDots(0);
+                    mnote->SetStemLen(0);
+                    mnote->SetStemVisible(BOOLEAN_false);
+                }
 
-    if ((note->beam == BEAM_INITIAL) && !m_is_mensural) {
-        pushContainer(new Beam());
-    }
+                if (note->fermata) {
+                    Fermata *fermata = new Fermata();
+                    fermata->SetStartid("#" + mnote->GetUuid());
+                    m_measure->AddChild(fermata);
+                }
 
-    // we have a tuplet, the tuplet_note is > 0
-    // which means we are counting a tuplet
-    if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
-        Tuplet *newTuplet = new Tuplet();
-        newTuplet->SetNum(note->tuplet_val);
-        newTuplet->SetNumbase(2);
-        pushContainer(newTuplet);
-    }
+                if (note->trill) {
+                    Trill *trill = new Trill();
+                    trill->SetStartid("#" + mnote->GetUuid());
+                    m_measure->AddChild(trill);
+                }
 
-    if ((note->beam == BEAM_TUPLET) && !m_is_mensural) {
-        pushContainer(new Beam());
-    }
+                if (m_tie != NULL) {
+                    m_tie->SetEndid("#" + mnote->GetUuid());
+                    m_tie = NULL;
+                }
 
-    // note in a chord
-    if (note->chord && element->Is(NOTE)) {
-        Note *mnote = dynamic_cast<Note *>(element);
-        assert(mnote);
-        // first note?
-        if (!m_is_in_chord) {
-            Chord *chord = new Chord();
-            chord->SetDots(mnote->GetDots());
-            chord->SetDur(mnote->GetDur());
-            pushContainer(chord);
-            m_is_in_chord = true;
-        }
-        mnote->ResetAugmentDots();
-        mnote->ResetDurationLogical();
-    }
+                if (note->tie) {
+                    m_tie = new Tie();
+                    m_tie->SetStartid("#" + mnote->GetUuid());
+                    m_measure->AddChild(m_tie);
+                }
 
-    // Add the note to the current container
-    addLayerElement(element);
-    element = NULL;
+                element = mnote;
+            }
 
-    // Add mensural dot
-    if (m_is_mensural && note->dots > 0) {
-        addLayerElement(new Dot());
-    }
+            // Does this note have a clef change? push it before everything else
+            if (note->clef) {
+                addLayerElement(note->clef);
+                note->clef = NULL;
+            }
 
-    // the last note counts always '1'
-    // insert the tuplet elem
-    // and reset the tuplet counter
-    if (note->tuplet_note == 1) {
-        popContainer();
-    }
+            // Same thing for time changes
+            // You can find this sometimes
+            if (note->meter) {
+                addLayerElement(note->meter);
+                note->meter = NULL;
+            }
+            if (note->mensur) {
+                addLayerElement(note->mensur);
+                note->mensur = NULL;
+            }
 
-    if ((note->beam == BEAM_TERMINAL) && !m_is_mensural) {
-        popContainer();
-    }
+            // Handle key change. Evil if done in a beam
+            if (note->key) {
+                addLayerElement(note->key);
+                note->key = NULL;
+            }
 
-    // last note of a chord
-    if (!note->chord && m_is_in_chord) {
-        Note *mnote = dynamic_cast<Note *>(element);
-        if (mnote) {
-            mnote->ResetAugmentDots();
-            mnote->ResetDurationLogical();
-        }
-        popContainer();
-        m_is_in_chord = false;
-    }
-}
+            // Acciaccaturas are similar but do not get beamed (do they)
+            // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
+            // Acciaccatura rests do not exist
+            if (note->acciaccatura && (element->Is(NOTE))) {
+                Note *mnote = vrv_cast<Note *>(element);
+                assert(mnote);
+                mnote->SetDur(DURATION_8);
+                mnote->SetGrace(GRACE_unacc);
+                mnote->SetStemDir(STEMDIRECTION_up);
+            }
 
-void PAEInput::pushContainer(LayerElement *container)
-{
-    addLayerElement(container);
-    m_nested_objects.push_back(container);
-}
+            if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
+                Note *mnote = vrv_cast<Note *>(element);
+                assert(mnote);
+                mnote->SetGrace(GRACE_acc);
+                mnote->SetStemDir(STEMDIRECTION_up);
+            }
 
-void PAEInput::popContainer()
-{
-    // assert(m_nested_objects.size() > 0);
-    if (m_nested_objects.size() == 0) {
-        LogError("Plaine & Easie import: tried to pop an object from empty stack. "
-                 "Cross-measure objects (tuplets, beams) are not supported.");
-    }
-    else {
-        m_nested_objects.pop_back();
-    }
-}
+            if ((note->beam == BEAM_INITIAL) && !m_is_mensural) {
+                pushContainer(new Beam());
+            }
 
-void PAEInput::addLayerElement(LayerElement *element)
-{
-    if (m_nested_objects.size() > 0) {
-        if (!m_nested_objects.back()->IsSupportedChild(element)) {
-            delete element;
+            // we have a tuplet, the tuplet_note is > 0
+            // which means we are counting a tuplet
+            if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
+                Tuplet *newTuplet = new Tuplet();
+                newTuplet->SetNum(note->tuplet_val);
+                newTuplet->SetNumbase(2);
+                pushContainer(newTuplet);
+            }
+
+            if ((note->beam == BEAM_TUPLET) && !m_is_mensural) {
+                pushContainer(new Beam());
+            }
+
+            // note in a chord
+            if (note->chord && element->Is(NOTE)) {
+                Note *mnote = dynamic_cast<Note *>(element);
+                assert(mnote);
+                // first note?
+                if (!m_is_in_chord) {
+                    Chord *chord = new Chord();
+                    chord->SetDots(mnote->GetDots());
+                    chord->SetDur(mnote->GetDur());
+                    pushContainer(chord);
+                    m_is_in_chord = true;
+                }
+                mnote->ResetAugmentDots();
+                mnote->ResetDurationLogical();
+            }
+
+            // Add the note to the current container
+            addLayerElement(element);
             element = NULL;
-        }
-        else {
-            m_nested_objects.back()->AddChild(element);
-        }
-    }
-    else {
-        m_layer->AddChild(element);
-    }
-}
 
-//////////////////////////////
-//
-// getAtRecordKeyValue --
-//   Formats: @key: value
-//            @key:value
-//            @key :value
-//            @ key :value
-//            @ key : value
-//   only one per line
-//
+            // Add mensural dot
+            if (m_is_mensural && note->dots > 0) {
+                addLayerElement(new Dot());
+            }
 
-void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
-{
+            // the last note counts always '1'
+            // insert the tuplet elem
+            // and reset the tuplet counter
+            if (note->tuplet_note == 1) {
+                popContainer();
+            }
+
+            if ((note->beam == BEAM_TERMINAL) && !m_is_mensural) {
+                popContainer();
+            }
+
+            // last note of a chord
+            if (!note->chord && m_is_in_chord) {
+                Note *mnote = dynamic_cast<Note *>(element);
+                if (mnote) {
+                    mnote->ResetAugmentDots();
+                    mnote->ResetDurationLogical();
+                }
+                popContainer();
+                m_is_in_chord = false;
+            }
+        }
+
+        void PAEInput::pushContainer(LayerElement * container)
+        {
+            addLayerElement(container);
+            m_nested_objects.push_back(container);
+        }
+
+        void PAEInput::popContainer()
+        {
+            // assert(m_nested_objects.size() > 0);
+            if (m_nested_objects.size() == 0) {
+                LogError("Plaine & Easie import: tried to pop an object from empty stack. "
+                         "Cross-measure objects (tuplets, beams) are not supported.");
+            }
+            else {
+                m_nested_objects.pop_back();
+            }
+        }
+
+        void PAEInput::addLayerElement(LayerElement * element)
+        {
+            if (m_nested_objects.size() > 0) {
+                if (!m_nested_objects.back()->IsSupportedChild(element)) {
+                    delete element;
+                    element = NULL;
+                }
+                else {
+                    m_nested_objects.back()->AddChild(element);
+                }
+            }
+            else {
+                m_layer->AddChild(element);
+            }
+        }
+
+        //////////////////////////////
+        //
+        // getAtRecordKeyValue --
+        //   Formats: @key: value
+        //            @key:value
+        //            @key :value
+        //            @ key :value
+        //            @ key : value
+        //   only one per line
+        //
+
+        void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
+        {
 
 #define SKIPSPACE                                                                                                      \
     while ((index < length) && isspace(input[index])) {                                                                \
         index++;                                                                                                       \
     }
 
-    char MARKER = '@';
-    char SEPARATOR = ':';
-    char EMPTY = '\0';
+            char MARKER = '@';
+            char SEPARATOR = ':';
+            char EMPTY = '\0';
 
-    int length = (int)strlen(input);
-    int count = 0;
+            int length = (int)strlen(input);
+            int count = 0;
 
-    // zero out strings
-    memset(key, EMPTY, MAX_DATA_LEN);
-    memset(value, EMPTY, MAX_DATA_LEN);
+            // zero out strings
+            memset(key, EMPTY, MAX_DATA_LEN);
+            memset(value, EMPTY, MAX_DATA_LEN);
 
-    if (length == 0) {
-        return;
-    }
+            if (length == 0) {
+                return;
+            }
 
-    char ch;
-    int index = 0;
+            char ch;
+            int index = 0;
 
-    // find starting @ symbol (ignoring any starting space)
-    SKIPSPACE
-    if (input[index] != MARKER) {
-        // invalid record format since it does not start with @
-        return;
-    }
-    index++;
-    SKIPSPACE
-
-    // start storing the key value:
-    while ((index < length) && (input[index] != SEPARATOR)) {
-        if (isspace(input[index])) {
+            // find starting @ symbol (ignoring any starting space)
+            SKIPSPACE
+            if (input[index] != MARKER) {
+                // invalid record format since it does not start with @
+                return;
+            }
             index++;
-            continue;
+            SKIPSPACE
+
+            // start storing the key value:
+            while ((index < length) && (input[index] != SEPARATOR)) {
+                if (isspace(input[index])) {
+                    index++;
+                    continue;
+                }
+                ch = input[index];
+
+                // Should never happen
+                if (count >= MAX_DATA_LEN) return;
+
+                key[count] = ch;
+                count++;
+                index++;
+            }
+            // check to see if valid format: (:) must be the current character
+            if (input[index] != SEPARATOR) {
+                key[0] = EMPTY;
+                return;
+            }
+            index++;
+            SKIPSPACE
+
+            // Also should never happen
+            if (strlen(&input[index]) > MAX_DATA_LEN) return;
+
+            strcpy(value, &input[index]);
+
+            // Truncate string to first space
+            size_t i;
+            for (i = strlen(value) - 2; i > 0; i--) {
+                if (isspace(value[i])) {
+                    value[i] = EMPTY;
+                    continue;
+                }
+                break;
+            }
         }
-        ch = input[index];
-
-        // Should never happen
-        if (count >= MAX_DATA_LEN) return;
-
-        key[count] = ch;
-        count++;
-        index++;
-    }
-    // check to see if valid format: (:) must be the current character
-    if (input[index] != SEPARATOR) {
-        key[0] = EMPTY;
-        return;
-    }
-    index++;
-    SKIPSPACE
-
-    // Also should never happen
-    if (strlen(&input[index]) > MAX_DATA_LEN) return;
-
-    strcpy(value, &input[index]);
-
-    // Truncate string to first space
-    size_t i;
-    for (i = strlen(value) - 2; i > 0; i--) {
-        if (isspace(value[i])) {
-            value[i] = EMPTY;
-            continue;
-        }
-        break;
-    }
-}
 
 #endif // NO_PAE_SUPPORT
 
@@ -2756,7 +2757,7 @@ bool PAEInput::Parse()
                 if (!tie->HasEndid()) {
                     assert(currentMeterSig);
                     double tstamp2 = currentMeterSig->GetTotalCount() + 1;
-                    tie->SetTstamp2(std::make_pair(0, tstamp2));
+                    tie->SetTstamp2({ 0, tstamp2 });
                 }
             }
             token.m_object = NULL;
@@ -3720,7 +3721,7 @@ bool PAEInput::ConvertDuration()
     // The stack of durations for handling patterns
     std::list<std::pair<data_DURATION, int>> durations;
     // Add a default quarter note duration
-    durations.push_back(std::make_pair(DURATION_4, 0));
+    durations.push_back({ DURATION_4, 0 });
     // Point to it
     std::list<std::pair<data_DURATION, int>>::iterator currentDur = durations.begin();
 
@@ -4079,14 +4080,14 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
             }
         }
         else {
-            keySig->SetSig(std::make_pair(altNumber, alterationType));
+            keySig->SetSig({ altNumber, alterationType });
         }
         if (cancel) {
             keySig->SetSigShowchange(BOOLEAN_true);
         }
     }
     else {
-        keySig->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+        keySig->SetSig({ 0, ACCIDENTAL_WRITTEN_n });
     }
     return true;
 }
@@ -4298,7 +4299,7 @@ bool PAEInput::ParseDuration(
         LogPAE("Duration content cannot be parsed (quarter note in non pedantic mode)", token);
         // Default to quarter note
         if (m_pedanticMode) return false;
-        durations.push_back(std::make_pair(DURATION_4, 0));
+        durations.push_back({ DURATION_4, 0 });
         return true;
     }
 
@@ -4343,7 +4344,7 @@ bool PAEInput::ParseDuration(
                     case '9': duration = DURATION_breve; break;
                 }
             }
-            durations.push_back(std::make_pair(duration, 0));
+            durations.push_back({ duration, 0 });
         }
         else {
             durations.back().second += 1;
@@ -4353,7 +4354,7 @@ bool PAEInput::ParseDuration(
     // just in case not to screw up iterators in ConvertDuration
     if (durations.empty()) {
         LogDebug("Something went wrong with the parsing of durations");
-        durations.push_back(std::make_pair(DURATION_4, 0));
+        durations.push_back({ DURATION_4, 0 });
     }
 
     return true;
@@ -4364,7 +4365,7 @@ bool PAEInput::ParseDuration(
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 #endif // USE_PAE_OLD_PARSER
-//----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
+        //----------------------------------------------------------------------------
+        //----------------------------------------------------------------------------
 
-} // namespace vrv
+    } // namespace vrv
