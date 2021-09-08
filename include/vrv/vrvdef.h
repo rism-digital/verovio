@@ -315,7 +315,7 @@ typedef std::vector<Note *> ChordCluster;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
 
-typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool>> ArrayOfAligmentArpegTuples;
+typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool>> ArrayOfAlignmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 

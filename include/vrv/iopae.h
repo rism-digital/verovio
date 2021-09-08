@@ -498,7 +498,7 @@ namespace pae {
         char m_inputChar;
         /** the position in the original input string for debuggin purposes */
         int m_position;
-        /** a flag indicating the an error occured at this position */
+        /** a flag indicating that an error occured at this position */
         bool m_isError;
     };
 

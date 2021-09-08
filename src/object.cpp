@@ -1230,6 +1230,21 @@ Object *ObjectFactory::Create(std::string name)
     }
 }
 
+ClassId ObjectFactory::GetClassId(std::string name)
+{
+    ClassId classId = OBJECT;
+
+    MapOfStrClassIds::iterator it = s_classIdsRegistry.find(name);
+    if (it != s_classIdsRegistry.end()) {
+        classId = it->second;
+    }
+    else {
+        LogError("ClassId for '%s' not found", name.c_str());
+    }
+
+    return classId;
+}
+
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
     for (auto str : classStrings) {
