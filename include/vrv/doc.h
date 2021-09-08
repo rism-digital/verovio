@@ -130,7 +130,10 @@ public:
     ///@{
     int GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const;
-    int GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphLeft(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphRight(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphBottom(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphTop(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const;
     int GetDrawingUnit(int staffSize) const;
     int GetDrawingDoubleUnit(int staffSize) const;
