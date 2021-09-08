@@ -254,28 +254,28 @@ void Att::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes)
         const AttAltSym *att = dynamic_cast<const AttAltSym *>(element);
         assert(att);
         if (att->HasAltsym()) {
-            attributes->push_back(std::make_pair("altsym", att->StrToStr(att->GetAltsym())));
+            attributes->push_back({ "altsym", att->StrToStr(att->GetAltsym()) });
         }
     }
     if (element->HasAttClass(ATT_ANCHOREDTEXTLOG)) {
         const AttAnchoredTextLog *att = dynamic_cast<const AttAnchoredTextLog *>(element);
         assert(att);
         if (att->HasFunc()) {
-            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+            attributes->push_back({ "func", att->StrToStr(att->GetFunc()) });
         }
     }
     if (element->HasAttClass(ATT_CURVELOG)) {
         const AttCurveLog *att = dynamic_cast<const AttCurveLog *>(element);
         assert(att);
         if (att->HasFunc()) {
-            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+            attributes->push_back({ "func", att->StrToStr(att->GetFunc()) });
         }
     }
     if (element->HasAttClass(ATT_LINELOG)) {
         const AttLineLog *att = dynamic_cast<const AttLineLog *>(element);
         assert(att);
         if (att->HasFunc()) {
-            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+            attributes->push_back({ "func", att->StrToStr(att->GetFunc()) });
         }
     }
 }
