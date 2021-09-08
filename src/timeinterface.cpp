@@ -220,6 +220,9 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 
     if (!this->GetStart() || !this->GetEnd() || !alignment->GetStaff()) return;
 
+    // We cannot have cross-staff slurs only with timestamps
+    if (this->GetStart()->Is(TIMESTAMP_ATTR) && this->GetEnd()->Is(TIMESTAMP_ATTR)) return;
+
     Layer *layer = NULL;
 
     // If the starting point is a chord we need to select the appropriate extreme staff
