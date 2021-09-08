@@ -1298,6 +1298,7 @@ void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     arpeg->WriteArpegLog(currentNode);
     arpeg->WriteArpegVis(currentNode);
     arpeg->WriteColor(currentNode);
+    arpeg->WriteEnclosingChars(currentNode);
 }
 
 void MEIOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
@@ -1725,6 +1726,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
+    clef->WriteEnclosingChars(currentNode);
     clef->WriteExtSym(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
@@ -1881,6 +1883,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     }
 
     WriteLayerElement(currentNode, meterSig);
+    meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
 }
@@ -4405,6 +4408,7 @@ bool MEIInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
     vrvArpeg->ReadArpegLog(arpeg);
     vrvArpeg->ReadArpegVis(arpeg);
     vrvArpeg->ReadColor(arpeg);
+    vrvArpeg->ReadEnclosingChars(arpeg);
 
     parent->AddChild(vrvArpeg);
     ReadUnsupportedAttr(arpeg, vrvArpeg);
@@ -5208,6 +5212,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
+    vrvClef->ReadEnclosingChars(clef);
     vrvClef->ReadExtSym(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
@@ -5385,6 +5390,7 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     MeterSig *vrvMeterSig = new MeterSig();
     ReadLayerElement(meterSig, vrvMeterSig);
 
+    vrvMeterSig->ReadEnclosingChars(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
 
