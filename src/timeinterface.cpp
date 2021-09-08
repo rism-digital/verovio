@@ -305,7 +305,7 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
     }
 
     // We set -1 to the data_MEASUREBEAT for @tstamp
-    params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(-1, this->GetTstamp())));
+    params->m_tstamps.push_back({ object, data_MEASUREBEAT(-1, this->GetTstamp()) });
 
     return FUNCTOR_CONTINUE;
 }
@@ -325,7 +325,7 @@ int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParam
     if (!this->HasStartid()) return FUNCTOR_CONTINUE;
 
     this->SetUuidStr();
-    params->m_timePointingInterfaces.push_back(std::make_pair(this, object->GetClassId()));
+    params->m_timePointingInterfaces.push_back({ this, object->GetClassId() });
 
     return FUNCTOR_CONTINUE;
 }
@@ -344,7 +344,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
     }
 
     this->SetUuidStr();
-    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
+    params->m_timeSpanningInterfaces.push_back({ this, object->GetClassId() });
 
     return FUNCTOR_CONTINUE;
 }
@@ -371,8 +371,8 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
     }
 
     // We can now add the pair to our stack
-    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
-    params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
+    params->m_timeSpanningInterfaces.push_back({ this, object->GetClassId() });
+    params->m_tstamps.push_back({ object, data_MEASUREBEAT(this->GetTstamp2()) });
 
     return TimePointInterface::InterfacePrepareTimestamps(params, object);
 }
