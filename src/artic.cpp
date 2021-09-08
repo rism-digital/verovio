@@ -263,21 +263,19 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
         return 0;
 }
 
-wchar_t Artic::GetEnclosingGlyph(bool beforeArtic) const
+std::pair<wchar_t, wchar_t> Artic::GetEnclosingGlyphs() const
 {
-    wchar_t glyph = 0;
+    std::pair<wchar_t, wchar_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
             case ENCLOSURE_brack:
-                glyph = beforeArtic ? SMUFL_E26C_accidentalBracketLeft : SMUFL_E26D_accidentalBracketRight;
+                glyphs = { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
                 break;
-            case ENCLOSURE_paren:
-                glyph = beforeArtic ? SMUFL_E26A_accidentalParensLeft : SMUFL_E26B_accidentalParensRight;
-                break;
+            case ENCLOSURE_paren: glyphs = { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
             default: break;
         }
     }
-    return glyph;
+    return glyphs;
 }
 
 //----------------------------------------------------------------------------
