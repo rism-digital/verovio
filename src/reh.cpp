@@ -64,4 +64,17 @@ bool Reh::IsSupportedChild(Object *child)
     return true;
 }
 
+//----------------------------------------------------------------------------
+// Reh functor methods
+//----------------------------------------------------------------------------
+
+int Reh::ResolveRehPosition(FunctorParams *)
+{
+    if (!this->HasStart() && !this->HasTstamp()) {
+        this->SetTstamp(0.0);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv
