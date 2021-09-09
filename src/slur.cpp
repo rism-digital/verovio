@@ -578,7 +578,7 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(
             = (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // grace notes - always below unless we have a drawing stem direction on the layer
-    else if (isGraceToNoteSlur && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
+    else if (isGraceToNoteSlur && layer && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
         drawingCurveDir = this->GetGraceCurveDirection(doc);
     }
     // the normal case
