@@ -92,7 +92,7 @@ void Att::GetPagebased(const Object *element, ArrayOfStrAttr *attributes)
         const AttSurface *att = dynamic_cast<const AttSurface *>(element);
         assert(att);
         if (att->HasSurface()) {
-            attributes->push_back(std::make_pair("surface", att->StrToStr(att->GetSurface())));
+            attributes->push_back({ "surface", att->StrToStr(att->GetSurface()) });
         }
     }
 }

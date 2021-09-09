@@ -562,69 +562,69 @@ void Att::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
         const AttHarmAnl *att = dynamic_cast<const AttHarmAnl *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->HarmAnlFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->HarmAnlFormToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_HARMONICFUNCTION)) {
         const AttHarmonicFunction *att = dynamic_cast<const AttHarmonicFunction *>(element);
         assert(att);
         if (att->HasDeg()) {
-            attributes->push_back(std::make_pair("deg", att->StrToStr(att->GetDeg())));
+            attributes->push_back({ "deg", att->StrToStr(att->GetDeg()) });
         }
     }
     if (element->HasAttClass(ATT_INTERVALHARMONIC)) {
         const AttIntervalHarmonic *att = dynamic_cast<const AttIntervalHarmonic *>(element);
         assert(att);
         if (att->HasInth()) {
-            attributes->push_back(std::make_pair("inth", att->StrToStr(att->GetInth())));
+            attributes->push_back({ "inth", att->StrToStr(att->GetInth()) });
         }
     }
     if (element->HasAttClass(ATT_INTERVALMELODIC)) {
         const AttIntervalMelodic *att = dynamic_cast<const AttIntervalMelodic *>(element);
         assert(att);
         if (att->HasIntm()) {
-            attributes->push_back(std::make_pair("intm", att->StrToStr(att->GetIntm())));
+            attributes->push_back({ "intm", att->StrToStr(att->GetIntm()) });
         }
     }
     if (element->HasAttClass(ATT_KEYSIGANL)) {
         const AttKeySigAnl *att = dynamic_cast<const AttKeySigAnl *>(element);
         assert(att);
         if (att->HasMode()) {
-            attributes->push_back(std::make_pair("mode", att->ModeToStr(att->GetMode())));
+            attributes->push_back({ "mode", att->ModeToStr(att->GetMode()) });
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTANL)) {
         const AttKeySigDefaultAnl *att = dynamic_cast<const AttKeySigDefaultAnl *>(element);
         assert(att);
         if (att->HasKeyAccid()) {
-            attributes->push_back(std::make_pair("key.accid", att->AccidentalGesturalToStr(att->GetKeyAccid())));
+            attributes->push_back({ "key.accid", att->AccidentalGesturalToStr(att->GetKeyAccid()) });
         }
         if (att->HasKeyMode()) {
-            attributes->push_back(std::make_pair("key.mode", att->ModeToStr(att->GetKeyMode())));
+            attributes->push_back({ "key.mode", att->ModeToStr(att->GetKeyMode()) });
         }
         if (att->HasKeyPname()) {
-            attributes->push_back(std::make_pair("key.pname", att->PitchnameToStr(att->GetKeyPname())));
+            attributes->push_back({ "key.pname", att->PitchnameToStr(att->GetKeyPname()) });
         }
     }
     if (element->HasAttClass(ATT_MELODICFUNCTION)) {
         const AttMelodicFunction *att = dynamic_cast<const AttMelodicFunction *>(element);
         assert(att);
         if (att->HasMfunc()) {
-            attributes->push_back(std::make_pair("mfunc", att->MelodicfunctionToStr(att->GetMfunc())));
+            attributes->push_back({ "mfunc", att->MelodicfunctionToStr(att->GetMfunc()) });
         }
     }
     if (element->HasAttClass(ATT_PITCHCLASS)) {
         const AttPitchClass *att = dynamic_cast<const AttPitchClass *>(element);
         assert(att);
         if (att->HasPclass()) {
-            attributes->push_back(std::make_pair("pclass", att->IntToStr(att->GetPclass())));
+            attributes->push_back({ "pclass", att->IntToStr(att->GetPclass()) });
         }
     }
     if (element->HasAttClass(ATT_SOLFA)) {
         const AttSolfa *att = dynamic_cast<const AttSolfa *>(element);
         assert(att);
         if (att->HasPsolfa()) {
-            attributes->push_back(std::make_pair("psolfa", att->StrToStr(att->GetPsolfa())));
+            attributes->push_back({ "psolfa", att->StrToStr(att->GetPsolfa()) });
         }
     }
 }

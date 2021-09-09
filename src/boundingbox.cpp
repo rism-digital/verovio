@@ -936,7 +936,7 @@ SegmentedLine::SegmentedLine(int start, int end)
     if (start > end) {
         BoundingBox::Swap(start, end);
     }
-    m_segments.push_back(std::make_pair(start, end));
+    m_segments.push_back({ start, end });
 }
 
 void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
@@ -969,7 +969,7 @@ void SegmentedLine::AddGap(int start, int end)
         }
         // cut the segment because the gap in within it
         if ((iter->first <= start) && (iter->second >= end)) {
-            iter = m_segments.insert(iter, std::make_pair(iter->first, start));
+            iter = m_segments.insert(iter, { iter->first, start });
             ++iter;
             iter->first = end;
             break;

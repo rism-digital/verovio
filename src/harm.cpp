@@ -171,7 +171,7 @@ int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 
     // first harm@n, create a new group
     this->SetDrawingGrpObject(this);
-    params->m_harms.insert(std::make_pair(n, this));
+    params->m_harms.insert({ n, this });
 
     return FUNCTOR_CONTINUE;
 }

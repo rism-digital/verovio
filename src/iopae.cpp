@@ -1709,14 +1709,14 @@ int PAEInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             }
         }
         else {
-            key->SetSig(std::make_pair(alt_nr, alterationType));
+            key->SetSig({ alt_nr, alterationType });
         }
         if (cancel) {
             key->SetSigShowchange(BOOLEAN_true);
         }
     }
     else {
-        key->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+        key->SetSig({ 0, ACCIDENTAL_WRITTEN_n });
     }
 
     m_currentKeySig = key;
@@ -2756,7 +2756,7 @@ bool PAEInput::Parse()
                 if (!tie->HasEndid()) {
                     assert(currentMeterSig);
                     double tstamp2 = currentMeterSig->GetTotalCount() + 1;
-                    tie->SetTstamp2(std::make_pair(0, tstamp2));
+                    tie->SetTstamp2({ 0, tstamp2 });
                 }
             }
             token.m_object = NULL;
@@ -3720,7 +3720,7 @@ bool PAEInput::ConvertDuration()
     // The stack of durations for handling patterns
     std::list<std::pair<data_DURATION, int>> durations;
     // Add a default quarter note duration
-    durations.push_back(std::make_pair(DURATION_4, 0));
+    durations.push_back({ DURATION_4, 0 });
     // Point to it
     std::list<std::pair<data_DURATION, int>>::iterator currentDur = durations.begin();
 
@@ -4079,14 +4079,14 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
             }
         }
         else {
-            keySig->SetSig(std::make_pair(altNumber, alterationType));
+            keySig->SetSig({ altNumber, alterationType });
         }
         if (cancel) {
             keySig->SetSigShowchange(BOOLEAN_true);
         }
     }
     else {
-        keySig->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+        keySig->SetSig({ 0, ACCIDENTAL_WRITTEN_n });
     }
     return true;
 }
@@ -4298,7 +4298,7 @@ bool PAEInput::ParseDuration(
         LogPAE("Duration content cannot be parsed (quarter note in non pedantic mode)", token);
         // Default to quarter note
         if (m_pedanticMode) return false;
-        durations.push_back(std::make_pair(DURATION_4, 0));
+        durations.push_back({ DURATION_4, 0 });
         return true;
     }
 
@@ -4343,7 +4343,7 @@ bool PAEInput::ParseDuration(
                     case '9': duration = DURATION_breve; break;
                 }
             }
-            durations.push_back(std::make_pair(duration, 0));
+            durations.push_back({ duration, 0 });
         }
         else {
             durations.back().second += 1;
@@ -4353,7 +4353,7 @@ bool PAEInput::ParseDuration(
     // just in case not to screw up iterators in ConvertDuration
     if (durations.empty()) {
         LogDebug("Something went wrong with the parsing of durations");
-        durations.push_back(std::make_pair(DURATION_4, 0));
+        durations.push_back({ DURATION_4, 0 });
     }
 
     return true;

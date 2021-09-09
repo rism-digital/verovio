@@ -315,11 +315,11 @@ data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarni
     std::regex test("mixed|0|[1-7][s|f]");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.KEYSIGNATURE '%s'", value.c_str());
-        return std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
+        return { -1, ACCIDENTAL_WRITTEN_NONE };
     }
 
     if (value == "mixed") {
-        return std::make_pair(VRV_UNSET, ACCIDENTAL_WRITTEN_NONE);
+        return { VRV_UNSET, ACCIDENTAL_WRITTEN_NONE };
     }
     else if (value != "0") {
         alterationNumber = atoi(value.substr(0, 1).c_str());
@@ -329,7 +329,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarni
         alterationType = ACCIDENTAL_WRITTEN_n;
     }
 
-    return std::make_pair(alterationNumber, alterationType);
+    return { alterationNumber, alterationType };
 }
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
@@ -356,7 +356,7 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
     else {
         timePoint = atof(value.c_str());
     }
-    return std::make_pair(measure, timePoint);
+    return { measure, timePoint };
 }
 
 std::string Att::MidivalueNameToStr(data_MIDIVALUE_NAME data) const

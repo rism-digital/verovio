@@ -318,16 +318,16 @@ int KeySig::Transpose(FunctorParams *functorParams)
     int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
 
     if (fifths == INVALID_INTERVAL_CLASS) {
-        this->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
     }
     else if (fifths < 0) {
-        this->SetSig(std::make_pair(-fifths, ACCIDENTAL_WRITTEN_f));
+        this->SetSig({ -fifths, ACCIDENTAL_WRITTEN_f });
     }
     else if (fifths > 0) {
-        this->SetSig(std::make_pair(fifths, ACCIDENTAL_WRITTEN_s));
+        this->SetSig({ fifths, ACCIDENTAL_WRITTEN_s });
     }
     else {
-        this->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
     }
 
     // Also convert pname and accid attributes

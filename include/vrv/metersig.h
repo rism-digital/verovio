@@ -50,7 +50,7 @@ public:
     wchar_t GetSymbolGlyph() const;
 
     /** Retrieve parentheses from the enclose attribute */
-    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs(bool small) const;
+    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs(bool smallGlpyh) const;
 
     //----------//
     // Functors //
