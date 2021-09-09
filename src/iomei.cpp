@@ -1432,6 +1432,7 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
         return;
     }
 
+    WriteFacsimileInterface(currentNode, accid);
     WriteLayerElement(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
