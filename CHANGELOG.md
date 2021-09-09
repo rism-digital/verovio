@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Complete refactoring of the Plaine and Easie parser
 * Support for `arpeg@enclose` (@eNote-GmBH)
 * Support for `clef@enclose` (@eNote-GmBH)
 * Support for `metersig@enclose` (@eNote-GmBH)
