@@ -206,7 +206,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // to be checked before PAE identification.
         return MUSEDATAHUM;
     }
-    if (data[0] == '@') {
+    if (data[0] == '@' || data[0] == '{') {
         return PAE;
     }
     if (data[0] == '*' || data[0] == '!') {
