@@ -87,25 +87,24 @@ wchar_t Pedal::GetPedalGlyph() const
 
 pedalVis_FORM Pedal::GetPedalForm(Doc *doc, System *system) const 
 {
-    const std::map<pedalVis_FORM, std::pair<option_PEDALSTYLE, pianoPedals_PEDALSTYLE>> pedalStyleValues
-        = { { pedalVis_FORM_line, { PEDALSTYLE_line, pianoPedals_PEDALSTYLE_line } },
-              { pedalVis_FORM_pedstar, { PEDALSTYLE_pedstar, pianoPedals_PEDALSTYLE_pedstar } },
-              { pedalVis_FORM_altpedstar, { PEDALSTYLE_altpedstar, pianoPedals_PEDALSTYLE_altpedstar } } };
+    const std::map<option_PEDALSTYLE, pedalVis_FORM> option2PedalVis = { { PEDALSTYLE_line, pedalVis_FORM_line },
+        { PEDALSTYLE_pedstar, pedalVis_FORM_pedstar }, { PEDALSTYLE_altpedstar, pedalVis_FORM_altpedstar } };
+    const std::map<pianoPedals_PEDALSTYLE, pedalVis_FORM> pianoPedals2PedalVis
+        = { { pianoPedals_PEDALSTYLE_line, pedalVis_FORM_line },
+              { pianoPedals_PEDALSTYLE_pedstar, pedalVis_FORM_pedstar },
+              { pianoPedals_PEDALSTYLE_altpedstar, pedalVis_FORM_altpedstar } };
 
     pedalVis_FORM style = pedalVis_FORM_NONE;
-    if (int option = doc->GetOptions()->m_pedalStyle.GetValue(); option != PEDALSTYLE_none) {
-        auto iter = std::find_if(pedalStyleValues.begin(), pedalStyleValues.end(),
-            [option](const auto &optionStylePair) { return option == optionStylePair.second.first; });
-        if (iter != pedalStyleValues.end()) style = iter->first;
+    if (option_PEDALSTYLE option = static_cast<option_PEDALSTYLE>(doc->GetOptions()->m_pedalStyle.GetValue());
+        option != PEDALSTYLE_auto) {
+        style = option2PedalVis.at(option);
     }
     else if (this->HasForm()) {
         style = this->GetForm();
     }
     else if (const ScoreDef *scoreDef = system->GetDrawingScoreDef(); scoreDef && scoreDef->HasPedalStyle()) {
         pianoPedals_PEDALSTYLE scoreDefStyle = scoreDef->GetPedalStyle();
-        auto iter = std::find_if(pedalStyleValues.begin(), pedalStyleValues.end(),
-            [scoreDefStyle](const auto &optionStylePair) { return scoreDefStyle == optionStylePair.second.second; });
-        if (iter != pedalStyleValues.end()) style = iter->first;
+        style = pianoPedals2PedalVis.at(scoreDefStyle);
     }
 
     return style;
