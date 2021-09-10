@@ -43,6 +43,7 @@
 #include "page.h"
 #include "pageboundary.h"
 #include "pageelement.h"
+#include "reh.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -976,7 +977,10 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
         MNum *mnum = dynamic_cast<MNum *>(measure->FindDescendantByType(MNUM));
-        if (mnum) {
+        Reh *reh = dynamic_cast<Reh *>(measure->FindDescendantByType(REH));
+        const bool hasRehearsal
+            = reh && reh->HasTstamp() && (0.0 == reh->GetTstamp() && (system->GetFirst(MEASURE) == measure));
+        if (mnum && !hasRehearsal) {
             // this should be an option
             Measure *systemStart = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE));
 

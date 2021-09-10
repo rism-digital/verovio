@@ -19,6 +19,7 @@
 #include "bboxdevicecontext.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "clef.h"
 #include "comparison.h"
 #include "devicecontext.h"
 #include "dir.h"
@@ -2099,6 +2100,15 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
     TextDrawingParams params;
 
     params.m_x = reh->GetStart()->GetDrawingX();
+
+    if ((system->GetFirst(MEASURE) == measure) && !system->IsFirstOfMdiv()) {
+        // StaffDef information is always in the first layer
+        Layer *layer = dynamic_cast<Layer *>(measure->FindDescendantByType(LAYER));
+        assert(layer);
+        if (Clef *clef = layer->GetStaffDefClef(); clef) {
+            params.m_x = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
+        }
+    }
 
     data_HORIZONTALALIGNMENT alignment = reh->GetChildRendAlignment();
     // Rehearsal marks are center aligned by default;
