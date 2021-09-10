@@ -390,7 +390,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
-        attributes->push_back(std::make_pair(pair.first, pair.second));
+        attributes->push_back({ pair.first, pair.second });
     }
 
     return (int)attributes->size();
@@ -1243,6 +1243,21 @@ Object *ObjectFactory::Create(std::string name)
         LogError("Factory for '%s' not found", name.c_str());
         return NULL;
     }
+}
+
+ClassId ObjectFactory::GetClassId(std::string name)
+{
+    ClassId classId = OBJECT;
+
+    MapOfStrClassIds::iterator it = s_classIdsRegistry.find(name);
+    if (it != s_classIdsRegistry.end()) {
+        classId = it->second;
+    }
+    else {
+        LogError("ClassId for '%s' not found", name.c_str());
+    }
+
+    return classId;
 }
 
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)

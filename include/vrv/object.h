@@ -1576,6 +1576,11 @@ public:
     void Register(std::string name, ClassId classId, std::function<Object *(void)> function);
 
     /**
+     * Get the ClassId from the MEI element string name by making a lookup in the register
+     */
+    ClassId GetClassId(std::string name);
+
+    /**
      * Get the correspondings ClassIds from the vector of MEI element string names
      */
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);

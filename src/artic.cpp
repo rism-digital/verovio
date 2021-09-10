@@ -198,6 +198,7 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
     if (place == STAFFREL_above) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A0_articAccentAbove;
+            case ARTICULATION_acc_soft: return SMUFL_ED40_articSoftAccentAbove;
             case ARTICULATION_stacc: return SMUFL_E4A2_articStaccatoAbove;
             case ARTICULATION_ten: return SMUFL_E4A4_articTenutoAbove;
             case ARTICULATION_stacciss: return SMUFL_E4A8_articStaccatissimoWedgeAbove;
@@ -238,6 +239,7 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
     else if (place == STAFFREL_below) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A1_articAccentBelow;
+            case ARTICULATION_acc_soft: return SMUFL_ED41_articSoftAccentBelow;
             case ARTICULATION_stacc: return SMUFL_E4A3_articStaccatoBelow;
             case ARTICULATION_ten: return SMUFL_E4A5_articTenutoBelow;
             case ARTICULATION_stacciss: return SMUFL_E4A9_articStaccatissimoWedgeBelow;
@@ -263,21 +265,19 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
         return 0;
 }
 
-wchar_t Artic::GetEnclosingGlyph(bool beforeArtic) const
+std::pair<wchar_t, wchar_t> Artic::GetEnclosingGlyphs() const
 {
-    wchar_t glyph = 0;
+    std::pair<wchar_t, wchar_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
             case ENCLOSURE_brack:
-                glyph = beforeArtic ? SMUFL_E26C_accidentalBracketLeft : SMUFL_E26D_accidentalBracketRight;
+                glyphs = { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
                 break;
-            case ENCLOSURE_paren:
-                glyph = beforeArtic ? SMUFL_E26A_accidentalParensLeft : SMUFL_E26B_accidentalParensRight;
-                break;
+            case ENCLOSURE_paren: glyphs = { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
             default: break;
         }
     }
-    return glyph;
+    return glyphs;
 }
 
 //----------------------------------------------------------------------------

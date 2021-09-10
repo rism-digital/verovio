@@ -836,7 +836,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
             [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
         // if not, then just add a new pair with the YRel of the current positioner
         if (i == grpIdYRel.end()) {
-            grpIdYRel.push_back(std::make_pair(currentGrpId, (*iter)->GetDrawingYRel()));
+            grpIdYRel.push_back({ currentGrpId, (*iter)->GetDrawingYRel() });
         }
         // else, adjust the min or max YRel of the pair if necessary
         else {

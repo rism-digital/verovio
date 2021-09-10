@@ -395,7 +395,7 @@ void LedgerLine::AddDash(int left, int right, int extension)
     for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
         if (iter->first > left) break;
     }
-    m_dashes.insert(iter, std::make_pair(left, right));
+    m_dashes.insert(iter, { left, right });
 
     // Merge dashes which overlap by more than 1.5 extensions
     // => Dashes belonging to the same chord overlap at least by two extensions and will get merged
