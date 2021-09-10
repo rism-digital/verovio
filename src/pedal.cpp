@@ -85,7 +85,7 @@ wchar_t Pedal::GetPedalGlyph() const
     return (GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
 }
 
-pedalVis_FORM Pedal::GetPedalForm(Doc *doc, System *system) const 
+pedalVis_FORM Pedal::GetPedalForm(Doc *doc, System *system) const
 {
     const std::map<option_PEDALSTYLE, pedalVis_FORM> option2PedalVis = { { PEDALSTYLE_line, pedalVis_FORM_line },
         { PEDALSTYLE_pedstar, pedalVis_FORM_pedstar }, { PEDALSTYLE_altpedstar, pedalVis_FORM_altpedstar } };
