@@ -105,6 +105,9 @@ verovio.vrvToolkit.resetXmlIdSeed = Module.cwrap( 'vrvToolkit_resetXmlIdSeed', n
 // void setOptions(Toolkit *ic, const char *options) 
 verovio.vrvToolkit.setOptions = Module.cwrap( 'vrvToolkit_setOptions', null, ['number', 'string'] );
 
+// char *validatePAE(Toolkit *ic, const char *options)
+verovio.vrvToolkit.validatePAE = Module.cwrap( 'vrvToolkit_validatePAE', 'string', ['number', 'string'] );
+
 // A pointer to the object - only one instance can be created for now
 verovio.instances = [];
 
@@ -318,6 +321,15 @@ verovio.toolkit.prototype.resetXmlIdSeed = function ( seed )
 verovio.toolkit.prototype.setOptions = function ( options )
 {
     verovio.vrvToolkit.setOptions( this.ptr, JSON.stringify( options ) );
+};
+
+verovio.toolkit.prototype.validatePAE = function ( data )
+{
+    if ( data instanceof Object )
+    {
+        data = JSON.stringify( data )
+    }
+    return JSON.parse( verovio.vrvToolkit.validatePAE( this.ptr, data ) );
 };
 
 /***************************************************************************************************************************/
