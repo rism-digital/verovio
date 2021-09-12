@@ -1629,16 +1629,12 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (label || labelAbbr) {
 
-        std::wstring labelStr;
         Object *graphic = NULL;
-
         if (label) {
             graphic = label;
-            labelStr = label->GetText(label);
         }
         else {
             graphic = labelAbbr;
-            labelStr = labelAbbr->GetText(labelAbbr);
         }
 
         FontInfo labelTxt;
