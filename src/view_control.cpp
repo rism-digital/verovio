@@ -1766,22 +1766,18 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         return;
     }
 
-    if (note1 || note2) {
-        const int firstLoc = note1->GetDrawingLoc();
-        const int secondLoc = note2->GetDrawingLoc();
-        if (x1 != x2)
-            slope = (secondLoc - firstLoc) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / (double)(x2 - x1);
-    }
+    const int firstLoc = note1->GetDrawingLoc();
+    const int secondLoc = note2->GetDrawingLoc();
+    if (x1 != x2) slope = (secondLoc - firstLoc) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / (double)(x2 - x1);
+
     // only half at system breaks
     if (spanningType != SPANNING_START_END) slope = slope / 2;
 
     // the normal case
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
-        if (note1) {
-            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
-        }
-        if (note1 && (note1->GetDots() > 0) && (abs(slope) < 1.0)) {
+        x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
+        if ((note1->GetDots() > 0) && (abs(slope) < 1.0)) {
             x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots() * slope;
         }
@@ -1794,11 +1790,9 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         y1 = note2->GetDrawingY() - (x2 - x1) * slope;
     }
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
-        if (note2) {
-            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 = note2->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
-        }
-        if (note2 && note2->GetDrawingAccid()) {
+        x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 = note2->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
+        if (note2->GetDrawingAccid()) {
             x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
         }
