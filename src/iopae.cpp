@@ -2288,7 +2288,7 @@ void PAEInput::LogPAE(std::string msg, pae::Token &token)
     token.m_isError = true;
     std::string posStr;
     switch (token.m_position) {
-        case pae::KEYSIG_POS: posStr = posStr = "(keysig input key)"; break;
+        case pae::KEYSIG_POS: posStr = "(keysig input key)"; break;
         case pae::CLEF_POS: posStr = "(clef input key)"; break;
         case pae::TIMESIG_POS: posStr = "(timesig input key)"; break;
         case pae::UNKOWN_POS: posStr = "(unspecified position)"; break;
