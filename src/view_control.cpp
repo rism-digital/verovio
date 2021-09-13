@@ -2100,13 +2100,19 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
     TextDrawingParams params;
 
     params.m_x = reh->GetStart()->GetDrawingX();
-
-    if ((system->GetFirst(MEASURE) == measure) && !system->IsFirstOfMdiv()) {
+    if ((system->GetFirst(MEASURE) == measure) && reh->HasTstamp() && (reh->GetTstamp() == 0.0)) {
         // StaffDef information is always in the first layer
         Layer *layer = dynamic_cast<Layer *>(measure->FindDescendantByType(LAYER));
         assert(layer);
-        if (Clef *clef = layer->GetStaffDefClef(); clef) {
-            params.m_x = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
+        if (!system->IsFirstOfMdiv()) {
+            if (Clef *clef = layer->GetStaffDefClef(); clef) {
+                params.m_x = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
+            }
+        }
+        else {
+            if (MeterSig *metersig = layer->GetStaffDefMeterSig(); metersig) {
+                params.m_x = metersig->GetDrawingX() + (metersig->GetContentRight() - metersig->GetContentLeft()) / 2;
+            }
         }
     }
 
@@ -2122,7 +2128,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         }
 
         params.m_boxedRend.clear();
-        params.m_y = reh->GetDrawingY();
+        params.m_y = reh->GetDrawingY() + 3 * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
         rehTxt.SetPointSize(params.m_pointSize);
