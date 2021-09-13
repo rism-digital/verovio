@@ -2270,7 +2270,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
         const std::string lang = rehearsal.attribute("xml:lang") ? rehearsal.attribute("xml:lang").as_string() : "it";
         const std::string textStr = GetContent(rehearsal);
         reh->SetColor(rehearsal.attribute("color").as_string());
-        reh->SetTstamp(timeStamp);
         int staffNum = staffNode.text().as_int() + staffOffset;
         staffNum = (staffNum < 1) ? 1 : staffNum;
         reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
@@ -2278,7 +2277,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         Rend *rend = new Rend();
         rend->SetFontweight(rend->AttTypography::StrToFontweight(rehearsal.attribute("font-weight").as_string()));
         rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
-        rend->SetRend(ConvertEnclosure(rehearsal.attribute("enclosure").as_string()));
+        const std::string enclosure = rehearsal.attribute("enclosure").as_string();
+        rend->SetRend(enclosure.empty() ? TEXTRENDITION_box : ConvertEnclosure(enclosure));
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         rend->AddChild(text);

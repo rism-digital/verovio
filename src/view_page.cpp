@@ -978,8 +978,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
         MNum *mnum = dynamic_cast<MNum *>(measure->FindDescendantByType(MNUM));
         Reh *reh = dynamic_cast<Reh *>(measure->FindDescendantByType(REH));
-        const bool hasRehearsal
-            = reh && reh->HasTstamp() && (0.0 == reh->GetTstamp() && (system->GetFirst(MEASURE) == measure));
+        const bool hasRehearsal = reh && reh->HasTstamp() && (0.0 == reh->GetTstamp());
         if (mnum && !hasRehearsal) {
             // this should be an option
             Measure *systemStart = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE));
