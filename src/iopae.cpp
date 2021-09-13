@@ -2227,7 +2227,7 @@ namespace pae {
     enum status_CHORD { CHORD_NONE = 0, CHORD_MARKER, CHORD_NOTE };
 
     // specific positions with negative numbers
-    enum { UNKOWN_POS = -1, KEYSIG_POS = -2, CLEF_POS = -3, TIMESIG_POS = -4 };
+    enum { UNKOWN_POS = -1, KEYSIG_POS = -2, CLEF_POS = -3, TIMESIG_POS = -4, INPUT_POS = -5 };
 
     Token::Token(char c, int position, Object *object)
     {
@@ -2280,10 +2280,56 @@ void PAEInput::ClearTokenObjects()
     m_pae.clear();
 }
 
+jsonxx::Object PAEInput::GetValidationLog()
+{
+    jsonxx::Object log;
+    // If we have an input error, that is the only one to log
+    if (!m_inputLog.empty()) {
+        log = m_inputLog;
+        return log;
+    }
+    if (!m_keysigLog.empty()) log << "keysig" << m_keysigLog;
+    if (!m_clefLog.empty()) log << "clef" << m_clefLog;
+    if (!m_timesigLog.empty()) log << "timesig" << m_timesigLog;
+    if (!m_dataLog.empty()) log << "data" << m_dataLog;
+    // LogDebug("%s", log.json().c_str());
+    return log;
+}
+
 #ifndef NO_PAE_SUPPORT
 
 void PAEInput::LogPAE(std::string msg, pae::Token &token)
 {
+    jsonxx::Object logEntry;
+    // Row is always 0
+    logEntry << "row" << 0;
+    int column = 0;
+    switch (token.m_position) {
+        case pae::KEYSIG_POS:
+        case pae::CLEF_POS:
+        case pae::TIMESIG_POS:
+        case pae::INPUT_POS: column = 0; break;
+        // Putting -1 when the position is unknown - maybe this could cause problems for tools that use it?
+        case pae::UNKOWN_POS: column = -1; break;
+        default: column = token.m_position;
+    }
+    logEntry << "column" << column;
+    logEntry << "text" << msg;
+    // Input log entry are always and error, include in non-pedantic mode because parsing fails and stops
+    std::string logType = (m_pedanticMode || token.m_position == pae::INPUT_POS) ? "error" : "warning";
+    logEntry << "type" << logType;
+
+    switch (token.m_position) {
+        case pae::KEYSIG_POS: m_keysigLog = logEntry; break;
+        case pae::CLEF_POS: m_clefLog = logEntry; break;
+        case pae::TIMESIG_POS: m_timesigLog = logEntry; break;
+        case pae::INPUT_POS: m_inputLog = logEntry; break;
+        // Other log entries go in the 'data' array
+        default: m_dataLog << logEntry;
+    }
+
+    // LogDebug("%s", m_validationLog.json().c_str());
+
     m_hasErrors = true;
     token.m_isError = true;
     std::string posStr;
@@ -2291,6 +2337,7 @@ void PAEInput::LogPAE(std::string msg, pae::Token &token)
         case pae::KEYSIG_POS: posStr = "(keysig input key)"; break;
         case pae::CLEF_POS: posStr = "(clef input key)"; break;
         case pae::TIMESIG_POS: posStr = "(timesig input key)"; break;
+        case pae::INPUT_POS: posStr = "(global input error)"; break;
         case pae::UNKOWN_POS: posStr = "(unspecified position)"; break;
         default: posStr = StringFormat("(character %d)", token.m_position);
     }
@@ -2431,17 +2478,25 @@ bool PAEInput::Import(const std::string &input)
 {
     this->ClearTokenObjects();
 
+    m_inputLog.reset();
+    m_keysigLog.reset();
+    m_clefLog.reset();
+    m_timesigLog.reset();
+    m_dataLog.reset();
+
     m_hasErrors = false;
 
     if (input.size() == 0) {
-        LogError("PAE: Input is empty");
+        pae::Token inputToken(0, pae::INPUT_POS);
+        LogPAE("Input is empty", inputToken);
         return false;
     }
 
     jsonxx::Object jsonInput;
     if (input.at(0) == '{') {
         if (!jsonInput.parse(input)) {
-            LogError("PAE: Cannot parse the JSON input");
+            pae::Token inputToken(0, pae::INPUT_POS);
+            LogPAE("Cannot parse the JSON input", inputToken);
             return false;
         }
     }
@@ -2499,7 +2554,8 @@ bool PAEInput::Import(const std::string &input)
 
     // No data - we can stop here
     if (!jsonInput.has<jsonxx::String>("data")) {
-        LogError("PAE: No 'data' key in the JSON input");
+        pae::Token inputToken(0, pae::INPUT_POS);
+        LogPAE("No 'data' key in the JSON input", inputToken);
         return false;
     }
 
