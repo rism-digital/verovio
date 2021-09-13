@@ -3282,6 +3282,12 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     // This actually sets the Doc::m_scoreDef
     bool success = ReadScoreDef(vrvScore, scoreDef);
 
+    // Missing staffDefs lead to crashes in the ScoreDefSetCurrent functor
+    if (success && !vrvScore->GetScoreDef()->FindDescendantByType(STAFFDEF)) {
+        LogError("The initial <scoreDef> of each <score> must contain at least one <staffDef>.");
+        success = false;
+    }
+
     if (!success) return false;
 
     pugi::xml_node current;
@@ -3851,13 +3857,6 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <scoreDef>", current.name());
         }
     }
-
-    // Missing staffDefs lead to crashes in the ScoreDefSetCurrent functor
-    if ((parent->Is(SCOREDEF)) && (!parent->FindDescendantByType(STAFFDEF))) {
-        LogError("Each <scoreDef> must contain at least one <staffDef>.");
-        return false;
-    }
-
     return success;
 }
 
