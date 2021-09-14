@@ -1124,7 +1124,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     assert(f->GetStart() && f->GetEnd());
     if (!f->GetStart() || !f->GetEnd()) return;
 
-    int y = GetFYRel(f, staff);
+    const int y = GetFYRel(f, staff);
     TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
@@ -1175,7 +1175,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = staff->GetDrawingY() + GetSylYRel(syl->m_drawingVerse, staff);
+    const int y = staff->GetDrawingY() + GetSylYRel(syl->m_drawingVerse, staff);
 
     // Invalid bounding boxes might occur for empty syllables without text child
     if (!syl->HasContentHorizontalBB()) return;
@@ -1257,9 +1257,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
         // Adjust it proportionally to the lyric size
         dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
-        int halfDashLength = dashLength / 2;
+        const int halfDashLength = dashLength / 2;
 
-        int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
+        const int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         int dist = x2 - x1;
         int nbDashes = dist / dashSpace;
 
@@ -1463,7 +1463,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     TextDrawingParams params;
 
-    int lineCount = dir->GetNumberOfLines(dir);
+    const int lineCount = dir->GetNumberOfLines(dir);
 
     // If we have not timestamp
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
@@ -1534,7 +1534,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     TextDrawingParams params;
 
-    int lineCount = dynam->GetNumberOfLines(dynam);
+    const int lineCount = dynam->GetNumberOfLines(dynam);
 
     // If we have not timestamp
     params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
@@ -1598,8 +1598,8 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     dc->StartGraphic(fb, "", fb->GetUuid());
 
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    int lineHeight = m_doc->GetTextLineHeight(fontDim, false);
-    int startX = params.m_x;
+    const int lineHeight = m_doc->GetTextLineHeight(fontDim, false);
+    const int startX = params.m_x;
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
 
@@ -1766,22 +1766,18 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         return;
     }
 
-    if (note1 || note2) {
-        int firstLoc = note1->GetDrawingLoc();
-        int secondLoc = note2->GetDrawingLoc();
-        if (x1 != x2)
-            slope = (secondLoc - firstLoc) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / (double)(x2 - x1);
-    }
+    const int firstLoc = note1->GetDrawingLoc();
+    const int secondLoc = note2->GetDrawingLoc();
+    if (x1 != x2) slope = (secondLoc - firstLoc) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / (double)(x2 - x1);
+
     // only half at system breaks
     if (spanningType != SPANNING_START_END) slope = slope / 2;
 
     // the normal case
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
-        if (note1) {
-            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
-        }
-        if (note1 && (note1->GetDots() > 0) && (abs(slope) < 1.0)) {
+        x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
+        if ((note1->GetDots() > 0) && (abs(slope) < 1.0)) {
             x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots() * slope;
         }
@@ -1794,11 +1790,9 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         y1 = note2->GetDrawingY() - (x2 - x1) * slope;
     }
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
-        if (note2) {
-            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 = note2->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
-        }
-        if (note2 && note2->GetDrawingAccid()) {
+        x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 = note2->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
+        if (note2->GetDrawingAccid()) {
             x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
         }
@@ -1924,10 +1918,10 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     dc->StartGraphic(mordent, "", mordent->GetUuid());
 
-    int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
+    const int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
     // set mordent glyph
-    int code = mordent->GetMordentGlyph();
+    const int code = mordent->GetMordentGlyph();
 
     std::wstring str;
     str.push_back(code);
