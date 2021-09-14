@@ -4536,6 +4536,7 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     Accid *vrvAccid = new Accid();
     ReadLayerElement(accid, vrvAccid);
 
+    ReadFacsimileInterface(accid, vrvAccid);
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGestural(accid);
