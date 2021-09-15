@@ -81,6 +81,28 @@ void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine 
     }
 }
 
+void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, bool isCircle)
+{
+    assert(dc); // DC cannot be NULL
+
+    BoundingBox::Swap(y1, y2);
+
+    dc->SetPen(m_currentColour, lineThinkness, AxSOLID);
+    dc->SetBrush(m_currentColour, AxTRANSPARENT);
+
+    int width = x2 - x1;
+    int height = y1 - y2;
+    if (isCircle) {
+        width = height > width ? height : width;
+        height = width > height ? width : height;
+    }
+
+    dc->DrawEllipse(ToDeviceContextX(x1), ToDeviceContextY(y1), width, height);
+
+    dc->ResetPen();
+    dc->ResetBrush();
+}
+
 /*
  * Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
  * 4=right side; 0=don't fill in any part. FIXME: <fillSection> IS IGNORED.

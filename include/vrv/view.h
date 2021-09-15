@@ -534,6 +534,7 @@ protected:
         int staffSize = 100, bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100,
         std::optional<TextDrawingParams> params = std::nullopt);
+    void DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, bool isCircle);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius);
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
