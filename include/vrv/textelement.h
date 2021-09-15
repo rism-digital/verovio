@@ -97,6 +97,7 @@ public:
         m_alignment = HORIZONTALALIGNMENT_left;
         m_pointSize = 0;
         m_actualWidth = 0;
+        m_enclose = TEXTRENDITION_NONE;
     }
     virtual ~TextDrawingParams(){};
 
@@ -112,7 +113,8 @@ public:
     bool m_verticalShift;
     data_HORIZONTALALIGNMENT m_alignment;
     int m_pointSize;
-    std::vector<TextElement *> m_boxedRend;
+    std::vector<TextElement *> m_enclosedRend;
+    data_TEXTRENDITION m_enclose;
 };
 
 } // namespace vrv
