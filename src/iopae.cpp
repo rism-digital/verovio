@@ -3349,7 +3349,8 @@ bool PAEInput::ConvertFermata()
                 // PAE guidelines are ambiguous because they say fermata should contain only a single rest sign (=)
                 // but at the same time allow =1 for a mrest - in non pendantic mode we want to support (=1)
                 else if (fermataTarget->Is(MREST) && isdigit(token.m_inputChar)) {
-                    LogPAE(StringFormat("Fermata on measure rest with extraneous content %c", token.m_inputChar), token);
+                    LogPAE(
+                        StringFormat("Fermata on measure rest with extraneous content %c", token.m_inputChar), token);
                     if (m_pedanticMode) return false;
                     continue;
                 }
@@ -4370,13 +4371,17 @@ bool PAEInput::ParseDuration(
                         duration = DURATION_breve;
                         // Ideally we should pass an offset toe LogPAE because this is going to show the position in
                         // token However, using rythmic pattern in mensural notation is probably not very common...
-                        LogPAE("Duration '3' unsupported with mensural notation (Setting to breve if running in non-pedantic mode)", token);
+                        LogPAE("Duration '3' unsupported with mensural notation"
+                               "(Setting to breve if running in non-pedantic mode)",
+                            token);
                         if (m_pedanticMode) return false;
                         break;
                     case '4': duration = DURATION_semiminima; break;
                     case '5':
                         duration = DURATION_breve;
-                        LogPAE("Duration '5' unsupported with mensural notation (Setting to breve if running in non-pedantic mode)", token);
+                        LogPAE("Duration '5' unsupported with mensural notation"
+                               "(Setting to breve if running in non-pedantic mode)",
+                            token);
                         if (m_pedanticMode) return false;
                         break;
                     case '6': duration = DURATION_semifusa; break;
