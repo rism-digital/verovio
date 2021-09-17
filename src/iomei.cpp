@@ -3889,6 +3889,7 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     assert(dynamic_cast<StaffGrp *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
+    bool missingStaffDef = true;
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
@@ -3911,9 +3912,11 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "staffGrp") {
             success = ReadStaffGrp(parent, current);
+            missingStaffDef = false; // innermost staffGrp child will report missing staffDef
         }
         else if (std::string(current.name()) == "staffDef") {
             success = ReadStaffDef(parent, current);
+            missingStaffDef = false;
         }
         // xml comment
         else if (std::string(current.name()) == "") {
@@ -3923,6 +3926,13 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
         }
     }
+
+    // Missing staffDefs lead to crashes in the ScoreDefSetCurrent functor
+    if (success && missingStaffDef) {
+        LogError("Each <staffGrp> must contain at least one <staffDef>.");
+        success = false;
+    }
+
     return success;
 }
 
