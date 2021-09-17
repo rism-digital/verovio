@@ -778,6 +778,24 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     return output;
 }
 
+std::string Toolkit::ValidatePAEFile(const std::string &filename)
+{
+    std::ifstream inFile;
+    inFile.open(filename);
+
+    std::stringstream sstream;
+    sstream << inFile.rdbuf();
+    return this->ValidatePAE(sstream.str());
+}
+
+std::string Toolkit::ValidatePAE(const std::string &data)
+{
+    PAEInput input(&m_doc);
+    input.Import(data);
+    m_doc.Reset();
+    return input.GetValidationLog().json();
+}
+
 bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptions)
 {
     std::string output = GetMEI(jsonOptions);

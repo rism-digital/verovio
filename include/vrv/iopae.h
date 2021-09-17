@@ -510,6 +510,13 @@ public:
     PAEInput(Doc *doc);
     virtual ~PAEInput();
 
+    /**
+     * Return a JSON object with the validation log
+     * It is a single object when an input error is encountered.
+     * Otherwise, validation log errors/warnings are listed in their respective JSON input keys
+     */
+    jsonxx::Object GetValidationLog();
+
 #ifndef NO_PAE_SUPPORT
     virtual bool Import(const std::string &input);
 
@@ -679,6 +686,19 @@ private:
     bool m_hasKeySig;
     bool m_hasMeterSig;
     bool m_hasMensur;
+    ///@}
+
+    /**
+     * @name The jsonxx members to store the validation logs
+     * ScoreDef and input members are single objects that can log one entry
+     * Data is an array that can store multiple entries
+     */
+    ///@{
+    jsonxx::Object m_clefLog;
+    jsonxx::Object m_keysigLog;
+    jsonxx::Object m_timesigLog;
+    jsonxx::Object m_inputLog;
+    jsonxx::Array m_dataLog;
     ///@}
 };
 
