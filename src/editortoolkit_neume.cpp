@@ -969,6 +969,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
 
         accid->SetAccid(accidTypeW);
+        zone->SetUlx(ulx);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        surface->AddChild(zone);
+        accid->SetZone(zone);
+        layer->AddChild(accid);
         
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
@@ -980,27 +985,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
-        accid->SetZone(zone);
-        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
-        assert(surface);
-        surface->AddChild(zone);
-        layer->AddChild(accid);
-        m_infoObject.import("uuid", accid->GetUuid());
         layer->ReorderByXPos();
 
-        // const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        // const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-
-        // ulx -= noteWidth / 2;
-        // uly -= noteHeight / 2;
-
-        // zone->SetUlx(ulx);
-        // zone->SetUly(uly);
-        // zone->SetLrx(ulx + noteWidth);
-        // zone->SetLry(uly + noteHeight);
-        // layer->ReorderByXPos();
-
-        // m_infoObject.import("uuid", accid->GetUuid());
+        m_infoObject.import("uuid", accid->GetUuid());
         
     }
     else {
