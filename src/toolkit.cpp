@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "comparison.h"
 #include "custos.h"
 #include "editortoolkit_cmn.h"

@@ -18,6 +18,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "accid.h"
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
@@ -925,6 +926,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     else if(elementType == "accid"){
         Accid *accid = new Accid();
+        zone->SetUlx(ulx);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        surface->AddChild(zone);
+        accid->SetZone(zone);
+        layer->AddChild(accid);
         data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
          for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "accid") {
@@ -939,11 +945,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             }
         }
         accid->SetAccid(accidTypeW);
-        zone->SetUlx(ulx);
-        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
-        surface->AddChild(zone);
-        accid->SetZone(zone);
-        layer->AddChild(accid);
+        
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);

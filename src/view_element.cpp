@@ -248,7 +248,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /************** editorial accidental **************/
 
-    std::wstring accidStr = accid->GetSymbolStr();
+    //std::wstring accidStr = accid->GetSymbolStr();
     int sym = 0;
 
     switch (accid->GetAccid()){
@@ -265,33 +265,33 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x,y;
     if ((m_doc->GetType() == Facs) && (accid->HasFacs())){
         x = accid->GetDrawingX();
-        y = ToLogicalY(accid->GetDrawingY());
+        y = ToLogicalY(staff->GetDrawingY());
     }
     else{
-        x = accid->GetDrawingX();
-        y = accid->GetDrawingY();
+        x = element->GetDrawingX();
+        y = element->GetDrawingY();
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
-        //y = staff->GetDrawingY();
-        // look at the note position and adjust it if necessary
-        // Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
-        // if (note) {
-        //     // Check if the note is on the top line or above (add a unit for the note head half size)
-        //     if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        //     // Check if the top of the stem is above
-        //     if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
-        //         y = note->GetDrawingStemEnd(note).y;
-        //     // Increase the x position of the accid
-        //     x += note->GetDrawingRadius(m_doc);
-        // }
-        TextExtend extend;
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
-        dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
-        dc->ResetFont();
-        y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
+    // if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
+    //     //y = staff->GetDrawingY();
+    //     // look at the note position and adjust it if necessary
+    //     // Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+    //     // if (note) {
+    //     //     // Check if the note is on the top line or above (add a unit for the note head half size)
+    //     //     if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    //     //     // Check if the top of the stem is above
+    //     //     if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
+    //     //         y = note->GetDrawingStemEnd(note).y;
+    //     //     // Increase the x position of the accid
+    //     //     x += note->GetDrawingRadius(m_doc);
+    //     // }
+    //     TextExtend extend;
+    //     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
+    //     dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
+    //     dc->ResetFont();
+    //     y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // }
     
 
     // DrawSmuflString(
