@@ -34,7 +34,6 @@ emscripten/data/
 emscripten/build/
 emscripten/CMakeFiles/
 emscripten/CMakeCache.txt
-emscripten/emsdk
 emscripten/testNeon.sh
 
 # python build
