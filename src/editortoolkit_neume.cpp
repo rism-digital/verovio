@@ -558,6 +558,20 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             fi->GetZone()->ShiftByXY(x, -y);
         }
     }
+    else if (element->Is(ACCID)) {
+        Accid *accid = dynamic_cast<Accid *>(element);
+        if (!accid->HasFacs()) {
+            LogError("Accid dragging is only supported for accid with facsimiles!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Accid dragging is only supported for accid with facsimiles.");
+            return false;
+        }
+        FacsimileInterface *fi = (*accid).GetFacsimileInterface();
+        assert(fi);
+        if (fi->GetZone() != NULL) {
+            fi->GetZone()->ShiftByXY(x, -y);
+        }
+    }
     else {
         LogWarning("Unsupported element for dragging.");
         m_infoObject.import("status", "FAILURE");
@@ -932,7 +946,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         accid->SetZone(zone);
         layer->AddChild(accid);
         data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
-         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+
+        for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "accid") {
                 if (it->second == "f") {
                     accidTypeW = ACCIDENTAL_WRITTEN_f;
@@ -944,9 +959,17 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
             }
         }
+        if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
+            LogError("A accid type must be specified.");
+            delete accid;
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "A accid type must be specified.");
+            return false;
+        }
+
         accid->SetAccid(accidTypeW);
         
-
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
@@ -957,9 +980,27 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
+        accid->SetZone(zone);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        assert(surface);
+        surface->AddChild(zone);
+        layer->AddChild(accid);
+        m_infoObject.import("uuid", accid->GetUuid());
         layer->ReorderByXPos();
 
-        m_infoObject.import("uuid", accid->GetUuid());
+        // const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        // const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        // ulx -= noteWidth / 2;
+        // uly -= noteHeight / 2;
+
+        // zone->SetUlx(ulx);
+        // zone->SetUly(uly);
+        // zone->SetLrx(ulx + noteWidth);
+        // zone->SetLry(uly + noteHeight);
+        // layer->ReorderByXPos();
+
+        // m_infoObject.import("uuid", accid->GetUuid());
         
     }
     else {
@@ -2420,13 +2461,21 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
-        LogError("Element is of type %s, but only Syllables, Custos, and Clefs can change staves.",
+    // if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(ACCID))) {
+    //     LogError("Element is of type %s, but only Syllables, Custos, Clefs, and Accids can change staves.",
+    //         element->GetClassName().c_str());
+    //     m_infoObject.import("status", "FAILURE");
+    //     m_infoObject.import("message",
+    //         "Element is of type " + element->GetClassName()
+    //             + ", but only Syllables, Custos, Clefs, and Accids can change staves.");
+    //     return false;
+        if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
+        LogError("Element is of type %s, but only Syllables, Custos, Clefs, and Accids can change staves.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",
             "Element is of type " + element->GetClassName()
-                + ", but only Syllables, Custos, and Clefs can change staves.");
+                + ", but only Syllables, Custos, Clefs, and Accids can change staves.");
         return false;
     }
 
@@ -2562,7 +2611,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             pi->AdjustPitchForNewClef(previousClefAfter, clef);
         }
     }
-    // custos or syllable
+    // custos or syllable or accid
     else {
         element->MoveItselfTo(layer);
         layer->ReorderByXPos();
