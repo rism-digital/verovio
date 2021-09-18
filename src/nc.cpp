@@ -16,8 +16,10 @@
 #include "comparison.h"
 #include "doc.h"
 #include "elementpart.h"
+#include "liquescent.h"
 #include "staff.h"
 #include "vrv.h"
+
 
 namespace vrv {
 
@@ -56,6 +58,17 @@ void Nc::Reset()
     ResetColor();
     ResetIntervalMelodic();
     ResetNcForm();
+}
+
+bool Nc::IsSupportedChild(Object *child)
+{
+    if (child->Is(LIQUESCENT)) {
+        assert(dynamic_cast<Liquescent *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 } // namespace vrv

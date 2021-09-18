@@ -51,6 +51,7 @@ public:
     virtual ClassId GetClassId() const { return NC; }
     ///@}
 
+    virtual bool IsSupportedChild(Object *object);
     /**
      * @name Getter to interfaces
      */
