@@ -34,6 +34,7 @@ emscripten/data/
 emscripten/build/
 emscripten/CMakeFiles/
 emscripten/CMakeCache.txt
+emscripten/testNeon.sh
 
 # python build
 bindings/python/verovio_wrap.cpp

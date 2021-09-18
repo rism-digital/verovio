@@ -940,11 +940,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     else if(elementType == "accid"){
         Accid *accid = new Accid();
-        zone->SetUlx(ulx);
-        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
-        surface->AddChild(zone);
-        accid->SetZone(zone);
-        layer->AddChild(accid);
         data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
 
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
