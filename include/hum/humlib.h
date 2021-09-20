@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Aug  9 09:41:34 CEST 2021
+// Last Modified: Mon Sep 20 02:39:26 PM PDT 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5875,9 +5875,18 @@ class Tool_composite : public HumTool {
 		void        extractGroup         (HumdrumFile& infile, const string &target);
 		void        backfillGroup        (vector<vector<string>>& curgroup, HumdrumFile& infile,
 		                                  int line, int track, int subtrack, const string& group);
+		void        analyzeComposite     (HumdrumFile& infile);
+		void        getCompositeSpineStarts(std::vector<HTp>& groups, HumdrumFile& infile);
+		std::string getExpansionString(std::vector<int>& tracks, int maxtrack);
+		void        doCoincidenceAnalysis(HumdrumFile& outfile, HumdrumFile& infile,
+		                                  int ctrack, HTp compositeStart);
+		void        doTotalAnalysis(HumdrumFile& outfile, HumdrumFile& infile, int ctrack);
+		void        doGroupAnalyses(HumdrumFile& outfile, HumdrumFile& infile, int atrack, int btrack);
+		int         countNoteAttacks(HTp token);
 
 	private:
 		std::string m_pitch     = "eR";   // pitch to display for composite rhythm
+		bool        m_analysisQ = false;  // calculate analyses, used with -A option
 		bool        m_nogroupsQ = false;  // do not split composite rhythms into markup groups
 		bool        m_extractQ  = false;  // output only composite rhythm analysis (not input data)
 		bool        m_appendQ   = false;  // display analysis at top of system
