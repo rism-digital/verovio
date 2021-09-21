@@ -1290,12 +1290,22 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (count) DrawSmuflCode(dc, x1, y1, SMUFL_E4E3_restWhole, staff->m_drawingStaffSize, false);
     }
 
-    // Draw the text above
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-    int y = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                                        : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    DrawSmuflString(dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center);
-    dc->ResetFont();
+    // Draw the number
+    if (multiRest->GetNumVisible() != BOOLEAN_false) {
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+
+        const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+        y1 = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() : y1;
+        y2 = ((staff->GetDrawingY() - staffHeight) < y2) ? staff->GetDrawingY() - staffHeight : y2;
+
+        const int y = (multiRest->GetNumPlace() == STAFFREL_basic_below)
+            ? y2 - 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+            : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+        DrawSmuflString(dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center);
+        dc->ResetFont();
+    }
 
     dc->EndGraphic(element, this);
 }
