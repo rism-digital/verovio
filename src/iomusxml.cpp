@@ -519,8 +519,7 @@ void MusicXmlInput::OpenTie(Note *note, Tie *tie)
 void MusicXmlInput::CloseTie(Note *note)
 {
     // add all notes with identical pitch/oct to m_tieStopStack
-    std::vector<std::pair<Tie *, Note *>>::iterator iter;
-    for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
+    for (auto iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
         if (note->GetPname() == iter->second->GetPname() && note->GetOct() == iter->second->GetOct()) {
             m_tieStopStack.push_back(note);
         }
@@ -530,8 +529,7 @@ void MusicXmlInput::CloseTie(Note *note)
 void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
 {
     // try to match open slur with slur stops within that measure
-    std::vector<std::pair<LayerElement *, musicxml::CloseSlur>>::iterator iter;
-    for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
+    for (auto iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
         if ((iter->second.m_number == number) && ((iter->second.m_measureNum).compare(measure->GetN()) == 0)) {
             slur->SetEndid("#" + iter->first->GetUuid());
             m_slurStopStack.erase(iter);
@@ -1020,8 +1018,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     ProcessClefChangeQueue(section);
 
     Measure *measure = NULL;
-    std::vector<std::pair<std::string, ControlElement *>>::iterator iter;
-    for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
+    for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
             measure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
@@ -1037,8 +1034,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     // manage endings stack: create new <ending> elements and move the corresponding measures into them
     if (!m_endingStack.empty()) {
-        std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo>>::iterator iter;
-        for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
+        for (auto iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
             std::string logString = "";
             logString = logString + "MusicXML import: Ending number='" + iter->second.m_endingNumber.c_str()
                 + "', type='" + iter->second.m_endingType.c_str() + "', text='" + iter->second.m_endingText + "' (";
@@ -1083,16 +1079,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         m_tieStack.clear();
     }
     if (!m_slurStack.empty()) { // There are slurs left open
-        std::vector<std::pair<Slur *, musicxml::OpenSlur>>::iterator iter;
-        for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
+        for (auto iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
             LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number,
                 iter->second.m_measureNum.c_str());
         }
         m_slurStack.clear();
     }
     if (!m_slurStopStack.empty()) { // There are slurs ends without opening
-        std::vector<std::pair<LayerElement *, musicxml::CloseSlur>>::iterator iter;
-        for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
+        for (auto iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
             LogWarning("MusicXML import: slur ending for element '%s' could not be "
                        "matched to a start element",
                 iter->first->GetUuid().c_str());
@@ -1100,15 +1094,13 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         m_slurStopStack.clear();
     }
     if (!m_glissStack.empty()) {
-        std::vector<Gliss *>::iterator iter;
-        for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
+        for (auto iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
             LogWarning("MusicXML import: gliss for '%s' could not be closed", (*iter)->GetUuid().c_str());
         }
         m_glissStack.clear();
     }
     if (!m_trillStack.empty()) { // open trills without ending
-        std::vector<std::pair<Trill *, musicxml::OpenSpanner>>::iterator iter;
-        for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
+        for (auto iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
             LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter->first->GetUuid().c_str());
         }
         m_trillStack.clear();
@@ -1449,16 +1441,14 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
 
     // clean up part specific stacks
     if (!m_openDashesStack.empty()) { // open dashes without ending
-        std::vector<std::pair<ControlElement *, musicxml::OpenDashes>>::iterator iter;
-        for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+        for (auto iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
             LogWarning(
                 "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetUuid().c_str());
         }
         m_openDashesStack.clear();
     }
     if (!m_bracketStack.empty()) { // open brackets without ending
-        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>>::iterator iter;
-        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+        for (auto iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
             LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
         }
         m_bracketStack.clear();
@@ -2127,8 +2117,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             hairpin->SetVgrp(defaultY);
             // match new hairpin to existing hairpin stop
-            std::vector<std::tuple<int, double, musicxml::OpenSpanner>>::iterator iter;
-            for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
+            for (auto iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
                 const int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
                     if (measureDifference >= 0) {
@@ -2151,8 +2140,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         const int staffNum = (!staffNode) ? 1 : staffNode.text().as_int() + staffOffset;
         if (HasAttributeWithValue(xmlShift, "type", "stop")) {
             m_octDis[staffNum] = 0;
-            std::vector<std::pair<std::string, ControlElement *>>::iterator iter;
-            for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
+            for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
                 if (iter->second->Is(OCTAVE)) {
                     Octave *octave = dynamic_cast<Octave *>(iter->second);
                     if (octave->HasEndid()) continue;
@@ -3233,8 +3221,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         const std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
         bool added = false;
         if (!m_ArpeggioStack.empty()) { // check existing arpeggios
-            std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio>>::iterator iter;
-            for (iter = m_ArpeggioStack.begin(); iter != m_ArpeggioStack.end(); ++iter) {
+            for (auto iter = m_ArpeggioStack.begin(); iter != m_ArpeggioStack.end(); ++iter) {
                 if (iter->second.m_arpegN == arpegN && onset == iter->second.m_timeStamp) {
                     // don't add other chord notes, because the chord is already referenced.
                     if (!isChord) iter->first->GetPlistInterface()->AddRef("#" + element->GetUuid());
@@ -3306,54 +3293,47 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
-        std::vector<Dir *>::iterator iter;
-        for (iter = m_dirStack.begin(); iter != m_dirStack.end(); ++iter) {
+        for (auto iter = m_dirStack.begin(); iter != m_dirStack.end(); ++iter) {
             if (!(*iter)->HasStaff())
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_dirStack.clear();
     }
     if (!m_dynamStack.empty()) {
-        std::vector<Dynam *>::iterator iter;
-        for (iter = m_dynamStack.begin(); iter != m_dynamStack.end(); ++iter) {
+        for (auto iter = m_dynamStack.begin(); iter != m_dynamStack.end(); ++iter) {
             if (!(*iter)->HasStaff())
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_dynamStack.clear();
     }
     if (!m_harmStack.empty()) {
-        std::vector<Harm *>::iterator iter;
-        for (iter = m_harmStack.begin(); iter != m_harmStack.end(); ++iter) {
+        for (auto iter = m_harmStack.begin(); iter != m_harmStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_harmStack.clear();
     }
     if (!m_octaveStack.empty()) {
-        std::vector<Octave *>::iterator iter;
-        for (iter = m_octaveStack.begin(); iter != m_octaveStack.end(); ++iter) {
+        for (auto iter = m_octaveStack.begin(); iter != m_octaveStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid(m_ID);
         }
         m_octaveStack.clear();
     }
     if (!m_pedalStack.empty()) {
-        std::vector<Pedal *>::iterator iter;
-        for (iter = m_pedalStack.begin(); iter != m_pedalStack.end(); ++iter) {
+        for (auto iter = m_pedalStack.begin(); iter != m_pedalStack.end(); ++iter) {
             if (!(*iter)->HasStaff())
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_pedalStack.clear();
     }
     if (!m_bracketStack.empty()) {
-        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>>::iterator iter;
-        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+        for (auto iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
             if (!(iter->first)->HasStaff())
                 iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
     }
     if (!m_tempoStack.empty()) {
-        std::vector<Tempo *>::iterator iter;
-        for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
+        for (auto iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
             if (!(*iter)->HasStaff())
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
@@ -3678,6 +3658,7 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
 data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
 {
     static const std::map<float, data_ACCIDENTAL_GESTURAL> Alter2Accid{
+        { -3, ACCIDENTAL_GESTURAL_tf }, //
         { -2, ACCIDENTAL_GESTURAL_ff }, //
         { -1.5, ACCIDENTAL_GESTURAL_fd }, //
         { -1, ACCIDENTAL_GESTURAL_f }, //
@@ -3686,7 +3667,8 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
         { 0.5, ACCIDENTAL_GESTURAL_sd }, //
         { 1, ACCIDENTAL_GESTURAL_s }, //
         { 1.5, ACCIDENTAL_GESTURAL_su }, //
-        { 2, ACCIDENTAL_GESTURAL_ss } //
+        { 2, ACCIDENTAL_GESTURAL_ss }, //
+        { 2, ACCIDENTAL_GESTURAL_ts } //
     };
 
     const auto result = Alter2Accid.find(value);
