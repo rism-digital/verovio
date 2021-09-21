@@ -1295,10 +1295,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
         const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        const int offset = 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         const int y = (multiRest->GetNumPlace() == STAFFREL_basic_below)
-            ? std::min(staff->GetDrawingY() - staffHeight, y2) - 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-            : std::max(staff->GetDrawingY(), y1) + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            ? std::min(staff->GetDrawingY() - staffHeight, y2) - offset
+            : std::max(staff->GetDrawingY(), y1) + offset;
 
         DrawSmuflString(dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center);
         dc->ResetFont();
