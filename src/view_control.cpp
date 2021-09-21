@@ -1664,11 +1664,21 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         int yCorr = 0;
         const int height = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
         const data_VERTICALALIGNMENT yAlignment = Fermata::GetVerticalAlignment(code);
+        int enclosureYCorr = 0;
         if (yAlignment == VERTICALALIGNMENT_top) {
             yCorr = height / 2;
         }
         else if (yAlignment == VERTICALALIGNMENT_bottom) {
             yCorr = -height / 2;
+        }
+        else {
+            const int glyphBottomY = m_doc->GetGlyphBottom(code, staff->m_drawingStaffSize, false);
+            if (fermata->GetPlace() == STAFFREL_above) {
+                yCorr = height / 2 + glyphBottomY;
+            }
+            else {
+                enclosureYCorr = height / 2 + glyphBottomY;
+            }
         }
 
         // Draw glyph including possible enclosing brackets
@@ -1677,14 +1687,16 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         if (enclosingFront) {
             const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3
                 + m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
-            DrawSmuflCode(dc, x - xCorrEncl, y, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(
+                dc, x - xCorrEncl, y + enclosureYCorr, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
         }
 
         DrawSmuflCode(dc, x - xCorr, y - yCorr, code, staff->m_drawingStaffSize, drawingCueSize);
 
         if (enclosingBack) {
             const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
-            DrawSmuflCode(dc, x + xCorrEncl, y, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(
+                dc, x + xCorrEncl, y + enclosureYCorr, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
         }
 
         dc->ResetFont();
