@@ -81,21 +81,17 @@ void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine 
     }
 }
 
-void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, bool isCircle)
+void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThickness)
 {
     assert(dc); // DC cannot be NULL
 
     BoundingBox::Swap(y1, y2);
 
-    dc->SetPen(m_currentColour, lineThinkness, AxSOLID);
+    dc->SetPen(m_currentColour, lineThickness, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 
     int width = x2 - x1;
     int height = y1 - y2;
-    if (isCircle) {
-        width = height > width ? height : width;
-        height = width > height ? width : height;
-    }
 
     dc->DrawEllipse(ToDeviceContextX(x1), ToDeviceContextY(y1), width, height);
 
@@ -126,13 +122,13 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
     return;
 }
 
-void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius = 0)
+void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThickness, int radius = 0)
 {
     assert(dc); // DC cannot be NULL
 
     BoundingBox::Swap(y1, y2);
 
-    const int penWidth = lineThinkness;
+    const int penWidth = lineThickness;
     dc->SetPen(m_currentColour, penWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 

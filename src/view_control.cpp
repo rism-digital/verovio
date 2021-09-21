@@ -2599,12 +2599,14 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
             const int width = std::abs(x2 - x1);
             const int height = std::abs(y2 - y1);
             if (width > height) {
+                y1 -= (width - height) / 2;
                 y2 += (width - height) / 2;
             }
             else if (height > width) {
                 x1 -= (height - width) / 2;
+                x2 += (height - width) / 2;
             }
-            DrawNotFilledEllipse(dc, x1, y1, x2, y2, lineThickness, true);
+            DrawNotFilledEllipse(dc, x1, y1, x2, y2, lineThickness);
         }
     }
 }
