@@ -1301,7 +1301,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 beam->ResetList(beam);
 
                 const ArrayOfObjects *beamList = beam->GetList(beam);
-                int restIndex = beam->GetChildIndex(rest);
+                const int restIndex = beam->GetListIndex(rest);
+                assert(restIndex >= 0);
 
                 int leftLoc = loc;
                 ArrayOfObjects::const_iterator it = beamList->begin();
