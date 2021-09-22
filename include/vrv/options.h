@@ -66,6 +66,8 @@ enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_symbols
 };
 
+enum option_PEDALSTYLE { PEDALSTYLE_auto = 0, PEDALSTYLE_line, PEDALSTYLE_pedstar, PEDALSTYLE_altpedstar };
+
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -127,6 +129,7 @@ public:
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_multiRestStyle;
+    static const std::map<int, std::string> s_pedalStyle;
     static const std::map<int, std::string> s_systemDivider;
 
 protected:
@@ -599,6 +602,7 @@ public:
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionIntMap m_pedalStyle;
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_shrinkToFit;

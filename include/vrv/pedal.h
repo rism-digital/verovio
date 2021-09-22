@@ -16,6 +16,7 @@
 
 namespace vrv {
 
+class System;
 //----------------------------------------------------------------------------
 // Pedal
 //----------------------------------------------------------------------------
@@ -64,6 +65,11 @@ public:
      * Get the SMuFL glyph for the pedal based on function or glyph.num
      */
     wchar_t GetPedalGlyph() const;
+
+    /**
+     * Get the pedal form based on the options and corresponding attributes from <pedal> and <scoreDef>
+     */
+    pedalVis_FORM GetPedalForm(Doc *doc, System *system) const;
 
     //----------//
     // Functors //
