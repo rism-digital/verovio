@@ -135,7 +135,7 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the array of Alignement, Arpeg, StaffN, bool tuples
+ * member 0: the array of Alignment, Arpeg, StaffN, bool tuples
  * member 1: the MeasureAligner
  * member 2: the Functor to be redirected to MeasureAligner
  * member 3: the Doc
@@ -149,7 +149,7 @@ public:
         m_doc = doc;
         m_functor = functor;
     }
-    ArrayOfAligmentArpegTuples m_alignmentArpegTuples;
+    ArrayOfAlignmentArpegTuples m_alignmentArpegTuples;
     MeasureAligner *m_measureAligner;
     Functor *m_functor;
     Doc *m_doc;
@@ -1853,20 +1853,23 @@ public:
  * member 2: the dynam in the current measure
  * member 3: the current hairpins to be linked / grouped
  * member 4: the map of existing harms (based on @n)
+ * member 5: a pointer to the doc scoreDef
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams()
+    PrepareFloatingGrpsParams(Doc *doc)
     {
         m_previousEnding = NULL;
         m_pedalLine = NULL;
+        m_doc = doc;
     }
     Ending *m_previousEnding;
     Pedal *m_pedalLine;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
     std::map<std::string, Harm *> m_harms;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

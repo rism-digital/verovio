@@ -298,38 +298,38 @@ void Att::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
         const AttNcLog *att = dynamic_cast<const AttNcLog *>(element);
         assert(att);
         if (att->HasOct()) {
-            attributes->push_back(std::make_pair("oct", att->StrToStr(att->GetOct())));
+            attributes->push_back({ "oct", att->StrToStr(att->GetOct()) });
         }
         if (att->HasPname()) {
-            attributes->push_back(std::make_pair("pname", att->StrToStr(att->GetPname())));
+            attributes->push_back({ "pname", att->StrToStr(att->GetPname()) });
         }
     }
     if (element->HasAttClass(ATT_NCFORM)) {
         const AttNcForm *att = dynamic_cast<const AttNcForm *>(element);
         assert(att);
         if (att->HasAngled()) {
-            attributes->push_back(std::make_pair("angled", att->BooleanToStr(att->GetAngled())));
+            attributes->push_back({ "angled", att->BooleanToStr(att->GetAngled()) });
         }
         if (att->HasCon()) {
-            attributes->push_back(std::make_pair("con", att->NcFormConToStr(att->GetCon())));
+            attributes->push_back({ "con", att->NcFormConToStr(att->GetCon()) });
         }
         if (att->HasCurve()) {
-            attributes->push_back(std::make_pair("curve", att->NcFormCurveToStr(att->GetCurve())));
+            attributes->push_back({ "curve", att->NcFormCurveToStr(att->GetCurve()) });
         }
         if (att->HasHooked()) {
-            attributes->push_back(std::make_pair("hooked", att->BooleanToStr(att->GetHooked())));
+            attributes->push_back({ "hooked", att->BooleanToStr(att->GetHooked()) });
         }
         if (att->HasLigated()) {
-            attributes->push_back(std::make_pair("ligated", att->BooleanToStr(att->GetLigated())));
+            attributes->push_back({ "ligated", att->BooleanToStr(att->GetLigated()) });
         }
         if (att->HasRellen()) {
-            attributes->push_back(std::make_pair("rellen", att->NcFormRellenToStr(att->GetRellen())));
+            attributes->push_back({ "rellen", att->NcFormRellenToStr(att->GetRellen()) });
         }
         if (att->HasSShape()) {
-            attributes->push_back(std::make_pair("sShape", att->StrToStr(att->GetSShape())));
+            attributes->push_back({ "sShape", att->StrToStr(att->GetSShape()) });
         }
         if (att->HasTilt()) {
-            attributes->push_back(std::make_pair("tilt", att->CompassdirectionToStr(att->GetTilt())));
+            attributes->push_back({ "tilt", att->CompassdirectionToStr(att->GetTilt()) });
         }
     }
 }

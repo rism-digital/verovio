@@ -537,6 +537,11 @@ void Doc::PrepareDrawing()
 
     /************ Resolve @starid (only) ************/
 
+    // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
+    // for placement
+    Functor resolveRehPosition(&Object::ResolveRehPosition);
+    this->Process(&resolveRehPosition, NULL);
+
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingParams prepareTimePointingParams;
     Functor prepareTimePointing(&Object::PrepareTimePointing);
@@ -747,7 +752,7 @@ void Doc::PrepareDrawing()
     /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
-    PrepareFloatingGrpsParams prepareFloatingGrpsParams;
+    PrepareFloatingGrpsParams prepareFloatingGrpsParams(this);
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     Functor prepareFloatingGrpsEnd(&Object::PrepareFloatingGrpsEnd);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams, &prepareFloatingGrpsEnd);
@@ -1364,7 +1369,24 @@ Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staf
     return point;
 }
 
-int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphLeft(wchar_t code, int staffSize, bool graceSize) const
+{
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(x, y, w, h);
+    x = x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) x = x * m_options->m_graceFactor.GetValue();
+    x = x * staffSize / 100;
+    return x;
+}
+
+int Doc::GetGlyphRight(wchar_t code, int staffSize, bool graceSize) const
+{
+    return GetGlyphLeft(code, staffSize, graceSize) + GetGlyphWidth(code, staffSize, graceSize);
+}
+
+int Doc::GetGlyphBottom(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     Glyph *glyph = Resources::GetGlyph(code);
@@ -1374,6 +1396,11 @@ int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
     if (graceSize) y = y * m_options->m_graceFactor.GetValue();
     y = y * staffSize / 100;
     return y;
+}
+
+int Doc::GetGlyphTop(wchar_t code, int staffSize, bool graceSize) const
+{
+    return GetGlyphBottom(code, staffSize, graceSize) + GetGlyphHeight(code, staffSize, graceSize);
 }
 
 int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const

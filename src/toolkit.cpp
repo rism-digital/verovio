@@ -209,7 +209,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // to be checked before PAE identification.
         return MUSEDATAHUM;
     }
-    if (data[0] == '@') {
+    if (data[0] == '@' || data[0] == '{') {
         return PAE;
     }
     if (data[0] == '*' || data[0] == '!') {
@@ -781,6 +781,24 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     return output;
 }
 
+std::string Toolkit::ValidatePAEFile(const std::string &filename)
+{
+    std::ifstream inFile;
+    inFile.open(filename);
+
+    std::stringstream sstream;
+    sstream << inFile.rdbuf();
+    return this->ValidatePAE(sstream.str());
+}
+
+std::string Toolkit::ValidatePAE(const std::string &data)
+{
+    PAEInput input(&m_doc);
+    input.Import(data);
+    m_doc.Reset();
+    return input.GetValidationLog().json();
+}
+
 bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptions)
 {
     std::string output = GetMEI(jsonOptions);
@@ -1232,6 +1250,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     svg.SetHtml5(m_options->m_svgHtml5.GetValue());
     svg.SetFormatRaw(m_options->m_svgFormatRaw.GetValue());
     svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
+    svg.SetAdditionalAttributes(m_options->m_svgAdditionalAttribute.GetValue());
 
     // render the page
     RenderToDeviceContext(pageNo, &svg);

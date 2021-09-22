@@ -269,21 +269,31 @@ bool MEIOutput::WriteObject(Object *object)
     }
 
     if (object->Is(MDIV)) {
-        m_currentNode = m_currentNode.append_child("mdiv");
-        WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
+        if (!m_scoreBasedMEI || (m_page < 0)) {
+            m_currentNode = m_currentNode.append_child("mdiv");
+            WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
+        }
+        else {
+            return true;
+        }
     }
     else if (object->Is(PAGES)) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("pages");
+            WritePages(m_currentNode, dynamic_cast<Pages *>(object));
         }
-        // else {
-        //    m_currentNode = m_currentNode.append_child("score");
-        //}
-        WritePages(m_currentNode, dynamic_cast<Pages *>(object));
+        else {
+            return true;
+        }
     }
     else if (object->Is(SCORE)) {
-        m_currentNode = m_currentNode.append_child("score");
-        WriteScore(m_currentNode, dynamic_cast<Score *>(object));
+        if (!m_scoreBasedMEI || (m_page < 0)) {
+            m_currentNode = m_currentNode.append_child("score");
+            WriteScore(m_currentNode, dynamic_cast<Score *>(object));
+        }
+        else {
+            return true;
+        }
     }
 
     // Page and content
@@ -770,24 +780,22 @@ bool MEIOutput::WriteObject(Object *object)
 
     // SystemElementEnd - nothing to add - only
     else if (object->Is(SYSTEM_ELEMENT_END)) {
-        if (m_scoreBasedMEI) {
-            // LogDebug("No piling '%s'", object->GetClassName().c_str());
-            return true;
-        }
-        else {
+        if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("systemElementEnd");
             WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
         }
-    }
-    // SystemElementEnd - nothing to add - only
-    else if (object->Is(PAGE_ELEMENT_END)) {
-        if (m_scoreBasedMEI) {
-            // LogDebug("No piling '%s'", object->GetClassName().c_str());
+        else {
             return true;
         }
-        else {
+    }
+    // PageElementEnd - nothing to add - only
+    else if (object->Is(PAGE_ELEMENT_END)) {
+        if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("pageElementEnd");
-            // WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
+            WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
+        }
+        else {
+            return true;
         }
     }
 
@@ -800,11 +808,7 @@ bool MEIOutput::WriteObject(Object *object)
     // Object representing an attribute have no node to push
     if (!object->IsAttribute()) m_nodeStack.push_back(m_currentNode);
 
-    if (object->Is(PAGES) && (dynamic_cast<Pages *>(object) == m_doc->GetPages())) {
-        // First save the main scoreDef
-        // m_doc->GetCurrentScoreDef()->Save(this);
-    }
-    else if (object->Is(SCORE)) {
+    if (object->Is(SCORE)) {
         // First save the main scoreDef
         m_doc->GetCurrentScoreDef()->Save(this);
     }
@@ -816,21 +820,34 @@ bool MEIOutput::WriteObject(Object *object)
 
 bool MEIOutput::WriteObjectEnd(Object *object)
 {
-    if (m_scoreBasedMEI && object->IsBoundaryElement()) {
-        return true;
-    }
     // Object representing an attribute have no node to pop
-    else if (object->IsAttribute()) {
+    if (object->IsAttribute()) {
         return true;
     }
-    else if (m_scoreBasedMEI && (object->Is(SYSTEM))) {
-        return true;
-    }
-    else if (m_scoreBasedMEI && (object->Is(PAGE))) {
-        return true;
-    }
-    else if (m_scoreBasedMEI && (object->Is(PAGES))) {
-        return true;
+
+    if (m_scoreBasedMEI) {
+        if (object->Is({ PAGE, PAGES, SYSTEM })) {
+            return true;
+        }
+        if (object->Is({ MDIV, SCORE })) {
+            if (m_page >= 0) {
+                return true;
+            }
+        }
+
+        // Merging boundaries into one xml element
+        if (object->IsBoundaryElement()) {
+            m_boundaries.push(object->GetBoundaryEnd());
+            return true;
+        }
+        if (object->Is({ PAGE_ELEMENT_END, SYSTEM_ELEMENT_END })) {
+            if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
+                m_boundaries.pop();
+            }
+            else {
+                return true;
+            }
+        }
     }
 
     if (object->HasClosingComment()) {
@@ -1298,6 +1315,7 @@ void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     arpeg->WriteArpegLog(currentNode);
     arpeg->WriteArpegVis(currentNode);
     arpeg->WriteColor(currentNode);
+    arpeg->WriteEnclosingChars(currentNode);
 }
 
 void MEIOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
@@ -1725,6 +1743,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
+    clef->WriteEnclosingChars(currentNode);
     clef->WriteExtSym(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
@@ -1881,6 +1900,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     }
 
     WriteLayerElement(currentNode, meterSig);
+    meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
 }
@@ -2272,6 +2292,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteLyricStyle(element);
     interface->WriteMidiTempo(element);
     interface->WriteMultinumMeasures(element);
+    interface->WritePianoPedals(element);
 }
 
 void MEIOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
@@ -3869,6 +3890,7 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     assert(dynamic_cast<StaffGrp *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
+    bool missingStaffDef = true;
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
@@ -3891,9 +3913,11 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "staffGrp") {
             success = ReadStaffGrp(parent, current);
+            missingStaffDef = false; // innermost staffGrp child will report missing staffDef
         }
         else if (std::string(current.name()) == "staffDef") {
             success = ReadStaffDef(parent, current);
+            missingStaffDef = false;
         }
         // xml comment
         else if (std::string(current.name()) == "") {
@@ -3903,6 +3927,13 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
         }
     }
+
+    // Missing staffDefs lead to crashes in the ScoreDefSetCurrent functor
+    if (success && missingStaffDef) {
+        LogError("Each <staffGrp> must contain at least one <staffDef>.");
+        success = false;
+    }
+
     return success;
 }
 
@@ -4405,6 +4436,7 @@ bool MEIInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
     vrvArpeg->ReadArpegLog(arpeg);
     vrvArpeg->ReadArpegVis(arpeg);
     vrvArpeg->ReadColor(arpeg);
+    vrvArpeg->ReadEnclosingChars(arpeg);
 
     parent->AddChild(vrvArpeg);
     ReadUnsupportedAttr(arpeg, vrvArpeg);
@@ -5208,6 +5240,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
+    vrvClef->ReadEnclosingChars(clef);
     vrvClef->ReadExtSym(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
@@ -5385,6 +5418,7 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     MeterSig *vrvMeterSig = new MeterSig();
     ReadLayerElement(meterSig, vrvMeterSig);
 
+    vrvMeterSig->ReadEnclosingChars(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
 
@@ -5948,6 +5982,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadLyricStyle(element);
     interface->ReadMidiTempo(element);
     interface->ReadMultinumMeasures(element);
+    interface->ReadPianoPedals(element);
     return true;
 }
 

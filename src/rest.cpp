@@ -299,7 +299,10 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 
     // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
     // margin that will adjust rest position
-    const int marginLocation = isTopLayer ? 6 : 2;
+    int marginLocation = isTopLayer ? 6 : 2;
+    if ((this->GetDur() == DURATION_2) || (this->GetDur() == DURATION_breve)) {
+        marginLocation = 4;
+    }
     const int optimalLocation = isTopLayer
         ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
         : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
@@ -377,16 +380,25 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
         ? GetElementLocation(nextElement, currentLayer, !isTopLayer).first
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, isTopLayer);
 
+    // Calculate optimal location depending on existence of values for previous and next element location
     int currentOptimalLocation = 0;
     if (VRV_UNSET == previousElementLoc) {
-        currentOptimalLocation = nextElementLoc;
-    }
-    else if (VRV_UNSET == nextElementLoc) {
-        currentOptimalLocation = previousElementLoc;
+        if (VRV_UNSET == nextElementLoc) {
+            return VRV_UNSET;
+        }
+        else {
+            currentOptimalLocation = nextElementLoc;
+        }
     }
     else {
-        currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2;
+        if (VRV_UNSET == nextElementLoc) {
+            currentOptimalLocation = previousElementLoc;
+        }
+        else {
+            currentOptimalLocation = (previousElementLoc + nextElementLoc) / 2;
+        }
     }
+
     const int marginLocation = isTopLayer ? 10 : -2;
     currentOptimalLocation = isTopLayer ? std::min(currentOptimalLocation, marginLocation)
                                         : std::max(currentOptimalLocation, marginLocation);

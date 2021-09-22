@@ -123,11 +123,6 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         return;
     }
 
-    if (start->Is(TIMESTAMP_ATTR) && end->Is(TIMESTAMP_ATTR)) {
-        // for now ignore slur using 2 tstamps
-        return;
-    }
-
     if (start->Is(NOTE)) {
         startNote = vrv_cast<Note *>(start);
         assert(startNote);
@@ -166,12 +161,13 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         layer = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
         layerElement = start;
     }
-    else {
+    else if (!end->Is(TIMESTAMP_ATTR)) {
         layer = dynamic_cast<Layer *>(end->GetFirstAncestor(LAYER));
         layerElement = end;
     }
-    if (layerElement->m_crossStaff) layer = layerElement->m_crossLayer;
-    assert(layer);
+    if (layerElement && layerElement->m_crossStaff) layer = layerElement->m_crossLayer;
+
+    // At this stage layer can still be NULL for slurs with @tstamp and @tstamp2
 
     if (start->m_crossStaff != end->m_crossStaff) {
         curve->SetCrossStaff(end->m_crossStaff);
@@ -240,7 +236,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // grace notes - always below unless we have a drawing stem direction on the layer
-    else if (isGraceToNoteSlur && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
+    else if (isGraceToNoteSlur && layer && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
         drawingCurveDir = curvature_CURVEDIR_below;
     }
     // the normal case
@@ -480,7 +476,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     points[0] = Point(x1, y1);
     points[3] = Point(x2, y2);
 
-    float angle = CalcInitialSlur(curve, slur, staff, layer->GetN(), drawingCurveDir, points);
+    float angle = CalcInitialSlur(curve, slur, staff, drawingCurveDir, points);
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurMidpointThickness.GetValue();
 
     curve->UpdateCurveParams(points, angle, thickness, drawingCurveDir);
@@ -530,7 +526,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 }
 
 float View::CalcInitialSlur(
-    FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
+    FloatingCurvePositioner *curve, Slur *slur, Staff *staff, curvature_CURVEDIR curveDir, Point points[4])
 {
     // For readability makes them p1 and p2
     BezierCurve bezier;
@@ -628,13 +624,13 @@ float View::CalcInitialSlur(
         std::copy(endTiePositioners.begin(), endTiePositioners.end(), std::back_inserter(tiePositioners));
     }
     for (FloatingPositioner *positioner : tiePositioners) {
-        System *positionerSystem = vrv_cast<System *>(positioner->GetObject()->GetFirstAncestor(SYSTEM));
-        if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)
-            && (positioner->GetContentLeft() < bezier.p2.x)
-            && (positionerSystem == curve->GetAlignment()->GetParentSystem())) {
-            CurveSpannedElement *spannedElement = new CurveSpannedElement();
-            spannedElement->m_boundingBox = positioner;
-            curve->AddSpannedElement(spannedElement);
+        if (positioner->GetAlignment()->GetParentSystem() == curve->GetAlignment()->GetParentSystem()) {
+            if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)
+                && (positioner->GetContentLeft() < bezier.p2.x)) {
+                CurveSpannedElement *spannedElement = new CurveSpannedElement();
+                spannedElement->m_boundingBox = positioner;
+                curve->AddSpannedElement(spannedElement);
+            }
         }
     }
 

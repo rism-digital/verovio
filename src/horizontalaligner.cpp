@@ -750,20 +750,6 @@ void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int s
     }
 }
 
-bool AlignmentReference::HasCrossStaffElements()
-{
-    ListOfObjects children;
-    ClassIdComparison classId(LAYER_ELEMENT);
-    FindAllDescendantByComparison(&children, &classId);
-
-    for (auto child : children) {
-        LayerElement *layerElement = vrv_cast<LayerElement *>(child);
-        if (layerElement && layerElement->m_crossStaff) return true;
-    }
-
-    return false;
-}
-
 //----------------------------------------------------------------------------
 // TimestampAligner
 //----------------------------------------------------------------------------
@@ -854,7 +840,7 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
     assert(params);
 
     // An array of Alignment / arpeg / staffN / bool (for indicating if we have reached the alignment yet)
-    ArrayOfAligmentArpegTuples::iterator iter = params->m_alignmentArpegTuples.begin();
+    ArrayOfAlignmentArpegTuples::iterator iter = params->m_alignmentArpegTuples.begin();
 
     while (iter != params->m_alignmentArpegTuples.end()) {
         // We are reaching the alignment to which an arpeg points to (i.e, the topNote one)
@@ -916,7 +902,7 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
                 if (topNote && bottomNote) {
                     const int arpegMax = topNote->GetDrawingY() + drawingUnit / 2;
                     const int arpegMin = bottomNote->GetDrawingY() - drawingUnit / 2;
-                    // Make sure that there is vertical overlap, otherwise do not shift arpeggo
+                    // Make sure that there is vertical overlap, otherwise do not shift arpeggio
                     if (((currentMin < arpegMin) && (currentMax > arpegMin))
                         || ((currentMax > arpegMax) && (currentMin < arpegMax))) {
                         std::get<0>(*iter)->SetXRel(std::get<0>(*iter)->GetXRel() + overlap + drawingUnit / 2);

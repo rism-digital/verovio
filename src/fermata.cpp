@@ -101,21 +101,19 @@ wchar_t Fermata::GetFermataGlyph() const
     return SMUFL_E4C0_fermataAbove;
 }
 
-wchar_t Fermata::GetEnclosingGlyph(bool beforeFermata) const
+std::pair<wchar_t, wchar_t> Fermata::GetEnclosingGlyphs() const
 {
-    wchar_t glyph = 0;
+    std::pair<wchar_t, wchar_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
             case ENCLOSURE_brack:
-                glyph = beforeFermata ? SMUFL_E26C_accidentalBracketLeft : SMUFL_E26D_accidentalBracketRight;
+                glyphs = { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
                 break;
-            case ENCLOSURE_paren:
-                glyph = beforeFermata ? SMUFL_E26A_accidentalParensLeft : SMUFL_E26B_accidentalParensRight;
-                break;
+            case ENCLOSURE_paren: glyphs = { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
             default: break;
         }
     }
-    return glyph;
+    return glyphs;
 }
 
 //----------------------------------------------------------------------------

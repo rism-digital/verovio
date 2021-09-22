@@ -235,6 +235,21 @@ bool Object::IsBoundaryElement()
     return false;
 }
 
+Object *Object::GetBoundaryEnd()
+{
+    if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
+        SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
+        assert(interface);
+        return (interface->GetEnd());
+    }
+    else if (this->Is(MDIV) || this->Is(SCORE)) {
+        PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
+        assert(interface);
+        return (interface->GetEnd());
+    }
+    return NULL;
+}
+
 void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChange)
 {
     if (this == sourceParent) {
@@ -375,7 +390,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
-        attributes->push_back(std::make_pair(pair.first, pair.second));
+        attributes->push_back({ pair.first, pair.second });
     }
 
     return (int)attributes->size();
@@ -618,8 +633,9 @@ void Object::SetParent(Object *parent)
 bool Object::IsSupportedChild(Object *child)
 {
     // This should never happen because the method should be overridden
-    LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
-    assert(false);
+    LogDebug(
+        "Method for adding %s to %s should be overridden", child->GetClassName().c_str(), this->GetClassName().c_str());
+    // assert(false);
     return false;
 }
 
@@ -1227,6 +1243,21 @@ Object *ObjectFactory::Create(std::string name)
         LogError("Factory for '%s' not found", name.c_str());
         return NULL;
     }
+}
+
+ClassId ObjectFactory::GetClassId(std::string name)
+{
+    ClassId classId = OBJECT;
+
+    MapOfStrClassIds::iterator it = s_classIdsRegistry.find(name);
+    if (it != s_classIdsRegistry.end()) {
+        classId = it->second;
+    }
+    else {
+        LogError("ClassId for '%s' not found", name.c_str());
+    }
+
+    return classId;
 }
 
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)

@@ -197,7 +197,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
 
     Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
     assert(lastNote);
-    int curPitch, lastPitch = lastNote->GetDiatonicPitch();
+    int lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
 
     ++iter;
@@ -208,7 +208,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
     while (iter != childList->end()) {
         curNote = vrv_cast<Note *>(*iter);
         assert(curNote);
-        curPitch = curNote->GetDiatonicPitch();
+        const int curPitch = curNote->GetDiatonicPitch();
 
         if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
             if (!lastNote->GetCluster()) {

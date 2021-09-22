@@ -83,7 +83,10 @@ public:
     /**
      * Wrapper for checking if an element has a boundary start interface and also if is set as a boundary element
      */
+    ///@{
     bool IsBoundaryElement();
+    Object *GetBoundaryEnd();
+    ///@}
 
     /**
      * @name Methods for checking if an object is part of a group of classId's.
@@ -1140,6 +1143,11 @@ public:
     virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Resolve Reh time pointing position in case none is set
+     */
+    virtual int ResolveRehPosition(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Go through all layer elements of the layer and return next/previous element relative to the specified
      * layer element. It will search recursively through children elements until note, chord or ftrem is found.
      * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
@@ -1571,6 +1579,11 @@ public:
      * Add the name / constructor map entry to the static register
      */
     void Register(std::string name, ClassId classId, std::function<Object *(void)> function);
+
+    /**
+     * Get the ClassId from the MEI element string name by making a lookup in the register
+     */
+    ClassId GetClassId(std::string name);
 
     /**
      * Get the correspondings ClassIds from the vector of MEI element string names

@@ -271,4 +271,11 @@ void vrvToolkit_setOptions(void *tkPtr, const char *options)
     }
 }
 
+const char *vrvToolkit_validatePAE(void *tkPtr, const char *data)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->ValidatePAE(data));
+    return tk->GetCString();
+}
+
 } // extern C

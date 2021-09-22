@@ -121,11 +121,11 @@ bool Dynam::GetSymbolsInStr(std::wstring &str, ArrayOfStringDynamTypePairs &toke
                 }
                 // previous one it also a symbol, add a space in between
                 else {
-                    tokens.push_back(std::make_pair(L" ", false));
+                    tokens.push_back({ L" ", false });
                 }
             }
             // Add it in all cases
-            tokens.push_back(std::make_pair(token, true));
+            tokens.push_back({ token, true });
         }
         else {
             if (tokens.size() > 0) {
@@ -135,12 +135,12 @@ bool Dynam::GetSymbolsInStr(std::wstring &str, ArrayOfStringDynamTypePairs &toke
                 }
                 // previous one is not a symbol, add it separately but with a space
                 else {
-                    tokens.push_back(std::make_pair(L" " + token, false));
+                    tokens.push_back({ L" " + token, false });
                 }
             }
             // First one, just add it
             else {
-                tokens.push_back(std::make_pair(token, false));
+                tokens.push_back({ token, false });
             }
         }
     }

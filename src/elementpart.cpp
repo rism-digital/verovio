@@ -114,15 +114,14 @@ Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code) 
 {
     code = this->GetFlagGlyph(STEMDIRECTION_up);
 
-    int h = doc->GetGlyphHeight(code, staffSize, graceSize);
-    return Point(0, h + doc->GetGlyphDescender(code, staffSize, graceSize));
+    return Point(0, doc->GetGlyphTop(code, staffSize, graceSize));
 }
 
 Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const
 {
     code = this->GetFlagGlyph(STEMDIRECTION_down);
 
-    return Point(0, doc->GetGlyphDescender(code, staffSize, graceSize));
+    return Point(0, doc->GetGlyphBottom(code, staffSize, graceSize));
 }
 
 //----------------------------------------------------------------------------

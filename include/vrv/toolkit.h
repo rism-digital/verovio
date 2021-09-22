@@ -165,6 +165,30 @@ public:
     bool LoadZipDataBuffer(const unsigned char *data, int length);
 
     /**
+     * Validate the Plaine and Easie file from the file system.
+     *
+     * The method calls Toolkit::ValidatePAE.
+     * This methods is not available in the JavaScript version of the toolkit.
+     *
+     * @param filename The filename to be validated
+     * @return A stringified JSON object with the validation warnings or errors
+     */
+    std::string ValidatePAEFile(const std::string &filename);
+
+    /**
+     * Validate the Plaine and Easie code passed in the string data.
+     *
+     * A single JSON object is returned when there is a global input error.
+     * When reading the input succeeds, validation is grouped by input keys.
+     * The methods always returns errors in PAE pedantic mode.
+     * No data remains loaded after the validation.
+     *
+     * @param data A string with the data in JSON or with PAE `@` keys
+     * @return A stringified JSON object with the validation warnings or errors
+     */
+    std::string ValidatePAE(const std::string &data);
+
+    /**
      * Return the number of pages in the loaded document
      *
      * The number of pages depends one the page size and if encoded layout was taken into account or not.

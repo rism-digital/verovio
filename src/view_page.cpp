@@ -43,6 +43,7 @@
 #include "page.h"
 #include "pageboundary.h"
 #include "pageelement.h"
+#include "reh.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -459,14 +460,12 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
         }
         case staffGroupingSym_SYMBOL_bracket: {
             DrawBracket(dc, x, yTop, yBottom, staffSize);
-            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue()
-                + m_doc->GetDrawingUnit(staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize) * (1.0 + m_options->m_bracketThickness.GetValue());
             break;
         }
         case staffGroupingSym_SYMBOL_bracketsq: {
-            DrawBracketsq(dc, x, yTop, yBottom, staffSize);
-            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue()
-                + m_doc->GetDrawingUnit(staffSize);
+            DrawBracketSq(dc, x, yTop, yBottom, staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize);
             break;
         }
         default: break;
@@ -562,25 +561,19 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     DrawSmuflCode(dc, x1, y2 - offset - bracketThickness / 2, SMUFL_E004_bracketBottom, staffSize, false);
 
     DrawFilledRectangle(dc, x1, y1 + 2 * offset + bracketThickness / 2, x2, y2 - 2 * offset - bracketThickness / 2);
-
-    return;
 }
 
-void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
 
-    const int offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
-    const int basicDist = m_doc->GetDrawingUnit(staffSize);
+    const int y = std::min(y1, y2);
+    const int height = std::abs(y2 - y1);
+    const int horizontalThickness = m_doc->GetDrawingStaffLineWidth(staffSize);
+    const int verticalThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
+    const int width = m_doc->GetDrawingUnit(staffSize);
 
-    const int bracketWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
-    x -= basicDist;
-
-    DrawFilledRectangle(dc, x, y1 + offset, x - bracketWidth, y2 - offset); // left
-    DrawFilledRectangle(dc, x, y1 + offset, x + basicDist, y1 - offset); // top
-    DrawFilledRectangle(dc, x, y2 + offset, x + basicDist, y2 - offset); // bottom
-
-    return;
+    DrawSquareBracket(dc, true, x - width, y, height, width, horizontalThickness, verticalThickness);
 }
 
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
@@ -984,7 +977,12 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
         MNum *mnum = dynamic_cast<MNum *>(measure->FindDescendantByType(MNUM));
-        if (mnum) {
+        Reh *reh = dynamic_cast<Reh *>(measure->FindDescendantByType(REH));
+        const bool hasRehearsal = reh
+            && ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
+                || (reh->GetStart()->Is(BARLINE)
+                    && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
+        if (mnum && !hasRehearsal) {
             // this should be an option
             Measure *systemStart = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE));
 
@@ -1051,25 +1049,21 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
         assert(meterSig);
 
-        dc->StartGraphic(meterSig, "", meterSig->GetUuid());
-        int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
-        int x = meterSig->GetDrawingX() + offset;
-
         if (meterSig->HasCount()) {
-            DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+            DrawMeterSig(dc, meterSig, staff, offset);
         }
 
-        dc->EndGraphic(meterSig, this);
-        int margin = unit / 2;
+        const int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
+        const int x = meterSig->GetDrawingX() + offset;
         const int width = meterSig->GetContentRight() - meterSig->GetContentLeft();
         if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))) {
             // draw plus sign here
-            const int plusX = x + width;
+            const int plusX = x + width + unit / 2;
             DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
-            offset += width + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
+            offset += width + unit + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
         }
         else {
-            offset += width + margin * 2;
+            offset += width + unit;
         }
     }
 

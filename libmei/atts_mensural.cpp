@@ -679,89 +679,89 @@ void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
         const AttDurationQuality *att = dynamic_cast<const AttDurationQuality *>(element);
         assert(att);
         if (att->HasDurQuality()) {
-            attributes->push_back(std::make_pair("dur.quality", att->DurqualityMensuralToStr(att->GetDurQuality())));
+            attributes->push_back({ "dur.quality", att->DurqualityMensuralToStr(att->GetDurQuality()) });
         }
     }
     if (element->HasAttClass(ATT_MENSURALLOG)) {
         const AttMensuralLog *att = dynamic_cast<const AttMensuralLog *>(element);
         assert(att);
         if (att->HasProportNum()) {
-            attributes->push_back(std::make_pair("proport.num", att->IntToStr(att->GetProportNum())));
+            attributes->push_back({ "proport.num", att->IntToStr(att->GetProportNum()) });
         }
         if (att->HasProportNumbase()) {
-            attributes->push_back(std::make_pair("proport.numbase", att->IntToStr(att->GetProportNumbase())));
+            attributes->push_back({ "proport.numbase", att->IntToStr(att->GetProportNumbase()) });
         }
     }
     if (element->HasAttClass(ATT_MENSURALSHARED)) {
         const AttMensuralShared *att = dynamic_cast<const AttMensuralShared *>(element);
         assert(att);
         if (att->HasModusmaior()) {
-            attributes->push_back(std::make_pair("modusmaior", att->ModusmaiorToStr(att->GetModusmaior())));
+            attributes->push_back({ "modusmaior", att->ModusmaiorToStr(att->GetModusmaior()) });
         }
         if (att->HasModusminor()) {
-            attributes->push_back(std::make_pair("modusminor", att->ModusminorToStr(att->GetModusminor())));
+            attributes->push_back({ "modusminor", att->ModusminorToStr(att->GetModusminor()) });
         }
         if (att->HasProlatio()) {
-            attributes->push_back(std::make_pair("prolatio", att->ProlatioToStr(att->GetProlatio())));
+            attributes->push_back({ "prolatio", att->ProlatioToStr(att->GetProlatio()) });
         }
         if (att->HasTempus()) {
-            attributes->push_back(std::make_pair("tempus", att->TempusToStr(att->GetTempus())));
+            attributes->push_back({ "tempus", att->TempusToStr(att->GetTempus()) });
         }
         if (att->HasDivisio()) {
-            attributes->push_back(std::make_pair("divisio", att->DivisioToStr(att->GetDivisio())));
+            attributes->push_back({ "divisio", att->DivisioToStr(att->GetDivisio()) });
         }
     }
     if (element->HasAttClass(ATT_NOTEVISMENSURAL)) {
         const AttNoteVisMensural *att = dynamic_cast<const AttNoteVisMensural *>(element);
         assert(att);
         if (att->HasLig()) {
-            attributes->push_back(std::make_pair("lig", att->LigatureformToStr(att->GetLig())));
+            attributes->push_back({ "lig", att->LigatureformToStr(att->GetLig()) });
         }
     }
     if (element->HasAttClass(ATT_PLICAVIS)) {
         const AttPlicaVis *att = dynamic_cast<const AttPlicaVis *>(element);
         assert(att);
         if (att->HasDir()) {
-            attributes->push_back(std::make_pair("dir", att->StemdirectionBasicToStr(att->GetDir())));
+            attributes->push_back({ "dir", att->StemdirectionBasicToStr(att->GetDir()) });
         }
         if (att->HasLen()) {
-            attributes->push_back(std::make_pair("len", att->DblToStr(att->GetLen())));
+            attributes->push_back({ "len", att->DblToStr(att->GetLen()) });
         }
     }
     if (element->HasAttClass(ATT_RESTVISMENSURAL)) {
         const AttRestVisMensural *att = dynamic_cast<const AttRestVisMensural *>(element);
         assert(att);
         if (att->HasSpaces()) {
-            attributes->push_back(std::make_pair("spaces", att->IntToStr(att->GetSpaces())));
+            attributes->push_back({ "spaces", att->IntToStr(att->GetSpaces()) });
         }
     }
     if (element->HasAttClass(ATT_STEMVIS)) {
         const AttStemVis *att = dynamic_cast<const AttStemVis *>(element);
         assert(att);
         if (att->HasPos()) {
-            attributes->push_back(std::make_pair("pos", att->StempositionToStr(att->GetPos())));
+            attributes->push_back({ "pos", att->StempositionToStr(att->GetPos()) });
         }
         if (att->HasLen()) {
-            attributes->push_back(std::make_pair("len", att->DblToStr(att->GetLen())));
+            attributes->push_back({ "len", att->DblToStr(att->GetLen()) });
         }
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->StemformMensuralToStr(att->GetForm())));
+            attributes->push_back({ "form", att->StemformMensuralToStr(att->GetForm()) });
         }
         if (att->HasDir()) {
-            attributes->push_back(std::make_pair("dir", att->StemdirectionToStr(att->GetDir())));
+            attributes->push_back({ "dir", att->StemdirectionToStr(att->GetDir()) });
         }
         if (att->HasFlagPos()) {
-            attributes->push_back(std::make_pair("flag.pos", att->FlagposMensuralToStr(att->GetFlagPos())));
+            attributes->push_back({ "flag.pos", att->FlagposMensuralToStr(att->GetFlagPos()) });
         }
         if (att->HasFlagForm()) {
-            attributes->push_back(std::make_pair("flag.form", att->FlagformMensuralToStr(att->GetFlagForm())));
+            attributes->push_back({ "flag.form", att->FlagformMensuralToStr(att->GetFlagForm()) });
         }
     }
     if (element->HasAttClass(ATT_STEMSMENSURAL)) {
         const AttStemsMensural *att = dynamic_cast<const AttStemsMensural *>(element);
         assert(att);
         if (att->HasStemForm()) {
-            attributes->push_back(std::make_pair("stem.form", att->StemformMensuralToStr(att->GetStemForm())));
+            attributes->push_back({ "stem.form", att->StemformMensuralToStr(att->GetStemForm()) });
         }
     }
 }

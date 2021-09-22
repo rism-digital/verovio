@@ -9,6 +9,7 @@
 #define __VRV_IOMEI_H__
 
 #include <sstream>
+#include <stack>
 
 //----------------------------------------------------------------------------
 
@@ -444,6 +445,7 @@ private:
     /** @name Current element */
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_nodeStack;
+    std::stack<Object *> m_boundaries;
     bool m_removeIds;
     ListOfObjects m_referredObjects;
 };

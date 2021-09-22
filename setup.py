@@ -84,7 +84,7 @@ def get_version():
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
     EXTRA_COMPILE_ARGS += ['-std=c++17',
-                           '-Wno-write-strings', '-Wno-overloaded-virtual']
+                           '-Wno-write-strings', '-Wno-overloaded-virtual', "-g0"]
 else:
     EXTRA_COMPILE_ARGS += ['/std:c++17',
                            '-DNO_PAE_SUPPORT']

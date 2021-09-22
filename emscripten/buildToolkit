@@ -190,6 +190,7 @@ $exports .= "'_vrvToolkit_renderToSVG',";
 $exports .= "'_vrvToolkit_renderToTimemap',";
 $exports .= "'_vrvToolkit_resetXmlIdSeed',";
 $exports .= "'_vrvToolkit_setOptions',";
+$exports .= "'_vrvToolkit_validatePAE',";
 $exports .= "'_malloc',";
 $exports .= "'_free'";
 $exports .= "]\"";

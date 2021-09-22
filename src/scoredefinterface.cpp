@@ -29,6 +29,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttMeasureNumbers()
     , AttMidiTempo()
     , AttMultinumMeasures()
+    , AttPianoPedals()
     , AttSpacing()
     , AttSystems()
 {
@@ -38,6 +39,7 @@ ScoreDefInterface::ScoreDefInterface()
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_MIDITEMPO);
     RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
+    RegisterInterfaceAttClass(ATT_PIANOPEDALS);
     RegisterInterfaceAttClass(ATT_SPACING);
     RegisterInterfaceAttClass(ATT_SYSTEMS);
 
@@ -52,6 +54,7 @@ void ScoreDefInterface::Reset()
     ResetMeasureNumbers();
     ResetMidiTempo();
     ResetMultinumMeasures();
+    ResetPianoPedals();
     ResetSpacing();
     ResetSystems();
 }
