@@ -60,6 +60,11 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::ResolveRehPosition
+     */
+    virtual int ResolveRehPosition(FunctorParams *params);
+
 protected:
     //
 private:
