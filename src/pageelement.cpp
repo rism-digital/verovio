@@ -73,12 +73,9 @@ int PageElement::CastOffPages(FunctorParams *functorParams)
     assert(params);
 
     // Hidden mdivs must be ignored
-    if (this->Is(MDIV)) {
-        Mdiv *mdiv = vrv_cast<Mdiv *>(this);
-        assert(mdiv);
-        if (mdiv->m_visibility == Hidden) {
-            return FUNCTOR_CONTINUE;
-        }
+    Mdiv *mdiv = dynamic_cast<Mdiv *>(this);
+    if (mdiv && (mdiv->m_visibility == Hidden)) {
+        return FUNCTOR_CONTINUE;
     }
 
     PageElement *element = dynamic_cast<PageElement *>(params->m_contentPage->Relinquish(this->GetIdx()));
