@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "mdiv.h"
 #include "page.h"
 
 namespace vrv {
@@ -70,6 +71,15 @@ int PageElement::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
     assert(params);
+
+    // Hidden mdivs must be ignored
+    if (this->Is(MDIV)) {
+        Mdiv *mdiv = vrv_cast<Mdiv *>(this);
+        assert(mdiv);
+        if (mdiv->m_visibility == Hidden) {
+            return FUNCTOR_CONTINUE;
+        }
+    }
 
     PageElement *element = dynamic_cast<PageElement *>(params->m_contentPage->Relinquish(this->GetIdx()));
     assert(element);
