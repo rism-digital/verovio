@@ -2100,7 +2100,10 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
     TextDrawingParams params;
 
     params.m_x = reh->GetStart()->GetDrawingX();
-    if ((system->GetFirst(MEASURE) == measure) && reh->HasTstamp() && (reh->GetTstamp() == 0.0)) {
+    const bool adjustPosition = ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
+        || (reh->GetStart()->Is(BARLINE)
+            && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
+    if ((system->GetFirst(MEASURE) == measure) && adjustPosition) {
         // StaffDef information is always in the first layer
         Layer *layer = dynamic_cast<Layer *>(measure->FindDescendantByType(LAYER));
         assert(layer);
