@@ -1368,6 +1368,7 @@ void MEIOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteEnclosingChars(currentNode);
     dynam->WriteExtender(currentNode);
     dynam->WriteLineRendBase(currentNode);
     dynam->WriteMidiValue(currentNode);
@@ -4586,6 +4587,7 @@ bool MEIInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadEnclosingChars(dynam);
     vrvDynam->ReadExtender(dynam);
     vrvDynam->ReadLineRendBase(dynam);
     vrvDynam->ReadMidiValue(dynam);

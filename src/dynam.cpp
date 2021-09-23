@@ -39,6 +39,7 @@ Dynam::Dynam()
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()
+    , AttEnclosingChars()
     , AttExtender()
     , AttLineRendBase()
     , AttMidiValue()
@@ -47,6 +48,7 @@ Dynam::Dynam()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_ENCLOSINGCHARS);
     RegisterAttClass(ATT_EXTENDER);
     RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_MIDIVALUE);
@@ -63,6 +65,7 @@ void Dynam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
+    ResetEnclosingChars();
     ResetExtender();
     ResetLineRendBase();
     ResetVerticalGroup();
@@ -96,6 +99,42 @@ bool Dynam::IsSymbolOnly()
 std::wstring Dynam::GetSymbolStr() const
 {
     return Dynam::GetSymbolStr(m_symbolStr);
+}
+
+int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
+{
+    if (this->HasEnclose()) {
+        Text *open = new Text();
+        Text *close = new Text();
+        std::wstring openElement, closeElement;
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: {
+                openElement.assign(L"[");
+                closeElement.assign(L"]");
+                break;
+            }   
+            case ENCLOSURE_paren: {
+                openElement.assign(L"(");
+                closeElement.assign(L")");
+                break;
+            }
+            default: break;
+        }
+        // If both opening/closing element are set - add them to the start and end of the dynam
+        if (!openElement.empty() && !closeElement.empty()) {
+            open->SetText(openElement);
+            open->SetParent(this);
+            this->InsertChild(open, 0);
+
+            close->SetText(closeElement);
+            this->AddChild(close);
+        }
+        else {
+            delete open;
+            delete close;
+        }
+    }
+    return FUNCTOR_SIBLINGS;
 }
 
 //----------------------------------------------------------------------------
