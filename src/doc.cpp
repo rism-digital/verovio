@@ -537,6 +537,11 @@ void Doc::PrepareDrawing()
 
     /************ Resolve @starid (only) ************/
 
+    // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
+    // for placement
+    Functor resolveRehPosition(&Object::ResolveRehPosition);
+    this->Process(&resolveRehPosition, NULL);
+
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingParams prepareTimePointingParams;
     Functor prepareTimePointing(&Object::PrepareTimePointing);
@@ -747,7 +752,7 @@ void Doc::PrepareDrawing()
     /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
-    PrepareFloatingGrpsParams prepareFloatingGrpsParams;
+    PrepareFloatingGrpsParams prepareFloatingGrpsParams(this);
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     Functor prepareFloatingGrpsEnd(&Object::PrepareFloatingGrpsEnd);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams, &prepareFloatingGrpsEnd);

@@ -17,6 +17,7 @@
 #include "horizontalaligner.h"
 #include "layerelement.h"
 #include "smufl.h"
+#include "system.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -84,6 +85,31 @@ wchar_t Pedal::GetPedalGlyph() const
     return (GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
 }
 
+pedalVis_FORM Pedal::GetPedalForm(Doc *doc, System *system) const
+{
+    const std::map<option_PEDALSTYLE, pedalVis_FORM> option2PedalVis = { { PEDALSTYLE_line, pedalVis_FORM_line },
+        { PEDALSTYLE_pedstar, pedalVis_FORM_pedstar }, { PEDALSTYLE_altpedstar, pedalVis_FORM_altpedstar } };
+    const std::map<pianoPedals_PEDALSTYLE, pedalVis_FORM> pianoPedals2PedalVis
+        = { { pianoPedals_PEDALSTYLE_line, pedalVis_FORM_line },
+              { pianoPedals_PEDALSTYLE_pedstar, pedalVis_FORM_pedstar },
+              { pianoPedals_PEDALSTYLE_altpedstar, pedalVis_FORM_altpedstar } };
+
+    pedalVis_FORM style = pedalVis_FORM_NONE;
+    if (option_PEDALSTYLE option = static_cast<option_PEDALSTYLE>(doc->GetOptions()->m_pedalStyle.GetValue());
+        option != PEDALSTYLE_auto) {
+        style = option2PedalVis.at(option);
+    }
+    else if (this->HasForm()) {
+        style = this->GetForm();
+    }
+    else if (const ScoreDef *scoreDef = system->GetDrawingScoreDef(); scoreDef && scoreDef->HasPedalStyle()) {
+        pianoPedals_PEDALSTYLE scoreDefStyle = scoreDef->GetPedalStyle();
+        style = pianoPedals2PedalVis.at(scoreDefStyle);
+    }
+
+    return style;
+}
+
 //----------------------------------------------------------------------------
 // Pedal functor methods
 //----------------------------------------------------------------------------
@@ -137,7 +163,10 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
         params->m_pedalLine = NULL;
     }
 
-    if ((this->GetDir() != pedalLog_DIR_up) && (this->GetForm() == pedalVis_FORM_line)) {
+    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    assert(system);
+    pedalVis_FORM form = this->GetPedalForm(params->m_doc, system);
+    if ((this->GetDir() != pedalLog_DIR_up) && (form == pedalVis_FORM_line)) {
         params->m_pedalLine = this;
     }
 

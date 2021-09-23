@@ -36,6 +36,9 @@ const std::map<int, std::string> Option::s_header
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
+const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTYLE_auto, "auto" }, { PEDALSTYLE_line, "line" },
+    { PEDALSTYLE_pedstar, "pedstar" }, { PEDALSTYLE_altpedstar, "altpedstar" } };
+
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
     { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
@@ -994,6 +997,10 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
+    m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
+    m_pedalStyle.Init(PEDALSTYLE_auto, &Option::s_pedalStyle);
+    this->Register(&m_pedalStyle, "pedalStyle", &m_general);
+
     m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
     m_preserveAnalyticalMarkup.Init(false);
     this->Register(&m_preserveAnalyticalMarkup, "preserveAnalyticalMarkup", &m_general);
@@ -1137,6 +1144,11 @@ Options::Options()
     m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
+
+    m_handwrittenFont.SetInfo("Handwritten font", "Fonts that emulate hand writing and require special handling");
+    m_handwrittenFont.Init();
+    m_handwrittenFont.SetValue("Petaluma");
+    this->Register(&m_handwrittenFont, "handwrittenFont", &m_generalLayout);
 
     m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
     m_harmDist.Init(1.0, 0.5, 16.0);
