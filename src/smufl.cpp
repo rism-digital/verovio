@@ -386,10 +386,12 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "mensuralRestSemifusa", SMUFL_E9F8_mensuralRestSemifusa },
     { "mensuralCustosUp", SMUFL_EA02_mensuralCustosUp },
     { "chantCustosStemUpPosMiddle", SMUFL_EA06_chantCustosStemUpPosMiddle },
+    { "wiggleTrill", SMUFL_EAA4_wiggleTrill },
     { "wiggleArpeggiatoUp", SMUFL_EAA9_wiggleArpeggiatoUp },
     { "wiggleArpeggiatoDown", SMUFL_EAAA_wiggleArpeggiatoDown },
     { "wiggleArpeggiatoUpArrow", SMUFL_EAAD_wiggleArpeggiatoUpArrow },
     { "wiggleArpeggiatoDownArrow", SMUFL_EAAE_wiggleArpeggiatoDownArrow },
+    { "wiggleGlissando", SMUFL_EAAF_wiggleGlissando },
     { "luteDurationWhole", SMUFL_EBA7_luteDurationWhole },
     { "luteDurationHalf", SMUFL_EBA8_luteDurationHalf },
     { "luteDurationQuarter", SMUFL_EBA9_luteDurationQuarter },
@@ -424,6 +426,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 398
+// 400
 
 } // namespace vrv
