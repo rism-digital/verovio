@@ -972,8 +972,9 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     castOffPagesParams.m_leftoverSystem = leftoverSystem;
 
     Functor castOffPages(&Object::CastOffPages);
+    Functor castOffPagesEnd(&Object::CastOffPagesEnd);
     pages->AddChild(castOffFirstPage);
-    castOffSinglePage->Process(&castOffPages, &castOffPagesParams);
+    castOffSinglePage->Process(&castOffPages, &castOffPagesParams, &castOffPagesEnd);
     delete castOffSinglePage;
 
     this->ScoreDefSetCurrentDoc(true);
