@@ -313,10 +313,14 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
 
     // Calculate offset from extremal slope, but use 1/20 of horizontal distance as minimum
     const int minOffset = (bezierCurve.p2.x - bezierCurve.p1.x) / 20;
-    int leftOffset = std::abs(bezierCurve.GetLeftControlHeight()) / leftSlopeMax;
-    leftOffset = std::max(leftOffset, minOffset);
-    int rightOffset = std::abs(bezierCurve.GetRightControlHeight()) / rightSlopeMax;
-    rightOffset = std::max(rightOffset, minOffset);
+    int leftOffset = minOffset;
+    if (bezierCurve.GetLeftControlPointOffset() > 0) {
+        leftOffset = std::max<int>(leftOffset, std::abs(bezierCurve.GetLeftControlHeight()) / leftSlopeMax);
+    }
+    int rightOffset = minOffset;
+    if (bezierCurve.GetRightControlPointOffset() > 0) {
+        rightOffset = std::max<int>(rightOffset, std::abs(bezierCurve.GetRightControlHeight()) / rightSlopeMax);
+    }
 
     return { true, leftOffset, rightOffset };
 }

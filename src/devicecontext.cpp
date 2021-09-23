@@ -36,7 +36,13 @@ void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staff
     const int unit = doc->GetDrawingUnit(staffSize);
 
     // Initialize offset
-    const int offset = dist / (2.0 + doc->GetOptions()->m_slurControlPoints.GetValue() / 5.0);
+    const double ratio = double(dist) / double(unit);
+    double baseVal = (ratio > 4.0) ? 2.0 : 5.0;
+    if ((ratio > 4.0) && (ratio < 32.0)) {
+        // interpolate baseVal between 5.0 and 2.0
+        baseVal = 7.0 - log2(ratio);
+    }
+    const int offset = dist / (baseVal + doc->GetOptions()->m_slurControlPoints.GetValue() / 5.0);
     m_leftControlPointOffset = offset;
     m_rightControlPointOffset = offset;
 
@@ -44,9 +50,9 @@ void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staff
     int height = std::max<int>(
         doc->GetOptions()->m_slurMinHeight.GetValue() * unit, dist / doc->GetOptions()->m_slurHeightFactor.GetValue());
     height = std::min<int>(doc->GetOptions()->m_slurMaxHeight.GetValue() * unit, height);
-    height *= sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 3.0;
+    height *= sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 2.0;
     height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
-    height = std::min<int>(height, offset * cos(angle));
+    height = std::min<int>(height, 2 * offset * cos(angle));
     this->SetControlHeight(height);
 }
 
