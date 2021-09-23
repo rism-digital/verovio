@@ -1839,7 +1839,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             // Smufl glyphs are horizontal - Rotate them counter clockwise
             dc->RotateGraphic(Point(ToDeviceContextX(x1), ToDeviceContextY(y1)), angle);
 
-            const wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+            const wchar_t fillGlyph = SMUFL_EAAF_wiggleGlissando;
             this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, fillGlyph);
 
             break;
