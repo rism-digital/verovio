@@ -1833,13 +1833,14 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
 
     switch (gliss->GetLform()) {
         case LINEFORM_wavy: {
-            const Point orig(x1, y1);
             const int length = static_cast<int>(hypot(x2 - x1, y2 - y1));
             const double angle = RadToDeg(atan2(y1 - y2, x2 - x1));
             // Smufl glyphs are horizontal - Rotate them counter clockwise
             dc->RotateGraphic(Point(ToDeviceContextX(x1), ToDeviceContextY(y1)), angle);
 
             const wchar_t fillGlyph = SMUFL_EAAF_wiggleGlissando;
+            const int height = m_doc->GetGlyphHeight(fillGlyph, staff->m_drawingStaffSize, false);
+            const Point orig(x1, y1 - height / 2);
             this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, fillGlyph);
 
             break;
