@@ -579,11 +579,11 @@ int Slur::AdjustCrossStaffContent(FunctorParams *functorParams)
 
             // Apply the shift
             if ((curve->GetAlignment() == topStaff->GetAlignment()) && (curve->GetDir() == curvature_CURVEDIR_below)) {
-                curve->SetDrawingYRel(curve->GetDrawingYRel() + shift);
+                curve->SetDrawingYRel(curve->GetDrawingYRel() + shift, true);
             }
             if ((curve->GetAlignment() == bottomStaff->GetAlignment())
                 && (curve->GetDir() == curvature_CURVEDIR_above)) {
-                curve->SetDrawingYRel(curve->GetDrawingYRel() - shift);
+                curve->SetDrawingYRel(curve->GetDrawingYRel() - shift, true);
             }
         }
     }

@@ -326,16 +326,18 @@ void FloatingPositioner::SetDrawingXRel(int drawingXRel)
     m_drawingXRel = drawingXRel;
 }
 
-void FloatingPositioner::SetDrawingYRel(int drawingYRel)
+void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
 {
-    ResetCachedDrawingY();
+    bool setValue = force;
     if (m_place == STAFFREL_above) {
-        if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
-    }
-    else if (m_place == STAFFREL_below) {
-        if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
+        if (drawingYRel < m_drawingYRel) setValue = true;
     }
     else {
+        if (drawingYRel > m_drawingYRel) setValue = true;
+    }
+
+    if (setValue) {
+        ResetCachedDrawingY();
         m_drawingYRel = drawingYRel;
     }
 }

@@ -217,7 +217,7 @@ public:
      */
     ///@{
     int GetDrawingYRel() const { return m_drawingYRel; }
-    virtual void SetDrawingYRel(int drawingYRel);
+    virtual void SetDrawingYRel(int drawingYRel, bool force = false);
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
     ///@}
