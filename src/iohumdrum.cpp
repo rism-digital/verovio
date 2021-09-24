@@ -10664,6 +10664,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             else {
                 setLocationId(artic, token);
             }
+            if (counts[i]) {
+                string id = artic->GetUuid();
+                id += "N";
+                id += to_string(j + 1);
+                artic->SetUuid(id);
+            }
             if (!color.empty()) {
                 artic->SetColor(color);
             }
