@@ -50,7 +50,7 @@ void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staff
     int height = std::max<int>(
         doc->GetOptions()->m_slurMinHeight.GetValue() * unit, dist / doc->GetOptions()->m_slurHeightFactor.GetValue());
     height = std::min<int>(doc->GetOptions()->m_slurMaxHeight.GetValue() * unit, height);
-    height *= sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 2.0;
+    height *= sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 3.0;
     height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
     height = std::min<int>(height, 2 * offset * cos(angle));
     this->SetControlHeight(height);

@@ -156,23 +156,9 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
-    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
 
-    // Find max/min value for the spanning elements within the slur
-    int extremeY = VRV_UNSET;
-    std::for_each(spannedElements->begin(), spannedElements->end(),
-        [dir = curve->GetDir(), &extremeY](CurveSpannedElement *element) {
-            if (dir == curvature_CURVEDIR_above) {
-                const int y = element->m_boundingBox->GetSelfTop();
-                extremeY = (extremeY == VRV_UNSET) ? y : std::max(y, extremeY);
-            }
-            else {
-                const int y = element->m_boundingBox->GetSelfBottom();
-                extremeY = (extremeY == VRV_UNSET) ? y : std::min(y, extremeY);
-            }
-        });
-    const int leftPointMaxHeight = extremeY - bezierCurve.p1.y;
-    const int rightPointMaxHeight = extremeY - bezierCurve.p2.y;
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
     for (auto spannedElement : *spannedElements) {
 
@@ -182,16 +168,16 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
 
         bool discard = false;
         const int intersection = curve->CalcAdjustment(spannedElement->m_boundingBox, discard, margin);
+        const int xMiddle
+            = (spannedElement->m_boundingBox->GetSelfLeft() + spannedElement->m_boundingBox->GetSelfRight()) / 2.0;
+        const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
 
-        // In case of cross-staff, intersection with the note that is in the staff directly under the start/end point
-        // might result in too big curve or strange slurs. If intersection is bigger than maximum height of the
-        // cross-staff slur, we should ignore it.
-        if (curve->IsCrossStaff()
-            && (intersection > std::max(std::abs(rightPointMaxHeight), std::abs(leftPointMaxHeight)))) {
-            discard = true;
-        }
-
-        if (discard) {
+        // In case of cross-staff, ignore obstacles which completely lie on the other side of the slur near the
+        // endpoints
+        const int elementHeight
+            = std::abs(spannedElement->m_boundingBox->GetSelfTop() - spannedElement->m_boundingBox->GetSelfBottom());
+        if (curve->IsCrossStaff() && (intersection > elementHeight + 4 * margin)
+            && (std::abs(distanceRatio - 0.5) > 0.45)) {
             spannedElement->m_discarded = true;
         }
     }
