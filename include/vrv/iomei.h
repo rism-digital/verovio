@@ -201,8 +201,13 @@ public:
      */
     ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
-    bool GetScoreBasedMEI() { return m_scoreBasedMEI; }
+    bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
     ///@}
+
+    /**
+     * Return true when the MEIOutput object is currently saving single page
+     */
+    bool IsSavingSinglePage() const { return (m_page != -1); }
 
     /**
      * Setter for indent for the MEI output (default is 3, -1 for tabs)

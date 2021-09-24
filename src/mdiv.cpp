@@ -84,12 +84,11 @@ int Mdiv::Save(FunctorParams *functorParams)
     assert(params);
 
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
-    if (m_visibility == Hidden && meiOutput && !meiOutput->GetScoreBasedMEI()) {
-        return FUNCTOR_SIBLINGS;
+    if (m_visibility == Hidden && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving a single score-based MEI page
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->IsSavingSinglePage()) return FUNCTOR_SIBLINGS;
     }
-    else {
-        return Object::Save(functorParams);
-    }
+    return Object::Save(functorParams);
 }
 
 int Mdiv::SaveEnd(FunctorParams *functorParams)
@@ -98,12 +97,11 @@ int Mdiv::SaveEnd(FunctorParams *functorParams)
     assert(params);
 
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
-    if (m_visibility == Hidden && meiOutput && !meiOutput->GetScoreBasedMEI()) {
-        return FUNCTOR_SIBLINGS;
+    if (m_visibility == Hidden && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving a single score-based MEI page
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->IsSavingSinglePage()) return FUNCTOR_SIBLINGS;
     }
-    else {
-        return Object::SaveEnd(functorParams);
-    }
+    return Object::SaveEnd(functorParams);
 }
 
 int Mdiv::ConvertToPageBased(FunctorParams *functorParams)

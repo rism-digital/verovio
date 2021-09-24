@@ -168,7 +168,10 @@ bool MEIOutput::Export()
     try {
         pugi::xml_document meiDoc;
 
-        if (m_page < 0) {
+        // Saving the entire document
+        // * With score-based MEI, all mdivs are saved
+        // * With page-based MEI, only visible mdivs are saved
+        if (!this->IsSavingSinglePage()) {
             pugi::xml_node decl = meiDoc.prepend_child(pugi::node_declaration);
             decl.append_attribute("version") = "1.0";
             decl.append_attribute("encoding") = "UTF-8";
@@ -200,9 +203,18 @@ bool MEIOutput::Export()
             // Redo the mensural segment cast of if necessary
             m_doc->ConvertToCastOffMensuralDoc(true);
         }
-        else {
+        // Saving a single page
+        // * This score-based MEI only
+        // * A single <score> element is saved without an MEI header
+        // * Saving a single page with --mdiv-all is not possible
+        // * All hidden mdivs are not saved when saving a single page in score-based MEI
+        else if (m_scoreBasedMEI) {
             if (m_doc->IsMensuralMusicOnly()) {
                 LogError("MEI output by page is not possible for mensural music");
+                return false;
+            }
+            if (m_doc->GetOptions()->m_mdivAll.GetValue()) {
+                LogError("MEI output by page is not possible for with --mdiv-all enabled");
                 return false;
             }
             if (m_page >= m_doc->GetPageCount()) {
@@ -213,18 +225,18 @@ bool MEIOutput::Export()
             assert(pages);
             Page *page = dynamic_cast<Page *>(pages->GetChild(m_page));
             assert(page);
-            if (m_scoreBasedMEI) {
-                m_currentNode = meiDoc.append_child("score");
-                m_currentNode = m_currentNode.append_child("section");
-                m_nodeStack.push_back(m_currentNode);
-                // First save the main scoreDef
-                m_doc->GetCurrentScoreDef()->Save(this);
-            }
-            else {
-                m_currentNode = meiDoc.append_child("pages");
-            }
+
+            m_currentNode = meiDoc.append_child("score");
+            m_currentNode = m_currentNode.append_child("section");
+            m_nodeStack.push_back(m_currentNode);
+            // First save the main scoreDef
+            m_doc->GetCurrentScoreDef()->Save(this);
 
             page->Save(this);
+        }
+        else {
+            LogError("MEI output by page is not possible in page-based MEI");
+            return false;
         }
 
         unsigned int output_flags = pugi::format_default;
