@@ -97,7 +97,16 @@ int PageElementEnd::CastOffPages(FunctorParams *functorParams)
     assert(params);
 
     assert(params->m_currentPage);
-    this->MoveItselfTo(params->m_currentPage);
+
+    PageElementEnd *endBoundary = dynamic_cast<PageElementEnd *>(params->m_contentPage->Relinquish(this->GetIdx()));
+    // End boundaries can be added to the page only if the pending list is empty
+    // Otherwise we are going to mess up the order
+    if (params->m_pendingPageElements.empty()) {
+        params->m_currentPage->AddChild(endBoundary);
+    }
+    else {
+        params->m_pendingPageElements.push_back(endBoundary);
+    }
 
     return FUNCTOR_SIBLINGS;
 }
