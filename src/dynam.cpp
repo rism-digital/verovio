@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "rend.h"
 #include "smufl.h"
 #include "text.h"
 #include "verticalaligner.h"
@@ -104,15 +105,15 @@ std::wstring Dynam::GetSymbolStr() const
 int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
 {
     if (this->HasEnclose()) {
-        Text *open = new Text();
-        Text *close = new Text();
+        Rend *open = new Rend();
+        Rend *close = new Rend();
         std::wstring openElement, closeElement;
         switch (this->GetEnclose()) {
             case ENCLOSURE_brack: {
                 openElement.assign(L"[");
                 closeElement.assign(L"]");
                 break;
-            }   
+            }
             case ENCLOSURE_paren: {
                 openElement.assign(L"(");
                 closeElement.assign(L")");
@@ -120,13 +121,21 @@ int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
             }
             default: break;
         }
-        // If both opening/closing element are set - add them to the start and end of the dynam
+        // If both opening/closing element are set - add them to the start and end of the dynam. Apply normal fontstyle
+        // to both, so that brackets are not inclined
         if (!openElement.empty() && !closeElement.empty()) {
-            open->SetText(openElement);
+            // Add opening bracket to the start of the dynam
+            Text *leftBracket = new Text();
+            leftBracket->SetText(openElement);
+            open->AddChild(leftBracket);
             open->SetParent(this);
+            open->SetFontstyle(FONTSTYLE_normal);
             this->InsertChild(open, 0);
-
-            close->SetText(closeElement);
+            // Add closing bracket at the end
+            Text *rightBracket = new Text();
+            rightBracket->SetText(closeElement);
+            close->AddChild(rightBracket);
+            close->SetFontstyle(FONTSTYLE_normal);
             this->AddChild(close);
         }
         else {
