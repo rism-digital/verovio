@@ -12399,12 +12399,10 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
     }
 
     if (symbol.empty()) {
-/*
         Text *text = new Text();
-	std::wstring value = UTF8to16(name2);
+        std::wstring value = UTF8to16(name2);
         text->SetText(value);
         label->AddChild(text);
-*/
     }
     else {
         if (!prestring.empty()) {
@@ -17584,6 +17582,9 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
             ss[staffindex].m_notehead += value[i];
         }
     }
+    else if (value == "*Xhead") {
+        ss[staffindex].m_notehead = "regular";
+    }
 }
 
 //////////////////////////////
@@ -19189,6 +19190,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     if (!head.empty()) {
         // See https://music-encoding.org/guidelines/v4/data-types/data.headshape.list.html
         // not all available in veorvio yet.
+        if (head == "invis") {
+            note->SetHeadVisible(BOOLEAN_false);
+        }
         if (head == "x") {
             note->SetHeadShape(HEADSHAPE_x);
         }
