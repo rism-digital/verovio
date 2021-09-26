@@ -40,7 +40,7 @@ public:
      * See MEIInput::ReadText and MEIInput ::WriteText
      */
     ///@{
-    void SetText(std::wstring text) { m_text = text; }
+    void SetText(const std::wstring &text) { m_text = text; }
     std::wstring GetText() const { return m_text; }
     ///@}
 
