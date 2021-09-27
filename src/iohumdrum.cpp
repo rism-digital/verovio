@@ -5178,6 +5178,7 @@ void HumdrumInput::setInstrumentName(ELEMENT *element, const std::string &name, 
     if (labeltok) {
         setLocationId(label, labeltok);
     }
+    label->SetParent(element);
     element->InsertChild(label, 0);
 }
 
@@ -5213,6 +5214,7 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
     std::wstring name16 = UTF8to16(name8);
     text->SetText(name16);
     label->AddChild(text);
+    label->SetParent(element);
     element->InsertChild(label, 0);
 }
 
