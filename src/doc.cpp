@@ -1579,6 +1579,12 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
     return &m_drawingLyricFont;
 }
 
+FontInfo *Doc::GetFingeringFont(int staffSize)
+{
+    m_fingeringFont.SetPointSize(m_fingeringFontSize * staffSize / 100);
+    return &m_fingeringFont;
+}
+
 double Doc::GetLeftMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_options->m_leftMarginAccid.GetValue();
@@ -1784,6 +1790,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // values for fonts
     m_drawingSmuflFontSize = CalcMusicFontSize();
     m_drawingLyricFontSize = m_options->m_unit.GetValue() * m_options->m_lyricSize.GetValue();
+    m_fingeringFontSize = m_options->m_unit.GetValue() * m_options->m_fingeringSize.GetValue();
 
     glyph_size = GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 

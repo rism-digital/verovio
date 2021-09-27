@@ -635,6 +635,7 @@ public:
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
     OptionBool m_breaksNoWidow;
+    OptionDbl m_fingeringSize;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;

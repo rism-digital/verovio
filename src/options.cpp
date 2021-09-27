@@ -1117,6 +1117,10 @@ Options::Options()
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
+    m_fingeringSize.SetInfo("Fingering size", "The fingering size in MEI units");
+    m_fingeringSize.Init(3.5, 2.0, 8.0);
+    this->Register(&m_fingeringSize, "fingeringSize", &m_generalLayout);
+
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
