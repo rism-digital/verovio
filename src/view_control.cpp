@@ -1719,6 +1719,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
     dc->StartGraphic(fing, "", fing->GetUuid());
 
     FontInfo fingTxt;
+    fingTxt.SetWeight(FONTWEIGHT_bold);
     if (!dc->UseGlobalStyling()) {
         fingTxt.SetFaceName("Times");
     }
@@ -1737,8 +1738,9 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
         params.m_boxedRend.clear();
         params.m_y = fing->GetDrawingY();
-
-        fingTxt.SetPointSize(m_doc->GetFingeringFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+        params.m_pointSize = m_doc->GetFingeringFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+        
+        fingTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&fingTxt);
