@@ -22575,7 +22575,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     bool ending = false;
     bool fakenum = false;
     bool newsection = false;
-    if (isdigit(currentsection.back())) {
+    if ((currentsection.size() > 0) && isdigit(currentsection.back())) {
         hum::HTp withnum = m_sectionlabels[startline];
         hum::HTp nonum = m_numberlesslabels[startline];
         std::string withnumstr;
@@ -22642,7 +22642,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
-    else if ((!fakenum) && isdigit(currentsection.back())) {
+    else if ((!fakenum) && (currentsection.size() > 0) && isdigit(currentsection.back())) {
         // inside a current ending
         m_currentending->AddChild(m_measure);
     }
