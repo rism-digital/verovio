@@ -1949,6 +1949,7 @@ void MEIOutput::WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest)
     multiRest->WriteColor(currentNode);
     multiRest->WriteMultiRestVis(currentNode);
     multiRest->WriteNumbered(currentNode);
+    multiRest->WriteNumberPlacement(currentNode);
     multiRest->WriteWidth(currentNode);
 }
 
@@ -5502,6 +5503,7 @@ bool MEIInput::ReadMultiRest(Object *parent, pugi::xml_node multiRest)
     vrvMultiRest->ReadColor(multiRest);
     vrvMultiRest->ReadMultiRestVis(multiRest);
     vrvMultiRest->ReadNumbered(multiRest);
+    vrvMultiRest->ReadNumberPlacement(multiRest);
     vrvMultiRest->ReadWidth(multiRest);
 
     parent->AddChild(vrvMultiRest);
