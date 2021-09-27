@@ -1719,7 +1719,6 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
     dc->StartGraphic(fing, "", fing->GetUuid());
 
     FontInfo fingTxt;
-    fingTxt.SetWeight(FONTWEIGHT_bold);
     if (!dc->UseGlobalStyling()) {
         fingTxt.SetFaceName("Times");
     }
