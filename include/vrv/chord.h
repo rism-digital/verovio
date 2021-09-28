@@ -139,7 +139,7 @@ public:
      * Check if the chord or one of its children is visible
      */
     bool IsVisible();
-    
+
     /**
      * Return true if the chord has two notes with 1 diatonic step difference
      */
