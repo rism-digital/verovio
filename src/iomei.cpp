@@ -208,7 +208,7 @@ bool MEIOutput::Export()
         // * A single <score> element is saved without an MEI header
         // * Saving a single page with --mdiv-all is not possible
         // * All hidden mdivs are not saved when saving a single page in score-based MEI
-        else if (m_scoreBasedMEI) {
+        else if (this->IsScoreBasedMEI()) {
             if (m_doc->IsMensuralMusicOnly()) {
                 LogError("MEI output by page is not possible for mensural music");
                 return false;
@@ -281,7 +281,7 @@ bool MEIOutput::WriteObject(Object *object)
     }
 
     if (object->Is(MDIV)) {
-        if (!m_scoreBasedMEI || (m_page < 0)) {
+        if (this->IsPageBasedMEI() || !this->IsSavingSinglePage()) {
             m_currentNode = m_currentNode.append_child("mdiv");
             WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
         }
@@ -290,7 +290,7 @@ bool MEIOutput::WriteObject(Object *object)
         }
     }
     else if (object->Is(PAGES)) {
-        if (!m_scoreBasedMEI) {
+        if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("pages");
             WritePages(m_currentNode, dynamic_cast<Pages *>(object));
         }
@@ -299,7 +299,7 @@ bool MEIOutput::WriteObject(Object *object)
         }
     }
     else if (object->Is(SCORE)) {
-        if (!m_scoreBasedMEI || (m_page < 0)) {
+        if (this->IsPageBasedMEI() || !this->IsSavingSinglePage()) {
             m_currentNode = m_currentNode.append_child("score");
             WriteScore(m_currentNode, dynamic_cast<Score *>(object));
         }
@@ -310,7 +310,7 @@ bool MEIOutput::WriteObject(Object *object)
 
     // Page and content
     else if (object->Is(PAGE)) {
-        if (!m_scoreBasedMEI) {
+        if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("page");
             WritePage(m_currentNode, dynamic_cast<Page *>(object));
         }
@@ -319,7 +319,7 @@ bool MEIOutput::WriteObject(Object *object)
         }
     }
     else if (object->Is(SYSTEM)) {
-        if (!m_scoreBasedMEI) {
+        if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("system");
             WriteSystem(m_currentNode, dynamic_cast<System *>(object));
         }
@@ -792,7 +792,7 @@ bool MEIOutput::WriteObject(Object *object)
 
     // SystemElementEnd - nothing to add - only
     else if (object->Is(SYSTEM_ELEMENT_END)) {
-        if (!m_scoreBasedMEI) {
+        if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("systemElementEnd");
             WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
         }
@@ -802,7 +802,7 @@ bool MEIOutput::WriteObject(Object *object)
     }
     // PageElementEnd - nothing to add - only
     else if (object->Is(PAGE_ELEMENT_END)) {
-        if (!m_scoreBasedMEI) {
+        if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("pageElementEnd");
             WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
         }
@@ -837,14 +837,14 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         return true;
     }
 
-    if (m_scoreBasedMEI) {
+    if (this->IsScoreBasedMEI()) {
+        // In score-based MEI, page, pages and system are not written.
         if (object->Is({ PAGE, PAGES, SYSTEM })) {
             return true;
         }
-        if (object->Is({ MDIV, SCORE })) {
-            if (m_page >= 0) {
-                return true;
-            }
+        // When saving a single page, mdiv and score object are not written.
+        if (object->Is({ MDIV, SCORE }) && this->IsSavingSinglePage()) {
+            return true;
         }
 
         // Merging boundaries into one xml element
@@ -942,21 +942,6 @@ bool MEIOutput::WriteDoc(Doc *doc)
         music.append_copy(m_doc->m_back.first_child());
     }
 
-    /*
-    if (m_scoreBasedMEI) {
-        m_currentNode = mdiv.append_child("score");
-        m_nodeStack.push_back(m_currentNode);
-        // First save the main scoreDef
-        m_doc->m_scoreDef.Save(this);
-    }
-    else {
-        // element to place the pages
-        m_currentNode = mdiv.append_child("pages");
-        m_currentNode.append_attribute("type") = DocTypeToStr(m_doc->GetType()).c_str();
-        m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
-    }
-     */
-
     return true;
 }
 
@@ -973,7 +958,7 @@ void MEIOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
 {
     assert(pages);
 
-    if (!m_scoreBasedMEI) {
+    if (this->IsPageBasedMEI()) {
         m_currentNode.append_attribute("type") = DocTypeToStr(m_doc->GetType()).c_str();
         m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
     }

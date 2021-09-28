@@ -210,6 +210,14 @@ public:
     bool IsSavingSinglePage() const { return (m_page != -1); }
 
     /**
+     * @name Gettersto improve code readability
+     */
+    ///@{
+    bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
+    bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
+    ///@}
+
+    /**
      * Setter for indent for the MEI output (default is 3, -1 for tabs)
      */
     void SetIndent(int indent) { m_indent = indent; }
