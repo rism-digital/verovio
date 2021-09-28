@@ -17,6 +17,7 @@
 #include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -139,10 +140,23 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     }
 
     int xRelShift = 0;
-    if (element->Is(STEM))
+    if (element->Is(STEM)) {
         xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
-    else
+        Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+        if (chord && chord->HasAdjacentNotes()) {
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            const int drawingUnit = doc->GetDrawingUnit(staffSize);
+            const int staffTop = staff->GetDrawingY();
+            const int staffBottom = staffTop - 2 * drawingUnit * (staff->m_drawingLines - 1);
+            if ((this->GetContentTop() > staffTop + 2 * drawingUnit)
+                || (this->GetContentBottom() < staffBottom - 2 * drawingUnit)) {
+                xRelShift += 2.5 * drawingUnit;
+            }
+        }
+    }
+    else {
         xRelShift = this->HorizontalRightOverlap(element, doc, horizontalMargin, verticalMargin);
+    }
 
     // Move only to the left
     if (xRelShift > 0) {

@@ -139,6 +139,11 @@ public:
      * Check if the chord or one of its children is visible
      */
     bool IsVisible();
+    
+    /**
+     * Return true if the chord has two notes with 1 diatonic step difference
+     */
+    bool HasAdjacentNotes();
 
     /**
      * Return true if the chord has at least one note with a @dots > 0
