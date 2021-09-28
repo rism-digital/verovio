@@ -83,7 +83,9 @@ Toolkit::Toolkit(bool initFont)
 
     m_editorToolkit = NULL;
 
+#ifndef NO_RUNTIME
     m_runtimeClock = NULL;
+#endif
 }
 
 Toolkit::~Toolkit()
@@ -100,10 +102,12 @@ Toolkit::~Toolkit()
         delete m_editorToolkit;
         m_editorToolkit = NULL;
     }
+#ifndef NO_RUNTIME
     if (m_runtimeClock) {
         delete m_runtimeClock;
         m_runtimeClock = NULL;
     }
+#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -1756,23 +1760,32 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
 
 void Toolkit::InitClock()
 {
+#ifndef NO_RUNTIME
     if (!m_runtimeClock) {
         m_runtimeClock = new RuntimeClock();
     }
+#else
+    LogError("Runtime clock is not supported in this build.");
+#endif
 }
 
 void Toolkit::ResetClock()
 {
+#ifndef NO_RUNTIME
     if (m_runtimeClock) {
         m_runtimeClock->Reset();
     }
     else {
         LogWarning("No clock available. Please call 'InitClock' to create one.");
     }
+#else
+    LogError("Runtime clock is not supported in this build.");
+#endif
 }
 
 double Toolkit::GetRuntimeInSeconds() const
 {
+#ifndef NO_RUNTIME
     if (m_runtimeClock) {
         return m_runtimeClock->GetSeconds();
     }
@@ -1780,10 +1793,15 @@ double Toolkit::GetRuntimeInSeconds() const
         LogWarning("No clock available. Please call 'InitClock' to create one.");
         return 0.0;
     }
+#else
+    LogError("Runtime clock is not supported in this build.");
+    return 0.0;
+#endif
 }
 
 void Toolkit::LogRuntime() const
 {
+#ifndef NO_RUNTIME
     if (m_runtimeClock) {
         double seconds = m_runtimeClock->GetSeconds();
         const int minutes = seconds / 60.0;
@@ -1798,6 +1816,9 @@ void Toolkit::LogRuntime() const
     else {
         LogWarning("No clock available. Please call 'InitClock' to create one.");
     }
+#else
+    LogError("Runtime clock is not supported in this build.");
+#endif
 }
 
 } // namespace vrv

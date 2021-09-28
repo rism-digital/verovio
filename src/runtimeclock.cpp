@@ -7,6 +7,8 @@
 
 #include "runtimeclock.h"
 
+#ifndef NO_RUNTIME
+
 //----------------------------------------------------------------------------
 
 namespace vrv {
@@ -33,3 +35,5 @@ double RuntimeClock::GetSeconds() const
 }
 
 } // namespace vrv
+
+#endif // NO_RUNTIME

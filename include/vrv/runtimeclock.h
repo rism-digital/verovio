@@ -8,6 +8,8 @@
 #ifndef __VRV_RUNTIMECLOCK_H__
 #define __VRV_RUNTIMECLOCK_H__
 
+#ifndef NO_RUNTIME
+
 #include <chrono>
 
 //----------------------------------------------------------------------------
@@ -48,4 +50,5 @@ private:
 
 } // namespace vrv
 
+#endif // NO_RUNTIME
 #endif // __VRV_RUNTIMECLOCK_H__

@@ -729,8 +729,10 @@ private:
 
     EditorToolkit *m_editorToolkit;
 
+#ifndef NO_RUNTIME
     /** Measuring runtime */
     RuntimeClock *m_runtimeClock;
+#endif
 
     //----------------//
     // Static members //
