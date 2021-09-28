@@ -116,6 +116,23 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
     if (element->Is(NOTE)) horizontalMargin = 3 * doc->GetDrawingStemWidth(staffSize);
 
+    if (Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+        element->Is(NOTE) && chord && chord->HasAdjacentNotes()) {
+        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        const int drawingUnit = doc->GetDrawingUnit(staffSize);
+        const int staffTop = staff->GetDrawingY();
+        const int staffHeight = 2 * drawingUnit * (staff->m_drawingLines - 1);
+        const int staffBottom = staffTop - staffHeight;
+        if (this->HorizontalContentOverlap(element, 0)) {
+            if (((this->GetContentTop() > staffTop + 2 * drawingUnit) && (this->GetDrawingY() < element->GetDrawingY()))
+                || ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+                    && (this->GetDrawingY() > element->GetDrawingY()))) {
+                int xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
+                if (xRelShift > 0) this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
+            }
+            return true;
+        }
+    }
     if (!this->VerticalSelfOverlap(element, verticalMargin)) return false;
 
     // Look for identical accidentals that needs to remain superimposed
@@ -142,17 +159,6 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     int xRelShift = 0;
     if (element->Is(STEM)) {
         xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
-        Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
-        if (chord && chord->HasAdjacentNotes()) {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            const int drawingUnit = doc->GetDrawingUnit(staffSize);
-            const int staffTop = staff->GetDrawingY();
-            const int staffBottom = staffTop - 2 * drawingUnit * (staff->m_drawingLines - 1);
-            if ((this->GetContentTop() > staffTop + 2 * drawingUnit)
-                || (this->GetContentBottom() < staffBottom - 2 * drawingUnit)) {
-                xRelShift += 2.5 * drawingUnit;
-            }
-        }
     }
     else {
         xRelShift = this->HorizontalRightOverlap(element, doc, horizontalMargin, verticalMargin);
