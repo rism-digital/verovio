@@ -229,7 +229,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
 
-        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(mei|music|pages|score[^-])[\\s\\n>]"))) {
             return MEI;
         }
         if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
