@@ -2273,13 +2273,6 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
             return FUNCTOR_CONTINUE;
         }
-        if (params->m_interface->GetStart()->HasDescendant(this)
-            || this->HasDescendant(params->m_interface->GetStart())) {
-            return FUNCTOR_CONTINUE;
-        }
-        if (params->m_interface->GetEnd()->HasDescendant(this) || this->HasDescendant(params->m_interface->GetEnd())) {
-            return FUNCTOR_CONTINUE;
-        }
 
         params->m_elements.push_back(this);
     }

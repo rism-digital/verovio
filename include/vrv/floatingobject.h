@@ -217,7 +217,7 @@ public:
      */
     ///@{
     int GetDrawingYRel() const { return m_drawingYRel; }
-    virtual void SetDrawingYRel(int drawingYRel);
+    virtual void SetDrawingYRel(int drawingYRel, bool force = false);
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
     ///@}
@@ -282,9 +282,12 @@ public:
 
     /**
      * Update the curve parameters.
-     * Stored points are made relative to the curve darwingY.
+     * Stored points are made relative to the curve drawingY.
      */
+    ///@{
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+    void UpdatePoints(const BezierCurve &bezier);
+    ///@}
 
     /**
      * Moves bounding points vertically by a specified distance downward
@@ -301,7 +304,12 @@ public:
      * Calculate the adjustment needed for an element for the curve not to overlap with it.
      * Discard will be true if the element already fits.
      */
+    ///@{
     int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    // Refined version that returns the adjustments on the left and right hand side of the bounding box
+    std::pair<int, int> CalcLeftRightAdjustment(
+        BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    ///@}
 
     /**
      * @name Getters for the current parameters
