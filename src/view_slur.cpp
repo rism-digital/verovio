@@ -614,12 +614,12 @@ float View::CalcInitialSlur(
     // This might be refined later, since using the entire bounding box of a tie for collision avoidance with slurs is
     // coarse.
     ArrayOfFloatingPositioners tiePositioners = staff->GetAlignment()->FindAllFloatingPositioners(TIE);
-    if (startStaff && (startStaff != staff)) {
+    if (startStaff && (startStaff != staff) && startStaff->GetAlignment()) {
         const ArrayOfFloatingPositioners startTiePositioners
             = startStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
         std::copy(startTiePositioners.begin(), startTiePositioners.end(), std::back_inserter(tiePositioners));
     }
-    else if (endStaff && (endStaff != staff)) {
+    else if (endStaff && (endStaff != staff) && endStaff->GetAlignment()) {
         const ArrayOfFloatingPositioners endTiePositioners = endStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
         std::copy(endTiePositioners.begin(), endTiePositioners.end(), std::back_inserter(tiePositioners));
     }

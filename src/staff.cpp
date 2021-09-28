@@ -593,6 +593,13 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Staff::CastOffEncoding(FunctorParams *functorParams)
+{
+    // Staff alignments must be reset, otherwise they would dangle whenever they belong to a deleted system
+    m_staffAlignment = NULL;
+    return FUNCTOR_SIBLINGS;
+}
+
 int Staff::ResetDrawing(FunctorParams *functorParams)
 {
     m_timeSpanningElements.clear();
