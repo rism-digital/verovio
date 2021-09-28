@@ -368,7 +368,7 @@ protected:
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
-    void DrawTextBox(DeviceContext *dc, const std::vector<TextElement *> &boxedRend, const int staffSize);
+    void DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params, int staffSize);
 
     /**
      * @name Method for drawing Beam and FTrem.
@@ -534,6 +534,7 @@ protected:
         int staffSize = 100, bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100,
         std::optional<TextDrawingParams> params = std::nullopt);
+    void DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius);
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);

@@ -1480,7 +1480,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
             continue;
         }
 
-        params.m_boxedRend.clear();
+        params.m_enclosedRend.clear();
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -1503,7 +1503,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBox(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
+        DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(dir, this);
@@ -1554,7 +1554,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             continue;
         }
 
-        params.m_boxedRend.clear();
+        params.m_enclosedRend.clear();
         params.m_y = dynam->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -1585,7 +1585,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             dc->ResetFont();
             dc->ResetBrush();
         }
-        DrawTextBox(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
+        DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(dynam, this);
@@ -1735,7 +1735,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
             continue;
         }
 
-        params.m_boxedRend.clear();
+        params.m_enclosedRend.clear();
         params.m_y = fing->GetDrawingY();
 
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
@@ -1752,7 +1752,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBox(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
+        DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(fing, this);
@@ -1891,7 +1891,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             continue;
         }
 
-        params.m_boxedRend.clear();
+        params.m_enclosedRend.clear();
         params.m_y = harm->GetDrawingY();
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
@@ -1912,7 +1912,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             dc->ResetFont();
             dc->ResetBrush();
 
-            DrawTextBox(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
+            DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
         }
     }
 
@@ -2138,7 +2138,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
             continue;
         }
 
-        params.m_boxedRend.clear();
+        params.m_enclosedRend.clear();
         params.m_y = reh->GetDrawingY() + 3 * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -2154,7 +2154,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBox(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
+        DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(reh, this);
@@ -2193,7 +2193,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         }
 
         params.m_x = tempo->GetDrawingXRelativeToStaff((*staffIter)->GetN());
-        params.m_boxedRend.clear();
+        params.m_enclosedRend.clear();
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
@@ -2216,7 +2216,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         dc->ResetFont();
         dc->ResetBrush();
 
-        DrawTextBox(dc, params.m_boxedRend, (*staffIter)->m_drawingStaffSize);
+        DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
     }
 
     dc->EndGraphic(tempo, this);
@@ -2581,18 +2581,33 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->EndGraphic(ending, this);
 }
 
-void View::DrawTextBox(DeviceContext *dc, const std::vector<TextElement *> &boxedRend, const int staffSize)
+void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params, int staffSize)
 {
     assert(dc);
     const int lineThickness = m_options->m_textEnclosureThickness.GetValue() * staffSize;
 
-    for (const auto rend : boxedRend) {
-        const int y1 = rend->GetContentBottom() - staffSize / 2;
-        const int y2 = rend->GetContentTop() + staffSize;
+    for (const auto rend : params.m_enclosedRend) {
         int x1 = rend->GetContentLeft() - staffSize;
         int x2 = rend->GetContentRight() + staffSize;
+        int y1 = rend->GetContentBottom() - staffSize / 2;
+        int y2 = rend->GetContentTop() + staffSize;
 
-        DrawNotFilledRectangle(dc, x1, y1, x2, y2, lineThickness, 0);
+        if (params.m_enclose == TEXTRENDITION_box) {
+            DrawNotFilledRectangle(dc, x1, y1, x2, y2, lineThickness, 0);
+        }
+        else if (params.m_enclose == TEXTRENDITION_circle) {
+            const int width = std::abs(x2 - x1);
+            const int height = std::abs(y2 - y1);
+            if (width > height) {
+                y1 -= (width - height) / 2;
+                y2 += (width - height) / 2;
+            }
+            else if (height > width) {
+                x1 -= (height - width) / 2;
+                x2 += (height - width) / 2;
+            }
+            DrawNotFilledEllipse(dc, x1, y1, x2, y2, lineThickness);
+        }
     }
 }
 

@@ -357,10 +357,11 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
     }
 
-    if (rend->GetRend() == TEXTRENDITION_box) {
-        params.m_boxedRend.push_back(rend);
+    if ((rend->GetRend() == TEXTRENDITION_box) || (rend->GetRend() == TEXTRENDITION_circle)) {
+        params.m_enclosedRend.push_back(rend);
         params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
         params.m_explicitPosition = true;
+        params.m_enclose = rend->GetRend();
     }
 
     if (customFont) dc->ResetFont();
