@@ -3050,8 +3050,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         music = singlePageDoc.append_child("music");
         body = music.append_child("body");
         pugi::xml_node mdiv = body.append_child("mdiv");
-        // Copy the score to the new document. This is not very efficient but it is not possible move a node to another
-        // document. Nonetheless acceptable since we are dealing with a single page
+        // Copy the score to the new document. This is not very efficient but it is not possible to move a node to
+        // another document. Nonetheless acceptable since we are dealing with a single page
         mdiv.append_copy(root);
     }
     else {
