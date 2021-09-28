@@ -1768,7 +1768,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int firstLoc = note1->GetDrawingLoc();
     const int secondLoc = note2->GetDrawingLoc();
-    const int diff = (secondLoc - firstLoc) * unit; 
+    const int diff = (secondLoc - firstLoc) * unit;
     double angle = atan2(diff, (double)(x2 - x1));
 
     // only half at system breaks
@@ -1803,7 +1803,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             const int offset = note2->GetDrawingRadius(m_doc) + unit;
             x2 -= cos(angle) * offset;
             y2 = note2->GetDrawingY() - offset * sin(angle);
-        }        
+        }
     }
     else {
         // shorten it
