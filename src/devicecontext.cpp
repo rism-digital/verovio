@@ -30,11 +30,48 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
     c2 = BoundingBox::CalcPositionAfterRotation(c2, angle, rotationPoint);
 }
 
-void BezierCurve::CalculateControlPointOffset(Doc *doc, int staffSize)
+void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
 {
-    m_rightControlPointOffset = std::min(
-        (p2.x - p1.x) / doc->GetOptions()->m_slurControlPoints.GetValue(), doc->GetDrawingStaffSize(staffSize));
-    m_leftControlPointOffset = m_rightControlPointOffset;
+    const int dist = abs(p2.x - p1.x);
+    const int unit = doc->GetDrawingUnit(staffSize);
+
+    // Initialize offset
+    const double ratio = double(dist) / double(unit);
+    double baseVal = (ratio > 4.0) ? 2.0 : 5.0;
+    if ((ratio > 4.0) && (ratio < 32.0)) {
+        // interpolate baseVal between 5.0 and 2.0
+        baseVal = 7.0 - log2(ratio);
+    }
+    const int offset = dist / (baseVal + doc->GetOptions()->m_slurControlPoints.GetValue() / 5.0);
+    m_leftControlPointOffset = offset;
+    m_rightControlPointOffset = offset;
+
+    // Initialize height
+    int height = std::max<int>(
+        doc->GetOptions()->m_slurMinHeight.GetValue() * unit, dist / doc->GetOptions()->m_slurHeightFactor.GetValue());
+    height = std::min<int>(doc->GetOptions()->m_slurMaxHeight.GetValue() * unit, height);
+    height *= sqrt(doc->GetOptions()->m_slurCurveFactor.GetValue()) / 3.0;
+    height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
+    height = std::min<int>(height, 2 * offset * cos(angle));
+    this->SetControlHeight(height);
+}
+
+void BezierCurve::UpdateControlPointParams(curvature_CURVEDIR dir)
+{
+    m_leftControlPointOffset = c1.x - p1.x;
+    m_rightControlPointOffset = p2.x - c2.x;
+    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    m_leftControlHeight = sign * (c1.y - p1.y);
+    m_rightControlHeight = sign * (c2.y - p2.y);
+}
+
+void BezierCurve::UpdateControlPoints(curvature_CURVEDIR dir)
+{
+    c1.x = p1.x + m_leftControlPointOffset;
+    c2.x = p2.x - m_rightControlPointOffset;
+    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    c1.y = p1.y + sign * m_leftControlHeight;
+    c2.y = p2.y + sign * m_rightControlHeight;
 }
 
 //----------------------------------------------------------------------------

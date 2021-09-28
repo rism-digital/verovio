@@ -1264,7 +1264,7 @@ Options::Options()
     this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
-    m_slurMaxSlope.Init(20, 0, 60);
+    m_slurMaxSlope.Init(40, 0, 80);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
     m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");

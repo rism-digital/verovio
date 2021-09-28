@@ -901,10 +901,8 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         if (!curve->HasContentBB()) continue;
         positioners.push_back(curve);
 
-        bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
-        if (adjusted) {
-            params->m_adjusted = true;
-        }
+        slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
+
         if (curve->IsCrossStaff()) {
             params->m_crossStaffSlurs = true;
         }

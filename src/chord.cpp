@@ -853,18 +853,24 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
 
         const int shift = getShift(extremalStaves.back()) - getShift(extremalStaves.front());
 
-        // Add the shift to the stem length of the chord.
+        // Add the shift to the stem length of the chord
         Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));
         if (!stem) return FUNCTOR_CONTINUE;
 
         const int stemLen = stem->GetDrawingStemLen();
         if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
             stem->SetDrawingStemLen(stemLen - shift);
-            stem->SetDrawingYRel(stem->GetDrawingYRel() - shift);
         }
         else {
             stem->SetDrawingStemLen(stemLen + shift);
         }
+
+        // Reposition the stem
+        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+        Staff *rootStaff
+            = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.back() : extremalStaves.front();
+        stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));
 
         // Add the shift to the flag position
         Flag *flag = vrv_cast<Flag *>(stem->FindDescendantByType(FLAG));

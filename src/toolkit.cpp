@@ -70,6 +70,7 @@ char *Toolkit::m_humdrumBuffer = NULL;
 Toolkit::Toolkit(bool initFont)
 {
     m_inputFrom = AUTO;
+    m_outputTo = UNKNOWN;
 
     m_humdrumBuffer = NULL;
     m_cString = NULL;

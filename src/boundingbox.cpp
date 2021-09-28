@@ -714,12 +714,29 @@ pow (t, 3)* bezier[3].y;
 }
 */
 
+double BoundingBox::CalcBezierParamAtPosition(const Point bezier[4], int x)
+{
+    double left = (bezier[0].x <= bezier[3].x) ? 0.0 : 1.0;
+    double right = (bezier[0].x <= bezier[3].x) ? 1.0 : 0.0;
+    for (int i = 0; i < 12; ++i) {
+        const double middle = (left + right) / 2.0;
+        Point p = BoundingBox::CalcDeCasteljau(bezier, middle);
+        if (p.x < x) {
+            left = middle;
+        }
+        else if (p.x > x) {
+            right = middle;
+        }
+        else {
+            return middle;
+        }
+    }
+    return (left + right) / 2.0;
+}
+
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
 {
-    double t = 0.0;
-    // avoid division by 0
-    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
-    t = std::min(1.0, std::max(0.0, t));
+    const double t = BoundingBox::CalcBezierParamAtPosition(bezier, x);
 
     Point p = BoundingBox::CalcDeCasteljau(bezier, t);
 
