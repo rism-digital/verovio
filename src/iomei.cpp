@@ -227,7 +227,6 @@ bool MEIOutput::Export()
             assert(page);
 
             m_currentNode = meiDoc.append_child("score");
-            m_currentNode = m_currentNode.append_child("section");
             m_nodeStack.push_back(m_currentNode);
             // First save the main scoreDef
             m_doc->GetCurrentScoreDef()->Save(this);
