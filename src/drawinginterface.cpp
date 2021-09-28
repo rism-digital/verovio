@@ -167,6 +167,16 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
             m_crossStaffContent = staff;
             m_crossStaffRel = current->GetCrossStaffRel();
         }
+        // Check if some beam chord has cross staff content
+        else if (current->Is(CHORD)) {
+            Chord *chord = vrv_cast<Chord *>(current);
+            for (Note *note : { chord->GetTopNote(), chord->GetBottomNote() }) {
+                if (note->m_crossStaff && (note->m_crossStaff != m_beamStaff)) {
+                    m_crossStaffContent = note->m_crossStaff;
+                    m_crossStaffRel = note->GetCrossStaffRel();
+                }
+            }
+        }
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
