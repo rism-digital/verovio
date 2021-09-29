@@ -664,8 +664,7 @@ public:
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
-    OptionInt m_slurControlPoints;
-    OptionInt m_slurCurveFactor;
+    OptionDbl m_slurCurveFactor;
     OptionInt m_slurHeightFactor;
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;

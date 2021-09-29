@@ -1242,13 +1242,8 @@ Options::Options()
     m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
 
-    m_slurControlPoints.SetInfo(
-        "Slur control points", "Slur control points - higher value means more curved at the end");
-    m_slurControlPoints.Init(5, 1, 10);
-    this->Register(&m_slurControlPoints, "slurControlPoints", &m_generalLayout);
-
     m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
-    m_slurCurveFactor.Init(10, 1, 100);
+    m_slurCurveFactor.Init(1.0, 0.2, 5.0);
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
     m_slurHeightFactor.SetInfo("Slur height factor", "Slur height factor -  high value means flatter slurs");
