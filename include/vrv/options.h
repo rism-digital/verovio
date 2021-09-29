@@ -665,6 +665,7 @@ public:
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionDbl m_slurCurveFactor;
+    OptionDbl m_slurMargin;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMidpointThickness;

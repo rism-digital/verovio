@@ -1246,6 +1246,10 @@ Options::Options()
     m_slurCurveFactor.Init(1.0, 0.2, 5.0);
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
+    m_slurMargin.SetInfo("Slur margin", "Slur safety distance in MEI units to obstacles");
+    m_slurMargin.Init(1.0, 0.1, 4.0);
+    this->Register(&m_slurMargin, "slurMargin", &m_generalLayout);
+
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
     m_slurMaxSlope.Init(40, 0, 80);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
