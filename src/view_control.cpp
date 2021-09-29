@@ -1766,7 +1766,6 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
-    double slope = 0.0;
 
     /************** parent layers **************/
 
@@ -1779,41 +1778,50 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         return;
     }
 
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int firstLoc = note1->GetDrawingLoc();
     const int secondLoc = note2->GetDrawingLoc();
-    if (x1 != x2) slope = (secondLoc - firstLoc) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / (double)(x2 - x1);
+    const int diff = (secondLoc - firstLoc) * unit;
+    double angle = atan2(diff, (double)(x2 - x1));
 
     // only half at system breaks
-    if (spanningType != SPANNING_START_END) slope = slope / 2;
+    if (spanningType != SPANNING_START_END) angle = angle / 2;
 
     // the normal case
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
-        x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
+        double slope = 0.0;
+        if (x1 != x2) slope = diff / (double)(x2 - x1);
+        int offset = note1->GetDrawingRadius(m_doc) + unit;
         if ((note1->GetDots() > 0) && (abs(slope) < 1.0)) {
-            x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
-            y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots() * slope;
+            offset += 1.5 * unit * note1->GetDots();
         }
-        else {
-            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
-        }
+        x1 += cos(angle) * offset;
+        y1 = note1->GetDrawingY() + offset * sin(angle);
     }
     else {
-        y1 = note2->GetDrawingY() - (x2 - x1) * slope;
+        y1 = note2->GetDrawingY() - (x2 - x1) * sin(angle);
     }
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
-        x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        y2 = note2->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
-        if (note2->GetDrawingAccid()) {
-            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
+        if (Accid *accid = note2->GetDrawingAccid(); accid) {
+            const int dist = x2 - accid->GetContentLeft() + 0.5 * unit;
+            x2 -= dist;
+            y2 = note2->GetDrawingY() - dist * tan(angle);
+            while (((firstLoc > secondLoc) && (y2 + 0.5 * unit * sin(angle) > accid->GetContentTop()))
+                || ((secondLoc > firstLoc) && (y2 + 0.5 * unit * sin(angle) < accid->GetContentBottom()))) {
+                y2 += unit * sin(angle);
+                x2 += unit * cos(angle);
+            }
+        }
+        else {
+            const int offset = note2->GetDrawingRadius(m_doc) + unit;
+            x2 -= cos(angle) * offset;
+            y2 = note2->GetDrawingY() - offset * sin(angle);
         }
     }
     else {
         // shorten it
-        x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y2 = y1 + (x2 - x1) * slope;
+        x2 -= unit;
+        y2 = y1 + (x2 - x1) * sin(angle);
     }
 
     int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.5;
@@ -1844,8 +1852,27 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         dc->StartGraphic(gliss, "", gliss->GetUuid(), false);
     }
 
-    // only solid lines for now
-    DrawRoundedLine(dc, x1, y1, x2, y2, lineWidth);
+    switch (gliss->GetLform()) {
+        case LINEFORM_wavy: {
+            const int length = static_cast<int>(hypot(x2 - x1, y2 - y1));
+            const double angle = RadToDeg(atan2(y1 - y2, x2 - x1));
+            // Smufl glyphs are horizontal - Rotate them counter clockwise
+            dc->RotateGraphic(Point(ToDeviceContextX(x1), ToDeviceContextY(y1)), angle);
+
+            const wchar_t glissGlyph = SMUFL_EAAF_wiggleGlissando;
+            const int height = m_doc->GetGlyphHeight(glissGlyph, staff->m_drawingStaffSize, false);
+            const Point orig(x1, y1 - height / 2);
+            this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, glissGlyph);
+
+            break;
+        }
+        case LINEFORM_solid:
+        default: {
+            // only solid lines for now
+            DrawRoundedLine(dc, x1, y1, x2, y2, lineWidth);
+            break;
+        }
+    }
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);

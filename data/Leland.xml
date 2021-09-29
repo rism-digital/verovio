@@ -454,6 +454,9 @@
 		<a n="stemDownNW" x="0" y="0"/>
 		<a n="stemUpSE" x="1.372" y="0"/>
 	</g>
+	<g c="EAA4" x="-27.0" y="117.0" w="264.0" h="164.0" h-a-x="220" >
+		<a n="repeatOffset" x="0.88" y="0"/>
+	</g>
 	<g c="EAA9" x="-22.0" y="0.0" w="264.0" h="164.0" h-a-x="220" >
 		<a n="repeatOffset" x="0.88" y="0"/>
 	</g>
