@@ -621,11 +621,11 @@ protected:
     int m_currentColour;
 
     /**
-     * Values to adjust tie/slur thickness by to have proper MEI values for thickness
+     * Values to adjust tie/slur thickness to have proper MEI values for thickness
      */
     ///@{
-    double m_tieThicknessCoeficient;
-    double m_slurThicknessCoeficient;
+    double m_tieThicknessCoefficient;
+    double m_slurThicknessCoefficient;
     ///@}
 
     /**

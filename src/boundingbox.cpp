@@ -762,7 +762,7 @@ Point BoundingBox::CalcPointAtBezier(const Point bezier[4], double t)
     return midPoint;
 }
 
-double BoundingBox::GetBezierThicknessCoeficient(
+double BoundingBox::GetBezierThicknessCoefficient(
     const Point bezier[4], int currentThickness, double angle, int penWidth)
 {
     Point top[4], bottom[4];
