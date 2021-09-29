@@ -3040,24 +3040,12 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     pugi::xml_node pages;
     pugi::xml_node back;
 
-    // single-page doc
-    pugi::xml_document singlePageDoc;
-
     if (std::string(root.name()) == "music") {
         music = root;
-    }
-    else if (std::string(root.name()) == "score") {
-        music = singlePageDoc.append_child("music");
-        body = music.append_child("body");
-        pugi::xml_node mdiv = body.append_child("mdiv");
-        // Copy the score to the new document. This is not very efficient but it is not possible move a node to another
-        // document. Nonetheless acceptable since we are dealing with a single page
-        mdiv.append_copy(root);
     }
     else {
         music = root.child("music");
     }
-
     if (music.empty()) {
         LogError("No <music> element found in the MEI data");
         return false;
