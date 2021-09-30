@@ -21,10 +21,13 @@ namespace vrv {
 
 static ClassRegistrar<Course> s_factory("course", COURSE);
 
-Course::Course() : Object("course-"), AttNNumberLike()
+Course::Course() : Object("course-")
 {
+    RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_NNUMBERLIKE);
-
+    RegisterAttClass(ATT_OCTAVE);
+    RegisterAttClass(ATT_PITCH);
+    
     Reset();
 }
 
@@ -33,7 +36,10 @@ Course::~Course() {}
 void Course::Reset()
 {
     Object::Reset();
+    ResetAccidental();
     ResetNNumberLike();
+    ResetOctave();
+    ResetPitch();
 }
 
 bool Course::IsSupportedChild(Object *child)

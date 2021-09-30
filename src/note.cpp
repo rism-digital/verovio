@@ -32,6 +32,7 @@
 #include "tabgrp.h"
 #include "tie.h"
 #include "transposition.h"
+#include "tuning.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -1256,7 +1257,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     if (note->HasPnum()) {
         pitch = note->GetPnum();
     }
-    else {
+    else if (note->HasPname() || note->HasPnameGes()){
         // calc pitch
         int midiBase = 0;
         data_PITCHNAME pname = note->GetPname();
@@ -1281,6 +1282,13 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         midiBase += params->m_transSemi;
 
         pitch = midiBase + (oct + 1) * 12;
+    }
+    else if (note->HasTabCourse()) {
+        // tablature
+        Staff* staff = vrv_cast<Staff *>(note->GetFirstAncestor(STAFF));
+        assert(staff);
+        if (staff->m_drawingTuning)
+            pitch = staff->m_drawingTuning->CalcPitchNumber(note->GetTabCourse(), note->GetTabFret(), staff->m_drawingNotationType);
     }
 
     // We do store the MIDIPitch in the note even with a sameas
