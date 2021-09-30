@@ -1252,6 +1252,12 @@
 		BDEF9ECA26725234008A3A47 /* caesura.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEF9EC626725234008A3A47 /* caesura.cpp */; };
 		BDEF9ECC26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
 		BDEF9ECD26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
+		E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
+		E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
+		E79ADDC726BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
+		E79ADDC826BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
+		E79ADDC926BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
+		E79ADDCA26BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
 		E79C87C3269440570098FE85 /* lv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79C87C2269440570098FE85 /* lv.cpp */; };
 		E79C87C4269440790098FE85 /* lv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79C87C2269440570098FE85 /* lv.cpp */; };
 		E79C87C52694407A0098FE85 /* lv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79C87C2269440570098FE85 /* lv.cpp */; };
@@ -1721,6 +1727,8 @@
 		BDC366C62576AF9300E4D826 /* grpsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grpsym.h; path = include/vrv/grpsym.h; sourceTree = "<group>"; };
 		BDEF9EC626725234008A3A47 /* caesura.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = caesura.cpp; path = src/caesura.cpp; sourceTree = "<group>"; };
 		BDEF9ECB26725248008A3A47 /* caesura.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = caesura.h; path = include/vrv/caesura.h; sourceTree = "<group>"; };
+		E79ADDC326BD1AE900527E4B /* runtimeclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = runtimeclock.h; path = include/vrv/runtimeclock.h; sourceTree = "<group>"; };
+		E79ADDC626BD645B00527E4B /* runtimeclock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = runtimeclock.cpp; path = src/runtimeclock.cpp; sourceTree = "<group>"; };
 		E79C87C1269440420098FE85 /* lv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lv.h; path = include/vrv/lv.h; sourceTree = "<group>"; };
 		E79C87C2269440570098FE85 /* lv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lv.cpp; path = src/lv.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2196,6 +2204,8 @@
 				8F59292418854BF800FE51AD /* object.h */,
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
 				4DA80D941A6940120089802D /* options.h */,
+				E79ADDC626BD645B00527E4B /* runtimeclock.cpp */,
+				E79ADDC326BD1AE900527E4B /* runtimeclock.h */,
 				4D1D733B1A1D0390001E08F6 /* smufl.h */,
 				4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
@@ -2513,6 +2523,7 @@
 				4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */,
 				4DB787662022F0BF00394520 /* jsonxx.h in Headers */,
 				E79C87C7269440800098FE85 /* lv.h in Headers */,
+				E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */,
 				8F59294918854BF800FE51AD /* multirest.h in Headers */,
 				8F59294A18854BF800FE51AD /* note.h in Headers */,
 				8F59294B18854BF800FE51AD /* object.h in Headers */,
@@ -2720,6 +2731,7 @@
 				BB4C4ACC22A932B6001F6AF0 /* pb.h in Headers */,
 				BB4C4B1222A932C8001F6AF0 /* expansion.h in Headers */,
 				BB4C4AC822A932B6001F6AF0 /* page.h in Headers */,
+				E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */,
 				4D2E758922BC2B25004C51F0 /* atts_frettab.h in Headers */,
 				BB4C4A9722A9328F001F6AF0 /* functorparams.h in Headers */,
 				BB4C4B0222A932BC001F6AF0 /* unclear.h in Headers */,
@@ -3138,6 +3150,7 @@
 				4D4C26EE1EF7E75400681770 /* label.cpp in Sources */,
 				4D1694331E3A44F300569BF4 /* section.cpp in Sources */,
 				4D1694341E3A44F300569BF4 /* MidiMessage.cpp in Sources */,
+				E79ADDC826BD645B00527E4B /* runtimeclock.cpp in Sources */,
 				4D1694351E3A44F300569BF4 /* editorial.cpp in Sources */,
 				4D1694361E3A44F300569BF4 /* tempo.cpp in Sources */,
 				4DA0EACC22BB779400A7EBEB /* zone.cpp in Sources */,
@@ -3234,6 +3247,7 @@
 				4DB3D8961F7C2B0E00B5FC2B /* lb.cpp in Sources */,
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
+				E79ADDC726BD645B00527E4B /* runtimeclock.cpp in Sources */,
 				40E1CEDE205060E20007C8AF /* labelabbr.cpp in Sources */,
 				4D674B46255F40B7008AEF4C /* plica.cpp in Sources */,
 				403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */,
@@ -3565,6 +3579,7 @@
 				4D2073F722A3BCE000E0765F /* tuning.cpp in Sources */,
 				4DB3D8F61F83D1DC00B5FC2B /* view_mensural.cpp in Sources */,
 				4DB3D8E41F83D16400B5FC2B /* elementpart.cpp in Sources */,
+				E79ADDC926BD645B00527E4B /* runtimeclock.cpp in Sources */,
 				8F3DD33818854B250051330C /* system.cpp in Sources */,
 				4D72A5E1208A37F0009DEC1E /* mnum.cpp in Sources */,
 				8F3DD32418854B090051330C /* io.cpp in Sources */,
@@ -3779,6 +3794,7 @@
 				BB4C4AEB22A932BC001F6AF0 /* editorial.cpp in Sources */,
 				BB4C4B8F22A932DF001F6AF0 /* text.cpp in Sources */,
 				BB4C4ADF22A932BC001F6AF0 /* annot.cpp in Sources */,
+				E79ADDCA26BD645B00527E4B /* runtimeclock.cpp in Sources */,
 				BB4C4B1522A932C8001F6AF0 /* systemelement.cpp in Sources */,
 				4DA0EACE22BB779400A7EBEB /* zone.cpp in Sources */,
 				BB4C4B5B22A932D7001F6AF0 /* mensur.cpp in Sources */,
