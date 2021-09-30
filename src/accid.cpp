@@ -116,7 +116,6 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
     if (element->Is(NOTE)) horizontalMargin = 3 * doc->GetDrawingStemWidth(staffSize);
 
-    
     if (!this->VerticalSelfOverlap(element, verticalMargin)) {
         if (Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
             element->Is(NOTE) && chord && chord->HasAdjacentNotes()) {
