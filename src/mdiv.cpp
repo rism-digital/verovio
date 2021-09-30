@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "iomei.h"
 #include "page.h"
 #include "pages.h"
 #include "score.h"
@@ -76,6 +77,32 @@ void Mdiv::MakeVisible()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Mdiv::Save(FunctorParams *functorParams)
+{
+    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
+    assert(params);
+
+    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
+    if (m_visibility == Hidden && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving a single score-based MEI page
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->IsSavingSinglePage()) return FUNCTOR_SIBLINGS;
+    }
+    return Object::Save(functorParams);
+}
+
+int Mdiv::SaveEnd(FunctorParams *functorParams)
+{
+    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
+    assert(params);
+
+    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
+    if (m_visibility == Hidden && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving a single score-based MEI page
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->IsSavingSinglePage()) return FUNCTOR_SIBLINGS;
+    }
+    return Object::SaveEnd(functorParams);
+}
 
 int Mdiv::ConvertToPageBased(FunctorParams *functorParams)
 {

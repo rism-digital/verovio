@@ -53,6 +53,15 @@ public:
     //----------//
 
     /**
+     * See Object::Save
+     * Invisible Mdiv elements are not saved in page-based MEI
+     */
+    ///@{
+    virtual int Save(FunctorParams *functorParams);
+    virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * See Object::ConvertToPageBased
      */
     ///@{
