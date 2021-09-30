@@ -225,13 +225,13 @@ int main(int argc, char **argv)
 
     static struct option base_options[] = { //
         { "all-pages", no_argument, 0, 'a' }, //
-        { "from", required_argument, 0, 'f' }, //
+        { "input-from", required_argument, 0, 'f' }, //
         { "help", no_argument, 0, 'h' }, //
         { "outfile", required_argument, 0, 'o' }, //
         { "page", required_argument, 0, 'p' }, //
         { "resources", required_argument, 0, 'r' }, //
         { "scale", required_argument, 0, 's' }, //
-        { "to", required_argument, 0, 't' }, //
+        { "output-to", required_argument, 0, 't' }, //
         { "version", no_argument, 0, 'v' }, //
         { "xml-id-seed", required_argument, 0, 'x' }, //
         // standard input - long options only or - as filename
