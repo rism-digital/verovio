@@ -246,6 +246,10 @@ public:
     void SetOverlap(int overlap);
     int GetOverlap() const { return m_overlap; }
     int GetStaffHeight() const { return m_staffHeight; }
+    void SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove);
+    BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
+    void SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom);
+    BoundingBox *GetOverflowBBoxBelow() const { return m_overflowBBoxBelow; }
     ///@}
 
     /**
@@ -366,6 +370,8 @@ private:
     int m_overflowBelow;
     int m_overlap;
     int m_staffHeight;
+    BoundingBox *m_overflowBBoxAbove;
+    BoundingBox *m_overflowBBoxBelow;
     ///@}
 
     /**
