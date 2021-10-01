@@ -377,6 +377,11 @@ int main(int argc, char **argv)
         exit(0);
     }
 
+    // Start the clock if desired
+    if (options->m_showRuntime.GetValue()) {
+        toolkit.InitClock();
+    }
+
     std::cerr << infile;
     if (optind <= argc - 1) {
         infile = std::string(argv[optind]);
@@ -649,6 +654,11 @@ int main(int argc, char **argv)
                 std::cerr << "Output written to " << outfile << "." << std::endl;
             }
         }
+    }
+
+    // Display runtime if desired
+    if (options->m_showRuntime.GetValue()) {
+        toolkit.LogRuntime();
     }
 
     free(long_options);

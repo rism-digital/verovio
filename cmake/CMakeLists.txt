@@ -18,6 +18,7 @@ option(NO_MUSICXML_SUPPORT      "Disable MusicXML support"                     O
 option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
+option(NO_RUNTIME               "Disable runtime clock support"                ON)
 option(BUILD_AS_LIBRARY         "Build verovio as library"                     OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
@@ -132,6 +133,10 @@ else()
     if (MUSICXML_DEFAULT_HUMDRUM)
         add_definitions(-DMUSICXML_DEFAULT_HUMDRUM)
     endif()
+endif()
+
+if(NO_RUNTIME)
+    add_definitions(-DNO_RUNTIME)
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")

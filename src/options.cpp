@@ -1009,6 +1009,10 @@ Options::Options()
     m_removeIds.Init(false);
     this->Register(&m_removeIds, "removeIds", &m_general);
 
+    m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
+    m_showRuntime.Init(false);
+    this->Register(&m_showRuntime, "showRuntime", &m_general);
+
     m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
     m_shrinkToFit.Init(false);
     this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
