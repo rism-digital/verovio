@@ -3459,6 +3459,10 @@ bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
 
 bool MEIInput::ReadSb(Object *parent, pugi::xml_node sb)
 {
+    // Consider a <sb> to be enough as an indication that we have layout encoded information
+    // This is debatable because having a <pb> might be seen as a requirement for this
+    m_hasLayoutInformation = true;
+
     Sb *vrvSb = new Sb();
     ReadSystemElement(sb, vrvSb);
 
