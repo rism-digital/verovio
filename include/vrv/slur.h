@@ -14,6 +14,19 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// ControlPointConstraint
+//----------------------------------------------------------------------------
+/**
+ * This represents a constraint ax + by >= c where x and y are
+ * vertical control point adjustments
+ */
+struct ControlPointConstraint {
+    double a;
+    double b;
+    double c;
+};
+
+//----------------------------------------------------------------------------
 // Slur
 //----------------------------------------------------------------------------
 
@@ -54,26 +67,9 @@ public:
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
 
-    bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
+    void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
-    int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, BezierCurve &bezierCurve,
-        curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
-
-    /**
-     * Adjust slur position based on overlapping objects within its spanning elements
-     */
-    bool AdjustSlurPosition(
-        Doc *doc, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, float &angle, bool forceBothSides);
-    /**
-     * Calculate slur left/right maximum shifts required for slur not to overlap with other objects
-     */
-    std::pair<int, int> CalculateAdjustedSlurShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
-        int margin, bool forceBothSides, bool &isNotAdjustable);
-
-    float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
-    void GetControlPoints(BezierCurve &curve, curvature_CURVEDIR curveDir, bool ignoreAngle = false);
-    void GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
-        curvature_CURVEDIR curveDir, int staffSize);
+    float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
 
     //----------//
     // Functors //
@@ -84,8 +80,50 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::AdjustCrossStaffContent
+     */
+    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
+
 private:
-    //
+    /**
+     * Adjust slur position based on overlapping objects within its spanning elements
+     */
+    ///@{
+    // Discard certain spanned elements
+    void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Calculate the vertical shift of the slur end points
+    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Calculate the horizontal control point offset
+    std::tuple<bool, int, int> CalcControlPointOffset(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Calculate the vertical control point shift
+    std::pair<int, int> CalcControlPointVerticalShift(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Solve the constraints for vertical control point adjustment
+    std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
+
+    // Improve the slur shape by adjusting the control point heights
+    void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
+    ///@}
+
+    /**
+     * Low level helper functions for slur adjustment
+     */
+    ///@{
+    // Shift end points for collisions nearby
+    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection) const;
+
+    // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
+    // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
+    // tan(atan(doublingBound) + degrees * PI / 180.0) ≈ 2.0 * doublingBound
+    double RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const;
+    ///@}
+
 public:
     //
 private:

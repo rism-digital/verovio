@@ -1184,7 +1184,7 @@ public:
     ///@{
 
     /**
-     * Fill a page by adding systems with the appropriate length.
+     * @name Fill a page by adding systems with the appropriate length.
      * At the end, add all the pending objects where reaching the end
      */
     ///@{
@@ -1193,9 +1193,12 @@ public:
     ///@}
 
     /**
-     *
+     * @name Fill a doc by adding pages with the appropriate length.
      */
+    ///@{
     virtual int CastOffPages(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CastOffPagesEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Cast off the document according to the encoding provided (pb and sb)

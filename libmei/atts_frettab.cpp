@@ -88,7 +88,7 @@ AttNoteGesTab::~AttNoteGesTab()
 void AttNoteGesTab::ResetNoteGesTab()
 {
     m_tabCourse = 0;
-    m_tabFret = 0;
+    m_tabFret = -1;
 }
 
 bool AttNoteGesTab::ReadNoteGesTab(pugi::xml_node element)
@@ -128,7 +128,7 @@ bool AttNoteGesTab::HasTabCourse() const
 
 bool AttNoteGesTab::HasTabFret() const
 {
-    return (m_tabFret != 0);
+    return (m_tabFret != -1);
 }
 
 /* include <atttab.fret> */

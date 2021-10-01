@@ -259,33 +259,28 @@ data_STAFFREL_basic LayerElement::GetCrossStaffRel()
 void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlignment *&below)
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Layer *crossLayer = NULL;
+    Staff *crossStaff = this->GetCrossStaff(crossLayer);
+    if (crossStaff) staff = crossStaff;
     assert(staff);
 
-    // By default use the alignment of the parent staff
+    // By default use the alignment of the staff
     above = staff->GetAlignment();
     below = above;
 
     // Chord and beam parent (if any)
-    Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD));
-    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
+    Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+    Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
 
-    Layer *crossLayer = NULL;
-    Staff *crossStaff = this->GetCrossStaff(crossLayer);
-
-    // By default for cross-staff element, use the cross-staff alignment
-    if (crossStaff && crossStaff->GetAlignment()) {
-        above = crossStaff->GetAlignment();
-        below = above;
-    }
     // Dots, flags and stems with cross-staff chords need special treatment
     if (this->Is({ DOTS, FLAG, STEM }) && chord && chord->HasCrossStaff()) {
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        if (staffAbove) {
+        if (staffAbove && (staffAbove->GetN() < staff->GetN())) {
             above = staffAbove->GetAlignment();
         }
-        if (staffBelow) {
+        if (staffBelow && (staffBelow->GetN() > staff->GetN())) {
             below = staffBelow->GetAlignment();
         }
     }
@@ -2271,13 +2266,6 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
         // We skip the start or end of the slur
         if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
-            return FUNCTOR_CONTINUE;
-        }
-        if (params->m_interface->GetStart()->HasDescendant(this)
-            || this->HasDescendant(params->m_interface->GetStart())) {
-            return FUNCTOR_CONTINUE;
-        }
-        if (params->m_interface->GetEnd()->HasDescendant(this) || this->HasDescendant(params->m_interface->GetEnd())) {
             return FUNCTOR_CONTINUE;
         }
 

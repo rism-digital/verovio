@@ -33,6 +33,7 @@
 #include "note.h"
 #include "options.h"
 #include "page.h"
+#include "runtimeclock.h"
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
@@ -82,6 +83,10 @@ Toolkit::Toolkit(bool initFont)
     m_options = m_doc.GetOptions();
 
     m_editorToolkit = NULL;
+
+#ifndef NO_RUNTIME
+    m_runtimeClock = NULL;
+#endif
 }
 
 Toolkit::~Toolkit()
@@ -98,6 +103,12 @@ Toolkit::~Toolkit()
         delete m_editorToolkit;
         m_editorToolkit = NULL;
     }
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        delete m_runtimeClock;
+        m_runtimeClock = NULL;
+    }
+#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -1757,6 +1768,69 @@ std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
     return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
 #else
     return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
+#endif
+}
+
+void Toolkit::InitClock()
+{
+#ifndef NO_RUNTIME
+    if (!m_runtimeClock) {
+        m_runtimeClock = new RuntimeClock();
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
+#endif
+}
+
+void Toolkit::ResetClock()
+{
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        m_runtimeClock->Reset();
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
+#endif
+}
+
+double Toolkit::GetRuntimeInSeconds() const
+{
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        return m_runtimeClock->GetSeconds();
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+        return 0.0;
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
+    return 0.0;
+#endif
+}
+
+void Toolkit::LogRuntime() const
+{
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        double seconds = m_runtimeClock->GetSeconds();
+        const int minutes = seconds / 60.0;
+        if (minutes > 0) {
+            seconds -= 60.0 * minutes;
+            LogMessage("Total runtime is %d min %.3f s.", minutes, seconds);
+        }
+        else {
+            LogMessage("Total runtime is %.3f s.", seconds);
+        }
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
 #endif
 }
 

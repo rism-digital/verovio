@@ -75,6 +75,8 @@ void BBoxDeviceContext::EndResumedGraphic(Object *object, View *view)
     // detach the object
     assert(m_objects.back() == object);
     m_objects.pop_back();
+
+    ResetGraphicRotation();
 }
 
 void BBoxDeviceContext::RotateGraphic(Point const &orig, double angle)

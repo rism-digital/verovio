@@ -475,15 +475,12 @@ void Page::LayOutVertically()
     AdjustSlursParams adjustSlursParams(doc, &adjustSlurs);
     this->Process(&adjustSlurs, &adjustSlursParams);
 
-    // If slurs were adjusted we need to redraw to adjust the bounding boxes
-    if (adjustSlursParams.m_adjusted) {
-        // There is a problem here with cross-staff slurs: if they have been adjusted, the
-        // Slur::m_isCrossStaff flag will trigger View::DrawSlurInitial to be called again.
-        // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
-        // but in between, we can have wrong collisions detections. To be improved
-        view.SetPage(this->GetIdx(), false);
-        view.DrawCurrentPage(&bBoxDC, false);
-    }
+    // There is a problem here with cross-staff slurs: the Slur::m_isCrossStaff flag
+    // will trigger View::DrawSlurInitial to be called again.
+    // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
+    // but in between, we can have wrong collisions detections. To be improved
+    view.SetPage(this->GetIdx(), false);
+    view.DrawCurrentPage(&bBoxDC, false);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);

@@ -28,6 +28,7 @@ class MultiRest : public LayerElement,
                   public AttColor,
                   public AttMultiRestVis,
                   public AttNumbered,
+                  public AttNumberPlacement,
                   public AttWidth {
 public:
     /**

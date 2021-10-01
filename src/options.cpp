@@ -1009,6 +1009,10 @@ Options::Options()
     m_removeIds.Init(false);
     this->Register(&m_removeIds, "removeIds", &m_general);
 
+    m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
+    m_showRuntime.Init(false);
+    this->Register(&m_showRuntime, "showRuntime", &m_general);
+
     m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
     m_shrinkToFit.Init(false);
     this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
@@ -1264,7 +1268,7 @@ Options::Options()
     this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
-    m_slurMaxSlope.Init(20, 0, 60);
+    m_slurMaxSlope.Init(40, 0, 80);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
     m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");

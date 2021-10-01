@@ -1013,7 +1013,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
         setLocationId(pb, token);
         m_sections.back()->AddChild(pb);
         // Maybe allow other types of line breaks here, but
-        // typically break groups should be done with !LO: system.
+        // typically break groups should be done with !!LO: system.
         if (token->find("original") != std::string::npos) {
             appendTypeTag(pb, "original");
         }
@@ -6272,8 +6272,8 @@ void HumdrumInput::checkForLayoutBreak(int line)
     group = token->getLayoutParameter("PB", "g");
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
-        // Pb *pb = new Pb();
-        Sb *pb = new Sb();
+        Pb *pb = new Pb();
+        // Sb *pb = new Sb();  // suppress page break encodings
         m_hasLayoutInformation = true;
         if (m_currentending) {
             m_currentending->AddChild(pb);

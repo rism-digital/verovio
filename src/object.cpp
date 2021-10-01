@@ -94,7 +94,6 @@ Object *Object::Clone() const
 
 Object::Object(const Object &object) : BoundingBox(object)
 {
-    ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
     m_classId = object.m_classId;

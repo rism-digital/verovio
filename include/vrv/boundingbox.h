@@ -191,6 +191,11 @@ public:
     static Point CalcPositionAfterRotation(Point point, float alpha, Point center);
 
     /**
+     * Calculate the t parameter of a bezier at position x
+     */
+    static double CalcBezierParamAtPosition(const Point bezier[4], int x);
+
+    /**
      * Calculate the y position of a bezier at position x
      */
     static int CalcBezierAtPosition(const Point bezier[4], int x);

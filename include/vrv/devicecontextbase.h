@@ -230,7 +230,6 @@ public:
      * @name Getter/setter for control point offset (as well as method to calculate it from options)
      */
     ///@{
-    void CalculateControlPointOffset(Doc *doc, int staffSize);
     void SetControlPointOffset(int controlPointOffset)
     {
         m_leftControlPointOffset = m_rightControlPointOffset = controlPointOffset;
@@ -252,9 +251,21 @@ public:
     int GetRightControlHeight() const { return m_rightControlHeight; }
     ///@}
 
+    /**
+     * @name Initialize control point height and offset from end point positions
+     */
+    void CalcInitialControlPointParams(Doc *doc, float angle, int staffSize);
+
+    /**
+     * Calculate control point offset and height from points or vice versa
+     */
+    ///@{
+    void UpdateControlPointParams(curvature_CURVEDIR dir);
+    void UpdateControlPoints(curvature_CURVEDIR dir);
+    ///@}
+
 private:
     // Control point X-axis offset for both start/end points
-    // In future, when more complex shapes are required, this should probably be changed to left/right offsets
     int m_leftControlPointOffset = 0;
     int m_rightControlPointOffset = 0;
     int m_leftControlHeight = 0;
