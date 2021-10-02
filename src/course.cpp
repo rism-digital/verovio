@@ -21,13 +21,13 @@ namespace vrv {
 
 static ClassRegistrar<Course> s_factory("course", COURSE);
 
-Course::Course() : Object("course-")
+Course::Course() : Object("course-"), AttAccidental(), AttNNumberLike(), AttOctave(), AttPitch()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_OCTAVE);
     RegisterAttClass(ATT_PITCH);
-    
+
     Reset();
 }
 

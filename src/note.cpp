@@ -1257,7 +1257,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     if (note->HasPnum()) {
         pitch = note->GetPnum();
     }
-    else if (note->HasPname() || note->HasPnameGes()){
+    else if (note->HasPname() || note->HasPnameGes()) {
         // calc pitch
         int midiBase = 0;
         data_PITCHNAME pname = note->GetPname();
@@ -1285,10 +1285,12 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
     else if (note->HasTabCourse()) {
         // tablature
-        Staff* staff = vrv_cast<Staff *>(note->GetFirstAncestor(STAFF));
+        Staff *staff = vrv_cast<Staff *>(note->GetFirstAncestor(STAFF));
         assert(staff);
-        if (staff->m_drawingTuning)
-            pitch = staff->m_drawingTuning->CalcPitchNumber(note->GetTabCourse(), note->GetTabFret(), staff->m_drawingNotationType);
+        if (staff->m_drawingTuning) {
+            pitch = staff->m_drawingTuning->CalcPitchNumber(
+                note->GetTabCourse(), note->GetTabFret(), staff->m_drawingNotationType);
+        }
     }
 
     // We do store the MIDIPitch in the note even with a sameas
