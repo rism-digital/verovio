@@ -3081,63 +3081,66 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     // Select the first mdiv by default
+    pages = body.child("pages");
     m_selectedMdiv = body.child("mdiv");
-    if (m_selectedMdiv.empty()) {
-        LogError("No <mdiv> element found in the MEI data");
+    
+    if (m_selectedMdiv.empty() && pages.empty()) {
+        LogError("No <mdiv> or no <pages> element found in the MEI data");
         return false;
     }
-
-    std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
-    // Give priority to mdiv-all - maybe we could give a warning
-    if (!m_doc->GetOptions()->m_mdivAll.GetValue() && !xPathQuery.empty()) {
-        pugi::xpath_node selection = body.select_node(xPathQuery.c_str());
-        if (selection) {
-            m_selectedMdiv = selection.node();
+    
+    // Reading score-based MEI
+    if (!m_selectedMdiv.empty())
+    {
+        std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
+        // Give priority to mdiv-all - maybe we could give a warning
+        if (!m_doc->GetOptions()->m_mdivAll.GetValue() && !xPathQuery.empty()) {
+            pugi::xpath_node selection = body.select_node(xPathQuery.c_str());
+            if (selection) {
+                m_selectedMdiv = selection.node();
+            }
+            else {
+                LogError("The <mdiv> requested with the xpath query '%s' could not be found", xPathQuery.c_str());
+                return false;
+            }
         }
         else {
-            LogError("The <mdiv> requested with the xpath query '%s' could not be found", xPathQuery.c_str());
+            // Try to select the mdiv above the first score (if any) - if not, we have pages or something is wrong
+            pugi::xpath_node scoreMdiv = body.select_node(".//mdiv[count(score)>0]");
+            if (scoreMdiv) {
+                m_selectedMdiv = scoreMdiv.node();
+            }
+        }
+
+        if (m_selectedMdiv.select_nodes(".//score").size() > 1) {
+            LogError("An <mdiv> with only one <score> descendant must be selected");
             return false;
         }
-    }
-    else {
-        // Try to select the mdiv above the first score (if any) - if not, we have pages or something is wrong
-        pugi::xpath_node scoreMdiv = body.select_node(".//mdiv[count(score)>0]");
-        if (scoreMdiv) {
-            m_selectedMdiv = scoreMdiv.node();
+
+        if ((m_selectedMdiv.select_nodes(".//score").size() > 0) && (m_selectedMdiv.select_nodes(".//pages").size() > 0)) {
+            LogError("An <mdiv> with only one <pages> or one <score> descendant must be selected");
+            return false;
+        }
+
+        const bool allMdivVisible = m_doc->GetOptions()->m_mdivAll.GetValue();
+        success = ReadMdivChildren(m_doc, body, allMdivVisible);
+
+        if (success) {
+            m_doc->ExpandExpansions();
+        }
+
+        if (success) {
+            m_doc->ConvertToPageBasedDoc();
+            m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
+        }
+
+        if (success && !m_hasScoreDef) {
+            LogWarning("No scoreDef provided, trying to generate one...");
+            success = m_doc->GenerateDocumentScoreDef();
         }
     }
-
-    if (m_selectedMdiv.select_nodes(".//score").size() > 1) {
-        LogError("An <mdiv> with only one <score> descendant must be selected");
-        return false;
-    }
-
-    if (m_selectedMdiv.select_nodes(".//pages").size() > 1) {
-        LogError("An <mdiv> with only one <pages> descendant must be selected");
-        return false;
-    }
-
-    if ((m_selectedMdiv.select_nodes(".//score").size() > 0) && (m_selectedMdiv.select_nodes(".//pages").size() > 0)) {
-        LogError("An <mdiv> with only one <pages> or one <score> descendant must be selected");
-        return false;
-    }
-
-    const bool allMdivVisible = m_doc->GetOptions()->m_mdivAll.GetValue();
-    success = ReadMdivChildren(m_doc, body, allMdivVisible);
-
-    if (success) {
-        m_doc->ExpandExpansions();
-    }
-
-    if (success && m_readingScoreBased) {
-        m_doc->ConvertToPageBasedDoc();
-        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
-    }
-
-    if (success && !m_hasScoreDef) {
-        LogWarning("No scoreDef provided, trying to generate one...");
-        success = m_doc->GenerateDocumentScoreDef();
-    }
+    // Reading page-based MEI
+    else
 
     return success;
 }
