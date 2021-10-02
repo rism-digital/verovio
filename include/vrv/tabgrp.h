@@ -44,6 +44,11 @@ public:
      * Add an element to a element.
      */
     virtual bool IsSupportedChild(Object *object);
+    
+    /**
+     * See Object::CalcOnsetOffsetEnd
+     */
+    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
 
 protected:
     //
