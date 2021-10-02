@@ -4185,7 +4185,7 @@ bool MEIInput::ReadCourse(Object *parent, pugi::xml_node course)
     vrvCourse->ReadNNumberLike(course);
     vrvCourse->ReadOctave(course);
     vrvCourse->ReadPitch(course);
-    
+
     ReadUnsupportedAttr(course, vrvCourse);
 
     return true;

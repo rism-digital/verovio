@@ -2338,7 +2338,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
         storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
-        // increase the currentTime accordingly, but only if not in a chord or tabGrp - checkit with note->IsChordTone() or note->IsTabGrpNote() 
+        // increase the currentTime accordingly, but only if not in a chord or tabGrp - checkit with note->IsChordTone()
+        // or note->IsTabGrpNote()
         if (!(note->IsChordTone()) && !(note->IsTabGrpNote())) {
             params->m_currentScoreTime += incrementScoreTime;
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;

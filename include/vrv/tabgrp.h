@@ -44,7 +44,7 @@ public:
      * Add an element to a element.
      */
     virtual bool IsSupportedChild(Object *object);
-    
+
     /**
      * See Object::CalcOnsetOffsetEnd
      */

@@ -20,11 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <course> element.
  */
-class Course : public Object,
-               public AttAccidental,
-               public AttNNumberLike,
-               public AttOctave,
-               public AttPitch {
+class Course : public Object, public AttAccidental, public AttNNumberLike, public AttOctave, public AttPitch {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
