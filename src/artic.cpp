@@ -230,7 +230,7 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
             // case ARTICULATION_heel;
             // case ARTICULATION_toe;
             // case ARTICULATION_tap;
-            // case ARTICULATION_lhpizz;
+            case ARTICULATION_lhpizz: return SMUFL_E633_pluckedLeftHandPizzicato;
             case ARTICULATION_dot: return SMUFL_E4A2_articStaccatoAbove;
             case ARTICULATION_stroke: return SMUFL_E4AA_articStaccatissimoStrokeAbove;
             default: return 0;
@@ -257,6 +257,7 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
             // Removed in MEI 4.0
             // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
+            case ARTICULATION_lhpizz: return SMUFL_E633_pluckedLeftHandPizzicato;
             case ARTICULATION_dot: return SMUFL_E4A3_articStaccatoBelow;
             case ARTICULATION_stroke: return SMUFL_E4AB_articStaccatissimoStrokeBelow;
             default: return 0;
