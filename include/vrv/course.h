@@ -39,6 +39,10 @@ public:
      */
     virtual bool IsSupportedChild(Object *object);
 
+    //----------//
+    // Functors //
+    //----------//
+
 protected:
     //
 private:

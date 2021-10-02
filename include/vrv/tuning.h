@@ -55,6 +55,10 @@ public:
      */
     int CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType);
 
+    //----------//
+    // Functors //
+    //----------//
+
 protected:
     //
 private:

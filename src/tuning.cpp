@@ -155,4 +155,8 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
     return (course > 0 && course <= pitchSize) ? pitch[course - 1] + fret : 0;
 }
 
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
 } // namespace vrv

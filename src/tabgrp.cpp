@@ -58,6 +58,10 @@ bool TabGrp::IsSupportedChild(Object *child)
     return true;
 }
 
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
 int TabGrp::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {
     CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);

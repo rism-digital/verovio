@@ -45,6 +45,10 @@ public:
      */
     virtual bool IsSupportedChild(Object *object);
 
+    //----------//
+    // Functors //
+    //----------//
+
     /**
      * See Object::CalcOnsetOffsetEnd
      */
