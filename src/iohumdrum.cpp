@@ -10500,9 +10500,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         posch = i < tsize - 1 ? token->at(i + 1) : 0;
         if ((ch == '^') && (posch == '^')) {
             // use 6 slot in array for "^^" (heavy accent)
-            ch = '6';
+            ch = 6;
+            intch = 6;
+            articloc.at(intch) = i + 1;
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
             ++i;
+            continue;
         }
         else if ((ch == '\'') && (posch == '\'')) {
             // staccatissimo alternate (eventually remove)
@@ -10602,11 +10605,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         counts.push_back(articcount['~']);
         showingpositions.push_back(showpos['~']);
     }
-    if (articloc['6']) {
+    if (articloc[6]) {
         artics.push_back(ARTICULATION_marc);
-        positions.push_back(articpos['6']);
-        gestural.push_back(articges['6']);
-        showingpositions.push_back(showpos['6']);
+        positions.push_back(articpos[6]);
+        gestural.push_back(articges[6]);
+        counts.push_back(articcount[6]);
+        showingpositions.push_back(showpos[6]);
     }
     if (articloc[7]) {
         artics.push_back(ARTICULATION_stroke);
@@ -10666,7 +10670,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             else {
                 setLocationId(artic, token);
             }
-            if (counts[i]) {
+            if (counts.at(i)) {
                 string id = artic->GetUuid();
                 id += "N";
                 id += to_string(j + 1);
