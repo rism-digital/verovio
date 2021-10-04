@@ -392,8 +392,10 @@ public:
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
 
+    // Articulation signfiers
     char hairpinAccent = '\0'; // For <> accent on a note.
     char verticalStroke = '\0'; // For horizontal stroke ornament
+    char lhpizz = '\0'; // For left-hand pizzicato
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */

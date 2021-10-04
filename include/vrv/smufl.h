@@ -292,6 +292,9 @@ enum {
     SMUFL_E5C6_ornamentPrecompMordentUpperPrefix = 0xE5C6,
     SMUFL_E5C7_ornamentPrecompInvertedMordentUpperPrefix = 0xE5C7,
     SMUFL_E5C8_ornamentPrecompTrillLowerSuffix = 0xE5C8,
+    SMUFL_E5E5_brassMuteClosed = 0xE5E5,
+    SMUFL_E5E6_brassMuteHalfClosed = 0xE5E6,
+    SMUFL_E5E7_brassMuteOpen = 0xE5E7,
     SMUFL_E610_stringsDownBow = 0xE610,
     SMUFL_E611_stringsDownBowTurned = 0xE611,
     SMUFL_E612_stringsUpBow = 0xE612,
@@ -425,7 +428,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 400
+#define SMUFL_COUNT 403
 
 } // namespace vrv
 

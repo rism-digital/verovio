@@ -10527,6 +10527,10 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             // use 7 slot in array for vertical strokes
             ch = 7;
         }
+        if (m_signifiers.lhpizz == ch) {
+            // use 8 slot in array for left-hand pizzicato symbol
+            ch = 8;
+        }
         articloc.at(intch) = i + 1;
         if (nextch == 'X') {
             // Count explicit articulation duplications:
@@ -10618,6 +10622,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         gestural.push_back(articges[7]);
         counts.push_back(articcount[7]);
         showingpositions.push_back(showpos[7]);
+    }
+    if (articloc[8]) {
+        artics.push_back(ARTICULATION_lhpizz);
+        positions.push_back(articpos[8]);
+        gestural.push_back(articges[8]);
+        showingpositions.push_back(showpos[8]);
     }
     if (articloc['^']) {
         artics.push_back(ARTICULATION_acc);
@@ -23963,6 +23973,21 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // !!!RDF**kern: | = vertical stroke
         if (value.find("vertical stroke", equals) != std::string::npos) {
             m_signifiers.verticalStroke = signifier;
+        }
+
+        // left-hand pizzicatos:
+        // !!!RDF**kern: + = l.h. pizz.
+        if (value.find("l.h. pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
+        }
+        else if (value.find("left hand pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
+        }
+        else if (value.find("left-hand pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
+        }
+        else if (value.find("lefthand pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
         }
 
         // terminal longs
