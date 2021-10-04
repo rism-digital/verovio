@@ -489,8 +489,20 @@ private:
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
-    bool ReadPages(Object *parent, pugi::xml_node parentNode);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    ///@}
+
+    /**
+     * @name Methods for reading MEI page-based elements
+     */
+    ///@{
+    bool ReadPages(Object *parent, pugi::xml_node parentNode);
+    bool ReadPage(Object *parent, pugi::xml_node parentNode);
+    bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd);
+    bool ReadSystem(Object *parent, pugi::xml_node system);
+    bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);
     ///@}
 
     /**
@@ -507,18 +519,13 @@ private:
 
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
-     * For each container (page, system, measure, staff and layer) there is one method for
+     * For each container (measure, staff and layer) there is one method for
      * reading the element and one method for reading its children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
      * for example. The filter object is optional and can be set for filtering the allowed
      * children (see MEIInput::IsAllowed)
      */
     ///@{
-    bool ReadPage(Object *parent, pugi::xml_node parentNode);
-    bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystem(Object *parent, pugi::xml_node system);
-    bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);
     bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
