@@ -10526,10 +10526,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         if (m_signifiers.verticalStroke == ch) {
             // use 7 slot in array for vertical strokes
             ch = 7;
+            intch = 7;
         }
         if (m_signifiers.lhpizz == ch) {
             // use 8 slot in array for left-hand pizzicato symbol
             ch = 8;
+            intch = 8;
         }
         articloc.at(intch) = i + 1;
         if (nextch == 'X') {
@@ -10627,6 +10629,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         artics.push_back(ARTICULATION_lhpizz);
         positions.push_back(articpos[8]);
         gestural.push_back(articges[8]);
+        counts.push_back(articcount[8]);
         showingpositions.push_back(showpos[8]);
     }
     if (articloc['^']) {
