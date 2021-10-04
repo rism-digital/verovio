@@ -534,6 +534,14 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 }
             }
 
+            if (beam->m_beamSegment.m_beamSlope == 0.0) {
+                const int staffHeight = params->m_doc->GetDrawingStaffSize(staffSize);
+                if ((beam->m_beamSegment.m_startingY < yReference)
+                    && (beam->m_beamSegment.m_startingY > yReference - staffHeight)
+                    && !(beam->m_beamSegment.m_startingY % verticalMargin)) {
+                    bracketVerticalMargin += verticalMargin / 4;
+                }
+            }
             tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin);
         }
         else {
