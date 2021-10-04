@@ -411,14 +411,14 @@ bool Chord::IsVisible()
 
 bool Chord::HasAdjacentNotes() 
 {
-    MapOfNoteLocs locations = CalcNoteLocations();
+    MapOfNoteLocs locations = this->CalcNoteLocations();
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
 
     std::vector<int> diff;
     diff.resize(locations[staff].size());
     std::adjacent_difference(locations[staff].begin(), locations[staff].end(), diff.begin());
 
-    return (diff.end() != std::find(diff.begin(), diff.end(), 1));
+    return (diff.end() != std::find(std::next(diff.begin()), diff.end(), 1));
 }
 
 bool Chord::HasNoteWithDots()

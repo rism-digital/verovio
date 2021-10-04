@@ -104,12 +104,12 @@ std::wstring Accid::GetSymbolStr() const
     return symbolStr;
 }
 
-bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids)
+void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids)
 {
     assert(element);
     assert(doc);
 
-    if (this == element) return false;
+    if (this == element) return;
 
     int verticalMargin = 1 * doc->GetDrawingStemWidth(staffSize);
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staffSize);
@@ -129,13 +129,12 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
                         && (this->GetDrawingY() < element->GetDrawingY()))
                     || ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
                         && (this->GetDrawingY() > element->GetDrawingY()))) {
-                    int xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
+                    const int xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
                     if (xRelShift > 0) this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
                 }
-                return true;
             }
         }
-        return false;
+        return;
     }
 
     // Look for identical accidentals that needs to remain superimposed
@@ -146,7 +145,7 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
             // There is the same accidental, so we leave it a the same place
             // This should also work for the chords on multiple layers by setting unison accidental
             accid->SetDrawingUnisonAccid(this);
-            return false;
+            return;
         }
     }
 
@@ -155,7 +154,7 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
             // There is enough space on the right of the accidental, but maybe we will need to
             // adjust it again (see recursive call below), so keep the accidental that is on the left
             leftAccids.push_back(dynamic_cast<Accid *>(element));
-            return false;
+            return;
         }
     }
 
@@ -179,10 +178,7 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
                 this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset);
             }
         }
-        return true;
     }
-
-    return false;
 }
 
 //----------------------------------------------------------------------------

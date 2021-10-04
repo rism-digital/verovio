@@ -74,7 +74,7 @@ public:
      */
     std::wstring GetSymbolStr() const;
 
-    bool AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
+    void AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
 
     //----------------//
     // Static methods //

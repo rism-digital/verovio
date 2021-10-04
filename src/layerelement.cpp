@@ -1839,10 +1839,16 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                     else if (this->Is(ACCID) && element->Is(NOTE)) {
                         Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
                         const int staffTop = staff->GetDrawingY();
+                        const int staffBottom = staffTop - params->m_doc->GetDrawingStaffSize(params->m_staffSize);
                         int verticalMargin = 0;
                         if ((this->GetContentTop() > staffTop + 2 * drawingUnit) && (element->GetDrawingY() > staffTop)
                             && (element->GetDrawingY() > this->GetDrawingY())) {
                             verticalMargin = element->GetDrawingY() - this->GetDrawingY();
+                        }
+                        else if ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+                            && (element->GetDrawingY() < staffBottom)
+                            && (element->GetDrawingY() < this->GetDrawingY())) {
+                            verticalMargin = this->GetDrawingY() - element->GetDrawingY();
                         }
                         overlap = std::max(
                             overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
