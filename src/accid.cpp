@@ -104,6 +104,29 @@ std::wstring Accid::GetSymbolStr() const
     return symbolStr;
 }
 
+void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
+{
+    Layer *layer = NULL;
+    Staff *staff = element->GetCrossStaff(layer);
+    if (!staff) staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+
+    if (Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+        element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
+        const int horizontalMargin = 4 * doc->GetDrawingStemWidth(staffSize);
+        const int drawingUnit = doc->GetDrawingUnit(staffSize);
+        const int staffTop = staff->GetDrawingY();
+        const int staffBottom = staffTop - doc->GetDrawingStaffSize(staffSize);
+        if (this->HorizontalContentOverlap(element, 0)) {
+            if (((this->GetContentTop() > staffTop + 2 * drawingUnit) && (this->GetDrawingY() < element->GetDrawingY()))
+                || ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+                    && (this->GetDrawingY() > element->GetDrawingY()))) {
+                const int xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
+                if (xRelShift > 0) this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
+            }
+        }
+    }
+}
+
 void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids)
 {
     assert(element);
@@ -111,29 +134,13 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
     if (this == element) return;
 
-    int verticalMargin = 1 * doc->GetDrawingStemWidth(staffSize);
+    const int verticalMargin = 1 * doc->GetDrawingStemWidth(staffSize);
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staffSize);
 
     if (element->Is(NOTE)) horizontalMargin = 3 * doc->GetDrawingStemWidth(staffSize);
 
     if (!this->VerticalSelfOverlap(element, verticalMargin)) {
-        if (Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
-            element->Is(NOTE) && chord && chord->HasAdjacentNotes()) {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            const int drawingUnit = doc->GetDrawingUnit(staffSize);
-            const int staffTop = staff->GetDrawingY();
-            const int staffHeight = 2 * drawingUnit * (staff->m_drawingLines - 1);
-            const int staffBottom = staffTop - staffHeight;
-            if (this->HorizontalContentOverlap(element, 0)) {
-                if (((this->GetContentTop() > staffTop + 2 * drawingUnit)
-                        && (this->GetDrawingY() < element->GetDrawingY()))
-                    || ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
-                        && (this->GetDrawingY() > element->GetDrawingY()))) {
-                    const int xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
-                    if (xRelShift > 0) this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
-                }
-            }
-        }
+        this->AdjustToLedgerLines(doc, element, staffSize);
         return;
     }
 

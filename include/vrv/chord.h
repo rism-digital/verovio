@@ -141,9 +141,9 @@ public:
     bool IsVisible();
 
     /**
-     * Return true if the chord has two notes with 1 diatonic step difference
+     * Return true if the chord has two notes with 1 diatonic step difference in the specific staff
      */
-    bool HasAdjacentNotes();
+    bool HasAdjacentNotesInStaff(Staff *staff);
 
     /**
      * Return true if the chord has at least one note with a @dots > 0

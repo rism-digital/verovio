@@ -409,10 +409,12 @@ bool Chord::IsVisible()
     return false;
 }
 
-bool Chord::HasAdjacentNotes() 
+bool Chord::HasAdjacentNotesInStaff(Staff *staff)
 {
+    assert(staff);
     MapOfNoteLocs locations = this->CalcNoteLocations();
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+
+    if (locations[staff].empty() || locations[staff].size() == 1) return false;
 
     std::vector<int> diff;
     diff.resize(locations[staff].size());
