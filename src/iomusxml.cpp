@@ -2642,7 +2642,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     note->AddChild(accid);
                     accid->IsAttribute(true);
                 }
-                data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(std::atof(alterStr.c_str()));
+                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(std::atof(alterStr.c_str()));
                 if (!IsSameAccidWrittenGestural(accid->GetAccid(), accidGes)) {
                     accid->SetAccidGes(accidGes);
                 }

@@ -400,7 +400,7 @@ private:
      * @name Helper method for comparing written/gestural accidental attributes
      */
     ///@{
-    bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
+    static bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
     ///@}
 
     /*
