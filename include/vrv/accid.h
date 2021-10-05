@@ -74,7 +74,11 @@ public:
      */
     std::wstring GetSymbolStr() const;
 
-    void AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
+     /**
+     * Adjust X position of accid in relation to other element
+     */
+    void AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
+        std::vector<Accid *> &adjustedAccids);
 
     /**
      * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
