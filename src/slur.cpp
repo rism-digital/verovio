@@ -16,11 +16,13 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "staff.h"
+#include "system.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -76,6 +78,52 @@ void Slur::Reset()
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
     // m_isCrossStaff = false;
+}
+
+std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
+{
+    System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
+    assert(system);
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
+    findSpannedLayerElementsParams.m_minPos = xMin;
+    findSpannedLayerElementsParams.m_maxPos = xMax;
+    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
+        TUPLET_NUM }; // Ties should be handled separately
+    // Create ad comparison object for each type / @n
+    // For now we only look at one layer (assumed layer1 == layer2)
+    std::set<int> staffNumbers;
+    staffNumbers.emplace(staff->GetN());
+    Staff *startStaff = this->GetStart()->m_crossStaff ? this->GetStart()->m_crossStaff
+                                                       : vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+    Staff *endStaff = this->GetEnd()->m_crossStaff ? this->GetEnd()->m_crossStaff
+                                                   : vrv_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
+    if (startStaff && (startStaff != staff)) {
+        staffNumbers.emplace(startStaff->GetN());
+    }
+    else if (endStaff && (endStaff != staff)) {
+        staffNumbers.emplace(endStaff->GetN());
+    }
+
+    // With the way FindSpannedLayerElements is implemented it's not currently possible to use AttNIntegerAnyComparison
+    // for the filter, since processing goes staff by staff and process stops as soon as maxPos is reached. To
+    // circumvent that, we're going to process each staff separately and add all overlapping elements together in the
+    // end
+    std::vector<LayerElement *> elements;
+    for (const auto staffNumber : staffNumbers) {
+        ArrayOfComparisons filters;
+        AttNIntegerComparison matchStaff(STAFF, staffNumber);
+        filters.push_back(&matchStaff);
+        Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
+        system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
+
+        if (!findSpannedLayerElementsParams.m_elements.empty()) {
+            elements.insert(elements.end(), std::make_move_iterator(findSpannedLayerElementsParams.m_elements.begin()),
+                std::make_move_iterator(findSpannedLayerElementsParams.m_elements.end()));
+        }
+        findSpannedLayerElementsParams.m_elements.clear();
+    }
+
+    return elements;
 }
 
 void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)

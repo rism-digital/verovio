@@ -534,47 +534,12 @@ float View::CalcInitialSlur(
 
     /************** content **************/
 
-    System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
-    assert(system);
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
-    findSpannedLayerElementsParams.m_minPos = bezier.p1.x;
-    findSpannedLayerElementsParams.m_maxPos = bezier.p2.x;
-    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
-        TUPLET_NUM }; // Ties obtain separate treatment below
-    // Create ad comparison object for each type / @n
-    // For now we only look at one layer (assumed layer1 == layer2)
-    std::set<int> staffNumbers;
-    staffNumbers.emplace(staff->GetN());
+    const std::vector<LayerElement *> elements = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x);
+
     Staff *startStaff = slur->GetStart()->m_crossStaff ? slur->GetStart()->m_crossStaff
                                                        : vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF));
     Staff *endStaff = slur->GetEnd()->m_crossStaff ? slur->GetEnd()->m_crossStaff
                                                    : vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF));
-    if (startStaff && (startStaff != staff)) {
-        staffNumbers.emplace(startStaff->GetN());
-    }
-    else if (endStaff && (endStaff != staff)) {
-        staffNumbers.emplace(endStaff->GetN());
-    }
-
-    // With the way FindSpannedLayerElements is implemented it's not currently possible to use AttNIntegerAnyComparison
-    // for the filter, since processing goes staff by staff and process stops as soon as maxPos is reached. To
-    // circumvent that, we're going to process each staff separately and add all overlapping elements together in the
-    // end
-    std::vector<LayerElement *> elements;
-    for (const auto staffNumber : staffNumbers) {
-        ArrayOfComparisons filters;
-        AttNIntegerComparison matchStaff(STAFF, staffNumber);
-        filters.push_back(&matchStaff);
-        Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-        system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
-
-        if (!findSpannedLayerElementsParams.m_elements.empty()) {
-            elements.insert(elements.end(), std::make_move_iterator(findSpannedLayerElementsParams.m_elements.begin()),
-                std::make_move_iterator(findSpannedLayerElementsParams.m_elements.end()));
-        }
-        findSpannedLayerElementsParams.m_elements.clear();
-    }
-
     curve->ClearSpannedElements();
     for (auto element : elements) {
 

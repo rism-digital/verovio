@@ -67,6 +67,11 @@ public:
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
 
+    /**
+     * Determine layer elements spanned by the slur
+     */
+    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax);
+
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
