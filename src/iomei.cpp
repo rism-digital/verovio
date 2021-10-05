@@ -3300,19 +3300,30 @@ bool MEIInput::ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd)
 {
     assert(dynamic_cast<Page *>(parent));
 
-    std::string startUuid;
-    Object *start = NULL;
-    if (elementEnd.attribute("startid")) {
-        std::string startUuid = elementEnd.attribute("startid").value();
-        start = m_doc->FindDescendantByUuid(startUuid);
+    // Check that we have a @startid
+    if (!elementEnd.attribute("startid")) {
+        LogError("Missing @startid on  pageElementEnd");
+        return false;
     }
+
+    // Find the element pointing to it
+    std::string startUuid = elementEnd.attribute("startid").value();
+    Object *start = m_doc->FindDescendantByUuid(startUuid);
     if (!start) {
-        LogError("Could not find start element <%s> for systemElementEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for pageElementEnd", startUuid.c_str());
+        return false;
+    }
+
+    // Check that it is a page boundary
+    PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(start);
+    if (!interface) {
+        LogError("The start element  '%s' is not a page boundary element", startUuid.c_str());
         return false;
     }
 
     PageElementEnd *vrvElementEnd = new PageElementEnd(start);
     SetMeiUuid(elementEnd, vrvElementEnd);
+    interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
     return true;
@@ -3693,19 +3704,30 @@ bool MEIInput::ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd)
 {
     assert(dynamic_cast<System *>(parent));
 
-    std::string startUuid;
-    Object *start = NULL;
-    if (elementEnd.attribute("startid")) {
-        std::string startUuid = elementEnd.attribute("startid").value();
-        start = m_doc->FindDescendantByUuid(startUuid);
+    // Check that we have a @startid
+    if (!elementEnd.attribute("startid")) {
+        LogError("Missing @startid on  systemElementEnd");
+        return false;
     }
+
+    // Find the element pointing to it
+    std::string startUuid = elementEnd.attribute("startid").value();
+    Object *start = m_doc->FindDescendantByUuid(startUuid);
     if (!start) {
-        LogError("Could not find start element <%s> for systemElementEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for systemElementEnd", startUuid.c_str());
+        return false;
+    }
+
+    // Check that it is a page boundary
+    SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(start);
+    if (!interface) {
+        LogError("The start element  '%s' is not a system boundary element", startUuid.c_str());
         return false;
     }
 
     SystemElementEnd *vrvElementEnd = new SystemElementEnd(start);
     SetMeiUuid(elementEnd, vrvElementEnd);
+    interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
     return true;
