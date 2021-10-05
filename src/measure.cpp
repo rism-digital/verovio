@@ -1205,7 +1205,7 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
 
     MoveItselfTo(params->m_currentSystem);
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
