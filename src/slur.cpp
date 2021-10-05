@@ -613,15 +613,16 @@ int Slur::AdjustCrossStaffContent(FunctorParams *functorParams)
                 return 0;
             };
 
-            const int shift = getShift(bottomStaff) - getShift(topStaff);
+            Staff *startStaff = this->GetStart()->m_crossStaff
+                ? this->GetStart()->m_crossStaff
+                : vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+            assert(startStaff);
 
-            // Apply the shift
-            if ((curve->GetAlignment() == topStaff->GetAlignment()) && (curve->GetDir() == curvature_CURVEDIR_below)) {
-                curve->SetDrawingYRel(curve->GetDrawingYRel() + shift, true);
+            if (curve->GetAlignment() == topStaff->GetAlignment()) {
+                curve->SetDrawingYRel(curve->GetDrawingYRel() + getShift(topStaff) - getShift(startStaff), true);
             }
-            if ((curve->GetAlignment() == bottomStaff->GetAlignment())
-                && (curve->GetDir() == curvature_CURVEDIR_above)) {
-                curve->SetDrawingYRel(curve->GetDrawingYRel() - shift, true);
+            if (curve->GetAlignment() == bottomStaff->GetAlignment()) {
+                curve->SetDrawingYRel(curve->GetDrawingYRel() + getShift(bottomStaff) - getShift(startStaff), true);
             }
         }
     }
