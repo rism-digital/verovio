@@ -1790,7 +1790,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // values for fonts
     m_drawingSmuflFontSize = CalcMusicFontSize();
     m_drawingLyricFontSize = m_options->m_unit.GetValue() * m_options->m_lyricSize.GetValue();
-    m_fingeringFontSize = m_options->m_unit.GetValue() * m_options->m_fingeringSize.GetValue();
+    m_fingeringFontSize = m_drawingLyricFontSize * m_options->m_fingeringScale.GetValue();
 
     glyph_size = GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 
