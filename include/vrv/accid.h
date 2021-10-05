@@ -74,7 +74,7 @@ public:
      */
     std::wstring GetSymbolStr() const;
 
-     /**
+    /**
      * Adjust X position of accid in relation to other element
      */
     void AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
