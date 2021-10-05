@@ -282,30 +282,30 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
-            int staffN = (*staffIter)->GetN();
+            Staff *staff = *staffIter;
             // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
             // corresponding to whether the slur is curved above/below
             if (element->Is(SLUR)) {
                 Slur *slur = vrv_cast<Slur *>(element);
-                const std::vector<LayerElement *> spannedElements = slur->CollectSpannedElements(*staffIter, x1, x2);
+                const std::vector<LayerElement *> spannedElements = slur->CollectSpannedElements(staff, x1, x2);
                 for (LayerElement *element : spannedElements) {
-                    Layer *layer = NULL;
-                    Staff *staff = element->GetCrossStaff(layer);
-                    if (!staff) staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
-                    assert(staff);
+                    Layer *elementLayer = NULL;
+                    Staff *elementStaff = element->GetCrossStaff(elementLayer);
+                    if (!elementStaff) elementStaff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+                    assert(elementStaff);
 
-                    if (slur->GetCurvedir() == curvature_CURVEDIR_above) {
-                        staffN = std::min(staffN, staff->GetN());
+                    if ((slur->GetCurvedir() == curvature_CURVEDIR_above) && (elementStaff->GetN() < staff->GetN())) {
+                        staff = elementStaff;
                     }
-                    else if (slur->GetCurvedir() == curvature_CURVEDIR_below) {
-                        staffN = std::max(staffN, staff->GetN());
+                    if ((slur->GetCurvedir() == curvature_CURVEDIR_below) && (elementStaff->GetN() > staff->GetN())) {
+                        staff = elementStaff;
                     }
                 }
             }
 
             // Create the floating positioner
             if (!system->SetCurrentFloatingPositioner(
-                    staffN, dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
+                    staff->GetN(), dynamic_cast<ControlElement *>(element), objectX, staff, spanningType)) {
                 continue;
             }
         }

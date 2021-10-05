@@ -85,11 +85,6 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
-    /**
-     * See Object::AdjustCrossStaffContent
-     */
-    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
-
 private:
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
