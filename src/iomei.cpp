@@ -3170,7 +3170,7 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
     }
 
     // This is a page-based MEI file
-    m_hasLayoutInformation = true;
+    m_layoutInformation = LAYOUT_DONE;
 
     bool success = true;
     /*
@@ -3570,7 +3570,7 @@ bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 
 bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
 {
-    m_hasLayoutInformation = true;
+    m_layoutInformation = LAYOUT_ENCODED;
 
     Pb *vrvPb = new Pb();
     ReadSystemElement(pb, vrvPb);
@@ -3586,7 +3586,7 @@ bool MEIInput::ReadSb(Object *parent, pugi::xml_node sb)
 {
     // Consider a <sb> to be enough as an indication that we have layout encoded information
     // This is debatable because having a <pb> might be seen as a requirement for this
-    m_hasLayoutInformation = true;
+    m_layoutInformation = LAYOUT_ENCODED;
 
     Sb *vrvSb = new Sb();
     ReadSystemElement(sb, vrvSb);

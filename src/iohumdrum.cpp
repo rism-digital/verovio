@@ -874,7 +874,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     if (linebreaki > 0) {
         hum::HTp token = infile[linebreaki].token(0);
         Sb *sb = new Sb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         setLocationId(sb, token);
         m_sections.back()->AddChild(sb);
         // Maybe allow other types of line breaks here, but
@@ -886,7 +886,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     else if (pagebreaki > 0) {
         hum::HTp token = infile[pagebreaki].token(0);
         Pb *pb = new Pb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         setLocationId(pb, token);
         m_sections.back()->AddChild(pb);
         // Maybe allow other types of line breaks here, but
@@ -5982,7 +5982,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         if (m_currentending) {
             m_currentending->AddChild(sb);
         }
@@ -5999,7 +5999,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
         std::string tstring = removeCommas(group);
         // Pb *pb = new Pb;
         Sb *pb = new Sb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         if (m_currentending) {
             m_currentending->AddChild(pb);
         }
@@ -22509,7 +22509,7 @@ void HumdrumInput::setupMeiDocument()
         // breaks encoded in the file to be activated, so adding a
         // dummy page break here:
         Pb *pb = new Pb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         section->AddChild(pb);
     }
 }
