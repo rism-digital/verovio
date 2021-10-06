@@ -21,7 +21,7 @@ namespace vrv {
 
 static const ClassRegistrar<Course> s_factory("course", COURSE);
 
-Course::Course() : Object("course-"), AttAccidental(), AttNNumberLike(), AttOctave(), AttPitch()
+Course::Course() : Object(COURSE, "course-"), AttAccidental(), AttNNumberLike(), AttOctave(), AttPitch()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_NNUMBERLIKE);

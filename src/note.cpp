@@ -578,7 +578,7 @@ void Note::CalcMIDIPitch(int shift)
     if (this->HasPnum()) {
         m_MIDIPitch = this->GetPnum();
     }
-    else {
+    else if (this->HasPname() || this->HasPnameGes()) {
         int midiBase = 0;
         data_PITCHNAME pname = this->GetPname();
         if (this->HasPnameGes()) pname = this->GetPnameGes();
@@ -603,6 +603,18 @@ void Note::CalcMIDIPitch(int shift)
         if (this->HasOctGes()) oct = this->GetOctGes();
 
         m_MIDIPitch = midiBase + (oct + 1) * 12;
+    }
+    else if (this->HasTabCourse()) {
+        // tablature
+        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+        if (staff->m_drawingTuning) {
+            m_MIDIPitch = staff->m_drawingTuning->CalcPitchNumber(
+                this->GetTabCourse(), this->GetTabFret(), staff->m_drawingNotationType);
+        }
+    }
+    else {
+        m_MIDIPitch = 0;
     }
 }
 
@@ -1305,46 +1317,6 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     // For now just ignore grace notes
     if (this->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
-    }
-
-    int pitch = 0;
-    if (note->HasPnum()) {
-        pitch = note->GetPnum();
-    }
-    else if (note->HasPname() || note->HasPnameGes()) {
-        // calc pitch
-        int midiBase = 0;
-        data_PITCHNAME pname = note->GetPname();
-        if (note->HasPnameGes()) pname = note->GetPnameGes();
-        switch (pname) {
-            case PITCHNAME_c: midiBase = 0; break;
-            case PITCHNAME_d: midiBase = 2; break;
-            case PITCHNAME_e: midiBase = 4; break;
-            case PITCHNAME_f: midiBase = 5; break;
-            case PITCHNAME_g: midiBase = 7; break;
-            case PITCHNAME_a: midiBase = 9; break;
-            case PITCHNAME_b: midiBase = 11; break;
-            case PITCHNAME_NONE: break;
-        }
-        int oct = note->GetOct();
-        if (note->HasOctGes()) oct = note->GetOctGes();
-
-        // Check for accidentals
-        midiBase += note->GetChromaticAlteration();
-
-        // Adjustment for transposition intruments
-        midiBase += params->m_transSemi;
-
-        pitch = midiBase + (oct + 1) * 12;
-    }
-    else if (note->HasTabCourse()) {
-        // tablature
-        Staff *staff = vrv_cast<Staff *>(note->GetFirstAncestor(STAFF));
-        assert(staff);
-        if (staff->m_drawingTuning) {
-            pitch = staff->m_drawingTuning->CalcPitchNumber(
-                note->GetTabCourse(), note->GetTabFret(), staff->m_drawingNotationType);
-        }
     }
 
     int channel = params->m_midiChannel;
