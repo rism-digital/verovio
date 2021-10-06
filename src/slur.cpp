@@ -82,8 +82,9 @@ void Slur::Reset()
 
 std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
 {
-    System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
-    assert(system);
+    // Decide whether we search the whole parent system or just one measure which is much faster
+    Object *container = this->IsSpanningMeasures() ? this->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
+
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
     findSpannedLayerElementsParams.m_minPos = xMin;
     findSpannedLayerElementsParams.m_maxPos = xMax;
@@ -114,7 +115,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         AttNIntegerComparison matchStaff(STAFF, staffNumber);
         filters.push_back(&matchStaff);
         Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-        system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
+        container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
 
         if (!findSpannedLayerElementsParams.m_elements.empty()) {
             elements.insert(elements.end(), std::make_move_iterator(findSpannedLayerElementsParams.m_elements.begin()),
