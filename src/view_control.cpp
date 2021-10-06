@@ -2099,7 +2099,13 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
         // center the pedal only with @startid
         if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
-            alignment = HORIZONTALALIGNMENT_left;
+            if (pedal->GetStart()->GetAlignment()->GetTime()
+                == measure->m_measureAligner.GetRightBarLineAlignment()->GetTime()) {
+                alignment = HORIZONTALALIGNMENT_right;
+            }
+            else {
+                alignment = HORIZONTALALIGNMENT_left;
+            }
         }
 
         std::vector<Staff *>::iterator staffIter;
