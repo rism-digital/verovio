@@ -83,7 +83,7 @@ void Slur::Reset()
 std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
 {
     // Decide whether we search the whole parent system or just one measure which is much faster
-    Object *container = this->IsSpanningMeasures() ? this->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
+    Object *container = this->IsSpanningMeasures() ? staff->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
 
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
     findSpannedLayerElementsParams.m_minPos = xMin;
