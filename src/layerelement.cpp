@@ -1884,7 +1884,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
         const int currentTieLength = it->second->GetContentLeft() - it->first->GetContentRight() - drawingUnit;
         if ((currentTieLength < minTieLength)
-            && ((this->GetFirstAncestor(CHORD) != NULL) || (it->first->FindDescendantByType(FLAG) != NULL))) {
+            && ((it->first->GetFirstAncestor(CHORD) != NULL) || (this->GetFirstAncestor(CHORD) != NULL)
+                || (it->first->FindDescendantByType(FLAG) != NULL))) {
             const int adjust = minTieLength - currentTieLength;
             this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() + adjust);
             // Also move the accumulated x shift and the minimum position for the next alignment accordingly
