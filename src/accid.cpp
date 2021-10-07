@@ -110,8 +110,8 @@ void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
     Staff *staff = element->GetCrossStaff(layer);
     if (!staff) staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
 
-    if (Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
-        element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
+    Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+    if (element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
         const int horizontalMargin = 4 * doc->GetDrawingStemWidth(staffSize);
         const int drawingUnit = doc->GetDrawingUnit(staffSize);
         const int staffTop = staff->GetDrawingY();
