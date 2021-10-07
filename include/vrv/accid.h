@@ -74,7 +74,12 @@ public:
      */
     std::wstring GetSymbolStr() const;
 
-    bool AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
+    void AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
+
+    /**
+     * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
+     */
+    void AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize);
 
     //----------------//
     // Static methods //

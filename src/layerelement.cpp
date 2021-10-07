@@ -1790,7 +1790,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int offset = 0;
     int selfLeft;
-    int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
+    const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
     // Nested aligment of bounding boxes is performed only when both the previous alignment and
     // the current one allow it. For example, when one of them is a barline, we do not look how
@@ -1831,6 +1831,23 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                     if (this->Is(NOTE) && element->Is(NOTE)) {
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
                     }
+                    else if (this->Is(ACCID) && element->Is(NOTE)) {
+                        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+                        const int staffTop = staff->GetDrawingY();
+                        const int staffBottom = staffTop - params->m_doc->GetDrawingStaffSize(params->m_staffSize);
+                        int verticalMargin = 0;
+                        if ((this->GetContentTop() > staffTop + 2 * drawingUnit) && (element->GetDrawingY() > staffTop)
+                            && (element->GetDrawingY() > this->GetDrawingY())) {
+                            verticalMargin = element->GetDrawingY() - this->GetDrawingY();
+                        }
+                        else if ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+                            && (element->GetDrawingY() < staffBottom)
+                            && (element->GetDrawingY() < this->GetDrawingY())) {
+                            verticalMargin = this->GetDrawingY() - element->GetDrawingY();
+                        }
+                        overlap = std::max(
+                            overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
+                    }
                     else {
                         overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
                     }
@@ -1842,7 +1859,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // Otherwise only look at the horizontal position
         else {
             selfLeft = this->GetSelfLeft();
-            selfLeft -= params->m_doc->GetLeftMargin(this) * params->m_doc->GetDrawingUnit(100);
+            selfLeft -= params->m_doc->GetLeftMargin(this) * drawingUnit;
         }
     }
 

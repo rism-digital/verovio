@@ -409,6 +409,23 @@ bool Chord::IsVisible()
     return false;
 }
 
+bool Chord::HasAdjacentNotesInStaff(Staff *staff)
+{
+    assert(staff);
+    MapOfNoteLocs locations = this->CalcNoteLocations();
+
+    if (locations[staff].empty() || locations[staff].size() == 1) return false;
+
+    std::vector<int> diff;
+    diff.resize(locations[staff].size());
+    // Find difference between adjacent notes in the chord. Since locations[staff] is multiset, elements are ordered and
+    // represent position of notes in chord. This way we can find whether there are notes with diatonic step difference
+    // of 1.
+    std::adjacent_difference(locations[staff].begin(), locations[staff].end(), diff.begin());
+
+    return (diff.end() != std::find(std::next(diff.begin()), diff.end(), 1));
+}
+
 bool Chord::HasNoteWithDots()
 {
     const ArrayOfObjects *notes = this->GetList(this);
