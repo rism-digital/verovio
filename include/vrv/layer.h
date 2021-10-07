@@ -192,66 +192,59 @@ public:
     /**
      * See Object::ConvertMarkupArtic
      */
-    virtual int ConvertMarkupArticEnd(FunctorParams *functorParams);
+    int ConvertMarkupArticEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
+    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToUnCastOffMensural
      */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnscoreDefSetCurrent
      */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
+    int AlignHorizontally(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignHorizontallyEnd
      */
-    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
+    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareProcessingLists
      */
-    virtual int PrepareProcessingLists(FunctorParams *functorParams);
+    int PrepareProcessingLists(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareRpt
      */
-    virtual int PrepareRpt(FunctorParams *functorParams);
+    int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcOnsetOffset
      */
     ///@{
-    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    int CalcOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::GenerateTimemap
-     * To be added once Layer implements LinkingInterface
-     */
-    // virtual int GenerateTimemap(FunctorParams *functorParams);
-
-    /**
      * See Object::ResetDrawing
-     * To be added once Layer implements LinkingInterface
      */
-    virtual int ResetDrawing(FunctorParams *);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

@@ -161,47 +161,47 @@ public:
     /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
+    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnscoreDefSetCurrent
      */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
     /**
      * See Object::ScoreDefOptimize
      */
-    virtual int ScoreDefOptimize(FunctorParams *functorParams);
+    int ScoreDefOptimize(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ApplyPPUFactor
      */
-    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
+    int AlignHorizontally(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignVertically
      */
-    virtual int AlignVertically(FunctorParams *functorParams);
+    int AlignVertically(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcLedgerLinesEnd
      */
-    virtual int CalcLedgerLinesEnd(FunctorParams *functorParams);
+    int CalcLedgerLinesEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
+    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffEncoding
@@ -211,34 +211,34 @@ public:
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareRpt
      */
-    virtual int PrepareRpt(FunctorParams *functorParams);
+    int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcOnsetOffset
      */
     ///@{
-    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    int CalcOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustSylSpacing
      */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
+    int AdjustSylSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
      */
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
 private:
     /**

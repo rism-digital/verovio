@@ -202,44 +202,44 @@ public:
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    virtual int SetAlignmentXPos(FunctorParams *functorParams);
+    int SetAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX(FunctorParams *functorParams);
+    int JustifyX(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArpeg
      */
-    virtual int AdjustArpeg(FunctorParams *functorParams);
+    int AdjustArpeg(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustGraceXPos
      */
     ///@{
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
-    virtual int AdjustGraceXPosEnd(FunctorParams *functorParams);
+    int AdjustGraceXPos(FunctorParams *functorParams) override;
+    int AdjustGraceXPosEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AdjustXPos
      */
     ///@{
-    virtual int AdjustXPos(FunctorParams *functorParams);
-    virtual int AdjustXPosEnd(FunctorParams *functorParams);
+    int AdjustXPos(FunctorParams *functorParams) override;
+    int AdjustXPosEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *functorParams);
+    int AdjustAccidX(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustDotsEnd
      */
-    virtual int AdjustDotsEnd(FunctorParams *);
+    int AdjustDotsEnd(FunctorParams *functorParams) override;
 
 private:
     /**
@@ -338,23 +338,23 @@ public:
     /**
      * See Object::AdjustLayers
      */
-    virtual int AdjustLayers(FunctorParams *functorParams);
-    virtual int AdjustLayersEnd(FunctorParams *functorParams);
+    int AdjustLayers(FunctorParams *functorParams) override;
+    int AdjustLayersEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustGraceXPos
      */
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    int AdjustGraceXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *functorParams);
+    int AdjustAccidX(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnscoreDefSetCurrent
      */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
 private:
     //
@@ -522,13 +522,13 @@ public:
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    virtual int SetAlignmentXPos(FunctorParams *functorParams);
+    int SetAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX(FunctorParams *functorParams);
+    int JustifyX(FunctorParams *functorParams) override;
 
 private:
     //

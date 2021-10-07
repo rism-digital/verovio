@@ -92,42 +92,42 @@ public:
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
+    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimePointing
      */
-    virtual int PrepareTimePointing(FunctorParams *functorParams);
+    int PrepareTimePointing(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
+    int PrepareTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int PrepareTimestamps(FunctorParams *functorParams);
+    int PrepareTimestamps(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
      */
-    virtual int UnCastOff(FunctorParams *functorParams);
+    int UnCastOff(FunctorParams *functorParams) override;
 
 private:
     //

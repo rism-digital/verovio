@@ -160,148 +160,148 @@ public:
     /**
      * See Object::UnscoreDefSetCurrent
      */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::ScoreDefOptimize
      */
     ///@{
-    virtual int ScoreDefOptimize(FunctorParams *functorParams);
-    virtual int ScoreDefOptimizeEnd(FunctorParams *functorParams);
+    int ScoreDefOptimize(FunctorParams *functorParams) override;
+    int ScoreDefOptimizeEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::ScoreDefSetGrpSym
      */
-    virtual int ScoreDefSetGrpSym(FunctorParams *functorParams);
+    int ScoreDefSetGrpSym(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ApplyPPUFactor
      */
-    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
+    int AlignHorizontally(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::AdjustXOverflow
      */
     ///@{
-    virtual int AdjustXOverflow(FunctorParams *functorParams);
-    virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
+    int AdjustXOverflow(FunctorParams *functorParams) override;
+    int AdjustXOverflowEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * @name See Object::AdjustHarmGrpsSpacing
      */
     ///@{
-    virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
-    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams);
+    int AdjustHarmGrpsSpacing(FunctorParams *functorParams) override;
+    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * @name See Object::AdjustSylSpacing
      */
     ///@{
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
-    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);
+    int AdjustSylSpacing(FunctorParams *functorParams) override;
+    int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AdjustTempo
      */
-    virtual int AdjustTempo(FunctorParams *functorParams);
+    int AdjustTempo(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::AlignVertically
      */
     ///@{
-    virtual int AlignVertically(FunctorParams *functorParams);
-    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+    int AlignVertically(FunctorParams *functorParams) override;
+    int AlignVerticallyEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AdjustYPos
      */
-    virtual int AdjustYPos(FunctorParams *functorParams);
+    int AdjustYPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignSystems
      */
-    virtual int AlignSystems(FunctorParams *functorParams);
+    int AlignSystems(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::AlignMeasures
      */
     ///@{
-    virtual int AlignMeasures(FunctorParams *functorParams);
-    virtual int AlignMeasuresEnd(FunctorParams *functorParams);
+    int AlignMeasures(FunctorParams *functorParams) override;
+    int AlignMeasuresEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::JustifyX
      */
-    virtual int JustifyX(FunctorParams *functorParams);
+    int JustifyX(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyY
      */
-    virtual int JustifyY(FunctorParams *functorParams);
+    int JustifyY(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustStaffOverlap
      */
-    virtual int AdjustStaffOverlap(FunctorParams *functorParams);
+    int AdjustStaffOverlap(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustFloatingPositioners
      */
-    virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
+    int AdjustFloatingPositioners(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustFloatingPositionersBetween
      */
-    virtual int AdjustFloatingPositionersBetween(FunctorParams *functorParams);
+    int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustSlurs
      */
-    virtual int AdjustSlurs(FunctorParams *functorParams);
+    int AdjustSlurs(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffPages
      */
-    virtual int CastOffPages(FunctorParams *functorParams);
+    int CastOffPages(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::CastOffSystems
      */
     ///@{
-    virtual int CastOffSystems(FunctorParams *functorParams);
-    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
+    int CastOffSystems(FunctorParams *functorParams) override;
+    int CastOffSystemsEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::CastOffEncoding
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
      */
-    virtual int UnCastOff(FunctorParams *functorParams);
+    int UnCastOff(FunctorParams *functorParams) override;
 
 public:
     SystemAligner m_systemAligner;

@@ -868,13 +868,10 @@ public:
     virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * @name Adjust the position of cross-staff element after the adjustment of the staves.
-     * This is called by Chords and Tuplets with cross-staff content
+     * Adjust the position of cross-staff elements after the adjustment of the staves.
+     * This is called by chords and tuplets with cross-staff content.
      */
-    ///@{
     virtual int AdjustCrossStaffYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int AdjustCrossStaffYPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
 
     /**
      * Adjust the position of all floating positionners, staff by staff.
@@ -932,7 +929,7 @@ public:
     ///@}
 
     /**
-     * @name Functors for aligning the content vertically.
+     * @name Functors for aligning the pages.
      */
     ///@{
 
@@ -1494,26 +1491,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// abstract base class Functor
+// Functor
 //----------------------------------------------------------------------------
 
-/**
- * This class is an abstact Functor for the object hierarchy.
- * Needs testing.
- */
 class Functor {
 private:
     int (Object::*obj_fpt)(FunctorParams *functorParams); // pointer to member function
 
 public:
-    // constructor - takes pointer to an object and pointer to a member and stores
-    // them in two private variables
+    // constructor - takes pointer to a functor method and stores it
     Functor();
     Functor(int (Object::*_obj_fpt)(FunctorParams *));
     virtual ~Functor(){};
 
-    // override function "Call"
-    virtual void Call(Object *ptr, FunctorParams *functorParams);
+    // Call the internal functor method
+    void Call(Object *ptr, FunctorParams *functorParams);
 
 private:
     //

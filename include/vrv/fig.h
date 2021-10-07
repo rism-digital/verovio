@@ -55,7 +55,7 @@ public:
      * See Object::AlignVertically
      */
     ///@{
-    virtual int AlignVertically(FunctorParams *functorParams);
+    int AlignVertically(FunctorParams *functorParams) override;
     ///@}
 
 private:

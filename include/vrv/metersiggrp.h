@@ -82,7 +82,7 @@ public:
     /**
      * See Object::AlignHorizontally
      */
-    int AlignHorizontally(FunctorParams *functorParams);
+    int AlignHorizontally(FunctorParams *functorParams) override;
 
 protected:
     /**

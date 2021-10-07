@@ -164,22 +164,22 @@ public:
     /**
      * See Object::AdjustBeams
      */
-    virtual int AdjustBeams(FunctorParams *);
+    int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustBeamsEnd
      */
-    virtual int AdjustBeamsEnd(FunctorParams *);
+    int AdjustBeamsEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     /**

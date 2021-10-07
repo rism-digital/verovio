@@ -110,32 +110,32 @@ public:
     /**
      * See Object::ConvertMarkupArtic
      */
-    virtual int ConvertMarkupArtic(FunctorParams *functorParams);
+    int ConvertMarkupArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcArtic
      */
-    virtual int CalcArtic(FunctorParams *functorParams);
+    int CalcArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArtic
      */
-    virtual int AdjustArtic(FunctorParams *functorParams);
+    int AdjustArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArticWithSlurs
      */
-    virtual int AdjustArticWithSlurs(FunctorParams *functorParams);
+    int AdjustArticWithSlurs(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;

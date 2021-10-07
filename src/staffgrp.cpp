@@ -220,11 +220,8 @@ LabelAbbr *StaffGrp::GetLabelAbbrCopy()
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
 
-int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
+int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *functorParams)
 {
-    // ScoreDefOptimize *params = vrv_params_cast<ScoreDefOptimize *>(functorParams);
-    // assert(params);
-
     this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
     for (auto &child : *this->GetChildren()) {

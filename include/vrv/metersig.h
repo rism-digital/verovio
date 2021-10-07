@@ -59,7 +59,7 @@ public:
     /**
      * See Object::LayerCountInTimeSpan
      */
-    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
+    int LayerCountInTimeSpan(FunctorParams *functorParams) override;
 
 private:
     //

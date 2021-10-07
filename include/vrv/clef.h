@@ -71,12 +71,12 @@ public:
     /**
      * See Object::AdjustBeams
      */
-    virtual int AdjustBeams(FunctorParams *functorParams);
+    int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustClefChanges
      */
-    virtual int AdjustClefChanges(FunctorParams *functorParams);
+    int AdjustClefChanges(FunctorParams *functorParams) override;
 
 private:
 public:

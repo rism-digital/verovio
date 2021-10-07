@@ -509,9 +509,8 @@ void Page::LayOutVertically()
     this->Process(&adjustFloatingPositionersBetween, &adjustFloatingPositionersBetweenParams);
 
     Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
-    Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);
-    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
+    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams);
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlursParams.m_crossStaffSlurs) {
@@ -857,22 +856,6 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
         else {
             footer->SetDrawingYRel(footer->GetTotalHeight());
         }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Page::CastOffPagesEnd(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    if (params->m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
-
-    // Otherwise add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
-        params->m_currentPage->AddChild(*iter);
     }
 
     return FUNCTOR_CONTINUE;

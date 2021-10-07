@@ -59,27 +59,27 @@ public:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
+    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimePointing
      */
-    virtual int PrepareTimePointing(FunctorParams *functorParams);
+    int PrepareTimePointing(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
+    int PrepareTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int PrepareTimestamps(FunctorParams *functorParams);
+    int PrepareTimestamps(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

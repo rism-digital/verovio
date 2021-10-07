@@ -242,72 +242,72 @@ public:
     /**
      * See Object::AdjustArtic
      */
-    virtual int AdjustArtic(FunctorParams *functorParams);
+    int AdjustArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
+    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcArtic
      */
-    virtual int CalcArtic(FunctorParams *functorParams);
+    int CalcArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcChordNoteHeads
      */
-    virtual int CalcChordNoteHeads(FunctorParams *functorParams);
+    int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcDots
      */
-    virtual int CalcDots(FunctorParams *functorParams);
+    int CalcDots(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcLedgerLines
      */
-    virtual int CalcLedgerLines(FunctorParams *functorParams);
+    int CalcLedgerLines(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+    int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareLyrics
      */
-    virtual int PrepareLyrics(FunctorParams *functorParams);
+    int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
      */
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateTimemap
      */
-    virtual int GenerateTimemap(FunctorParams *functorParams);
+    int GenerateTimemap(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *);
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**

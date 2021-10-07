@@ -66,7 +66,7 @@ public:
     /**
      * See Object::ScoreDefSetGrpSym
      */
-    virtual int ScoreDefSetGrpSym(FunctorParams *functorParams);
+    int ScoreDefSetGrpSym(FunctorParams *functorParams) override;
 
 private:
     //

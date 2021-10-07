@@ -76,7 +76,7 @@ public:
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
 protected:
     //

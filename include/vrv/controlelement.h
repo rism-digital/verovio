@@ -63,12 +63,12 @@ public:
     /**
      * See Object::AdjustXOverflow
      */
-    virtual int AdjustXOverflow(FunctorParams *functorParams);
+    int AdjustXOverflow(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

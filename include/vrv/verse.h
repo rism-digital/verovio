@@ -54,22 +54,22 @@ public:
     /**
      * See Object::AlignVertically
      */
-    virtual int AlignVertically(FunctorParams *functorParams);
+    int AlignVertically(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustSylSpacing
      */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
+    int AdjustSylSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareProcessingLists
      */
-    virtual int PrepareProcessingLists(FunctorParams *functorParams);
+    int PrepareProcessingLists(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

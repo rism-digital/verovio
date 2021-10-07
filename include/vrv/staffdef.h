@@ -67,12 +67,12 @@ public:
     /**
      * See Object::ReplaceDrawingValuesInStaffDef
      */
-    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams);
+    int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) override;
 
     /**
      * See Object::SetStaffDefRedrawFlags
      */
-    virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams);
+    int SetStaffDefRedrawFlags(FunctorParams *functorParams) override;
 
 private:
     //

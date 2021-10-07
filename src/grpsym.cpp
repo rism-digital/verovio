@@ -80,7 +80,7 @@ int GrpSym::GetDrawingY() const
 // GrpSym functor methods
 //----------------------------------------------------------------------------
 
-int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
+int GrpSym::ScoreDefSetGrpSym(FunctorParams *functorParams)
 {
     // For the grpSym that is encoded in the scope of the staffGrp just get first and last staffDefs and set then as
     // starting and ending points

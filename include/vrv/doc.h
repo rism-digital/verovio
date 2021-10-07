@@ -417,12 +417,12 @@ public:
     /**
      * See Object::PrepareLyricsEnd
      */
-    virtual int PrepareLyricsEnd(FunctorParams *functorParams);
+    int PrepareLyricsEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimestampsEnd
      */
-    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
+    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
 
 private:
     /**

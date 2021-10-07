@@ -63,7 +63,7 @@ public:
     /**
      * See Object::ResolveRehPosition
      */
-    virtual int ResolveRehPosition(FunctorParams *params);
+    int ResolveRehPosition(FunctorParams *functorParams) override;
 
 protected:
     //

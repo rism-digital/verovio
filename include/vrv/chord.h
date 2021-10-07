@@ -164,55 +164,55 @@ public:
     /**
      * See Object::AdjustCrossStaffYPos
      */
-    virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
+    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArtic
      */
-    virtual int AdjustArtic(FunctorParams *functorParams);
+    int AdjustArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertMarkupAnalytical
      */
     ///@{
-    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
-    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);
+    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
+    int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::CalcArtic
      */
-    virtual int CalcArtic(FunctorParams *functorParams);
+    int CalcArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcDots
      */
-    virtual int CalcDots(FunctorParams *functorParams);
+    int CalcDots(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+    int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcOnsetOffsetEnd
      */
-    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
+    int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustCrossStaffContent
      */
-    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
+    int AdjustCrossStaffContent(FunctorParams *functorParams) override;
 
 protected:
     /**

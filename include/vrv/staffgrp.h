@@ -109,7 +109,7 @@ public:
     /**
      * See Object::ScoreDefOptimize
      */
-    virtual int ScoreDefOptimizeEnd(FunctorParams *functorParams);
+    int ScoreDefOptimizeEnd(FunctorParams *functorParams) override;
 
 protected:
     /**

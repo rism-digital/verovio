@@ -1943,7 +1943,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::AdjustXRelForTranscription(FunctorParams *)
+int LayerElement::AdjustXRelForTranscription(FunctorParams *functorParams)
 {
     if (m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
@@ -2417,7 +2417,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::ResolveMIDITies(FunctorParams *)
+int LayerElement::ResolveMIDITies(FunctorParams *functorParams)
 {
     return FUNCTOR_CONTINUE;
 }

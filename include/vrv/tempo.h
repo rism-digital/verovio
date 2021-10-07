@@ -70,12 +70,12 @@ public:
     /**
      * See Object::AdjustTempoX
      */
-    virtual int AdjustTempo(FunctorParams *functorParams);
+    int AdjustTempo(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

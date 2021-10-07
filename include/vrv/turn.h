@@ -62,12 +62,12 @@ public:
     /**
      * See Object::PrepareDelayedTurns
      */
-    virtual int PrepareDelayedTurns(FunctorParams *functorParams);
+    int PrepareDelayedTurns(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     //

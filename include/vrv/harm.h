@@ -73,17 +73,17 @@ public:
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustHarmGrpsSpacing
      */
-    virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
+    int AdjustHarmGrpsSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *functorParams);
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     //

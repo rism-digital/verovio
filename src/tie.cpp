@@ -412,7 +412,7 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
 // Tie functor methods
 //----------------------------------------------------------------------------
 
-int Tie::ResolveMIDITies(FunctorParams *)
+int Tie::ResolveMIDITies(FunctorParams *functorParams)
 {
     Note *note1 = dynamic_cast<Note *>(this->GetStart());
     Note *note2 = dynamic_cast<Note *>(this->GetEnd());

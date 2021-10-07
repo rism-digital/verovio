@@ -94,7 +94,7 @@ public:
     /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *);
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**

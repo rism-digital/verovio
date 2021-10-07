@@ -62,7 +62,7 @@ public:
      * see Object::ResolveMIDITies
      */
     ///@{
-    virtual int ResolveMIDITies(FunctorParams *functorParams);
+    int ResolveMIDITies(FunctorParams *functorParams) override;
     ///@}
 
 private:

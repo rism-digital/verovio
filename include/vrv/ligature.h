@@ -70,12 +70,12 @@ public:
     /**
      * See Object::CalcLigatureNotePos
      */
-    virtual int CalcLigatureNotePos(FunctorParams *functorParams);
+    int CalcLigatureNotePos(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     /**
