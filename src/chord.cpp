@@ -420,7 +420,7 @@ bool Chord::HasAdjacentNotesInStaff(Staff *staff)
     diff.resize(locations[staff].size());
     // Find difference between adjacent notes in the chord. Since locations[staff] is multiset, elements are ordered and
     // represent position of notes in chord. This way we can find whether there are notes with diatonic step difference
-    // of 1. 
+    // of 1.
     std::adjacent_difference(locations[staff].begin(), locations[staff].end(), diff.begin());
 
     return (diff.end() != std::find(std::next(diff.begin()), diff.end(), 1));
