@@ -89,7 +89,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
     bezier.UpdateControlPointParams(curve->GetDir());
 
-    const int margin = doc->GetDrawingUnit(100);
+    const int margin = doc->GetOptions()->m_slurMargin.GetValue() * doc->GetDrawingUnit(100);
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);

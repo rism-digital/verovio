@@ -1246,26 +1246,13 @@ Options::Options()
     m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
 
-    m_slurControlPoints.SetInfo(
-        "Slur control points", "Slur control points - higher value means more curved at the end");
-    m_slurControlPoints.Init(5, 1, 10);
-    this->Register(&m_slurControlPoints, "slurControlPoints", &m_generalLayout);
-
     m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
-    m_slurCurveFactor.Init(10, 1, 100);
+    m_slurCurveFactor.Init(1.0, 0.2, 5.0);
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
-    m_slurHeightFactor.SetInfo("Slur height factor", "Slur height factor -  high value means flatter slurs");
-    m_slurHeightFactor.Init(5, 1, 100);
-    this->Register(&m_slurHeightFactor, "slurHeightFactor", &m_generalLayout);
-
-    m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
-    m_slurMinHeight.Init(1.2, 0.3, 2.0);
-    this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
-
-    m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
-    m_slurMaxHeight.Init(3.0, 2.0, 6.0);
-    this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
+    m_slurMargin.SetInfo("Slur margin", "Slur safety distance in MEI units to obstacles");
+    m_slurMargin.Init(1.0, 0.1, 4.0);
+    this->Register(&m_slurMargin, "slurMargin", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
     m_slurMaxSlope.Init(40, 0, 80);
