@@ -1422,9 +1422,15 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     // ignore elements that are both on other layer and cross-staff
     if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
     // ignore specific elements, since they should not be influencing beam positioning
-    if (Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
+    if (this->Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
     // ignore elements that start before the beam
     if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
+    // ignore editorial accidental
+    if (this->Is(ACCID)) {
+        Accid *accid = vrv_cast<Accid *>(this);
+        assert(accid);
+        if (accid->GetFunc() == accidLog_FUNC_edit) return FUNCTOR_CONTINUE;
+    }
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
