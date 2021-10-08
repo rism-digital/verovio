@@ -879,6 +879,20 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             }
         }
 
+        // Make sure that there is no overlap with grace notes (since they are handled separately by graceAligner)
+        if (m_type == ALIGNMENT_GRACENOTE) {
+            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : std::get<2>(*iter);
+            if (this->HasGraceAligner(graceAlignerId)) {
+                GraceAligner *graceAligner = this->GetGraceAligner(graceAlignerId);
+                maxRight = graceAligner->GetGraceGroupRight(std::get<2>(*iter));
+                const int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+                if (overlap > 0) {
+                    const int drawingUnit = params->m_doc->GetDrawingUnit(100);
+                    this->SetXRel(this->GetXRel() - drawingUnit / 6);
+                }
+            }
+        }
+
         // Nothing, just continue
         if (maxRight == VRV_UNSET) {
             ++iter;
