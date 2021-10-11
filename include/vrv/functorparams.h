@@ -1858,11 +1858,10 @@ public:
     PrepareFloatingGrpsParams(Doc *doc)
     {
         m_previousEnding = NULL;
-        m_pedalLine = NULL;
         m_doc = doc;
     }
     Ending *m_previousEnding;
-    Pedal *m_pedalLine;
+    std::list<Pedal *> m_pedalLines;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
     std::map<std::string, Harm *> m_harms;
