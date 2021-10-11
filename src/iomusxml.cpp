@@ -2596,10 +2596,24 @@ void MusicXmlInput::ReadMusicXmlNote(
             Accid *accid = new Accid();
             accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
             accid->SetColor(accidental.attribute("color").as_string());
-            if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
-            if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
-            if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
-            if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
+            bool isAttribute = true;
+            if (HasAttributeWithValue(accidental, "cautionary", "yes")) {
+                accid->SetFunc(accidLog_FUNC_caution);
+                isAttribute = false;
+            }
+            if (HasAttributeWithValue(accidental, "editorial", "yes")) {
+                accid->SetFunc(accidLog_FUNC_edit);
+                isAttribute = false;
+            }
+            if (HasAttributeWithValue(accidental, "bracket", "yes")) {
+                accid->SetEnclose(ENCLOSURE_brack);
+                isAttribute = false;
+            }
+            if (HasAttributeWithValue(accidental, "parentheses", "yes")) {
+                accid->SetEnclose(ENCLOSURE_paren);
+                isAttribute = false;
+            }
+            accid->IsAttribute(isAttribute);
             note->AddChild(accid);
         }
 
@@ -2628,7 +2642,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                     note->AddChild(accid);
                     accid->IsAttribute(true);
                 }
-                accid->SetAccidGes(ConvertAlterToAccid(std::atof(alterStr.c_str())));
+                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(std::atof(alterStr.c_str()));
+                if (!IsSameAccidWrittenGestural(accid->GetAccid(), accidGes)) {
+                    accid->SetAccidGes(accidGes);
+                }
             }
             if (m_octDis[staff->GetN()] != 0) {
                 note->SetOct(octaveNum - m_octDis[staff->GetN()]);
@@ -3612,6 +3629,26 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
     }
 
     return keySig;
+}
+
+bool MusicXmlInput::IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural)
+{
+    const std::map<data_ACCIDENTAL_WRITTEN, data_ACCIDENTAL_GESTURAL> writtenToGesturalMap{
+        { ACCIDENTAL_WRITTEN_tf, ACCIDENTAL_GESTURAL_tf }, //
+        { ACCIDENTAL_WRITTEN_ff, ACCIDENTAL_GESTURAL_ff }, //
+        { ACCIDENTAL_WRITTEN_fd, ACCIDENTAL_GESTURAL_fd }, //
+        { ACCIDENTAL_WRITTEN_f, ACCIDENTAL_GESTURAL_f }, //
+        { ACCIDENTAL_WRITTEN_fu, ACCIDENTAL_GESTURAL_fu }, //
+        { ACCIDENTAL_WRITTEN_n, ACCIDENTAL_GESTURAL_n }, //
+        { ACCIDENTAL_WRITTEN_sd, ACCIDENTAL_GESTURAL_sd }, //
+        { ACCIDENTAL_WRITTEN_s, ACCIDENTAL_GESTURAL_s }, //
+        { ACCIDENTAL_WRITTEN_su, ACCIDENTAL_GESTURAL_su }, //
+        { ACCIDENTAL_WRITTEN_ss, ACCIDENTAL_GESTURAL_ss }, //
+        { ACCIDENTAL_WRITTEN_ts, ACCIDENTAL_GESTURAL_ts }
+    };
+
+    const auto result = writtenToGesturalMap.find(written);
+    return ((result != writtenToGesturalMap.end()) && (result->second == gestural));
 }
 
 //////////////////////////////////////////////////////////////////////////////
