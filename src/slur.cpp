@@ -788,6 +788,10 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                         x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                     }
                 }
+                else if ((end->GetContentTop() >= start->GetContentTop())
+                    && (end->GetContentBottom() <= start->GetContentTop())) {
+                    y2 = end->GetDrawingY() + unit * 3;
+                }
                 else {
                     y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
                     x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
