@@ -1121,6 +1121,10 @@ Options::Options()
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
+    m_fingeringScale.SetInfo("Fingering scale", "The scale of fingering font compared to default font size");
+    m_fingeringScale.Init(0.75, 0.25, 1);
+    this->Register(&m_fingeringScale, "fingeringScale", &m_generalLayout);
+
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);

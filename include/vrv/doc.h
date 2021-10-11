@@ -176,6 +176,7 @@ public:
     ///@{
     FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
     FontInfo *GetDrawingLyricFont(int staffSize);
+    FontInfo *GetFingeringFont(int staffSize);
     ///@}
 
     /**
@@ -519,10 +520,14 @@ private:
     int m_drawingSmuflFontSize;
     /** Lyric font size  */
     int m_drawingLyricFontSize;
+    /** Fingering font size*/
+    int m_fingeringFontSize;
     /** Current music font */
     FontInfo m_drawingSmuflFont;
     /** Current lyric font */
     FontInfo m_drawingLyricFont;
+    /** Current fingering font */
+    FontInfo m_fingeringFont;
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.

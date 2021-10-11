@@ -1737,10 +1737,9 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
         params.m_enclosedRend.clear();
         params.m_y = fing->GetDrawingY();
+        params.m_pointSize = m_doc->GetFingeringFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-
-        fingTxt.SetPointSize(params.m_pointSize / 2);
+        fingTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&fingTxt);
