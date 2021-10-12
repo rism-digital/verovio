@@ -15,11 +15,14 @@
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
 #include "chord.h"
 #include "doc.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "note.h"
 #include "staff.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -499,6 +502,410 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVE
     }
 
     return slurAngle;
+}
+
+curvature_CURVEDIR Slur::GetGraceCurveDirection(Doc *doc)
+{
+    LayerElement *start = this->GetStart();
+    LayerElement *end = this->GetEnd();
+    Staff *staff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
+    assert(staff);
+    const bool overlap = start->VerticalContentOverlap(end);
+    const int topDiff = std::abs(start->GetContentTop() - end->GetContentTop());
+    const int bottomDiff = std::abs(start->GetContentBottom() - end->GetContentBottom());
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (overlap) {
+        if (bottomDiff < 1.5 * topDiff) {
+            return curvature_CURVEDIR_below;
+        }
+        else if ((bottomDiff < 3 * topDiff) && (NULL != end->IsInBeam())) {
+            return curvature_CURVEDIR_below;
+        }
+        else {
+            return curvature_CURVEDIR_above;
+        }
+    }
+    else {
+        StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(start);
+        StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(end);
+
+        data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
+        if (startStemDrawInterface) {
+            startStemDir = startStemDrawInterface->GetDrawingStemDir();
+        }
+        data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
+        if (endStemDrawInterface) {
+            endStemDir = endStemDrawInterface->GetDrawingStemDir();
+        }
+
+        if (end->GetContentBottom() > start->GetContentTop()) {
+            if (endStemDir == STEMDIRECTION_up)
+                return curvature_CURVEDIR_above;
+            else {
+                return (bottomDiff < topDiff) ? curvature_CURVEDIR_below : curvature_CURVEDIR_above;
+            }
+        }
+        else if (end->GetContentTop() < start->GetContentBottom()) {
+            if (endStemDir == STEMDIRECTION_down)
+                return curvature_CURVEDIR_below;
+            else {
+                return (bottomDiff < topDiff) ? curvature_CURVEDIR_below : curvature_CURVEDIR_above;
+            }
+        }
+    }
+    return curvature_CURVEDIR_below;
+}
+
+curvature_CURVEDIR Slur::GetPreferredCurveDirection(
+    Doc *doc, Layer *layer, LayerElement *layerElement, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter)
+{
+    assert(layerElement);
+    const bool isGraceToNoteSlur = !this->GetStart()->Is(TIMESTAMP_ATTR) && !this->GetEnd()->Is(TIMESTAMP_ATTR)
+        && this->GetStart()->IsGraceNote() && !this->GetEnd()->IsGraceNote();
+    Note *startNote = NULL;
+    Chord *startParentChord = NULL;
+    if (this->GetStart()->Is(NOTE)) {
+        startNote = vrv_cast<Note *>(this->GetStart());
+        assert(startNote);
+        startParentChord = startNote->IsChordTone();
+    }
+
+    data_STEMDIRECTION layerStemDir;
+    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
+    // first should be the slur @curvedir
+    if (this->HasCurvedir()) {
+        drawingCurveDir
+            = (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // grace notes - always below unless we have a drawing stem direction on the layer
+    else if (isGraceToNoteSlur && layer && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
+        drawingCurveDir = this->GetGraceCurveDirection(doc);
+    }
+    // the normal case
+    else if (this->HasDrawingCurvedir()) {
+        drawingCurveDir = this->GetDrawingCurvedir();
+    }
+    // then layer direction trumps note direction
+    else if (layer && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
+        drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // look if in a chord
+    else if (startParentChord) {
+        if (startParentChord->PositionInChord(startNote) < 0) {
+            drawingCurveDir = curvature_CURVEDIR_below;
+        }
+        else if (startParentChord->PositionInChord(startNote) > 0) {
+            drawingCurveDir = curvature_CURVEDIR_above;
+        }
+        // away from the stem if odd number (center note)
+        else {
+            drawingCurveDir = (noteStemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        }
+    }
+    else if (noteStemDir == STEMDIRECTION_up) {
+        drawingCurveDir = curvature_CURVEDIR_below;
+    }
+    else if (noteStemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        drawingCurveDir = (isAboveStaffCenter) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+
+    return drawingCurveDir;
+}
+
+std::pair<Point, Point> Slur::AdjustCoordinates(
+    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir)
+{
+    StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetStart());
+    StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetEnd());
+
+    data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
+    int startStemLen = 0;
+    if (startStemDrawInterface) {
+        startStemDir = startStemDrawInterface->GetDrawingStemDir();
+        startStemLen = startStemDrawInterface->GetDrawingStemLen();
+    }
+    data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
+    int endStemLen = 0;
+    if (endStemDrawInterface) {
+        endStemDir = endStemDrawInterface->GetDrawingStemDir();
+        endStemLen = endStemDrawInterface->GetDrawingStemLen();
+    }
+
+    // Pointers for the start point of the slur
+    Note *startNote = NULL;
+    LayerElement *start = this->GetStart();
+    Chord *startChord = NULL;
+    if (start->Is(NOTE)) {
+        startNote = vrv_cast<Note *>(start);
+        assert(startNote);
+        startChord = startNote->IsChordTone();
+    }
+    else if (start->Is(CHORD)) {
+        startChord = vrv_cast<Chord *>(start);
+        assert(startChord);
+    }
+
+    // Pointers for the end point of the slur
+    Note *endNote = NULL;
+    LayerElement *end = this->GetEnd();
+    Chord *endChord = NULL;
+    if (end->Is(NOTE)) {
+        endNote = vrv_cast<Note *>(end);
+        assert(endNote);
+        endChord = endNote->IsChordTone();
+    }
+    else if (end->Is(CHORD)) {
+        endChord = vrv_cast<Chord *>(end);
+        assert(endChord);
+    }
+
+    const bool isGraceToNoteSlur
+        = !start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && start->IsGraceNote() && !end->IsGraceNote();
+
+    int x1, x2, y1, y2;
+    std::tie(x1, x2, y1, y2) = std::tie(points.first.x, points.second.x, points.first.y, points.second.y);
+
+    bool isShortSlur = false;
+    if (x2 - x1 < doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
+
+    /************** calculate the radius for adjusting the x position **************/
+
+    int startRadius = 0;
+    if (!start->Is(TIMESTAMP_ATTR)) {
+        startRadius = start->GetDrawingRadius(doc);
+    }
+
+    int endRadius = 0;
+    if (!end->Is(TIMESTAMP_ATTR)) {
+        endRadius = end->GetDrawingRadius(doc);
+    }
+
+    Beam *parentBeam = NULL;
+    FTrem *parentFTrem = NULL;
+    int yChordMax = 0, yChordMin = 0;
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        // first get the min max of the chord (if any)
+        if (startChord) {
+            startChord->GetYExtremes(yChordMax, yChordMin);
+        }
+        // slur is up
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            // P(^)
+            if (startStemDir == STEMDIRECTION_down || startStemLen == 0)
+                y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            //  d(^)d
+            else if (isShortSlur) {
+                y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam - adjust the x too
+            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
+                || isGraceToNoteSlur) {
+                y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            // d(^)
+            else {
+                // put it on the side, move it left, but not if we have a @tstamp
+                if (!start->Is(TIMESTAMP_ATTR) && (startStemLen != 0)) x1 += unit * 2;
+                if (startChord)
+                    y1 = yChordMax + unit * 3;
+                else
+                    y1 = start->GetDrawingY() + unit * 3;
+            }
+        }
+        // slur is down
+        else {
+            // grace note
+            if (isGraceToNoteSlur) {
+                y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                if (startStemDir != STEMDIRECTION_up) {
+                    x1 -= startRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+                else {
+                    y1 += unit / 2;
+                }
+            }
+            // d(_)
+            else if (startStemDir == STEMDIRECTION_up || startStemLen == 0)
+                y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            // P(_)P
+            else if (isShortSlur) {
+                y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam
+            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))) {
+                y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            // P(_)
+            else {
+                // put it on the side, but no need to move it left
+                if (startChord) {
+                    y1 = yChordMin - unit * 3;
+                }
+                else {
+                    y1 = start->GetDrawingY() - unit * 3;
+                }
+            }
+        }
+    }
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        // get the min max of the chord if any
+        if (endChord) {
+            endChord->GetYExtremes(yChordMax, yChordMin);
+        }
+        // get the stem direction of the end
+        // slur is up
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            // (^)P
+            if (endStemDir == STEMDIRECTION_down || endStemLen == 0)
+                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            // d(^)d
+            else if (isShortSlur) {
+                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam - adjust the x too
+            else if ((((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                         || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end)))
+                && !isGraceToNoteSlur) {
+                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            else if (isGraceToNoteSlur) {
+                if (start->IsInBeam()) {
+                    x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+                else if (parentBeam || parentFTrem) {
+                    if (end->GetDrawingY() > y1) {
+                        y2 = end->GetDrawingY() + unit * 3;
+                    }
+                    else {
+                        y2 = y1;
+                        x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    }
+                }
+                else if ((end->GetContentTop() >= start->GetContentTop())
+                    && (end->GetContentBottom() <= start->GetContentTop())) {
+                    y2 = end->GetDrawingY() + unit * 3;
+                }
+                else {
+                    y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                    x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+            }
+            // (^)d
+            else {
+                // put it on the side, no need to move it right
+                if (endChord) {
+                    y2 = yChordMax + unit * 3;
+                }
+                else {
+                    y2 = end->GetDrawingY() + unit * 3;
+                }
+            }
+        }
+        else {
+            // (_)d
+            if (endStemDir == STEMDIRECTION_up || endStemLen == 0) {
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            }
+            // P(_)P
+            else if (isShortSlur && !isGraceToNoteSlur) {
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam
+            else if ((((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                         || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end)))
+                && !isGraceToNoteSlur) {
+
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            else if (isGraceToNoteSlur) {
+                if (start->IsInBeam()) {
+                    x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+                else if (parentBeam || parentFTrem) {
+                    if (end->GetDrawingY() < y1) {
+                        y2 = end->GetDrawingY();
+                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    }
+                    else {
+                        y2 = y1;
+                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    }
+                }
+                else {
+                    y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                    x2 -= endRadius;
+                }
+            }
+            // (_)P
+            else {
+                // put it on the side, move it right, but not if we have a @tstamp2
+                if (!end->Is(TIMESTAMP_ATTR)) x2 -= unit * 2;
+                if (endChord) {
+                    y2 = yChordMin - unit * 3;
+                }
+                else {
+                    y2 = end->GetDrawingY() - unit * 3;
+                }
+            }
+        }
+    }
+
+    // Positions not attached to a note
+    if (spanningType == SPANNING_START) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            y2 = staff->GetDrawingY();
+        }
+        else {
+            y2 = staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+        }
+        // At the end of a system, the slur finishes just short of the last barline
+        x2 -= (doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize) + unit) / 2;
+    }
+    if (end->Is(TIMESTAMP_ATTR)) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            y2 = std::max(staff->GetDrawingY(), y1);
+        }
+        else {
+            y2 = std::min(staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
+        }
+    }
+    if (spanningType == SPANNING_END) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            y1 = staff->GetDrawingY();
+        }
+        else {
+            y1 = staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+        }
+    }
+    if (start->Is(TIMESTAMP_ATTR)) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            y1 = std::max(staff->GetDrawingY(), y2);
+        }
+        else {
+            y1 = std::min(staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
+        }
+    }
+    // slur across an entire system; use the staff position
+    else if (spanningType == SPANNING_MIDDLE) {
+        // To be adjusted
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            y1 = staff->GetDrawingY();
+        }
+        else {
+            y1 = staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+        }
+        y2 = y1;
+    }
+
+    return std::make_pair(Point(x1, y1), Point(x2, y2));
 }
 
 //----------------------------------------------------------------------------

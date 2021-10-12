@@ -13,6 +13,10 @@
 
 namespace vrv {
 
+class Doc;
+class Layer;
+class Staff;
+
 //----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
@@ -67,9 +71,21 @@ public:
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
 
+    /**
+     * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
+     */
+    std::pair<Point, Point> AdjustCoordinates(
+        Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir);
+
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
+
+    /**
+     * Get preferred curve direction based on number of conditions: presence of other layers, stem direction, etc.
+     */
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        Doc *doc, Layer *layer, LayerElement *layerElement, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
 
     //----------//
     // Functors //
@@ -103,6 +119,9 @@ private:
     // Calculate the vertical control point shift
     std::pair<int, int> CalcControlPointVerticalShift(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Helper function to determine curve direction for the slurs that start at grace note
+    curvature_CURVEDIR GetGraceCurveDirection(Doc *doc);
 
     // Solve the constraints for vertical control point adjustment
     std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
