@@ -77,6 +77,11 @@ public:
     std::pair<Point, Point> AdjustCoordinates(
         Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir);
 
+    /**
+     * Determine layer elements spanned by the slur
+     */
+    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax);
+
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
@@ -95,11 +100,6 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustCrossStaffContent
-     */
-    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
 
 private:
     /**

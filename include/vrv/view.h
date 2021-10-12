@@ -179,6 +179,11 @@ public:
     int CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave);
     ///@}
 
+    /**
+     * Set whether slurs should be initialized when drawn
+     */
+    void ActivateSlurInitialization(bool active) { m_initializeSlurs = active; };
+
 protected:
     /**
      * @name Methods for drawing System, ScoreDef, StaffDef, Staff, and Layer.
@@ -627,6 +632,11 @@ protected:
     double m_tieThicknessCoefficient;
     double m_slurThicknessCoefficient;
     ///@}
+
+    /**
+     * Indicates whether slurs should be initialized when drawn
+     */
+    bool m_initializeSlurs;
 
     /**
      * The current drawing score def.
