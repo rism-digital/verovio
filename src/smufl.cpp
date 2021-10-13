@@ -74,6 +74,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "timeSigParensRightSmall", SMUFL_E093_timeSigParensRightSmall },
     { "timeSigParensLeft", SMUFL_E094_timeSigParensLeft },
     { "timeSigParensRight", SMUFL_E095_timeSigParensRight },
+    { "noteheadDoubleWhole", SMUFL_E0A0_noteheadDoubleWhole },
+    { "noteheadDoubleWholeSquare", SMUFL_E0A1_noteheadDoubleWholeSquare },
     { "noteheadWhole", SMUFL_E0A2_noteheadWhole },
     { "noteheadHalf", SMUFL_E0A3_noteheadHalf },
     { "noteheadBlack", SMUFL_E0A4_noteheadBlack },
@@ -429,6 +431,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 403
+// 405
 
 } // namespace vrv
