@@ -572,7 +572,9 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         Chord *chord = vrv_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
-        if (dur == DUR_1)
+        if (dur == DUR_BR)
+            code = SMUFL_E0A1_noteheadDoubleWholeSquare;
+        else if (dur == DUR_1)
             code = SMUFL_E0A2_noteheadWhole;
         else if (dur == DUR_2)
             code = SMUFL_E0A3_noteheadHalf;
