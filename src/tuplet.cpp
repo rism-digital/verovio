@@ -180,21 +180,17 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, int yReference, int staffSize)
         this->FindAllDescendantByComparison(&descendants, &rest);
 
         int restAdjust = 0;
+        const int bracketRel = tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin;
+        const int bracketPosition = (tupletBracket->GetSelfTop() + tupletBracket->GetSelfBottom() + bracketRel) / 2;
         for (auto &descendant : descendants) {
             if (descendant->GetFirstAncestor(BEAM) || !descendant->HasSelfBB()) continue;
             if (m_drawingBracketPos == STAFFREL_basic_above) {
-                const int bracketRel = tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin;
-                const int bracketPosition
-                    = (tupletBracket->GetSelfTop() + tupletBracket->GetSelfBottom() + bracketRel) / 2;
                 if (bracketPosition < descendant->GetSelfTop()) {
                     const int verticalShift = descendant->GetSelfTop() - bracketPosition;
                     if ((restAdjust == 0) || (restAdjust < verticalShift)) restAdjust = verticalShift;
                 }
             }
             else {
-                const int bracketRel = tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin;
-                const int bracketPosition
-                    = (tupletBracket->GetSelfTop() + tupletBracket->GetSelfBottom() + bracketRel) / 2;
                 if (bracketPosition > descendant->GetSelfBottom()) {
                     const int verticalShift = descendant->GetSelfBottom() - bracketPosition;
                     if ((restAdjust == 0) || (restAdjust > verticalShift)) restAdjust = verticalShift;
