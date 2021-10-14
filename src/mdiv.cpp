@@ -52,9 +52,6 @@ bool Mdiv::IsSupportedChild(Object *child)
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));
     }
-    else if (child->Is(PAGES)) {
-        assert(dynamic_cast<Pages *>(child));
-    }
     else if (child->Is(SCORE)) {
         assert(dynamic_cast<Score *>(child));
     }

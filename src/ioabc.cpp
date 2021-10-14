@@ -80,7 +80,7 @@ int keyPitchAlterAmount = 0;
 
 ABCInput::ABCInput(Doc *doc) : Input(doc)
 {
-    m_hasLayoutInformation = true;
+    m_layoutInformation = LAYOUT_ENCODED;
 }
 
 ABCInput::~ABCInput() {}
@@ -556,11 +556,11 @@ void ABCInput::parseInstruction(const std::string &instruction)
     else if (!strncmp(instruction.c_str(), "linebreak", 9)) {
         if (instruction.find("<none>") != std::string::npos) {
             m_linebreak = '\0';
-            m_hasLayoutInformation = false;
+            m_layoutInformation = LAYOUT_NONE;
         }
         else {
             m_linebreak = '$';
-            m_hasLayoutInformation = true;
+            m_layoutInformation = LAYOUT_ENCODED;
             LogWarning("ABC import: Default linebreaks are used for now.");
         }
     }
