@@ -1417,9 +1417,9 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <!--<glyph glyph-code="E5E2" smufl-name="brassSmear"/>-->
             <!--<glyph glyph-code="E5E3" smufl-name="brassBend"/>-->
             <!--<glyph glyph-code="E5E4" smufl-name="brassJazzTurn"/>-->
-            <!--<glyph glyph-code="E5E5" smufl-name="brassMuteClosed"/>-->
-            <!--<glyph glyph-code="E5E6" smufl-name="brassMuteHalfClosed"/>-->
-            <!--<glyph glyph-code="E5E7" smufl-name="brassMuteOpen"/>-->
+            <glyph glyph-code="E5E5" smufl-name="brassMuteClosed"/>
+            <glyph glyph-code="E5E6" smufl-name="brassMuteHalfClosed"/>
+            <glyph glyph-code="E5E7" smufl-name="brassMuteOpen"/>
             <!--<glyph glyph-code="E5E8" smufl-name="brassHarmonMuteClosed"/>-->
             <!--<glyph glyph-code="E5E9" smufl-name="brassHarmonMuteStemHalfLeft"/>-->
             <!--<glyph glyph-code="E5EA" smufl-name="brassHarmonMuteStemHalfRight"/>-->

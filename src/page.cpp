@@ -475,10 +475,8 @@ void Page::LayOutVertically()
     AdjustSlursParams adjustSlursParams(doc, &adjustSlurs);
     this->Process(&adjustSlurs, &adjustSlursParams);
 
-    // There is a problem here with cross-staff slurs: the Slur::m_isCrossStaff flag
-    // will trigger View::DrawSlurInitial to be called again.
-    // The slur will then remain not adjusted. It will again when AdjustSlurs is called below,
-    // but in between, we can have wrong collisions detections. To be improved
+    // At this point slurs must not be reinitialized, otherwise the adjustment we just did was in vain
+    view.ActivateSlurInitialization(false);
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
@@ -517,6 +515,7 @@ void Page::LayOutVertically()
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlursParams.m_crossStaffSlurs) {
+        view.ActivateSlurInitialization(true);
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(&adjustSlurs, &adjustSlursParams);

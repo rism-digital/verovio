@@ -1422,9 +1422,15 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     // ignore elements that are both on other layer and cross-staff
     if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
     // ignore specific elements, since they should not be influencing beam positioning
-    if (Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
+    if (this->Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
     // ignore elements that start before the beam
     if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
+    // ignore editorial accidental
+    if (this->Is(ACCID)) {
+        Accid *accid = vrv_cast<Accid *>(this);
+        assert(accid);
+        if (accid->GetFunc() == accidLog_FUNC_edit) return FUNCTOR_CONTINUE;
+    }
 
     Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(staff);
@@ -1790,7 +1796,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int offset = 0;
     int selfLeft;
-    int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
+    const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
     // Nested aligment of bounding boxes is performed only when both the previous alignment and
     // the current one allow it. For example, when one of them is a barline, we do not look how
@@ -1831,6 +1837,23 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                     if (this->Is(NOTE) && element->Is(NOTE)) {
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
                     }
+                    else if (this->Is(ACCID) && element->Is(NOTE)) {
+                        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+                        const int staffTop = staff->GetDrawingY();
+                        const int staffBottom = staffTop - params->m_doc->GetDrawingStaffSize(params->m_staffSize);
+                        int verticalMargin = 0;
+                        if ((this->GetContentTop() > staffTop + 2 * drawingUnit) && (element->GetDrawingY() > staffTop)
+                            && (element->GetDrawingY() > this->GetDrawingY())) {
+                            verticalMargin = element->GetDrawingY() - this->GetDrawingY();
+                        }
+                        else if ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+                            && (element->GetDrawingY() < staffBottom)
+                            && (element->GetDrawingY() < this->GetDrawingY())) {
+                            verticalMargin = this->GetDrawingY() - element->GetDrawingY();
+                        }
+                        overlap = std::max(
+                            overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
+                    }
                     else {
                         overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
                     }
@@ -1842,7 +1865,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // Otherwise only look at the horizontal position
         else {
             selfLeft = this->GetSelfLeft();
-            selfLeft -= params->m_doc->GetLeftMargin(this) * params->m_doc->GetDrawingUnit(100);
+            selfLeft -= params->m_doc->GetLeftMargin(this) * drawingUnit;
         }
     }
 
@@ -1884,7 +1907,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
         const int currentTieLength = it->second->GetContentLeft() - it->first->GetContentRight() - drawingUnit;
         if ((currentTieLength < minTieLength)
-            && ((this->GetFirstAncestor(CHORD) != NULL) || (it->first->FindDescendantByType(FLAG) != NULL))) {
+            && ((it->first->GetFirstAncestor(CHORD) != NULL) || (this->GetFirstAncestor(CHORD) != NULL)
+                || (it->first->FindDescendantByType(FLAG) != NULL))) {
             const int adjust = minTieLength - currentTieLength;
             this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() + adjust);
             // Also move the accumulated x shift and the minimum position for the next alignment accordingly

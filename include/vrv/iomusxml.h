@@ -397,6 +397,13 @@ private:
     ///@}
 
     /*
+     * @name Helper method for comparing written/gestural accidental attributes
+     */
+    ///@{
+    static bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
+    ///@}
+
+    /*
      * @name Methods for converting MusicXML values to MEI attributes.
      */
     ///@{

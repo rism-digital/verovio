@@ -293,6 +293,9 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "ornamentPrecompMordentUpperPrefix", SMUFL_E5C6_ornamentPrecompMordentUpperPrefix },
     { "ornamentPrecompInvertedMordentUpperPrefix", SMUFL_E5C7_ornamentPrecompInvertedMordentUpperPrefix },
     { "ornamentPrecompTrillLowerSuffix", SMUFL_E5C8_ornamentPrecompTrillLowerSuffix },
+    { "brassMuteClosed", SMUFL_E5E5_brassMuteClosed },
+    { "brassMuteHalfClosed", SMUFL_E5E6_brassMuteHalfClosed },
+    { "brassMuteOpen", SMUFL_E5E7_brassMuteOpen },
     { "stringsDownBow", SMUFL_E610_stringsDownBow },
     { "stringsDownBowTurned", SMUFL_E611_stringsDownBowTurned },
     { "stringsUpBow", SMUFL_E612_stringsUpBow },
@@ -426,6 +429,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 400
+// 403
 
 } // namespace vrv

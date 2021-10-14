@@ -282,8 +282,30 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
+            Staff *staff = *staffIter;
+            // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
+            // corresponding to whether the slur is curved above/below
+            if (element->Is(SLUR)) {
+                Slur *slur = vrv_cast<Slur *>(element);
+                const std::vector<LayerElement *> spannedElements = slur->CollectSpannedElements(staff, x1, x2);
+                for (LayerElement *element : spannedElements) {
+                    Layer *elementLayer = NULL;
+                    Staff *elementStaff = element->GetCrossStaff(elementLayer);
+                    if (!elementStaff) elementStaff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+                    assert(elementStaff);
+
+                    if ((slur->GetCurvedir() == curvature_CURVEDIR_above) && (elementStaff->GetN() < staff->GetN())) {
+                        staff = elementStaff;
+                    }
+                    if ((slur->GetCurvedir() == curvature_CURVEDIR_below) && (elementStaff->GetN() > staff->GetN())) {
+                        staff = elementStaff;
+                    }
+                }
+            }
+
+            // Create the floating positioner
             if (!system->SetCurrentFloatingPositioner(
-                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
+                    staff->GetN(), dynamic_cast<ControlElement *>(element), objectX, staff, spanningType)) {
                 continue;
             }
         }
@@ -902,11 +924,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_tieMidpointThickness.GetValue();
     const int penWidth
         = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (m_tieThicknessCoeficient <= 0) {
-        m_tieThicknessCoeficient = BoundingBox::GetBezierThicknessCoeficient(bezier, thickness, 0, penWidth);
+    if (m_tieThicknessCoefficient <= 0) {
+        m_tieThicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, 0, penWidth);
     }
     DrawThickBezierCurve(
-        dc, bezier, m_tieThicknessCoeficient * thickness, staff->m_drawingStaffSize, penWidth, 0, penStyle);
+        dc, bezier, m_tieThicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, 0, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1737,10 +1759,9 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
         params.m_enclosedRend.clear();
         params.m_y = fing->GetDrawingY();
+        params.m_pointSize = m_doc->GetFingeringFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-
-        fingTxt.SetPointSize(params.m_pointSize / 2);
+        fingTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&fingTxt);

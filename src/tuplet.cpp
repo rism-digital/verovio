@@ -136,10 +136,113 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
-void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int staffSize)
+void Tuplet::AdjustTupletBracketY(Doc *doc, int yReference, int staffSize)
+{
+    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
+    if (!tupletBracket || (this->GetBracketVisible() == BOOLEAN_false)) return;
+
+    const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
+    int bracketVerticalMargin = doubleUnit;
+    bracketVerticalMargin *= (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
+
+    Beam *beam = this->GetBracketAlignedBeam();
+    if (beam) {
+        // Check for possible articulations
+        ListOfObjects artics;
+        ClassIdsComparison comparison({ ARTIC });
+        this->FindAllDescendantByComparison(&artics, &comparison);
+
+        int articPadding = 0;
+        for (auto &artic : artics) {
+            if (!artic->HasSelfBB()) continue;
+            if (m_drawingBracketPos == STAFFREL_basic_above) {
+                // Left point when slope is going up and right when going down
+                int relevantX = (beam->m_beamSegment.m_beamSlope > 0) ? artic->GetSelfLeft() : artic->GetSelfRight();
+                int currentYRel = beam->m_beamSegment.m_startingY
+                    + beam->m_beamSegment.m_beamSlope * (relevantX - beam->m_beamSegment.m_startingX);
+                int articYRel = artic->GetSelfTop();
+                articPadding = std::min(currentYRel - articYRel, articPadding);
+            }
+            else {
+                // Right point when slope is going up and left when going down
+                int relevantX = (beam->m_beamSegment.m_beamSlope > 0) ? artic->GetSelfRight() : artic->GetSelfLeft();
+                int currentYRel = beam->m_beamSegment.m_startingY
+                    + beam->m_beamSegment.m_beamSlope * (relevantX - beam->m_beamSegment.m_startingX);
+                int articYRel = artic->GetSelfBottom();
+                articPadding = std::max(currentYRel - articYRel, articPadding);
+            }
+        }
+
+        // Check for overlap with rest elements. This might happen when tuplet has rest and beam children that are
+        // on the same level in encoding - there might be overlap of bracket with rest in that case
+        ListOfObjects descendants;
+        ClassIdsComparison rest({ REST });
+        this->FindAllDescendantByComparison(&descendants, &rest);
+
+        int restAdjust = 0;
+        const int bracketRel = tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin;
+        const int bracketPosition = (tupletBracket->GetSelfTop() + tupletBracket->GetSelfBottom() + bracketRel) / 2;
+        for (auto &descendant : descendants) {
+            if (descendant->GetFirstAncestor(BEAM) || !descendant->HasSelfBB()) continue;
+            if (m_drawingBracketPos == STAFFREL_basic_above) {
+                if (bracketPosition < descendant->GetSelfTop()) {
+                    const int verticalShift = descendant->GetSelfTop() - bracketPosition;
+                    if ((restAdjust == 0) || (restAdjust < verticalShift)) restAdjust = verticalShift;
+                }
+            }
+            else {
+                if (bracketPosition > descendant->GetSelfBottom()) {
+                    const int verticalShift = descendant->GetSelfBottom() - bracketPosition;
+                    if ((restAdjust == 0) || (restAdjust > verticalShift)) restAdjust = verticalShift;
+                }
+            }
+        }
+        if (restAdjust) bracketVerticalMargin += restAdjust;
+
+        // Adjust bracket in case beam is horizontal and bracket overlaps with staff line
+        if (beam->m_beamSegment.m_beamSlope == 0.0) {
+            const int staffHeight = doc->GetDrawingStaffSize(staffSize);
+            if ((beam->m_beamSegment.m_startingY < yReference)
+                && (beam->m_beamSegment.m_startingY > yReference - staffHeight)
+                && !(beam->m_beamSegment.m_startingY % doubleUnit)) {
+                bracketVerticalMargin += doubleUnit / 4;
+            }
+        }
+
+        tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin);
+    }
+    else {
+        // Default position is above or below the staff
+        int yRel = (m_drawingBracketPos == STAFFREL_basic_above) ? 0 : -doc->GetDrawingStaffSize(staffSize);
+
+        // Check for overlap with content
+        // Possible issue with beam above the tuplet - not sure this will be noticeable
+        ListOfObjects descendants;
+        ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
+        this->FindAllDescendantByComparison(&descendants, &comparison);
+
+        for (auto &descendant : descendants) {
+            if (!descendant->HasSelfBB()) continue;
+            if (m_drawingBracketPos == STAFFREL_basic_above) {
+                int dist = descendant->GetSelfTop() - yReference;
+                if (yRel < dist) yRel = dist;
+            }
+            else {
+                int dist = descendant->GetSelfBottom() - yReference;
+                if (yRel > dist) yRel = dist;
+            }
+        }
+
+        tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + yRel + bracketVerticalMargin);
+    }
+}
+
+void Tuplet::AdjustTupletNumY(Doc *doc, int yReference, int staffSize)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
+
+    const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
     // The num is within a bracket
     if (tupletNum->GetAlignedBracket()) {
         // yRel is not used for drawing but we need to adjust it for the bounding box to follow the changes
@@ -148,7 +251,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int 
     }
 
     // The num is on its own
-    const int numVerticalMargin = (m_drawingNumPos == STAFFREL_basic_above) ? verticalMargin : -verticalMargin;
+    const int numVerticalMargin = (m_drawingNumPos == STAFFREL_basic_above) ? doubleUnit : -doubleUnit;
     // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
     ListOfObjects descendants;
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
@@ -495,83 +598,11 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 
-    const int verticalMargin = params->m_doc->GetDrawingDoubleUnit(staffSize);
     const int yReference = m_crossStaff ? m_crossStaff->GetDrawingY() : staff->GetDrawingY();
 
-    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
-    if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
+    this->AdjustTupletBracketY(params->m_doc, yReference, staffSize);
 
-        int bracketVerticalMargin = verticalMargin;
-        bracketVerticalMargin *= (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
-
-        Beam *beam = this->GetBracketAlignedBeam();
-        if (beam) {
-            // Check for possible articulations
-            ListOfObjects artics;
-            ClassIdsComparison comparison({ ARTIC });
-            this->FindAllDescendantByComparison(&artics, &comparison);
-
-            int articPadding = 0;
-            for (auto &artic : artics) {
-                if (!artic->HasSelfBB()) continue;
-                if (m_drawingBracketPos == STAFFREL_basic_above) {
-                    // Left point when slope is going up and right when going down
-                    int relevantX
-                        = (beam->m_beamSegment.m_beamSlope > 0) ? artic->GetSelfLeft() : artic->GetSelfRight();
-                    int currentYRel = beam->m_beamSegment.m_startingY
-                        + beam->m_beamSegment.m_beamSlope * (relevantX - beam->m_beamSegment.m_startingX);
-                    int articYRel = artic->GetSelfTop();
-                    articPadding = std::min(currentYRel - articYRel, articPadding);
-                }
-                else {
-                    // Right point when slope is going up and left when going down
-                    int relevantX
-                        = (beam->m_beamSegment.m_beamSlope > 0) ? artic->GetSelfRight() : artic->GetSelfLeft();
-                    int currentYRel = beam->m_beamSegment.m_startingY
-                        + beam->m_beamSegment.m_beamSlope * (relevantX - beam->m_beamSegment.m_startingX);
-                    int articYRel = artic->GetSelfBottom();
-                    articPadding = std::max(currentYRel - articYRel, articPadding);
-                }
-            }
-
-            tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin);
-        }
-        else {
-            // Default position is above or below the staff
-            int yRel
-                = (m_drawingBracketPos == STAFFREL_basic_above) ? 0 : -params->m_doc->GetDrawingStaffSize(staffSize);
-
-            // Check for overlap with content
-            // Possible issue with beam above the tuplet - not sure this will be noticeable
-            ListOfObjects descendants;
-            ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
-            this->FindAllDescendantByComparison(&descendants, &comparison);
-
-            // Possible fix for beam above tuplet
-            /*
-            Object *parentBeam = this->GetFirstAncestor(BEAM);
-            if (parentBeam) {
-                descendants.push_back(parentBeam);
-            }
-            */
-
-            for (auto &descendant : descendants) {
-                if (!descendant->HasSelfBB()) continue;
-                if (m_drawingBracketPos == STAFFREL_basic_above) {
-                    int dist = descendant->GetSelfTop() - yReference;
-                    if (yRel < dist) yRel = dist;
-                }
-                else {
-                    int dist = descendant->GetSelfBottom() - yReference;
-                    if (yRel > dist) yRel = dist;
-                }
-            }
-
-            tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + yRel + bracketVerticalMargin);
-        }
-    }
-
-    AdjustTupletNumY(params->m_doc, verticalMargin, yReference, staffSize);
+    this->AdjustTupletNumY(params->m_doc, yReference, staffSize);
 
     return FUNCTOR_SIBLINGS;
 }

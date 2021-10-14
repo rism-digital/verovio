@@ -54,7 +54,12 @@ public:
     /**
      * Adjust tuplet relative positioning based on possible overlaps
      */
-    void AdjustTupletNumY(Doc *doc, int verticalMargin, int yReference, int staffSize);
+    void AdjustTupletBracketY(Doc *doc, int yReference, int staffSize);
+
+    /**
+     * Adjust tuplet relative positioning based on possible overlaps
+     */
+    void AdjustTupletNumY(Doc *doc, int yReference, int staffSize);
 
     /**
      * @name Setter and getter for darwing elements and position

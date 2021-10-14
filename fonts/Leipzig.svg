@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20201107 at Thu Sep 23 14:22:07 2021
+Created by FontForge 20201107 at Sat Oct  2 19:16:28 2021
  By Klaus Rettinghaus
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.60
+Version 5.2.61
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
@@ -1531,5 +1531,11 @@ d="M0 0h33c0 -1 5 -23 6 -27c12 -41 56 -200 264 -200v-93c-49 0 -241 6 -299 299c-1
 d="M0 44c-17 -5 -6 17 0 24c32 32 58 44 74 44c45 0 46 -64 76 -64c10 0 26 0 48 20c17 5 5 -17 0 -24c-32 -32 -58 -44 -74 -44c-45 0 -46 64 -76 64c-10 0 -26 0 -48 -20z" />
     <glyph glyph-name="uniEAA4" unicode="&#xeaa4;" horiz-adv-x="198" 
 d="M0 44c-20 20 -12 36 0 24s22 -20 38 -20s70 64 86 64s42 -12 74 -44c20 -20 12 -36 0 -24s-22 20 -38 20s-70 -64 -86 -64s-42 12 -74 44z" />
+    <glyph glyph-name="uniE5E5" unicode="&#xe5e5;" horiz-adv-x="330" 
+d="M152 152h-152v26h152v152h26v-152h152v-26h-152v-152h-26v152z" />
+    <glyph glyph-name="uniE5E6" unicode="&#xe5e6;" horiz-adv-x="330" 
+d="M0 165c0 106 59 165 165 165s165 -59 165 -165s-59 -165 -165 -165s-165 59 -165 165zM28 152c4 -77 47 -120 124 -124v124h-124zM178 28c77 4 120 47 124 124h-124v-124zM178 178h124c-4 77 -47 120 -124 124v-124zM28 178h124v124c-77 -4 -120 -47 -124 -124z" />
+    <glyph glyph-name="uniE5E7" unicode="&#xe5e7;" horiz-adv-x="330" 
+d="M0 165c0 106 59 165 165 165s165 -59 165 -165s-59 -165 -165 -165s-165 59 -165 165zM28 165c0 -90 47 -137 137 -137s137 47 137 137s-47 137 -137 137s-137 -47 -137 -137z" />
   </font>
 </defs></svg>
