@@ -136,11 +136,12 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
-void Tuplet::AdjustTupletBracketY(Doc *doc, int yReference, int staffSize)
+void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
 {
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (!tupletBracket || (this->GetBracketVisible() == BOOLEAN_false)) return;
 
+    const int yReference = staff->GetDrawingY();
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
     int bracketVerticalMargin = doubleUnit;
     bracketVerticalMargin *= (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
@@ -237,11 +238,12 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, int yReference, int staffSize)
     }
 }
 
-void Tuplet::AdjustTupletNumY(Doc *doc, int yReference, int staffSize)
+void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
 
+    const int yReference = staff->GetDrawingY();
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
     // The num is within a bracket
     if (tupletNum->GetAlignedBracket()) {
@@ -257,12 +259,6 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int yReference, int staffSize)
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
     this->FindAllDescendantByComparison(&descendants, &comparison);
 
-    auto it = std::find_if(descendants.begin(), descendants.end(), [](Object *object) {
-        LayerElement *element = vrv_cast<LayerElement *>(object);
-        if (!element) return false;
-        return !element->m_crossStaff;
-    });
-
     const int staffHeight = doc->GetDrawingStaffSize(staffSize);
     const int adjustedPosition = (m_drawingNumPos == STAFFREL_basic_above) ? 0 : -staffHeight;
     Beam *beam = this->GetNumAlignedBeam();
@@ -271,11 +267,10 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int yReference, int staffSize)
     }
 
     // Calculate relative Y for the tupletNum
-    AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
+    AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum, staff);
     adjustTupletNumOverlapParams.m_horizontalMargin = 2 * doc->GetDrawingUnit(staffSize);
     adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
     adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
-    adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
     Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
     this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
     int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
@@ -598,11 +593,11 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 
-    const int yReference = m_crossStaff ? m_crossStaff->GetDrawingY() : staff->GetDrawingY();
+    Staff *relevantStaff = m_crossStaff ? m_crossStaff : staff;
 
-    this->AdjustTupletBracketY(params->m_doc, yReference, staffSize);
+    this->AdjustTupletBracketY(params->m_doc, relevantStaff, staffSize);
 
-    this->AdjustTupletNumY(params->m_doc, yReference, staffSize);
+    this->AdjustTupletNumY(params->m_doc, relevantStaff, staffSize);
 
     return FUNCTOR_SIBLINGS;
 }
