@@ -3092,6 +3092,13 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     else if (m_selectedMdiv.empty()) {
         m_readingScoreBased = false;
     }
+    // Old page-based files. We skip the mdiv and load the pages element.
+    // The mdiv and score boundaries are added by UpgradePageTo_5_0_0.
+    // This work only for single page files
+    else if (m_selectedMdiv.child("pages") && (m_version == MEI_2013)) {
+        pages = m_selectedMdiv.child("pages");
+        m_readingScoreBased = false;
+    }
 
     // Reading score-based MEI
     if (m_readingScoreBased) {
@@ -3146,6 +3153,11 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     // Reading page-based MEI
     else {
         success = this->ReadPages(m_doc, pages);
+
+        if (success && !m_hasScoreDef) {
+            LogWarning("No scoreDef provided, trying to generate one...");
+            success = m_doc->GenerateDocumentScoreDef();
+        }
     }
 
     return success;
@@ -3210,14 +3222,12 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
 
 bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
 {
-    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
-        // UpgradePageTo_3_0_0(vrvPage, m_doc);
-        LogError("Backward compatibility with previous page-based MEI files could not be maintained");
-        return false;
-    }
-
     Page *vrvPage = new Page();
     SetMeiUuid(page, vrvPage);
+
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradePageTo_3_0_0(vrvPage, m_doc);
+    }
 
     if (page.attribute("page.height")) {
         vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
@@ -3258,6 +3268,10 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
         ApplyPPUFactorParams applyPPUFactorParams;
         Functor applyPPUFactor(&Object::ApplyPPUFactor);
         vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
+    }
+
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradePageTo_5_0_0(vrvPage);
     }
 
     ReadUnsupportedAttr(page, vrvPage);
@@ -3366,13 +3380,6 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
         if (!success) break;
         if (std::string(current.name()) == "mdiv") {
             success = ReadMdiv(parent, current, makeVisible);
-        }
-        else if (std::string(current.name()) == "pages") {
-            success = ReadPages(parent, current);
-            if (parentNode.last_child() != current) {
-                LogWarning("Skipping nodes after <pages> element");
-            }
-            break;
         }
         else if (std::string(current.name()) == "score") {
             success = ReadScore(parent, current);
@@ -3834,7 +3841,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     // assert(dynamic_cast<Pages *>(parent));
 
     ScoreDef *vrvScoreDef;
-    // We have not reached the first scoreDef and we have to use if for the doc
+    // We are reading the score/scoreDef
     if (parent->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(parent);
         assert(score);
@@ -6874,6 +6881,28 @@ bool MEIInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MEIInput::s_editorialElementNames.begin(), MEIInput::s_editorialElementNames.end(), elementName);
     if (i != MEIInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MEIInput::UpgradePageTo_5_0_0(Page *page)
+{
+    assert(page);
+
+    // Upgrade old page-based files by inserting a mdiv and score with corresponding boundaries
+    // Works only for single page files
+
+    Score *score = new Score();
+    score->SetParent(page);
+    page->InsertChild(score, 0);
+
+    PageElementEnd *scoreEnd = new PageElementEnd(score);
+    page->AddChild(scoreEnd);
+
+    Mdiv *mdiv = new Mdiv();
+    mdiv->SetParent(page);
+    page->InsertChild(mdiv, 0);
+
+    PageElementEnd *mdivEnd = new PageElementEnd(mdiv);
+    page->AddChild(mdivEnd);
 }
 
 void MEIInput::UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt)

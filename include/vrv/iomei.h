@@ -743,6 +743,8 @@ private:
      * @name Various methods for upgrading older MEI files
      */
     ///@{
+    // to MEI 5.0.0
+    void UpgradePageTo_5_0_0(Page *page);
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);
