@@ -52,16 +52,6 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize);
-
-    /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize);
-
-    /**
      * @name Setter and getter for darwing elements and position
      */
     ///@{
@@ -129,7 +119,27 @@ protected:
     virtual void FilterList(ArrayOfObjects *childList);
 
 private:
-    //
+    /**
+     * Adjust tuplet relative positioning based on possible overlaps
+     */
+    void AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize);
+
+    /**
+     * Adjust tuplet relative positioning based on possible overlaps
+     */
+    void AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize);
+
+    /**
+     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
+     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
+     */
+    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
+
+    /**
+     * Check whether tuplet number has valid postioning staffwise
+     */
+    bool HasValidTupletNumPosition(Staff *preferredStaff, Staff *otherStaff);
+
 public:
     //
 private:
