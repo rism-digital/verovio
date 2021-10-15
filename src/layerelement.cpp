@@ -556,12 +556,14 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
     wchar_t code = 0;
     int dur = DUR_4;
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    bool isMensuralDur = false;
     assert(staff);
     if (this->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
-        if (note->IsMensuralDur() && !isInLigature) {
+        isMensuralDur = note->IsMensuralDur();
+        if (isMensuralDur && !isInLigature) {
             code = note->GetMensuralNoteheadGlyph();
         }
         else {
@@ -572,6 +574,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         Chord *chord = vrv_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
+        isMensuralDur = chord->IsMensuralDur();
         if (dur == DUR_BR)
             code = SMUFL_E0A1_noteheadDoubleWholeSquare;
         else if (dur == DUR_1)
@@ -586,7 +589,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
     }
 
     // Mensural note shorter than DUR_BR
-    if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
+    if ((isMensuralDur && (dur <= DUR_BR)) || ((dur == DUR_1) && isInLigature)) {
         int widthFactor = (dur == DUR_MX) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.7;
