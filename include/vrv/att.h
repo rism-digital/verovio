@@ -42,7 +42,8 @@ public:
      * The implementation is implemented by LibMEI in each module corresponding file
      * Use in the toolkit for applying attribute modification to unspecified elements
      * See Toolkit::Set method
-     * Files to be uncommented according to the inclusion of the corresponding LibMEI files
+     * Files to be uncommented according to the inclusion of the corresponding LibMEI files.
+     * When uncommentting a file also uncomment corresponding calls in Object::GetAttributes
      */
     ///@{
     static bool SetAnalytical(Object *element, const std::string &attrType, const std::string &attrValue);
