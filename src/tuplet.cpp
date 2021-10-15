@@ -242,7 +242,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
-    
+
     this->CalculateTupletNumCrossStaff(tupletNum);
 
     Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
@@ -367,12 +367,10 @@ bool Tuplet::HasValidTupletNumPosition(Staff *preferredStaff, Staff *otherStaff)
     if (beam->m_drawingPlace == BEAMPLACE_mixed) return false;
 
     if (preferredStaff->GetN() < otherStaff->GetN()) {
-        if ((beam->m_drawingPlace == BEAMPLACE_below) && (m_drawingNumPos == STAFFREL_basic_below))
-            return false;
+        if ((beam->m_drawingPlace == BEAMPLACE_below) && (m_drawingNumPos == STAFFREL_basic_below)) return false;
     }
     else {
-        if ((beam->m_drawingPlace == BEAMPLACE_above) && (m_drawingNumPos == STAFFREL_basic_above))
-            return false;
+        if ((beam->m_drawingPlace == BEAMPLACE_above) && (m_drawingNumPos == STAFFREL_basic_above)) return false;
     }
 
     return true;
