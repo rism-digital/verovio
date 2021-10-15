@@ -127,7 +127,8 @@ void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
     }
 }
 
-void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids)
+void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
+    std::vector<Accid *> &adjustedAccids)
 {
     assert(element);
     assert(doc);
@@ -157,12 +158,14 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     }
 
     if (element->Is(ACCID)) {
+        Accid *accid = vrv_cast<Accid *>(element);
         if (!this->HorizontalLeftOverlap(element, doc, horizontalMargin, verticalMargin)) {
             // There is enough space on the right of the accidental, but maybe we will need to
             // adjust it again (see recursive call below), so keep the accidental that is on the left
-            leftAccids.push_back(dynamic_cast<Accid *>(element));
+            leftAccids.push_back(accid);
             return;
         }
+        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end()) return;
     }
 
     int xRelShift = 0;
@@ -176,13 +179,15 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     // Move only to the left
     if (xRelShift > 0) {
         this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
+        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), this) == adjustedAccids.end())
+            adjustedAccids.push_back(this);
         // We have some accidentals on the left, check again with all of these
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;
             std::vector<Accid *>::iterator iter;
             // Recursively adjust all accidental that are on the left because enough space was previously available
             for (iter = leftAccids.begin(); iter != leftAccids.end(); ++iter) {
-                this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset);
+                this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset, adjustedAccids);
             }
         }
     }

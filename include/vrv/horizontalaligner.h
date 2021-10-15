@@ -319,7 +319,7 @@ public:
     /**
      * See Object::AjustAccidX
      */
-    void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize);
+    void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids);
 
     /**
      * Return true if the reference has elements from multiple layers.
