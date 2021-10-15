@@ -1891,6 +1891,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            above->SetOverflowBBoxAbove(current, overflowAbove);
             above->SetOverflowAbove(overflowAbove);
             above->AddBBoxAbove(current);
         }
@@ -1901,6 +1902,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            below->SetOverflowBBoxBelow(current, overflowBelow);
             below->SetOverflowBelow(overflowBelow);
             below->AddBBoxBelow(current);
         }
