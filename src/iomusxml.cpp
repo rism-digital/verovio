@@ -187,6 +187,8 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
         if (!currentMeasure) {
             LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
                 clefChange.m_measureNum.c_str(), clefChange.m_staff->GetN(), clefChange.m_scoreOnset);
+            delete clefChange.m_clef;
+            continue;
         }
         if (!clefChange.m_scoreOnset && !clefChange.m_afterBarline) {
             Measure *previousMeasure = NULL;
