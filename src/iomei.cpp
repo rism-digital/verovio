@@ -87,6 +87,7 @@
 #include "octave.h"
 #include "orig.h"
 #include "page.h"
+#include "pageboundary.h"
 #include "pages.h"
 #include "pb.h"
 #include "pedal.h"
@@ -2989,7 +2990,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 {
     pugi::xml_node current;
     bool success = true;
-    m_readingScoreBased = false;
+    m_readingScoreBased = true;
 
     if (root.empty()) {
         LogError("The tree of the MEI data cannot be parsed (no root found)");
@@ -3081,118 +3082,81 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     // Select the first mdiv by default
+    pages = body.child("pages");
     m_selectedMdiv = body.child("mdiv");
-    if (m_selectedMdiv.empty()) {
-        LogError("No <mdiv> element found in the MEI data");
+
+    if (m_selectedMdiv.empty() && pages.empty()) {
+        LogError("No <mdiv> or no <pages> element found in the MEI data");
         return false;
     }
+    else if (m_selectedMdiv.empty()) {
+        m_readingScoreBased = false;
+    }
+    // Old page-based files. We skip the mdiv and load the pages element.
+    // The mdiv and score boundaries are added by UpgradePageTo_5_0_0.
+    // This work only for single page files
+    else if (m_selectedMdiv.child("pages") && (m_version == MEI_2013)) {
+        pages = m_selectedMdiv.child("pages");
+        m_readingScoreBased = false;
+    }
 
-    std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
-    // Give priority to mdiv-all - maybe we could give a warning
-    if (!m_doc->GetOptions()->m_mdivAll.GetValue() && !xPathQuery.empty()) {
-        pugi::xpath_node selection = body.select_node(xPathQuery.c_str());
-        if (selection) {
-            m_selectedMdiv = selection.node();
+    // Reading score-based MEI
+    if (m_readingScoreBased) {
+        std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
+        // Give priority to mdiv-all - maybe we could give a warning
+        if (!m_doc->GetOptions()->m_mdivAll.GetValue() && !xPathQuery.empty()) {
+            pugi::xpath_node selection = body.select_node(xPathQuery.c_str());
+            if (selection) {
+                m_selectedMdiv = selection.node();
+            }
+            else {
+                LogError("The <mdiv> requested with the xpath query '%s' could not be found", xPathQuery.c_str());
+                return false;
+            }
         }
         else {
-            LogError("The <mdiv> requested with the xpath query '%s' could not be found", xPathQuery.c_str());
+            // Try to select the mdiv above the first score (if any) - if not, we have pages or something is wrong
+            pugi::xpath_node scoreMdiv = body.select_node(".//mdiv[count(score)>0]");
+            if (scoreMdiv) {
+                m_selectedMdiv = scoreMdiv.node();
+            }
+        }
+
+        if (m_selectedMdiv.select_nodes(".//score").size() > 1) {
+            LogError("An <mdiv> with only one <score> descendant must be selected");
             return false;
         }
+
+        if ((m_selectedMdiv.select_nodes(".//score").size() > 0)
+            && (m_selectedMdiv.select_nodes(".//pages").size() > 0)) {
+            LogError("An <mdiv> with only one <pages> or one <score> descendant must be selected");
+            return false;
+        }
+
+        const bool allMdivVisible = m_doc->GetOptions()->m_mdivAll.GetValue();
+        success = ReadMdivChildren(m_doc, body, allMdivVisible);
+
+        if (success) {
+            m_doc->ExpandExpansions();
+        }
+
+        if (success) {
+            m_doc->ConvertToPageBasedDoc();
+            m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
+        }
+
+        if (success && !m_hasScoreDef) {
+            LogWarning("No scoreDef provided, trying to generate one...");
+            success = m_doc->GenerateDocumentScoreDef();
+        }
     }
+    // Reading page-based MEI
     else {
-        // Try to select the mdiv above the first score (if any) - if not, we have pages or something is wrong
-        pugi::xpath_node scoreMdiv = body.select_node(".//mdiv[count(score)>0]");
-        if (scoreMdiv) {
-            m_selectedMdiv = scoreMdiv.node();
-        }
-    }
+        success = this->ReadPages(m_doc, pages);
 
-    if (m_selectedMdiv.select_nodes(".//score").size() > 1) {
-        LogError("An <mdiv> with only one <score> descendant must be selected");
-        return false;
-    }
-
-    if (m_selectedMdiv.select_nodes(".//pages").size() > 1) {
-        LogError("An <mdiv> with only one <pages> descendant must be selected");
-        return false;
-    }
-
-    if ((m_selectedMdiv.select_nodes(".//score").size() > 0) && (m_selectedMdiv.select_nodes(".//pages").size() > 0)) {
-        LogError("An <mdiv> with only one <pages> or one <score> descendant must be selected");
-        return false;
-    }
-
-    const bool allMdivVisible = m_doc->GetOptions()->m_mdivAll.GetValue();
-    success = ReadMdivChildren(m_doc, body, allMdivVisible);
-
-    if (success) {
-        m_doc->ExpandExpansions();
-    }
-
-    if (success && m_readingScoreBased) {
-        m_doc->ConvertToPageBasedDoc();
-        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
-    }
-
-    if (success && !m_hasScoreDef) {
-        LogWarning("No scoreDef provided, trying to generate one...");
-        success = m_doc->GenerateDocumentScoreDef();
-    }
-
-    return success;
-}
-
-bool MEIInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
-{
-    Mdiv *vrvMdiv = new Mdiv();
-    SetMeiUuid(mdiv, vrvMdiv);
-
-    vrvMdiv->ReadLabelled(mdiv);
-    vrvMdiv->ReadNNumberLike(mdiv);
-
-    parent->AddChild(vrvMdiv);
-
-    if (isVisible) {
-        vrvMdiv->MakeVisible();
-    }
-
-    ReadUnsupportedAttr(mdiv, vrvMdiv);
-    return ReadMdivChildren(vrvMdiv, mdiv, isVisible);
-}
-
-bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible)
-{
-    assert(dynamic_cast<Doc *>(parent) || dynamic_cast<Mdiv *>(parent));
-
-    pugi::xml_node current;
-    bool success = true;
-    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
-        // We make the mdiv visible if already set or if matching the desired selection
-        bool makeVisible = (isVisible || (m_selectedMdiv == current));
-        if (!success) break;
-        if (std::string(current.name()) == "mdiv") {
-            success = ReadMdiv(parent, current, makeVisible);
-        }
-        else if (std::string(current.name()) == "pages") {
-            success = ReadPages(parent, current);
-            if (parentNode.last_child() != current) {
-                LogWarning("Skipping nodes after <pages> element");
-            }
-            break;
-        }
-        else if (std::string(current.name()) == "score") {
-            success = ReadScore(parent, current);
-            if (parentNode.last_child() != current) {
-                LogWarning("Skipping nodes after <score> element");
-            }
-            break;
-        }
-        // xml comment
-        else if (std::string(current.name()) == "") {
-            success = ReadXMLComment(parent, current);
-        }
-        else {
-            LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
+        if (success && !m_hasScoreDef) {
+            LogWarning("No scoreDef provided, trying to generate one...");
+            success = m_doc->GenerateDocumentScoreDef();
         }
     }
 
@@ -3218,9 +3182,10 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
     }
 
     // This is a page-based MEI file
-    m_hasLayoutInformation = true;
+    m_layoutInformation = LAYOUT_DONE;
 
     bool success = true;
+    /*
     // We require to have s <scoreDef> as first child of <score>
     pugi::xml_node scoreDef = pages.first_child();
     if (!scoreDef || (std::string(scoreDef.name()) != "scoreDef")) {
@@ -3232,6 +3197,7 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
     }
 
     if (!success) return false;
+    */
 
     // No need to have ReadPagesChildren for this...
     pugi::xml_node current;
@@ -3240,10 +3206,6 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
         // page
         if (std::string(current.name()) == "page") {
             success = ReadPage(vrvPages, current);
-        }
-        else if (std::string(current.name()) == "scoreDef") {
-            // Skipping scoreDefs, only the first one is possible
-            continue;
         }
         // xml comment
         else if (std::string(current.name()) == "") {
@@ -3255,6 +3217,186 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
     }
 
     ReadUnsupportedAttr(pages, vrvPages);
+    return success;
+}
+
+bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
+{
+    Page *vrvPage = new Page();
+    SetMeiUuid(page, vrvPage);
+
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradePageTo_3_0_0(vrvPage, m_doc);
+    }
+
+    if (page.attribute("page.height")) {
+        vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.height");
+    }
+    if (page.attribute("page.width")) {
+        vrvPage->m_pageWidth = atoi(page.attribute("page.width").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.width");
+    }
+    if (page.attribute("page.botmar")) {
+        vrvPage->m_pageMarginBottom = atoi(page.attribute("page.botmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.botmar");
+    }
+    if (page.attribute("page.leftmar")) {
+        vrvPage->m_pageMarginLeft = atoi(page.attribute("page.leftmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.leftmar");
+    }
+    if (page.attribute("page.rightmar")) {
+        vrvPage->m_pageMarginRight = atoi(page.attribute("page.rightmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.rightmar");
+    }
+    if (page.attribute("page.topmar")) {
+        vrvPage->m_pageMarginTop = atoi(page.attribute("page.topmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.topmar");
+    }
+    if (page.attribute("surface")) {
+        vrvPage->m_surface = page.attribute("surface").value();
+        page.remove_attribute("surface");
+    }
+    if (page.attribute("ppu")) {
+        vrvPage->m_PPUFactor = atof(page.attribute("ppu").value());
+    }
+
+    parent->AddChild(vrvPage);
+    bool success = ReadPageChildren(vrvPage, page);
+
+    if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
+        ApplyPPUFactorParams applyPPUFactorParams;
+        Functor applyPPUFactor(&Object::ApplyPPUFactor);
+        vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
+    }
+
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradePageTo_5_0_0(vrvPage);
+    }
+
+    ReadUnsupportedAttr(page, vrvPage);
+    return success;
+}
+
+bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
+{
+    // If we allow <app> between <page> elements
+    // assert(dynamic_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
+    assert(dynamic_cast<Page *>(parent));
+
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (std::string(current.name()) == "mdiv") {
+            ReadMdiv(parent, current, true);
+        }
+        else if (std::string(current.name()) == "score") {
+            ReadScore(parent, current);
+        }
+        else if (std::string(current.name()) == "system") {
+            ReadSystem(parent, current);
+        }
+        else if (std::string(current.name()) == "pageElementEnd") {
+            ReadPageElementEnd(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <page>", current.name());
+        }
+    }
+
+    return true;
+}
+
+bool MEIInput::ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd)
+{
+    assert(dynamic_cast<Page *>(parent));
+
+    // Check that we have a @startid
+    if (!elementEnd.attribute("startid")) {
+        LogError("Missing @startid on  pageElementEnd");
+        return false;
+    }
+
+    // Find the element pointing to it
+    std::string startUuid = elementEnd.attribute("startid").value();
+    Object *start = m_doc->FindDescendantByUuid(startUuid);
+    if (!start) {
+        LogError("Could not find start element '%s' for pageElementEnd", startUuid.c_str());
+        return false;
+    }
+
+    // Check that it is a page boundary
+    PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(start);
+    if (!interface) {
+        LogError("The start element  '%s' is not a page boundary element", startUuid.c_str());
+        return false;
+    }
+
+    PageElementEnd *vrvElementEnd = new PageElementEnd(start);
+    SetMeiUuid(elementEnd, vrvElementEnd);
+    interface->SetEnd(vrvElementEnd);
+
+    parent->AddChild(vrvElementEnd);
+    return true;
+}
+
+bool MEIInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
+{
+    Mdiv *vrvMdiv = new Mdiv();
+    SetMeiUuid(mdiv, vrvMdiv);
+
+    vrvMdiv->ReadLabelled(mdiv);
+    vrvMdiv->ReadNNumberLike(mdiv);
+
+    parent->AddChild(vrvMdiv);
+
+    if (isVisible) {
+        vrvMdiv->MakeVisible();
+    }
+
+    ReadUnsupportedAttr(mdiv, vrvMdiv);
+    return ReadMdivChildren(vrvMdiv, mdiv, isVisible);
+}
+
+bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible)
+{
+    assert(dynamic_cast<Doc *>(parent) || dynamic_cast<Mdiv *>(parent));
+
+    if (!m_readingScoreBased) {
+        if (parentNode.first_child()) {
+            LogWarning("Unexpected <mdiv> content in page-based MEI");
+        }
+        return true;
+    }
+
+    pugi::xml_node current;
+    bool success = true;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        // We make the mdiv visible if already set or if matching the desired selection
+        bool makeVisible = (isVisible || (m_selectedMdiv == current));
+        if (!success) break;
+        if (std::string(current.name()) == "mdiv") {
+            success = ReadMdiv(parent, current, makeVisible);
+        }
+        else if (std::string(current.name()) == "score") {
+            success = ReadScore(parent, current);
+            if (parentNode.last_child() != current) {
+                LogWarning("Skipping nodes after <score> element");
+            }
+            break;
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
+        }
+    }
+
     return success;
 }
 
@@ -3330,9 +3472,10 @@ bool MEIInput::ReadSection(Object *parent, pugi::xml_node section)
     if (m_readingScoreBased) {
         return ReadSectionChildren(vrvSection, section);
     }
-    else {
-        return ReadSystemChildren(vrvSection, section);
+    else if (section.first_child()) {
+        LogWarning("Unexpected <section> content in page-based MEI");
     }
+    return true;
 }
 
 bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
@@ -3445,7 +3588,7 @@ bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 
 bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
 {
-    m_hasLayoutInformation = true;
+    m_layoutInformation = LAYOUT_ENCODED;
 
     Pb *vrvPb = new Pb();
     ReadSystemElement(pb, vrvPb);
@@ -3461,7 +3604,7 @@ bool MEIInput::ReadSb(Object *parent, pugi::xml_node sb)
 {
     // Consider a <sb> to be enough as an indication that we have layout encoded information
     // This is debatable because having a <pb> might be seen as a requirement for this
-    m_hasLayoutInformation = true;
+    m_layoutInformation = LAYOUT_ENCODED;
 
     Sb *vrvSb = new Sb();
     ReadSystemElement(sb, vrvSb);
@@ -3470,94 +3613,6 @@ bool MEIInput::ReadSb(Object *parent, pugi::xml_node sb)
 
     parent->AddChild(vrvSb);
     ReadUnsupportedAttr(sb, vrvSb);
-    return true;
-}
-
-bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
-{
-    Page *vrvPage = new Page();
-    SetMeiUuid(page, vrvPage);
-
-    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
-        UpgradePageTo_3_0_0(vrvPage, m_doc);
-    }
-
-    if (page.attribute("page.height")) {
-        vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
-        page.remove_attribute("page.height");
-    }
-    if (page.attribute("page.width")) {
-        vrvPage->m_pageWidth = atoi(page.attribute("page.width").value()) * DEFINITION_FACTOR;
-        page.remove_attribute("page.width");
-    }
-    if (page.attribute("page.botmar")) {
-        vrvPage->m_pageMarginBottom = atoi(page.attribute("page.botmar").value()) * DEFINITION_FACTOR;
-        page.remove_attribute("page.botmar");
-    }
-    if (page.attribute("page.leftmar")) {
-        vrvPage->m_pageMarginLeft = atoi(page.attribute("page.leftmar").value()) * DEFINITION_FACTOR;
-        page.remove_attribute("page.leftmar");
-    }
-    if (page.attribute("page.rightmar")) {
-        vrvPage->m_pageMarginRight = atoi(page.attribute("page.rightmar").value()) * DEFINITION_FACTOR;
-        page.remove_attribute("page.rightmar");
-    }
-    if (page.attribute("page.topmar")) {
-        vrvPage->m_pageMarginTop = atoi(page.attribute("page.topmar").value()) * DEFINITION_FACTOR;
-        page.remove_attribute("page.topmar");
-    }
-    if (page.attribute("surface")) {
-        vrvPage->m_surface = page.attribute("surface").value();
-        page.remove_attribute("surface");
-    }
-    if (page.attribute("ppu")) {
-        vrvPage->m_PPUFactor = atof(page.attribute("ppu").value());
-    }
-
-    parent->AddChild(vrvPage);
-    bool success = ReadPageChildren(vrvPage, page);
-
-    if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
-        ApplyPPUFactorParams applyPPUFactorParams;
-        Functor applyPPUFactor(&Object::ApplyPPUFactor);
-        vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
-    }
-
-    ReadUnsupportedAttr(page, vrvPage);
-    return success;
-}
-
-bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
-{
-    // If we allow <app> between <page> elements
-    // assert(dynamic_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
-    assert(dynamic_cast<Page *>(parent));
-
-    pugi::xml_node current;
-    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
-        if (std::string(current.name()) == "system") {
-            ReadSystem(parent, current);
-        }
-        // can we have scoreDef between system in the current page-based cusotmization? To be checked
-        else if (std::string(current.name()) == "scoreDef") {
-            ReadScoreDef(parent, current);
-        }
-        // can we have scoreDef between system in the current page-based cusotmization?
-        // To be checked or defined - we would need to add an EDITORIAL_PAGE EditorialLevel
-        /*
-         else if (std::string(current.name()) == "app") {
-         ReadApp(vrvPage, current, EDITORIAL_PAGE);
-         }
-         */
-        // xml comment
-        else if (std::string(current.name()) == "") {
-            ReadXMLComment(parent, current);
-        }
-        else {
-            LogWarning("Unsupported '<%s>' within <page>", current.name());
-        }
-    }
-
     return true;
 }
 
@@ -3601,6 +3656,10 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         // editorial
         else if (IsEditorialElementName(current.name())) {
             success = ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
+        }
+        // section
+        else if (std::string(current.name()) == "section") {
+            success = ReadSection(parent, current);
         }
         // elementEnd
         else if (std::string(current.name()) == "systemElementEnd") {
@@ -3652,19 +3711,30 @@ bool MEIInput::ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd)
 {
     assert(dynamic_cast<System *>(parent));
 
-    std::string startUuid;
-    Object *start = NULL;
-    if (elementEnd.attribute("startid")) {
-        std::string startUuid = elementEnd.attribute("startid").value();
-        start = m_doc->FindDescendantByUuid(startUuid);
+    // Check that we have a @startid
+    if (!elementEnd.attribute("startid")) {
+        LogError("Missing @startid on  systemElementEnd");
+        return false;
     }
+
+    // Find the element pointing to it
+    std::string startUuid = elementEnd.attribute("startid").value();
+    Object *start = m_doc->FindDescendantByUuid(startUuid);
     if (!start) {
-        LogError("Could not find start element <%s> for systemElementEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for systemElementEnd", startUuid.c_str());
+        return false;
+    }
+
+    // Check that it is a page boundary
+    SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(start);
+    if (!interface) {
+        LogError("The start element  '%s' is not a system boundary element", startUuid.c_str());
         return false;
     }
 
     SystemElementEnd *vrvElementEnd = new SystemElementEnd(start);
-    ReadSystemElement(elementEnd, vrvElementEnd);
+    SetMeiUuid(elementEnd, vrvElementEnd);
+    interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
     return true;
@@ -3771,7 +3841,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     // assert(dynamic_cast<Pages *>(parent));
 
     ScoreDef *vrvScoreDef;
-    // We have not reached the first scoreDef and we have to use if for the doc
+    // We are reading the score/scoreDef
     if (parent->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(parent);
         assert(score);
@@ -6811,6 +6881,28 @@ bool MEIInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MEIInput::s_editorialElementNames.begin(), MEIInput::s_editorialElementNames.end(), elementName);
     if (i != MEIInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MEIInput::UpgradePageTo_5_0_0(Page *page)
+{
+    assert(page);
+
+    // Upgrade old page-based files by inserting a mdiv and score with corresponding boundaries
+    // Works only for single page files
+
+    Score *score = new Score();
+    score->SetParent(page);
+    page->InsertChild(score, 0);
+
+    PageElementEnd *scoreEnd = new PageElementEnd(score);
+    page->AddChild(scoreEnd);
+
+    Mdiv *mdiv = new Mdiv();
+    mdiv->SetParent(page);
+    page->InsertChild(mdiv, 0);
+
+    PageElementEnd *mdivEnd = new PageElementEnd(mdiv);
+    page->AddChild(mdivEnd);
 }
 
 void MEIInput::UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt)

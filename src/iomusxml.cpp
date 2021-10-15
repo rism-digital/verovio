@@ -187,6 +187,8 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
         if (!currentMeasure) {
             LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
                 clefChange.m_measureNum.c_str(), clefChange.m_staff->GetN(), clefChange.m_scoreOnset);
+            delete clefChange.m_clef;
+            continue;
         }
         if (!clefChange.m_scoreOnset && !clefChange.m_afterBarline) {
             Measure *previousMeasure = NULL;
@@ -768,7 +770,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     score->AddChild(section);
     // initialize layout
     if (root.select_node("/score-partwise/part/measure/print[@new-system or @new-page]")) {
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         if (!root.select_node("/score-partwise/part[1]/measure[1]/print[@new-system or @new-page]")) {
             // always start with a new page
             Pb *pb = new Pb();
