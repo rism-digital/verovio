@@ -315,7 +315,8 @@ void StaffAlignment::SetOverflowAbove(int overflowAbove)
     }
 }
 
-void StaffAlignment::SetOverflowBBoxAbove(BoundingBox* bboxAbove, int overflowAbove) {
+void StaffAlignment::SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove)
+{
     if (overflowAbove > m_overflowAbove) {
         m_overflowBBoxAbove = bboxAbove;
     }
