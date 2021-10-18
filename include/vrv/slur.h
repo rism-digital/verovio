@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class Chord;
 class Doc;
 class Layer;
 class Staff;
@@ -113,6 +114,17 @@ public:
     int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
+    /**
+     * Helper for calculating the initial slur start and end points
+     */
+    ///@{
+    // Retrieve the start and end note locations of the slur
+    std::pair<int, int> GetStartEndLocs(
+        Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, curvature_CURVEDIR dir) const;
+    // Calculate the break location at system start/end
+    int CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const;
+    ///@}
+
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
      */

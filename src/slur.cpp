@@ -1037,53 +1037,98 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     }
 
     // Positions not attached to a note
+    int startLoc = 0;
+    int endLoc = 0;
+    std::tie(startLoc, endLoc) = this->GetStartEndLocs(startNote, startChord, endNote, endChord, drawingCurveDir);
+
+    const int staffSize = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    const int staffTop = staff->GetDrawingY();
+    const int staffBottom = staffTop - staffSize;
+
+    const int brokenSlurLoc = this->CalcBrokenLoc(staff, startLoc, endLoc, drawingCurveDir);
     if (spanningType == SPANNING_START) {
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
-            y2 = staff->GetDrawingY();
-        }
-        else {
-            y2 = staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-        }
+        y2 = staffBottom + brokenSlurLoc * unit;
         // At the end of a system, the slur finishes just short of the last barline
         x2 -= (doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize) + unit) / 2;
     }
     if (end->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above) {
-            y2 = std::max(staff->GetDrawingY(), y1);
+            y2 = std::max(staffTop, y1);
         }
         else {
-            y2 = std::min(staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
+            y2 = std::min(staffBottom, y1);
         }
     }
     if (spanningType == SPANNING_END) {
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
-            y1 = staff->GetDrawingY();
-        }
-        else {
-            y1 = staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-        }
+        y1 = staffBottom + brokenSlurLoc * unit;
     }
     if (start->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above) {
-            y1 = std::max(staff->GetDrawingY(), y2);
+            y1 = std::max(staffTop, y2);
         }
         else {
-            y1 = std::min(staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
+            y1 = std::min(staffBottom, y2);
         }
     }
     // slur across an entire system; use the staff position
     else if (spanningType == SPANNING_MIDDLE) {
-        // To be adjusted
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
-            y1 = staff->GetDrawingY();
-        }
-        else {
-            y1 = staff->GetDrawingY() - doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-        }
+        y1 = staffBottom + brokenSlurLoc * unit;
         y2 = y1;
     }
 
     return std::make_pair(Point(x1, y1), Point(x2, y2));
+}
+
+std::pair<int, int> Slur::GetStartEndLocs(
+    Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, curvature_CURVEDIR dir) const
+{
+    int startLoc = startNote ? startNote->GetDrawingLoc() : 0;
+    if (startChord) {
+        if (dir == curvature_CURVEDIR_above) {
+            startLoc = startChord->GetTopNote()->GetDrawingLoc();
+        }
+        else {
+            startLoc = startChord->GetBottomNote()->GetDrawingLoc();
+        }
+    }
+
+    int endLoc = endNote ? endNote->GetDrawingLoc() : 0;
+    if (endChord) {
+        if (dir == curvature_CURVEDIR_above) {
+            endLoc = endChord->GetTopNote()->GetDrawingLoc();
+        }
+        else {
+            endLoc = endChord->GetBottomNote()->GetDrawingLoc();
+        }
+    }
+
+    return { startLoc, endLoc };
+}
+
+int Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const
+{
+    assert(staff);
+
+    int brokenLoc = 0;
+    if (dir == curvature_CURVEDIR_above) {
+        const int staffTopLoc = 2 * (staff->m_drawingLines - 1);
+        const int midLoc = (std::max(startLoc, staffTopLoc) + std::max(endLoc, staffTopLoc)) / 2;
+        brokenLoc = std::max(midLoc, staffTopLoc + 2);
+    }
+    else {
+        const int midLoc = (std::min(startLoc, 0) + std::min(endLoc, 0)) / 2;
+        brokenLoc = std::min(midLoc, -2);
+    }
+
+    // Make sure that broken slurs do not look like ties
+    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    for (int loc : { startLoc, endLoc }) {
+        if (std::abs(brokenLoc - loc) < 3) {
+            brokenLoc = loc + 3 * sign;
+        }
+    }
+
+    return brokenLoc;
 }
 
 //----------------------------------------------------------------------------
