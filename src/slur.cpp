@@ -1112,23 +1112,22 @@ int Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVED
     int brokenLoc = 0;
     if (dir == curvature_CURVEDIR_above) {
         const int staffTopLoc = 2 * (staff->m_drawingLines - 1);
-        const int midLoc = (std::max(startLoc, staffTopLoc) + std::max(endLoc, staffTopLoc)) / 2;
-        brokenLoc = std::max(midLoc, staffTopLoc + 2);
+        brokenLoc = (std::max(startLoc, staffTopLoc - 1) + std::max(endLoc, staffTopLoc - 1)) / 2;
     }
     else {
-        const int midLoc = (std::min(startLoc, 0) + std::min(endLoc, 0)) / 2;
-        brokenLoc = std::min(midLoc, -2);
+        brokenLoc = (std::min(startLoc, 1) + std::min(endLoc, 1)) / 2;
     }
 
     // Make sure that broken slurs do not look like ties
     const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
     for (int loc : { startLoc, endLoc }) {
-        if (std::abs(brokenLoc - loc) < 3) {
-            brokenLoc = loc + 3 * sign;
+        if (std::abs(brokenLoc - loc) < 2) {
+            brokenLoc = loc + 2 * sign;
         }
     }
 
-    return brokenLoc;
+    // Move position one unit outwards to match the upper/lower boundary of the corresponding note
+    return brokenLoc + sign;
 }
 
 //----------------------------------------------------------------------------
