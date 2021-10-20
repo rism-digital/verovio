@@ -1038,11 +1038,12 @@ int BeamSegment::GetAdjacentElementsDuration(int elementX) const
 
 static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
-Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
+Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend(), AttCue()
 {
-    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
     RegisterAttClass(ATT_BEAMREND);
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
 
     Reset();
 }
@@ -1053,9 +1054,10 @@ void Beam::Reset()
 {
     LayerElement::Reset();
     BeamDrawingInterface::Reset();
-    ResetColor();
     ResetBeamedWith();
     ResetBeamRend();
+    ResetColor();
+    ResetCue();
 }
 
 bool Beam::IsSupportedChild(Object *child)
