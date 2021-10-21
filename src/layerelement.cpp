@@ -2293,10 +2293,20 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
             return FUNCTOR_CONTINUE;
         }
 
+        // Skip if neither parent staff nor cross staff matches the given staff number
+        if (!params->m_staffNs.empty()) {
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            assert(staff);
+            if (params->m_staffNs.find(staff->GetN()) == params->m_staffNs.end()) {
+                Layer *layer = NULL;
+                staff = this->GetCrossStaff(layer);
+                if (!staff || (params->m_staffNs.find(staff->GetN()) == params->m_staffNs.end())) {
+                    return FUNCTOR_CONTINUE;
+                }
+            }
+        }
+
         params->m_elements.push_back(this);
-    }
-    else if (this->GetDrawingX() > params->m_maxPos) {
-        return FUNCTOR_STOP;
     }
 
     return FUNCTOR_CONTINUE;

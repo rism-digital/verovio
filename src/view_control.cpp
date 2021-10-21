@@ -287,7 +287,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             // corresponding to whether the slur is curved above/below
             if (element->Is(SLUR)) {
                 Slur *slur = vrv_cast<Slur *>(element);
-                const std::vector<LayerElement *> spannedElements = slur->CollectSpannedElements(staff, x1, x2);
+                const std::vector<LayerElement *> spannedElements
+                    = slur->CollectSpannedElements(staff, x1, x2, spanningType);
                 for (LayerElement *element : spannedElements) {
                     Layer *elementLayer = NULL;
                     Staff *elementStaff = element->GetCrossStaff(elementLayer);

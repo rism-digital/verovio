@@ -83,7 +83,7 @@ void Slur::Reset()
     // m_isCrossStaff = false;
 }
 
-std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
+std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType)
 {
     // Decide whether we search the whole parent system or just one measure which is much faster
     Object *container = this->IsSpanningMeasures() ? staff->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
@@ -91,10 +91,11 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
     findSpannedLayerElementsParams.m_minPos = xMin;
     findSpannedLayerElementsParams.m_maxPos = xMax;
+    findSpannedLayerElementsParams.m_inMeasureRange
+        = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
     findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
         TUPLET_NUM }; // Ties should be handled separately
-    // Create ad comparison object for each type / @n
-    // For now we only look at one layer (assumed layer1 == layer2)
+
     std::set<int> staffNumbers;
     staffNumbers.emplace(staff->GetN());
     Staff *startStaff = this->GetStart()->m_crossStaff ? this->GetStart()->m_crossStaff
@@ -108,26 +109,12 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         staffNumbers.emplace(endStaff->GetN());
     }
 
-    // With the way FindSpannedLayerElements is implemented it's not currently possible to use AttNIntegerAnyComparison
-    // for the filter, since processing goes staff by staff and process stops as soon as maxPos is reached. To
-    // circumvent that, we're going to process each staff separately and add all overlapping elements together in the
-    // end
-    std::vector<LayerElement *> elements;
-    for (const auto staffNumber : staffNumbers) {
-        ArrayOfComparisons filters;
-        AttNIntegerComparison matchStaff(STAFF, staffNumber);
-        filters.push_back(&matchStaff);
-        Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-        container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
+    findSpannedLayerElementsParams.m_staffNs = staffNumbers;
+    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
+    Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
+    container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
 
-        if (!findSpannedLayerElementsParams.m_elements.empty()) {
-            elements.insert(elements.end(), std::make_move_iterator(findSpannedLayerElementsParams.m_elements.begin()),
-                std::make_move_iterator(findSpannedLayerElementsParams.m_elements.end()));
-        }
-        findSpannedLayerElementsParams.m_elements.clear();
-    }
-
-    return elements;
+    return findSpannedLayerElementsParams.m_elements;
 }
 
 void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
