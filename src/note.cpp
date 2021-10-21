@@ -503,8 +503,8 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
         case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
         case HEADSHAPE_whole: {
-            return GetHeadMod() == NOTEHEADMODIFIER_dblwhole ? SMUFL_E0A0_noteheadDoubleWhole
-                                                             : SMUFL_E0A2_noteheadWhole;
+            return (GetHeadMod() == NOTEHEADMODIFIER_dblwhole) ? SMUFL_E0A0_noteheadDoubleWhole
+                                                               : SMUFL_E0A2_noteheadWhole;
         }
         // case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
         // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
@@ -531,7 +531,7 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
 
     if (DUR_BR == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
     if (DUR_1 == duration) {
-        return GetHeadMod() == NOTEHEADMODIFIER_dblwhole ? SMUFL_E0A0_noteheadDoubleWhole : SMUFL_E0A2_noteheadWhole;
+        return (GetHeadMod() == NOTEHEADMODIFIER_dblwhole) ? SMUFL_E0A0_noteheadDoubleWhole : SMUFL_E0A2_noteheadWhole;
     }
     if (DUR_2 == duration) return SMUFL_E0A3_noteheadHalf;
     return SMUFL_E0A4_noteheadBlack;
