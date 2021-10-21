@@ -1175,7 +1175,8 @@ void Beam::FilterList(ArrayOfObjects *childList)
     }
     */
 
-    InitCoords(childList, beamStaff, this->GetPlace());
+    this->InitCoords(childList, beamStaff, this->GetPlace());
+    this->InitCue(this->GetCue() == BOOLEAN_true);
 }
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
@@ -1253,6 +1254,14 @@ void BeamElementCoord::SetDrawingStemDir(
     m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
                                          : interface->m_stemXBelow[interface->m_cueSize];
     if (!m_closestNote) return;
+
+    if (!interface->m_cueSize && (m_element->IsGraceNote() || m_element->GetDrawingCueSize())
+        && !this->m_element->GetFirstAncestor(CHORD) && (STEMDIRECTION_up == stemDir)) {
+        const double cueScaling = doc->GetCueScaling();
+        int diameter = 2 * m_element->GetDrawingRadius(doc);
+        int cueShift = (1.0 / cueScaling - 1.0) * diameter;
+        m_x -= cueShift;
+    }
 
     m_yBeam = m_closestNote->GetDrawingY();
     if (stemDir == STEMDIRECTION_up) {

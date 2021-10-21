@@ -224,9 +224,22 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     }
 
     int last = elementCount - 1;
+}
 
-    // We look only at the last note for checking if cue-sized. Somehow arbitrarily
-    m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
+void BeamDrawingInterface::InitCue(bool beamCue) 
+{
+    if (beamCue) {
+        m_cueSize = beamCue;
+    }
+    else {
+        bool hasNonGraceElements
+            = std::any_of(m_beamElementCoords.begin(), m_beamElementCoords.end(), [](BeamElementCoord *coord) {
+                  if (!coord->m_element) return true;
+                  if (coord->m_element->IsGraceNote() || coord->m_element->GetDrawingCueSize()) return false;
+                  return true;
+              });
+        m_cueSize = !hasNonGraceElements;
+    }
 
     // Always set stem direction to up for grace note beam unless stem direction is provided
     if (m_cueSize && (m_notesStemDir == STEMDIRECTION_NONE)) {
