@@ -1505,7 +1505,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         params.m_enclosedRend.clear();
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-        
+
         int xAdjust = 0;
         const bool isBetweenStaves = (dir->GetPlace() == STAFFREL_between)
             || ((dir->GetPlace() == STAFFREL_below) && (*staffIter != measure->GetLast(STAFF)))
