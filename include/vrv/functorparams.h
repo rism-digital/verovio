@@ -1479,8 +1479,10 @@ public:
  * member 0: a pointer to the vector of LayerElement pointer to fill
  * member 1: the minimum position
  * member 2: the maximum position
- * member 3: the timespanning interface
- * member 4: the class Ids to keep
+ * member 3: the staff numbers to consider, any staff if empty
+ * member 4: true if within measure range of timespanning interface, only this is searched
+ * member 5: the timespanning interface
+ * member 6: the class ids to keep
  **/
 
 class FindSpannedLayerElementsParams : public FunctorParams {
@@ -1490,10 +1492,13 @@ public:
         m_interface = interface;
         m_minPos = 0;
         m_maxPos = 0;
+        m_inMeasureRange = false;
     }
     std::vector<LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
+    std::set<int> m_staffNs;
+    bool m_inMeasureRange;
     TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
 };
