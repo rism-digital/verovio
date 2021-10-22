@@ -29,8 +29,9 @@ View::View()
     m_doc = NULL;
     m_options = NULL;
     m_pageIdx = 0;
-    m_tieThicknessCoeficient = 0.0;
-    m_slurThicknessCoeficient = 0.0;
+    m_tieThicknessCoefficient = 0.0;
+    m_slurThicknessCoefficient = 0.0;
+    m_initializeSlurs = true;
 
     m_currentColour = AxNONE;
     m_currentElement = NULL;

@@ -378,14 +378,23 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetCmn(this, attributes);
     Att::GetCmnornaments(this, attributes);
     Att::GetCritapp(this, attributes);
-    Att::GetGestural(this, attributes);
+    // Att::GetEdittrans(this, attributes);
     Att::GetExternalsymbols(this, attributes);
+    Att::GetFrettab(this, attributes);
+    Att::GetFacsimile(this, attributes);
+    // Att::GetFigtable(this, attributes);
+    // Att::GetFingering(this, attributes);
+    Att::GetGestural(this, attributes);
+    // Att::GetHarmony(this, attributes);
+    // Att::GetHeader(this, attributes);
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
     Att::GetNeumes(this, attributes);
     Att::GetPagebased(this, attributes);
+    // Att::GetPerformance(this, attributes);
     Att::GetShared(this, attributes);
+    // Att::GetUsersymbols(this, attributes);
     Att::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
@@ -1882,6 +1891,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            above->SetOverflowBBoxAbove(current, overflowAbove);
             above->SetOverflowAbove(overflowAbove);
             above->AddBBoxAbove(current);
         }
@@ -1892,6 +1902,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            below->SetOverflowBBoxBelow(current, overflowBelow);
             below->SetOverflowBelow(overflowBelow);
             below->AddBBoxBelow(current);
         }

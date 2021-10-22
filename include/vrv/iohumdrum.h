@@ -749,6 +749,7 @@ protected:
     void analyzeVerseColor(hum::HumdrumFile &infile);
     void analyzeVerseColor(hum::HTp &token);
     void processHangingTieEnds();
+    bool checkForInvisibleBeam(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int layerindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

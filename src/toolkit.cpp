@@ -697,11 +697,23 @@ bool Toolkit::LoadData(const std::string &data)
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
     int breaks = m_options->m_breaks.GetValue();
+
+    // When loading page-based MEI, the layout is marked as done
+    // In this case, we do not cast-off the document (breaks is expected to be not set)
+    if (input->GetLayoutInformation() == LAYOUT_DONE) {
+        if (breaks != BREAKS_auto) {
+            LogWarning("Requesting layout with specific breaks but the layout is already done");
+        }
+        // We set it to 'none' for no cast-off process to be triggered
+        breaks = BREAKS_none;
+    }
+
     // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI
     // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
+
     if (breaks != BREAKS_none) {
-        if (input->HasLayoutInformation()
+        if (input->GetLayoutInformation() == LAYOUT_ENCODED
             && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
                 // LogElapsedTimeStart();

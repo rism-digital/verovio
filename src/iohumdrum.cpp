@@ -996,8 +996,8 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
 
     if (linebreaki > 0) {
         hum::HTp token = infile[linebreaki].token(0);
-        Sb *sb = new Sb();
-        m_hasLayoutInformation = true;
+        Sb *sb = new Sb;
+        m_layoutInformation = LAYOUT_ENCODED;
         setLocationId(sb, token);
         m_sections.back()->AddChild(sb);
         // Maybe allow other types of line breaks here, but
@@ -1008,8 +1008,8 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     }
     else if (pagebreaki > 0) {
         hum::HTp token = infile[pagebreaki].token(0);
-        Pb *pb = new Pb();
-        m_hasLayoutInformation = true;
+        Pb *pb = new Pb;
+        m_layoutInformation = LAYOUT_ENCODED;
         setLocationId(pb, token);
         m_sections.back()->AddChild(pb);
         // Maybe allow other types of line breaks here, but
@@ -6256,8 +6256,8 @@ void HumdrumInput::checkForLayoutBreak(int line)
     group = token->getLayoutParameter("LB", "g");
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
-        Sb *sb = new Sb();
-        m_hasLayoutInformation = true;
+        Sb *sb = new Sb;
+        m_layoutInformation = LAYOUT_ENCODED;
         if (m_currentending) {
             m_currentending->AddChild(sb);
         }
@@ -6274,7 +6274,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
         std::string tstring = removeCommas(group);
         Pb *pb = new Pb();
         // Sb *pb = new Sb();  // suppress page break encodings
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         if (m_currentending) {
             m_currentending->AddChild(pb);
         }
@@ -8519,6 +8519,52 @@ bool HumdrumInput::checkForTremolo(
 
 //////////////////////////////
 //
+// HumdrumInput::checkForInvisibleBeam --  Not checking for interleaved grace notes
+//    within regular note beams yet.
+//
+
+bool HumdrumInput::checkForInvisibleBeam(
+    Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int layerindex)
+{
+    int beamnum = tgs.at(layerindex).beamstart;
+    for (int i = layerindex; i < (int)tgs.size(); i++) {
+        if (!tgs.at(layerindex).token) {
+            cerr << "WARNING in checkForInvisibleBeam: null token\n";
+            return false;
+        }
+        int len = (int)tgs.at(layerindex).token->size();
+        if (len > 0) {
+            if (tgs.at(layerindex).token->at(0) == '*') {
+                continue;
+            }
+            if (tgs.at(layerindex).token->at(0) == '!') {
+                continue;
+            }
+            if (tgs.at(layerindex).token->at(0) == '=') {
+                continue;
+            }
+        }
+        else {
+            // strange problem
+            return false;
+        }
+        if (tgs.at(layerindex).token->find("yy") == std::string::npos) {
+            return false;
+        }
+        int beamend = tgs.at(layerindex).beamend;
+        if (beamend == beamnum) {
+            break;
+        }
+    }
+
+    // All notes in a beam are invisible, so mark the beam as type="invisible":
+    beam->SetType("invisible");
+
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::handleGroupStarts --
 //
 
@@ -8573,6 +8619,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
             insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
                 ss[staffindex].suppress_tuplet_bracket);
             beam = insertBeam(elements, pointers, tg);
+            checkForInvisibleBeam(beam, tgs, layerindex);
             if (direction) {
                 appendTypeTag(beam, "placed");
             }
@@ -8581,6 +8628,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         }
         else {
             beam = insertBeam(elements, pointers, tg);
+            checkForInvisibleBeam(beam, tgs, layerindex);
             if (direction) {
                 appendTypeTag(beam, "placed");
             }
@@ -8592,6 +8640,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
     }
     else if (tg.beamstart) {
         beam = insertBeam(elements, pointers, tg);
+        checkForInvisibleBeam(beam, tgs, layerindex);
         if (direction) {
             appendTypeTag(beam, "placed");
         }
@@ -23094,8 +23143,8 @@ void HumdrumInput::setupMeiDocument()
         // An initial page break is required in order for the system
         // breaks encoded in the file to be activated, so adding a
         // dummy page break here:
-        Pb *pb = new Pb();
-        m_hasLayoutInformation = true;
+        Pb *pb = new Pb;
+        m_layoutInformation = LAYOUT_ENCODED;
         section->AddChild(pb);
     }
 }

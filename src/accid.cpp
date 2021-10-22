@@ -17,6 +17,7 @@
 #include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -103,19 +104,46 @@ std::wstring Accid::GetSymbolStr() const
     return symbolStr;
 }
 
-bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids)
+void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
+{
+    Layer *layer = NULL;
+    Staff *staff = element->GetCrossStaff(layer);
+    if (!staff) staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+
+    Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+    if (element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
+        const int horizontalMargin = 4 * doc->GetDrawingStemWidth(staffSize);
+        const int drawingUnit = doc->GetDrawingUnit(staffSize);
+        const int staffTop = staff->GetDrawingY();
+        const int staffBottom = staffTop - doc->GetDrawingStaffSize(staffSize);
+        if (this->HorizontalContentOverlap(element, 0)) {
+            if (((this->GetContentTop() > staffTop + 2 * drawingUnit) && (this->GetDrawingY() < element->GetDrawingY()))
+                || ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+                    && (this->GetDrawingY() > element->GetDrawingY()))) {
+                const int xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
+                if (xRelShift > 0) this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
+            }
+        }
+    }
+}
+
+void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
+    std::vector<Accid *> &adjustedAccids)
 {
     assert(element);
     assert(doc);
 
-    if (this == element) return false;
+    if (this == element) return;
 
-    int verticalMargin = 1 * doc->GetDrawingStemWidth(staffSize);
+    const int verticalMargin = 1 * doc->GetDrawingStemWidth(staffSize);
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staffSize);
 
     if (element->Is(NOTE)) horizontalMargin = 3 * doc->GetDrawingStemWidth(staffSize);
 
-    if (!this->VerticalSelfOverlap(element, verticalMargin)) return false;
+    if (!this->VerticalSelfOverlap(element, verticalMargin)) {
+        this->AdjustToLedgerLines(doc, element, staffSize);
+        return;
+    }
 
     // Look for identical accidentals that needs to remain superimposed
     if (element->Is(ACCID) && (this->GetDrawingY() == element->GetDrawingY())) {
@@ -125,41 +153,44 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
             // There is the same accidental, so we leave it a the same place
             // This should also work for the chords on multiple layers by setting unison accidental
             accid->SetDrawingUnisonAccid(this);
-            return false;
+            return;
         }
     }
 
     if (element->Is(ACCID)) {
+        Accid *accid = vrv_cast<Accid *>(element);
         if (!this->HorizontalLeftOverlap(element, doc, horizontalMargin, verticalMargin)) {
             // There is enough space on the right of the accidental, but maybe we will need to
             // adjust it again (see recursive call below), so keep the accidental that is on the left
-            leftAccids.push_back(dynamic_cast<Accid *>(element));
-            return false;
+            leftAccids.push_back(accid);
+            return;
         }
+        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end()) return;
     }
 
     int xRelShift = 0;
-    if (element->Is(STEM))
+    if (element->Is(STEM)) {
         xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
-    else
+    }
+    else {
         xRelShift = this->HorizontalRightOverlap(element, doc, horizontalMargin, verticalMargin);
+    }
 
     // Move only to the left
     if (xRelShift > 0) {
         this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
+        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), this) == adjustedAccids.end())
+            adjustedAccids.push_back(this);
         // We have some accidentals on the left, check again with all of these
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;
             std::vector<Accid *>::iterator iter;
             // Recursively adjust all accidental that are on the left because enough space was previously available
             for (iter = leftAccids.begin(); iter != leftAccids.end(); ++iter) {
-                this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset);
+                this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset, adjustedAccids);
             }
         }
-        return true;
     }
-
-    return false;
 }
 
 //----------------------------------------------------------------------------

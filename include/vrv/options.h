@@ -636,6 +636,7 @@ public:
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
     OptionBool m_breaksNoWidow;
+    OptionDbl m_fingeringScale;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
@@ -665,12 +666,9 @@ public:
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
-    OptionInt m_slurControlPoints;
-    OptionInt m_slurCurveFactor;
-    OptionInt m_slurHeightFactor;
-    OptionDbl m_slurMaxHeight;
+    OptionDbl m_slurCurveFactor;
+    OptionDbl m_slurMargin;
     OptionInt m_slurMaxSlope;
-    OptionDbl m_slurMinHeight;
     OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMidpointThickness;
     OptionInt m_spacingBraceGroup;
