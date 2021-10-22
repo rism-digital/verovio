@@ -1697,10 +1697,10 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     int positionShiftX2 = positionShift * 2;
     int positionShiftY2 = positionShift * -1;
     int y = stem->GetDrawingY() - stem->GetDrawingStemLen();
-    Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
+    Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
     if (flag) {
         const wchar_t glyph = flag->GetFlagGlyph(stem->GetDrawingStemDir());
-        const int slashAdjust = stem->GetDrawingStemDir() == STEMDIRECTION_up
+        const int slashAdjust = (stem->GetDrawingStemDir() == STEMDIRECTION_up)
             ? m_doc->GetGlyphTop(glyph, staff->m_drawingStaffSize, true)
             : m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, true); 
         y += slashAdjust;
