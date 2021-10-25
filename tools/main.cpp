@@ -199,6 +199,14 @@ void display_usage()
     }
 }
 
+bool optionExists(const std::string& option, int argc, char** argv) 
+{
+    for (int i = 0; i < argc; ++i) {
+        if (!strncmp(option.c_str(), argv[i], option.size())) return true;
+    }
+    return false;
+}
+
 int main(int argc, char **argv)
 {
     std::string infile;
@@ -288,6 +296,10 @@ int main(int argc, char **argv)
                 key = long_options[option_index].name;
                 opt = params->at(toCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
+                if (!optionExists("--" + key, argc, argv)) {
+                    vrv::LogError("Unrecognized option abbreviated from --%s has been skipped.", key.c_str());
+                    continue;
+                }
 
                 // Handle deprecated options
                 /*
