@@ -756,6 +756,16 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
 
+    // check for multimetric music
+    bool multiMetric = root.select_node("/score-partwise/part/measure[@non-controlling]")
+                           .node()
+                           .attribute("non-controlling")
+                           .as_bool();
+    if (multiMetric) {
+        LogError("MusicXML import: Multimetric music detected. Import cancelled.");
+        exit(1);
+    }
+
     ReadMusicXmlTitle(root);
 
     // the mdiv
