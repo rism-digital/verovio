@@ -70,7 +70,7 @@ void Dynam::Reset()
 
 bool Dynam::IsSupportedChild(Object *child)
 {
-    if (child->Is({ REND, LB, TEXT })) {
+    if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

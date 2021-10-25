@@ -43,7 +43,7 @@ void Fing::Reset()
 
 bool Fing::IsSupportedChild(Object *child)
 {
-    if (!child->Is({ REND, TEXT })) {
+    if (child->Is({ LB, REND, TEXT })) {
         return false;
     }
     assert(dynamic_cast<TextElement *>(child));

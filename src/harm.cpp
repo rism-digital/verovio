@@ -62,7 +62,7 @@ void Harm::Reset()
 
 bool Harm::IsSupportedChild(Object *child)
 {
-    if (child->Is({ REND, TEXT })) {
+    if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->Is(FB)) {
