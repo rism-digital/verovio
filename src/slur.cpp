@@ -1041,13 +1041,29 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     int endLoc = 0;
     std::tie(startLoc, endLoc) = this->GetStartEndLocs(startNote, startChord, endNote, endChord, drawingCurveDir);
 
+    const int sign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
     const int staffSize = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     const int staffTop = staff->GetDrawingY();
     const int staffBottom = staffTop - staffSize;
 
-    const int brokenSlurLoc = this->CalcBrokenLoc(staff, startLoc, endLoc, drawingCurveDir);
+    int brokenLoc = 0;
+    int pitchDiff = 0;
+    std::tie(brokenLoc, pitchDiff) = this->CalcBrokenLoc(staff, startLoc, endLoc, drawingCurveDir);
     if (spanningType == SPANNING_START) {
-        y2 = staffBottom + brokenSlurLoc * unit;
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            y2 = std::max(staffTop, y1);
+            y2 += pitchDiff * unit / 2;
+            y2 = std::max(staffTop, y2);
+        }
+        else {
+            y2 = std::min(staffBottom, y1);
+            y2 += pitchDiff * unit / 2;
+            y2 = std::min(staffBottom, y2);
+        }
+        // Make sure that broken slurs do not look like ties
+        if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
+            y2 = y1 + 2 * sign * unit;
+        }
         // At the end of a system, the slur finishes just short of the last barline
         x2 -= (doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize) + unit) / 2;
     }
@@ -1060,7 +1076,20 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
     }
     if (spanningType == SPANNING_END) {
-        y1 = staffBottom + brokenSlurLoc * unit;
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
+            y1 = std::max(staffTop, y2);
+            y1 -= pitchDiff * unit / 2;
+            y1 = std::max(staffTop, y1);
+        }
+        else {
+            y1 = std::min(staffBottom, y2);
+            y1 -= pitchDiff * unit / 2;
+            y1 = std::min(staffBottom, y1);
+        }
+        // Make sure that broken slurs do not look like ties
+        if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
+            y1 = y2 + 2 * sign * unit;
+        }
     }
     if (start->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above) {
@@ -1072,7 +1101,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     }
     // slur across an entire system; use the staff position
     else if (spanningType == SPANNING_MIDDLE) {
-        y1 = staffBottom + brokenSlurLoc * unit;
+        y1 = staffBottom + brokenLoc * unit;
         y2 = y1;
     }
 
@@ -1105,29 +1134,22 @@ std::pair<int, int> Slur::GetStartEndLocs(
     return { startLoc, endLoc };
 }
 
-int Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const
+std::pair<int, int> Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const
 {
     assert(staff);
 
-    int brokenLoc = 0;
+    int loc1, loc2;
     if (dir == curvature_CURVEDIR_above) {
         const int staffTopLoc = 2 * (staff->m_drawingLines - 1);
-        brokenLoc = (std::max(startLoc, staffTopLoc - 1) + std::max(endLoc, staffTopLoc - 1)) / 2;
+        loc1 = std::max(startLoc, staffTopLoc - 1);
+        loc2 = std::max(endLoc, staffTopLoc - 1);
     }
     else {
-        brokenLoc = (std::min(startLoc, 1) + std::min(endLoc, 1)) / 2;
+        loc1 = std::min(startLoc, 1);
+        loc2 = std::min(endLoc, 1);
     }
 
-    // Make sure that broken slurs do not look like ties
-    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
-    for (int loc : { startLoc, endLoc }) {
-        if (std::abs(brokenLoc - loc) < 2) {
-            brokenLoc = loc + 2 * sign;
-        }
-    }
-
-    // Move position one unit outwards to match the upper/lower boundary of the corresponding note
-    return brokenLoc + sign;
+    return { (loc1 + loc2) / 2, loc2 - loc1 };
 }
 
 //----------------------------------------------------------------------------
