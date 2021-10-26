@@ -1598,6 +1598,13 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
                         shift -= 0.8 * horizontalMargin;
                         continue;
                     }
+                    else if ((currentNote->IsGraceNote() || currentNote->GetDrawingCueSize())
+                        && (!previousNote->IsGraceNote() && !previousNote->GetDrawingCueSize())
+                        && (STEMDIRECTION_up == stemDir)) {
+                        currentNote->SetDrawingXRel(currentNote->GetDrawingXRel() + 0.8 * horizontalMargin);
+                        isInUnison = true;
+                        continue;
+                    }
                     else if ((currentNote->GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
                         isInUnison = true;
                         continue;
