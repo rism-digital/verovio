@@ -199,7 +199,7 @@ void display_usage()
     }
 }
 
-bool optionExists(const std::string& option, int argc, char** argv, std::string& badOption) 
+bool optionExists(const std::string &option, int argc, char **argv, std::string &badOption)
 {
     for (int i = 0; i < argc; ++i) {
         if (!strncmp(option.c_str(), argv[i], option.size())) return true;
