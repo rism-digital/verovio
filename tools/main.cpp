@@ -199,10 +199,11 @@ void display_usage()
     }
 }
 
-bool optionExists(const std::string& option, int argc, char** argv) 
+bool optionExists(const std::string& option, int argc, char** argv, std::string& badOption) 
 {
     for (int i = 0; i < argc; ++i) {
         if (!strncmp(option.c_str(), argv[i], option.size())) return true;
+        if (option.find(argv[i]) != std::string::npos) badOption = argv[i];
     }
     return false;
 }
@@ -296,8 +297,8 @@ int main(int argc, char **argv)
                 key = long_options[option_index].name;
                 opt = params->at(toCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
-                if (!optionExists("--" + key, argc, argv)) {
-                    vrv::LogError("Unrecognized option abbreviated from --%s has been skipped.", key.c_str());
+                if (std::string badOption; !optionExists("--" + key, argc, argv, badOption)) {
+                    vrv::LogError("Unrecognized option %s has been skipped.", badOption.c_str());
                     continue;
                 }
 
