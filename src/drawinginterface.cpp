@@ -222,8 +222,6 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         LogDebug("Beam with no notes of duration > 8 detected. Exiting DrawBeam.");
         return;
     }
-
-    int last = elementCount - 1;
 }
 
 void BeamDrawingInterface::InitCue(bool beamCue) 
@@ -232,13 +230,11 @@ void BeamDrawingInterface::InitCue(bool beamCue)
         m_cueSize = beamCue;
     }
     else {
-        bool hasNonGraceElements
-            = std::any_of(m_beamElementCoords.begin(), m_beamElementCoords.end(), [](BeamElementCoord *coord) {
-                  if (!coord->m_element) return true;
-                  if (coord->m_element->IsGraceNote() || coord->m_element->GetDrawingCueSize()) return false;
-                  return true;
-              });
-        m_cueSize = !hasNonGraceElements;
+        m_cueSize = std::all_of(m_beamElementCoords.begin(), m_beamElementCoords.end(), [](BeamElementCoord *coord) {
+            if (!coord->m_element) return false;
+            if (coord->m_element->IsGraceNote() || coord->m_element->GetDrawingCueSize()) return true;
+            return false;
+        });
     }
 
     // Always set stem direction to up for grace note beam unless stem direction is provided

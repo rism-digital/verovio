@@ -1258,8 +1258,8 @@ void BeamElementCoord::SetDrawingStemDir(
     if (!interface->m_cueSize && (m_element->IsGraceNote() || m_element->GetDrawingCueSize())
         && !this->m_element->GetFirstAncestor(CHORD) && (STEMDIRECTION_up == stemDir)) {
         const double cueScaling = doc->GetCueScaling();
-        int diameter = 2 * m_element->GetDrawingRadius(doc);
-        int cueShift = (1.0 / cueScaling - 1.0) * diameter;
+        const int diameter = 2 * m_element->GetDrawingRadius(doc);
+        const int cueShift = (1.0 / cueScaling - 1.0) * diameter;
         m_x -= cueShift;
     }
 

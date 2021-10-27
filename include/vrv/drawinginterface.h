@@ -107,7 +107,7 @@ public:
     void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
 
     /**
-     * Initializie m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
+     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
      * attributes
      */
     void InitCue(bool beamCue);
