@@ -40,12 +40,12 @@ public:
     ///@{
     Accid();
     virtual ~Accid();
-    virtual Object *Clone() const { return new Accid(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Accid"; }
+    Object *Clone() const override { return new Accid(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Accid"; }
     ///@}
 
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }

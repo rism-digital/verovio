@@ -26,10 +26,10 @@ public:
     ///@{
     Choice();
     Choice(EditorialLevel level);
-    virtual Object *Clone() const { return new Choice(*this); }
+    Object *Clone() const override { return new Choice(*this); }
     virtual ~Choice();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Choice"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Choice"; }
     ///@}
 
     /** Getter for level **/
@@ -38,7 +38,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
 protected:
     /** We store the level of the <choice> for integrity check */

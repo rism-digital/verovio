@@ -37,24 +37,24 @@ public:
     ///@{
     Reh();
     virtual ~Reh();
-    virtual Object *Clone() const { return new Reh(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Reh"; }
+    Object *Clone() const override { return new Reh(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Reh"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a reh.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //

@@ -75,7 +75,7 @@ public:
     Alignment();
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
@@ -86,7 +86,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Set and get the xRel value of the alignment
@@ -298,18 +298,18 @@ public:
     AlignmentReference();
     AlignmentReference(int staffN);
     virtual ~AlignmentReference();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Override the method of adding AlignmentReference children
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for AlignmentReference children
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * Add an accidental to the accidSpace of the AlignmentReference.
@@ -390,13 +390,13 @@ public:
     ///@(
     HorizontalAligner(ClassId classId);
     virtual ~HorizontalAligner();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Do not copy children for HorizontalAligner
      */
-    virtual bool CopyChildren() const { return false; }
+    bool CopyChildren() const override { return false; }
 
     int GetAlignmentCount() const { return (int)GetChildren()->size(); }
 
@@ -440,7 +440,7 @@ public:
     ///@(
     MeasureAligner();
     virtual ~MeasureAligner();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
@@ -576,7 +576,7 @@ public:
     ///@(
     GraceAligner();
     virtual ~GraceAligner();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
@@ -660,7 +660,7 @@ public:
     /**
      * Reset the aligner (clear the content)
      */
-    virtual void Reset();
+    void Reset() override;
 
     /**
      * Look for an existing TimestampAttr at a certain time.

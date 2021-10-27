@@ -43,12 +43,12 @@ public:
     /**
      * Do not copy children for HorizontalAligner
      */
-    virtual bool CopyChildren() const { return false; }
+    bool CopyChildren() const override { return false; }
 
     /**
      * Reset the aligner (clear the content) and creates the end (bottom) alignement
      */
-    virtual void Reset();
+    void Reset() override;
 
     /**
      * Get bottom StaffAlignment for the system.

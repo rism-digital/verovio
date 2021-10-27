@@ -36,20 +36,20 @@ public:
     RunningElement(ClassId classId);
     RunningElement(ClassId classId, const std::string &classIdStr);
     virtual ~RunningElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Disable cloning of the running elements (for now?).
      * It does not make sense you carry copying the running element across the systems.
      */
-    virtual Object *Clone() const { return NULL; }
+    Object *Clone() const override { return NULL; }
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -64,8 +64,8 @@ public:
      * @name Get and set the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     int GetWidth() const;

@@ -44,21 +44,21 @@ public:
     ///@{
     Layer();
     virtual ~Layer();
-    virtual Object *Clone() const { return new Layer(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Layer"; }
+    Object *Clone() const override { return new Layer(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Layer"; }
     ///@}
 
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CloneReset();
+    void CloneReset() override;
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**

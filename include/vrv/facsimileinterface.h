@@ -29,7 +29,7 @@ public:
     ///@{
     FacsimileInterface();
     virtual ~FacsimileInterface();
-    virtual void Reset();
+    void Reset() override;
     virtual InterfaceId IsInterface() { return INTERFACE_FACSIMILE; }
     ///@}
 

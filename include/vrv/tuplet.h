@@ -35,21 +35,21 @@ public:
     ///@{
     Tuplet();
     virtual ~Tuplet();
-    virtual Object *Clone() const { return new Tuplet(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Tuplet"; }
+    Object *Clone() const override { return new Tuplet(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Tuplet"; }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for tuplet
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * @name Setter and getter for darwing elements and position

@@ -51,12 +51,12 @@ public:
     /**
      * Add a page to the document
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Clear the content of the document.
      */
-    virtual void Reset();
+    void Reset() override;
 
     /**
      * Refreshes the views from Doc.

@@ -29,16 +29,16 @@ public:
     ///@{
     BTrem();
     virtual ~BTrem();
-    virtual Object *Clone() const { return new BTrem(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "BTrem"; }
+    Object *Clone() const override { return new BTrem(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "BTrem"; }
     ///@}
 
     /**
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //

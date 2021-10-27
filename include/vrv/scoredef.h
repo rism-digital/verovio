@@ -50,14 +50,14 @@ public:
     ScoreDefElement(ClassId classId);
     ScoreDefElement(ClassId classId, const std::string &classIdStr);
     virtual ~ScoreDefElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
+    ScoreDefInterface *GetScoreDefInterface() override { return dynamic_cast<ScoreDefInterface *>(this); }
     ///@}
 
     /**
@@ -126,12 +126,12 @@ public:
     ///@{
     ScoreDef();
     virtual ~ScoreDef();
-    virtual Object *Clone() const { return new ScoreDef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "ScoreDef"; }
+    Object *Clone() const override { return new ScoreDef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "ScoreDef"; }
     ///@}
 
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.

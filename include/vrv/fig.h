@@ -29,9 +29,9 @@ public:
     ///@{
     Fig();
     virtual ~Fig();
-    virtual Object *Clone() const { return new Fig(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Fig"; }
+    Object *Clone() const override { return new Fig(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Fig"; }
     ///@}
 
     /**
@@ -45,7 +45,7 @@ public:
      * Add an element (svg) to an fig.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //

@@ -39,9 +39,9 @@ public:
     ///@{
     Clef();
     virtual ~Clef();
-    virtual Object *Clone() const { return new Clef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Clef"; }
+    Object *Clone() const override { return new Clef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Clef"; }
     ///@}
 
     /** Override the method since alignment is required */

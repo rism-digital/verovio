@@ -69,18 +69,18 @@ public:
     ///@{
     Note();
     virtual ~Note();
-    virtual Object *Clone() const { return new Note(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Note"; }
+    Object *Clone() const override { return new Note(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Note"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
-    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
@@ -96,12 +96,12 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for note
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * Align dots shift for two notes. Should be used for unison notes to align dots positioning

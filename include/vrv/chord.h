@@ -49,17 +49,17 @@ public:
     ///@{
     Chord();
     virtual ~Chord();
-    virtual Object *Clone() const { return new Chord(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Chord"; }
+    Object *Clone() const override { return new Chord(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Chord"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
-    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
@@ -71,12 +71,12 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for chord
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * Return the maximum and minimum Y positions of the notes in the chord

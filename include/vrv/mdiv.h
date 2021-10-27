@@ -31,16 +31,16 @@ public:
     ///@{
     Mdiv();
     virtual ~Mdiv();
-    virtual Object *Clone() const { return new Mdiv(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Mdiv"; }
+    Object *Clone() const override { return new Mdiv(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Mdiv"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**

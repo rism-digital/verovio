@@ -36,9 +36,9 @@ public:
     ///@{
     Rend();
     virtual ~Rend();
-    virtual Object *Clone() const { return new Rend(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Rend"; }
+    Object *Clone() const override { return new Rend(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Rend"; }
     ///@}
 
     /**
@@ -52,7 +52,7 @@ public:
      * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //

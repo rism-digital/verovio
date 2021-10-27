@@ -38,24 +38,24 @@ public:
     ///@{
     MNum();
     virtual ~MNum();
-    virtual Object *Clone() const { return new MNum(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MNum"; }
+    Object *Clone() const override { return new MNum(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MNum"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a dynam.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Setter and getter of the generated flag

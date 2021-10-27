@@ -40,9 +40,9 @@ public:
     ///@{
     Mensur();
     virtual ~Mensur();
-    virtual Object *Clone() const { return new Mensur(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Mensur"; }
+    Object *Clone() const override { return new Mensur(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Mensur"; }
     ///@}
 
     /** Override the method since alignment is required */

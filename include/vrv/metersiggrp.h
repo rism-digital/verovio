@@ -42,23 +42,23 @@ public:
     ///@{
     MeterSigGrp();
     virtual ~MeterSigGrp();
-    virtual Object *Clone() const { return new MeterSigGrp(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MeterSigGrp"; }
+    Object *Clone() const override { return new MeterSigGrp(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MeterSigGrp"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual LinkingInterface *GetLinkingInterface() { return this; }
+    LinkingInterface *GetLinkingInterface() override { return this; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**

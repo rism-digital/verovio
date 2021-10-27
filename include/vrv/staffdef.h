@@ -41,16 +41,16 @@ public:
     ///@{
     StaffDef();
     virtual ~StaffDef();
-    virtual Object *Clone() const { return new StaffDef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffDef"; }
+    Object *Clone() const override { return new StaffDef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "StaffDef"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Setter and getter of the drawing visible flag

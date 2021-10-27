@@ -66,16 +66,16 @@ public:
     ///@{
     Neume();
     virtual ~Neume();
-    virtual void Reset();
-    virtual Object *Clone() const { return new Neume(*this); }
-    virtual std::string GetClassName() const { return "Neume"; }
+    void Reset() override;
+    Object *Clone() const override { return new Neume(*this); }
+    std::string GetClassName() const override { return "Neume"; }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     virtual int GetPosition(LayerElement *element);
     virtual bool IsLastInNeume(LayerElement *element);

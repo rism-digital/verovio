@@ -31,9 +31,9 @@ public:
     ///@{
     BeatRpt();
     virtual ~BeatRpt();
-    virtual Object *Clone() const { return new BeatRpt(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "BeatRpt"; }
+    Object *Clone() const override { return new BeatRpt(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "BeatRpt"; }
     ///@}
 
     /** Override the method since alignment is required */

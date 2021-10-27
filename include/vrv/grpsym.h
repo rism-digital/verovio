@@ -36,9 +36,9 @@ public:
     ///@{
     GrpSym();
     virtual ~GrpSym();
-    virtual Object *Clone() const { return new GrpSym(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "GrpSym"; }
+    Object *Clone() const override { return new GrpSym(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "GrpSym"; }
     ///@}
 
     /**
@@ -55,8 +55,8 @@ public:
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     //----------//

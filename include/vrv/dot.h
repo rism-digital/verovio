@@ -28,16 +28,16 @@ public:
     ///@{
     Dot();
     virtual ~Dot();
-    virtual Object *Clone() const { return new Dot(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Dot"; }
+    Object *Clone() const override { return new Dot(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Dot"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

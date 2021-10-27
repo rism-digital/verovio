@@ -30,15 +30,15 @@ public:
     TextElement(ClassId classId);
     TextElement(ClassId classId, const std::string &classIdStr);
     virtual ~TextElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     /**

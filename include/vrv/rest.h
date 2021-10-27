@@ -48,28 +48,28 @@ public:
     ///@{
     Rest();
     virtual ~Rest();
-    virtual Object *Clone() const { return new Rest(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Rest"; }
+    Object *Clone() const override { return new Rest(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Rest"; }
     ///@}
 
     /**
      * Add an element to a rest.
      * Only Dots elements will be actually added to the rest.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for rest
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

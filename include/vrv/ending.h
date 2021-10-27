@@ -34,15 +34,15 @@ public:
     ///@{
     Ending();
     virtual ~Ending();
-    virtual Object *Clone() const { return new Ending(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Ending"; }
+    Object *Clone() const override { return new Ending(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Ending"; }
     ///@}
 
     /**
      * Method for adding allowed content
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //

@@ -42,23 +42,23 @@ public:
     ///@{
     System();
     virtual ~System();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "System"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "System"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     /**

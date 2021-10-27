@@ -32,8 +32,8 @@ public:
     ///@{
     SystemElementEnd(Object *start);
     virtual ~SystemElementEnd();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "systemElementEnd"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "SystemElementEnd"; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }

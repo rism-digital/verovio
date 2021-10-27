@@ -35,15 +35,15 @@ public:
     ///@{
     Score();
     virtual ~Score();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Score"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Score"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**

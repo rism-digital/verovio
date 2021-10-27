@@ -36,7 +36,7 @@ public:
     FloatingObject(ClassId classId);
     FloatingObject(ClassId classId, const std::string &classIdStr);
     virtual ~FloatingObject();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     virtual void UpdateContentBBoxX(int x1, int x2);
@@ -48,8 +48,8 @@ public:
      * @name Get and set the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
@@ -174,12 +174,12 @@ public:
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
-    virtual void ResetCachedDrawingX() const;
-    virtual void ResetCachedDrawingY() const;
+    void ResetCachedDrawingX() const override;
+    void ResetCachedDrawingY() const override;
 
     /**
      * @name Setter and getters for the objectX and Y

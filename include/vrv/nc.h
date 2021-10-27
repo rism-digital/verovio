@@ -45,17 +45,17 @@ public:
     ///@{
     Nc();
     virtual ~Nc();
-    virtual Object *Clone() const { return new Nc(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Nc"; }
+    Object *Clone() const override { return new Nc(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Nc"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
     ///@}
 
 private:

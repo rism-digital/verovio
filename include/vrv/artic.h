@@ -32,9 +32,9 @@ public:
     ///@{
     Artic();
     virtual ~Artic();
-    virtual Object *Clone() const { return new Artic(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Artic"; }
+    Object *Clone() const override { return new Artic(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Artic"; }
     ///@}
 
     /** Override the method since alignment is required */

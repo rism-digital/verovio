@@ -32,9 +32,9 @@ public:
     ///@{
     HalfmRpt();
     virtual ~HalfmRpt();
-    virtual Object *Clone() const { return new HalfmRpt(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "HalfmRpt"; }
+    Object *Clone() const override { return new HalfmRpt(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "HalfmRpt"; }
     ///@}
 
     /** Override the method since alignment is required */

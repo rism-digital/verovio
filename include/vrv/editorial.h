@@ -46,14 +46,14 @@ public:
     EditorialElement(ClassId classId);
     EditorialElement(ClassId classId, const std::string &classIdStr);
     virtual ~EditorialElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * @name Add children to an editorial element.
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     //----------//

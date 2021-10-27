@@ -43,9 +43,9 @@ public:
     ///@{
     Syl();
     virtual ~Syl();
-    virtual Object *Clone() const { return new Syl(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Syl"; }
+    Object *Clone() const override { return new Syl(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Syl"; }
     ///@}
 
     /** Override the method since it is align to the staff */
@@ -55,15 +55,15 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a syl.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Calculate the spacing needed depending on the @worpos and @con

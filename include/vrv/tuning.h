@@ -29,15 +29,15 @@ public:
     ///@{
     Tuning();
     virtual ~Tuning();
-    virtual Object *Clone() const { return new Tuning(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Tuning"; };
+    Object *Clone() const override { return new Tuning(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Tuning"; }
     ///@}
 
     /**
      * Add an element to a element.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Return the line for a the tuning and a given course and a notation type

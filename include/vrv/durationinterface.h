@@ -43,7 +43,7 @@ public:
     ///@{
     DurationInterface();
     virtual ~DurationInterface();
-    virtual void Reset();
+    void Reset() override;
     virtual InterfaceId IsInterface() { return INTERFACE_DURATION; }
     ///@}SetDurationGes
 

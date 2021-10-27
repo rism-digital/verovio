@@ -29,8 +29,8 @@ public:
     ///@{
     TabDurSym();
     virtual ~TabDurSym();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "TabDurSym"; };
+    void Reset() override;
+    std::string GetClassName() const override { return "TabDurSym"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -39,7 +39,7 @@ public:
     /**
      * Add an element to a element.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //

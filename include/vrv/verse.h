@@ -29,16 +29,16 @@ public:
     ///@{
     Verse();
     virtual ~Verse();
-    virtual Object *Clone() const { return new Verse(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Verse"; }
+    Object *Clone() const override { return new Verse(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Verse"; }
     ///@}
 
     /**
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Calculate the adjustment according to the overlap and the free space available before.

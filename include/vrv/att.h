@@ -276,6 +276,12 @@ public:
     std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; }
 
     /**
+     * Virtual reset method.
+     * Needs to be overridden in child classes.
+     */
+    virtual void Reset() {}
+
+    /**
      * Virtual method returning the InterfaceId of the interface.
      * Needs to be overridden in child classes.
      */

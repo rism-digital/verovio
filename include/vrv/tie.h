@@ -39,17 +39,17 @@ public:
     Tie(ClassId classId);
     Tie(ClassId classId, const std::string &classIdStr);
     virtual ~Tie();
-    virtual Object *Clone() const { return new Tie(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Tie"; }
+    Object *Clone() const override { return new Tie(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Tie"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);

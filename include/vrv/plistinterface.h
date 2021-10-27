@@ -33,7 +33,7 @@ public:
     ///@{
     PlistInterface();
     virtual ~PlistInterface();
-    virtual void Reset();
+    void Reset() override;
     virtual InterfaceId IsInterface() { return INTERFACE_PLIST; }
     ///@}
 

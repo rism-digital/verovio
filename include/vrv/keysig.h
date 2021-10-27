@@ -42,9 +42,9 @@ public:
     ///@{
     KeySig();
     virtual ~KeySig();
-    virtual Object *Clone() const { return new KeySig(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "KeySig"; }
+    Object *Clone() const override { return new KeySig(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "KeySig"; }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
@@ -55,7 +55,7 @@ public:
     /**
      * Add an element (a keyAccid) to a keySig.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /** Accid number getter */
     int GetAccidCount();

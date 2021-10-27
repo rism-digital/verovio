@@ -51,15 +51,15 @@ public:
     ///@{
     Measure(bool measuredMusic = true, int logMeasureNb = -1);
     virtual ~Measure();
-    virtual Object *Clone() const { return new Measure(*this); };
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Measure"; }
+    Object *Clone() const override { return new Measure(*this); };
+    void Reset() override;
+    std::string GetClassName() const override { return "Measure"; }
     ///@}
 
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CloneReset();
+    void CloneReset() override;
 
     /**
      * Return true if measured music (otherwise we have fake measures)
@@ -69,7 +69,7 @@ public:
     /**
      * Methods for adding allowed content
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Specific method for measures
@@ -85,12 +85,12 @@ public:
     /**
      * Get the X drawing position
      */
-    virtual int GetDrawingX() const;
+    int GetDrawingX() const override;
 
     /**
      * Reset the cached values of the drawingX values.
      */
-    virtual void ResetCachedDrawingX() const;
+    void ResetCachedDrawingX() const override;
 
     /**
      * @name Get and set the X drawing relative positions

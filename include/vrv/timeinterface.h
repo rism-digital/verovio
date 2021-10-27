@@ -36,7 +36,7 @@ public:
     ///@{
     TimePointInterface();
     virtual ~TimePointInterface();
-    virtual void Reset();
+    void Reset() override;
     virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; }
     ///@}
 
@@ -140,11 +140,9 @@ public:
     ///@{
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
-    virtual void Reset();
+    void Reset() override;
     virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; }
     ///@}
-
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     /**
      * @name Set and get the first and second LayerElement

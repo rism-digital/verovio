@@ -33,8 +33,8 @@ public:
     ///@{
     Dots();
     virtual ~Dots();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Dots"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Dots"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -109,8 +109,8 @@ public:
     ///@{
     Flag();
     virtual ~Flag();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Flag"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Flag"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -164,8 +164,8 @@ public:
     ///@{
     TupletBracket();
     virtual ~TupletBracket();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "TupletBracket"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "TupletBracket"; }
     ///@}
 
     /**
@@ -257,8 +257,8 @@ public:
     ///@{
     TupletNum();
     virtual ~TupletNum();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "TupletNum"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "TupletNum"; }
     ///@}
 
     /**
@@ -328,8 +328,8 @@ public:
     ///@{
     Stem();
     virtual ~Stem();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Stem"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Stem"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -338,7 +338,7 @@ public:
     /**
      * Add an element (only flag supported) to a stem.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Setter and getter for darwing stem direction and length

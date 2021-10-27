@@ -29,15 +29,15 @@ public:
     ///@{
     Course();
     virtual ~Course();
-    virtual Object *Clone() const { return new Course(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Course"; };
+    Object *Clone() const override { return new Course(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Course"; }
     ///@}
 
     /**
      * Add an element to a element.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
 protected:
     //

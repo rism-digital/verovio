@@ -31,7 +31,7 @@ public:
     ///@{
     AreaPosInterface();
     virtual ~AreaPosInterface();
-    virtual void Reset();
+    void Reset() override;
     virtual InterfaceId IsInterface() { return INTERFACE_AREA_POS; }
     ///@}
 

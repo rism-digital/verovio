@@ -43,17 +43,17 @@ public:
     ///@{
     Staff(int n = 1);
     virtual ~Staff();
-    virtual Object *Clone() const { return new Staff(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Staff"; }
+    Object *Clone() const override { return new Staff(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Staff"; }
     ///@}
 
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CloneReset();
+    void CloneReset() override;
 
-    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
+    FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
 
     /**
      * Return a const pointer to the children
@@ -69,15 +69,15 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
      * @name Get the X, Y, and angle of drawing position
      */
     ///@{
-    virtual int GetDrawingY() const;
-    virtual int GetDrawingX() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     virtual double GetDrawingRotate() const;
     ///@}
 

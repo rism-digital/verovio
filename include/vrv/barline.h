@@ -36,9 +36,9 @@ public:
     BarLine();
     BarLine(ClassId classId);
     virtual ~BarLine();
-    virtual Object *Clone() const { return new BarLine(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "BarLine"; }
+    Object *Clone() const override { return new BarLine(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "BarLine"; }
     ///@}
 
     /** Override the method since alignment is required */

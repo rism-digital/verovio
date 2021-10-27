@@ -327,8 +327,8 @@ public:
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     /**
@@ -336,8 +336,8 @@ public:
      * Reset all children recursively
      */
     ///@{
-    virtual void ResetCachedDrawingX() const;
-    virtual void ResetCachedDrawingY() const;
+    void ResetCachedDrawingX() const override;
+    void ResetCachedDrawingY() const override;
     ///@}
 
     /**

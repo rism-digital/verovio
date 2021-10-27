@@ -30,9 +30,9 @@ public:
     ///@{
     Pb();
     virtual ~Pb();
-    virtual Object *Clone() const { return new Pb(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Pb"; }
+    Object *Clone() const override { return new Pb(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Pb"; }
     ///@}
 
     //----------//

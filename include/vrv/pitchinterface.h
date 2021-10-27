@@ -33,7 +33,7 @@ public:
     ///@{
     PitchInterface();
     virtual ~PitchInterface();
-    virtual void Reset();
+    void Reset() override;
     virtual InterfaceId IsInterface() { return INTERFACE_PITCH; }
     ///@}
 

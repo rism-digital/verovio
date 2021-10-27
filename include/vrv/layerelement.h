@@ -52,20 +52,20 @@ public:
     LayerElement(ClassId classId);
     LayerElement(ClassId classId, const std::string &classIdStr);
     virtual ~LayerElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CloneReset();
+    void CloneReset() override;
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
-    virtual LinkingInterface *GetLinkingInterface() { return dynamic_cast<LinkingInterface *>(this); }
+    FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
+    LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
     ///@}
 
     /**
@@ -134,8 +134,8 @@ public:
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     /**

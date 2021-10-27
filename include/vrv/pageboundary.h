@@ -32,8 +32,8 @@ public:
     ///@{
     PageElementEnd(Object *start);
     virtual ~PageElementEnd();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "PageElementEnd"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "PageElementEnd"; }
     ///@}
 
     // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }

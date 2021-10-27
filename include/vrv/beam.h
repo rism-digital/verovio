@@ -139,9 +139,9 @@ public:
     ///@{
     Beam();
     virtual ~Beam();
-    virtual Object *Clone() const { return new Beam(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Beam"; }
+    Object *Clone() const override { return new Beam(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Beam"; }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }
@@ -150,7 +150,7 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      *
