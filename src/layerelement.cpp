@@ -1425,6 +1425,9 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     if (this->Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
     // ignore elements that start before the beam
     if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
+    // ignore elements that have @visible attribute set to false
+    AttVisibilityComparison isInvisible(this->GetClassId(), BOOLEAN_false);
+    if (isInvisible(this)) return FUNCTOR_SIBLINGS;
     // ignore editorial accidental
     if (this->Is(ACCID)) {
         Accid *accid = vrv_cast<Accid *>(this);
