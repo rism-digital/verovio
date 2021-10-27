@@ -224,7 +224,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     }
 }
 
-void BeamDrawingInterface::InitCue(bool beamCue) 
+void BeamDrawingInterface::InitCue(bool beamCue)
 {
     if (beamCue) {
         m_cueSize = beamCue;
