@@ -203,7 +203,7 @@ bool optionExists(const std::string &option, int argc, char **argv, std::string 
 {
     for (int i = 0; i < argc; ++i) {
         if (!strncmp(option.c_str(), argv[i], option.size())) return true;
-        if (option.find(argv[i]) != std::string::npos) badOption = argv[i];
+        if (option.rfind(argv[i], 0) == 0) badOption = argv[i];
     }
     return false;
 }
