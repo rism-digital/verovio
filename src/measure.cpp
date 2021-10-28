@@ -1039,7 +1039,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     }
     // Adjust min width based on multirest attributes (@num and @width), but only if these values are larger than
     // current min width
-    else if (MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST)); multiRest) {
+    else if (this->FindDescendantByType(MULTIREST) != NULL) {
+        MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST));
         const int num = multiRest->GetNum();
         if (multiRest->HasWidth()) {
             const int fixedWidth
