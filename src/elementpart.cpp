@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "btrem.h"
 #include "chord.h"
 #include "doc.h"
 #include "functorparams.h"
@@ -527,7 +528,20 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
-    int slashFactor = (this->GetStemMod() < 8) ? this->GetStemMod() - 1 : 0;
+    int slashFactor = 0;
+    // In case there is explicitly specified stem mod for slashes
+    if (this->HasStemMod() && (this->GetStemMod() < 8)) 
+    {
+        slashFactor = this->GetStemMod() - 1;
+    }
+    // otherwise check whether it's trem and its @unitdir attribute is shorter than duration
+    else if (this->GetFirstAncestor(BTREM)) {
+        BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+        assert(bTrem);
+        if (bTrem->HasUnitdur() && (bTrem->GetUnitdur() > DURATION_4)) {
+            slashFactor = bTrem->GetUnitdur() - DURATION_4;
+        }
+    }
 
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
@@ -540,7 +554,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     // Adjust basic stem length to number of slashes
-    if (slashFactor && !this->HasStemLen()) {
+    if ((slashFactor > 0) && !this->HasStemLen()) {
         const int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
             + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
         while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
