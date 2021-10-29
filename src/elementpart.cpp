@@ -530,8 +530,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     int slashFactor = 0;
     // In case there is explicitly specified stem mod for slashes
-    if (this->HasStemMod() && (this->GetStemMod() < 8)) 
-    {
+    if (this->HasStemMod() && (this->GetStemMod() < 8)) {
         slashFactor = this->GetStemMod() - 1;
     }
     // otherwise check whether it's trem and its @unitdir attribute is shorter than duration
