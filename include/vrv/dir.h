@@ -62,7 +62,7 @@ public:
     /**
      * See FloatingObject::IsExtenderElement
      */
-    virtual bool IsExtenderElement() const { return GetExtender() == BOOLEAN_true; }
+    bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
 
     /**
      * Check whether one of the children has hAlign attribute set to `alignment` value

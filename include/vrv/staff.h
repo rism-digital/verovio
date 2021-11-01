@@ -58,7 +58,7 @@ public:
     /**
      * Return a const pointer to the children
      */
-    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const;
+    const ArrayOfObjects *GetChildren(bool docChildren = true) const override;
 
     /**
      * Delete all the legder line arrays.

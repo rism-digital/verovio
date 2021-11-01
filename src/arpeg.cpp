@@ -75,7 +75,7 @@ int Arpeg::GetDrawingX() const
     return measure->GetDrawingX() + this->GetDrawingXRel();
 }
 
-bool Arpeg::IsValidRef(Object *ref)
+bool Arpeg::IsValidRef(Object *ref) const
 {
     if (!ref->Is({ CHORD, NOTE })) {
         LogWarning(

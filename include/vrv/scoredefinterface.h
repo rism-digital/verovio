@@ -44,7 +44,7 @@ public:
     ScoreDefInterface();
     virtual ~ScoreDefInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; }
+    InterfaceId IsInterface() const override { return INTERFACE_SCOREDEF; }
     ///@}
 
 private:

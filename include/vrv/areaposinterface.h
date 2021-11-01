@@ -32,7 +32,7 @@ public:
     AreaPosInterface();
     virtual ~AreaPosInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_AREA_POS; }
+    InterfaceId IsInterface() const override { return INTERFACE_AREA_POS; }
     ///@}
 
 private:

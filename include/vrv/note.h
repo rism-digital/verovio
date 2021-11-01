@@ -90,7 +90,7 @@ public:
      * Override the method since alignment is required.
      * For notes we want not to align notes within a ligature (except first and last)
      */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add an element (a verse or an accid) to a note.
@@ -185,9 +185,9 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
-    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir);
+    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
+    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
+    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
     ///@}
 
     /**
@@ -313,14 +313,14 @@ protected:
     /**
      * The note locations w.r.t. each staff
      */
-    virtual MapOfNoteLocs CalcNoteLocations();
+    MapOfNoteLocs CalcNoteLocations() override;
 
     /**
      * The dot locations w.r.t. each staff
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary);
+    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
 
 private:
     /**

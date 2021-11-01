@@ -40,7 +40,7 @@ public:
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add children (notes or editorial markup)
@@ -86,7 +86,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ArrayOfObjects *childlist);
+    void FilterList(ArrayOfObjects *childList) override;
 
 public:
     /**

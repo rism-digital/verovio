@@ -42,7 +42,7 @@ public:
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Use to set the alignment for the Measure BarLine members.

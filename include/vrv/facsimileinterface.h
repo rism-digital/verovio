@@ -30,7 +30,7 @@ public:
     FacsimileInterface();
     virtual ~FacsimileInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_FACSIMILE; }
+    InterfaceId IsInterface() const override { return INTERFACE_FACSIMILE; }
     ///@}
 
     virtual int GetDrawingX() const;

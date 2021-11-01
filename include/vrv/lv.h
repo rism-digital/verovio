@@ -33,7 +33,7 @@ public:
     std::string GetClassName() const override { return "Lv"; }
     ///@}
 
-    virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
+    bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]) override;
 
     //----------//
     // Functors //

@@ -32,7 +32,7 @@ public:
     TextDirInterface();
     virtual ~TextDirInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_TEXT_DIR; }
+    InterfaceId IsInterface() const override { return INTERFACE_TEXT_DIR; }
     ///@}
 
     /**

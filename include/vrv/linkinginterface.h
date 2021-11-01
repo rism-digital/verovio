@@ -35,7 +35,7 @@ public:
     LinkingInterface();
     virtual ~LinkingInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_LINKING; }
+    InterfaceId IsInterface() const override { return INTERFACE_LINKING; }
     ///@}
 
     /**

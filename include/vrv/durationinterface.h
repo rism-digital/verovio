@@ -44,7 +44,7 @@ public:
     DurationInterface();
     virtual ~DurationInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_DURATION; }
+    InterfaceId IsInterface() const override { return INTERFACE_DURATION; }
     ///@}SetDurationGes
 
     /**

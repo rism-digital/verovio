@@ -186,7 +186,7 @@ protected:
      * Filter the flat list and keep only Note and Chords elements.
      * This also initializes the m_beamElementCoords vector
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
     /**
      * Helper function to calculate overlap with layer elements that

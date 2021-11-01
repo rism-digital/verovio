@@ -285,7 +285,7 @@ public:
      * Virtual method returning the InterfaceId of the interface.
      * Needs to be overridden in child classes.
      */
-    virtual InterfaceId IsInterface() { return INTERFACE; }
+    virtual InterfaceId IsInterface() const { return INTERFACE; }
 
 private:
     /**

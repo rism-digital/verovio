@@ -44,7 +44,7 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add a default syl to this syllable if one does not exist.

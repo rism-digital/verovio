@@ -72,7 +72,7 @@ protected:
     /**
      * Filter the flat list and keep only Note or Chords elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 public:
     /** */

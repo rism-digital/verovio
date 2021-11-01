@@ -37,7 +37,7 @@ public:
     TimePointInterface();
     virtual ~TimePointInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; }
+    InterfaceId IsInterface() const override { return INTERFACE_TIME_POINT; }
     ///@}
 
     /**
@@ -141,7 +141,7 @@ public:
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; }
+    InterfaceId IsInterface() const override { return INTERFACE_TIME_SPANNING; }
     ///@}
 
     /**
@@ -210,12 +210,12 @@ public:
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
+    int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    int InterfaceResetDrawing(FunctorParams *functorParams, Object *object) override;
 
 private:
     //

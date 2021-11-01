@@ -49,7 +49,7 @@ public:
     ///@}
 
     /** Override the method since it is align to the staff */
-    virtual bool IsRelativeToStaff() const { return true; }
+    bool IsRelativeToStaff() const override { return true; }
 
     /**
      * @name Getter to interfaces

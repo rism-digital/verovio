@@ -66,7 +66,7 @@ public:
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add an element (only note supported) to a chord.
@@ -130,9 +130,9 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
-    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir);
+    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
+    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
+    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
     ///@}
 
     /**
@@ -154,8 +154,8 @@ public:
      * Helper to adjust overlapping layers for chords
      * Returns the shift of the adjustment
      */
-    virtual int AdjustOverlappingLayers(
-        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
+    int AdjustOverlappingLayers(
+        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison) override;
 
     //----------//
     // Functors //
@@ -218,14 +218,14 @@ protected:
     /**
      * The note locations w.r.t. each staff
      */
-    virtual MapOfNoteLocs CalcNoteLocations();
+    MapOfNoteLocs CalcNoteLocations() override;
 
     /**
      * The dot locations w.r.t. each staff
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary);
+    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
 
     /**
      * Clear the m_clusters vector and delete all the objects.
@@ -235,7 +235,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ArrayOfObjects *childlist);
+    void FilterList(ArrayOfObjects *childList) override;
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

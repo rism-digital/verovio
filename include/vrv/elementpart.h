@@ -38,7 +38,7 @@ public:
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     std::set<int> GetDotLocsForStaff(Staff *staff) const;
     std::set<int> &ModifyDotLocsForStaff(Staff *staff);
@@ -114,7 +114,7 @@ public:
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
 
@@ -333,7 +333,7 @@ public:
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add an element (only flag supported) to a stem.

@@ -88,7 +88,7 @@ protected:
     /**
      * Filter the flat list and keep only meterSigGrp elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 private:
     // vector with alternating measures to be used only with meterSigGrpLog_FUNC_alternating

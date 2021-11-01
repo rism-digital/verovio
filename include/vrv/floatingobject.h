@@ -39,10 +39,10 @@ public:
     void Reset() override;
     ///@}
 
-    virtual void UpdateContentBBoxX(int x1, int x2);
-    virtual void UpdateContentBBoxY(int y1, int y2);
-    virtual void UpdateSelfBBoxX(int x1, int x2);
-    virtual void UpdateSelfBBoxY(int y1, int y2);
+    void UpdateContentBBoxX(int x1, int x2) override;
+    void UpdateContentBBoxY(int y1, int y2) override;
+    void UpdateSelfBBoxX(int x1, int x2) override;
+    void UpdateSelfBBoxY(int y1, int y2) override;
 
     /**
      * @name Get and set the X and Y drawing position
@@ -166,7 +166,7 @@ public:
     // constructors and destructors
     FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
     virtual ~FloatingPositioner(){};
-    virtual ClassId GetClassId() const { return FLOATING_POSITIONER; }
+    ClassId GetClassId() const override { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
 
@@ -270,9 +270,9 @@ public:
     // constructors and destructors
     FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
     virtual ~FloatingCurvePositioner();
-    virtual ClassId GetClassId() const { return FLOATING_CURVE_POSITIONER; }
+    ClassId GetClassId() const override { return FLOATING_CURVE_POSITIONER; }
 
-    virtual void ResetPositioner();
+    void ResetPositioner() override;
 
     /**
      * Reset the curve parameters in FloatingCurvePositioner::FloatingCurvePositioner and in

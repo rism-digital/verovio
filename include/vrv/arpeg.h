@@ -80,7 +80,7 @@ public:
     /**
      * Custom method for @plist validation
      */
-    virtual bool IsValidRef(Object *ref);
+    bool IsValidRef(Object *ref) const override;
 
     //----------//
     // Functors //

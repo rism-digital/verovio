@@ -34,7 +34,7 @@ public:
     PitchInterface();
     virtual ~PitchInterface();
     void Reset() override;
-    virtual InterfaceId IsInterface() { return INTERFACE_PITCH; }
+    InterfaceId IsInterface() const override { return INTERFACE_PITCH; }
     ///@}
 
     /**
