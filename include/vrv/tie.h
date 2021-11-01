@@ -54,6 +54,12 @@ public:
 
     virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
 
+    /**
+    * Calculate starting/ending point for the ties in the chords with adjacent notes
+    */
+    int CaclulateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
+        curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint);
+
     //----------//
     // Functors //
     //----------//
@@ -72,7 +78,7 @@ private:
 
     // Calculate initial position X position and return stem direction of the startNote
     void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
-        bool isOuterChordNote, Point &startPoint, Point &endPoint);
+        bool isOuterChordNote, Point &startPoint, Point &endPoint, curvature_CURVEDIR drawingCurveDir);
 
     // Helper function to get preferred curve direction based on the number of conditions (like note direction, position
     // on the staff, etc.)

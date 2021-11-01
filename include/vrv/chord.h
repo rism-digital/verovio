@@ -157,6 +157,13 @@ public:
     int AdjustOverlappingLayers(
         Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison) override;
 
+    /**
+     * Helper to get list of notes that are adjacent to the specified location.
+     * Diatonic step difference is take up to 2 points, so HasAdjacentNotesInStaff() needs to be called first, to make
+     * sure there actually are adjacent notes.
+     */
+    std::list<Note *> GetAdjacentNotesList(Staff *staff, int loc);
+
     //----------//
     // Functors //
     //----------//
