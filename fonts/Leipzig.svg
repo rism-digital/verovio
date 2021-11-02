@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20201107 at Sat Oct  2 19:16:28 2021
+Created by FontForge 20201107 at Fri Oct 15 13:49:03 2021
  By Klaus Rettinghaus
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.61
+Version 5.2.62
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
@@ -1537,5 +1537,11 @@ d="M152 152h-152v26h152v152h26v-152h152v-26h-152v-152h-26v152z" />
 d="M0 165c0 106 59 165 165 165s165 -59 165 -165s-59 -165 -165 -165s-165 59 -165 165zM28 152c4 -77 47 -120 124 -124v124h-124zM178 28c77 4 120 47 124 124h-124v-124zM178 178h124c-4 77 -47 120 -124 124v-124zM28 178h124v124c-77 -4 -120 -47 -124 -124z" />
     <glyph glyph-name="uniE5E7" unicode="&#xe5e7;" horiz-adv-x="330" 
 d="M0 165c0 106 59 165 165 165s165 -59 165 -165s-59 -165 -165 -165s-165 59 -165 165zM28 165c0 -90 47 -137 137 -137s137 47 137 137s-47 137 -137 137s-137 -47 -137 -137z" />
+    <glyph glyph-name="uniE0A0" unicode="&#xe0a0;" horiz-adv-x="545" 
+d="M60 -165v330c0 5 6 5 12 5s13 0 13 -5v-109c30 51 103 77 183 77c79 0 159 -27 192 -80v112c0 5 6 5 12 5s13 0 13 -5v-330c0 -5 -7 -5 -13 -5s-12 0 -12 5v109c-31 -53 -109 -77 -192 -77c-77 0 -152 27 -183 78v-110c0 -5 -7 -5 -13 -5s-12 0 -12 5zM292 -108
+c49 0 71 39 71 87c0 41 -19 74 -41 98c-20 21 -43 31 -68 31l-20 -2c-15 -5 -27 -14 -36 -28c-8 -17 -11 -28 -11 -51c0 -15 3 -34 9 -57s18 -41 34 -55c15 -15 36 -23 62 -23zM0 -165v330c0 5 6 5 12 5s13 0 13 -5v-330c0 -5 -7 -5 -13 -5s-12 0 -12 5zM520 -165v330
+c0 5 6 5 12 5s13 0 13 -5v-330c0 -5 -7 -5 -13 -5s-12 0 -12 5z" />
+    <glyph glyph-name="uniE0A1" unicode="&#xe0a1;" horiz-adv-x="348" 
+d="M0 165c0 5 6 5 12 5s13 0 13 -5v-40h298v40c0 5 7 5 13 5s12 0 12 -5v-330c0 -5 -6 -5 -12 -5s-13 0 -13 5v40h-298v-40c0 -5 -7 -5 -13 -5s-12 0 -12 5v330zM25 0c0 -29 1 -55 25 -55h248c24 0 25 26 25 55s-1 55 -25 55h-248c-24 0 -25 -26 -25 -55z" />
   </font>
 </defs></svg>
