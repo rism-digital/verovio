@@ -80,7 +80,7 @@ public:
     /**
      * Determine layer elements spanned by the slur
      */
-    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax);
+    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType);
 
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 

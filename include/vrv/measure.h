@@ -255,6 +255,14 @@ public:
     //----------//
 
     /**
+     * See Object::FindSpannedLayerElements
+     */
+    ///@{
+    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
+    virtual int FindSpannedLayerElementsEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
     virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);

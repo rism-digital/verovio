@@ -264,7 +264,8 @@ float View::CalcInitialSlur(
 
     /************** content **************/
 
-    const std::vector<LayerElement *> elements = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x);
+    const std::vector<LayerElement *> elements
+        = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x, curve->GetSpanningType());
 
     Staff *startStaff = slur->GetStart()->m_crossStaff ? slur->GetStart()->m_crossStaff
                                                        : vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF));
