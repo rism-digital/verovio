@@ -243,6 +243,12 @@ public:
     static int RectBottomOverlap(const Point rect1[2], const Point rect2[2], int margin, int hMargin);
     ///@}
 
+    /**
+     * Solve the cubic equation ax^3 + bx^2 + cx + d = 0
+     * Returns up to three real roots
+     */
+    static std::set<double> SolveCubicPolynomial(double a, double b, double c, double d);
+
 private:
     /**
      * Get the rectangles covering the inside of a bounding box given two anchors (e.g., NW and NE, or NE and SE)
