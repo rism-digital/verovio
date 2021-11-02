@@ -2102,6 +2102,8 @@
 				4DDBBB561C7AE43E00054AFF /* dynam.h */,
 				4067E4C71DDDAF0000C6E059 /* fermata.cpp */,
 				4067E4C91DDDAF6400C6E059 /* fermata.h */,
+				35FDEBD024B6DC5B00AC1696 /* fing.cpp */,
+				35FDEBCD24B6DBC100AC1696 /* fing.h */,
 				403B050E244F3E2800EE4F71 /* gliss.cpp */,
 				403B0513244F3E4C00EE4F71 /* gliss.h */,
 				4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */,
@@ -2132,8 +2134,6 @@
 				40F910061E2799640081B7BB /* trill.h */,
 				40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */,
 				40D0D5E11E3BD7FE00E6BF5C /* turn.h */,
-				35FDEBD024B6DC5B00AC1696 /* fing.cpp */,
-				35FDEBCD24B6DBC100AC1696 /* fing.h */,
 			);
 			name = controlelements;
 			sourceTree = "<group>";
