@@ -136,11 +136,12 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
-void Tuplet::AdjustTupletBracketY(Doc *doc, int yReference, int staffSize)
+void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
 {
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (!tupletBracket || (this->GetBracketVisible() == BOOLEAN_false)) return;
 
+    const int yReference = staff->GetDrawingY();
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
     int bracketVerticalMargin = doubleUnit;
     bracketVerticalMargin *= (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
@@ -237,11 +238,15 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, int yReference, int staffSize)
     }
 }
 
-void Tuplet::AdjustTupletNumY(Doc *doc, int yReference, int staffSize)
+void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
 
+    this->CalculateTupletNumCrossStaff(tupletNum);
+
+    Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
+    const int yReference = tupletNumStaff->GetDrawingY();
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
     // The num is within a bracket
     if (tupletNum->GetAlignedBracket()) {
@@ -252,17 +257,6 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int yReference, int staffSize)
 
     // The num is on its own
     const int numVerticalMargin = (m_drawingNumPos == STAFFREL_basic_above) ? doubleUnit : -doubleUnit;
-    // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
-    ListOfObjects descendants;
-    ClassIdsComparison comparison({ CHORD, NOTE, REST });
-    this->FindAllDescendantByComparison(&descendants, &comparison);
-
-    auto it = std::find_if(descendants.begin(), descendants.end(), [](Object *object) {
-        LayerElement *element = vrv_cast<LayerElement *>(object);
-        if (!element) return false;
-        return !element->m_crossStaff;
-    });
-
     const int staffHeight = doc->GetDrawingStaffSize(staffSize);
     const int adjustedPosition = (m_drawingNumPos == STAFFREL_basic_above) ? 0 : -staffHeight;
     Beam *beam = this->GetNumAlignedBeam();
@@ -271,11 +265,10 @@ void Tuplet::AdjustTupletNumY(Doc *doc, int yReference, int staffSize)
     }
 
     // Calculate relative Y for the tupletNum
-    AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum);
+    AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum, tupletNumStaff);
     adjustTupletNumOverlapParams.m_horizontalMargin = 2 * doc->GetDrawingUnit(staffSize);
     adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
     adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
-    adjustTupletNumOverlapParams.m_ignoreCrossStaff = (descendants.end() != it);
     Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
     this->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
     int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
@@ -319,6 +312,68 @@ void Tuplet::FilterList(ArrayOfObjects *childList)
             ++iter;
         }
     }
+}
+
+void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
+{
+    assert(layerElement);
+    // If tuplet is fully cross-staff, just return it - it's enough
+    if (m_crossStaff) {
+        layerElement->m_crossStaff = m_crossStaff;
+        layerElement->m_crossLayer = m_crossLayer;
+        return;
+    };
+
+    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
+    ListOfObjects descendants;
+    ClassIdsComparison comparison({ CHORD, NOTE, REST });
+    this->FindAllDescendantByComparison(&descendants, &comparison);
+
+    Staff *crossStaff = NULL;
+    Layer *crossLayer = NULL;
+    int crossStaffCount = 0;
+    for (auto object : descendants) {
+        LayerElement *durElement = vrv_cast<LayerElement *>(object);
+        assert(durElement);
+        if (crossStaff && durElement->m_crossStaff && (durElement->m_crossStaff != crossStaff)) {
+            crossStaff = NULL;
+            // We can stop here
+            break;
+        }
+        else if (durElement->m_crossStaff) {
+            ++crossStaffCount;
+            crossStaff = durElement->m_crossStaff;
+            crossLayer = durElement->m_crossLayer;
+        }
+    }
+    if (!crossStaff) return;
+
+    // In case if most elements of the tuplet are cross-staff we need to make sure there for proper positioning of the
+    // tuplet number - otherwise tuplet number can end up with extreme adjustments
+    const bool isMostlyCrossStaff = crossStaff && (crossStaffCount > descendants.size() / 2);
+    if ((isMostlyCrossStaff && this->HasValidTupletNumPosition(crossStaff, staff))
+        || (!isMostlyCrossStaff && !this->HasValidTupletNumPosition(staff, crossStaff))) {
+        layerElement->m_crossStaff = crossStaff;
+        layerElement->m_crossLayer = crossLayer;
+    }
+}
+
+bool Tuplet::HasValidTupletNumPosition(Staff *preferredStaff, Staff *otherStaff)
+{
+    Beam *beam = this->GetNumAlignedBeam();
+    if (!beam) return true;
+    if (beam->m_drawingPlace == BEAMPLACE_mixed) return false;
+
+    if (preferredStaff->GetN() < otherStaff->GetN()) {
+        if ((beam->m_drawingPlace == BEAMPLACE_below) && (m_drawingNumPos == STAFFREL_basic_below)) return false;
+    }
+    else {
+        if ((beam->m_drawingPlace == BEAMPLACE_above) && (m_drawingNumPos == STAFFREL_basic_above)) return false;
+    }
+
+    return true;
 }
 
 void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
@@ -598,11 +653,11 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 
-    const int yReference = m_crossStaff ? m_crossStaff->GetDrawingY() : staff->GetDrawingY();
+    Staff *relevantStaff = m_crossStaff ? m_crossStaff : staff;
 
-    this->AdjustTupletBracketY(params->m_doc, yReference, staffSize);
+    this->AdjustTupletBracketY(params->m_doc, relevantStaff, staffSize);
 
-    this->AdjustTupletNumY(params->m_doc, yReference, staffSize);
+    this->AdjustTupletNumY(params->m_doc, relevantStaff, staffSize);
 
     return FUNCTOR_SIBLINGS;
 }
