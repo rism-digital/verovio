@@ -284,13 +284,23 @@ int Tie::CaclulateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
 
     // adjust starting point for the ties in chords with adjacent notes
     if (isStartPoint) {
+        const int defaultX = initialX + (radius + drawingUnit / 2);
         // if stem is down adjacent notes are going to be on the left side of the stem, hence always take right side of
         // the chord
         if (parentChord->GetDrawingStemDir() == STEMDIRECTION_down) {
-            return parentChord->GetContentRight() + drawingUnit / 2;
+            if ((curvature_CURVEDIR_below == drawingCurveDir) && (note == parentChord->GetBottomNote())) {
+                return defaultX;
+            }
+            Stem *stem = parentChord->GetDrawingStem();
+            if (stem) {
+                return stem->GetContentRight() + 2 * radius + drawingUnit / 2;
+            }
+            else {
+                return parentChord->GetContentRight() + drawingUnit / 2;
+            }
         }
         else {
-            if (!note) return initialX + (radius + drawingUnit / 2);
+            if (!note) return defaultX;
             const std::list<Note *> adjacentNotes = parentChord->GetAdjacentNotesList(staff, note->GetDrawingLoc());
             for (const auto adjacentNote : adjacentNotes) {
                 if (adjacentNote->GetDrawingX() > note->GetDrawingX()) {
@@ -304,18 +314,28 @@ int Tie::CaclulateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
                     }
                 }
             }
-            return initialX + (radius + drawingUnit / 2);
+            return defaultX;
         }
     }
     // adjust ending point for the ties in chords with adjacent notes
     else {
+        const int defaultX = initialX - (radius + drawingUnit / 2);
         // similar to the starting point - when stem direction is up, all adjacent notes are on the right, so take left
         // side of the chord
         if (parentChord->GetDrawingStemDir() == STEMDIRECTION_up) {
-            return parentChord->GetContentLeft() - drawingUnit / 2;
+            if ((curvature_CURVEDIR_above == drawingCurveDir) && (note == parentChord->GetTopNote())) {
+                return defaultX;
+            }
+            Stem *stem = parentChord->GetDrawingStem();
+            if (stem) {
+                return stem->GetContentLeft() - 2 * radius - drawingUnit / 2;
+            }
+            else {
+                return parentChord->GetContentLeft() - drawingUnit / 2;
+            }
         }
         else {
-            if (!note) return initialX - (radius + drawingUnit / 2);
+            if (!note) return defaultX;
             const std::list<Note *> adjacentNotes = parentChord->GetAdjacentNotesList(staff, note->GetDrawingLoc());
             for (const auto adjacentNote : adjacentNotes) {
                 if (adjacentNote->GetDrawingX() < note->GetDrawingX()) {
@@ -329,7 +349,7 @@ int Tie::CaclulateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
                     }
                 }
             }
-            return initialX - (radius + drawingUnit / 2);
+            return defaultX;
         }
     }
 }
