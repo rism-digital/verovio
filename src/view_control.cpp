@@ -1506,6 +1506,17 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
+        int xAdjust = 0;
+        const bool isBetweenStaves = (dir->GetPlace() == STAFFREL_between)
+            || ((dir->GetPlace() == STAFFREL_below) && (*staffIter != measure->GetLast(STAFF)))
+            || ((dir->GetPlace() == STAFFREL_above) && (*staffIter != measure->GetFirst(STAFF)));
+        if (isBetweenStaves
+            && (dir->GetStart()->GetAlignment()->GetTime()
+                == measure->m_measureAligner.GetRightBarLineAlignment()->GetTime())
+            && dir->AreChildrenAlignedTo(HORIZONTALALIGNMENT_right)) {
+            xAdjust = m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) / 2;
+        }
+
         dirTxt.SetPointSize(params.m_pointSize);
 
         if (dir->GetPlace() == STAFFREL_between) {
@@ -1518,7 +1529,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        dc->StartText(ToDeviceContextX(params.m_x - xAdjust), ToDeviceContextY(params.m_y), alignment);
         DrawTextChildren(dc, dir, params);
         dc->EndText();
 
