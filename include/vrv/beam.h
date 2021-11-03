@@ -9,6 +9,7 @@
 #define __VRV_BEAM_H__
 
 #include "atts_cmn.h"
+#include "atts_shared.h"
 #include "drawinginterface.h"
 #include "layerelement.h"
 
@@ -126,9 +127,10 @@ public:
 
 class Beam : public LayerElement,
              public BeamDrawingInterface,
-             public AttColor,
              public AttBeamedWith,
-             public AttBeamRend {
+             public AttBeamRend,
+             public AttColor,
+             public AttCue {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

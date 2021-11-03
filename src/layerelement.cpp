@@ -556,12 +556,14 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
     wchar_t code = 0;
     int dur = DUR_4;
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    bool isMensuralDur = false;
     assert(staff);
     if (this->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
-        if (note->IsMensuralDur() && !isInLigature) {
+        isMensuralDur = note->IsMensuralDur();
+        if (isMensuralDur && !isInLigature) {
             code = note->GetMensuralNoteheadGlyph();
         }
         else {
@@ -572,7 +574,10 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         Chord *chord = vrv_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
-        if (dur == DUR_1)
+        isMensuralDur = chord->IsMensuralDur();
+        if (dur == DUR_BR)
+            code = SMUFL_E0A1_noteheadDoubleWholeSquare;
+        else if (dur == DUR_1)
             code = SMUFL_E0A2_noteheadWhole;
         else if (dur == DUR_2)
             code = SMUFL_E0A3_noteheadHalf;
@@ -584,7 +589,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
     }
 
     // Mensural note shorter than DUR_BR
-    if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
+    if ((isMensuralDur && (dur <= DUR_BR)) || ((dur == DUR_1) && isInLigature)) {
         int widthFactor = (dur == DUR_MX) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.7;
@@ -1579,9 +1584,9 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
                 int previousDuration = previousNote->GetDrawingDur();
                 const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
+                data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
                 if (isPreviousCoord) {
                     Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
-                    data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
                     previousDuration = parentChord->GetDur();
                     isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
                         || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
@@ -1592,6 +1597,19 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
                 }
                 if (!isPreviousCoord || isEdgeElement || isChordElement) {
                     if ((currentNote->GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
+                        isInUnison = true;
+                        continue;
+                    }
+                    else if ((!currentNote->IsGraceNote() && !currentNote->GetDrawingCueSize())
+                        && (previousNote->IsGraceNote() || previousNote->GetDrawingCueSize())
+                        && (STEMDIRECTION_down == stemDir)) {
+                        shift -= 0.8 * horizontalMargin;
+                        continue;
+                    }
+                    else if ((currentNote->IsGraceNote() || currentNote->GetDrawingCueSize())
+                        && (!previousNote->IsGraceNote() && !previousNote->GetDrawingCueSize())
+                        && (STEMDIRECTION_up == stemDir)) {
+                        currentNote->SetDrawingXRel(currentNote->GetDrawingXRel() + 0.8 * horizontalMargin);
                         isInUnison = true;
                         continue;
                     }

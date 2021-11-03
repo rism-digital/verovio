@@ -1142,7 +1142,9 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
         }
 
+        dc->StartCustomGraphic("ledgerLines");
         DrawHorizontalLine(dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -1361,7 +1363,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         int drawingDur = note->GetDrawingDur();
         drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
-        if (drawingDur < DUR_1) {
+        if (drawingDur < DUR_BR) {
             DrawMaximaToBrevis(dc, noteY, element, layer, staff);
         }
         else {
@@ -1453,6 +1455,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         const int bottomMargin = staff->GetDrawingY()
             - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
+        dc->StartCustomGraphic("ledgerLines");
         // single legder line for half and whole rests
         if ((drawingDur == DUR_1 || drawingDur == DUR_2) && (y > topMargin || y < bottomMargin)) {
             dc->DeactivateGraphicX();
@@ -1473,6 +1476,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             }
             dc->ReactivateGraphic();
         }
+        dc->EndCustomGraphic();
     }
 
     /************ Draw children (dots) ************/

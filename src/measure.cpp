@@ -22,6 +22,7 @@
 #include "ending.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "multirest.h"
 #include "page.h"
 #include "pedal.h"
 #include "staff.h"
@@ -1064,6 +1065,20 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     // Nothing if the measure has at least one note or @metcon="false"
     else if ((this->FindDescendantByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
         minMeasureWidth = 0;
+    }
+    // Adjust min width based on multirest attributes (@num and @width), but only if these values are larger than
+    // current min width
+    else if (this->FindDescendantByType(MULTIREST) != NULL) {
+        MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST));
+        const int num = multiRest->GetNum();
+        if (multiRest->HasWidth()) {
+            const int fixedWidth
+                = multiRest->AttWidth::GetWidth() * (params->m_doc->GetDrawingUnit(params->m_staffSize) + 4);
+            if (minMeasureWidth < fixedWidth) minMeasureWidth = fixedWidth;
+        }
+        else if (num > 10) {
+            minMeasureWidth *= log1p(num) / 2;
+        }
     }
 
     int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
