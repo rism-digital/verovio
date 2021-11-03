@@ -46,7 +46,7 @@ public:
     ABCInput(Doc *doc);
     virtual ~ABCInput();
 
-    virtual bool Import(const std::string &abc);
+    bool Import(const std::string &abc) override;
 
 #ifndef NO_ABC_SUPPORT
 

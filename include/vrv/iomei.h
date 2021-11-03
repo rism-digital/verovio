@@ -184,12 +184,12 @@ public:
     /**
      * The main method for write objects.
      */
-    virtual bool WriteObject(Object *object);
+    bool WriteObject(Object *object) override;
 
     /**
      * Writing object method that must be overridden in the child class.
      */
-    virtual bool WriteObjectEnd(Object *object);
+    bool WriteObjectEnd(Object *object) override;
 
     /**
      * Return the output as a string by writing it to the stringstream member.
@@ -481,7 +481,7 @@ public:
     MEIInput(Doc *doc);
     virtual ~MEIInput();
 
-    virtual bool Import(const std::string &mei);
+    bool Import(const std::string &mei) override;
 
 private:
     bool ReadDoc(pugi::xml_node root);

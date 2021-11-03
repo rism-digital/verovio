@@ -84,12 +84,12 @@ public:
     /**
      * The main method for write objects.
      */
-    virtual bool WriteObject(Object *object);
+    bool WriteObject(Object *object) override;
 
     /**
      * Writing object method that must be overridden in the child class.
      */
-    virtual bool WriteObjectEnd(Object *object);
+    bool WriteObjectEnd(Object *object) override;
 
 private:
     bool WriteDoc(Doc *doc);
@@ -405,7 +405,7 @@ public:
     virtual ~PAEInput();
 
 #ifndef NO_PAE_SUPPORT
-    virtual bool Import(const std::string &pae);
+    bool Import(const std::string &pae) override;
 
 private:
     // function declarations:
@@ -518,7 +518,7 @@ public:
     jsonxx::Object GetValidationLog();
 
 #ifndef NO_PAE_SUPPORT
-    virtual bool Import(const std::string &input);
+    bool Import(const std::string &input) override;
 
 private:
     /**
