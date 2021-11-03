@@ -749,6 +749,12 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
     for (auto child : *this->GetChildren()) {
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
+
+    // if current accidental is not in the list then XRel wasn't adjusted and position is fine as it is - add it to the
+    // list. Generally this would happen with octave accidentals, that are processed first and most likely have no
+    // overlaps with other elements
+    if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end())
+        adjustedAccids.push_back(accid);
 }
 
 //----------------------------------------------------------------------------
