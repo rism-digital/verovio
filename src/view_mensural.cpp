@@ -538,19 +538,27 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
     Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
-    int position = ligature->GetListIndex(note);
-    assert(position != -1);
-    int shape = ligature->m_drawingShapes.at(position);
-    bool isLast = (position == (int)ligature->m_drawingShapes.size() - 1);
+    double shiftMultiplier = 3.0;
+    bool isVerticalDot = false;
+    if (!m_doc->GetOptions()->m_ligatureAsBracket.GetValue()) {
+        const int position = ligature->GetListIndex(note);
+        assert(position != -1);
+        const int shape = ligature->m_drawingShapes.at(position);
+        const bool isLast = (position == (int)ligature->m_drawingShapes.size() - 1);
+        isVerticalDot = !isLast && (shape & LIGATURE_OBLIQUE);
+    }
+    else {
+        if (note->GetActualDur() == DUR_1) shiftMultiplier = 3.5;
+    }
 
     int y = note->GetDrawingY();
     int x = note->GetDrawingX();
-    if (!isLast && (shape & LIGATURE_OBLIQUE)) {
+    if (isVerticalDot) {
         x += note->GetDrawingRadius(m_doc, true);
         y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
-        x += 3 * note->GetDrawingRadius(m_doc, true);
+        x += shiftMultiplier * note->GetDrawingRadius(m_doc, true);
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
