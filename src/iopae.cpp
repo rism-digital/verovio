@@ -2951,7 +2951,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
 
 bool PAEInput::ConvertMeasure()
 {
-    Measure *currentMeasure;
+    Measure *currentMeasure = NULL;
     pae::Token *measureToken = NULL;
     std::string paeStr;
     // measureCount is currently ignored by the Measure constructor

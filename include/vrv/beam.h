@@ -127,10 +127,10 @@ public:
 
 class Beam : public LayerElement,
              public BeamDrawingInterface,
-             public AttColor,
-             public AttCue,
              public AttBeamedWith,
-             public AttBeamRend {
+             public AttBeamRend,
+             public AttColor,
+             public AttCue {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

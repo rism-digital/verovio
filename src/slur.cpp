@@ -559,9 +559,7 @@ curvature_CURVEDIR Slur::GetGraceCurveDirection(Doc *doc)
         }
     }
     else {
-        StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(start);
         StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(end);
-
         data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
         if (endStemDrawInterface) {
             endStemDir = endStemDrawInterface->GetDrawingStemDir();
