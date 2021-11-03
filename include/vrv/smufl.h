@@ -73,6 +73,8 @@ enum {
     SMUFL_E093_timeSigParensRightSmall = 0xE093,
     SMUFL_E094_timeSigParensLeft = 0xE094,
     SMUFL_E095_timeSigParensRight = 0xE095,
+    SMUFL_E0A0_noteheadDoubleWhole = 0xE0A0,
+    SMUFL_E0A1_noteheadDoubleWholeSquare = 0xE0A1,
     SMUFL_E0A2_noteheadWhole = 0xE0A2,
     SMUFL_E0A3_noteheadHalf = 0xE0A3,
     SMUFL_E0A4_noteheadBlack = 0xE0A4,
@@ -428,7 +430,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 403
+#define SMUFL_COUNT 405
 
 } // namespace vrv
 

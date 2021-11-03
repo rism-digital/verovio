@@ -4544,6 +4544,26 @@
                 -0.0
             ]
         },
+        "noteheadDoubleWhole": {
+            "stemDownNW": [
+                0.0,
+                0.0
+            ],
+            "stemUpSE": [
+                2.18,
+                0.0
+            ]
+        },
+        "noteheadDoubleWholeSquare": {
+            "stemDownNW": [
+                0.0,
+                0.0
+            ],
+            "stemUpSE": [
+                1.392,
+                0.0
+            ]
+        },
         "noteheadHalfWithX": {
             "cutOutNW": [
                 0.14,

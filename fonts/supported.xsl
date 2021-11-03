@@ -170,8 +170,8 @@
         </timeSignatures>
         <noteheads>
             <description>Noteheads</description>
-            <!--<glyph glyph-code="E0A0" smufl-name="noteheadDoubleWhole"/>-->
-            <!--<glyph glyph-code="E0A1" smufl-name="noteheadDoubleWholeSquare"/>-->
+            <glyph glyph-code="E0A0" smufl-name="noteheadDoubleWhole"/>
+            <glyph glyph-code="E0A1" smufl-name="noteheadDoubleWholeSquare"/>
             <glyph glyph-code="E0A2" smufl-name="noteheadWhole"/>
             <glyph glyph-code="E0A3" smufl-name="noteheadHalf"/>
             <glyph glyph-code="E0A4" smufl-name="noteheadBlack"/>

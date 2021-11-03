@@ -1363,7 +1363,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         int drawingDur = note->GetDrawingDur();
         drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
-        if (drawingDur < DUR_1) {
+        if (drawingDur < DUR_BR) {
             DrawMaximaToBrevis(dc, noteY, element, layer, staff);
         }
         else {
