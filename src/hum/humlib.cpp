@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Sep 20 02:39:26 PM PDT 2021
+// Last Modified: Mon Nov  1 15:07:54 PDT 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -27971,7 +27971,9 @@ void HumdrumFileStructure::analyzeSpineStrands(vector<TokenPair>& ends,
 	int index = (int)ends.size()-1;
 	ends[index].first = starttok;
 	HTp tok = starttok;
+	HTp lasttok = starttok;
 	while (tok != NULL) {
+		lasttok = tok;
 		if ((tok->getSubtrack() > 1) && (tok->isMerge())) {
 			// check to the left: if the left primary/sub spine also has
 			// a *v, then this is the end of this strand; otherwise, the
@@ -27998,6 +28000,7 @@ void HumdrumFileStructure::analyzeSpineStrands(vector<TokenPair>& ends,
 	}
 
 	cerr << "Should not get here in analyzeSpineStrands()\n";
+	ends[index].last = lasttok;
 }
 
 
@@ -30386,7 +30389,11 @@ bool HumdrumLine::allSameBarlineStyle(void) {
 
 void HumdrumLine::clearTokenLinkInfo(void) {
 	for (int i=0; i<getFieldCount(); i++) {
-		token(i)->clearLinkInfo();
+		if (token(i)) {
+			token(i)->clearLinkInfo();
+		} else {
+			cerr << "Warning: non-existent token at field " << (i+1) << " on line " << (m_lineindex+1) << endl;
+		}
 	}
 }
 
@@ -56413,7 +56420,10 @@ void Tool_colortriads::processFile(HumdrumFile& infile) {
 
 Tool_composite::Tool_composite(void) {
 	define("a|append=b",    "append data to end of line (top of system)");
-	define("A|analysis=b",  "analyze composite");
+	define("A|analysis-attacks=b",       "analyze composite rhythm note attacks");
+	define("R|analysis-articulations=b", "analyze composite rhythm note articulations");
+	define("O|analysis-ornaments=b",     "analyze composite rhythm note ornaments");
+	define("S|analysis-slurs=b",         "analyze composite rhythm slurs");
 	define("g|grace=b",     "include grace notes in composite rhythm");
 	define("u|stem-up=b",   "stem-up for composite rhythm parts");
 	define("x|extract=b",   "only output composite rhythm spines");
@@ -56488,15 +56498,25 @@ bool Tool_composite::run(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_composite::analyzeComposite --
+// Tool_composite::analyzeComposite -- Do numerical analyses of features from notes
+//     in composite rhythms (full, group A, group B, coincidence) and insert
+//     analyses as lyrics for each composite rhythm staff.
 //
 
 void Tool_composite::analyzeComposite(HumdrumFile& infile) {
 	infile.analyzeStructureNoRhythm();
+
+	// groups is a list of the spine starts for composite rhythms.
+	// the value is null if there is no analysis of that type, or
+	// if there always has been a -AROS analysis already for that type.
+	// groups[0] = full composite rhythm spine start
+	// groups[1] = group A composite rhythm spine start
+	// groups[2] = group B composite rhythm spine start
+	// groups[3] = coincidence rhythm spine start
 	vector<HTp> groups;
 	getCompositeSpineStarts(groups, infile);
 
-	// Invalidate composite spines that already have analysises:
+	// Invalidate composite spines that already have analyses:
 	// **text spine after composite spine:
 	for (int i=0; i<(int)groups.size(); i++) {
 		if (!groups[i]) {
@@ -56518,20 +56538,26 @@ void Tool_composite::analyzeComposite(HumdrumFile& infile) {
 		}
 	}
 
-	vector<int> tracks;
+	// tracks :: A boolean for composite analysis staves.  These staves
+	// will have extra **text spines added after them with the analyses
+	// inserted into them.  The tracks vector also is used to prevent
+	// composite rhythms from being includeded in the numerical analyses
+	// for note attacks, articulations, ornaments and slurs.
+	vector<bool> tracks(infile.getMaxTrack() + 1, false);;
 	for (int i=0; i<(int)groups.size(); i++) {
 		if (groups[i] == NULL) {
 			continue;
 		}
 		int track = groups[i]->getTrack();
-		tracks.push_back(track);
+		tracks[track] = true;
 	}
 
-	// presuming analysis tracks are already in sorted order
+	// Presuming analysis tracks are already in sorted order
+// probably get rid of analysisTracks if no longer used?
 	vector<int> analysisTracks(groups.size());
 	int addition = 0;
-   // Coincidence spine added at end of array, but calculate
-   // for beginning here:
+	// Coincidence spine added at end of array, but calculate
+	// for beginning here:
 	if (groups[3]) {
 		addition++;
 		analysisTracks[3] = groups[3]->getTrack() + addition;
@@ -56544,52 +56570,381 @@ void Tool_composite::analyzeComposite(HumdrumFile& infile) {
 		analysisTracks[i] = groups[i]->getTrack() + addition;
 	}
 
-	sort(tracks.begin(), tracks.end());
+	// Do analyses and keep track of which features to add to inserted **text spines.
+	vector<string> spines;
+	if (m_analysisAttacksQ) {
+		spines.push_back("attack");
+		analyzeCompositeAttacks(infile, groups, tracks);
+	}
+	if (m_analysisArticulationsQ) {
+//		spines.push_back("articulation");
+//		analyzeCompositeArticulations(HumdrumFile& infile);
+	}
+	if (m_analysisOrnamentsQ) {
+//		spines.push_back("ornament");
+//		analyzeCompositeOrnaments(HumdrumFile& infile);
+	}
+	if (m_analysisSlursQ) {
+//		spines.push_back("slur");
+//		analyzeCompositeSlurs(HumdrumFile& infile);
+	}
 
-	if (tracks.empty()) {
-		// nothing to do
+	if (spines.size() > 1) {
+//		spines.push_back("sum");
+	}
+
+	if (spines.size() == 0) {
+		// Strange: nothing to do...
 		return;
 	}
 
-	string expansion = getExpansionString(tracks, infile.getMaxTrack());
-
+	// Fill in the analyses in the desired spine:
+	vector<int> expansionList = getExpansionList(tracks,
+			infile.getMaxTrack(), (int)spines.size());
+	string expansion = makeExpansionString(expansionList);
 	Tool_extract extract;
-
 	stringstream edata;
 	infile.createLinesFromTokens();
 	edata << infile;
 	HumdrumFile einput;
 	einput.readString(edata.str());
-
 	extract.setModified("s", expansion);
 	extract.setModified("n", "text");
 	extract.run(einput);
-
 	HumdrumFile outfile;
 	outfile.readString(extract.getAllText());
 
-	bool done = false;
-	if (groups[0]) {
-		doTotalAnalysis(outfile, infile, analysisTracks[0]);
-		done = true;
-	}
-	if (groups[1] || groups[2]) {
-		doGroupAnalyses(outfile, infile, analysisTracks[1], analysisTracks[2]);
-		done = true;
-	}
-	if (groups[3]) {
-		doCoincidenceAnalysis(outfile, infile, analysisTracks[3], groups[3]);
-		done = true;
-	}
+	// Now go back an insert analyses into outfile.
+	insertAnalysesIntoFile(outfile, spines, expansionList, tracks);
+
 
 	// Replace contents of infile with the analysis:
+	bool done = 1;
 	if (done) {
 		stringstream temp;
 		outfile.createLinesFromTokens();
 		temp << outfile;
 		infile.readString(temp.str());
 	}
+
 }
+
+
+
+//////////////////////////////
+//
+// Tool_composite::insertAnalysesIntoFile --
+//     spines   -- List of string for analysis types requested.
+//
+//     spineMap -- Expansion list that was applied to the output file to add
+//                 extra **text spines for storing anlayses.  Index according
+//                 to the new track numberes and the value is the old track
+//                 value or 0 if it is a new analysis spine that was added.
+//
+//     tracks   -- A boolean for composite analysis staves.  These tracks
+//                 will have extra **text spines added after them
+//                 with the analyses inserted into the added spines.  The tracks
+//                 vector also is used to prevent composite rhythms
+//                 from being included in the numerical analyses
+//                 for note attacks, articulations, ornaments and
+//                 slurs. The track values are the old track assignments
+//                 before extra analysis spines are added (see spineMap which
+//                 is similar
+
+
+void Tool_composite::insertAnalysesIntoFile(HumdrumFile& outfile, vector<string>& spines,
+		vector<int>& spineMap, vector<bool>& tracks) {
+
+	int count = (int)spines.size();
+	if (count <= 0) {
+		return;
+	}
+
+	vector<int> trackMap; // spine map but indexed by track by adding a dummy first element.
+	trackMap.resize(spineMap.size() + 1);
+	trackMap[0] = -1;
+	for (int i=0; i<(int)spineMap.size(); i++) {
+		trackMap[i+1] = spineMap[i];
+	}
+
+	// dataByTrack -- a lookup table where the index is the new track number, and the
+	// value is a pointer to the vector containing the analysis to place in that
+	// track.
+	vector<vector<double>*> dataByTrack;
+	assignAnalysesToTextTracks(dataByTrack, spines, tracks, trackMap);
+
+	stringstream ss;
+	for (int i=0; i<outfile.getLineCount(); i++) {
+		if (!outfile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<outfile[i].getFieldCount(); j++) {
+			HTp token = outfile.token(i, j);
+			int track = token->getTrack();
+			if (dataByTrack.at(track) == NULL) {
+				continue;
+			}
+			double value = dataByTrack.at(track)->at(i);
+			if (value > 0) {
+				ss.str("");
+				ss << value;
+				string newvalue = ss.str();
+				token->setText(newvalue);
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::assignAnalysesToTextTracks -- temp. algo.
+//    * spines is a list of the analysis/analyses that are done.
+//    * tracks is a bookean to indicate that there is a **text spine
+//      at that position in the file (zero-indexed spine position)
+//      that should be filled in with an analysis.
+//    * dataByTrack is a list of analysis data (pointers) that should be filling
+//      in a particular spine (also zero-indexed).
+//
+//
+//
+
+void Tool_composite::assignAnalysesToTextTracks(vector<vector<double>*>& dataByTrack,
+		vector<string>& spines, vector<bool>& tracks, vector<int>& trackMap) {
+
+	// spineMap is a 0-index track map.
+	dataByTrack.resize(trackMap.size());
+	for (int i=0; i<(int)dataByTrack.size(); i++) {
+		dataByTrack[i] = NULL;
+	}
+
+	int zerocount = 0;
+	bool coincidence = false; // composite spine has not been added
+	bool total     = false;   // total spine has not been added
+	for (int i=1; i<(int)trackMap.size(); i++) {
+		if (trackMap[i] != 0) {
+			continue;
+		}
+		if (m_coincidenceQ && !coincidence) {
+			dataByTrack[i] = &m_analysisNoteAttacks[3];
+			coincidence = true;
+		} else if (m_nogroupsQ && !total) {
+			dataByTrack[i] = &m_analysisNoteAttacks[0];
+			total = true;
+		} else {
+			if (zerocount == 0) {
+				dataByTrack[i] = &m_analysisNoteAttacks[1];
+				zerocount++;
+			} else {
+				dataByTrack[i] = &m_analysisNoteAttacks[2];
+				zerocount++;
+				break;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::analyzeCompositeAttacks --
+//
+
+void Tool_composite::analyzeCompositeAttacks(HumdrumFile& infile,
+		vector<HTp>& groups, vector<bool>& tracks) {
+
+	m_analysisNoteAttacks.resize(4);
+
+	for (int i=0; i<(int)m_analysisNoteAttacks.size(); i++) {
+		m_analysisNoteAttacks[i].resize(infile.getLineCount());
+		fill(m_analysisNoteAttacks[i].begin(), m_analysisNoteAttacks[i].end(), -1.0);
+	}
+
+	if (groups[0] || groups[3]) {
+		doTotalAttackAnalysis(m_analysisNoteAttacks[0], infile, groups[0]->getTrack(), tracks);
+	}
+
+	if ((groups[1] && groups[2]) || groups[3]) {
+		doGroupAttackAnalyses(m_analysisNoteAttacks.at(1), m_analysisNoteAttacks.at(2), infile,
+			groups.at(1)->getTrack(), groups.at(2)->getTrack(), tracks);
+	}
+
+	if (groups[3]) {
+		doCoincidenceAttackAnalysis(m_analysisNoteAttacks);
+	}
+
+	if (m_debugQ) {
+		for (int i=0; i<(int)m_analysisNoteAttacks[0].size(); i++) {
+			for (int j=0; j<4; j++) {
+				cout << m_analysisNoteAttacks[j][i] << "\t";
+			}
+			cout << endl;
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::doCoincidenceAttackAnalyses --
+//
+
+void Tool_composite::doCoincidenceAttackAnalysis(vector<vector<double>>& analysis) {
+	if (analysis.size() < 4) {
+		cerr << "ERROR: Expecting at least 4 analysis slots." << endl;
+	}
+	fill(analysis[3].begin(), analysis[3].end(), -1);
+
+	bool found = false;
+	for (int i=0; i<(int)analysis[1].size(); i++) {
+		if ((analysis[1].at(i) > 0) && (analysis[2].at(i) > 0)) {
+			analysis[3].at(i) = analysis[1].at(i) + analysis[2].at(i);
+cerr << "I=" << i << "\t" << analysis[3].at(i) << " <= " << analysis[1].at(i) << " + " << analysis[2].at(i) << endl;
+			found = true;
+		}
+	}
+	if (found) {
+		return;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::doGroupAttackAnalyses --
+//
+
+void Tool_composite::doGroupAttackAnalyses(vector<double>& analysisA,
+      vector<double>& analysisB, HumdrumFile& infile, int trackA, int trackB,
+      vector<bool>& tracks) {
+
+	HTp atok = NULL;
+	HTp btok = NULL;
+	int asum = 0;
+	int bsum = 0;
+	for (int i=0; i<(int)infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		atok = NULL;
+		btok = NULL;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			if (track == trackA) {
+				atok = token;
+			}
+			if (track == trackB) {
+				btok = token;
+			}
+		}
+
+		asum = 0;
+		bsum = 0;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			string group = token->getValue("auto", "group");
+			if (group == "A") {
+				asum += countNoteAttacks(token);
+			} else if (group == "B") {
+				bsum += countNoteAttacks(token);
+			}
+		}
+		if (asum > 0) {
+			// Don't report 0 note attacks on tied notes.
+			analysisA[i] = asum;
+		}
+		if (bsum > 0) {
+			// Don't report 0 note attacks on tied notes.
+			analysisB[i] = bsum;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::doTotalAttackAnalysis -- Count all of the notes on each line
+//   (that are not any potential previous analsysis spine).
+//
+
+void Tool_composite::doTotalAttackAnalysis(vector<double>& analysis, HumdrumFile& infile,
+		int track, vector<bool>& tracks) {
+
+	analysis.resize(infile.getLineCount());
+	fill(analysis.begin(), analysis.end(), -1);
+
+	// Identify previous composite analysis spines that should be ignored:
+	vector<HTp> composites;
+	vector<bool> ignore(infile.getMaxTrack() + 1, false);
+	getCompositeSpineStarts(composites, infile);
+	for (int i=0; i<(int)composites.size(); i++) {
+		if (!composites[i]) {
+			continue;
+		}
+		int track = composites[i]->getTrack();
+		ignore[track] = true;
+	}
+
+	int csum = 0;
+	for (int i=0; i<(int)infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		csum = 0;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			int track = token->getTrack();
+			if (ignore[track]) {
+				continue;
+			}
+			csum += countNoteAttacks(token);
+		}
+		if (csum > 0) {
+			// don't report 0 counts on tied notes
+			analysis[i] = csum;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::analyzeCompositeArticulations --
+//
+
+void Tool_composite::analyzeCompositeArticulations(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks) { }
+
+
+
+//////////////////////////////
+//
+// Tool_composite::analyzeCompositeOrnaments --
+//
+
+void Tool_composite::analyzeCompositeOrnaments(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks) { }
+
+
+
+//////////////////////////////
+//
+// Tool_composite::analyzeCompositeSlurs --
+//
+
+void Tool_composite::analyzeCompositeSlurs(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks) { }
 
 
 
@@ -56605,7 +56960,7 @@ void Tool_composite::doCoincidenceAnalysis(HumdrumFile& outfile, HumdrumFile& in
 	vector<HTp> composites;
 	vector<bool> ignore(infile.getMaxTrack() + 1, false);
 
-   getCompositeSpineStarts(composites, infile);
+	getCompositeSpineStarts(composites, infile);
 	for (int i=0; i<(int)composites.size(); i++) {
 		if (!composites[i]) {
 			continue;
@@ -56662,116 +57017,6 @@ void Tool_composite::doCoincidenceAnalysis(HumdrumFile& outfile, HumdrumFile& in
 }
 
 
-
-//////////////////////////////
-//
-// Tool_composite::doTotalAnalysis --
-//
-
-void Tool_composite::doTotalAnalysis(HumdrumFile& outfile, HumdrumFile& infile, int ctrack) {
-
-	vector<HTp> composites;
-	vector<bool> ignore(infile.getMaxTrack() + 1, false);
-
-   getCompositeSpineStarts(composites, infile);
-	for (int i=0; i<(int)composites.size(); i++) {
-		if (!composites[i]) {
-			continue;
-		}
-		int track = composites[i]->getTrack();
-		ignore[track] = true;
-	}
-
-	HTp ctok = NULL;
-	int csum = 0;
-	for (int i=0; i<(int)outfile.getLineCount(); i++) {
-		if (!outfile[i].isData()) {
-			continue;
-		}
-		ctok = NULL;
-		for (int j=0; j<outfile[i].getFieldCount(); j++) {
-			HTp token = outfile.token(i, j);
-			int track = token->getTrack();
-			if (track == ctrack) {
-				ctok = token;
-				break;
-			}
-		}
-
-		csum = 0;
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			HTp token = infile.token(i, j);
-			if (!token->isKern()) {
-				continue;
-			}
-			int track = token->getTrack();
-			if (ignore[track]) {
-				continue;
-			}
-			csum += countNoteAttacks(token);
-		}
-		if (csum > 0) {
-			// don't report 0 counts on tied notes
-			ctok->setText(to_string(csum));
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_composite::doGroupAnalyses --
-//
-
-void Tool_composite::doGroupAnalyses(HumdrumFile& outfile, HumdrumFile& infile, int atrack, int btrack) {
-	HTp atok = NULL;
-	HTp btok = NULL;
-	int asum = 0;
-	int bsum = 0;
-	for (int i=0; i<(int)outfile.getLineCount(); i++) {
-		if (!outfile[i].isData()) {
-			continue;
-		}
-		atok = NULL;
-		btok = NULL;
-		for (int j=0; j<outfile[i].getFieldCount(); j++) {
-			HTp token = outfile.token(i, j);
-			int track = token->getTrack();
-			if (track == atrack) {
-				atok = token;
-			}
-			if (track == btrack) {
-				btok = token;
-			}
-		}
-
-		asum = 0;
-		bsum = 0;
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			HTp token = infile.token(i, j);
-			if (!token->isKern()) {
-				continue;
-			}
-			string group = token->getValue("auto", "group");
-			if (group == "A") {
-				asum += countNoteAttacks(token);
-			} else if (group == "B") {
-				bsum += countNoteAttacks(token);
-			}
-		}
-		if (asum > 0) {
-			// Don't report 0 note attacks on tied notes.
-			atok->setText(to_string(asum));
-		}
-		if (bsum > 0) {
-			// Don't report 0 note attacks on tied notes.
-			btok->setText(to_string(bsum));
-		}
-	}
-}
-
-
 //////////////////////////////
 //
 // Tool_composite::countNoteAttacks --
@@ -56803,28 +57048,46 @@ int Tool_composite::countNoteAttacks(HTp token) {
 
 //////////////////////////////
 //
-// Tool_composite::getExpansionString --  Add an extra spine after
+// Tool_composite::getexpansionList --  Add an extra spine after
 //      every track in the input list, up to maxtrack.
 //
 
-string Tool_composite::getExpansionString(vector<int>& tracks, int maxtrack) {
-	vector<bool> extraspine(maxtrack, false);
-	for (int i=0; i<(int)tracks.size(); i++) {
-		if (tracks[i]) {
-			extraspine[tracks[i]-1] = true;
-		}
-	}
-	string output = "";
-	for (int i=0; i<(int)extraspine.size(); i++) {
-		output += to_string(i+1) + ",";
-		if (extraspine[i]) {
-			output += "0,";
-		}
-	}
-	if (!output.empty()) {
-		output.resize(output.size() - 1);
-	}
+vector<int> Tool_composite::getExpansionList(vector<bool>& tracks, int maxtrack, int count) {
+	vector<int> extraspine(maxtrack, false);
 
+	for (int i=1; i<(int)tracks.size(); i++) {
+		if (tracks.at(i)) {
+			extraspine.at(i-1) = count;
+		}
+	}
+	vector<int> output;
+	for (int i=0; i<(int)extraspine.size(); i++) {
+		output.push_back(i+1);
+		for (int j=0; j<extraspine.at(i); j++) {
+			output.push_back(0);
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::makeExpansionString -- converts output of
+//      getExpansionList into a string.  New spines are given
+//      a track value of 0.
+//
+
+
+string Tool_composite::makeExpansionString(vector<int>& tracks) {
+	string output;
+	for (int i=0; i<(int)tracks.size(); i++) {
+		output += to_string(tracks[i]);
+		if (i < (int)tracks.size() - 1) {
+			output += ",";
+		}
+	}
 	return output;
 }
 
@@ -56918,7 +57181,14 @@ void Tool_composite::initialize(void) {
 	m_appendQ   = getBoolean("append");
 	m_debugQ    = getBoolean("debug");
 	m_onlyQ     = getBoolean("only");
-	m_analysisQ = getBoolean("analysis");
+	m_analysisAttacksQ       = getBoolean("analysis-attacks");
+	m_analysisArticulationsQ = getBoolean("analysis-articulations");
+	m_analysisOrnamentsQ     = getBoolean("analysis-ornaments");
+	m_analysisSlursQ         = getBoolean("analysis-slurs");
+	m_analysisQ = m_analysisAttacksQ;
+	m_analysisQ |= m_analysisArticulationsQ;
+	m_analysisQ |= m_analysisOrnamentsQ;
+	m_analysisQ |= m_analysisSlursQ;
 	m_only      = getString("only");
 	m_coincidenceQ = getBoolean("coincidence-rhythm");
 
@@ -58077,7 +58347,7 @@ void Tool_composite::prepareSingleGroup(HumdrumFile& infile) {
 		}
 
 		// need to analyze structure for some reason:
-		//	 infile.analyzeStrands();
+		// infile.analyzeStrands();
 		infile.analyzeStructure();
 		autobeam.run(infile);
 	}
