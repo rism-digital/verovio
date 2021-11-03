@@ -352,7 +352,8 @@ void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
 
     // In case if most elements of the tuplet are cross-staff we need to make sure there for proper positioning of the
     // tuplet number - otherwise tuplet number can end up with extreme adjustments
-    const bool isMostlyCrossStaff = crossStaff && (crossStaffCount > descendants.size() / 2);
+    const int descendantCount = static_cast<int>(descendants.size());
+    const bool isMostlyCrossStaff = crossStaff && (crossStaffCount > descendantCount / 2);
     if ((isMostlyCrossStaff && this->HasValidTupletNumPosition(crossStaff, staff))
         || (!isMostlyCrossStaff && !this->HasValidTupletNumPosition(staff, crossStaff))) {
         layerElement->m_crossStaff = crossStaff;
