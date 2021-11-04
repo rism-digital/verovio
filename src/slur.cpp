@@ -690,6 +690,8 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     const bool isGraceToNoteSlur
         = !start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && start->IsGraceNote() && !end->IsGraceNote();
 
+    const bool isPortatoSlur = this->IsPortatoSlur(startNote, startChord, endNote, endChord);
+
     int x1, x2, y1, y2;
     std::tie(x1, x2, y1, y2) = std::tie(points.first.x, points.second.x, points.first.y, points.second.y);
 
@@ -733,6 +735,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
+            // similar for portato slurs
+            else if (isPortatoSlur) {
+                y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                if (!doc->GetOptions()->m_staccatoCenter.GetValue()) {
+                    x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+            }
             // d(^)
             else {
                 // put it on the side, move it left, but not if we have a @tstamp
@@ -767,6 +776,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            // similar for portato slurs
+            else if (isPortatoSlur) {
+                y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                if (!doc->GetOptions()->m_staccatoCenter.GetValue()) {
+                    x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
             }
             // P(_)
             else {
@@ -824,6 +840,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
+            // similar to beam for portato slurs
+            else if (isPortatoSlur) {
+                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                if (!doc->GetOptions()->m_staccatoCenter.GetValue()) {
+                    x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
+            }
             // (^)d
             else {
                 // put it on the side, no need to move it right
@@ -869,6 +892,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 else {
                     y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                     x2 -= endRadius;
+                }
+            }
+            // similar to beam for portato slurs
+            else if (isPortatoSlur) {
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                if (!doc->GetOptions()->m_staccatoCenter.GetValue()) {
+                    x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
             // (_)P
@@ -933,6 +963,15 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     }
 
     return std::make_pair(Point(x1, y1), Point(x2, y2));
+}
+
+bool Slur::IsPortatoSlur(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord) const
+{
+    const bool startHasArtic
+        = startChord ? (startChord->GetChildCount(ARTIC) == 1) : (startNote && (startNote->GetChildCount(ARTIC) == 1));
+    const bool endHasArtic
+        = endChord ? (endChord->GetChildCount(ARTIC) == 1) : (endNote && (endNote->GetChildCount(ARTIC) == 1));
+    return (startHasArtic && endHasArtic);
 }
 
 //----------------------------------------------------------------------------

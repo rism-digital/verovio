@@ -13,8 +13,10 @@
 
 namespace vrv {
 
+class Chord;
 class Doc;
 class Layer;
+class Note;
 class Staff;
 
 //----------------------------------------------------------------------------
@@ -102,6 +104,14 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
+    /**
+     * Helper for calculating the initial slur start and end points
+     */
+    ///@{
+    // Check if the slur resembles portato
+    bool IsPortatoSlur(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord) const;
+    ///@}
+
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
      */
