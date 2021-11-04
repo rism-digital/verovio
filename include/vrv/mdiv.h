@@ -57,8 +57,8 @@ public:
      * Invisible Mdiv elements are not saved in page-based MEI
      */
     ///@{
-    virtual int Save(FunctorParams *functorParams);
-    virtual int SaveEnd(FunctorParams *functorParams);
+    int Save(FunctorParams *functorParams) override;
+    int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**

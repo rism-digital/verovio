@@ -258,8 +258,8 @@ public:
      * See Object::FindSpannedLayerElements
      */
     ///@{
-    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
-    virtual int FindSpannedLayerElementsEnd(FunctorParams *functorParams);
+    int FindSpannedLayerElements(FunctorParams *functorParams) override;
+    int FindSpannedLayerElementsEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
