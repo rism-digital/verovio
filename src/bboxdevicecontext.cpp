@@ -307,7 +307,8 @@ void BBoxDeviceContext::MoveTextVerticallyTo(int y)
     // m_textY = y;
 }
 
-void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
+void BBoxDeviceContext::DrawText(
+    const std::string &text, const std::wstring &wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 

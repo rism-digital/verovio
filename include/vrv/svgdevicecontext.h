@@ -48,19 +48,19 @@ public:
      * @name Setters
      */
     ///@{
-    virtual void SetBackground(int colour, int style = AxSOLID);
-    virtual void SetBackgroundImage(void *image, double opacity = 1.0);
-    virtual void SetBackgroundMode(int mode);
-    virtual void SetTextForeground(int colour);
-    virtual void SetTextBackground(int colour);
-    virtual void SetLogicalOrigin(int x, int y);
+    void SetBackground(int colour, int style = AxSOLID) override;
+    void SetBackgroundImage(void *image, double opacity = 1.0) override;
+    void SetBackgroundMode(int mode) override;
+    void SetTextForeground(int colour) override;
+    void SetTextBackground(int colour) override;
+    void SetLogicalOrigin(int x, int y) override;
     ///@}
 
     /**
      * @name Getters
      */
     ///@{
-    virtual Point GetLogicalOrigin();
+    Point GetLogicalOrigin() override;
     ///}
 
     /**
@@ -73,93 +73,93 @@ public:
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawQuadBezierPath(Point bezier[3]);
-    virtual void DrawCubicBezierPath(Point bezier[4]);
-    virtual void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]);
-    virtual void DrawCircle(int x, int y, int radius);
-    virtual void DrawEllipse(int x, int y, int width, int height);
-    virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
-    virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
-    virtual void DrawRectangle(int x, int y, int width, int height);
-    virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
-    virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius);
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
-        int width = VRV_UNSET, int height = VRV_UNSET);
-    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
-    virtual void DrawSpline(int n, Point points[]);
-    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
-    virtual void DrawBackgroundImage(int x = 0, int y = 0);
+    void DrawQuadBezierPath(Point bezier[3]) override;
+    void DrawCubicBezierPath(Point bezier[4]) override;
+    void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
+    void DrawCircle(int x, int y, int radius) override;
+    void DrawEllipse(int x, int y, int width, int height) override;
+    void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
+    void DrawLine(int x1, int y1, int x2, int y2) override;
+    void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE) override;
+    void DrawRectangle(int x, int y, int width, int height) override;
+    void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
+    void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
+    void DrawText(const std::string &text, const std::wstring &wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
+        int width = VRV_UNSET, int height = VRV_UNSET) override;
+    void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) override;
+    void DrawSpline(int n, Point points[]) override;
+    void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) override;
+    void DrawBackgroundImage(int x = 0, int y = 0) override;
     ///@}
 
     /**
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left);
-    virtual void EndText();
+    void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left) override;
+    void EndText() override;
 
     /**
      * @name Move a text to the specified position, for example when starting a new line.
      */
     ///@{
-    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
-    virtual void MoveTextVerticallyTo(int y);
+    void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) override;
+    void MoveTextVerticallyTo(int y) override;
     ///@}
 
     /**
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false);
-    virtual void EndGraphic(Object *object, View *view);
+    void StartGraphic(
+        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false) override;
+    void EndGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
      */
     ///@{
-    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "");
-    virtual void EndCustomGraphic();
+    void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "") override;
+    void EndCustomGraphic() override;
     ///@}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ResumeGraphic(Object *object, std::string gId);
-    virtual void EndResumedGraphic(Object *object, View *view);
+    void ResumeGraphic(Object *object, std::string gId) override;
+    void EndResumedGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Method for starting and ending a text (<tspan>) text graphic
      */
     ///@{
-    virtual void StartTextGraphic(Object *object, std::string gClass, std::string gId);
-    virtual void EndTextGraphic(Object *object, View *view);
+    void StartTextGraphic(Object *object, std::string gClass, std::string gId) override;
+    void EndTextGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Method for rotating a graphic (clockwise).
      */
     ///@{
-    virtual void RotateGraphic(Point const &orig, double angle);
+    void RotateGraphic(Point const &orig, double angle) override;
     ///@}
 
     /**
      * @name Method for starting and ending page
      */
     ///@{
-    virtual void StartPage();
-    virtual void EndPage();
+    void StartPage() override;
+    void EndPage() override;
     ///@}
 
     /**
      * @name Method for adding description element
      */
     ///@{
-    virtual void AddDescription(const std::string &text);
+    void AddDescription(const std::string &text) override;
     ///@}
 
     /**
@@ -175,7 +175,7 @@ public:
     /**
      * In SVG use global styling but not with mm output (for pdf generation)
      */
-    virtual bool UseGlobalStyling() { return !m_mmOutput; }
+    bool UseGlobalStyling() override { return !m_mmOutput; }
 
     /**
      * Setting mm output flag (false by default)
