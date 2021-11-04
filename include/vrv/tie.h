@@ -57,7 +57,7 @@ public:
     /**
     * Calculate starting/ending point for the ties in the chords with adjacent notes
     */
-    int CaclulateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
+    int CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
         curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint);
 
     //----------//

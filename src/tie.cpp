@@ -276,9 +276,10 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     return true;
 }
 
-int Tie::CaclulateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
+int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
     curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint)
 {
+    assert(parentChord);
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int radius = note ? note->GetDrawingRadius(doc) : drawingUnit;
 
@@ -385,7 +386,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             if (endNote) r2 = endNote->GetDrawingRadius(doc);
             // startPoint
             if (startParentChord && startParentChord->HasAdjacentNotesInStaff(staff)) {
-                startPoint.x = this->CaclulateAdjacentChordXOffset(
+                startPoint.x = this->CalculateAdjacentChordXOffset(
                     doc, staff, startParentChord, startNote, drawingCurveDir, startPoint.x, true);
             }
             else {
@@ -395,7 +396,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             Staff *endStaff = staff;
             if (endParentChord) endStaff = vrv_cast<Staff *>(endParentChord->GetFirstAncestor(STAFF));
             if (endParentChord && endParentChord->HasAdjacentNotesInStaff(endStaff)) {
-                endPoint.x = this->CaclulateAdjacentChordXOffset(
+                endPoint.x = this->CalculateAdjacentChordXOffset(
                     doc, endStaff, endParentChord, endNote, drawingCurveDir, endPoint.x, false);
             }
             else {
@@ -449,7 +450,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             Staff *endStaff = staff;
             if (endParentChord) endStaff = vrv_cast<Staff *>(endParentChord->GetFirstAncestor(STAFF));
             if (endParentChord && endParentChord->HasAdjacentNotesInStaff(endStaff)) {
-                endPoint.x = this->CaclulateAdjacentChordXOffset(
+                endPoint.x = this->CalculateAdjacentChordXOffset(
                     doc, endStaff, endParentChord, endNote, drawingCurveDir, endPoint.x, false);
             }
             else {
