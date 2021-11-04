@@ -77,8 +77,7 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
-    virtual int GetPosition(LayerElement *element);
-    virtual bool IsLastInNeume(LayerElement *element);
+    bool IsLastInNeume(LayerElement *element);
 
     bool GenerateChildMelodic();
 
@@ -90,7 +89,8 @@ public:
     PitchInterface *GetLowestPitch();
 
 private:
-    //
+    int GetPosition(LayerElement *element);
+
 public:
     //----------------//
     // Static members //
