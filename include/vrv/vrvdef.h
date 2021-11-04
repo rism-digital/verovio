@@ -173,6 +173,7 @@ enum ClassId {
     CHORD,
     CLEF,
     CUSTOS,
+    DIVLINE,
     DOT,
     DOTS,
     FLAG,

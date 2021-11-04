@@ -175,11 +175,7 @@ public:
     ///@}
 
 private:
-    /**
-     * States the length of barlines in virtual units.
-     * The value must be greater than 0 and is typically equal to 2 times (the number
-     * of staff lines - 1); e.g., a value of '8' for a 5-line staff.
-     **/
+    /** Encodes the stem length. **/
     double m_len;
     /** Indicates the method employed to mark corrections and normalizations. **/
     data_BARMETHOD m_method;
@@ -720,6 +716,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttLigatureVis
+//----------------------------------------------------------------------------
+
+class AttLigatureVis : public Att {
+public:
+    AttLigatureVis();
+    virtual ~AttLigatureVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetLigatureVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadLigatureVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteLigatureVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetForm(data_LIGATUREFORM form_) { m_form = form_; }
+    data_LIGATUREFORM GetForm() const { return m_form; }
+    bool HasForm() const;
+    ///@}
+
+private:
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    data_LIGATUREFORM m_form;
+
+    /* include <attform> */
+};
+
+//----------------------------------------------------------------------------
 // AttLineVis
 //----------------------------------------------------------------------------
 
@@ -853,6 +885,10 @@ public:
      * to the default value)
      **/
     ///@{
+    void SetDot(data_BOOLEAN dot_) { m_dot = dot_; }
+    data_BOOLEAN GetDot() const { return m_dot; }
+    bool HasDot() const;
+    //
     void SetForm(mensurVis_FORM form_) { m_form = form_; }
     mensurVis_FORM GetForm() const { return m_form; }
     bool HasForm() const;
@@ -860,15 +896,23 @@ public:
     void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; }
     data_ORIENTATION GetOrient() const { return m_orient; }
     bool HasOrient() const;
+    //
+    void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; }
+    data_MENSURATIONSIGN GetSign() const { return m_sign; }
+    bool HasSign() const;
     ///@}
 
 private:
+    /** Specifies whether a dot is to be added to the base symbol. **/
+    data_BOOLEAN m_dot;
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     mensurVis_FORM m_form;
     /** Describes the rotation or reflection of the base symbol. **/
     data_ORIENTATION m_orient;
+    /** The base symbol in the mensuration sign/time signature of mensural notation. **/
+    data_MENSURATIONSIGN m_sign;
 
-    /* include <attorient> */
+    /* include <attsign> */
 };
 
 //----------------------------------------------------------------------------
@@ -899,6 +943,10 @@ public:
     std::string GetMensurColor() const { return m_mensurColor; }
     bool HasMensurColor() const;
     //
+    void SetMensurDot(data_BOOLEAN mensurDot_) { m_mensurDot = mensurDot_; }
+    data_BOOLEAN GetMensurDot() const { return m_mensurDot; }
+    bool HasMensurDot() const;
+    //
     void SetMensurForm(mensuralVis_MENSURFORM mensurForm_) { m_mensurForm = mensurForm_; }
     mensuralVis_MENSURFORM GetMensurForm() const { return m_mensurForm; }
     bool HasMensurForm() const;
@@ -911,11 +959,19 @@ public:
     data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; }
     bool HasMensurOrient() const;
     //
+    void SetMensurSign(data_MENSURATIONSIGN mensurSign_) { m_mensurSign = mensurSign_; }
+    data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; }
+    bool HasMensurSign() const;
+    //
     void SetMensurSize(data_FONTSIZE mensurSize_) { m_mensurSize = mensurSize_; }
     data_FONTSIZE GetMensurSize() const { return m_mensurSize; }
     bool HasMensurSize() const;
     /** Getter for reference (for alternate type only) */
     data_FONTSIZE *GetMensurSizeAlternate() { return &m_mensurSize; }
+    //
+    void SetMensurSlash(int mensurSlash_) { m_mensurSlash = mensurSlash_; }
+    int GetMensurSlash() const { return m_mensurSlash; }
+    bool HasMensurSlash() const;
     ///@}
 
 private:
@@ -924,16 +980,25 @@ private:
      * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
      **/
     std::string m_mensurColor;
+    /** Determines if a dot is to be added to the base symbol. **/
+    data_BOOLEAN m_mensurDot;
     /** Indicates whether the base symbol is written vertically or horizontally. **/
     mensuralVis_MENSURFORM m_mensurForm;
     /** Holds the staff location of the mensuration sign. **/
     int m_mensurLoc;
     /** Describes the rotation or reflection of the base symbol. **/
     data_ORIENTATION m_mensurOrient;
+    /** The base symbol in the mensuration sign/time signature of mensural notation. **/
+    data_MENSURATIONSIGN m_mensurSign;
     /** Describes the relative size of the mensuration sign. **/
     data_FONTSIZE m_mensurSize;
+    /**
+     * Indicates the number lines added to the mensuration sign.
+     * For example, one slash is added for what we now call 'alla breve'.
+     **/
+    int m_mensurSlash;
 
-    /* include <attmensur.size> */
+    /* include <attmensur.slash> */
 };
 
 //----------------------------------------------------------------------------
@@ -1048,9 +1113,9 @@ public:
 
 private:
     /**
-     * When the block attribute is used, combinations of the 1, 2, and 4 measure rest
-     * forms (Read, p.
-     * 104) should be rendered instead of the modern form or an alternative symbol.
+     * The block attribute controls whether the multimeasure rest should be rendered as
+     * a block rest or as church rests ("Kirchenpausen"), that are combinations of
+     * longa, breve and semibreve rests.
      **/
     data_BOOLEAN m_block;
 

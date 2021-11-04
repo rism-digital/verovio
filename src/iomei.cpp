@@ -495,6 +495,10 @@ bool MEIOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("custos");
         WriteCustos(m_currentNode, dynamic_cast<Custos *>(object));
     }
+    else if (object->Is(DIVLINE)) {
+        m_currentNode = m_currentNode.append_child("divLine");
+        WriteDivLine(m_currentNode, dynamic_cast<BDivLine *>(object));
+    }
     else if (object->Is(DOT)) {
         m_currentNode = m_currentNode.append_child("dot");
         WriteDot(m_currentNode, dynamic_cast<Dot *>(object));
@@ -1548,6 +1552,16 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
+}
+
+void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
+{
+    assert(divLine);
+
+    WriteLayerElement(currentNode, divLine);
+    divLine->WriteDivLineLog(currentNode);
+    divLine->WriteColor(currentNode);
+    // divLine->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -4439,6 +4453,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "custos") {
             success = ReadCustos(parent, xmlElement);
         }
+        else if (elementName == "divLine") {
+            success = ReadDivrLine(parent, xmlElement);
+        }        
         else if (elementName == "dot") {
             success = ReadDot(parent, xmlElement);
         }
@@ -4695,6 +4712,20 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
+    return true;
+}
+
+bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
+{
+    DivLine *vrvDivLine = new DivLine();
+    ReadLayerElement(divLine, vrvDivLine);
+
+    vrvDivLine->ReadDivLineLog(divLine);
+    vrvDivLine->ReadColor(divLine);
+    // vrvDivLine->ReadVisibility(divLine);
+
+    parent->AddChild(vrvDivLine);
+    ReadUnsupportedAttr(divLine, vrvDivLine);
     return true;
 }
 

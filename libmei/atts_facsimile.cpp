@@ -92,7 +92,7 @@ void Att::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
         const AttFacsimile *att = dynamic_cast<const AttFacsimile *>(element);
         assert(att);
         if (att->HasFacs()) {
-            attributes->push_back(std::make_pair("facs", att->StrToStr(att->GetFacs())));
+            attributes->push_back({ "facs", att->StrToStr(att->GetFacs()) });
         }
     }
 }

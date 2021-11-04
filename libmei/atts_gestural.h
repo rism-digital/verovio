@@ -213,6 +213,45 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttMdivGes
+//----------------------------------------------------------------------------
+
+class AttMdivGes : public Att {
+public:
+    AttMdivGes();
+    virtual ~AttMdivGes();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMdivGes();
+
+    /** Read the values for the attribute class **/
+    bool ReadMdivGes(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMdivGes(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAttacca(data_BOOLEAN attacca_) { m_attacca = attacca_; }
+    data_BOOLEAN GetAttacca() const { return m_attacca; }
+    bool HasAttacca() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that the performance of the next musical division should begin
+     * immediately following this one.
+     **/
+    data_BOOLEAN m_attacca;
+
+    /* include <attattacca> */
+};
+
+//----------------------------------------------------------------------------
 // AttNcGes
 //----------------------------------------------------------------------------
 
@@ -393,8 +432,8 @@ public:
 
 private:
     /**
-     * Indicates that the performance of the next section should begin immediately
-     * following this one.
+     * Indicates that the performance of the next musical division should begin
+     * immediately following this one.
      **/
     data_BOOLEAN m_attacca;
 

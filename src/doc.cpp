@@ -18,6 +18,7 @@
 #include "beatrpt.h"
 #include "chord.h"
 #include "comparison.h"
+#include "divline.h"
 #include "expansion.h"
 #include "functorparams.h"
 #include "glyph.h"
