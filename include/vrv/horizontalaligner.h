@@ -185,6 +185,11 @@ public:
         double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
 
     /**
+     * Return true if there is vertical overlap with accidentals from another alignment for specific staffN
+     */
+    bool HasAccidVerticalOverlap(Alignment *otherAlignment, int staffN);
+
+    /**
      * Return true if the alignment contains at least one reference with staffN
      */
     bool HasAlignmentReference(int staffN);
@@ -320,6 +325,11 @@ public:
      * See Object::AjustAccidX
      */
     void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids);
+
+    /**
+     * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)
+     */
+    bool HasAccidVerticalOverlap(const ArrayOfObjects *objects);
 
     /**
      * Return true if the reference has elements from multiple layers.
