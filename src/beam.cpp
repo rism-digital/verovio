@@ -56,11 +56,11 @@ void BeamSegment::Reset()
     m_startingY = 0;
     m_beamSlope = 0.0;
     m_verticalCenter = 0;
-    m_avgY = 0;
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
     m_uniformStemLength = 0;
+    m_weightedPlace = BEAMPLACE_NONE;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -334,10 +334,8 @@ void BeamSegment::CalcBeamInit(
     /******************************************************************/
     // Calculate the extreme values
 
-    int yMax = 0, yMin = 0;
     int nbRests = 0;
 
-    m_avgY = 0;
     m_nbNotesOrChords = 0;
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
@@ -346,6 +344,13 @@ void BeamSegment::CalcBeamInit(
     // somebody might want to have a beam with only rest of space elements...
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
+
+    int yMax = m_verticalCenter;
+    int yMin = m_verticalCenter;
+    auto SetExtrema = [&yMax, &yMin](int currentY) {
+        yMax = std::max(currentY, yMax);
+        yMin = std::min(currentY, yMin);
+    };
 
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
@@ -359,11 +364,14 @@ void BeamSegment::CalcBeamInit(
         }
 
         if (coord->m_element->Is(CHORD)) {
+            int max = 0;
+            int min = 0;
             Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
-            chord->GetYExtremes(yMax, yMin);
+            chord->GetYExtremes(max, min);
 
-            m_avgY += ((yMax + yMin) / 2);
+            SetExtrema(max);
+            SetExtrema(min);
 
             int linesAbove = 0;
             int linesBelow = 0;
@@ -381,7 +389,7 @@ void BeamSegment::CalcBeamInit(
         else if (coord->m_element->Is(NOTE)) {
             Note *note = vrv_cast<Note *>(coord->m_element);
             assert(note);
-            m_avgY += note->GetDrawingY();
+            SetExtrema(note->GetDrawingY());
 
             int linesAbove = 0;
             int linesBelow = 0;
@@ -395,10 +403,7 @@ void BeamSegment::CalcBeamInit(
         }
     }
 
-    // Only if not only rests. (Will produce non-sense output anyway)
-    if (elementCount != nbRests) {
-        m_avgY /= (elementCount - nbRests);
-    }
+    m_weightedPlace = ((m_verticalCenter - yMin) > (yMax - m_verticalCenter)) ? BEAMPLACE_above : BEAMPLACE_below;
 }
 
 bool BeamSegment::CalcBeamSlope(
@@ -899,7 +904,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
                     = (m_ledgerLinesBelow > m_ledgerLinesAbove) ? BEAMPLACE_above : BEAMPLACE_below;
             }
             else {
-                beamInterface->m_drawingPlace = (m_avgY < m_verticalCenter) ? BEAMPLACE_above : BEAMPLACE_below;
+                beamInterface->m_drawingPlace = m_weightedPlace;
             }
         }
         // Look at the note position
