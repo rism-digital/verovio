@@ -49,6 +49,8 @@ public:
 
     void GetUuidList(Object *object, std::vector<std::string> &idList);
 
+    void GeneratePredictableIds(Object *source, Object *target);
+
 private:
     /** Ads an id string to an original/notated id */
     bool AddExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId);

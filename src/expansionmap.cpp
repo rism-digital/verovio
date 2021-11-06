@@ -72,18 +72,19 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
+                GeneratePredictableIds(currSect, clonedObject);
                 clonedObject->SetUuid(currSect->GetUuid() + "-rend"
                     + std::to_string(GetExpansionIdsForElement(currSect->GetUuid()).size() + 1));
 
                 // get IDs of old and new sections and add them to m_map
                 std::vector<std::string> oldIds;
                 oldIds.push_back(currSect->GetUuid());
-                this->GetUuidList(currSect, oldIds);
+                GetUuidList(currSect, oldIds);
                 std::vector<std::string> clonedIds;
                 clonedIds.push_back(clonedObject->GetUuid());
-                this->GetUuidList(clonedObject, clonedIds);
+                GetUuidList(clonedObject, clonedIds);
                 for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
-                    this->AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
+                    AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
 
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
@@ -243,6 +244,18 @@ void ExpansionMap::GetUuidList(Object *object, std::vector<std::string> &idList)
     for (Object *o : *object->GetChildren()) {
         idList.push_back(o->GetUuid());
         GetUuidList(o, idList);
+    }
+}
+
+void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
+{
+    unsigned i = 0;
+    ArrayOfObjects targetObjects = *target->GetChildren();
+    for (Object *s : *source->GetChildren()) {
+        std::string id = s->GetUuid() + "-rend" + std::to_string(GetExpansionIdsForElement(s->GetUuid()).size() + 1);
+        targetObjects[i]->SetUuid(id);
+        GeneratePredictableIds(s, targetObjects[i]);
+        i++;
     }
 }
 
