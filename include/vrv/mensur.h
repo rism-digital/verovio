@@ -29,7 +29,7 @@ class Mensur : public LayerElement,
                public AttCue,
                public AttDurationRatio,
                public AttMensuralShared,
-               public AttMensuralLog,
+               public AttMensurLog,
                public AttMensurVis,
                public AttSlashCount,
                public AttStaffLoc {

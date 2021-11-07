@@ -92,7 +92,7 @@ void Att::GetPerformance(const Object *element, ArrayOfStrAttr *attributes)
         const AttAlignment *att = dynamic_cast<const AttAlignment *>(element);
         assert(att);
         if (att->HasWhen()) {
-            attributes->push_back({ "when", att->StrToStr(att->GetWhen()) });
+            attributes->push_back(std::make_pair("when", att->StrToStr(att->GetWhen())));
         }
     }
 }

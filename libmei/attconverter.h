@@ -32,23 +32,8 @@ public:
     std::string AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data) const;
     data_ACCIDENTAL_GESTURAL StrToAccidentalGestural(const std::string &value, bool logWarning = true) const;
 
-    std::string AccidentalGesturalBasicToStr(data_ACCIDENTAL_GESTURAL_basic data) const;
-    data_ACCIDENTAL_GESTURAL_basic StrToAccidentalGesturalBasic(const std::string &value, bool logWarning = true) const;
-
-    std::string AccidentalGesturalExtendedToStr(data_ACCIDENTAL_GESTURAL_extended data) const;
-    data_ACCIDENTAL_GESTURAL_extended StrToAccidentalGesturalExtended(const std::string &value, bool logWarning = true) const;
-
     std::string AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) const;
     data_ACCIDENTAL_WRITTEN StrToAccidentalWritten(const std::string &value, bool logWarning = true) const;
-
-    std::string AccidentalWrittenBasicToStr(data_ACCIDENTAL_WRITTEN_basic data) const;
-    data_ACCIDENTAL_WRITTEN_basic StrToAccidentalWrittenBasic(const std::string &value, bool logWarning = true) const;
-
-    std::string AccidentalWrittenExtendedToStr(data_ACCIDENTAL_WRITTEN_extended data) const;
-    data_ACCIDENTAL_WRITTEN_extended StrToAccidentalWrittenExtended(const std::string &value, bool logWarning = true) const;
-
-    std::string AccidentalAeuToStr(data_ACCIDENTAL_aeu data) const;
-    data_ACCIDENTAL_aeu StrToAccidentalAeu(const std::string &value, bool logWarning = true) const;
 
     std::string ArticulationToStr(data_ARTICULATION data) const;
     data_ARTICULATION StrToArticulation(const std::string &value, bool logWarning = true) const;
@@ -89,18 +74,6 @@ public:
     std::string CompassdirectionExtendedToStr(data_COMPASSDIRECTION_extended data) const;
     data_COMPASSDIRECTION_extended StrToCompassdirectionExtended(const std::string &value, bool logWarning = true) const;
 
-    std::string DivisioToStr(data_DIVISIO data) const;
-    data_DIVISIO StrToDivisio(const std::string &value, bool logWarning = true) const;
-
-    std::string DurationrestsToStr(data_DURATIONRESTS data) const;
-    data_DURATIONRESTS StrToDurationrests(const std::string &value, bool logWarning = true) const;
-
-    std::string DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const;
-    data_DURATIONRESTS_mensural StrToDurationrestsMensural(const std::string &value, bool logWarning = true) const;
-
-    std::string DurqualityMensuralToStr(data_DURQUALITY_mensural data) const;
-    data_DURQUALITY_mensural StrToDurqualityMensural(const std::string &value, bool logWarning = true) const;
-
     std::string EnclosureToStr(data_ENCLOSURE data) const;
     data_ENCLOSURE StrToEnclosure(const std::string &value, bool logWarning = true) const;
 
@@ -115,12 +88,6 @@ public:
 
     std::string FillToStr(data_FILL data) const;
     data_FILL StrToFill(const std::string &value, bool logWarning = true) const;
-
-    std::string FlagformMensuralToStr(data_FLAGFORM_mensural data) const;
-    data_FLAGFORM_mensural StrToFlagformMensural(const std::string &value, bool logWarning = true) const;
-
-    std::string FlagposMensuralToStr(data_FLAGPOS_mensural data) const;
-    data_FLAGPOS_mensural StrToFlagposMensural(const std::string &value, bool logWarning = true) const;
 
     std::string FontsizetermToStr(data_FONTSIZETERM data) const;
     data_FONTSIZETERM StrToFontsizeterm(const std::string &value, bool logWarning = true) const;
@@ -182,20 +149,8 @@ public:
     std::string ModeToStr(data_MODE data) const;
     data_MODE StrToMode(const std::string &value, bool logWarning = true) const;
 
-    std::string ModeCmnToStr(data_MODE_cmn data) const;
-    data_MODE_cmn StrToModeCmn(const std::string &value, bool logWarning = true) const;
-
-    std::string ModeExtendedToStr(data_MODE_extended data) const;
-    data_MODE_extended StrToModeExtended(const std::string &value, bool logWarning = true) const;
-
-    std::string ModeGregorianToStr(data_MODE_gregorian data) const;
-    data_MODE_gregorian StrToModeGregorian(const std::string &value, bool logWarning = true) const;
-
     std::string ModsrelationshipToStr(data_MODSRELATIONSHIP data) const;
     data_MODSRELATIONSHIP StrToModsrelationship(const std::string &value, bool logWarning = true) const;
-
-    std::string MultibreverestsMensuralToStr(data_MULTIBREVERESTS_mensural data) const;
-    data_MULTIBREVERESTS_mensural StrToMultibreverestsMensural(const std::string &value, bool logWarning = true) const;
 
     std::string NonstaffplaceToStr(data_NONSTAFFPLACE data) const;
     data_NONSTAFFPLACE StrToNonstaffplace(const std::string &value, bool logWarning = true) const;
@@ -251,9 +206,6 @@ public:
     std::string StemdirectionExtendedToStr(data_STEMDIRECTION_extended data) const;
     data_STEMDIRECTION_extended StrToStemdirectionExtended(const std::string &value, bool logWarning = true) const;
 
-    std::string StemformMensuralToStr(data_STEMFORM_mensural data) const;
-    data_STEMFORM_mensural StrToStemformMensural(const std::string &value, bool logWarning = true) const;
-
     std::string StemmodifierToStr(data_STEMMODIFIER data) const;
     data_STEMMODIFIER StrToStemmodifier(const std::string &value, bool logWarning = true) const;
 
@@ -295,9 +247,6 @@ public:
 
     std::string BracketSpanLogFuncToStr(bracketSpanLog_FUNC data) const;
     bracketSpanLog_FUNC StrToBracketSpanLogFunc(const std::string &value, bool logWarning = true) const;
-
-    std::string ComponentTypeComptypeToStr(componentType_COMPTYPE data) const;
-    componentType_COMPTYPE StrToComponentTypeComptype(const std::string &value, bool logWarning = true) const;
 
     std::string CurvatureCurvedirToStr(curvature_CURVEDIR data) const;
     curvature_CURVEDIR StrToCurvatureCurvedir(const std::string &value, bool logWarning = true) const;
@@ -406,6 +355,9 @@ public:
 
     std::string NcFormRellenToStr(ncForm_RELLEN data) const;
     ncForm_RELLEN StrToNcFormRellen(const std::string &value, bool logWarning = true) const;
+
+    std::string NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const;
+    noteAnlMensural_LIG StrToNoteAnlMensuralLig(const std::string &value, bool logWarning = true) const;
 
     std::string NoteGesExtremisToStr(noteGes_EXTREMIS data) const;
     noteGes_EXTREMIS StrToNoteGesExtremis(const std::string &value, bool logWarning = true) const;

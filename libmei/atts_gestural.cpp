@@ -286,52 +286,6 @@ bool AttDurationGestural::HasDurRecip() const
 /* include <attdur.recip> */
 
 //----------------------------------------------------------------------------
-// AttMdivGes
-//----------------------------------------------------------------------------
-
-AttMdivGes::AttMdivGes() : Att()
-{
-    ResetMdivGes();
-}
-
-AttMdivGes::~AttMdivGes()
-{
-}
-
-void AttMdivGes::ResetMdivGes()
-{
-    m_attacca = BOOLEAN_NONE;
-}
-
-bool AttMdivGes::ReadMdivGes(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("attacca")) {
-        this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
-        element.remove_attribute("attacca");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttMdivGes::WriteMdivGes(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasAttacca()) {
-        element.append_attribute("attacca") = BooleanToStr(this->GetAttacca()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttMdivGes::HasAttacca() const
-{
-    return (m_attacca != BOOLEAN_NONE);
-}
-
-/* include <attattacca> */
-
-//----------------------------------------------------------------------------
 // AttNcGes
 //----------------------------------------------------------------------------
 
@@ -857,14 +811,6 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
-    if (element->HasAttClass(ATT_MDIVGES)) {
-        AttMdivGes *att = dynamic_cast<AttMdivGes *>(element);
-        assert(att);
-        if (attrType == "attacca") {
-            att->SetAttacca(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_NCGES)) {
         AttNcGes *att = dynamic_cast<AttNcGes *>(element);
         assert(att);
@@ -971,129 +917,122 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         const AttAccidentalGestural *att = dynamic_cast<const AttAccidentalGestural *>(element);
         assert(att);
         if (att->HasAccidGes()) {
-            attributes->push_back({ "accid.ges", att->AccidentalGesturalToStr(att->GetAccidGes()) });
+            attributes->push_back(std::make_pair("accid.ges", att->AccidentalGesturalToStr(att->GetAccidGes())));
         }
     }
     if (element->HasAttClass(ATT_ARTICULATIONGESTURAL)) {
         const AttArticulationGestural *att = dynamic_cast<const AttArticulationGestural *>(element);
         assert(att);
         if (att->HasArticGes()) {
-            attributes->push_back({ "artic.ges", att->ArticulationToStr(att->GetArticGes()) });
+            attributes->push_back(std::make_pair("artic.ges", att->ArticulationToStr(att->GetArticGes())));
         }
     }
     if (element->HasAttClass(ATT_BENDGES)) {
         const AttBendGes *att = dynamic_cast<const AttBendGes *>(element);
         assert(att);
         if (att->HasAmount()) {
-            attributes->push_back({ "amount", att->DblToStr(att->GetAmount()) });
+            attributes->push_back(std::make_pair("amount", att->DblToStr(att->GetAmount())));
         }
     }
     if (element->HasAttClass(ATT_DURATIONGESTURAL)) {
         const AttDurationGestural *att = dynamic_cast<const AttDurationGestural *>(element);
         assert(att);
         if (att->HasDurGes()) {
-            attributes->push_back({ "dur.ges", att->DurationToStr(att->GetDurGes()) });
+            attributes->push_back(std::make_pair("dur.ges", att->DurationToStr(att->GetDurGes())));
         }
         if (att->HasDotsGes()) {
-            attributes->push_back({ "dots.ges", att->IntToStr(att->GetDotsGes()) });
+            attributes->push_back(std::make_pair("dots.ges", att->IntToStr(att->GetDotsGes())));
         }
         if (att->HasDurMetrical()) {
-            attributes->push_back({ "dur.metrical", att->DblToStr(att->GetDurMetrical()) });
+            attributes->push_back(std::make_pair("dur.metrical", att->DblToStr(att->GetDurMetrical())));
         }
         if (att->HasDurPpq()) {
-            attributes->push_back({ "dur.ppq", att->IntToStr(att->GetDurPpq()) });
+            attributes->push_back(std::make_pair("dur.ppq", att->IntToStr(att->GetDurPpq())));
         }
         if (att->HasDurReal()) {
-            attributes->push_back({ "dur.real", att->DblToStr(att->GetDurReal()) });
+            attributes->push_back(std::make_pair("dur.real", att->DblToStr(att->GetDurReal())));
         }
         if (att->HasDurRecip()) {
-            attributes->push_back({ "dur.recip", att->StrToStr(att->GetDurRecip()) });
-        }
-    }
-    if (element->HasAttClass(ATT_MDIVGES)) {
-        const AttMdivGes *att = dynamic_cast<const AttMdivGes *>(element);
-        assert(att);
-        if (att->HasAttacca()) {
-            attributes->push_back({ "attacca", att->BooleanToStr(att->GetAttacca()) });
+            attributes->push_back(std::make_pair("dur.recip", att->StrToStr(att->GetDurRecip())));
         }
     }
     if (element->HasAttClass(ATT_NCGES)) {
         const AttNcGes *att = dynamic_cast<const AttNcGes *>(element);
         assert(att);
         if (att->HasOctGes()) {
-            attributes->push_back({ "oct.ges", att->OctaveToStr(att->GetOctGes()) });
+            attributes->push_back(std::make_pair("oct.ges", att->OctaveToStr(att->GetOctGes())));
         }
         if (att->HasPnameGes()) {
-            attributes->push_back({ "pname.ges", att->PitchnameToStr(att->GetPnameGes()) });
+            attributes->push_back(std::make_pair("pname.ges", att->PitchnameToStr(att->GetPnameGes())));
         }
         if (att->HasPnum()) {
-            attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
+            attributes->push_back(std::make_pair("pnum", att->IntToStr(att->GetPnum())));
         }
     }
     if (element->HasAttClass(ATT_NOTEGES)) {
         const AttNoteGes *att = dynamic_cast<const AttNoteGes *>(element);
         assert(att);
         if (att->HasExtremis()) {
-            attributes->push_back({ "extremis", att->NoteGesExtremisToStr(att->GetExtremis()) });
+            attributes->push_back(std::make_pair("extremis", att->NoteGesExtremisToStr(att->GetExtremis())));
         }
         if (att->HasOctGes()) {
-            attributes->push_back({ "oct.ges", att->OctaveToStr(att->GetOctGes()) });
+            attributes->push_back(std::make_pair("oct.ges", att->OctaveToStr(att->GetOctGes())));
         }
         if (att->HasPnameGes()) {
-            attributes->push_back({ "pname.ges", att->PitchnameToStr(att->GetPnameGes()) });
+            attributes->push_back(std::make_pair("pname.ges", att->PitchnameToStr(att->GetPnameGes())));
         }
         if (att->HasPnum()) {
-            attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
+            attributes->push_back(std::make_pair("pnum", att->IntToStr(att->GetPnum())));
         }
     }
     if (element->HasAttClass(ATT_SCOREDEFGES)) {
         const AttScoreDefGes *att = dynamic_cast<const AttScoreDefGes *>(element);
         assert(att);
         if (att->HasTunePname()) {
-            attributes->push_back({ "tune.pname", att->PitchnameToStr(att->GetTunePname()) });
+            attributes->push_back(std::make_pair("tune.pname", att->PitchnameToStr(att->GetTunePname())));
         }
         if (att->HasTuneHz()) {
-            attributes->push_back({ "tune.Hz", att->DblToStr(att->GetTuneHz()) });
+            attributes->push_back(std::make_pair("tune.Hz", att->DblToStr(att->GetTuneHz())));
         }
         if (att->HasTuneTemper()) {
-            attributes->push_back({ "tune.temper", att->TemperamentToStr(att->GetTuneTemper()) });
+            attributes->push_back(std::make_pair("tune.temper", att->TemperamentToStr(att->GetTuneTemper())));
         }
     }
     if (element->HasAttClass(ATT_SECTIONGES)) {
         const AttSectionGes *att = dynamic_cast<const AttSectionGes *>(element);
         assert(att);
         if (att->HasAttacca()) {
-            attributes->push_back({ "attacca", att->BooleanToStr(att->GetAttacca()) });
+            attributes->push_back(std::make_pair("attacca", att->BooleanToStr(att->GetAttacca())));
         }
     }
     if (element->HasAttClass(ATT_SOUNDLOCATION)) {
         const AttSoundLocation *att = dynamic_cast<const AttSoundLocation *>(element);
         assert(att);
         if (att->HasAzimuth()) {
-            attributes->push_back({ "azimuth", att->DblToStr(att->GetAzimuth()) });
+            attributes->push_back(std::make_pair("azimuth", att->DblToStr(att->GetAzimuth())));
         }
         if (att->HasElevation()) {
-            attributes->push_back({ "elevation", att->DblToStr(att->GetElevation()) });
+            attributes->push_back(std::make_pair("elevation", att->DblToStr(att->GetElevation())));
         }
     }
     if (element->HasAttClass(ATT_TIMESTAMPGESTURAL)) {
         const AttTimestampGestural *att = dynamic_cast<const AttTimestampGestural *>(element);
         assert(att);
         if (att->HasTstampGes()) {
-            attributes->push_back({ "tstamp.ges", att->DblToStr(att->GetTstampGes()) });
+            attributes->push_back(std::make_pair("tstamp.ges", att->DblToStr(att->GetTstampGes())));
         }
         if (att->HasTstampReal()) {
-            attributes->push_back({ "tstamp.real", att->StrToStr(att->GetTstampReal()) });
+            attributes->push_back(std::make_pair("tstamp.real", att->StrToStr(att->GetTstampReal())));
         }
     }
     if (element->HasAttClass(ATT_TIMESTAMP2GESTURAL)) {
         const AttTimestamp2Gestural *att = dynamic_cast<const AttTimestamp2Gestural *>(element);
         assert(att);
         if (att->HasTstamp2Ges()) {
-            attributes->push_back({ "tstamp2.ges", att->MeasurebeatToStr(att->GetTstamp2Ges()) });
+            attributes->push_back(std::make_pair("tstamp2.ges", att->MeasurebeatToStr(att->GetTstamp2Ges())));
         }
         if (att->HasTstamp2Real()) {
-            attributes->push_back({ "tstamp2.real", att->StrToStr(att->GetTstamp2Real()) });
+            attributes->push_back(std::make_pair("tstamp2.real", att->StrToStr(att->GetTstamp2Real())));
         }
     }
 }

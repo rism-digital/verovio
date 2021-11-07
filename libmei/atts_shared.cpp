@@ -1009,7 +1009,7 @@ void AttCoordinated::ResetCoordinated()
     m_uly = 0;
     m_lrx = 0;
     m_lry = 0;
-    m_rotate = 0.0;
+    m_rotate = 0;
 }
 
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
@@ -1091,10 +1091,10 @@ bool AttCoordinated::HasLry() const
 
 bool AttCoordinated::HasRotate() const
 {
-    return (m_rotate != 0.0);
+    return (m_rotate != 0);
 }
 
-/* include <attrotate> */
+/* include <attlry> */
 
 //----------------------------------------------------------------------------
 // AttCue
@@ -3478,6 +3478,67 @@ bool AttMeiVersion::HasMeiversion() const
 /* include <attmeiversion> */
 
 //----------------------------------------------------------------------------
+// AttMensurLog
+//----------------------------------------------------------------------------
+
+AttMensurLog::AttMensurLog() : Att()
+{
+    ResetMensurLog();
+}
+
+AttMensurLog::~AttMensurLog()
+{
+}
+
+void AttMensurLog::ResetMensurLog()
+{
+    m_dot = BOOLEAN_NONE;
+    m_sign = MENSURATIONSIGN_NONE;
+}
+
+bool AttMensurLog::ReadMensurLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("dot")) {
+        this->SetDot(StrToBoolean(element.attribute("dot").value()));
+        element.remove_attribute("dot");
+        hasAttribute = true;
+    }
+    if (element.attribute("sign")) {
+        this->SetSign(StrToMensurationsign(element.attribute("sign").value()));
+        element.remove_attribute("sign");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMensurLog::WriteMensurLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasDot()) {
+        element.append_attribute("dot") = BooleanToStr(this->GetDot()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSign()) {
+        element.append_attribute("sign") = MensurationsignToStr(this->GetSign()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMensurLog::HasDot() const
+{
+    return (m_dot != BOOLEAN_NONE);
+}
+
+bool AttMensurLog::HasSign() const
+{
+    return (m_sign != MENSURATIONSIGN_NONE);
+}
+
+/* include <attsign> */
+
+//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 
@@ -3645,7 +3706,7 @@ AttMeterSigLog::~AttMeterSigLog()
 
 void AttMeterSigLog::ResetMeterSigLog()
 {
-    m_count = std::vector<int>();
+    m_count = 0;
     m_sym = METERSIGN_NONE;
     m_unit = 0;
 }
@@ -3654,7 +3715,7 @@ bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("count")) {
-        this->SetCount(StrToSummandList(element.attribute("count").value()));
+        this->SetCount(StrToInt(element.attribute("count").value()));
         element.remove_attribute("count");
         hasAttribute = true;
     }
@@ -3675,7 +3736,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasCount()) {
-        element.append_attribute("count") = SummandListToStr(this->GetCount()).c_str();
+        element.append_attribute("count") = IntToStr(this->GetCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSym()) {
@@ -3691,7 +3752,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 
 bool AttMeterSigLog::HasCount() const
 {
-    return (m_count != std::vector<int>());
+    return (m_count != 0);
 }
 
 bool AttMeterSigLog::HasSym() const
@@ -3721,7 +3782,7 @@ AttMeterSigDefaultLog::~AttMeterSigDefaultLog()
 
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
-    m_meterCount = std::vector<int>();
+    m_meterCount = 0;
     m_meterUnit = 0;
     m_meterSym = METERSIGN_NONE;
 }
@@ -3730,7 +3791,7 @@ bool AttMeterSigDefaultLog::ReadMeterSigDefaultLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("meter.count")) {
-        this->SetMeterCount(StrToSummandList(element.attribute("meter.count").value()));
+        this->SetMeterCount(StrToInt(element.attribute("meter.count").value()));
         element.remove_attribute("meter.count");
         hasAttribute = true;
     }
@@ -3751,7 +3812,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMeterCount()) {
-        element.append_attribute("meter.count") = SummandListToStr(this->GetMeterCount()).c_str();
+        element.append_attribute("meter.count") = IntToStr(this->GetMeterCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMeterUnit()) {
@@ -3767,7 +3828,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 
 bool AttMeterSigDefaultLog::HasMeterCount() const
 {
-    return (m_meterCount != std::vector<int>());
+    return (m_meterCount != 0);
 }
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
@@ -3797,7 +3858,7 @@ AttMmTempo::~AttMmTempo()
 
 void AttMmTempo::ResetMmTempo()
 {
-    m_mm = 0.0;
+    m_mm = 0;
     m_mmUnit = DURATION_NONE;
     m_mmDots = 0;
 }
@@ -3806,7 +3867,7 @@ bool AttMmTempo::ReadMmTempo(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("mm")) {
-        this->SetMm(StrToDbl(element.attribute("mm").value()));
+        this->SetMm(StrToInt(element.attribute("mm").value()));
         element.remove_attribute("mm");
         hasAttribute = true;
     }
@@ -3827,7 +3888,7 @@ bool AttMmTempo::WriteMmTempo(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMm()) {
-        element.append_attribute("mm") = DblToStr(this->GetMm()).c_str();
+        element.append_attribute("mm") = IntToStr(this->GetMm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMmUnit()) {
@@ -3843,7 +3904,7 @@ bool AttMmTempo::WriteMmTempo(pugi::xml_node element)
 
 bool AttMmTempo::HasMm() const
 {
-    return (m_mm != 0.0);
+    return (m_mm != 0);
 }
 
 bool AttMmTempo::HasMmUnit() const
@@ -5002,70 +5063,24 @@ bool AttPitch::HasPname() const
 /* include <attpname> */
 
 //----------------------------------------------------------------------------
-// AttPlacementOnStaff
+// AttPlacement
 //----------------------------------------------------------------------------
 
-AttPlacementOnStaff::AttPlacementOnStaff() : Att()
+AttPlacement::AttPlacement() : Att()
 {
-    ResetPlacementOnStaff();
+    ResetPlacement();
 }
 
-AttPlacementOnStaff::~AttPlacementOnStaff()
-{
-}
-
-void AttPlacementOnStaff::ResetPlacementOnStaff()
-{
-    m_onstaff = BOOLEAN_NONE;
-}
-
-bool AttPlacementOnStaff::ReadPlacementOnStaff(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("onstaff")) {
-        this->SetOnstaff(StrToBoolean(element.attribute("onstaff").value()));
-        element.remove_attribute("onstaff");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttPlacementOnStaff::WritePlacementOnStaff(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasOnstaff()) {
-        element.append_attribute("onstaff") = BooleanToStr(this->GetOnstaff()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttPlacementOnStaff::HasOnstaff() const
-{
-    return (m_onstaff != BOOLEAN_NONE);
-}
-
-/* include <attonstaff> */
-
-//----------------------------------------------------------------------------
-// AttPlacementRelEvent
-//----------------------------------------------------------------------------
-
-AttPlacementRelEvent::AttPlacementRelEvent() : Att()
-{
-    ResetPlacementRelEvent();
-}
-
-AttPlacementRelEvent::~AttPlacementRelEvent()
+AttPlacement::~AttPlacement()
 {
 }
 
-void AttPlacementRelEvent::ResetPlacementRelEvent()
+void AttPlacement::ResetPlacement()
 {
     m_place = data_STAFFREL();
 }
 
-bool AttPlacementRelEvent::ReadPlacementRelEvent(pugi::xml_node element)
+bool AttPlacement::ReadPlacement(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("place")) {
@@ -5076,7 +5091,7 @@ bool AttPlacementRelEvent::ReadPlacementRelEvent(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttPlacementRelEvent::WritePlacementRelEvent(pugi::xml_node element)
+bool AttPlacement::WritePlacement(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPlace()) {
@@ -5086,53 +5101,7 @@ bool AttPlacementRelEvent::WritePlacementRelEvent(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttPlacementRelEvent::HasPlace() const
-{
-    return (m_place != data_STAFFREL());
-}
-
-/* include <attplace> */
-
-//----------------------------------------------------------------------------
-// AttPlacementRelStaff
-//----------------------------------------------------------------------------
-
-AttPlacementRelStaff::AttPlacementRelStaff() : Att()
-{
-    ResetPlacementRelStaff();
-}
-
-AttPlacementRelStaff::~AttPlacementRelStaff()
-{
-}
-
-void AttPlacementRelStaff::ResetPlacementRelStaff()
-{
-    m_place = data_STAFFREL();
-}
-
-bool AttPlacementRelStaff::ReadPlacementRelStaff(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("place")) {
-        this->SetPlace(StrToStaffrel(element.attribute("place").value()));
-        element.remove_attribute("place");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttPlacementRelStaff::WritePlacementRelStaff(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasPlace()) {
-        element.append_attribute("place") = StaffrelToStr(this->GetPlace()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttPlacementRelStaff::HasPlace() const
+bool AttPlacement::HasPlace() const
 {
     return (m_place != data_STAFFREL());
 }
@@ -5488,52 +5457,6 @@ bool AttResponsibility::HasResp() const
 }
 
 /* include <attresp> */
-
-//----------------------------------------------------------------------------
-// AttRestdurationLogical
-//----------------------------------------------------------------------------
-
-AttRestdurationLogical::AttRestdurationLogical() : Att()
-{
-    ResetRestdurationLogical();
-}
-
-AttRestdurationLogical::~AttRestdurationLogical()
-{
-}
-
-void AttRestdurationLogical::ResetRestdurationLogical()
-{
-    m_dur = DURATIONRESTS_NONE;
-}
-
-bool AttRestdurationLogical::ReadRestdurationLogical(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("dur")) {
-        this->SetDur(StrToDurationrests(element.attribute("dur").value()));
-        element.remove_attribute("dur");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttRestdurationLogical::WriteRestdurationLogical(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasDur()) {
-        element.append_attribute("dur") = DurationrestsToStr(this->GetDur()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttRestdurationLogical::HasDur() const
-{
-    return (m_dur != DURATIONRESTS_NONE);
-}
-
-/* include <attdur> */
 
 //----------------------------------------------------------------------------
 // AttScalable
@@ -6334,7 +6257,6 @@ void AttStems::ResetStems()
     m_stemLen = -1;
     m_stemMod = STEMMODIFIER_NONE;
     m_stemPos = STEMPOSITION_NONE;
-    m_stemSameas = "";
     m_stemVisible = BOOLEAN_NONE;
     m_stemX = 0.0;
     m_stemY = 0.0;
@@ -6361,11 +6283,6 @@ bool AttStems::ReadStems(pugi::xml_node element)
     if (element.attribute("stem.pos")) {
         this->SetStemPos(StrToStemposition(element.attribute("stem.pos").value()));
         element.remove_attribute("stem.pos");
-        hasAttribute = true;
-    }
-    if (element.attribute("stem.sameas")) {
-        this->SetStemSameas(StrToStr(element.attribute("stem.sameas").value()));
-        element.remove_attribute("stem.sameas");
         hasAttribute = true;
     }
     if (element.attribute("stem.visible")) {
@@ -6405,10 +6322,6 @@ bool AttStems::WriteStems(pugi::xml_node element)
         element.append_attribute("stem.pos") = StempositionToStr(this->GetStemPos()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasStemSameas()) {
-        element.append_attribute("stem.sameas") = StrToStr(this->GetStemSameas()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasStemVisible()) {
         element.append_attribute("stem.visible") = BooleanToStr(this->GetStemVisible()).c_str();
         wroteAttribute = true;
@@ -6442,11 +6355,6 @@ bool AttStems::HasStemMod() const
 bool AttStems::HasStemPos() const
 {
     return (m_stemPos != STEMPOSITION_NONE);
-}
-
-bool AttStems::HasStemSameas() const
-{
-    return (m_stemSameas != "");
 }
 
 bool AttStems::HasStemVisible() const
@@ -8236,10 +8144,6 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetLry(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "rotate") {
-            att->SetRotate(att->StrToDbl(attrValue));
-            return true;
-        }
     }
     if (element->HasAttClass(ATT_CUE)) {
         AttCue *att = dynamic_cast<AttCue *>(element);
@@ -8701,6 +8605,18 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
+    if (element->HasAttClass(ATT_MENSURLOG)) {
+        AttMensurLog *att = dynamic_cast<AttMensurLog *>(element);
+        assert(att);
+        if (attrType == "dot") {
+            att->SetDot(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "sign") {
+            att->SetSign(att->StrToMensurationsign(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_METADATAPOINTING)) {
         AttMetadataPointing *att = dynamic_cast<AttMetadataPointing *>(element);
         assert(att);
@@ -8733,7 +8649,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigLog *att = dynamic_cast<AttMeterSigLog *>(element);
         assert(att);
         if (attrType == "count") {
-            att->SetCount(att->StrToSummandList(attrValue));
+            att->SetCount(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "sym") {
@@ -8749,7 +8665,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog *>(element);
         assert(att);
         if (attrType == "meter.count") {
-            att->SetMeterCount(att->StrToSummandList(attrValue));
+            att->SetMeterCount(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "meter.unit") {
@@ -8765,7 +8681,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMmTempo *att = dynamic_cast<AttMmTempo *>(element);
         assert(att);
         if (attrType == "mm") {
-            att->SetMm(att->StrToDbl(attrValue));
+            att->SetMm(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "mm.unit") {
@@ -9005,24 +8921,8 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
-    if (element->HasAttClass(ATT_PLACEMENTONSTAFF)) {
-        AttPlacementOnStaff *att = dynamic_cast<AttPlacementOnStaff *>(element);
-        assert(att);
-        if (attrType == "onstaff") {
-            att->SetOnstaff(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_PLACEMENTRELEVENT)) {
-        AttPlacementRelEvent *att = dynamic_cast<AttPlacementRelEvent *>(element);
-        assert(att);
-        if (attrType == "place") {
-            att->SetPlace(att->StrToStaffrel(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_PLACEMENTRELSTAFF)) {
-        AttPlacementRelStaff *att = dynamic_cast<AttPlacementRelStaff *>(element);
+    if (element->HasAttClass(ATT_PLACEMENT)) {
+        AttPlacement *att = dynamic_cast<AttPlacement *>(element);
         assert(att);
         if (attrType == "place") {
             att->SetPlace(att->StrToStaffrel(attrValue));
@@ -9098,14 +8998,6 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         assert(att);
         if (attrType == "resp") {
             att->SetResp(att->StrToStr(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_RESTDURATIONLOGICAL)) {
-        AttRestdurationLogical *att = dynamic_cast<AttRestdurationLogical *>(element);
-        assert(att);
-        if (attrType == "dur") {
-            att->SetDur(att->StrToDurationrests(attrValue));
             return true;
         }
     }
@@ -9270,10 +9162,6 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         }
         if (attrType == "stem.pos") {
             att->SetStemPos(att->StrToStemposition(attrValue));
-            return true;
-        }
-        if (attrType == "stem.sameas") {
-            att->SetStemSameas(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "stem.visible") {
@@ -9599,1299 +9487,1282 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttAccidLog *att = dynamic_cast<const AttAccidLog *>(element);
         assert(att);
         if (att->HasFunc()) {
-            attributes->push_back({ "func", att->AccidLogFuncToStr(att->GetFunc()) });
+            attributes->push_back(std::make_pair("func", att->AccidLogFuncToStr(att->GetFunc())));
         }
     }
     if (element->HasAttClass(ATT_ACCIDENTAL)) {
         const AttAccidental *att = dynamic_cast<const AttAccidental *>(element);
         assert(att);
         if (att->HasAccid()) {
-            attributes->push_back({ "accid", att->AccidentalWrittenToStr(att->GetAccid()) });
+            attributes->push_back(std::make_pair("accid", att->AccidentalWrittenToStr(att->GetAccid())));
         }
     }
     if (element->HasAttClass(ATT_ARTICULATION)) {
         const AttArticulation *att = dynamic_cast<const AttArticulation *>(element);
         assert(att);
         if (att->HasArtic()) {
-            attributes->push_back({ "artic", att->ArticulationListToStr(att->GetArtic()) });
+            attributes->push_back(std::make_pair("artic", att->ArticulationListToStr(att->GetArtic())));
         }
     }
     if (element->HasAttClass(ATT_ATTACCALOG)) {
         const AttAttaccaLog *att = dynamic_cast<const AttAttaccaLog *>(element);
         assert(att);
         if (att->HasTarget()) {
-            attributes->push_back({ "target", att->StrToStr(att->GetTarget()) });
+            attributes->push_back(std::make_pair("target", att->StrToStr(att->GetTarget())));
         }
     }
     if (element->HasAttClass(ATT_AUDIENCE)) {
         const AttAudience *att = dynamic_cast<const AttAudience *>(element);
         assert(att);
         if (att->HasAudience()) {
-            attributes->push_back({ "audience", att->AudienceAudienceToStr(att->GetAudience()) });
+            attributes->push_back(std::make_pair("audience", att->AudienceAudienceToStr(att->GetAudience())));
         }
     }
     if (element->HasAttClass(ATT_AUGMENTDOTS)) {
         const AttAugmentDots *att = dynamic_cast<const AttAugmentDots *>(element);
         assert(att);
         if (att->HasDots()) {
-            attributes->push_back({ "dots", att->IntToStr(att->GetDots()) });
+            attributes->push_back(std::make_pair("dots", att->IntToStr(att->GetDots())));
         }
     }
     if (element->HasAttClass(ATT_AUTHORIZED)) {
         const AttAuthorized *att = dynamic_cast<const AttAuthorized *>(element);
         assert(att);
         if (att->HasAuth()) {
-            attributes->push_back({ "auth", att->StrToStr(att->GetAuth()) });
+            attributes->push_back(std::make_pair("auth", att->StrToStr(att->GetAuth())));
         }
         if (att->HasAuthUri()) {
-            attributes->push_back({ "auth.uri", att->StrToStr(att->GetAuthUri()) });
+            attributes->push_back(std::make_pair("auth.uri", att->StrToStr(att->GetAuthUri())));
         }
     }
     if (element->HasAttClass(ATT_BARLINELOG)) {
         const AttBarLineLog *att = dynamic_cast<const AttBarLineLog *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back({ "form", att->BarrenditionToStr(att->GetForm()) });
+            attributes->push_back(std::make_pair("form", att->BarrenditionToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_BARRING)) {
         const AttBarring *att = dynamic_cast<const AttBarring *>(element);
         assert(att);
         if (att->HasBarLen()) {
-            attributes->push_back({ "bar.len", att->DblToStr(att->GetBarLen()) });
+            attributes->push_back(std::make_pair("bar.len", att->DblToStr(att->GetBarLen())));
         }
         if (att->HasBarMethod()) {
-            attributes->push_back({ "bar.method", att->BarmethodToStr(att->GetBarMethod()) });
+            attributes->push_back(std::make_pair("bar.method", att->BarmethodToStr(att->GetBarMethod())));
         }
         if (att->HasBarPlace()) {
-            attributes->push_back({ "bar.place", att->IntToStr(att->GetBarPlace()) });
+            attributes->push_back(std::make_pair("bar.place", att->IntToStr(att->GetBarPlace())));
         }
     }
     if (element->HasAttClass(ATT_BASIC)) {
         const AttBasic *att = dynamic_cast<const AttBasic *>(element);
         assert(att);
         if (att->HasBase()) {
-            attributes->push_back({ "xml:base", att->StrToStr(att->GetBase()) });
+            attributes->push_back(std::make_pair("xml:base", att->StrToStr(att->GetBase())));
         }
     }
     if (element->HasAttClass(ATT_BIBL)) {
         const AttBibl *att = dynamic_cast<const AttBibl *>(element);
         assert(att);
         if (att->HasAnalog()) {
-            attributes->push_back({ "analog", att->StrToStr(att->GetAnalog()) });
+            attributes->push_back(std::make_pair("analog", att->StrToStr(att->GetAnalog())));
         }
     }
     if (element->HasAttClass(ATT_CALENDARED)) {
         const AttCalendared *att = dynamic_cast<const AttCalendared *>(element);
         assert(att);
         if (att->HasCalendar()) {
-            attributes->push_back({ "calendar", att->StrToStr(att->GetCalendar()) });
+            attributes->push_back(std::make_pair("calendar", att->StrToStr(att->GetCalendar())));
         }
     }
     if (element->HasAttClass(ATT_CANONICAL)) {
         const AttCanonical *att = dynamic_cast<const AttCanonical *>(element);
         assert(att);
         if (att->HasCodedval()) {
-            attributes->push_back({ "codedval", att->StrToStr(att->GetCodedval()) });
+            attributes->push_back(std::make_pair("codedval", att->StrToStr(att->GetCodedval())));
         }
     }
     if (element->HasAttClass(ATT_CLASSED)) {
         const AttClassed *att = dynamic_cast<const AttClassed *>(element);
         assert(att);
         if (att->HasClass()) {
-            attributes->push_back({ "class", att->StrToStr(att->GetClass()) });
+            attributes->push_back(std::make_pair("class", att->StrToStr(att->GetClass())));
         }
     }
     if (element->HasAttClass(ATT_CLEFLOG)) {
         const AttClefLog *att = dynamic_cast<const AttClefLog *>(element);
         assert(att);
         if (att->HasCautionary()) {
-            attributes->push_back({ "cautionary", att->BooleanToStr(att->GetCautionary()) });
+            attributes->push_back(std::make_pair("cautionary", att->BooleanToStr(att->GetCautionary())));
         }
     }
     if (element->HasAttClass(ATT_CLEFSHAPE)) {
         const AttClefShape *att = dynamic_cast<const AttClefShape *>(element);
         assert(att);
         if (att->HasShape()) {
-            attributes->push_back({ "shape", att->ClefshapeToStr(att->GetShape()) });
+            attributes->push_back(std::make_pair("shape", att->ClefshapeToStr(att->GetShape())));
         }
     }
     if (element->HasAttClass(ATT_CLEFFINGLOG)) {
         const AttCleffingLog *att = dynamic_cast<const AttCleffingLog *>(element);
         assert(att);
         if (att->HasClefShape()) {
-            attributes->push_back({ "clef.shape", att->ClefshapeToStr(att->GetClefShape()) });
+            attributes->push_back(std::make_pair("clef.shape", att->ClefshapeToStr(att->GetClefShape())));
         }
         if (att->HasClefLine()) {
-            attributes->push_back({ "clef.line", att->IntToStr(att->GetClefLine()) });
+            attributes->push_back(std::make_pair("clef.line", att->IntToStr(att->GetClefLine())));
         }
         if (att->HasClefDis()) {
-            attributes->push_back({ "clef.dis", att->OctaveDisToStr(att->GetClefDis()) });
+            attributes->push_back(std::make_pair("clef.dis", att->OctaveDisToStr(att->GetClefDis())));
         }
         if (att->HasClefDisPlace()) {
-            attributes->push_back({ "clef.dis.place", att->StaffrelBasicToStr(att->GetClefDisPlace()) });
+            attributes->push_back(std::make_pair("clef.dis.place", att->StaffrelBasicToStr(att->GetClefDisPlace())));
         }
     }
     if (element->HasAttClass(ATT_COLOR)) {
         const AttColor *att = dynamic_cast<const AttColor *>(element);
         assert(att);
         if (att->HasColor()) {
-            attributes->push_back({ "color", att->StrToStr(att->GetColor()) });
+            attributes->push_back(std::make_pair("color", att->StrToStr(att->GetColor())));
         }
     }
     if (element->HasAttClass(ATT_COLORATION)) {
         const AttColoration *att = dynamic_cast<const AttColoration *>(element);
         assert(att);
         if (att->HasColored()) {
-            attributes->push_back({ "colored", att->BooleanToStr(att->GetColored()) });
+            attributes->push_back(std::make_pair("colored", att->BooleanToStr(att->GetColored())));
         }
     }
     if (element->HasAttClass(ATT_COORDINATED)) {
         const AttCoordinated *att = dynamic_cast<const AttCoordinated *>(element);
         assert(att);
         if (att->HasUlx()) {
-            attributes->push_back({ "ulx", att->IntToStr(att->GetUlx()) });
+            attributes->push_back(std::make_pair("ulx", att->IntToStr(att->GetUlx())));
         }
         if (att->HasUly()) {
-            attributes->push_back({ "uly", att->IntToStr(att->GetUly()) });
+            attributes->push_back(std::make_pair("uly", att->IntToStr(att->GetUly())));
         }
         if (att->HasLrx()) {
-            attributes->push_back({ "lrx", att->IntToStr(att->GetLrx()) });
+            attributes->push_back(std::make_pair("lrx", att->IntToStr(att->GetLrx())));
         }
         if (att->HasLry()) {
-            attributes->push_back({ "lry", att->IntToStr(att->GetLry()) });
-        }
-        if (att->HasRotate()) {
-            attributes->push_back({ "rotate", att->DblToStr(att->GetRotate()) });
+            attributes->push_back(std::make_pair("lry", att->IntToStr(att->GetLry())));
         }
     }
     if (element->HasAttClass(ATT_CUE)) {
         const AttCue *att = dynamic_cast<const AttCue *>(element);
         assert(att);
         if (att->HasCue()) {
-            attributes->push_back({ "cue", att->BooleanToStr(att->GetCue()) });
+            attributes->push_back(std::make_pair("cue", att->BooleanToStr(att->GetCue())));
         }
     }
     if (element->HasAttClass(ATT_CURVATURE)) {
         const AttCurvature *att = dynamic_cast<const AttCurvature *>(element);
         assert(att);
         if (att->HasBezier()) {
-            attributes->push_back({ "bezier", att->StrToStr(att->GetBezier()) });
+            attributes->push_back(std::make_pair("bezier", att->StrToStr(att->GetBezier())));
         }
         if (att->HasBulge()) {
-            attributes->push_back({ "bulge", att->StrToStr(att->GetBulge()) });
+            attributes->push_back(std::make_pair("bulge", att->StrToStr(att->GetBulge())));
         }
         if (att->HasCurvedir()) {
-            attributes->push_back({ "curvedir", att->CurvatureCurvedirToStr(att->GetCurvedir()) });
+            attributes->push_back(std::make_pair("curvedir", att->CurvatureCurvedirToStr(att->GetCurvedir())));
         }
     }
     if (element->HasAttClass(ATT_CURVEREND)) {
         const AttCurveRend *att = dynamic_cast<const AttCurveRend *>(element);
         assert(att);
         if (att->HasLform()) {
-            attributes->push_back({ "lform", att->LineformToStr(att->GetLform()) });
+            attributes->push_back(std::make_pair("lform", att->LineformToStr(att->GetLform())));
         }
         if (att->HasLwidth()) {
-            attributes->push_back({ "lwidth", att->LinewidthToStr(att->GetLwidth()) });
+            attributes->push_back(std::make_pair("lwidth", att->LinewidthToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass(ATT_CUSTOSLOG)) {
         const AttCustosLog *att = dynamic_cast<const AttCustosLog *>(element);
         assert(att);
         if (att->HasTarget()) {
-            attributes->push_back({ "target", att->StrToStr(att->GetTarget()) });
+            attributes->push_back(std::make_pair("target", att->StrToStr(att->GetTarget())));
         }
     }
     if (element->HasAttClass(ATT_DATAPOINTING)) {
         const AttDataPointing *att = dynamic_cast<const AttDataPointing *>(element);
         assert(att);
         if (att->HasData()) {
-            attributes->push_back({ "data", att->StrToStr(att->GetData()) });
+            attributes->push_back(std::make_pair("data", att->StrToStr(att->GetData())));
         }
     }
     if (element->HasAttClass(ATT_DATABLE)) {
         const AttDatable *att = dynamic_cast<const AttDatable *>(element);
         assert(att);
         if (att->HasEnddate()) {
-            attributes->push_back({ "enddate", att->StrToStr(att->GetEnddate()) });
+            attributes->push_back(std::make_pair("enddate", att->StrToStr(att->GetEnddate())));
         }
         if (att->HasIsodate()) {
-            attributes->push_back({ "isodate", att->StrToStr(att->GetIsodate()) });
+            attributes->push_back(std::make_pair("isodate", att->StrToStr(att->GetIsodate())));
         }
         if (att->HasNotafter()) {
-            attributes->push_back({ "notafter", att->StrToStr(att->GetNotafter()) });
+            attributes->push_back(std::make_pair("notafter", att->StrToStr(att->GetNotafter())));
         }
         if (att->HasNotbefore()) {
-            attributes->push_back({ "notbefore", att->StrToStr(att->GetNotbefore()) });
+            attributes->push_back(std::make_pair("notbefore", att->StrToStr(att->GetNotbefore())));
         }
         if (att->HasStartdate()) {
-            attributes->push_back({ "startdate", att->StrToStr(att->GetStartdate()) });
+            attributes->push_back(std::make_pair("startdate", att->StrToStr(att->GetStartdate())));
         }
     }
     if (element->HasAttClass(ATT_DISTANCES)) {
         const AttDistances *att = dynamic_cast<const AttDistances *>(element);
         assert(att);
         if (att->HasDynamDist()) {
-            attributes->push_back({ "dynam.dist", att->MeasurementrelToStr(att->GetDynamDist()) });
+            attributes->push_back(std::make_pair("dynam.dist", att->MeasurementrelToStr(att->GetDynamDist())));
         }
         if (att->HasHarmDist()) {
-            attributes->push_back({ "harm.dist", att->MeasurementrelToStr(att->GetHarmDist()) });
+            attributes->push_back(std::make_pair("harm.dist", att->MeasurementrelToStr(att->GetHarmDist())));
         }
         if (att->HasTextDist()) {
-            attributes->push_back({ "text.dist", att->MeasurementrelToStr(att->GetTextDist()) });
+            attributes->push_back(std::make_pair("text.dist", att->MeasurementrelToStr(att->GetTextDist())));
         }
     }
     if (element->HasAttClass(ATT_DOTLOG)) {
         const AttDotLog *att = dynamic_cast<const AttDotLog *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back({ "form", att->DotLogFormToStr(att->GetForm()) });
+            attributes->push_back(std::make_pair("form", att->DotLogFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_DURATIONADDITIVE)) {
         const AttDurationAdditive *att = dynamic_cast<const AttDurationAdditive *>(element);
         assert(att);
         if (att->HasDur()) {
-            attributes->push_back({ "dur", att->DurationToStr(att->GetDur()) });
+            attributes->push_back(std::make_pair("dur", att->DurationToStr(att->GetDur())));
         }
     }
     if (element->HasAttClass(ATT_DURATIONDEFAULT)) {
         const AttDurationDefault *att = dynamic_cast<const AttDurationDefault *>(element);
         assert(att);
         if (att->HasDurDefault()) {
-            attributes->push_back({ "dur.default", att->DurationToStr(att->GetDurDefault()) });
+            attributes->push_back(std::make_pair("dur.default", att->DurationToStr(att->GetDurDefault())));
         }
         if (att->HasNumDefault()) {
-            attributes->push_back({ "num.default", att->IntToStr(att->GetNumDefault()) });
+            attributes->push_back(std::make_pair("num.default", att->IntToStr(att->GetNumDefault())));
         }
         if (att->HasNumbaseDefault()) {
-            attributes->push_back({ "numbase.default", att->IntToStr(att->GetNumbaseDefault()) });
+            attributes->push_back(std::make_pair("numbase.default", att->IntToStr(att->GetNumbaseDefault())));
         }
     }
     if (element->HasAttClass(ATT_DURATIONLOGICAL)) {
         const AttDurationLogical *att = dynamic_cast<const AttDurationLogical *>(element);
         assert(att);
         if (att->HasDur()) {
-            attributes->push_back({ "dur", att->DurationToStr(att->GetDur()) });
+            attributes->push_back(std::make_pair("dur", att->DurationToStr(att->GetDur())));
         }
     }
     if (element->HasAttClass(ATT_DURATIONRATIO)) {
         const AttDurationRatio *att = dynamic_cast<const AttDurationRatio *>(element);
         assert(att);
         if (att->HasNum()) {
-            attributes->push_back({ "num", att->IntToStr(att->GetNum()) });
+            attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
         }
         if (att->HasNumbase()) {
-            attributes->push_back({ "numbase", att->IntToStr(att->GetNumbase()) });
+            attributes->push_back(std::make_pair("numbase", att->IntToStr(att->GetNumbase())));
         }
     }
     if (element->HasAttClass(ATT_ENCLOSINGCHARS)) {
         const AttEnclosingChars *att = dynamic_cast<const AttEnclosingChars *>(element);
         assert(att);
         if (att->HasEnclose()) {
-            attributes->push_back({ "enclose", att->EnclosureToStr(att->GetEnclose()) });
+            attributes->push_back(std::make_pair("enclose", att->EnclosureToStr(att->GetEnclose())));
         }
     }
     if (element->HasAttClass(ATT_ENDINGS)) {
         const AttEndings *att = dynamic_cast<const AttEndings *>(element);
         assert(att);
         if (att->HasEndingRend()) {
-            attributes->push_back({ "ending.rend", att->EndingsEndingrendToStr(att->GetEndingRend()) });
+            attributes->push_back(std::make_pair("ending.rend", att->EndingsEndingrendToStr(att->GetEndingRend())));
         }
     }
     if (element->HasAttClass(ATT_EVIDENCE)) {
         const AttEvidence *att = dynamic_cast<const AttEvidence *>(element);
         assert(att);
         if (att->HasCert()) {
-            attributes->push_back({ "cert", att->CertaintyToStr(att->GetCert()) });
+            attributes->push_back(std::make_pair("cert", att->CertaintyToStr(att->GetCert())));
         }
         if (att->HasEvidence()) {
-            attributes->push_back({ "evidence", att->StrToStr(att->GetEvidence()) });
+            attributes->push_back(std::make_pair("evidence", att->StrToStr(att->GetEvidence())));
         }
     }
     if (element->HasAttClass(ATT_EXTENDER)) {
         const AttExtender *att = dynamic_cast<const AttExtender *>(element);
         assert(att);
         if (att->HasExtender()) {
-            attributes->push_back({ "extender", att->BooleanToStr(att->GetExtender()) });
+            attributes->push_back(std::make_pair("extender", att->BooleanToStr(att->GetExtender())));
         }
     }
     if (element->HasAttClass(ATT_EXTENT)) {
         const AttExtent *att = dynamic_cast<const AttExtent *>(element);
         assert(att);
         if (att->HasExtent()) {
-            attributes->push_back({ "extent", att->StrToStr(att->GetExtent()) });
+            attributes->push_back(std::make_pair("extent", att->StrToStr(att->GetExtent())));
         }
     }
     if (element->HasAttClass(ATT_FERMATAPRESENT)) {
         const AttFermataPresent *att = dynamic_cast<const AttFermataPresent *>(element);
         assert(att);
         if (att->HasFermata()) {
-            attributes->push_back({ "fermata", att->StaffrelBasicToStr(att->GetFermata()) });
+            attributes->push_back(std::make_pair("fermata", att->StaffrelBasicToStr(att->GetFermata())));
         }
     }
     if (element->HasAttClass(ATT_FILING)) {
         const AttFiling *att = dynamic_cast<const AttFiling *>(element);
         assert(att);
         if (att->HasNonfiling()) {
-            attributes->push_back({ "nonfiling", att->IntToStr(att->GetNonfiling()) });
+            attributes->push_back(std::make_pair("nonfiling", att->IntToStr(att->GetNonfiling())));
         }
     }
     if (element->HasAttClass(ATT_GRPSYMLOG)) {
         const AttGrpSymLog *att = dynamic_cast<const AttGrpSymLog *>(element);
         assert(att);
         if (att->HasLevel()) {
-            attributes->push_back({ "level", att->IntToStr(att->GetLevel()) });
+            attributes->push_back(std::make_pair("level", att->IntToStr(att->GetLevel())));
         }
     }
     if (element->HasAttClass(ATT_HANDIDENT)) {
         const AttHandIdent *att = dynamic_cast<const AttHandIdent *>(element);
         assert(att);
         if (att->HasHand()) {
-            attributes->push_back({ "hand", att->StrToStr(att->GetHand()) });
+            attributes->push_back(std::make_pair("hand", att->StrToStr(att->GetHand())));
         }
     }
     if (element->HasAttClass(ATT_HEIGHT)) {
         const AttHeight *att = dynamic_cast<const AttHeight *>(element);
         assert(att);
         if (att->HasHeight()) {
-            attributes->push_back({ "height", att->MeasurementabsToStr(att->GetHeight()) });
+            attributes->push_back(std::make_pair("height", att->MeasurementabsToStr(att->GetHeight())));
         }
     }
     if (element->HasAttClass(ATT_HORIZONTALALIGN)) {
         const AttHorizontalAlign *att = dynamic_cast<const AttHorizontalAlign *>(element);
         assert(att);
         if (att->HasHalign()) {
-            attributes->push_back({ "halign", att->HorizontalalignmentToStr(att->GetHalign()) });
+            attributes->push_back(std::make_pair("halign", att->HorizontalalignmentToStr(att->GetHalign())));
         }
     }
     if (element->HasAttClass(ATT_INTERNETMEDIA)) {
         const AttInternetMedia *att = dynamic_cast<const AttInternetMedia *>(element);
         assert(att);
         if (att->HasMimetype()) {
-            attributes->push_back({ "mimetype", att->StrToStr(att->GetMimetype()) });
+            attributes->push_back(std::make_pair("mimetype", att->StrToStr(att->GetMimetype())));
         }
     }
     if (element->HasAttClass(ATT_JOINED)) {
         const AttJoined *att = dynamic_cast<const AttJoined *>(element);
         assert(att);
         if (att->HasJoin()) {
-            attributes->push_back({ "join", att->StrToStr(att->GetJoin()) });
+            attributes->push_back(std::make_pair("join", att->StrToStr(att->GetJoin())));
         }
     }
     if (element->HasAttClass(ATT_KEYSIGLOG)) {
         const AttKeySigLog *att = dynamic_cast<const AttKeySigLog *>(element);
         assert(att);
         if (att->HasSig()) {
-            attributes->push_back({ "sig", att->KeysignatureToStr(att->GetSig()) });
+            attributes->push_back(std::make_pair("sig", att->KeysignatureToStr(att->GetSig())));
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
         const AttKeySigDefaultLog *att = dynamic_cast<const AttKeySigDefaultLog *>(element);
         assert(att);
         if (att->HasKeySig()) {
-            attributes->push_back({ "key.sig", att->KeysignatureToStr(att->GetKeySig()) });
+            attributes->push_back(std::make_pair("key.sig", att->KeysignatureToStr(att->GetKeySig())));
         }
     }
     if (element->HasAttClass(ATT_LABELLED)) {
         const AttLabelled *att = dynamic_cast<const AttLabelled *>(element);
         assert(att);
         if (att->HasLabel()) {
-            attributes->push_back({ "label", att->StrToStr(att->GetLabel()) });
+            attributes->push_back(std::make_pair("label", att->StrToStr(att->GetLabel())));
         }
     }
     if (element->HasAttClass(ATT_LANG)) {
         const AttLang *att = dynamic_cast<const AttLang *>(element);
         assert(att);
         if (att->HasLang()) {
-            attributes->push_back({ "xml:lang", att->StrToStr(att->GetLang()) });
+            attributes->push_back(std::make_pair("xml:lang", att->StrToStr(att->GetLang())));
         }
         if (att->HasTranslit()) {
-            attributes->push_back({ "xml:translit", att->StrToStr(att->GetTranslit()) });
+            attributes->push_back(std::make_pair("xml:translit", att->StrToStr(att->GetTranslit())));
         }
     }
     if (element->HasAttClass(ATT_LAYERLOG)) {
         const AttLayerLog *att = dynamic_cast<const AttLayerLog *>(element);
         assert(att);
         if (att->HasDef()) {
-            attributes->push_back({ "def", att->StrToStr(att->GetDef()) });
+            attributes->push_back(std::make_pair("def", att->StrToStr(att->GetDef())));
         }
     }
     if (element->HasAttClass(ATT_LAYERIDENT)) {
         const AttLayerIdent *att = dynamic_cast<const AttLayerIdent *>(element);
         assert(att);
         if (att->HasLayer()) {
-            attributes->push_back({ "layer", att->IntToStr(att->GetLayer()) });
+            attributes->push_back(std::make_pair("layer", att->IntToStr(att->GetLayer())));
         }
     }
     if (element->HasAttClass(ATT_LINELOC)) {
         const AttLineLoc *att = dynamic_cast<const AttLineLoc *>(element);
         assert(att);
         if (att->HasLine()) {
-            attributes->push_back({ "line", att->IntToStr(att->GetLine()) });
+            attributes->push_back(std::make_pair("line", att->IntToStr(att->GetLine())));
         }
     }
     if (element->HasAttClass(ATT_LINEREND)) {
         const AttLineRend *att = dynamic_cast<const AttLineRend *>(element);
         assert(att);
         if (att->HasLendsym()) {
-            attributes->push_back({ "lendsym", att->LinestartendsymbolToStr(att->GetLendsym()) });
+            attributes->push_back(std::make_pair("lendsym", att->LinestartendsymbolToStr(att->GetLendsym())));
         }
         if (att->HasLendsymSize()) {
-            attributes->push_back({ "lendsym.size", att->IntToStr(att->GetLendsymSize()) });
+            attributes->push_back(std::make_pair("lendsym.size", att->IntToStr(att->GetLendsymSize())));
         }
         if (att->HasLstartsym()) {
-            attributes->push_back({ "lstartsym", att->LinestartendsymbolToStr(att->GetLstartsym()) });
+            attributes->push_back(std::make_pair("lstartsym", att->LinestartendsymbolToStr(att->GetLstartsym())));
         }
         if (att->HasLstartsymSize()) {
-            attributes->push_back({ "lstartsym.size", att->IntToStr(att->GetLstartsymSize()) });
+            attributes->push_back(std::make_pair("lstartsym.size", att->IntToStr(att->GetLstartsymSize())));
         }
     }
     if (element->HasAttClass(ATT_LINERENDBASE)) {
         const AttLineRendBase *att = dynamic_cast<const AttLineRendBase *>(element);
         assert(att);
         if (att->HasLform()) {
-            attributes->push_back({ "lform", att->LineformToStr(att->GetLform()) });
+            attributes->push_back(std::make_pair("lform", att->LineformToStr(att->GetLform())));
         }
         if (att->HasLsegs()) {
-            attributes->push_back({ "lsegs", att->IntToStr(att->GetLsegs()) });
+            attributes->push_back(std::make_pair("lsegs", att->IntToStr(att->GetLsegs())));
         }
         if (att->HasLwidth()) {
-            attributes->push_back({ "lwidth", att->LinewidthToStr(att->GetLwidth()) });
+            attributes->push_back(std::make_pair("lwidth", att->LinewidthToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass(ATT_LINKING)) {
         const AttLinking *att = dynamic_cast<const AttLinking *>(element);
         assert(att);
         if (att->HasCopyof()) {
-            attributes->push_back({ "copyof", att->StrToStr(att->GetCopyof()) });
+            attributes->push_back(std::make_pair("copyof", att->StrToStr(att->GetCopyof())));
         }
         if (att->HasCorresp()) {
-            attributes->push_back({ "corresp", att->StrToStr(att->GetCorresp()) });
+            attributes->push_back(std::make_pair("corresp", att->StrToStr(att->GetCorresp())));
         }
         if (att->HasFollows()) {
-            attributes->push_back({ "follows", att->StrToStr(att->GetFollows()) });
+            attributes->push_back(std::make_pair("follows", att->StrToStr(att->GetFollows())));
         }
         if (att->HasNext()) {
-            attributes->push_back({ "next", att->StrToStr(att->GetNext()) });
+            attributes->push_back(std::make_pair("next", att->StrToStr(att->GetNext())));
         }
         if (att->HasPrecedes()) {
-            attributes->push_back({ "precedes", att->StrToStr(att->GetPrecedes()) });
+            attributes->push_back(std::make_pair("precedes", att->StrToStr(att->GetPrecedes())));
         }
         if (att->HasPrev()) {
-            attributes->push_back({ "prev", att->StrToStr(att->GetPrev()) });
+            attributes->push_back(std::make_pair("prev", att->StrToStr(att->GetPrev())));
         }
         if (att->HasSameas()) {
-            attributes->push_back({ "sameas", att->StrToStr(att->GetSameas()) });
+            attributes->push_back(std::make_pair("sameas", att->StrToStr(att->GetSameas())));
         }
         if (att->HasSynch()) {
-            attributes->push_back({ "synch", att->StrToStr(att->GetSynch()) });
+            attributes->push_back(std::make_pair("synch", att->StrToStr(att->GetSynch())));
         }
     }
     if (element->HasAttClass(ATT_LYRICSTYLE)) {
         const AttLyricStyle *att = dynamic_cast<const AttLyricStyle *>(element);
         assert(att);
         if (att->HasLyricAlign()) {
-            attributes->push_back({ "lyric.align", att->MeasurementrelToStr(att->GetLyricAlign()) });
+            attributes->push_back(std::make_pair("lyric.align", att->MeasurementrelToStr(att->GetLyricAlign())));
         }
         if (att->HasLyricFam()) {
-            attributes->push_back({ "lyric.fam", att->StrToStr(att->GetLyricFam()) });
+            attributes->push_back(std::make_pair("lyric.fam", att->StrToStr(att->GetLyricFam())));
         }
         if (att->HasLyricName()) {
-            attributes->push_back({ "lyric.name", att->StrToStr(att->GetLyricName()) });
+            attributes->push_back(std::make_pair("lyric.name", att->StrToStr(att->GetLyricName())));
         }
         if (att->HasLyricSize()) {
-            attributes->push_back({ "lyric.size", att->FontsizeToStr(att->GetLyricSize()) });
+            attributes->push_back(std::make_pair("lyric.size", att->FontsizeToStr(att->GetLyricSize())));
         }
         if (att->HasLyricStyle()) {
-            attributes->push_back({ "lyric.style", att->FontstyleToStr(att->GetLyricStyle()) });
+            attributes->push_back(std::make_pair("lyric.style", att->FontstyleToStr(att->GetLyricStyle())));
         }
         if (att->HasLyricWeight()) {
-            attributes->push_back({ "lyric.weight", att->FontweightToStr(att->GetLyricWeight()) });
+            attributes->push_back(std::make_pair("lyric.weight", att->FontweightToStr(att->GetLyricWeight())));
         }
     }
     if (element->HasAttClass(ATT_MEASURENUMBERS)) {
         const AttMeasureNumbers *att = dynamic_cast<const AttMeasureNumbers *>(element);
         assert(att);
         if (att->HasMnumVisible()) {
-            attributes->push_back({ "mnum.visible", att->BooleanToStr(att->GetMnumVisible()) });
+            attributes->push_back(std::make_pair("mnum.visible", att->BooleanToStr(att->GetMnumVisible())));
         }
     }
     if (element->HasAttClass(ATT_MEASUREMENT)) {
         const AttMeasurement *att = dynamic_cast<const AttMeasurement *>(element);
         assert(att);
         if (att->HasUnit()) {
-            attributes->push_back({ "unit", att->StrToStr(att->GetUnit()) });
+            attributes->push_back(std::make_pair("unit", att->StrToStr(att->GetUnit())));
         }
     }
     if (element->HasAttClass(ATT_MEDIABOUNDS)) {
         const AttMediaBounds *att = dynamic_cast<const AttMediaBounds *>(element);
         assert(att);
         if (att->HasBegin()) {
-            attributes->push_back({ "begin", att->StrToStr(att->GetBegin()) });
+            attributes->push_back(std::make_pair("begin", att->StrToStr(att->GetBegin())));
         }
         if (att->HasEnd()) {
-            attributes->push_back({ "end", att->StrToStr(att->GetEnd()) });
+            attributes->push_back(std::make_pair("end", att->StrToStr(att->GetEnd())));
         }
         if (att->HasBetype()) {
-            attributes->push_back({ "betype", att->BetypeToStr(att->GetBetype()) });
+            attributes->push_back(std::make_pair("betype", att->BetypeToStr(att->GetBetype())));
         }
     }
     if (element->HasAttClass(ATT_MEDIUM)) {
         const AttMedium *att = dynamic_cast<const AttMedium *>(element);
         assert(att);
         if (att->HasMedium()) {
-            attributes->push_back({ "medium", att->StrToStr(att->GetMedium()) });
+            attributes->push_back(std::make_pair("medium", att->StrToStr(att->GetMedium())));
         }
     }
     if (element->HasAttClass(ATT_MEIVERSION)) {
         const AttMeiVersion *att = dynamic_cast<const AttMeiVersion *>(element);
         assert(att);
         if (att->HasMeiversion()) {
-            attributes->push_back({ "meiversion", att->MeiVersionMeiversionToStr(att->GetMeiversion()) });
+            attributes->push_back(std::make_pair("meiversion", att->MeiVersionMeiversionToStr(att->GetMeiversion())));
+        }
+    }
+    if (element->HasAttClass(ATT_MENSURLOG)) {
+        const AttMensurLog *att = dynamic_cast<const AttMensurLog *>(element);
+        assert(att);
+        if (att->HasDot()) {
+            attributes->push_back(std::make_pair("dot", att->BooleanToStr(att->GetDot())));
+        }
+        if (att->HasSign()) {
+            attributes->push_back(std::make_pair("sign", att->MensurationsignToStr(att->GetSign())));
         }
     }
     if (element->HasAttClass(ATT_METADATAPOINTING)) {
         const AttMetadataPointing *att = dynamic_cast<const AttMetadataPointing *>(element);
         assert(att);
         if (att->HasDecls()) {
-            attributes->push_back({ "decls", att->StrToStr(att->GetDecls()) });
+            attributes->push_back(std::make_pair("decls", att->StrToStr(att->GetDecls())));
         }
     }
     if (element->HasAttClass(ATT_METERCONFORMANCE)) {
         const AttMeterConformance *att = dynamic_cast<const AttMeterConformance *>(element);
         assert(att);
         if (att->HasMetcon()) {
-            attributes->push_back({ "metcon", att->MeterConformanceMetconToStr(att->GetMetcon()) });
+            attributes->push_back(std::make_pair("metcon", att->MeterConformanceMetconToStr(att->GetMetcon())));
         }
     }
     if (element->HasAttClass(ATT_METERCONFORMANCEBAR)) {
         const AttMeterConformanceBar *att = dynamic_cast<const AttMeterConformanceBar *>(element);
         assert(att);
         if (att->HasMetcon()) {
-            attributes->push_back({ "metcon", att->BooleanToStr(att->GetMetcon()) });
+            attributes->push_back(std::make_pair("metcon", att->BooleanToStr(att->GetMetcon())));
         }
         if (att->HasControl()) {
-            attributes->push_back({ "control", att->BooleanToStr(att->GetControl()) });
+            attributes->push_back(std::make_pair("control", att->BooleanToStr(att->GetControl())));
         }
     }
     if (element->HasAttClass(ATT_METERSIGLOG)) {
         const AttMeterSigLog *att = dynamic_cast<const AttMeterSigLog *>(element);
         assert(att);
         if (att->HasCount()) {
-            attributes->push_back({ "count", att->SummandListToStr(att->GetCount()) });
+            attributes->push_back(std::make_pair("count", att->IntToStr(att->GetCount())));
         }
         if (att->HasSym()) {
-            attributes->push_back({ "sym", att->MetersignToStr(att->GetSym()) });
+            attributes->push_back(std::make_pair("sym", att->MetersignToStr(att->GetSym())));
         }
         if (att->HasUnit()) {
-            attributes->push_back({ "unit", att->IntToStr(att->GetUnit()) });
+            attributes->push_back(std::make_pair("unit", att->IntToStr(att->GetUnit())));
         }
     }
     if (element->HasAttClass(ATT_METERSIGDEFAULTLOG)) {
         const AttMeterSigDefaultLog *att = dynamic_cast<const AttMeterSigDefaultLog *>(element);
         assert(att);
         if (att->HasMeterCount()) {
-            attributes->push_back({ "meter.count", att->SummandListToStr(att->GetMeterCount()) });
+            attributes->push_back(std::make_pair("meter.count", att->IntToStr(att->GetMeterCount())));
         }
         if (att->HasMeterUnit()) {
-            attributes->push_back({ "meter.unit", att->IntToStr(att->GetMeterUnit()) });
+            attributes->push_back(std::make_pair("meter.unit", att->IntToStr(att->GetMeterUnit())));
         }
         if (att->HasMeterSym()) {
-            attributes->push_back({ "meter.sym", att->MetersignToStr(att->GetMeterSym()) });
+            attributes->push_back(std::make_pair("meter.sym", att->MetersignToStr(att->GetMeterSym())));
         }
     }
     if (element->HasAttClass(ATT_MMTEMPO)) {
         const AttMmTempo *att = dynamic_cast<const AttMmTempo *>(element);
         assert(att);
         if (att->HasMm()) {
-            attributes->push_back({ "mm", att->DblToStr(att->GetMm()) });
+            attributes->push_back(std::make_pair("mm", att->IntToStr(att->GetMm())));
         }
         if (att->HasMmUnit()) {
-            attributes->push_back({ "mm.unit", att->DurationToStr(att->GetMmUnit()) });
+            attributes->push_back(std::make_pair("mm.unit", att->DurationToStr(att->GetMmUnit())));
         }
         if (att->HasMmDots()) {
-            attributes->push_back({ "mm.dots", att->IntToStr(att->GetMmDots()) });
+            attributes->push_back(std::make_pair("mm.dots", att->IntToStr(att->GetMmDots())));
         }
     }
     if (element->HasAttClass(ATT_MULTINUMMEASURES)) {
         const AttMultinumMeasures *att = dynamic_cast<const AttMultinumMeasures *>(element);
         assert(att);
         if (att->HasMultiNumber()) {
-            attributes->push_back({ "multi.number", att->BooleanToStr(att->GetMultiNumber()) });
+            attributes->push_back(std::make_pair("multi.number", att->BooleanToStr(att->GetMultiNumber())));
         }
     }
     if (element->HasAttClass(ATT_NINTEGER)) {
         const AttNInteger *att = dynamic_cast<const AttNInteger *>(element);
         assert(att);
         if (att->HasN()) {
-            attributes->push_back({ "n", att->IntToStr(att->GetN()) });
+            attributes->push_back(std::make_pair("n", att->IntToStr(att->GetN())));
         }
     }
     if (element->HasAttClass(ATT_NNUMBERLIKE)) {
         const AttNNumberLike *att = dynamic_cast<const AttNNumberLike *>(element);
         assert(att);
         if (att->HasN()) {
-            attributes->push_back({ "n", att->StrToStr(att->GetN()) });
+            attributes->push_back(std::make_pair("n", att->StrToStr(att->GetN())));
         }
     }
     if (element->HasAttClass(ATT_NAME)) {
         const AttName *att = dynamic_cast<const AttName *>(element);
         assert(att);
         if (att->HasNymref()) {
-            attributes->push_back({ "nymref", att->StrToStr(att->GetNymref()) });
+            attributes->push_back(std::make_pair("nymref", att->StrToStr(att->GetNymref())));
         }
         if (att->HasRole()) {
-            attributes->push_back({ "role", att->StrToStr(att->GetRole()) });
+            attributes->push_back(std::make_pair("role", att->StrToStr(att->GetRole())));
         }
     }
     if (element->HasAttClass(ATT_NOTATIONSTYLE)) {
         const AttNotationStyle *att = dynamic_cast<const AttNotationStyle *>(element);
         assert(att);
         if (att->HasMusicName()) {
-            attributes->push_back({ "music.name", att->StrToStr(att->GetMusicName()) });
+            attributes->push_back(std::make_pair("music.name", att->StrToStr(att->GetMusicName())));
         }
         if (att->HasMusicSize()) {
-            attributes->push_back({ "music.size", att->FontsizeToStr(att->GetMusicSize()) });
+            attributes->push_back(std::make_pair("music.size", att->FontsizeToStr(att->GetMusicSize())));
         }
     }
     if (element->HasAttClass(ATT_NOTEHEADS)) {
         const AttNoteHeads *att = dynamic_cast<const AttNoteHeads *>(element);
         assert(att);
         if (att->HasHeadAltsym()) {
-            attributes->push_back({ "head.altsym", att->StrToStr(att->GetHeadAltsym()) });
+            attributes->push_back(std::make_pair("head.altsym", att->StrToStr(att->GetHeadAltsym())));
         }
         if (att->HasHeadAuth()) {
-            attributes->push_back({ "head.auth", att->StrToStr(att->GetHeadAuth()) });
+            attributes->push_back(std::make_pair("head.auth", att->StrToStr(att->GetHeadAuth())));
         }
         if (att->HasHeadColor()) {
-            attributes->push_back({ "head.color", att->StrToStr(att->GetHeadColor()) });
+            attributes->push_back(std::make_pair("head.color", att->StrToStr(att->GetHeadColor())));
         }
         if (att->HasHeadFill()) {
-            attributes->push_back({ "head.fill", att->FillToStr(att->GetHeadFill()) });
+            attributes->push_back(std::make_pair("head.fill", att->FillToStr(att->GetHeadFill())));
         }
         if (att->HasHeadFillcolor()) {
-            attributes->push_back({ "head.fillcolor", att->StrToStr(att->GetHeadFillcolor()) });
+            attributes->push_back(std::make_pair("head.fillcolor", att->StrToStr(att->GetHeadFillcolor())));
         }
         if (att->HasHeadMod()) {
-            attributes->push_back({ "head.mod", att->NoteheadmodifierToStr(att->GetHeadMod()) });
+            attributes->push_back(std::make_pair("head.mod", att->NoteheadmodifierToStr(att->GetHeadMod())));
         }
         if (att->HasHeadRotation()) {
-            attributes->push_back({ "head.rotation", att->RotationToStr(att->GetHeadRotation()) });
+            attributes->push_back(std::make_pair("head.rotation", att->RotationToStr(att->GetHeadRotation())));
         }
         if (att->HasHeadShape()) {
-            attributes->push_back({ "head.shape", att->HeadshapeToStr(att->GetHeadShape()) });
+            attributes->push_back(std::make_pair("head.shape", att->HeadshapeToStr(att->GetHeadShape())));
         }
         if (att->HasHeadVisible()) {
-            attributes->push_back({ "head.visible", att->BooleanToStr(att->GetHeadVisible()) });
+            attributes->push_back(std::make_pair("head.visible", att->BooleanToStr(att->GetHeadVisible())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVE)) {
         const AttOctave *att = dynamic_cast<const AttOctave *>(element);
         assert(att);
         if (att->HasOct()) {
-            attributes->push_back({ "oct", att->OctaveToStr(att->GetOct()) });
+            attributes->push_back(std::make_pair("oct", att->OctaveToStr(att->GetOct())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDEFAULT)) {
         const AttOctaveDefault *att = dynamic_cast<const AttOctaveDefault *>(element);
         assert(att);
         if (att->HasOctDefault()) {
-            attributes->push_back({ "oct.default", att->OctaveToStr(att->GetOctDefault()) });
+            attributes->push_back(std::make_pair("oct.default", att->OctaveToStr(att->GetOctDefault())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDISPLACEMENT)) {
         const AttOctaveDisplacement *att = dynamic_cast<const AttOctaveDisplacement *>(element);
         assert(att);
         if (att->HasDis()) {
-            attributes->push_back({ "dis", att->OctaveDisToStr(att->GetDis()) });
+            attributes->push_back(std::make_pair("dis", att->OctaveDisToStr(att->GetDis())));
         }
         if (att->HasDisPlace()) {
-            attributes->push_back({ "dis.place", att->StaffrelBasicToStr(att->GetDisPlace()) });
+            attributes->push_back(std::make_pair("dis.place", att->StaffrelBasicToStr(att->GetDisPlace())));
         }
     }
     if (element->HasAttClass(ATT_ONELINESTAFF)) {
         const AttOneLineStaff *att = dynamic_cast<const AttOneLineStaff *>(element);
         assert(att);
         if (att->HasOntheline()) {
-            attributes->push_back({ "ontheline", att->BooleanToStr(att->GetOntheline()) });
+            attributes->push_back(std::make_pair("ontheline", att->BooleanToStr(att->GetOntheline())));
         }
     }
     if (element->HasAttClass(ATT_OPTIMIZATION)) {
         const AttOptimization *att = dynamic_cast<const AttOptimization *>(element);
         assert(att);
         if (att->HasOptimize()) {
-            attributes->push_back({ "optimize", att->BooleanToStr(att->GetOptimize()) });
+            attributes->push_back(std::make_pair("optimize", att->BooleanToStr(att->GetOptimize())));
         }
     }
     if (element->HasAttClass(ATT_ORIGINLAYERIDENT)) {
         const AttOriginLayerIdent *att = dynamic_cast<const AttOriginLayerIdent *>(element);
         assert(att);
         if (att->HasOriginLayer()) {
-            attributes->push_back({ "origin.layer", att->StrToStr(att->GetOriginLayer()) });
+            attributes->push_back(std::make_pair("origin.layer", att->StrToStr(att->GetOriginLayer())));
         }
     }
     if (element->HasAttClass(ATT_ORIGINSTAFFIDENT)) {
         const AttOriginStaffIdent *att = dynamic_cast<const AttOriginStaffIdent *>(element);
         assert(att);
         if (att->HasOriginStaff()) {
-            attributes->push_back({ "origin.staff", att->StrToStr(att->GetOriginStaff()) });
+            attributes->push_back(std::make_pair("origin.staff", att->StrToStr(att->GetOriginStaff())));
         }
     }
     if (element->HasAttClass(ATT_ORIGINSTARTENDID)) {
         const AttOriginStartEndId *att = dynamic_cast<const AttOriginStartEndId *>(element);
         assert(att);
         if (att->HasOriginStartid()) {
-            attributes->push_back({ "origin.startid", att->StrToStr(att->GetOriginStartid()) });
+            attributes->push_back(std::make_pair("origin.startid", att->StrToStr(att->GetOriginStartid())));
         }
         if (att->HasOriginEndid()) {
-            attributes->push_back({ "origin.endid", att->StrToStr(att->GetOriginEndid()) });
+            attributes->push_back(std::make_pair("origin.endid", att->StrToStr(att->GetOriginEndid())));
         }
     }
     if (element->HasAttClass(ATT_ORIGINTIMESTAMPLOGICAL)) {
         const AttOriginTimestampLogical *att = dynamic_cast<const AttOriginTimestampLogical *>(element);
         assert(att);
         if (att->HasOriginTstamp()) {
-            attributes->push_back({ "origin.tstamp", att->MeasurebeatToStr(att->GetOriginTstamp()) });
+            attributes->push_back(std::make_pair("origin.tstamp", att->MeasurebeatToStr(att->GetOriginTstamp())));
         }
         if (att->HasOriginTstamp2()) {
-            attributes->push_back({ "origin.tstamp2", att->MeasurebeatToStr(att->GetOriginTstamp2()) });
+            attributes->push_back(std::make_pair("origin.tstamp2", att->MeasurebeatToStr(att->GetOriginTstamp2())));
         }
     }
     if (element->HasAttClass(ATT_PAGES)) {
         const AttPages *att = dynamic_cast<const AttPages *>(element);
         assert(att);
         if (att->HasPageHeight()) {
-            attributes->push_back({ "page.height", att->MeasurementabsToStr(att->GetPageHeight()) });
+            attributes->push_back(std::make_pair("page.height", att->MeasurementabsToStr(att->GetPageHeight())));
         }
         if (att->HasPageWidth()) {
-            attributes->push_back({ "page.width", att->MeasurementabsToStr(att->GetPageWidth()) });
+            attributes->push_back(std::make_pair("page.width", att->MeasurementabsToStr(att->GetPageWidth())));
         }
         if (att->HasPageTopmar()) {
-            attributes->push_back({ "page.topmar", att->MeasurementabsToStr(att->GetPageTopmar()) });
+            attributes->push_back(std::make_pair("page.topmar", att->MeasurementabsToStr(att->GetPageTopmar())));
         }
         if (att->HasPageBotmar()) {
-            attributes->push_back({ "page.botmar", att->MeasurementabsToStr(att->GetPageBotmar()) });
+            attributes->push_back(std::make_pair("page.botmar", att->MeasurementabsToStr(att->GetPageBotmar())));
         }
         if (att->HasPageLeftmar()) {
-            attributes->push_back({ "page.leftmar", att->MeasurementabsToStr(att->GetPageLeftmar()) });
+            attributes->push_back(std::make_pair("page.leftmar", att->MeasurementabsToStr(att->GetPageLeftmar())));
         }
         if (att->HasPageRightmar()) {
-            attributes->push_back({ "page.rightmar", att->MeasurementabsToStr(att->GetPageRightmar()) });
+            attributes->push_back(std::make_pair("page.rightmar", att->MeasurementabsToStr(att->GetPageRightmar())));
         }
         if (att->HasPagePanels()) {
-            attributes->push_back({ "page.panels", att->StrToStr(att->GetPagePanels()) });
+            attributes->push_back(std::make_pair("page.panels", att->StrToStr(att->GetPagePanels())));
         }
         if (att->HasPageScale()) {
-            attributes->push_back({ "page.scale", att->StrToStr(att->GetPageScale()) });
+            attributes->push_back(std::make_pair("page.scale", att->StrToStr(att->GetPageScale())));
         }
     }
     if (element->HasAttClass(ATT_PARTIDENT)) {
         const AttPartIdent *att = dynamic_cast<const AttPartIdent *>(element);
         assert(att);
         if (att->HasPart()) {
-            attributes->push_back({ "part", att->StrToStr(att->GetPart()) });
+            attributes->push_back(std::make_pair("part", att->StrToStr(att->GetPart())));
         }
         if (att->HasPartstaff()) {
-            attributes->push_back({ "partstaff", att->StrToStr(att->GetPartstaff()) });
+            attributes->push_back(std::make_pair("partstaff", att->StrToStr(att->GetPartstaff())));
         }
     }
     if (element->HasAttClass(ATT_PITCH)) {
         const AttPitch *att = dynamic_cast<const AttPitch *>(element);
         assert(att);
         if (att->HasPname()) {
-            attributes->push_back({ "pname", att->PitchnameToStr(att->GetPname()) });
+            attributes->push_back(std::make_pair("pname", att->PitchnameToStr(att->GetPname())));
         }
     }
-    if (element->HasAttClass(ATT_PLACEMENTONSTAFF)) {
-        const AttPlacementOnStaff *att = dynamic_cast<const AttPlacementOnStaff *>(element);
-        assert(att);
-        if (att->HasOnstaff()) {
-            attributes->push_back({ "onstaff", att->BooleanToStr(att->GetOnstaff()) });
-        }
-    }
-    if (element->HasAttClass(ATT_PLACEMENTRELEVENT)) {
-        const AttPlacementRelEvent *att = dynamic_cast<const AttPlacementRelEvent *>(element);
+    if (element->HasAttClass(ATT_PLACEMENT)) {
+        const AttPlacement *att = dynamic_cast<const AttPlacement *>(element);
         assert(att);
         if (att->HasPlace()) {
-            attributes->push_back({ "place", att->StaffrelToStr(att->GetPlace()) });
-        }
-    }
-    if (element->HasAttClass(ATT_PLACEMENTRELSTAFF)) {
-        const AttPlacementRelStaff *att = dynamic_cast<const AttPlacementRelStaff *>(element);
-        assert(att);
-        if (att->HasPlace()) {
-            attributes->push_back({ "place", att->StaffrelToStr(att->GetPlace()) });
+            attributes->push_back(std::make_pair("place", att->StaffrelToStr(att->GetPlace())));
         }
     }
     if (element->HasAttClass(ATT_PLIST)) {
         const AttPlist *att = dynamic_cast<const AttPlist *>(element);
         assert(att);
         if (att->HasPlist()) {
-            attributes->push_back({ "plist", att->XsdAnyURIListToStr(att->GetPlist()) });
+            attributes->push_back(std::make_pair("plist", att->XsdAnyURIListToStr(att->GetPlist())));
         }
     }
     if (element->HasAttClass(ATT_POINTING)) {
         const AttPointing *att = dynamic_cast<const AttPointing *>(element);
         assert(att);
         if (att->HasActuate()) {
-            attributes->push_back({ "xlink:actuate", att->StrToStr(att->GetActuate()) });
+            attributes->push_back(std::make_pair("xlink:actuate", att->StrToStr(att->GetActuate())));
         }
         if (att->HasRole()) {
-            attributes->push_back({ "xlink:role", att->StrToStr(att->GetRole()) });
+            attributes->push_back(std::make_pair("xlink:role", att->StrToStr(att->GetRole())));
         }
         if (att->HasShow()) {
-            attributes->push_back({ "xlink:show", att->StrToStr(att->GetShow()) });
+            attributes->push_back(std::make_pair("xlink:show", att->StrToStr(att->GetShow())));
         }
         if (att->HasTarget()) {
-            attributes->push_back({ "xlink:target", att->StrToStr(att->GetTarget()) });
+            attributes->push_back(std::make_pair("xlink:target", att->StrToStr(att->GetTarget())));
         }
         if (att->HasTargettype()) {
-            attributes->push_back({ "xlink:targettype", att->StrToStr(att->GetTargettype()) });
+            attributes->push_back(std::make_pair("xlink:targettype", att->StrToStr(att->GetTargettype())));
         }
     }
     if (element->HasAttClass(ATT_QUANTITY)) {
         const AttQuantity *att = dynamic_cast<const AttQuantity *>(element);
         assert(att);
         if (att->HasQuantity()) {
-            attributes->push_back({ "quantity", att->DblToStr(att->GetQuantity()) });
+            attributes->push_back(std::make_pair("quantity", att->DblToStr(att->GetQuantity())));
         }
     }
     if (element->HasAttClass(ATT_RANGING)) {
         const AttRanging *att = dynamic_cast<const AttRanging *>(element);
         assert(att);
         if (att->HasAtleast()) {
-            attributes->push_back({ "atleast", att->DblToStr(att->GetAtleast()) });
+            attributes->push_back(std::make_pair("atleast", att->DblToStr(att->GetAtleast())));
         }
         if (att->HasAtmost()) {
-            attributes->push_back({ "atmost", att->DblToStr(att->GetAtmost()) });
+            attributes->push_back(std::make_pair("atmost", att->DblToStr(att->GetAtmost())));
         }
         if (att->HasMin()) {
-            attributes->push_back({ "min", att->DblToStr(att->GetMin()) });
+            attributes->push_back(std::make_pair("min", att->DblToStr(att->GetMin())));
         }
         if (att->HasMax()) {
-            attributes->push_back({ "max", att->DblToStr(att->GetMax()) });
+            attributes->push_back(std::make_pair("max", att->DblToStr(att->GetMax())));
         }
         if (att->HasConfidence()) {
-            attributes->push_back({ "confidence", att->DblToStr(att->GetConfidence()) });
+            attributes->push_back(std::make_pair("confidence", att->DblToStr(att->GetConfidence())));
         }
     }
     if (element->HasAttClass(ATT_RESPONSIBILITY)) {
         const AttResponsibility *att = dynamic_cast<const AttResponsibility *>(element);
         assert(att);
         if (att->HasResp()) {
-            attributes->push_back({ "resp", att->StrToStr(att->GetResp()) });
-        }
-    }
-    if (element->HasAttClass(ATT_RESTDURATIONLOGICAL)) {
-        const AttRestdurationLogical *att = dynamic_cast<const AttRestdurationLogical *>(element);
-        assert(att);
-        if (att->HasDur()) {
-            attributes->push_back({ "dur", att->DurationrestsToStr(att->GetDur()) });
+            attributes->push_back(std::make_pair("resp", att->StrToStr(att->GetResp())));
         }
     }
     if (element->HasAttClass(ATT_SCALABLE)) {
         const AttScalable *att = dynamic_cast<const AttScalable *>(element);
         assert(att);
         if (att->HasScale()) {
-            attributes->push_back({ "scale", att->PercentToStr(att->GetScale()) });
+            attributes->push_back(std::make_pair("scale", att->PercentToStr(att->GetScale())));
         }
     }
     if (element->HasAttClass(ATT_SEQUENCE)) {
         const AttSequence *att = dynamic_cast<const AttSequence *>(element);
         assert(att);
         if (att->HasSeq()) {
-            attributes->push_back({ "seq", att->IntToStr(att->GetSeq()) });
+            attributes->push_back(std::make_pair("seq", att->IntToStr(att->GetSeq())));
         }
     }
     if (element->HasAttClass(ATT_SLASHCOUNT)) {
         const AttSlashCount *att = dynamic_cast<const AttSlashCount *>(element);
         assert(att);
         if (att->HasSlash()) {
-            attributes->push_back({ "slash", att->IntToStr(att->GetSlash()) });
+            attributes->push_back(std::make_pair("slash", att->IntToStr(att->GetSlash())));
         }
     }
     if (element->HasAttClass(ATT_SLURPRESENT)) {
         const AttSlurPresent *att = dynamic_cast<const AttSlurPresent *>(element);
         assert(att);
         if (att->HasSlur()) {
-            attributes->push_back({ "slur", att->StrToStr(att->GetSlur()) });
+            attributes->push_back(std::make_pair("slur", att->StrToStr(att->GetSlur())));
         }
     }
     if (element->HasAttClass(ATT_SOURCE)) {
         const AttSource *att = dynamic_cast<const AttSource *>(element);
         assert(att);
         if (att->HasSource()) {
-            attributes->push_back({ "source", att->StrToStr(att->GetSource()) });
+            attributes->push_back(std::make_pair("source", att->StrToStr(att->GetSource())));
         }
     }
     if (element->HasAttClass(ATT_SPACING)) {
         const AttSpacing *att = dynamic_cast<const AttSpacing *>(element);
         assert(att);
         if (att->HasSpacingPackexp()) {
-            attributes->push_back({ "spacing.packexp", att->DblToStr(att->GetSpacingPackexp()) });
+            attributes->push_back(std::make_pair("spacing.packexp", att->DblToStr(att->GetSpacingPackexp())));
         }
         if (att->HasSpacingPackfact()) {
-            attributes->push_back({ "spacing.packfact", att->DblToStr(att->GetSpacingPackfact()) });
+            attributes->push_back(std::make_pair("spacing.packfact", att->DblToStr(att->GetSpacingPackfact())));
         }
         if (att->HasSpacingStaff()) {
-            attributes->push_back({ "spacing.staff", att->MeasurementrelToStr(att->GetSpacingStaff()) });
+            attributes->push_back(std::make_pair("spacing.staff", att->MeasurementrelToStr(att->GetSpacingStaff())));
         }
         if (att->HasSpacingSystem()) {
-            attributes->push_back({ "spacing.system", att->MeasurementrelToStr(att->GetSpacingSystem()) });
+            attributes->push_back(std::make_pair("spacing.system", att->MeasurementrelToStr(att->GetSpacingSystem())));
         }
     }
     if (element->HasAttClass(ATT_STAFFLOG)) {
         const AttStaffLog *att = dynamic_cast<const AttStaffLog *>(element);
         assert(att);
         if (att->HasDef()) {
-            attributes->push_back({ "def", att->StrToStr(att->GetDef()) });
+            attributes->push_back(std::make_pair("def", att->StrToStr(att->GetDef())));
         }
     }
     if (element->HasAttClass(ATT_STAFFDEFLOG)) {
         const AttStaffDefLog *att = dynamic_cast<const AttStaffDefLog *>(element);
         assert(att);
         if (att->HasLines()) {
-            attributes->push_back({ "lines", att->IntToStr(att->GetLines()) });
+            attributes->push_back(std::make_pair("lines", att->IntToStr(att->GetLines())));
         }
     }
     if (element->HasAttClass(ATT_STAFFGROUPINGSYM)) {
         const AttStaffGroupingSym *att = dynamic_cast<const AttStaffGroupingSym *>(element);
         assert(att);
         if (att->HasSymbol()) {
-            attributes->push_back({ "symbol", att->StaffGroupingSymSymbolToStr(att->GetSymbol()) });
+            attributes->push_back(std::make_pair("symbol", att->StaffGroupingSymSymbolToStr(att->GetSymbol())));
         }
     }
     if (element->HasAttClass(ATT_STAFFIDENT)) {
         const AttStaffIdent *att = dynamic_cast<const AttStaffIdent *>(element);
         assert(att);
         if (att->HasStaff()) {
-            attributes->push_back({ "staff", att->XsdPositiveIntegerListToStr(att->GetStaff()) });
+            attributes->push_back(std::make_pair("staff", att->XsdPositiveIntegerListToStr(att->GetStaff())));
         }
     }
     if (element->HasAttClass(ATT_STAFFITEMS)) {
         const AttStaffItems *att = dynamic_cast<const AttStaffItems *>(element);
         assert(att);
         if (att->HasAboveorder()) {
-            attributes->push_back({ "aboveorder", att->StaffitemToStr(att->GetAboveorder()) });
+            attributes->push_back(std::make_pair("aboveorder", att->StaffitemToStr(att->GetAboveorder())));
         }
         if (att->HasBeloworder()) {
-            attributes->push_back({ "beloworder", att->StaffitemToStr(att->GetBeloworder()) });
+            attributes->push_back(std::make_pair("beloworder", att->StaffitemToStr(att->GetBeloworder())));
         }
         if (att->HasBetweenorder()) {
-            attributes->push_back({ "betweenorder", att->StaffitemToStr(att->GetBetweenorder()) });
+            attributes->push_back(std::make_pair("betweenorder", att->StaffitemToStr(att->GetBetweenorder())));
         }
     }
     if (element->HasAttClass(ATT_STAFFLOC)) {
         const AttStaffLoc *att = dynamic_cast<const AttStaffLoc *>(element);
         assert(att);
         if (att->HasLoc()) {
-            attributes->push_back({ "loc", att->IntToStr(att->GetLoc()) });
+            attributes->push_back(std::make_pair("loc", att->IntToStr(att->GetLoc())));
         }
     }
     if (element->HasAttClass(ATT_STAFFLOCPITCHED)) {
         const AttStaffLocPitched *att = dynamic_cast<const AttStaffLocPitched *>(element);
         assert(att);
         if (att->HasPloc()) {
-            attributes->push_back({ "ploc", att->PitchnameToStr(att->GetPloc()) });
+            attributes->push_back(std::make_pair("ploc", att->PitchnameToStr(att->GetPloc())));
         }
         if (att->HasOloc()) {
-            attributes->push_back({ "oloc", att->OctaveToStr(att->GetOloc()) });
+            attributes->push_back(std::make_pair("oloc", att->OctaveToStr(att->GetOloc())));
         }
     }
     if (element->HasAttClass(ATT_STARTENDID)) {
         const AttStartEndId *att = dynamic_cast<const AttStartEndId *>(element);
         assert(att);
         if (att->HasEndid()) {
-            attributes->push_back({ "endid", att->StrToStr(att->GetEndid()) });
+            attributes->push_back(std::make_pair("endid", att->StrToStr(att->GetEndid())));
         }
     }
     if (element->HasAttClass(ATT_STARTID)) {
         const AttStartId *att = dynamic_cast<const AttStartId *>(element);
         assert(att);
         if (att->HasStartid()) {
-            attributes->push_back({ "startid", att->StrToStr(att->GetStartid()) });
+            attributes->push_back(std::make_pair("startid", att->StrToStr(att->GetStartid())));
         }
     }
     if (element->HasAttClass(ATT_STEMS)) {
         const AttStems *att = dynamic_cast<const AttStems *>(element);
         assert(att);
         if (att->HasStemDir()) {
-            attributes->push_back({ "stem.dir", att->StemdirectionToStr(att->GetStemDir()) });
+            attributes->push_back(std::make_pair("stem.dir", att->StemdirectionToStr(att->GetStemDir())));
         }
         if (att->HasStemLen()) {
-            attributes->push_back({ "stem.len", att->DblToStr(att->GetStemLen()) });
+            attributes->push_back(std::make_pair("stem.len", att->DblToStr(att->GetStemLen())));
         }
         if (att->HasStemMod()) {
-            attributes->push_back({ "stem.mod", att->StemmodifierToStr(att->GetStemMod()) });
+            attributes->push_back(std::make_pair("stem.mod", att->StemmodifierToStr(att->GetStemMod())));
         }
         if (att->HasStemPos()) {
-            attributes->push_back({ "stem.pos", att->StempositionToStr(att->GetStemPos()) });
-        }
-        if (att->HasStemSameas()) {
-            attributes->push_back({ "stem.sameas", att->StrToStr(att->GetStemSameas()) });
+            attributes->push_back(std::make_pair("stem.pos", att->StempositionToStr(att->GetStemPos())));
         }
         if (att->HasStemVisible()) {
-            attributes->push_back({ "stem.visible", att->BooleanToStr(att->GetStemVisible()) });
+            attributes->push_back(std::make_pair("stem.visible", att->BooleanToStr(att->GetStemVisible())));
         }
         if (att->HasStemX()) {
-            attributes->push_back({ "stem.x", att->DblToStr(att->GetStemX()) });
+            attributes->push_back(std::make_pair("stem.x", att->DblToStr(att->GetStemX())));
         }
         if (att->HasStemY()) {
-            attributes->push_back({ "stem.y", att->DblToStr(att->GetStemY()) });
+            attributes->push_back(std::make_pair("stem.y", att->DblToStr(att->GetStemY())));
         }
     }
     if (element->HasAttClass(ATT_SYLLOG)) {
         const AttSylLog *att = dynamic_cast<const AttSylLog *>(element);
         assert(att);
         if (att->HasCon()) {
-            attributes->push_back({ "con", att->SylLogConToStr(att->GetCon()) });
+            attributes->push_back(std::make_pair("con", att->SylLogConToStr(att->GetCon())));
         }
         if (att->HasWordpos()) {
-            attributes->push_back({ "wordpos", att->SylLogWordposToStr(att->GetWordpos()) });
+            attributes->push_back(std::make_pair("wordpos", att->SylLogWordposToStr(att->GetWordpos())));
         }
     }
     if (element->HasAttClass(ATT_SYLTEXT)) {
         const AttSylText *att = dynamic_cast<const AttSylText *>(element);
         assert(att);
         if (att->HasSyl()) {
-            attributes->push_back({ "syl", att->StrToStr(att->GetSyl()) });
+            attributes->push_back(std::make_pair("syl", att->StrToStr(att->GetSyl())));
         }
     }
     if (element->HasAttClass(ATT_SYSTEMS)) {
         const AttSystems *att = dynamic_cast<const AttSystems *>(element);
         assert(att);
         if (att->HasSystemLeftline()) {
-            attributes->push_back({ "system.leftline", att->BooleanToStr(att->GetSystemLeftline()) });
+            attributes->push_back(std::make_pair("system.leftline", att->BooleanToStr(att->GetSystemLeftline())));
         }
         if (att->HasSystemLeftmar()) {
-            attributes->push_back({ "system.leftmar", att->MeasurementabsToStr(att->GetSystemLeftmar()) });
+            attributes->push_back(std::make_pair("system.leftmar", att->MeasurementabsToStr(att->GetSystemLeftmar())));
         }
         if (att->HasSystemRightmar()) {
-            attributes->push_back({ "system.rightmar", att->MeasurementabsToStr(att->GetSystemRightmar()) });
+            attributes->push_back(std::make_pair("system.rightmar", att->MeasurementabsToStr(att->GetSystemRightmar())));
         }
         if (att->HasSystemTopmar()) {
-            attributes->push_back({ "system.topmar", att->MeasurementabsToStr(att->GetSystemTopmar()) });
+            attributes->push_back(std::make_pair("system.topmar", att->MeasurementabsToStr(att->GetSystemTopmar())));
         }
     }
     if (element->HasAttClass(ATT_TARGETEVAL)) {
         const AttTargetEval *att = dynamic_cast<const AttTargetEval *>(element);
         assert(att);
         if (att->HasEvaluate()) {
-            attributes->push_back({ "evaluate", att->TargetEvalEvaluateToStr(att->GetEvaluate()) });
+            attributes->push_back(std::make_pair("evaluate", att->TargetEvalEvaluateToStr(att->GetEvaluate())));
         }
     }
     if (element->HasAttClass(ATT_TEMPOLOG)) {
         const AttTempoLog *att = dynamic_cast<const AttTempoLog *>(element);
         assert(att);
         if (att->HasFunc()) {
-            attributes->push_back({ "func", att->TempoLogFuncToStr(att->GetFunc()) });
+            attributes->push_back(std::make_pair("func", att->TempoLogFuncToStr(att->GetFunc())));
         }
     }
     if (element->HasAttClass(ATT_TEXTRENDITION)) {
         const AttTextRendition *att = dynamic_cast<const AttTextRendition *>(element);
         assert(att);
         if (att->HasAltrend()) {
-            attributes->push_back({ "altrend", att->StrToStr(att->GetAltrend()) });
+            attributes->push_back(std::make_pair("altrend", att->StrToStr(att->GetAltrend())));
         }
         if (att->HasRend()) {
-            attributes->push_back({ "rend", att->TextrenditionToStr(att->GetRend()) });
+            attributes->push_back(std::make_pair("rend", att->TextrenditionToStr(att->GetRend())));
         }
     }
     if (element->HasAttClass(ATT_TEXTSTYLE)) {
         const AttTextStyle *att = dynamic_cast<const AttTextStyle *>(element);
         assert(att);
         if (att->HasTextFam()) {
-            attributes->push_back({ "text.fam", att->StrToStr(att->GetTextFam()) });
+            attributes->push_back(std::make_pair("text.fam", att->StrToStr(att->GetTextFam())));
         }
         if (att->HasTextName()) {
-            attributes->push_back({ "text.name", att->StrToStr(att->GetTextName()) });
+            attributes->push_back(std::make_pair("text.name", att->StrToStr(att->GetTextName())));
         }
         if (att->HasTextSize()) {
-            attributes->push_back({ "text.size", att->FontsizeToStr(att->GetTextSize()) });
+            attributes->push_back(std::make_pair("text.size", att->FontsizeToStr(att->GetTextSize())));
         }
         if (att->HasTextStyle()) {
-            attributes->push_back({ "text.style", att->FontstyleToStr(att->GetTextStyle()) });
+            attributes->push_back(std::make_pair("text.style", att->FontstyleToStr(att->GetTextStyle())));
         }
         if (att->HasTextWeight()) {
-            attributes->push_back({ "text.weight", att->FontweightToStr(att->GetTextWeight()) });
+            attributes->push_back(std::make_pair("text.weight", att->FontweightToStr(att->GetTextWeight())));
         }
     }
     if (element->HasAttClass(ATT_TIEPRESENT)) {
         const AttTiePresent *att = dynamic_cast<const AttTiePresent *>(element);
         assert(att);
         if (att->HasTie()) {
-            attributes->push_back({ "tie", att->TieToStr(att->GetTie()) });
+            attributes->push_back(std::make_pair("tie", att->TieToStr(att->GetTie())));
         }
     }
     if (element->HasAttClass(ATT_TIMESTAMPLOGICAL)) {
         const AttTimestampLogical *att = dynamic_cast<const AttTimestampLogical *>(element);
         assert(att);
         if (att->HasTstamp()) {
-            attributes->push_back({ "tstamp", att->DblToStr(att->GetTstamp()) });
+            attributes->push_back(std::make_pair("tstamp", att->DblToStr(att->GetTstamp())));
         }
     }
     if (element->HasAttClass(ATT_TIMESTAMP2LOGICAL)) {
         const AttTimestamp2Logical *att = dynamic_cast<const AttTimestamp2Logical *>(element);
         assert(att);
         if (att->HasTstamp2()) {
-            attributes->push_back({ "tstamp2", att->MeasurebeatToStr(att->GetTstamp2()) });
+            attributes->push_back(std::make_pair("tstamp2", att->MeasurebeatToStr(att->GetTstamp2())));
         }
     }
     if (element->HasAttClass(ATT_TRANSPOSITION)) {
         const AttTransposition *att = dynamic_cast<const AttTransposition *>(element);
         assert(att);
         if (att->HasTransDiat()) {
-            attributes->push_back({ "trans.diat", att->DblToStr(att->GetTransDiat()) });
+            attributes->push_back(std::make_pair("trans.diat", att->DblToStr(att->GetTransDiat())));
         }
         if (att->HasTransSemi()) {
-            attributes->push_back({ "trans.semi", att->DblToStr(att->GetTransSemi()) });
+            attributes->push_back(std::make_pair("trans.semi", att->DblToStr(att->GetTransSemi())));
         }
     }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {
         const AttTupletPresent *att = dynamic_cast<const AttTupletPresent *>(element);
         assert(att);
         if (att->HasTuplet()) {
-            attributes->push_back({ "tuplet", att->StrToStr(att->GetTuplet()) });
+            attributes->push_back(std::make_pair("tuplet", att->StrToStr(att->GetTuplet())));
         }
     }
     if (element->HasAttClass(ATT_TYPED)) {
         const AttTyped *att = dynamic_cast<const AttTyped *>(element);
         assert(att);
         if (att->HasType()) {
-            attributes->push_back({ "type", att->StrToStr(att->GetType()) });
+            attributes->push_back(std::make_pair("type", att->StrToStr(att->GetType())));
         }
     }
     if (element->HasAttClass(ATT_TYPOGRAPHY)) {
         const AttTypography *att = dynamic_cast<const AttTypography *>(element);
         assert(att);
         if (att->HasFontfam()) {
-            attributes->push_back({ "fontfam", att->StrToStr(att->GetFontfam()) });
+            attributes->push_back(std::make_pair("fontfam", att->StrToStr(att->GetFontfam())));
         }
         if (att->HasFontname()) {
-            attributes->push_back({ "fontname", att->StrToStr(att->GetFontname()) });
+            attributes->push_back(std::make_pair("fontname", att->StrToStr(att->GetFontname())));
         }
         if (att->HasFontsize()) {
-            attributes->push_back({ "fontsize", att->FontsizeToStr(att->GetFontsize()) });
+            attributes->push_back(std::make_pair("fontsize", att->FontsizeToStr(att->GetFontsize())));
         }
         if (att->HasFontstyle()) {
-            attributes->push_back({ "fontstyle", att->FontstyleToStr(att->GetFontstyle()) });
+            attributes->push_back(std::make_pair("fontstyle", att->FontstyleToStr(att->GetFontstyle())));
         }
         if (att->HasFontweight()) {
-            attributes->push_back({ "fontweight", att->FontweightToStr(att->GetFontweight()) });
+            attributes->push_back(std::make_pair("fontweight", att->FontweightToStr(att->GetFontweight())));
         }
     }
     if (element->HasAttClass(ATT_VERTICALALIGN)) {
         const AttVerticalAlign *att = dynamic_cast<const AttVerticalAlign *>(element);
         assert(att);
         if (att->HasValign()) {
-            attributes->push_back({ "valign", att->VerticalalignmentToStr(att->GetValign()) });
+            attributes->push_back(std::make_pair("valign", att->VerticalalignmentToStr(att->GetValign())));
         }
     }
     if (element->HasAttClass(ATT_VERTICALGROUP)) {
         const AttVerticalGroup *att = dynamic_cast<const AttVerticalGroup *>(element);
         assert(att);
         if (att->HasVgrp()) {
-            attributes->push_back({ "vgrp", att->IntToStr(att->GetVgrp()) });
+            attributes->push_back(std::make_pair("vgrp", att->IntToStr(att->GetVgrp())));
         }
     }
     if (element->HasAttClass(ATT_VISIBILITY)) {
         const AttVisibility *att = dynamic_cast<const AttVisibility *>(element);
         assert(att);
         if (att->HasVisible()) {
-            attributes->push_back({ "visible", att->BooleanToStr(att->GetVisible()) });
+            attributes->push_back(std::make_pair("visible", att->BooleanToStr(att->GetVisible())));
         }
     }
     if (element->HasAttClass(ATT_VISUALOFFSETHO)) {
         const AttVisualOffsetHo *att = dynamic_cast<const AttVisualOffsetHo *>(element);
         assert(att);
         if (att->HasHo()) {
-            attributes->push_back({ "ho", att->MeasurementrelToStr(att->GetHo()) });
+            attributes->push_back(std::make_pair("ho", att->MeasurementrelToStr(att->GetHo())));
         }
     }
     if (element->HasAttClass(ATT_VISUALOFFSETTO)) {
         const AttVisualOffsetTo *att = dynamic_cast<const AttVisualOffsetTo *>(element);
         assert(att);
         if (att->HasTo()) {
-            attributes->push_back({ "to", att->DblToStr(att->GetTo()) });
+            attributes->push_back(std::make_pair("to", att->DblToStr(att->GetTo())));
         }
     }
     if (element->HasAttClass(ATT_VISUALOFFSETVO)) {
         const AttVisualOffsetVo *att = dynamic_cast<const AttVisualOffsetVo *>(element);
         assert(att);
         if (att->HasVo()) {
-            attributes->push_back({ "vo", att->MeasurementrelToStr(att->GetVo()) });
+            attributes->push_back(std::make_pair("vo", att->MeasurementrelToStr(att->GetVo())));
         }
     }
     if (element->HasAttClass(ATT_VISUALOFFSET2HO)) {
         const AttVisualOffset2Ho *att = dynamic_cast<const AttVisualOffset2Ho *>(element);
         assert(att);
         if (att->HasStartho()) {
-            attributes->push_back({ "startho", att->MeasurementrelToStr(att->GetStartho()) });
+            attributes->push_back(std::make_pair("startho", att->MeasurementrelToStr(att->GetStartho())));
         }
         if (att->HasEndho()) {
-            attributes->push_back({ "endho", att->MeasurementrelToStr(att->GetEndho()) });
+            attributes->push_back(std::make_pair("endho", att->MeasurementrelToStr(att->GetEndho())));
         }
     }
     if (element->HasAttClass(ATT_VISUALOFFSET2TO)) {
         const AttVisualOffset2To *att = dynamic_cast<const AttVisualOffset2To *>(element);
         assert(att);
         if (att->HasStartto()) {
-            attributes->push_back({ "startto", att->DblToStr(att->GetStartto()) });
+            attributes->push_back(std::make_pair("startto", att->DblToStr(att->GetStartto())));
         }
         if (att->HasEndto()) {
-            attributes->push_back({ "endto", att->DblToStr(att->GetEndto()) });
+            attributes->push_back(std::make_pair("endto", att->DblToStr(att->GetEndto())));
         }
     }
     if (element->HasAttClass(ATT_VISUALOFFSET2VO)) {
         const AttVisualOffset2Vo *att = dynamic_cast<const AttVisualOffset2Vo *>(element);
         assert(att);
         if (att->HasStartvo()) {
-            attributes->push_back({ "startvo", att->MeasurementrelToStr(att->GetStartvo()) });
+            attributes->push_back(std::make_pair("startvo", att->MeasurementrelToStr(att->GetStartvo())));
         }
         if (att->HasEndvo()) {
-            attributes->push_back({ "endvo", att->MeasurementrelToStr(att->GetEndvo()) });
+            attributes->push_back(std::make_pair("endvo", att->MeasurementrelToStr(att->GetEndvo())));
         }
     }
     if (element->HasAttClass(ATT_VOLTAGROUPINGSYM)) {
         const AttVoltaGroupingSym *att = dynamic_cast<const AttVoltaGroupingSym *>(element);
         assert(att);
         if (att->HasVoltasym()) {
-            attributes->push_back({ "voltasym", att->VoltaGroupingSymVoltasymToStr(att->GetVoltasym()) });
+            attributes->push_back(std::make_pair("voltasym", att->VoltaGroupingSymVoltasymToStr(att->GetVoltasym())));
         }
     }
     if (element->HasAttClass(ATT_WHITESPACE)) {
         const AttWhitespace *att = dynamic_cast<const AttWhitespace *>(element);
         assert(att);
         if (att->HasSpace()) {
-            attributes->push_back({ "xml:space", att->StrToStr(att->GetSpace()) });
+            attributes->push_back(std::make_pair("xml:space", att->StrToStr(att->GetSpace())));
         }
     }
     if (element->HasAttClass(ATT_WIDTH)) {
         const AttWidth *att = dynamic_cast<const AttWidth *>(element);
         assert(att);
         if (att->HasWidth()) {
-            attributes->push_back({ "width", att->MeasurementabsToStr(att->GetWidth()) });
+            attributes->push_back(std::make_pair("width", att->MeasurementabsToStr(att->GetWidth())));
         }
     }
     if (element->HasAttClass(ATT_XY)) {
         const AttXy *att = dynamic_cast<const AttXy *>(element);
         assert(att);
         if (att->HasX()) {
-            attributes->push_back({ "x", att->DblToStr(att->GetX()) });
+            attributes->push_back(std::make_pair("x", att->DblToStr(att->GetX())));
         }
         if (att->HasY()) {
-            attributes->push_back({ "y", att->DblToStr(att->GetY()) });
+            attributes->push_back(std::make_pair("y", att->DblToStr(att->GetY())));
         }
     }
     if (element->HasAttClass(ATT_XY2)) {
         const AttXy2 *att = dynamic_cast<const AttXy2 *>(element);
         assert(att);
         if (att->HasX2()) {
-            attributes->push_back({ "x2", att->DblToStr(att->GetX2()) });
+            attributes->push_back(std::make_pair("x2", att->DblToStr(att->GetX2())));
         }
         if (att->HasY2()) {
-            attributes->push_back({ "y2", att->DblToStr(att->GetY2()) });
+            attributes->push_back(std::make_pair("y2", att->DblToStr(att->GetY2())));
         }
     }
 }
