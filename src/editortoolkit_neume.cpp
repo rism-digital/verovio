@@ -2005,10 +2005,13 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *fparent = NULL;
     Object *sparent = NULL;
     Object *currentParent = NULL;
+    Object *newParent = NULL;
+    Object *ligParent = NULL;
     Nc *firstNc = NULL;
     Nc *secondNc = NULL;
     bool success1, success2;
     int ligCount = 0;
+    int ligNum = 0; // for ligature in ungroupNcs
     bool firstIsSyl = false;
     Clef *oldClef = NULL;
     ClassIdComparison ac(CLEF);
@@ -2125,21 +2128,34 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             }
         }
         else if (currentParent) {
-            if (groupType == "nc") {
-                Nc *nc = dynamic_cast<Nc *>(el);
-                assert(nc);
-                if (nc->HasLigated()) continue;
-            }
-
+            
             // if the element is a syl then we want to keep it attached to the first node
-
             if (el->Is(SYL)) {
                 continue;
             }
-            Object *newParent = currentParent->Clone();
-            newParent->CloneReset();
-            assert(newParent);
-            newParent->ClearChildren();
+
+            if (groupType == "nc") {
+                Nc *nc = dynamic_cast<Nc *>(el);
+                assert(nc);
+                // if (nc->HasLigated()) continue;
+                if (nc->HasLigated()) ligNum++;
+            }
+
+            if (ligNum != 2) {
+                // no ligature or the first nc in the ligature
+                // init new parent
+                newParent = currentParent->Clone();
+                newParent->CloneReset();
+                assert(newParent);
+                newParent->ClearChildren();
+    
+            } else {
+                // if it is the second nc in the ligature, use saved parent
+                newParent = ligParent->Clone();
+                newParent->CloneReset();
+                assert(newParent);
+                ligNum = 0;
+            }
 
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
@@ -2217,6 +2233,14 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 }
             }
             uuidArray << newParent->GetUuid();
+            
+            if (ligNum == 1) {
+                // if it is the first nc in the ligature, save the parent
+                ligParent = newParent->Clone();
+                ligParent->CloneReset();
+                assert(ligParent);
+                continue;
+            }
 
             sparent->AddChild(newParent);
             sparent->ReorderByXPos();
