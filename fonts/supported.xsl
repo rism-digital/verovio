@@ -2129,10 +2129,10 @@ a            <glyph glyph-code="E5BF" smufl-name="ornamentPrecompCadenceWithTurn
             <!--<glyph glyph-code="E8F0" smufl-name="chantStaff"/>-->
             <!--<glyph glyph-code="E8F1" smufl-name="chantStaffWide"/>-->
             <!--<glyph glyph-code="E8F2" smufl-name="chantStaffNarrow"/>-->
-            <!--<glyph glyph-code="E8F3" smufl-name="chantDivisioMinima"/>-->
-            <!--<glyph glyph-code="E8F4" smufl-name="chantDivisioMaior"/>-->
-            <!--<glyph glyph-code="E8F5" smufl-name="chantDivisioMaxima"/>-->
-            <!--<glyph glyph-code="E8F6" smufl-name="chantDivisioFinalis"/>-->
+            <glyph glyph-code="E8F3" smufl-name="chantDivisioMinima"/>
+            <glyph glyph-code="E8F4" smufl-name="chantDivisioMaior"/>
+            <glyph glyph-code="E8F5" smufl-name="chantDivisioMaxima"/>
+            <glyph glyph-code="E8F6" smufl-name="chantDivisioFinalis"/>
             <!--<glyph glyph-code="E8F7" smufl-name="chantVirgula"/>-->
             <!--<glyph glyph-code="E8F8" smufl-name="chantCaesura"/>-->
             <range_end>U+E8FF</range_end>
