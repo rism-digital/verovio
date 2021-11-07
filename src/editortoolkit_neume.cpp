@@ -18,6 +18,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "accid.h"
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
@@ -558,6 +559,20 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             fi->GetZone()->ShiftByXY(x, -y);
         }
     }
+    else if (element->Is(ACCID)) {
+        Accid *accid = dynamic_cast<Accid *>(element);
+        if (!accid->HasFacs()) {
+            LogError("Accid dragging is only supported for accid with facsimiles!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Accid dragging is only supported for accid with facsimiles.");
+            return false;
+        }
+        FacsimileInterface *fi = (*accid).GetFacsimileInterface();
+        assert(fi);
+        if (fi->GetZone() != NULL) {
+            fi->GetZone()->ShiftByXY(x, -y);
+        }
+    }
     else {
         LogWarning("Unsupported element for dragging.");
         m_infoObject.import("status", "FAILURE");
@@ -941,6 +956,53 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             return false;
         }
         m_infoObject.import("uuid", custos->GetUuid());
+    }
+    else if(elementType == "accid"){
+        Accid *accid = new Accid();
+        data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
+
+        for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+            if (it->first == "accid") {
+                if (it->second == "f") {
+                    accidTypeW = ACCIDENTAL_WRITTEN_f;
+                    break;
+                }
+                else if (it->second == "n") {
+                    accidTypeW = ACCIDENTAL_WRITTEN_n;
+                    break;
+                }
+            }
+        }
+        if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
+            LogError("A accid type must be specified.");
+            delete accid;
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "A accid type must be specified.");
+            return false;
+        }
+
+        accid->SetAccid(accidTypeW);
+        zone->SetUlx(ulx);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        surface->AddChild(zone);
+        accid->SetZone(zone);
+        layer->AddChild(accid);
+        
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        ulx -= noteWidth / 2;
+        uly -= noteHeight / 2;
+
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth);
+        zone->SetLry(uly + noteHeight);
+        layer->ReorderByXPos();
+
+        m_infoObject.import("uuid", accid->GetUuid());
+        
     }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
@@ -1943,10 +2005,13 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *fparent = NULL;
     Object *sparent = NULL;
     Object *currentParent = NULL;
+    Object *newParent = NULL;
+    Object *ligParent = NULL;
     Nc *firstNc = NULL;
     Nc *secondNc = NULL;
     bool success1, success2;
     int ligCount = 0;
+    int ligNum = 0; // for ligature in ungroupNcs
     bool firstIsSyl = false;
     Clef *oldClef = NULL;
     ClassIdComparison ac(CLEF);
@@ -2063,21 +2128,34 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             }
         }
         else if (currentParent) {
-            if (groupType == "nc") {
-                Nc *nc = dynamic_cast<Nc *>(el);
-                assert(nc);
-                if (nc->HasLigated()) continue;
-            }
-
+            
             // if the element is a syl then we want to keep it attached to the first node
-
             if (el->Is(SYL)) {
                 continue;
             }
-            Object *newParent = currentParent->Clone();
-            newParent->CloneReset();
-            assert(newParent);
-            newParent->ClearChildren();
+
+            if (groupType == "nc") {
+                Nc *nc = dynamic_cast<Nc *>(el);
+                assert(nc);
+                // if (nc->HasLigated()) continue;
+                if (nc->HasLigated()) ligNum++;
+            }
+
+            if (ligNum != 2) {
+                // no ligature or the first nc in the ligature
+                // init new parent
+                newParent = currentParent->Clone();
+                newParent->CloneReset();
+                assert(newParent);
+                newParent->ClearChildren();
+    
+            } else {
+                // if it is the second nc in the ligature, use saved parent
+                newParent = ligParent->Clone();
+                newParent->CloneReset();
+                assert(newParent);
+                ligNum = 0;
+            }
 
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
@@ -2155,6 +2233,14 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 }
             }
             uuidArray << newParent->GetUuid();
+            
+            if (ligNum == 1) {
+                // if it is the first nc in the ligature, save the parent
+                ligParent = newParent->Clone();
+                ligParent->CloneReset();
+                assert(ligParent);
+                continue;
+            }
 
             sparent->AddChild(newParent);
             sparent->ReorderByXPos();
@@ -2400,13 +2486,21 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
-        LogError("Element is of type %s, but only Syllables, Custos, and Clefs can change staves.",
+    // if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(ACCID))) {
+    //     LogError("Element is of type %s, but only Syllables, Custos, Clefs, and Accids can change staves.",
+    //         element->GetClassName().c_str());
+    //     m_infoObject.import("status", "FAILURE");
+    //     m_infoObject.import("message",
+    //         "Element is of type " + element->GetClassName()
+    //             + ", but only Syllables, Custos, Clefs, and Accids can change staves.");
+    //     return false;
+        if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
+        LogError("Element is of type %s, but only Syllables, Custos, Clefs, and Accids can change staves.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",
             "Element is of type " + element->GetClassName()
-                + ", but only Syllables, Custos, and Clefs can change staves.");
+                + ", but only Syllables, Custos, Clefs, and Accids can change staves.");
         return false;
     }
 
@@ -2542,7 +2636,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             pi->AdjustPitchForNewClef(previousClefAfter, clef);
         }
     }
-    // custos or syllable
+    // custos or syllable or accid
     else {
         element->MoveItselfTo(layer);
         layer->ReorderByXPos();

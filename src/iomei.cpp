@@ -1438,12 +1438,14 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     }
 
     WriteLayerElement(currentNode, accid);
+    WriteFacsimileInterface(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGestural(currentNode);
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
+
 }
 
 void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
@@ -4553,6 +4555,7 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     ReadLayerElement(accid, vrvAccid);
 
     ReadPositionInterface(accid, vrvAccid);
+    ReadFacsimileInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGestural(accid);
     vrvAccid->ReadAccidLog(accid);

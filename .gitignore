@@ -34,7 +34,6 @@ emscripten/data/
 emscripten/build/
 emscripten/CMakeFiles/
 emscripten/CMakeCache.txt
-emscripten/emsdk
 emscripten/testNeon.sh
 
 # python build
@@ -71,6 +70,7 @@ output.svg
 output.mei
 index.js
 emscripten/npm-dev/node_modules
+emscripten/testNeon.sh
 
 # VS Code files
 .vscode/settings.json
