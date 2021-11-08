@@ -88,7 +88,7 @@ bool Dir::AreChildrenAlignedTo(data_HORIZONTALALIGNMENT alignment) const
 // Dir functor methods
 //----------------------------------------------------------------------------
 
-int Dir::PrepareFloatingGrps(FunctorParams *functorParams)
+int Dir::PrepareFloatingGrps(FunctorParams *)
 {
     if (this->HasVgrp()) {
         this->SetDrawingGrpId(-this->GetVgrp());

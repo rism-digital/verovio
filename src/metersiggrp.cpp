@@ -168,7 +168,7 @@ void MeterSigGrp::SetMeasureBasedCount(Measure *measure)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSigGrp::AlignHorizontally(FunctorParams *functorParams)
+int MeterSigGrp::AlignHorizontally(FunctorParams *)
 {
     return this->IsScoreDefElement() ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
 }

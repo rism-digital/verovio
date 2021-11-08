@@ -69,7 +69,7 @@ bool Reh::IsSupportedChild(Object *child)
 // Reh functor methods
 //----------------------------------------------------------------------------
 
-int Reh::ResolveRehPosition(FunctorParams *functorParams)
+int Reh::ResolveRehPosition(FunctorParams *)
 {
     if (!this->HasStart() && !this->HasTstamp()) {
         Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));

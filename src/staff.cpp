@@ -647,7 +647,7 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::CalcStem(FunctorParams *functorParams)
+int Staff::CalcStem(FunctorParams *)
 {
     ClassIdComparison isLayer(LAYER);
     ListOfObjects layers;

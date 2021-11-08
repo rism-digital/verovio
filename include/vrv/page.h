@@ -173,6 +173,11 @@ public:
     int AlignSystemsEnd(FunctorParams *functorParams) override;
     ///@}
 
+    /**
+     * See Object::CastOffPages
+     */
+    int CastOffPagesEnd(FunctorParams *functorParams) override;
+
 private:
     /**
      * Adjust the horizontal postition of the syl processing verse by verse

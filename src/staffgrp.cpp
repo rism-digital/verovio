@@ -220,7 +220,7 @@ LabelAbbr *StaffGrp::GetLabelAbbrCopy()
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
 
-int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *functorParams)
+int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
 {
     this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
