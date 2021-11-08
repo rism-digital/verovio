@@ -2329,6 +2329,18 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
             }
         }
 
+        // Skip if layer number is outside given bounds
+        int layerN = this->GetAlignmentLayerN();
+        if (layerN < 0) {
+            layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
+        }
+        if (params->m_minLayerN && (params->m_minLayerN > layerN)) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_maxLayerN && (params->m_maxLayerN < layerN)) {
+            return FUNCTOR_CONTINUE;
+        }
+
         params->m_elements.push_back(this);
     }
 

@@ -108,11 +108,101 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     else if (endStaff && (endStaff != staff)) {
         staffNumbers.emplace(endStaff->GetN());
     }
-
     findSpannedLayerElementsParams.m_staffNs = staffNumbers;
+
+    // Run the search without layer bounds
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
     container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+
+    // Now determine the minimal and maximal layer
+    std::set<int> layersN;
+    for (LayerElement *element : { this->GetStart(), this->GetEnd() }) {
+        int layerN = element->GetAlignmentLayerN();
+        if (layerN < 0) {
+            layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
+        }
+        layersN.insert(layerN);
+    }
+    const int minLayerN = *layersN.begin();
+    const int maxLayerN = *layersN.rbegin();
+
+    // Check whether outside layers exist
+    const bool hasOutsideLayers = std::any_of(findSpannedLayerElementsParams.m_elements.cbegin(),
+        findSpannedLayerElementsParams.m_elements.cend(), [minLayerN, maxLayerN](LayerElement *element) {
+            int layerN = element->GetAlignmentLayerN();
+            if (layerN < 0) {
+                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
+            }
+            return ((layerN < minLayerN) || (layerN > maxLayerN));
+        });
+
+    if (hasOutsideLayers) {
+        // Filter all notes, also include the notes of the start and end of the slur
+        ListOfObjects notes;
+        std::copy_if(findSpannedLayerElementsParams.m_elements.cbegin(),
+            findSpannedLayerElementsParams.m_elements.cend(), std::back_inserter(notes),
+            [](LayerElement *element) { return element->Is(NOTE); });
+        ClassIdComparison cmp(NOTE);
+        if (this->GetStart()->Is(NOTE)) {
+            notes.push_back(this->GetStart());
+        }
+        else {
+            this->GetStart()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+        }
+        if (this->GetEnd()->Is(NOTE)) {
+            notes.push_back(this->GetEnd());
+        }
+        else {
+            this->GetEnd()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+        }
+
+        // Determine the minimal and maximal diatonic pitch
+        int minPitch = 1000;
+        int maxPitch = 0;
+        for (Object *object : notes) {
+            Note *note = vrv_cast<Note *>(object);
+            assert(note);
+            int layerN = note->GetAlignmentLayerN();
+            if (layerN < 0) {
+                layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
+            }
+            if (layerN == maxLayerN) {
+                minPitch = std::min(note->GetDiatonicPitch(), minPitch);
+            }
+            if (layerN == minLayerN) {
+                maxPitch = std::max(note->GetDiatonicPitch(), maxPitch);
+            }
+        }
+
+        // Check if voices are separated
+        const bool layersAreSeparated
+            = std::all_of(notes.cbegin(), notes.cend(), [minLayerN, maxLayerN, minPitch, maxPitch](Object *object) {
+                  Note *note = vrv_cast<Note *>(object);
+                  int layerN = note->GetAlignmentLayerN();
+                  if (layerN < 0) {
+                      layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
+                  }
+                  if (layerN < minLayerN) {
+                      return (note->GetDiatonicPitch() > maxPitch);
+                  }
+                  if (layerN > maxLayerN) {
+                      return (note->GetDiatonicPitch() < minPitch);
+                  }
+                  return true;
+              });
+
+        // For separated voices rerun the search with layer bounds
+        if (layersAreSeparated) {
+            findSpannedLayerElementsParams.m_elements.clear();
+            findSpannedLayerElementsParams.m_inMeasureRange
+                = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
+            findSpannedLayerElementsParams.m_minLayerN = minLayerN;
+            findSpannedLayerElementsParams.m_maxLayerN = maxLayerN;
+            container->Process(
+                &findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+        }
+    }
 
     return findSpannedLayerElementsParams.m_elements;
 }
