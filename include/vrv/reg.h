@@ -26,9 +26,9 @@ public:
     ///@{
     Reg();
     virtual ~Reg();
-    virtual Object *Clone() const { return new Reg(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Reg"; }
+    Object *Clone() const override { return new Reg(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Reg"; }
     ///@}
 
 private:

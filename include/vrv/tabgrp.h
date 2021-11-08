@@ -29,21 +29,21 @@ public:
     ///@{
     TabGrp();
     virtual ~TabGrp();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "TabGrp"; };
+    void Reset() override;
+    std::string GetClassName() const override { return "TabGrp"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
     ///@}
 
     /**
      * Add an element to a element.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
 protected:
     //

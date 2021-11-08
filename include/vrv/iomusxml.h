@@ -174,7 +174,7 @@ public:
     virtual ~MusicXmlInput();
 
 #ifndef NO_MUSICXML_SUPPORT
-    virtual bool Import(std::string const &musicxml);
+    bool Import(const std::string &musicxml) override;
 
 private:
     /*

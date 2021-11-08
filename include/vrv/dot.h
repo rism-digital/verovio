@@ -28,20 +28,20 @@ public:
     ///@{
     Dot();
     virtual ~Dot();
-    virtual Object *Clone() const { return new Dot(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Dot"; }
+    Object *Clone() const override { return new Dot(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Dot"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     //----------//
     // Functors //
@@ -50,17 +50,17 @@ public:
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
+    int PreparePointersByLayer(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
 private:
     //

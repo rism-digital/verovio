@@ -29,16 +29,16 @@ public:
     ///@{
     Space();
     virtual ~Space();
-    virtual Object *Clone() const { return new Space(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Space"; }
+    Object *Clone() const override { return new Space(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Space"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
     ///@}
 
     //----------//

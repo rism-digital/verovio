@@ -43,12 +43,12 @@ public:
     /**
      * Do not copy children for HorizontalAligner
      */
-    virtual bool CopyChildren() const { return false; }
+    bool CopyChildren() const override { return false; }
 
     /**
      * Reset the aligner (clear the content) and creates the end (bottom) alignement
      */
-    virtual void Reset();
+    void Reset() override;
 
     /**
      * Get bottom StaffAlignment for the system.
@@ -288,42 +288,42 @@ public:
     /**
      * See Object::AlignVertically
      */
-    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+    int AlignVerticallyEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustYPos
      */
-    virtual int AdjustYPos(FunctorParams *functorParams);
+    int AdjustYPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustStaffOverlap
      */
-    virtual int AdjustStaffOverlap(FunctorParams *functorParams);
+    int AdjustStaffOverlap(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustFloatingPositioners
      */
-    virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
+    int AdjustFloatingPositioners(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustFloatingPositionersBetween
      */
-    virtual int AdjustFloatingPositionersBetween(FunctorParams *functorParams);
+    int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustFloatingPositionerGrps
      */
-    virtual int AdjustFloatingPositionerGrps(FunctorParams *functorParams);
+    int AdjustFloatingPositionerGrps(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustSlurs
      */
-    virtual int AdjustSlurs(FunctorParams *functorParams);
+    int AdjustSlurs(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyY
      */
-    virtual int JustifyY(FunctorParams *functorParams);
+    int JustifyY(FunctorParams *functorParams) override;
 
 private:
     /**

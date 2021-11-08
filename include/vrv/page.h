@@ -38,15 +38,15 @@ public:
     ///@{
     Page();
     virtual ~Page();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Page"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Page"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -141,42 +141,42 @@ public:
     /**
      * See Object::ScoreDefSetCurrentPage
      */
-    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams);
+    int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnscoreDefSetCurrent
      */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
     /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
-    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignVertically
      */
     ///@{
-    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+    int AlignVerticallyEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AlignSystems
      */
     ///@{
-    virtual int AlignSystems(FunctorParams *functorParams);
-    virtual int AlignSystemsEnd(FunctorParams *functorParams);
+    int AlignSystems(FunctorParams *functorParams) override;
+    int AlignSystemsEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::CastOffPages
      */
-    virtual int CastOffPagesEnd(FunctorParams *functorParams);
+    int CastOffPagesEnd(FunctorParams *functorParams) override;
 
 private:
     /**

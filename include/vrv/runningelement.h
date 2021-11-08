@@ -36,20 +36,20 @@ public:
     RunningElement(ClassId classId);
     RunningElement(ClassId classId, const std::string &classIdStr);
     virtual ~RunningElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Disable cloning of the running elements (for now?).
      * It does not make sense you carry copying the running element across the systems.
      */
-    virtual Object *Clone() const { return NULL; }
+    Object *Clone() const override { return NULL; }
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -64,8 +64,8 @@ public:
      * @name Get and set the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     int GetWidth() const;
@@ -134,15 +134,15 @@ public:
      * See Object::Save
      */
     ///@{
-    virtual int Save(FunctorParams *functorParams);
-    virtual int SaveEnd(FunctorParams *functorParams);
+    int Save(FunctorParams *functorParams) override;
+    int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AlignVertically
      */
     ///@{
-    virtual int AlignVertically(FunctorParams *functorParams);
+    int AlignVertically(FunctorParams *functorParams) override;
     ///@}
 
 protected:
@@ -150,7 +150,7 @@ protected:
      * Filter the list for a specific class.
      * Keep only the top <rend> and <fig>
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 private:
     /**

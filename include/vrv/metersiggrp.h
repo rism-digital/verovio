@@ -42,23 +42,23 @@ public:
     ///@{
     MeterSigGrp();
     virtual ~MeterSigGrp();
-    virtual Object *Clone() const { return new MeterSigGrp(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MeterSigGrp"; }
+    Object *Clone() const override { return new MeterSigGrp(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MeterSigGrp"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual LinkingInterface *GetLinkingInterface() { return this; }
+    LinkingInterface *GetLinkingInterface() override { return this; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -82,13 +82,13 @@ public:
     /**
      * See Object::AlignHorizontally
      */
-    int AlignHorizontally(FunctorParams *functorParams);
+    int AlignHorizontally(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only meterSigGrp elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 private:
     // vector with alternating measures to be used only with meterSigGrpLog_FUNC_alternating

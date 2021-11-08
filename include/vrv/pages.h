@@ -32,15 +32,15 @@ public:
     ///@{
     Pages();
     virtual ~Pages();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Pages"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Pages"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**

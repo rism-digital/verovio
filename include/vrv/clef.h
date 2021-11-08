@@ -39,16 +39,16 @@ public:
     ///@{
     Clef();
     virtual ~Clef();
-    virtual Object *Clone() const { return new Clef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Clef"; }
+    Object *Clone() const override { return new Clef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Clef"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /** Override the method since check is required */
-    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
+    bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /**
      * Return the offset of the clef
@@ -71,12 +71,12 @@ public:
     /**
      * See Object::AdjustBeams
      */
-    virtual int AdjustBeams(FunctorParams *functorParams);
+    int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustClefChanges
      */
-    virtual int AdjustClefChanges(FunctorParams *functorParams);
+    int AdjustClefChanges(FunctorParams *functorParams) override;
 
 private:
 public:

@@ -30,25 +30,25 @@ public:
     ///@{
     Custos();
     virtual ~Custos();
-    virtual Object *Clone() const { return new Custos(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Custos"; }
+    Object *Clone() const override { return new Custos(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Custos"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add an accid to a custos.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //
@@ -57,12 +57,12 @@ public:
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
 private:
     //

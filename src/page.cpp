@@ -509,9 +509,8 @@ void Page::LayOutVertically()
     this->Process(&adjustFloatingPositionersBetween, &adjustFloatingPositionersBetweenParams);
 
     Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
-    Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);
-    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
+    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams);
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlursParams.m_crossStaffSlurs) {

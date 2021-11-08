@@ -32,16 +32,16 @@ public:
     ///@{
     Expansion();
     virtual ~Expansion();
-    virtual Object *Clone() const { return new Expansion(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Expansion"; }
+    Object *Clone() const override { return new Expansion(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Expansion"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
     ////@}
 
     //----------//

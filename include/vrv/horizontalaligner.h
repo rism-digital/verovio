@@ -75,7 +75,7 @@ public:
     Alignment();
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
@@ -86,7 +86,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Set and get the xRel value of the alignment
@@ -202,44 +202,44 @@ public:
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    virtual int SetAlignmentXPos(FunctorParams *functorParams);
+    int SetAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX(FunctorParams *functorParams);
+    int JustifyX(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArpeg
      */
-    virtual int AdjustArpeg(FunctorParams *functorParams);
+    int AdjustArpeg(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustGraceXPos
      */
     ///@{
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
-    virtual int AdjustGraceXPosEnd(FunctorParams *functorParams);
+    int AdjustGraceXPos(FunctorParams *functorParams) override;
+    int AdjustGraceXPosEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AdjustXPos
      */
     ///@{
-    virtual int AdjustXPos(FunctorParams *functorParams);
-    virtual int AdjustXPosEnd(FunctorParams *functorParams);
+    int AdjustXPos(FunctorParams *functorParams) override;
+    int AdjustXPosEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *functorParams);
+    int AdjustAccidX(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustDotsEnd
      */
-    virtual int AdjustDotsEnd(FunctorParams *);
+    int AdjustDotsEnd(FunctorParams *functorParams) override;
 
 private:
     /**
@@ -298,18 +298,18 @@ public:
     AlignmentReference();
     AlignmentReference(int staffN);
     virtual ~AlignmentReference();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Override the method of adding AlignmentReference children
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for AlignmentReference children
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * Add an accidental to the accidSpace of the AlignmentReference.
@@ -338,23 +338,23 @@ public:
     /**
      * See Object::AdjustLayers
      */
-    virtual int AdjustLayers(FunctorParams *functorParams);
-    virtual int AdjustLayersEnd(FunctorParams *functorParams);
+    int AdjustLayers(FunctorParams *functorParams) override;
+    int AdjustLayersEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustGraceXPos
      */
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    int AdjustGraceXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *functorParams);
+    int AdjustAccidX(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnscoreDefSetCurrent
      */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
 private:
     //
@@ -390,13 +390,13 @@ public:
     ///@(
     HorizontalAligner(ClassId classId);
     virtual ~HorizontalAligner();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Do not copy children for HorizontalAligner
      */
-    virtual bool CopyChildren() const { return false; }
+    bool CopyChildren() const override { return false; }
 
     int GetAlignmentCount() const { return (int)GetChildren()->size(); }
 
@@ -440,7 +440,7 @@ public:
     ///@(
     MeasureAligner();
     virtual ~MeasureAligner();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
@@ -522,13 +522,13 @@ public:
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    virtual int SetAlignmentXPos(FunctorParams *functorParams);
+    int SetAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX(FunctorParams *functorParams);
+    int JustifyX(FunctorParams *functorParams) override;
 
 private:
     //
@@ -576,7 +576,7 @@ public:
     ///@(
     GraceAligner();
     virtual ~GraceAligner();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
@@ -660,7 +660,7 @@ public:
     /**
      * Reset the aligner (clear the content)
      */
-    virtual void Reset();
+    void Reset() override;
 
     /**
      * Look for an existing TimestampAttr at a certain time.

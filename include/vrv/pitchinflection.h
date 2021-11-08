@@ -29,17 +29,17 @@ public:
     ///@{
     PitchInflection();
     virtual ~PitchInflection();
-    virtual Object *Clone() const { return new PitchInflection(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "PitchInflection"; }
+    Object *Clone() const override { return new PitchInflection(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "PitchInflection"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     //----------//

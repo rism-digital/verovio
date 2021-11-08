@@ -812,7 +812,7 @@ void SvgDeviceContext::EndText()
 
 // draw text element with optional parameters to specify the bounding box of the text
 // if the bounding box is specified then append a rect child
-void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
+void SvgDeviceContext::DrawText(const std::string &text, const std::wstring &wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 

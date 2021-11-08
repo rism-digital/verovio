@@ -34,18 +34,18 @@ public:
     ///@{
     Ligature();
     virtual ~Ligature();
-    virtual Object *Clone() const { return new Ligature(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Ligature"; }
+    Object *Clone() const override { return new Ligature(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Ligature"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add children (notes or editorial markup)
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Return the first or last note
@@ -70,12 +70,12 @@ public:
     /**
      * See Object::CalcLigatureNotePos
      */
-    virtual int CalcLigatureNotePos(FunctorParams *functorParams);
+    int CalcLigatureNotePos(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -86,7 +86,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ArrayOfObjects *childlist);
+    void FilterList(ArrayOfObjects *childList) override;
 
 public:
     /**
