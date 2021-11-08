@@ -32,6 +32,9 @@ struct ControlPointConstraint {
     double c;
 };
 
+// Helper enum classes
+enum class PortatoSlurType { None, StemSide, Centered };
+
 //----------------------------------------------------------------------------
 // Slur
 //----------------------------------------------------------------------------
@@ -109,7 +112,7 @@ private:
      */
     ///@{
     // Check if the slur resembles portato
-    bool IsPortatoSlur(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord) const;
+    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord) const;
     ///@}
 
     /**
