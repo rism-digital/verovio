@@ -995,7 +995,7 @@ PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord
 
     // Stem directions are not considered here and must be checked on client side
     PortatoSlurType type = PortatoSlurType::None;
-    if (artics.size() == 1) {
+    if (!artics.empty()) {
         type = PortatoSlurType::Centered;
         Artic *artic = vrv_cast<Artic *>(artics.front());
         if (!doc->GetOptions()->m_staccatoCenter.GetValue()) {
