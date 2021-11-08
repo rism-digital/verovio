@@ -921,11 +921,19 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
 {
     const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    int firstNoteLoc = VRV_UNSET;
     for (auto coord : m_beamElementCoordRefs) {
         coord->SetClosestNote(stemDir);
         const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
+        if (firstNoteLoc == VRV_UNSET) firstNoteLoc = coord->m_closestNote->GetDrawingLoc();
         if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
             m_uniformStemLength = coordStemDir;
+            if (!(firstNoteLoc % 2) && !(m_uniformStemLength % 2)) {
+                m_uniformStemLength -= stemDirBias;
+            }
+            else if ((firstNoteLoc % 2) && (m_uniformStemLength % 2)) {
+                m_uniformStemLength += stemDirBias;
+            }
         }
     }
     // make adjustments for the grace notes length
