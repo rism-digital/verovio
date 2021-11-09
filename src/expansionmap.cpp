@@ -72,23 +72,21 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
-                GeneratePredictableIds(currSect, clonedObject);
-                clonedObject->SetUuid(currSect->GetUuid() + "-rend"
-                    + std::to_string(GetExpansionIdsForElement(currSect->GetUuid()).size() + 1));
+                this->GeneratePredictableIds(currSect, clonedObject);
 
                 // get IDs of old and new sections and add them to m_map
                 std::vector<std::string> oldIds;
                 oldIds.push_back(currSect->GetUuid());
-                GetUuidList(currSect, oldIds);
+                this->GetUuidList(currSect, oldIds);
                 std::vector<std::string> clonedIds;
                 clonedIds.push_back(clonedObject->GetUuid());
-                GetUuidList(clonedObject, clonedIds);
+                this->GetUuidList(clonedObject, clonedIds);
                 for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
-                    AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
+                    this->AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
 
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
-                UpdateIds(clonedObject);
+                this->UpdateIds(clonedObject);
 
                 assert(prevSect->GetParent());
                 prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
@@ -243,18 +241,25 @@ void ExpansionMap::GetUuidList(Object *object, std::vector<std::string> &idList)
 {
     for (Object *o : *object->GetChildren()) {
         idList.push_back(o->GetUuid());
-        GetUuidList(o, idList);
+        this->GetUuidList(o, idList);
     }
 }
 
 void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
 {
-    unsigned i = 0;
+    ArrayOfObjects sourceObjects = *source->GetChildren();
     ArrayOfObjects targetObjects = *target->GetChildren();
-    for (Object *s : *source->GetChildren()) {
-        std::string id = s->GetUuid() + "-rend" + std::to_string(GetExpansionIdsForElement(s->GetUuid()).size() + 1);
-        targetObjects[i]->SetUuid(id);
-        GeneratePredictableIds(s, targetObjects[i]);
+    if (sourceObjects.size() != targetObjects.size()) return;
+
+    target->SetUuid(
+        source->GetUuid() + "-rend" + std::to_string(this->GetExpansionIdsForElement(source->GetUuid()).size() + 1));
+
+    unsigned i = 0;
+    for (Object *s : sourceObjects) {
+        std::string id
+            = s->GetUuid() + "-rend" + std::to_string(this->GetExpansionIdsForElement(s->GetUuid()).size() + 1);
+        targetObjects.at(i)->SetUuid(id);
+        this->GeneratePredictableIds(s, targetObjects.at(i));
         i++;
     }
 }
