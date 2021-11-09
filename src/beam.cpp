@@ -671,7 +671,7 @@ void BeamSegment::CalcBeamPosition(
             CalcAdjustSlope(staff, doc, beamInterface, shorten, step);
         }
         else {
-            CalcSetValues();
+            this->CalcAdjustPosition(staff, doc, beamInterface);
         }
     }
     else {
@@ -702,7 +702,7 @@ void BeamSegment::CalcBeamPosition(
             m_beamElementCoordRefs.at(0)->m_yBeam = maxLength;
         }
 
-        CalcSetValues();
+        this->CalcAdjustPosition(staff, doc, beamInterface);
     }
 }
 
@@ -712,7 +712,7 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
     assert(doc);
     assert(beamInterface);
 
-    this->CalcSetValues();
+    this->CalcAdjustPosition(staff, doc, beamInterface);
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
@@ -778,7 +778,7 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
             m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
                 Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
 
-            this->CalcSetValues();
+            this->CalcAdjustPosition(staff, doc, beamInterface);
             // Try again - shortening will obviously be false at this stage
             return this->CalcAdjustSlope(staff, doc, beamInterface, false, step);
         }
@@ -792,7 +792,7 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
                 BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
                 coord->m_yBeam += lengthening;
             }
-            this->CalcSetValues(elementCount);
+            this->CalcAdjustPosition(staff, doc, beamInterface);
             return;
         }
         */
@@ -823,7 +823,7 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
             m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
                 Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
 
-            this->CalcSetValues();
+            this->CalcAdjustPosition(staff, doc, beamInterface);
             // Simply ignore shortening
             return;
         }
@@ -859,6 +859,35 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
         }
     }
     */
+}
+
+void BeamSegment::CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+{
+    const int staffTop = staff->GetDrawingY();
+    const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    int adjust = 0;
+    const int start = m_beamElementCoordRefs.at(0)->m_yBeam;
+    if ((start <= staffTop + unit) && (start >= staffTop - staffHeight - unit)) {
+        const int positionWithinStaffLines = std::abs((staffTop - start) % (unit * 2));
+        if ((beamInterface->m_drawingPlace == BEAMPLACE_above) && (start < staffTop)) {
+            if (((positionWithinStaffLines == unit) && (m_beamSlope >= 0))
+                || ((positionWithinStaffLines == 0.5 * unit) && (m_beamSlope < 0))) {
+                adjust = -45;
+            }
+        }
+        else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+            if (((positionWithinStaffLines == unit) && (m_beamSlope <= 0))
+                || ((positionWithinStaffLines == 1.5 * unit) && (m_beamSlope > 0))) {
+                adjust = 45;
+            }
+        }
+    }
+
+    m_beamElementCoordRefs.at(0)->m_yBeam += adjust;
+
+    this->CalcSetValues();
 }
 
 void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
@@ -922,18 +951,25 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
     const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     int firstNoteLoc = VRV_UNSET;
+    int relevantNoteLoc = VRV_UNSET;
     for (auto coord : m_beamElementCoordRefs) {
         coord->SetClosestNote(stemDir);
+        if (!coord->m_closestNote) continue;
+        if (relevantNoteLoc == VRV_UNSET) {
+            relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
+        }
+        else {
+            relevantNoteLoc = (place == BEAMPLACE_below)
+                ? std::min(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc)
+                : std::max(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc);
+        }
+    }
+
+    for (auto coord : m_beamElementCoordRefs) {
         const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
-        if (firstNoteLoc == VRV_UNSET) firstNoteLoc = coord->m_closestNote->GetDrawingLoc();
-        if (stemDirBias * coordStemDir > stemDirBias * m_uniformStemLength) {
-            m_uniformStemLength = coordStemDir;
-            if (!(firstNoteLoc % 2) && !(m_uniformStemLength % 2)) {
-                m_uniformStemLength -= stemDirBias;
-            }
-            else if ((firstNoteLoc % 2) && (m_uniformStemLength % 2)) {
-                m_uniformStemLength += stemDirBias;
-            }
+        if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) m_uniformStemLength = coordStemDir;
+        if (m_uniformStemLength % 2) {
+            m_uniformStemLength += stemDirBias;
         }
     }
     // make adjustments for the grace notes length

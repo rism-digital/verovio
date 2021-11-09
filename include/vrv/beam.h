@@ -77,6 +77,9 @@ private:
 
     void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
 
+    // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
+    void CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
