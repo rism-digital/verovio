@@ -207,6 +207,42 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     return findSpannedLayerElementsParams.m_elements;
 }
 
+Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType)
+{
+    Staff *extremalStaff = staff;
+
+    const curvature_CURVEDIR curveDir = this->GetCurvedir();
+    const std::vector<LayerElement *> spannedElements = this->CollectSpannedElements(staff, xMin, xMax, spanningType);
+
+    // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
+    // corresponding to whether the slur is curved above/below
+    auto adaptStaff = [&extremalStaff, curveDir](LayerElement *element) {
+        Layer *elementLayer = NULL;
+        Staff *elementStaff = element->GetCrossStaff(elementLayer);
+        if (!elementStaff) elementStaff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+        assert(elementStaff);
+
+        if ((curveDir == curvature_CURVEDIR_above) && (elementStaff->GetN() < extremalStaff->GetN())) {
+            extremalStaff = elementStaff;
+        }
+        if ((curveDir == curvature_CURVEDIR_below) && (elementStaff->GetN() > extremalStaff->GetN())) {
+            extremalStaff = elementStaff;
+        }
+    };
+
+    // Run once through all spanned elements
+    std::for_each(spannedElements.begin(), spannedElements.end(), adaptStaff);
+
+    // Also check the beams of spanned elements
+    std::for_each(spannedElements.begin(), spannedElements.end(), [&adaptStaff](LayerElement *element) {
+        if (Beam *beam = element->IsInBeam(); beam) {
+            adaptStaff(beam);
+        }
+    });
+
+    return extremalStaff;
+}
+
 void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 {
     assert(doc);

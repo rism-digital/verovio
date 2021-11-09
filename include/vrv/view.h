@@ -83,6 +83,9 @@ class TupletBracket;
 class TupletNum;
 class Verse;
 
+// Helper enums
+enum class SlurHandling { Ignore, Initialize, Drawing };
+
 //----------------------------------------------------------------------------
 // View
 //----------------------------------------------------------------------------
@@ -180,9 +183,12 @@ public:
     ///@}
 
     /**
-     * Set whether slurs should be initialized when drawn
+     * Control how slurs are handled
      */
-    void ActivateSlurInitialization(bool active) { m_initializeSlurs = active; };
+    ///@{
+    SlurHandling GetSlurHandling() const { return m_slurHandling; }
+    void SetSlurHandling(SlurHandling slurHandling) { m_slurHandling = slurHandling; }
+    ///@}
 
 protected:
     /**
@@ -634,9 +640,9 @@ protected:
     ///@}
 
     /**
-     * Indicates whether slurs should be initialized when drawn
+     * Control the handling of slurs
      */
-    bool m_initializeSlurs;
+    SlurHandling m_slurHandling;
 
     /**
      * The current drawing score def.

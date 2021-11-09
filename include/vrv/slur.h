@@ -82,9 +82,19 @@ public:
      */
     std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType);
 
+    /**
+     * Calculate the staff where the slur's floating curve positioner lives
+     */
+    Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType);
+
+    /**
+     * Slur adjustment
+     */
+    ///@{
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
+    ///@}
 
     /**
      * Get preferred curve direction based on number of conditions: presence of other layers, stem direction, etc.
