@@ -2308,7 +2308,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
+    if (this->HasContentBB() && !this->HasEmptyBB() && (this->GetContentRight() > params->m_minPos)
         && (this->GetContentLeft() < params->m_maxPos)) {
 
         // We skip the start or end of the slur
