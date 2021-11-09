@@ -37,34 +37,53 @@ namespace vrv {
 
 static const ClassRegistrar<Slur> s_factory("slur", SLUR);
 
-Slur::Slur() : ControlElement(SLUR, "slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Slur::Slur()
+    : ControlElement(SLUR, "slur-")
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttCurvature()
+    , AttCurveRend()
+    , AttLayerIdent()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
     RegisterAttClass(ATT_CURVEREND);
+    RegisterAttClass(ATT_LAYERIDENT);
 
     Reset();
 }
 
 Slur::Slur(ClassId classId)
-    : ControlElement(classId, "slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+    : ControlElement(classId, "slur-")
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttCurvature()
+    , AttCurveRend()
+    , AttLayerIdent()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
     RegisterAttClass(ATT_CURVEREND);
+    RegisterAttClass(ATT_LAYERIDENT);
 
     Reset();
 }
 
 Slur::Slur(ClassId classId, const std::string &classIdStr)
-    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+    : ControlElement(classId, classIdStr)
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttCurvature()
+    , AttCurveRend()
+    , AttLayerIdent()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
     RegisterAttClass(ATT_CURVEREND);
+    RegisterAttClass(ATT_LAYERIDENT);
 
     Reset();
 }
@@ -78,6 +97,7 @@ void Slur::Reset()
     ResetColor();
     ResetCurvature();
     ResetCurveRend();
+    ResetLayerIdent();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
     // m_isCrossStaff = false;
@@ -117,12 +137,17 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
 
     // Now determine the minimal and maximal layer
     std::set<int> layersN;
-    for (LayerElement *element : { this->GetStart(), this->GetEnd() }) {
-        int layerN = element->GetAlignmentLayerN();
-        if (layerN < 0) {
-            layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
+    if (this->HasLayer()) {
+        layersN = { this->GetLayer() };
+    }
+    else {
+        for (LayerElement *element : { this->GetStart(), this->GetEnd() }) {
+            int layerN = element->GetAlignmentLayerN();
+            if (layerN < 0) {
+                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
+            }
+            layersN.insert(layerN);
         }
-        layersN.insert(layerN);
     }
     const int minLayerN = *layersN.begin();
     const int maxLayerN = *layersN.rbegin();
@@ -192,8 +217,8 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
                   return true;
               });
 
-        // For separated voices rerun the search with layer bounds
-        if (layersAreSeparated) {
+        // For separated voices or prescribed layers rerun the search with layer bounds
+        if (layersAreSeparated || this->HasLayer()) {
             findSpannedLayerElementsParams.m_elements.clear();
             findSpannedLayerElementsParams.m_inMeasureRange
                 = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
