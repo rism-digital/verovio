@@ -527,7 +527,12 @@
             <!--<glyph glyph-code="E200" smufl-name="textTupletBracketEndShortStem" />-->
             <!--<glyph glyph-code="E201" smufl-name="textTupletBracketStartLongStem" />-->
             <!--<glyph glyph-code="E202" smufl-name="textTuplet3LongStem" />-->
-            <!--<glyph glyph-code="E203" smufl-name="textTupletBracketEndLongStem" />-->
+            <!--<glyph glyph-code="E203" smufl-name="textHeadlessBlackNoteLongStem" />-->
+            <!--<glyph glyph-code="E204" smufl-name="textHeadlessBlackNoteFrac8thShortStem" />-->
+            <!--<glyph glyph-code="E205" smufl-name="textHeadlessBlackNoteFrac8thLongStem" />-->
+            <!--<glyph glyph-code="E206" smufl-name="textHeadlessBlackNoteFrac16thShortStem" />-->
+            <!--<glyph glyph-code="E207" smufl-name="textHeadlessBlackNoteFrac16thLongStem" />-->
+            <!--<glyph glyph-code="E208" smufl-name="textHeadlessBlackNoteFrac32ndLongStem" />-->
             <range_end>U+E20F</range_end>
             <range_start>U+E1F0</range_start>
         </beamedGroupsOfNotes>
@@ -1169,6 +1174,7 @@
             <!--<glyph glyph-code="E4D4" smufl-name="caesuraCurved" />-->
             <!--<glyph glyph-code="E4D5" smufl-name="breathMarkSalzedo" />-->
             <!--<glyph glyph-code="E4D6" smufl-name="curlewSign" />-->
+            <!--<glyph glyph-code="E4D7" smufl-name="caesuraSingleStroke" />-->
             <range_end>U+E4DF</range_end>
             <range_start>U+E4C0</range_start>
         </holdsAndPauses>
@@ -1500,6 +1506,7 @@
             <!--<glyph glyph-code="E639" smufl-name="pluckedDampAll" />-->
             <!--<glyph glyph-code="E63A" smufl-name="pluckedPlectrum" />-->
             <!--<glyph glyph-code="E63B" smufl-name="pluckedDampOnStem" />-->
+            <!--<glyph glyph-code="E63C" smufl-name="arpeggiato" />-->
             <range_end>U+E63F</range_end>
             <range_start>U+E630</range_start>
         </pluckedTechniques>
@@ -1972,6 +1979,12 @@
             <!--<glyph glyph-code="E845" smufl-name="guitarVolumeSwell" />-->
             <!--<glyph glyph-code="E846" smufl-name="guitarStrumUp" />-->
             <!--<glyph glyph-code="E847" smufl-name="guitarStrumDown" />-->
+            <!--<glyph glyph-code="E848" smufl-name="guitarBarreFull" />-->
+            <!--<glyph glyph-code="E849" smufl-name="guitarBarreHalf" />-->
+            <!--<glyph glyph-code="E84A" smufl-name="guitarString10" />-->
+            <!--<glyph glyph-code="E84B" smufl-name="guitarString11" />-->
+            <!--<glyph glyph-code="E84C" smufl-name="guitarString12" />-->
+            <!--<glyph glyph-code="E84D" smufl-name="guitarString13" />-->
             <range_end>U+E84F</range_end>
             <range_start>U+E830</range_start>
         </guitar>
@@ -2247,6 +2260,7 @@
             <!--<glyph glyph-code="E95F" smufl-name="mensuralWhiteMinima" />-->
             <!--<glyph glyph-code="E960" smufl-name="mensuralWhiteSemiminima" />-->
             <!--<glyph glyph-code="E961" smufl-name="mensuralWhiteFusa" />-->
+            <!--<glyph glyph-code="E962" smufl-name="mensuralWhiteSemibrevis" />-->
             <range_end>U+E96F</range_end>
             <range_start>U+E950</range_start>
         </medievalAndRenaissanceIndividualNotes>
