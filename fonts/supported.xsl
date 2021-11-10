@@ -3066,5 +3066,26 @@
             <range_end>U+ED40</range_end>
             <range_start>U+ED4F</range_start>
         </articulationSupplement>
+        <fingeringSupplement>
+            <description>Fingering supplement</description>
+            <!--<glyph glyph-code="ED80" smufl-name="fingering0Italic" />-->
+            <!--<glyph glyph-code="ED81" smufl-name="fingering1Italic" />-->
+            <!--<glyph glyph-code="ED82" smufl-name="fingering2Italic" />-->
+            <!--<glyph glyph-code="ED83" smufl-name="fingering3Italic" />-->
+            <!--<glyph glyph-code="ED84" smufl-name="fingering4Italic" />-->
+            <!--<glyph glyph-code="ED85" smufl-name="fingering5Italic" />-->
+            <!--<glyph glyph-code="ED86" smufl-name="fingering6Italic" />-->
+            <!--<glyph glyph-code="ED87" smufl-name="fingering7Italic" />-->
+            <!--<glyph glyph-code="ED88" smufl-name="fingering8Italic" />-->
+            <!--<glyph glyph-code="ED89" smufl-name="fingering9Italic" />-->
+            <!--<glyph glyph-code="ED8A" smufl-name="fingeringLeftParenthesisItalic" />-->
+            <!--<glyph glyph-code="ED8B" smufl-name="fingeringRightParenthesisItalic" />-->
+            <!--<glyph glyph-code="ED8C" smufl-name="fingeringLeftBracketItalic" />-->
+            <!--<glyph glyph-code="ED8D" smufl-name="fingeringRightBracketItalic" />-->
+            <!--<glyph glyph-code="ED8E" smufl-name="fingeringQLower" />-->
+            <!--<glyph glyph-code="ED8F" smufl-name="fingeringSLower" />-->
+            <range_end>U+ED9F</range_end>
+            <range_start>U+ED80</range_start>
+        </fingeringSupplement>
     </xsl:variable>
 </xsl:stylesheet>
