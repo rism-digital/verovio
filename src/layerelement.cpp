@@ -1190,7 +1190,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 m_alignment->AddToAccidSpace(accid);
         }
         else if (this->GetFirstAncestor(CUSTOS)) {
-            m_alignment->AddToAccidSpace(accid); // If this is not added, the custos is drawn an octave below the custos
+            m_alignment->AddToAccidSpace(accid); // If this is not added, the accidental is drawn an octave below the custos
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
