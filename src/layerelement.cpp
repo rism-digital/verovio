@@ -1821,7 +1821,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
-    // Nested aligment of bounding boxes is performed only when both the previous alignment and
+    // Nested alignment of bounding boxes is performed only when both the previous alignment and
     // the current one allow it. For example, when one of them is a barline, we do not look how
     // bounding boxes can be nested but instead only look at the horizontal position
     bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
