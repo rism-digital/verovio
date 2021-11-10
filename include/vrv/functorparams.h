@@ -1382,6 +1382,7 @@ public:
 /**
  * member 0: the attComparision text
  * member 1: an array of all matching objects
+ * member 2: flag indicating whether descendants of matches should be searched as well
  **/
 
 class FindAllByComparisonParams : public FunctorParams {
@@ -1390,9 +1391,11 @@ public:
     {
         m_comparison = comparison;
         m_elements = elements;
+        m_continueDepthSearchForMatches = true;
     }
     Comparison *m_comparison;
     ListOfObjects *m_elements;
+    bool m_continueDepthSearchForMatches;
 };
 
 //----------------------------------------------------------------------------

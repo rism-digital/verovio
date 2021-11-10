@@ -562,6 +562,17 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
     return findExtremeByComparisonParams.m_element;
 }
 
+ListOfObjects Object::FindAllDescendantByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
+{
+    ListOfObjects objects;
+    ClassIdComparison comparison(classId);
+    Functor findAllByComparison(&Object::FindAllByComparison);
+    FindAllByComparisonParams findAllByComparisonParams(&comparison, &objects);
+    findAllByComparisonParams.m_continueDepthSearchForMatches = continueDepthSearchForMatches;
+    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness);
+    return objects;
+}
+
 void Object::FindAllDescendantByComparison(
     ListOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
@@ -1392,6 +1403,9 @@ int Object::FindAllByComparison(FunctorParams *functorParams)
     // evaluate by applying the Comparison operator()
     if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
+        if (!params->m_continueDepthSearchForMatches) {
+            return FUNCTOR_SIBLINGS;
+        }
     }
     // continue until the end
     return FUNCTOR_CONTINUE;

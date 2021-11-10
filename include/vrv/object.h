@@ -394,6 +394,12 @@ public:
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
+     * Return all the objects with specified type
+     */
+    ListOfObjects FindAllDescendantByType(
+        ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH);
+
+    /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
