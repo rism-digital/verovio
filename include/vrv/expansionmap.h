@@ -43,15 +43,15 @@ public:
      */
     void Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSection);
 
-    bool UpdateIds(Object *object);
-
     std::vector<std::string> GetExpansionIdsForElement(const std::string &xmlId);
+
+private:
+    bool UpdateIds(Object *object);
 
     void GetUuidList(Object *object, std::vector<std::string> &idList);
 
     void GeneratePredictableIds(Object *source, Object *target);
 
-private:
     /** Ads an id string to an original/notated id */
     bool AddExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId);
 
