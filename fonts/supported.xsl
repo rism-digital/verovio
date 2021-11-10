@@ -101,7 +101,6 @@
             <!--<glyph glyph-code="E060" smufl-name="cClefSquare" />-->
             <!--<glyph glyph-code="E061" smufl-name="cClefCombining" />-->
             <glyph glyph-code="E062" smufl-name="fClef" />
-            -->
             <glyph glyph-code="E063" smufl-name="fClef15mb" />
             <glyph glyph-code="E064" smufl-name="fClef8vb" />
             <glyph glyph-code="E065" smufl-name="fClef8va" />
@@ -1113,9 +1112,7 @@
         <articulation>
             <description>Articulation</description>
             <glyph glyph-code="E4A0" smufl-name="articAccentAbove" />
-            -->
             <glyph glyph-code="E4A1" smufl-name="articAccentBelow" />
-            -->
             <glyph glyph-code="E4A2" smufl-name="articStaccatoAbove" />
             <glyph glyph-code="E4A3" smufl-name="articStaccatoBelow" />
             <glyph glyph-code="E4A4" smufl-name="articTenutoAbove" />
