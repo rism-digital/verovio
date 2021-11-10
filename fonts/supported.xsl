@@ -3080,6 +3080,18 @@
             <range_end>U+ED40</range_end>
             <range_start>U+ED4F</range_start>
         </articulationSupplement>
+        <standardAccidentalsChordSymbols>
+            <description>Standard accidentals for chord symbols</description>
+            <!--<glyph glyph-code="ED60" smufl-name="csymAccidentalFlat" />-->
+            <!--<glyph glyph-code="ED61" smufl-name="csymAccidentalNatural" />-->
+            <!--<glyph glyph-code="ED62" smufl-name="csymAccidentalSharp" />-->
+            <!--<glyph glyph-code="ED63" smufl-name="csymAccidentalDoubleSharp" />-->
+            <!--<glyph glyph-code="ED64" smufl-name="csymAccidentalDoubleFlat" />-->
+            <!--<glyph glyph-code="ED65" smufl-name="csymAccidentalTripleSharp" />-->
+            <!--<glyph glyph-code="ED66" smufl-name="csymAccidentalTripleFlat" />-->
+            <range_end>U+ED6F</range_end>
+            <range_start>U+ED60</range_start>
+        </standardAccidentalsChordSymbols>
         <fingeringSupplement>
             <description>Fingering supplement</description>
             <!--<glyph glyph-code="ED80" smufl-name="fingering0Italic" />-->
@@ -3101,5 +3113,15 @@
             <range_end>U+ED9F</range_end>
             <range_start>U+ED80</range_start>
         </fingeringSupplement>
+        <medievalAndRenaissanceProlationsSupplement>
+            <description>Medieval and Renaissance prolations supplement</description>
+            <!--<glyph glyph-code="EE90" smufl-name="mensuralProportion5" />-->
+            <!--<glyph glyph-code="EE91" smufl-name="mensuralProportion6" />-->
+            <!--<glyph glyph-code="EE92" smufl-name="mensuralProportion7" />-->
+            <!--<glyph glyph-code="EE93" smufl-name="mensuralProportion8" />-->
+            <!--<glyph glyph-code="EE94" smufl-name="mensuralProportion9" />-->
+            <range_end>U+EE9F</range_end>
+            <range_start>U+EE90</range_start>
+        </medievalAndRenaissanceProlationsSupplement>
     </xsl:variable>
 </xsl:stylesheet>
