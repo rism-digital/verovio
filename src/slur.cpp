@@ -37,34 +37,53 @@ namespace vrv {
 
 static const ClassRegistrar<Slur> s_factory("slur", SLUR);
 
-Slur::Slur() : ControlElement(SLUR, "slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Slur::Slur()
+    : ControlElement(SLUR, "slur-")
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttCurvature()
+    , AttCurveRend()
+    , AttLayerIdent()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
     RegisterAttClass(ATT_CURVEREND);
+    RegisterAttClass(ATT_LAYERIDENT);
 
     Reset();
 }
 
 Slur::Slur(ClassId classId)
-    : ControlElement(classId, "slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+    : ControlElement(classId, "slur-")
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttCurvature()
+    , AttCurveRend()
+    , AttLayerIdent()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
     RegisterAttClass(ATT_CURVEREND);
+    RegisterAttClass(ATT_LAYERIDENT);
 
     Reset();
 }
 
 Slur::Slur(ClassId classId, const std::string &classIdStr)
-    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+    : ControlElement(classId, classIdStr)
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttCurvature()
+    , AttCurveRend()
+    , AttLayerIdent()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
     RegisterAttClass(ATT_CURVEREND);
+    RegisterAttClass(ATT_LAYERIDENT);
 
     Reset();
 }
@@ -78,6 +97,7 @@ void Slur::Reset()
     ResetColor();
     ResetCurvature();
     ResetCurveRend();
+    ResetLayerIdent();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
     // m_isCrossStaff = false;
@@ -108,13 +128,144 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     else if (endStaff && (endStaff != staff)) {
         staffNumbers.emplace(endStaff->GetN());
     }
-
     findSpannedLayerElementsParams.m_staffNs = staffNumbers;
+
+    // Run the search without layer bounds
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
     container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
 
+    // Now determine the minimal and maximal layer
+    std::set<int> layersN;
+    if (this->HasLayer()) {
+        layersN = { this->GetLayer() };
+    }
+    else {
+        for (LayerElement *element : { this->GetStart(), this->GetEnd() }) {
+            int layerN = element->GetAlignmentLayerN();
+            if (layerN < 0) {
+                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
+            }
+            layersN.insert(layerN);
+        }
+    }
+    const int minLayerN = *layersN.begin();
+    const int maxLayerN = *layersN.rbegin();
+
+    // Check whether outside layers exist
+    const bool hasOutsideLayers = std::any_of(findSpannedLayerElementsParams.m_elements.cbegin(),
+        findSpannedLayerElementsParams.m_elements.cend(), [minLayerN, maxLayerN](LayerElement *element) {
+            int layerN = element->GetAlignmentLayerN();
+            if (layerN < 0) {
+                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
+            }
+            return ((layerN < minLayerN) || (layerN > maxLayerN));
+        });
+
+    if (hasOutsideLayers) {
+        // Filter all notes, also include the notes of the start and end of the slur
+        ListOfObjects notes;
+        std::copy_if(findSpannedLayerElementsParams.m_elements.cbegin(),
+            findSpannedLayerElementsParams.m_elements.cend(), std::back_inserter(notes),
+            [](LayerElement *element) { return element->Is(NOTE); });
+        ClassIdComparison cmp(NOTE);
+        if (this->GetStart()->Is(NOTE)) {
+            notes.push_back(this->GetStart());
+        }
+        else {
+            this->GetStart()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+        }
+        if (this->GetEnd()->Is(NOTE)) {
+            notes.push_back(this->GetEnd());
+        }
+        else {
+            this->GetEnd()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+        }
+
+        // Determine the minimal and maximal diatonic pitch
+        int minPitch = 1000;
+        int maxPitch = 0;
+        for (Object *object : notes) {
+            Note *note = vrv_cast<Note *>(object);
+            assert(note);
+            int layerN = note->GetAlignmentLayerN();
+            if (layerN < 0) {
+                layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
+            }
+            if (layerN == maxLayerN) {
+                minPitch = std::min(note->GetDiatonicPitch(), minPitch);
+            }
+            if (layerN == minLayerN) {
+                maxPitch = std::max(note->GetDiatonicPitch(), maxPitch);
+            }
+        }
+
+        // Check if voices are separated
+        const bool layersAreSeparated
+            = std::all_of(notes.cbegin(), notes.cend(), [minLayerN, maxLayerN, minPitch, maxPitch](Object *object) {
+                  Note *note = vrv_cast<Note *>(object);
+                  int layerN = note->GetAlignmentLayerN();
+                  if (layerN < 0) {
+                      layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
+                  }
+                  if (layerN < minLayerN) {
+                      return (note->GetDiatonicPitch() > maxPitch);
+                  }
+                  if (layerN > maxLayerN) {
+                      return (note->GetDiatonicPitch() < minPitch);
+                  }
+                  return true;
+              });
+
+        // For separated voices or prescribed layers rerun the search with layer bounds
+        if (layersAreSeparated || this->HasLayer()) {
+            findSpannedLayerElementsParams.m_elements.clear();
+            findSpannedLayerElementsParams.m_inMeasureRange
+                = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
+            findSpannedLayerElementsParams.m_minLayerN = minLayerN;
+            findSpannedLayerElementsParams.m_maxLayerN = maxLayerN;
+            container->Process(
+                &findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+        }
+    }
+
     return findSpannedLayerElementsParams.m_elements;
+}
+
+Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType)
+{
+    Staff *extremalStaff = staff;
+
+    const curvature_CURVEDIR curveDir = this->GetCurvedir();
+    const std::vector<LayerElement *> spannedElements = this->CollectSpannedElements(staff, xMin, xMax, spanningType);
+
+    // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
+    // corresponding to whether the slur is curved above/below
+    auto adaptStaff = [&extremalStaff, curveDir](LayerElement *element) {
+        Layer *elementLayer = NULL;
+        Staff *elementStaff = element->GetCrossStaff(elementLayer);
+        if (!elementStaff) elementStaff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+        assert(elementStaff);
+
+        if ((curveDir == curvature_CURVEDIR_above) && (elementStaff->GetN() < extremalStaff->GetN())) {
+            extremalStaff = elementStaff;
+        }
+        if ((curveDir == curvature_CURVEDIR_below) && (elementStaff->GetN() > extremalStaff->GetN())) {
+            extremalStaff = elementStaff;
+        }
+    };
+
+    // Run once through all spanned elements
+    std::for_each(spannedElements.begin(), spannedElements.end(), adaptStaff);
+
+    // Also check the beams of spanned elements
+    std::for_each(spannedElements.begin(), spannedElements.end(), [&adaptStaff](LayerElement *element) {
+        if (Beam *beam = element->IsInBeam(); beam) {
+            adaptStaff(beam);
+        }
+    });
+
+    return extremalStaff;
 }
 
 void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)

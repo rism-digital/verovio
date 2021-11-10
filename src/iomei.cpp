@@ -1534,6 +1534,7 @@ void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
     slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
     slur->WriteCurveRend(currentNode);
+    slur->WriteLayerIdent(currentNode);
 }
 
 void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
@@ -4770,6 +4771,7 @@ bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
     vrvPhrase->ReadColor(phrase);
     vrvPhrase->ReadCurvature(phrase);
     vrvPhrase->ReadCurveRend(phrase);
+    vrvPhrase->ReadLayerIdent(phrase);
 
     parent->AddChild(vrvPhrase);
     ReadUnsupportedAttr(phrase, vrvPhrase);
@@ -4813,6 +4815,7 @@ bool MEIInput::ReadSlur(Object *parent, pugi::xml_node slur)
     vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
     vrvSlur->ReadCurveRend(slur);
+    vrvSlur->ReadLayerIdent(slur);
 
     parent->AddChild(vrvSlur);
     ReadUnsupportedAttr(slur, vrvSlur);

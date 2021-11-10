@@ -49,7 +49,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
 
-    if (m_initializeSlurs && dc->Is(BBOX_DEVICE_CONTEXT)
+    if ((this->GetSlurHandling() == SlurHandling::Initialize) && dc->Is(BBOX_DEVICE_CONTEXT)
         && (curve->GetDir() == curvature_CURVEDIR_NONE || curve->IsCrossStaff())) {
         this->DrawSlurInitial(curve, slur, x1, x2, staff, spanningType);
     }

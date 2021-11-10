@@ -31,7 +31,7 @@ View::View()
     m_pageIdx = 0;
     m_tieThicknessCoefficient = 0.0;
     m_slurThicknessCoefficient = 0.0;
-    m_initializeSlurs = true;
+    m_slurHandling = SlurHandling::Initialize;
 
     m_currentColour = AxNONE;
     m_currentElement = NULL;
