@@ -1190,7 +1190,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 m_alignment->AddToAccidSpace(accid);
         }
         else if (this->GetFirstAncestor(CUSTOS)) {
-            m_alignment->AddToAccidSpace(accid); // If this is not added, the accidental is drawn an octave below the custos
+            m_alignment->AddToAccidSpace(
+                accid); // If this is not added, the accidental is drawn an octave below the custos
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
@@ -1198,7 +1199,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         // override if staff position is set explicitly
         if (accid->HasPloc() && accid->HasOloc()) {
-            accid->SetDrawingLoc(PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY)));
+            accid->SetDrawingLoc(
+                PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY)));
             this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->GetDrawingLoc()));
         }
         else if (accid->HasLoc()) {
