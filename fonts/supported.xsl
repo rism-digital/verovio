@@ -2943,6 +2943,18 @@
             <range_end>U+EC6F</range_end>
             <range_start>U+EC60</range_start>
         </miscellaneousSymbols>
+        <timeSignaturesSupplement>
+            <description>Time signatures supplement</description>
+            <!--<glyph glyph-code="EC80" smufl-name="timeSigBracketLeft" />-->
+            <!--<glyph glyph-code="EC81" smufl-name="timeSigBracketRight" />-->
+            <!--<glyph glyph-code="EC82" smufl-name="timeSigBracketLeftSmall" />-->
+            <!--<glyph glyph-code="EC83" smufl-name="timeSigBracketRightSmall" />-->
+            <!--<glyph glyph-code="EC84" smufl-name="timeSigSlash" />-->
+            <!--<glyph glyph-code="EC85" smufl-name="timeSigCut2" />-->
+            <!--<glyph glyph-code="EC86" smufl-name="timeSigCut3" />-->
+            <range_end>U+EC8F</range_end>
+            <range_start>U+EC80</range_start>
+        </timeSignaturesSupplement>
         <octavesSupplement>
             <description>Octaves supplement</description>
             <!--<glyph glyph-code="EC90" smufl-name="octaveLoco" />-->
@@ -2957,6 +2969,40 @@
             <range_end>U+EC9F</range_end>
             <range_start>U+EC90</range_start>
         </octavesSupplement>
+        <timeSignaturesTurned>
+            <description>Turned time signatures</description>
+            <!--<glyph glyph-code="ECE0" smufl-name="timeSig0Turned" />-->
+            <!--<glyph glyph-code="ECE1" smufl-name="timeSig1Turned" />-->
+            <!--<glyph glyph-code="ECE2" smufl-name="timeSig2Turned" />-->
+            <!--<glyph glyph-code="ECE3" smufl-name="timeSig3Turned" />-->
+            <!--<glyph glyph-code="ECE4" smufl-name="timeSig4Turned" />-->
+            <!--<glyph glyph-code="ECE5" smufl-name="timeSig5Turned" />-->
+            <!--<glyph glyph-code="ECE6" smufl-name="timeSig6Turned" />-->
+            <!--<glyph glyph-code="ECE7" smufl-name="timeSig7Turned" />-->
+            <!--<glyph glyph-code="ECE8" smufl-name="timeSig8Turned" />-->
+            <!--<glyph glyph-code="ECE9" smufl-name="timeSig9Turned" />-->
+            <!--<glyph glyph-code="ECEA" smufl-name="timeSigCommonTurned" />-->
+            <!--<glyph glyph-code="ECEB" smufl-name="timeSigCutCommonTurned" />-->
+            <range_end>U+ECEF</range_end>
+            <range_start>U+ECE0</range_start>
+        </timeSignaturesTurned>
+        <timeSignaturesReversed>
+            <description>Reversed time signatures</description>
+            <!--<glyph glyph-code="ECF0" smufl-name="timeSig0Reversed" />-->
+            <!--<glyph glyph-code="ECF1" smufl-name="timeSig1Reversed" />-->
+            <!--<glyph glyph-code="ECF2" smufl-name="timeSig2Reversed" />-->
+            <!--<glyph glyph-code="ECF3" smufl-name="timeSig3Reversed" />-->
+            <!--<glyph glyph-code="ECF4" smufl-name="timeSig4Reversed" />-->
+            <!--<glyph glyph-code="ECF5" smufl-name="timeSig5Reversed" />-->
+            <!--<glyph glyph-code="ECF6" smufl-name="timeSig6Reversed" />-->
+            <!--<glyph glyph-code="ECF7" smufl-name="timeSig7Reversed" />-->
+            <!--<glyph glyph-code="ECF8" smufl-name="timeSig8Reversed" />-->
+            <!--<glyph glyph-code="ECF9" smufl-name="timeSig9Reversed" />-->
+            <!--<glyph glyph-code="ECFA" smufl-name="timeSigCommonReversed" />-->
+            <!--<glyph glyph-code="ECFB" smufl-name="timeSigCutCommonReversed" />-->
+            <range_end>U+ECFF</range_end>
+            <range_start>U+ECF0</range_start>
+        </timeSignaturesReversed>
         <fingering>
             <description>Fingering</description>
             <!--<glyph glyph-code="ED10" smufl-name="fingering0" />-->
