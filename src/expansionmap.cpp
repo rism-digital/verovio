@@ -72,8 +72,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
-                clonedObject->SetUuid(currSect->GetUuid() + "-rend"
-                    + std::to_string(GetExpansionIdsForElement(currSect->GetUuid()).size() + 1));
+                this->GeneratePredictableIds(currSect, clonedObject);
 
                 // get IDs of old and new sections and add them to m_map
                 std::vector<std::string> oldIds;
@@ -87,7 +86,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 }
 
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
-                UpdateIds(clonedObject);
+                this->UpdateIds(clonedObject);
 
                 assert(prevSect->GetParent());
                 prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
@@ -242,7 +241,22 @@ void ExpansionMap::GetUuidList(Object *object, std::vector<std::string> &idList)
 {
     for (Object *o : *object->GetChildren()) {
         idList.push_back(o->GetUuid());
-        GetUuidList(o, idList);
+        this->GetUuidList(o, idList);
+    }
+}
+
+void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
+{
+    target->SetUuid(
+        source->GetUuid() + "-rend" + std::to_string(this->GetExpansionIdsForElement(source->GetUuid()).size() + 1));
+
+    ArrayOfObjects sourceObjects = *source->GetChildren();
+    ArrayOfObjects targetObjects = *target->GetChildren();
+    if (sourceObjects.size() <= 0 || sourceObjects.size() != targetObjects.size()) return;
+
+    unsigned i = 0;
+    for (Object *s : sourceObjects) {
+        this->GeneratePredictableIds(s, targetObjects.at(i++));
     }
 }
 
