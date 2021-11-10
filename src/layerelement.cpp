@@ -1994,7 +1994,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
             if (note) m_drawingCueSize = note->GetDrawingCueSize();
         }
     }
-    else if (this->Is({ DOTS, FLAG, STEM })) {
+    else if (this->Is({ ARTIC, DOTS, FLAG, STEM })) {
         Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
         if (note)
             m_drawingCueSize = note->GetDrawingCueSize();
