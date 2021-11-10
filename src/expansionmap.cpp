@@ -247,20 +247,16 @@ void ExpansionMap::GetUuidList(Object *object, std::vector<std::string> &idList)
 
 void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
 {
-    ArrayOfObjects sourceObjects = *source->GetChildren();
-    ArrayOfObjects targetObjects = *target->GetChildren();
-    if (sourceObjects.size() != targetObjects.size()) return;
-
     target->SetUuid(
         source->GetUuid() + "-rend" + std::to_string(this->GetExpansionIdsForElement(source->GetUuid()).size() + 1));
 
+    ArrayOfObjects sourceObjects = *source->GetChildren();
+    ArrayOfObjects targetObjects = *target->GetChildren();
+    if (sourceObjects.size() <= 0 || sourceObjects.size() != targetObjects.size()) return;
+
     unsigned i = 0;
     for (Object *s : sourceObjects) {
-        std::string id
-            = s->GetUuid() + "-rend" + std::to_string(this->GetExpansionIdsForElement(s->GetUuid()).size() + 1);
-        targetObjects.at(i)->SetUuid(id);
-        this->GeneratePredictableIds(s, targetObjects.at(i));
-        i++;
+        this->GeneratePredictableIds(s, targetObjects.at(i++));
     }
 }
 
