@@ -103,7 +103,7 @@ void BeamSegment::CalcBeam(
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
     this->CalcBeamPlace(layer, beamInterface, place);
 
-    CalcBeamStemLength(staff, beamInterface->m_drawingPlace);
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
 
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         CalcMixedBeamPlace(staff);
@@ -115,7 +115,7 @@ void BeamSegment::CalcBeam(
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (!beamInterface->m_crossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
             CalcBeamInit(layer, staff, doc, beamInterface, place);
-            CalcBeamStemLength(staff, beamInterface->m_drawingPlace);
+            CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
     }
@@ -869,18 +869,18 @@ void BeamSegment::CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterfac
 
     int adjust = 0;
     const int start = m_beamElementCoordRefs.at(0)->m_yBeam;
-    if ((start <= staffTop + unit) && (start >= staffTop - staffHeight - unit)) {
+    if ((start <= staffTop) && (start >= staffTop - staffHeight)) {
         const int positionWithinStaffLines = std::abs((staffTop - start) % (unit * 2));
-        if ((beamInterface->m_drawingPlace == BEAMPLACE_above) && (start < staffTop)) {
-            if (((positionWithinStaffLines == unit) && (m_beamSlope >= 0))
+        if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+            if (((positionWithinStaffLines == unit) && (m_beamSlope > 0))
                 || ((positionWithinStaffLines == 0.5 * unit) && (m_beamSlope < 0))) {
-                adjust = -45;
+                adjust = -0.5 * unit;
             }
         }
         else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
-            if (((positionWithinStaffLines == unit) && (m_beamSlope <= 0))
+            if (((positionWithinStaffLines == unit) && (m_beamSlope < 0))
                 || ((positionWithinStaffLines == 1.5 * unit) && (m_beamSlope > 0))) {
-                adjust = 45;
+                adjust = 0.5 * unit;
             }
         }
     }
@@ -946,7 +946,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     // if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
-void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
+void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
@@ -966,11 +966,8 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
     }
 
     for (auto coord : m_beamElementCoordRefs) {
-        const int coordStemDir = coord->CalculateStemLength(staff, stemDir);
+        const int coordStemDir = coord->CalculateStemLength(staff, stemDir, isHorizontal);
         if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) m_uniformStemLength = coordStemDir;
-        if (m_uniformStemLength % 2) {
-            m_uniformStemLength += stemDirBias;
-        }
     }
     // make adjustments for the grace notes length
     for (auto coord : m_beamElementCoordRefs) {
@@ -1350,7 +1347,7 @@ void BeamElementCoord::SetDrawingStemDir(
     m_yBeam += m_overlapMargin;
 }
 
-int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir)
+int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal)
 {
     if (!m_closestNote) return 0;
 
@@ -1378,18 +1375,19 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
             stemLen *= stemLenInHalfUnits;
         }
         else {
-            stemLen *= (onStaffSpace) ? 14 : 13;
+            stemLen *= (onStaffSpace || !isHorizontal) ? 14 : 13;
         }
     }
     else {
+        const bool isOddLength = (extend || !isHorizontal);
         switch (m_dur) {
-            case (DUR_16): stemLen *= (extend) ? 14 : 13; break;
-            case (DUR_32): stemLen *= (extend) ? 18 : 16; break;
-            case (DUR_64): stemLen *= (extend) ? 22 : 20; break;
-            case (DUR_128): stemLen *= (extend) ? 26 : 24; break;
-            case (DUR_256): stemLen *= (extend) ? 30 : 28; break;
-            case (DUR_512): stemLen *= (extend) ? 34 : 32; break;
-            case (DUR_1024): stemLen *= (extend) ? 38 : 36; break;
+            case (DUR_16): stemLen *= isOddLength ? 14 : 13; break;
+            case (DUR_32): stemLen *= isOddLength ? 18 : 16; break;
+            case (DUR_64): stemLen *= isOddLength ? 22 : 20; break;
+            case (DUR_128): stemLen *= isOddLength ? 26 : 24; break;
+            case (DUR_256): stemLen *= isOddLength ? 30 : 28; break;
+            case (DUR_512): stemLen *= isOddLength ? 34 : 32; break;
+            case (DUR_1024): stemLen *= isOddLength ? 38 : 36; break;
             default: stemLen *= 14;
         }
     }
