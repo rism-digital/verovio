@@ -516,7 +516,7 @@ void Doc::PrepareDrawing()
         this->Process(&resetDrawing, NULL);
     }
 
-    /************ Resolve @starid / @endid ************/
+    /************ Resolve @startid / @endid ************/
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
     PrepareTimeSpanningParams prepareTimeSpanningParams;
@@ -535,7 +535,17 @@ void Doc::PrepareDrawing()
         this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
     }
 
-    /************ Resolve @starid (only) ************/
+    // Display warning if some elements were not matched
+    const size_t unmatchedElements = std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
+        prepareTimeSpanningParams.m_timeSpanningInterfaces.cend(),
+        [](const ListOfSpanningInterClassIdPairs::value_type &entry) {
+            return (entry.first->HasStartid() && entry.first->HasEndid());
+        });
+    if (unmatchedElements > 0) {
+        LogWarning("%d time spanning element(s) with startid and endid could not be matched.", unmatchedElements);
+    }
+
+    /************ Resolve @startid (only) ************/
 
     // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
     // for placement
@@ -559,7 +569,7 @@ void Doc::PrepareDrawing()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
-        LogWarning("%d time spanning element(s) could not be matched",
+        LogWarning("%d time spanning element(s) with timestamps could not be matched.",
             prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
