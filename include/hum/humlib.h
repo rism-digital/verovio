@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Nov  1 15:07:54 PDT 2021
+// Last Modified: Mon Nov  8 15:58:16 PST 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1567,6 +1567,7 @@ class HumdrumToken : public std::string, public HumHash {
 		const std::string& getDataType     (void) const;
 		bool     isDataType                (const std::string& dtype) const;
 		bool     isKern                    (void) const;
+		bool     isKernLike                (void) const;
 		bool     isMens                    (void) const;
 		std::string   getSpineInfo         (void) const;
 		int      getTrack                  (void) const;
@@ -1988,6 +1989,10 @@ class HumdrumFileBase : public HumHash {
 		                                        const std::string& exinterp);
 		void          getKernSpineStartList    (std::vector<HTp>& spinestarts);
 		std::vector<HTp> getKernSpineStartList (void);
+		void          getKernLikeSpineStartList(std::vector<HTp>& spinestarts);
+		std::vector<HTp> getKernLikeSpineStartList(void);
+		void          getStaffLikeSpineStartList(std::vector<HTp>& spinestarts);
+		std::vector<HTp> getStaffLikeSpineStartList(void);
 		int           getExinterpCount         (const std::string& exinterp);
 		void          getSpineStartList        (std::vector<HTp>& spinestarts,
 		                                        const std::vector<std::string>& exinterps);
@@ -5888,13 +5893,13 @@ class Tool_composite : public HumTool {
 		void        doCoincidenceAnalysis(HumdrumFile& outfile, HumdrumFile& infile,
 		                                  int ctrack, HTp compositeStart);
 		void        doTotalAnalysis(HumdrumFile& outfile, HumdrumFile& infile, int ctrack);
-		void        doGroupAnalyses(HumdrumFile& outfile, HumdrumFile& infile, int atrack, int btrack);
+		void        doGroupAnalyses(HumdrumFile& outfile, HumdrumFile& infile);
 		int         countNoteAttacks(HTp token);
 		void        doTotalAttackAnalysis(vector<double>& analysis, HumdrumFile& infile,
 		                                  int track, vector<bool>& tracks);
 		void        doGroupAttackAnalyses(vector<double>& analysisA,
-		                                  vector<double>& analysisB, HumdrumFile& infile,
-		                                  int trackA, int trackB, vector<bool>& tracks);
+		                                  vector<double>& analysisB,
+		                                  HumdrumFile& infile);
 		void        doCoincidenceAttackAnalysis(vector<vector<double>>& analysis);
 		void        insertAnalysesIntoFile(HumdrumFile& outfile, vector<string>& spines,
 		                                   vector<int>& trackMap, vector<bool>& tracks);

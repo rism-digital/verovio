@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Nov  1 15:07:54 PDT 2021
+// Last Modified: Mon Nov  8 15:58:16 PST 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -20510,6 +20510,11 @@ void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts,
 }
 
 
+//////////////////////////////
+//
+// HumdrumFileBase::getKernSpineStartList -- return only the spines that are **kern.
+//
+
 void HumdrumFileBase::getKernSpineStartList(vector<HTp>& spinestarts) {
 	getSpineStartList(spinestarts, "**kern");
 }
@@ -20517,6 +20522,60 @@ void HumdrumFileBase::getKernSpineStartList(vector<HTp>& spinestarts) {
 vector<HTp> HumdrumFileBase::getKernSpineStartList(void) {
 	vector<HTp> starts;
 	HumdrumFileBase::getKernSpineStartList(starts);
+	return starts;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getKernLikeSpineStartList -- return spines that are "kern-like".  These
+//    can be either **kern or forms matching **kern-tag pattern.
+//
+
+void HumdrumFileBase::getKernLikeSpineStartList(vector<HTp>& spinestarts) {
+	vector <HTp> starts;
+	HumdrumFileBase::getSpineStartList(starts);
+	spinestarts.clear();
+	for (int i=0; i<(int)starts.size(); i++) {
+		if (*(starts.at(i)) == "**kern") {
+			spinestarts.push_back(starts[i]);
+		} else if (starts.at(i)->compare(0, 7, "**kern-") == 0) {
+			spinestarts.push_back(starts[i]);
+		}
+	}
+}
+
+
+vector<HTp> HumdrumFileBase::getKernLikeSpineStartList(void) {
+	vector<HTp> starts;
+	HumdrumFileBase::getKernLikeSpineStartList(starts);
+	return starts;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getStaffLikeSpineStartList -- return spines that have isSpine()
+//    being true.  These can be either **kern or forms matching **kern-tag pattern.
+//
+
+void HumdrumFileBase::getStaffLikeSpineStartList(vector<HTp>& spinestarts) {
+	vector <HTp> starts;
+	HumdrumFileBase::getSpineStartList(starts);
+	spinestarts.clear();
+	for (int i=0; i<(int)starts.size(); i++) {
+		if (starts.at(i)->isStaff()) {
+			spinestarts.push_back(starts[i]);
+		}
+	}
+}
+
+
+vector<HTp> HumdrumFileBase::getStaffLikeSpineStartList(void) {
+	vector<HTp> starts;
+	HumdrumFileBase::getStaffLikeSpineStartList(starts);
 	return starts;
 }
 
@@ -27002,6 +27061,7 @@ void HumdrumFileStructure::setLineRhythmAnalyzed(void) {
 }
 
 
+
 //////////////////////////////
 //
 // HumdrumFileStructure::analyzeRhythm -- Analyze the rhythmic structure
@@ -30811,6 +30871,28 @@ bool HumdrumToken::isKern(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::isKernLike -- Returns true if the data type of the token
+//    is **kern, or **kern- plus a tag.  This Allows for **kern-tag to be
+//    treated as a staff for printing in verovio.  This can be used to separate
+//    analysis spines that are output as **kern data to be prevented for use
+//    as input to another analysis as real **kern data.
+// @SEEALSO: isDataType
+//
+
+bool HumdrumToken::isKernLike(void) const {
+	string dtype = getDataType();
+	if (dtype == "**kern") {
+		return true;
+	} else if (dtype.compare(0, 7, "**kern-") == 0) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::isMens -- Returns true if the data type of the token
 //    is **mens.
 // @SEEALSO: isDataType
@@ -31159,7 +31241,7 @@ bool HumdrumToken::analyzeDuration(void) {
 	if (hasRhythm()) {
 		if (isData()) {
 			if (!isNull()) {
-				if (isKern()) {
+				if (isKernLike()) {
 					if (strchr(this->c_str(), 'q') != NULL) {
 						m_duration = 0;
 					} else {
@@ -31478,6 +31560,9 @@ bool HumdrumToken::hasRhythm(void) const {
 	if (type == "**kern") {
 		return true;
 	}
+	if (type.compare(0, 7, "**kern-") == 0) {
+		return true;
+	}
 	if (type == "**recip") {
 		return true;
 	}
@@ -31546,12 +31631,13 @@ bool HumdrumToken::equalTo(const string& pattern) {
 //
 
 bool HumdrumToken::isStaff(void) const {
-	if (isKern()) {
+	if (isKernLike()) {
 		return true;
 	}
 	if (isMens()) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -56762,13 +56848,13 @@ void Tool_composite::analyzeCompositeAttacks(HumdrumFile& infile,
 		fill(m_analysisNoteAttacks[i].begin(), m_analysisNoteAttacks[i].end(), -1.0);
 	}
 
-	if (groups[0] || groups[3]) {
+//	if (groups[0] || groups[3]) {
+	if (groups[0]) {
 		doTotalAttackAnalysis(m_analysisNoteAttacks[0], infile, groups[0]->getTrack(), tracks);
 	}
 
 	if ((groups[1] && groups[2]) || groups[3]) {
-		doGroupAttackAnalyses(m_analysisNoteAttacks.at(1), m_analysisNoteAttacks.at(2), infile,
-			groups.at(1)->getTrack(), groups.at(2)->getTrack(), tracks);
+		doGroupAttackAnalyses(m_analysisNoteAttacks.at(1), m_analysisNoteAttacks.at(2), infile);
 	}
 
 	if (groups[3]) {
@@ -56803,7 +56889,6 @@ void Tool_composite::doCoincidenceAttackAnalysis(vector<vector<double>>& analysi
 	for (int i=0; i<(int)analysis[1].size(); i++) {
 		if ((analysis[1].at(i) > 0) && (analysis[2].at(i) > 0)) {
 			analysis[3].at(i) = analysis[1].at(i) + analysis[2].at(i);
-cerr << "I=" << i << "\t" << analysis[3].at(i) << " <= " << analysis[1].at(i) << " + " << analysis[2].at(i) << endl;
 			found = true;
 		}
 	}
@@ -56820,30 +56905,14 @@ cerr << "I=" << i << "\t" << analysis[3].at(i) << " <= " << analysis[1].at(i) <<
 //
 
 void Tool_composite::doGroupAttackAnalyses(vector<double>& analysisA,
-      vector<double>& analysisB, HumdrumFile& infile, int trackA, int trackB,
-      vector<bool>& tracks) {
+      vector<double>& analysisB, HumdrumFile& infile) {
 
-	HTp atok = NULL;
-	HTp btok = NULL;
 	int asum = 0;
 	int bsum = 0;
 	for (int i=0; i<(int)infile.getLineCount(); i++) {
 		if (!infile[i].isData()) {
 			continue;
 		}
-		atok = NULL;
-		btok = NULL;
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			HTp token = infile.token(i, j);
-			int track = token->getTrack();
-			if (track == trackA) {
-				atok = token;
-			}
-			if (track == trackB) {
-				btok = token;
-			}
-		}
-
 		asum = 0;
 		bsum = 0;
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
@@ -57096,69 +57165,36 @@ string Tool_composite::makeExpansionString(vector<int>& tracks) {
 //////////////////////////////
 //
 // Tool_composite::getCompositeSpineStarts --
+//    **kern-grpA == Group A composite analysis
+//    **kern-grpB == Group B composite analysis
+//    **kern-comp == (Total group) Composite analysis
+//    **kern-coin == Group A + B coincidence analysis
 //
 
 void Tool_composite::getCompositeSpineStarts(vector<HTp>& groups, HumdrumFile& infile) {
 	groups.resize(4);
+	// 0: full composite rhythm analysis (union of Group A and Group B)
+	// 1: Group A
+	// 2: Group B
+	// 3: Coincidence (intersection of Group A and Group B)
 	for (int i=0; i<(int)groups.size(); i++) {
 		groups[i] = NULL;
 	}
-	// 0th index is the full composite (Identified by *I"Composite instrument label)
-	// 1st index is Group A (Identified by I"Group A insturment label)
-	// 2nd index is Group A (Identified by I"Group B insturment label)
-	// 3nd index is Coincidence (Identified by I"Coincidence insturment label)
 
 	vector<HTp> spines;
-	infile.getSpineStartList(spines);
+	infile.getKernLikeSpineStartList(spines);
 	for (int i=0; i<(int)spines.size(); i++) {
-		if (!spines[i]->isKern()) {
-			continue;
-		}
-		HTp current = spines[i]->getNextToken();
-		bool clefx     = false;  // *clefX is required in composite spine
-		bool part      = false;  // *part# must not be present.
-		bool groupA    = false;  // *I"Group A is required in composite A spine
-		bool groupB    = false;  // *I"Group A is required in composite A spine
-		bool composite = false;  // *I"Composite is required in full composite spine
-		bool coincidence = false; // *I"Coincidence is the name of the "instrument"
-		while (current) {
-			if (current->isData()) {
-				break;
-			}
-			if (!current->isInterpretation()) {
-				current = current->getNextToken();
-				continue;
-			}
-			if (*current == "*I\"Composite") {
-				composite = true;
-			} else if (*current == "*I\"Group A") {
-				groupA = true;
-			} else if (*current == "*I\"Group B") {
-				groupB = true;
-			} else if (*current == "*I\"Coincidence") {
-				coincidence = true;
-			}
-			if (*current == "*clefX") {
-				clefx = true;
-			}
-			if (current->compare(0, 5, "*part") == 0) {
-				part = true;
-			}
-			current = current->getNextToken();
-		}
-		if (part) {
-			continue;
-		}
-		if (!clefx) {
-			continue;
-		}
-		if (composite) {
+		string dtype = spines[i]->getDataType();
+		if (dtype == "**kern-comp") {
 			groups[0] = spines[i];
-		} else if (groupA) {
+		}
+		if (dtype == "**kern-grpA") {
 			groups[1] = spines[i];
-		} else if (groupB) {
+		}
+		if (dtype == "**kern-grpB") {
 			groups[2] = spines[i];
-		} else if (coincidence) {
+		}
+		if (dtype == "**kern-coin") {
 			groups[3] = spines[i];
 		}
 	}
@@ -57664,10 +57700,10 @@ void Tool_composite::prepareMultipleGroups(HumdrumFile& infile) {
 				}
 			}
 			if (token && token->compare("**blank") == 0) {
-				token->setText("**kern");
+				token->setText("**kern-grpA");
 			}
 			if (token2 && token2->compare("**blank") == 0) {
-				token2->setText("**kern");
+				token2->setText("**kern-grpB");
 			}
 			// continue;
 
@@ -58211,7 +58247,7 @@ void Tool_composite::prepareSingleGroup(HumdrumFile& infile) {
 				}
 			}
 			if (token->compare("**blank") == 0) {
-				token->setText("**kern");
+				token->setText("**kern-comp");
 				continue;
 			}
 			// copy time signature and tempos
@@ -58706,7 +58742,7 @@ void Tool_composite::processCoincidenceInterpretation(HumdrumFile& infile, HTp t
 		token->setText("*I'Coin.");
 	}
 	if (exinterp) {
-		token->setText("**kern");
+		token->setText("**kern-coin");
 	}
 
 }
