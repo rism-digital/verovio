@@ -949,8 +949,6 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
-    const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
-    int firstNoteLoc = VRV_UNSET;
     int relevantNoteLoc = VRV_UNSET;
     for (auto coord : m_beamElementCoordRefs) {
         coord->SetClosestNote(stemDir);
@@ -966,8 +964,8 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
     }
 
     for (auto coord : m_beamElementCoordRefs) {
-        const int coordStemDir = coord->CalculateStemLength(staff, stemDir, isHorizontal);
-        if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) m_uniformStemLength = coordStemDir;
+        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
+        if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) m_uniformStemLength = coordStemLength;
     }
     // make adjustments for the grace notes length
     for (auto coord : m_beamElementCoordRefs) {
