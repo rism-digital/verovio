@@ -217,6 +217,14 @@ public:
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
     ///@}
 
+    /**
+     * @name Setter and getter of section restart offset
+     */
+    ///@{
+    int GetSectionRestartOffset() const { return m_sectionRestartOffset; }
+    void SetSectionRestartOffset(int offset) { m_sectionRestartOffset = offset; }
+    ///@}
+
     /*
      * Return the first staff of each staffGrp according to the scoreDef
      */
@@ -525,6 +533,11 @@ private:
      * A flag indicating if the measure has AlignmentReference with multiple layers
      */
     bool m_hasAlignmentRefWithMultipleLayers;
+
+    /**
+     * An offset to be added in case measure is right before the section restart
+     */
+    int m_sectionRestartOffset = 0;
 
     /**
      * Start time state variables.

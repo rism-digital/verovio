@@ -1170,7 +1170,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
 
     SetDrawingXRel(params->m_shift);
 
-    params->m_shift += this->GetWidth();
+    params->m_shift += this->GetWidth() + m_sectionRestartOffset;
     params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
 
     return FUNCTOR_SIBLINGS;
