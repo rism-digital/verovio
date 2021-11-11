@@ -1538,6 +1538,9 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             if (nextMeasure && scoreDef->DrawLabels()) {
                 DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
             }
+            else if (scoreDef->IsSectionRestart()) {
+                scoreDef->SetDrawingLabelsWidth(5 * m_doc->GetDrawingDoubleUnit(100));
+            }
 
             SetScoreDefDrawingWidth(dc, scoreDef);
         }
