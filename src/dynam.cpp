@@ -105,8 +105,6 @@ std::wstring Dynam::GetSymbolStr() const
 int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
 {
     if (this->HasEnclose()) {
-        Rend *open = new Rend();
-        Rend *close = new Rend();
         std::wstring openElement, closeElement;
         switch (this->GetEnclose()) {
             case ENCLOSURE_brack: {
@@ -124,6 +122,8 @@ int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
         // If both opening/closing element are set - add them to the start and end of the dynam. Apply normal fontstyle
         // to both, so that brackets are not inclined
         if (!openElement.empty() && !closeElement.empty()) {
+            Rend *open = new Rend();
+            Rend *close = new Rend();
             // Add opening bracket to the start of the dynam
             Text *leftBracket = new Text();
             leftBracket->SetText(openElement);
@@ -137,10 +137,6 @@ int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
             close->AddChild(rightBracket);
             close->SetFontstyle(FONTSTYLE_normal);
             this->AddChild(close);
-        }
-        else {
-            delete open;
-            delete close;
         }
     }
     return FUNCTOR_SIBLINGS;
