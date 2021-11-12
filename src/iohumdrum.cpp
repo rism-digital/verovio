@@ -683,10 +683,7 @@ bool HumdrumInput::convertHumdrum()
 
     // Create a list of the parts and which spine represents them.
     std::vector<hum::HTp> &staffstarts = m_staffstarts;
-    std::vector<string> stafftypes;
-    stafftypes.push_back("**kern");
-    stafftypes.push_back("**mens");
-    infile.getSpineStartList(staffstarts, stafftypes);
+    infile.getStaffLikeSpineStartList(staffstarts);
 
     m_fbstates.resize(staffstarts.size());
     std::fill(m_fbstates.begin(), m_fbstates.end(), 0);
@@ -2324,16 +2321,16 @@ void HumdrumInput::prepareVerses()
     for (i = 0; i < (int)staffstarts.size(); ++i) {
         field = staffstarts[i]->getFieldIndex();
         for (j = field + 1; j < line.getFieldCount(); ++j) {
-            if (line.token(j)->isKern()) {
+            if (line.token(j)->isKernLike()) {
                 break;
             }
             if (line.token(j)->isMens()) {
                 break;
             }
-            else if (line.token(j)->isDataType("**text")) {
+            else if (line.token(j)->isDataTypeLike("**text")) {
                 ss[i].verse = true;
             }
-            else if (line.token(j)->isDataType("**silbe")) {
+            else if (line.token(j)->isDataTypeLike("**silbe")) {
                 ss[i].verse = true;
             }
             else if (line.token(j)->getDataType().compare(0, 7, "**vdata") == 0) {
@@ -2362,7 +2359,7 @@ void HumdrumInput::prepareTimeSigDur(int &top, int &bot)
     sigdurs.resize(infile.getLineCount());
     std::fill(sigdurs.begin(), sigdurs.end(), -1);
 
-    infile.getKernSpineStartList(spinestarts);
+    infile.getKernLikeSpineStartList(spinestarts);
     hum::HTp kernspine = NULL;
     if (spinestarts.size() == 0) {
         infile.getSpineStartList(spinestarts, "**recip");
@@ -2440,7 +2437,7 @@ void HumdrumInput::calculateReverseKernIndex()
 //////////////////////////////
 //
 // HumdrumInput::prepareStaffGroups --  Add information about each part and
-//    group by brackets/bar groupings
+//    group by brackets/bar groupings (for initial staff information).
 //
 
 void HumdrumInput::prepareStaffGroups(int top, int bot)
@@ -2450,8 +2447,12 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
     if (staffstarts.size() > 0) {
         addMidiTempo(m_doc->GetCurrentScoreDef(), staffstarts[0], top, bot);
     }
+    hum::HumRegex hre;
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
+        if (hre.search(staffstarts[i], "^\\*\\*kern-(.*)")) {
+            m_staffdef.back()->SetType(hre.getMatch(1));
+        }
         // m_staffgroup->AddChild(m_staffdef.back());
         int staffnumber = i + 1;
         int staffcount = (int)staffstarts.size();
@@ -6737,7 +6738,7 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
     int kerntrack = -1;
     hum::HTp current = token;
     while (current) {
-        if (current->isKern()) {
+        if (current->isKernLike()) {
             kerntrack = current->getTrack();
         }
         current = current->getPreviousFieldToken();
@@ -6793,7 +6794,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                     break;
                 }
                 hum::HTp token = infile.token(i, j);
-                if (token->isKern()) {
+                if (token->isKernLike()) {
                     staffindex++;
                 }
                 else if (token->isDataType("**mens")) {
@@ -7095,7 +7096,7 @@ void HumdrumInput::linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex
 
     for (int i = startfield - 1; i >= 0; i--) {
         hum::HTp testtok = line.token(i);
-        if (!testtok->isKern()) {
+        if (!testtok->isKernLike()) {
             continue;
         }
         linktrack = testtok->getTrack();
@@ -8736,7 +8737,7 @@ void HumdrumInput::checkForVerseLabels(hum::HTp token)
         current = current->getNextFieldToken();
     }
     while (current && !current->isStaff()) {
-        if (!current->isDataType("**text")) {
+        if (!current->isDataTypeLike("**text")) {
             current = current->getNextFieldToken();
             continue;
         }
@@ -13037,7 +13038,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
             active = false;
         }
-        if (dyntok->isKern()) {
+        if (dyntok->isKernLike()) {
             active = true;
             ttrack = dyntok->getTrack();
             if (ttrack != track) {
@@ -13645,7 +13646,7 @@ hum::HumNum HumdrumInput::getLeftNoteDuration(hum::HTp token)
     hum::HumNum output = 0;
     hum::HTp current = token;
     while (current) {
-        if (!current->isKern()) {
+        if (!current->isKernLike()) {
             current = current->getPreviousFieldToken();
             continue;
         }
@@ -17749,7 +17750,7 @@ void HumdrumInput::handleStaffDynamStateVariables(hum::HTp token)
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     hum::HTp tok = token->getNextFieldToken();
-    while ((tok != NULL) && (!tok->isKern())) {
+    while ((tok != NULL) && (!tok->isKernLike())) {
         if (!tok->isDataType("**dynam")) {
             tok = tok->getNextFieldToken();
             continue;
@@ -20006,7 +20007,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
     for (int i = startfield; i < line.getFieldCount(); ++i) {
         std::string exinterp = line.token(i)->getDataType();
 
-        if (line.token(i)->isKern() || (exinterp.find("kern") != std::string::npos)) {
+        if (line.token(i)->isKernLike() || (exinterp.find("kern") != std::string::npos)) {
             ttrack = line.token(i)->getTrack();
             if (ttrack != track) {
                 break;
@@ -20023,10 +20024,10 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
         lyricQ = false;
         vdataQ = false;
         vvdataQ = false;
-        if (line.token(i)->isDataType("**text")) {
+        if (line.token(i)->isDataTypeLike("**text")) {
             lyricQ = true;
         }
-        else if (line.token(i)->isDataType("**silbe")) {
+        else if (line.token(i)->isDataTypeLike("**silbe")) {
             lyricQ = true;
         }
         else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
@@ -20046,7 +20047,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             versenum++;
             continue;
         }
-        if (line.token(i)->isDataType("**silbe")) {
+        if (line.token(i)->isDataTypeLike("**silbe")) {
             if (line.token(i)->getText() == "|") {
                 versenum++;
                 continue;
@@ -20070,7 +20071,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
         vtoks.clear();
         // int track = line.token(i)->getTrack();
         // int strack = line.token(i)->getSubtrack();
-        if (line.token(i)->isDataType("**silbe")) {
+        if (line.token(i)->isDataTypeLike("**silbe")) {
             vtoks.push_back(line.token(i));
             std::string value = line.token(i)->getText();
             hre.replaceDestructive(value, "", "\\|", "g");
@@ -21071,7 +21072,7 @@ hum::HTp HumdrumInput::getRightmostStaffArpeggio(hum::HTp token)
         if (ntrack != track) {
             break;
         }
-        if (!token->isKern()) {
+        if (!token->isKernLike()) {
             token = token->getNextFieldToken();
             continue;
         }
@@ -21103,7 +21104,7 @@ bool HumdrumInput::leftmostStaffArpeggio(hum::HTp token)
         if (track != ntrack) {
             break;
         }
-        if (!token->isKern()) {
+        if (!token->isKernLike()) {
             token = token->getPreviousFieldToken();
             if (token) {
                 ntrack = token->getTrack();
@@ -21137,7 +21138,7 @@ hum::HTp HumdrumInput::getHighestSystemArpeggio(hum::HTp token)
     hum::HLp line = token->getLine();
     for (int i = 0; i < line->getFieldCount(); ++i) {
         hum::HTp tok2 = line->token(i);
-        if (!tok2->isKern()) {
+        if (!tok2->isKernLike()) {
             continue;
         }
         if (tok2->find("::") == std::string::npos) {
@@ -21178,7 +21179,7 @@ bool HumdrumInput::isLowestSystemArpeggio(hum::HTp token)
     hum::HLp line = token->getLine();
     for (int i = 0; i < line->getFieldCount(); ++i) {
         hum::HTp tok2 = line->token(i);
-        if (!tok2->isKern()) {
+        if (!tok2->isKernLike()) {
             continue;
         }
         if (tok2->find("::") == std::string::npos) {
@@ -22895,7 +22896,7 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
     int kerncount = 0;
     int menscount = 0;
     for (int i = 0; i < (int)m_oclef.size(); ++i) {
-        if (m_oclef[i].second->isKern()) {
+        if (m_oclef[i].second->isKernLike()) {
             kerncount++;
         }
         else if (m_oclef[i].second->isMens()) {
@@ -23932,7 +23933,7 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // check for known signifier meanings:
 
         if (((key == "RDF**silbe") || (key == "RDF**text")) && hre.search(value, "marked text|matched text")) {
-            // for **text and **silbe
+            // for **text and **silbe (and text-like/silbe-like)
             m_signifiers.textmark.push_back(signifier);
             if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
                 m_signifiers.textcolor.push_back(hre.getMatch(1));
@@ -24240,7 +24241,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
             restQ = true;
             line = dataline[i];
             for (int j = 0; j < infile[line].getFieldCount(); ++j) {
-                if (!infile.token(line, j)->isKern()) {
+                if (!infile.token(line, j)->isKernLike()) {
                     continue;
                 }
                 if (!infile.token(line, j)->isRest()) {
@@ -24277,7 +24278,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
                 hasitem = true;
                 break;
             }
-            else if (tok->isDataType("**text")) {
+            else if (tok->isDataTypeLike("**text")) {
                 hasitem = true;
                 break;
             }
@@ -24300,7 +24301,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
             if (tok->isNull()) {
                 continue;
             }
-            if (!tok->isKern()) {
+            if (!tok->isKernLike()) {
                 continue;
             }
             std::string text = tok->getLayoutParameter("TX", "t");
@@ -24674,7 +24675,7 @@ void HumdrumInput::hideTerminalBarlines(hum::HumdrumFile &infile)
 {
     for (int i = 0; i < infile.getStrandCount(); ++i) {
         hum::HTp stok = infile.getStrandStart(i);
-        if (!stok->isKern()) {
+        if (!stok->isKernLike()) {
             continue;
         }
         hum::HTp etok = infile.getStrandEnd(i);
@@ -24755,7 +24756,7 @@ void HumdrumInput::analyzeClefNulls(hum::HumdrumFile &infile)
         }
         for (int j = 0; j < infile[i].getFieldCount(); j++) {
             hum::HTp token = infile[i].token(j);
-            if (!token->isKern()) {
+            if (!token->isKernLike()) {
                 continue;
             }
             if (!token->isClef()) {

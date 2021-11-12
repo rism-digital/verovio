@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Nov  8 15:58:16 PST 2021
+// Last Modified: Thu Nov 11 20:41:04 PST 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -25193,7 +25193,7 @@ void HumdrumFileContent::getTimeSigs(vector<pair<int, HumNum> >& output,
 	pair<int, HumNum> current(0, 0);
 	fill(output.begin(), output.end(), current);
 	if (track == 0) {
-		vector<HTp> kernspines = infile.getKernSpineStartList();
+		vector<HTp> kernspines = infile.getKernLikeSpineStartList();
 		if (kernspines.size() > 0) {
 			track = kernspines[0]->getTrack();
 		}
@@ -30810,7 +30810,7 @@ HumdrumToken* HumdrumToken::getNextNonNullDataToken(int index) {
 //
 
 HumNum HumdrumToken::getSlurDuration(HumNum scale) {
-	if (!isDataType("**kern")) {
+	if (!isDataTypeLike("**kern")) {
 		return 0;
 	}
 	if (isDefined("auto", "slurDuration")) {
@@ -30851,6 +30851,42 @@ bool HumdrumToken::isDataType(const string& dtype) const {
 		return dtype == getDataType();
 	} else {
 		return getDataType().compare(2, string::npos, dtype) == 0;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isDataTypeLike -- Returns true if the data type of the token
+//   matches the test data type plus a dash followed by any text.
+// @SEEALSO: getDataType getKern
+//
+
+bool HumdrumToken::isDataTypeLike(const string& dtype) const {
+	if (isDataType(dtype)) {
+		return true;
+	}
+	if (dtype.compare(0, 2, "**") == 0) {
+		string comparison = dtype;
+		comparison += "-";
+		string tokentype = getDataType();
+		if (tokentype.compare(0, comparison.size(), comparison) == 0) {
+			return true;
+		} else {
+			return false;
+		}
+		return dtype == getDataType();
+	} else {
+		string comparison = "**";
+		comparison += dtype;
+		comparison += "-";
+		string tokentype = getDataType();
+		if (tokentype.compare(0, comparison.size(), comparison) == 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 
@@ -31649,7 +31685,7 @@ bool HumdrumToken::isStaff(void) const {
 //
 
 bool HumdrumToken::isRest(void) {
-	if (isKern()) {
+	if (isKernLike()) {
 		if (isNull() && Convert::isKernRest((string)(*resolveNull()))) {
 			return true;
 		} else if (Convert::isKernRest((string)(*this))) {
@@ -31680,7 +31716,7 @@ bool HumdrumToken::isNote(void) {
 	if (isNull()) {
 		return false;
 	}
-	if (isKern()) {
+	if (isKernLike()) {
 		if (Convert::isKernNote((string)(*this))) {
 			return true;
 		}
@@ -31700,7 +31736,7 @@ bool HumdrumToken::isNote(void) {
 //
 
 bool HumdrumToken::isPitched(void) { 
-	if (this->isKern()) {
+	if (this->isKernLike()) {
 		for (int i=0; i<(int)this->size(); i++) {
 			if ((this->at(i) == 'r') || (this->at(i) == 'R')) {
 				return false;
@@ -31720,7 +31756,7 @@ bool HumdrumToken::isPitched(void) {
 //
 
 bool HumdrumToken::isUnpitched(void) {
-	if (this->isKern()) {
+	if (this->isKernLike()) {
 		if (this->find('R') != string::npos) {
 			return 1;
 		} else {
@@ -32280,7 +32316,7 @@ bool HumdrumToken::hasObliquaLigatureBegin(void) {
 //
 
 char HumdrumToken::hasStemDirection(void) {
-	if (isKern()) {
+	if (isKernLike()) {
 		return Convert::hasKernStemDirection(*this);
 	} else {
 		// don't know what a stem in this datatype is
@@ -49665,7 +49701,7 @@ void Tool_autobeam::beamGraceNotes(HumdrumFile& infile) {
 		if (!m_tracks.at(track)) {
 			continue;
 		}
-		if (!starttok->isKern()) {
+		if (!starttok->isKernLike()) {
 			continue;
 		}
 		endtok   = infile.getStrandEnd(i);
@@ -49819,7 +49855,7 @@ void Tool_autobeam::removeBeams(HumdrumFile& infile) {
 		if (!m_tracks.at(track)) {
 			continue;
 		}
-		if (!starttok->isKern()) {
+		if (!starttok->isKernLike()) {
 			continue;
 		}
 		endtok   = infile.getStrandEnd(i);
@@ -49875,12 +49911,12 @@ void Tool_autobeam::breakBeamsByLyrics(HumdrumFile& infile) {
 		if (!m_tracks.at(track)) {
 			continue;
 		}
-		if (!starttok->isKern()) {
+		if (!starttok->isKernLike()) {
 			continue;
 		}
 		HTp curtok = starttok->getNextFieldToken();
 		bool hastext = false;
-		while (curtok && !curtok->isKern()) {
+		while (curtok && !curtok->isKernLike()) {
 			if (curtok->isDataType("**text")) {
 				hastext = true;
 				break;
@@ -50331,7 +50367,7 @@ void Tool_autobeam::getBeamedNotes(vector<HTp>& toks, HTp tok, HTp stok, HTp eto
 
 bool Tool_autobeam::hasSyllable(HTp token) {
 	HTp current = token->getNextFieldToken();
-	while (current && !current->isKern()) {
+	while (current && !current->isKernLike()) {
 		if (current->isDataType("**text")) {
 			if (current->isNull()) {
 				return false;
@@ -50361,7 +50397,7 @@ void Tool_autobeam::addBeams(HumdrumFile& infile) {
 		if (!m_tracks.at(track)) {
 				continue;
 		}
-		if (!starttok->isKern()) {
+		if (!starttok->isKernLike()) {
 			continue;
 		}
 		processStrand(infile.getStrandStart(i), infile.getStrandEnd(i));
@@ -50378,7 +50414,7 @@ void Tool_autobeam::addBeams(HumdrumFile& infile) {
 
 void Tool_autobeam::initialize(HumdrumFile& infile) {
 	m_splitcount = 0;
-	m_kernspines = infile.getKernSpineStartList();
+	m_kernspines = infile.getKernLikeSpineStartList();
 	vector<HTp>& ks = m_kernspines;
 	m_timesigs.resize(infile.getTrackCount() + 1);
 	for (int i=0; i<(int)ks.size(); i++) {
@@ -50457,8 +50493,8 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 	vector<pair<int, HumNum> >& timesig = m_timesigs[measure[0]->getTrack()];
 	for (int i=0; i<(int)measure.size(); i++) {
 		int line = measure[i]->getLineIndex();
-		if ((current.first != timesig[line].first) ||
-		    (current.second != timesig[line].second)) {
+		if ((current.first != timesig.at(line).first) ||
+		    (current.second != timesig.at(line).second)) {
 			current = timesig[line];
 			beatdur = 1;
 			beatdur /= current.second;
