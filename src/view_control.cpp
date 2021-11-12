@@ -186,6 +186,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
     }
     if (!start || !end) return;
+    if (!interface->IsOrdered(start, end)) {
+        // To avoid showing the same warning multiple times, display a warning only during actual drawing
+        if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
+            LogWarning("%s '%s' is ignored, since start '%s' does not occur temporally before end '%s'.",
+                element->GetClassName().c_str(), element->GetUuid().c_str(), start->GetUuid().c_str(),
+                end->GetUuid().c_str());
+        }
+        return;
+    }
 
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System *>(start->GetFirstAncestor(SYSTEM));

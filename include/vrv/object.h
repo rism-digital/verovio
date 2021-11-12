@@ -436,6 +436,11 @@ public:
     bool DeleteChild(Object *child);
 
     /**
+     * Returns all ancestors
+     */
+    ListOfObjects GetAncestors() const;
+
+    /**
      * Return the first ancestor of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
@@ -539,6 +544,11 @@ public:
     static std::string GenerateRandUuid();
 
     static bool sortByUlx(Object *a, Object *b);
+
+    /**
+     * @Return true if left appears before right in preorder traversal
+     */
+    static bool IsPreOrdered(Object *left, Object *right);
 
     //----------//
     // Functors //
