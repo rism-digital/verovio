@@ -15,6 +15,7 @@
 
 #include "btrem.h"
 #include "chord.h"
+#include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -386,6 +387,33 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
         const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
         SetDrawingStemLen(GetDrawingStemLen() + heightToAdjust);
         flag->SetDrawingYRel(-GetDrawingStemLen());
+    }
+
+    // As separate case we need to account for possible overlaps of flag bottom part with ledger lines when stem has up
+    // direction (i.e. note to the right is being shifted closer to current note and ledger lines end up overlapping)
+    if (stemDirection == STEMDIRECTION_up) {
+        Layer *layer = vrv_cast<Layer *>(parent->GetFirstAncestor(LAYER));
+        assert(layer);
+        ClassIdsComparison cmp({NOTE, CHORD});
+        Object *object = layer->FindNextChild(&cmp, parent);
+        if (object) {
+            Note *nextNote = NULL;
+            if (object->Is(NOTE)) {
+                nextNote = vrv_cast<Note *>(object);
+            }
+            else if (object->Is(CHORD)) {
+                nextNote = vrv_cast<Chord *>(object)->GetTopNote();
+            }
+            if (nextNote && (nextNote->GetDrawingLoc() < note->GetDrawingLoc())) {
+                const int flagBottom = GetDrawingY() - GetDrawingStemLen() - glyphHeight;
+                const int margin = ledgerPosition - flagBottom;
+                if (margin > 0) {
+                    const int heightToAdjust = ((margin - 1) / adjustmentStep + 1) * adjustmentStep;
+                    SetDrawingStemLen(GetDrawingStemLen() - heightToAdjust);
+                    flag->SetDrawingYRel(-GetDrawingStemLen());
+                }
+            }
+        }
     }
 }
 
