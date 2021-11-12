@@ -735,6 +735,17 @@ void Object::FillFlatList(ArrayOfObjects *flatList)
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
+ListOfObjects Object::GetAncestors() const
+{
+    ListOfObjects ancestors;
+    Object *object = m_parent;
+    while (object) {
+        ancestors.push_back(object);
+        object = object->m_parent;
+    }
+    return ancestors;
+}
+
 Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
@@ -1043,6 +1054,26 @@ bool Object::sortByUlx(Object *a, Object *b)
     }
 
     return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+}
+
+bool Object::IsPreOrdered(Object *left, Object *right)
+{
+    ListOfObjects ancestorsLeft = left->GetAncestors();
+    ancestorsLeft.push_front(left);
+    // Check if right is an ancestor of left
+    if (std::find(ancestorsLeft.begin(), ancestorsLeft.end(), right) != ancestorsLeft.end()) return false;
+    ListOfObjects ancestorsRight = right->GetAncestors();
+    ancestorsRight.push_front(right);
+    // Check if left is an ancestor of right
+    if (std::find(ancestorsRight.begin(), ancestorsRight.end(), left) != ancestorsRight.end()) return true;
+
+    // Now there must be mismatches since we included left and right into the ancestor lists above
+    auto iterPair = std::mismatch(ancestorsLeft.rbegin(), ancestorsLeft.rend(), ancestorsRight.rbegin());
+    Object *commonParent = (*iterPair.first)->m_parent;
+    if (commonParent) {
+        return (commonParent->GetChildIndex(*iterPair.first) < commonParent->GetChildIndex(*iterPair.second));
+    }
+    return false;
 }
 
 //----------------------------------------------------------------------------
