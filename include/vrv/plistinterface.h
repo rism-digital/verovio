@@ -33,8 +33,8 @@ public:
     ///@{
     PlistInterface();
     virtual ~PlistInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_PLIST; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_PLIST; }
     ///@}
 
     /**
@@ -86,7 +86,7 @@ protected:
      * Method to be redefined in the child class if specific validation is required.
      * The method is called from PlistInterface::SetRef
      */
-    virtual bool IsValidRef(Object *ref) { return true; }
+    virtual bool IsValidRef(Object *ref) const { return true; }
 
 private:
     //

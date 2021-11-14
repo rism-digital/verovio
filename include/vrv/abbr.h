@@ -26,9 +26,9 @@ public:
     ///@{
     Abbr();
     virtual ~Abbr();
-    virtual Object *Clone() const { return new Abbr(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Abbr"; }
+    Object *Clone() const override { return new Abbr(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Abbr"; }
     ///@}
 
 private:

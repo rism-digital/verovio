@@ -1821,7 +1821,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
-    // Nested aligment of bounding boxes is performed only when both the previous alignment and
+    // Nested alignment of bounding boxes is performed only when both the previous alignment and
     // the current one allow it. For example, when one of them is a barline, we do not look how
     // bounding boxes can be nested but instead only look at the horizontal position
     bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
@@ -1994,7 +1994,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
             if (note) m_drawingCueSize = note->GetDrawingCueSize();
         }
     }
-    else if (this->Is({ DOTS, FLAG, STEM })) {
+    else if (this->Is({ ARTIC, DOTS, FLAG, STEM })) {
         Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
         if (note)
             m_drawingCueSize = note->GetDrawingCueSize();
@@ -2308,7 +2308,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
+    if (this->HasContentBB() && !this->HasEmptyBB() && (this->GetContentRight() > params->m_minPos)
         && (this->GetContentLeft() < params->m_maxPos)) {
 
         // We skip the start or end of the slur
@@ -2327,6 +2327,18 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
                     return FUNCTOR_CONTINUE;
                 }
             }
+        }
+
+        // Skip if layer number is outside given bounds
+        int layerN = this->GetAlignmentLayerN();
+        if (layerN < 0) {
+            layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
+        }
+        if (params->m_minLayerN && (params->m_minLayerN > layerN)) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_maxLayerN && (params->m_maxLayerN < layerN)) {
+            return FUNCTOR_CONTINUE;
         }
 
         params->m_elements.push_back(this);

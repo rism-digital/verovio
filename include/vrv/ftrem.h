@@ -31,16 +31,16 @@ public:
     ///@{
     FTrem();
     virtual ~FTrem();
-    virtual Object *Clone() const { return new FTrem(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "FTrem"; }
+    Object *Clone() const override { return new FTrem(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "FTrem"; }
     ///@}
 
     /**
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      *
@@ -54,17 +54,17 @@ public:
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
      */
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
 private:
     //
@@ -72,7 +72,7 @@ protected:
     /**
      * Filter the flat list and keep only Note or Chords elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 public:
     /** */

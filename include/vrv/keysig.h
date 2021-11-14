@@ -42,20 +42,20 @@ public:
     ///@{
     KeySig();
     virtual ~KeySig();
-    virtual Object *Clone() const { return new KeySig(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "KeySig"; }
+    Object *Clone() const override { return new KeySig(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "KeySig"; }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /** Override the method since check is required */
-    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
+    bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /**
      * Add an element (a keyAccid) to a keySig.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /** Accid number getter */
     int GetAccidCount();
@@ -94,13 +94,13 @@ public:
     /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *);
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 private:
     //

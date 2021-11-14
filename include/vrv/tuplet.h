@@ -35,21 +35,21 @@ public:
     ///@{
     Tuplet();
     virtual ~Tuplet();
-    virtual Object *Clone() const { return new Tuplet(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Tuplet"; }
+    Object *Clone() const override { return new Tuplet(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Tuplet"; }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for tuplet
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * @name Setter and getter for darwing elements and position
@@ -90,33 +90,33 @@ public:
     /**
      * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+    int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustTupletsX
      */
-    virtual int AdjustTupletsX(FunctorParams *);
+    int AdjustTupletsX(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustTupletsY
      */
-    virtual int AdjustTupletsY(FunctorParams *);
+    int AdjustTupletsY(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 private:
     /**

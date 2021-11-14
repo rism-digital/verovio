@@ -29,8 +29,8 @@ public:
     ///@{
     FacsimileInterface();
     virtual ~FacsimileInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_FACSIMILE; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_FACSIMILE; }
     ///@}
 
     virtual int GetDrawingX() const;

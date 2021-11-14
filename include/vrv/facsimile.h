@@ -37,11 +37,11 @@ public:
     ///@{
     Facsimile();
     virtual ~Facsimile();
-    virtual Object *Clone() const { return new Facsimile(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "facsimile"; }
+    Object *Clone() const override { return new Facsimile(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Facsimile"; }
     ///@}
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     Zone *FindZoneByUuid(std::string zoneId);
     int GetMaxY();

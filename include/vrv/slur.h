@@ -38,7 +38,8 @@ class Slur : public ControlElement,
              public TimeSpanningInterface,
              public AttColor,
              public AttCurvature,
-             public AttCurveRend {
+             public AttCurveRend,
+             public AttLayerIdent {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -49,17 +50,17 @@ public:
     Slur(ClassId classId);
     Slur(ClassId classId, const std::string &classIdStr);
     virtual ~Slur();
-    virtual Object *Clone() const { return new Slur(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Slur"; }
+    Object *Clone() const override { return new Slur(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Slur"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
@@ -82,9 +83,19 @@ public:
      */
     std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType);
 
+    /**
+     * Calculate the staff where the slur's floating curve positioner lives
+     */
+    Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType);
+
+    /**
+     * Slur adjustment
+     */
+    ///@{
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
+    ///@}
 
     /**
      * Get preferred curve direction based on number of conditions: presence of other layers, stem direction, etc.
@@ -99,7 +110,7 @@ public:
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     /**

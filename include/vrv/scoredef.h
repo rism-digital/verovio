@@ -50,14 +50,14 @@ public:
     ScoreDefElement(ClassId classId);
     ScoreDefElement(ClassId classId, const std::string &classIdStr);
     virtual ~ScoreDefElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
+    ScoreDefInterface *GetScoreDefInterface() override { return dynamic_cast<ScoreDefInterface *>(this); }
     ///@}
 
     /**
@@ -126,12 +126,12 @@ public:
     ///@{
     ScoreDef();
     virtual ~ScoreDef();
-    virtual Object *Clone() const { return new ScoreDef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "ScoreDef"; }
+    Object *Clone() const override { return new ScoreDef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "ScoreDef"; }
     ///@}
 
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.
@@ -216,44 +216,44 @@ public:
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToPageBased
      */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
+    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffSystems
      */
-    virtual int CastOffSystems(FunctorParams *functorParams);
+    int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
 
      * See Object::CastOffEncoding
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignMeasures
      */
-    virtual int AlignMeasures(FunctorParams *functorParams);
+    int AlignMeasures(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyX
      */
-    virtual int JustifyX(FunctorParams *functorParams);
+    int JustifyX(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 private:
     //

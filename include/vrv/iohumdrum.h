@@ -410,7 +410,7 @@ public:
     HumdrumInput(vrv::Doc *doc);
     virtual ~HumdrumInput();
 
-    virtual bool Import(const std::string &humdrum);
+    bool Import(const std::string &humdrum) override;
 
     void parseEmbeddedOptions(vrv::Doc *doc);
     void finalizeDocument(vrv::Doc *doc);

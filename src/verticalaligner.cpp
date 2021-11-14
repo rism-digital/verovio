@@ -1039,7 +1039,9 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     const int minSpacing = CalcMinimumRequiredSpacing(params->m_doc);
 
     if (m_spacingType == SystemAligner::SpacingType::System) {
-        params->m_cumulatedShift += minSpacing;
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = params->m_doc->GetDrawingUnit(GetStaffSize());
+        params->m_cumulatedShift += minSpacing + 2 * unit;
     }
     else if (minSpacing > defaultSpacing) {
         params->m_cumulatedShift += minSpacing - defaultSpacing;

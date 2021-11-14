@@ -35,17 +35,17 @@ public:
     ///@{
     BracketSpan();
     virtual ~BracketSpan();
-    virtual Object *Clone() const { return new BracketSpan(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "BracketSpan"; }
+    Object *Clone() const override { return new BracketSpan(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "BracketSpan"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     //----------//

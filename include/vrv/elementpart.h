@@ -33,12 +33,12 @@ public:
     ///@{
     Dots();
     virtual ~Dots();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Dots"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Dots"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     std::set<int> GetDotLocsForStaff(Staff *staff) const;
     std::set<int> &ModifyDotLocsForStaff(Staff *staff);
@@ -54,16 +54,11 @@ public:
     //----------//
 
     /**
-     * See Object::CalcStem
-     */
-    // virtual int CalcStem(FunctorParams *functorParams);
-
-    /**
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
-    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
+    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -77,12 +72,12 @@ public:
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
 private:
     //
@@ -114,12 +109,12 @@ public:
     ///@{
     Flag();
     virtual ~Flag();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Flag"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Flag"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
 
@@ -134,14 +129,14 @@ public:
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
-    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
+    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //
@@ -169,8 +164,8 @@ public:
     ///@{
     TupletBracket();
     virtual ~TupletBracket();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "TupletBracket"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "TupletBracket"; }
     ///@}
 
     /**
@@ -212,19 +207,19 @@ public:
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
-    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
+    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
 private:
     //
@@ -262,8 +257,8 @@ public:
     ///@{
     TupletNum();
     virtual ~TupletNum();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "TupletNum"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "TupletNum"; }
     ///@}
 
     /**
@@ -294,19 +289,19 @@ public:
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
-    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
+    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
 private:
     //
@@ -333,17 +328,17 @@ public:
     ///@{
     Stem();
     virtual ~Stem();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Stem"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Stem"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add an element (only flag supported) to a stem.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Setter and getter for darwing stem direction and length
@@ -375,20 +370,20 @@ public:
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
-    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
+    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     /**

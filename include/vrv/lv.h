@@ -28,12 +28,12 @@ public:
     ///@{
     Lv();
     virtual ~Lv();
-    virtual Object *Clone() const { return new Lv(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Lv"; }
+    Object *Clone() const override { return new Lv(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Lv"; }
     ///@}
 
-    virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
+    bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]) override;
 
     //----------//
     // Functors //

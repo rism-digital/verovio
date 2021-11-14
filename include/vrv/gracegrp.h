@@ -26,15 +26,15 @@ public:
     ///@{
     GraceGrp();
     virtual ~GraceGrp();
-    virtual Object *Clone() const { return new GraceGrp(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "GraceGrp"; };
+    Object *Clone() const override { return new GraceGrp(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "GraceGrp"; }
     ///@}
 
     /**
      * Add childElement to a element.
      */
-    virtual bool IsSupportedChild(Object *childElement);
+    bool IsSupportedChild(Object *object) override;
 
 protected:
     //

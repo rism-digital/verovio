@@ -298,7 +298,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = artic->GetDrawingX();
     int y = artic->GetDrawingY();
 
-    const bool drawingCueSize = true;
+    const bool drawingCueSize = artic->GetDrawingCueSize();
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
 

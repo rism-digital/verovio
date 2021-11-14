@@ -590,7 +590,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
 
     // first check if they overlap at all
     if (horizontalOverlap) {
-        if (p2.x < boundingBox->GetLeftBy(type) + margin) return { 0, 0 };
+        if (p2.x < boundingBox->GetLeftBy(type) - margin) return { 0, 0 };
         if (p1.x > boundingBox->GetRightBy(type) + margin) return { 0, 0 };
     }
 
