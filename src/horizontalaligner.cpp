@@ -997,7 +997,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 // last alignment of GraceAligner is rightmost one, so get it
                 Alignment *alignment = vrv_cast<Alignment *>(graceAligner->GetLast(ALIGNMENT));
                 // if there is no overlap with accidentals, exclude them when getting left-right margins of alignment
-                if (!alignment->HasAccidVerticalOverlap(params->m_rightDefaultAlignment, graceAlignerId)) {
+                if (alignment && !alignment->HasAccidVerticalOverlap(params->m_rightDefaultAlignment, graceAlignerId)) {
                     exclude.push_back(ACCID);
                 }
             }
