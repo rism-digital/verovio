@@ -67,7 +67,7 @@ wchar_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
         wchar_t code = Resources::GetGlyphCode(GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
-    
+
     switch (notationtype) {
         case NOTATIONTYPE_neume:
             return SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
