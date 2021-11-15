@@ -145,7 +145,7 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense)
     if ((optionCondense == CONDENSE_auto) && !m_scoreDef.HasOptimize()) {
         ListOfObjects symbols;
         ClassIdComparison matchClassId(GRPSYM);
-        m_scoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
+        m_scoreDef.FindAllDescendantsByComparison(&symbols, &matchClassId);
         optimize = (symbols.size() > 1);
     }
 

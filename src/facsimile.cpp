@@ -54,7 +54,7 @@ int Facsimile::GetMaxX()
 {
     ClassIdComparison ac(SURFACE);
     ListOfObjects surfaces;
-    this->FindAllDescendantByComparison(&surfaces, &ac);
+    this->FindAllDescendantsByComparison(&surfaces, &ac);
 
     int max = 0;
     for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {
@@ -69,7 +69,7 @@ int Facsimile::GetMaxY()
 {
     ClassIdComparison ac(SURFACE);
     ListOfObjects surfaces;
-    this->FindAllDescendantByComparison(&surfaces, &ac);
+    this->FindAllDescendantsByComparison(&surfaces, &ac);
 
     int max = 0;
     for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {

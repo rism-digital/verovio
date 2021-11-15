@@ -401,7 +401,7 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
 {
     ListOfObjects objects;
     ClassIdsComparison cmp({ DOT, DOTS, FLAG });
-    durElement->FindAllDescendantByComparison(&objects, &cmp);
+    durElement->FindAllDescendantsByComparison(&objects, &cmp);
 
     int adjust = 0;
     int dotsPosition = 0;

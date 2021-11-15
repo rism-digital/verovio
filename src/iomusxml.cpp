@@ -269,7 +269,7 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
     // the same staff to see if we need to insert #sameas clef to them.
     ListOfObjects staffLayers;
     ClassIdComparison cmp(LAYER);
-    staff->FindAllDescendantByComparison(&staffLayers, &cmp);
+    staff->FindAllDescendantsByComparison(&staffLayers, &cmp);
     for (const auto listLayer : staffLayers) {
         Layer *otherLayer = vrv_cast<Layer *>(listLayer);
         if (m_layerTimes.find(otherLayer) == m_layerTimes.end()) continue;

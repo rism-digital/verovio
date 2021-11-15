@@ -157,7 +157,7 @@ bool Doc::GenerateDocumentScoreDef()
 
     ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
-    measure->FindAllDescendantByComparison(&staves, &matchType);
+    measure->FindAllDescendantsByComparison(&staves, &matchType);
 
     if (staves.empty()) {
         LogError("No staff found for generating a scoreDef");
@@ -228,7 +228,7 @@ bool Doc::GenerateMeasureNumbers()
 {
     ClassIdComparison matchType(MEASURE);
     ListOfObjects measures;
-    this->FindAllDescendantByComparison(&measures, &matchType);
+    this->FindAllDescendantsByComparison(&measures, &matchType);
 
     // run through all measures and generate missing mNum from attribute
     for (auto &object : measures) {
@@ -807,7 +807,7 @@ void Doc::PrepareDrawing()
     /************ Add default syl for syllables (if applicable) ************/
     ListOfObjects syllables;
     ClassIdComparison comp(SYLLABLE);
-    this->FindAllDescendantByComparison(&syllables, &comp);
+    this->FindAllDescendantsByComparison(&syllables, &comp);
     for (auto it = syllables.begin(); it != syllables.end(); ++it) {
         Syllable *syllable = dynamic_cast<Syllable *>(*it);
         syllable->MarkupAddSyl();
@@ -1109,7 +1109,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 
     ListOfObjects systems;
     ClassIdComparison cmp(SYSTEM);
-    contentPage->FindAllDescendantByComparison(&systems, &cmp, 1);
+    contentPage->FindAllDescendantsByComparison(&systems, &cmp, 1);
     for (const auto item : systems) {
         System *system = vrv_cast<System *>(item);
         assert(system);
@@ -1311,7 +1311,7 @@ std::list<Score *> Doc::GetScores()
     std::list<Score *> scores;
     ListOfObjects objects;
     ClassIdComparison cmp(SCORE);
-    this->FindAllDescendantByComparison(&objects, &cmp, 3);
+    this->FindAllDescendantsByComparison(&objects, &cmp, 3);
     for (const auto object : objects) {
         Score *score = vrv_cast<Score *>(object);
         assert(score);

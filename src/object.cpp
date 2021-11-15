@@ -365,7 +365,7 @@ int Object::GetChildCount(const ClassId classId, int deepth)
 {
     ListOfObjects objects;
     ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantByComparison(&objects, &matchClassId);
+    this->FindAllDescendantsByComparison(&objects, &matchClassId);
     return (int)objects.size();
 }
 
@@ -562,7 +562,7 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
     return findExtremeByComparisonParams.m_element;
 }
 
-ListOfObjects Object::FindAllDescendantByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
+ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
 {
     ListOfObjects objects;
     ClassIdComparison comparison(classId);
@@ -573,7 +573,7 @@ ListOfObjects Object::FindAllDescendantByType(ClassId classId, bool continueDept
     return objects;
 }
 
-void Object::FindAllDescendantByComparison(
+void Object::FindAllDescendantsByComparison(
     ListOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
@@ -584,7 +584,7 @@ void Object::FindAllDescendantByComparison(
     this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
 }
 
-void Object::FindAllDescendantBetween(
+void Object::FindAllDescendantsBetween(
     ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
 {
     assert(objects);
@@ -607,7 +607,7 @@ Object *Object::GetChild(int idx, const ClassId classId)
 {
     ListOfObjects objects;
     ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantByComparison(&objects, &matchClassId, 1);
+    this->FindAllDescendantsByComparison(&objects, &matchClassId, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
@@ -721,7 +721,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
 {
     ListOfObjects objects;
     ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantByComparison(&objects, &matchClassId);
+    this->FindAllDescendantsByComparison(&objects, &matchClassId);
     int i = 0;
     for (auto &object : objects) {
         if (child == object) return i;
@@ -814,7 +814,7 @@ bool Object::HasEditorialContent()
 {
     ListOfObjects editorial;
     IsEditorialElementComparison editorialComparison;
-    this->FindAllDescendantByComparison(&editorial, &editorialComparison);
+    this->FindAllDescendantsByComparison(&editorial, &editorialComparison);
     return (!editorial.empty());
 }
 
@@ -823,7 +823,7 @@ bool Object::HasNonEditorialContent()
     ListOfObjects nonEditorial;
     IsEditorialElementComparison editorialComparison;
     editorialComparison.ReverseComparison();
-    this->FindAllDescendantByComparison(&nonEditorial, &editorialComparison);
+    this->FindAllDescendantsByComparison(&nonEditorial, &editorialComparison);
     return (!nonEditorial.empty());
 }
 
@@ -1015,7 +1015,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         fa = a->GetFacsimileInterface();
     else {
         ListOfObjects children;
-        a->FindAllDescendantByComparison(&children, &comp);
+        a->FindAllDescendantsByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
@@ -1029,7 +1029,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         fb = b->GetFacsimileInterface();
     else {
         ListOfObjects children;
-        b->FindAllDescendantByComparison(&children, &comp);
+        b->FindAllDescendantsByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
@@ -1699,12 +1699,12 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         // them)
         ListOfObjects currentObjects, previousObjects;
         AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
-        measure->FindAllDescendantByComparison(&currentObjects, &comparison);
+        measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
         if ((int)currentObjects.size() == measure->GetChildCount(STAFF)) {
             drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
         }
         if (params->m_previousMeasure) {
-            params->m_previousMeasure->FindAllDescendantByComparison(&previousObjects, &comparison);
+            params->m_previousMeasure->FindAllDescendantsByComparison(&previousObjects, &comparison);
             if ((int)previousObjects.size() == params->m_previousMeasure->GetChildCount(STAFF))
                 drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
         }

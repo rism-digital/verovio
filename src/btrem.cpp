@@ -98,7 +98,7 @@ int BTrem::GenerateMIDI(FunctorParams *functorParams)
     if (chord) {
         ListOfObjects notes;
         ClassIdComparison noteComparison(NOTE);
-        chord->FindAllDescendantByComparison(&notes, &noteComparison);
+        chord->FindAllDescendantsByComparison(&notes, &noteComparison);
         std::for_each(notes.begin(), notes.end(), expandNote);
     }
     else {

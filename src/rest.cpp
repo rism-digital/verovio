@@ -275,7 +275,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
-    realStaff->FindAllDescendantByComparison(&layers, &matchType);
+    realStaff->FindAllDescendantsByComparison(&layers, &matchType);
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer, isTopLayer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
@@ -427,7 +427,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     // Compare number of layers in the next/previous staff and if it's the same - find layer with same N
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
-    previousStaff->FindAllDescendantByComparison(&layers, &matchType);
+    previousStaff->FindAllDescendantsByComparison(&layers, &matchType);
     auto layerIter = std::find_if(layers.begin(), layers.end(),
         [&](Object *foundLayer) { return vrv_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN(); });
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
@@ -683,7 +683,7 @@ int Rest::Transpose(FunctorParams *functorParams)
 
     ListOfObjects objects;
     ClassIdComparison matchClassId(LAYER);
-    parentStaff->FindAllDescendantByComparison(&objects, &matchClassId);
+    parentStaff->FindAllDescendantsByComparison(&objects, &matchClassId);
     const int layerCount = (int)objects.size();
 
     Layer *firstLayer = vrv_cast<Layer *>(objects.front());

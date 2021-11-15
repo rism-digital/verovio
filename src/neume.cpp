@@ -92,7 +92,7 @@ NeumeGroup Neume::GetNeumeGroup()
 {
     ListOfObjects children;
     ClassIdComparison ac(NC);
-    this->FindAllDescendantByComparison(&children, &ac);
+    this->FindAllDescendantsByComparison(&children, &ac);
 
     auto iter = children.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
@@ -131,7 +131,7 @@ std::vector<int> Neume::GetPitchDifferences()
     std::vector<int> pitchDifferences;
     ListOfObjects ncChildren;
     ClassIdComparison ac(NC);
-    this->FindAllDescendantByComparison(&ncChildren, &ac);
+    this->FindAllDescendantsByComparison(&ncChildren, &ac);
 
     pitchDifferences.reserve(ncChildren.size() - 1);
 
@@ -154,7 +154,7 @@ bool Neume::GenerateChildMelodic()
 {
     ListOfObjects children;
     ClassIdComparison ac(NC);
-    this->FindAllDescendantByComparison(&children, &ac);
+    this->FindAllDescendantsByComparison(&children, &ac);
 
     // Get the first neume component of the neume
     auto iter = children.begin();
@@ -190,7 +190,7 @@ PitchInterface *Neume::GetHighestPitch()
 {
     ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
-    this->FindAllDescendantByComparison(&pitchChildren, &ic);
+    this->FindAllDescendantsByComparison(&pitchChildren, &ic);
 
     auto it = pitchChildren.begin();
     PitchInterface *max = (*it)->GetPitchInterface();
@@ -209,7 +209,7 @@ PitchInterface *Neume::GetLowestPitch()
 {
     ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
-    this->FindAllDescendantByComparison(&pitchChildren, &ic);
+    this->FindAllDescendantsByComparison(&pitchChildren, &ic);
 
     auto it = pitchChildren.begin();
     PitchInterface *min = (*it)->GetPitchInterface();

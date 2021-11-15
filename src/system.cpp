@@ -226,7 +226,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     for (auto &measure : measures) {
         Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
         Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
-        measure->FindAllDescendantBetween(&children, &matchType, curStart, curEnd, false);
+        measure->FindAllDescendantsBetween(&children, &matchType, curStart, curEnd, false);
     }
 
     Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));

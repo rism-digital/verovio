@@ -473,11 +473,11 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
     ListOfObjects layers;
     IsEmptyComparison matchTypeLayer(LAYER);
     matchTypeLayer.ReverseComparison();
-    this->FindAllDescendantByComparison(&layers, &matchTypeLayer);
+    this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
 
     ListOfObjects mRests;
     ClassIdComparison matchTypeMRest(MREST);
-    this->FindAllDescendantByComparison(&mRests, &matchTypeMRest);
+    this->FindAllDescendantsByComparison(&mRests, &matchTypeMRest);
 
     // Show the staff only if no layer with content or only mRests
     if (layers.empty() || (mRests.size() != layers.size())) {
@@ -651,7 +651,7 @@ int Staff::CalcStem(FunctorParams *)
 {
     ClassIdComparison isLayer(LAYER);
     ListOfObjects layers;
-    this->FindAllDescendantByComparison(&layers, &isLayer);
+    this->FindAllDescendantsByComparison(&layers, &isLayer);
 
     if (layers.empty()) {
         return FUNCTOR_CONTINUE;
@@ -673,7 +673,7 @@ int Staff::CalcStem(FunctorParams *)
     // Detecting empty layers (empty layers can also have @sameas) which have to be ignored for stem direction
     IsEmptyComparison isEmptyElement(LAYER);
     ListOfObjects emptyLayers;
-    this->FindAllDescendantByComparison(&emptyLayers, &isEmptyElement);
+    this->FindAllDescendantsByComparison(&emptyLayers, &isEmptyElement);
 
     // We have only one layer (or less) with content - drawing stem dir remains unset
     if ((layers.size() < 3) && (emptyLayers.size() > 0)) {

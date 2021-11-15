@@ -462,7 +462,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
 
         ListOfObjects lyric;
         ClassIdsComparison lyricsComparison({ VERSE, SYL });
-        currentNote->FindAllDescendantByComparison(&lyric, &lyricsComparison);
+        currentNote->FindAllDescendantsByComparison(&lyric, &lyricsComparison);
         if (!lyric.empty()) {
             LogMessage("Inserting a note where a note has lyric content is not possible");
             return false;
@@ -488,7 +488,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
 
         ListOfObjects artics;
         ClassIdComparison articComparison(ARTIC);
-        currentNote->FindAllDescendantByComparison(&artics, &articComparison);
+        currentNote->FindAllDescendantsByComparison(&artics, &articComparison);
         for (auto &artic : artics) {
             artic->MoveItselfTo(chord);
         }
@@ -543,7 +543,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
 
             ListOfObjects artics;
             ClassIdComparison articComparison(ARTIC);
-            chord->FindAllDescendantByComparison(&artics, &articComparison, 1);
+            chord->FindAllDescendantsByComparison(&artics, &articComparison, 1);
             for (auto &artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }

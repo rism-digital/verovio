@@ -61,7 +61,7 @@ int Surface::GetMaxX()
     int max = 0;
     ClassIdComparison ac(ZONE);
     ListOfObjects zones;
-    FindAllDescendantByComparison(&zones, &ac);
+    FindAllDescendantsByComparison(&zones, &ac);
     for (auto iter = zones.begin(); iter != zones.end(); ++iter) {
         Zone *zone = vrv_cast<Zone *>(*iter);
         assert(zone);
@@ -76,7 +76,7 @@ int Surface::GetMaxY()
     int max = 0;
     ClassIdComparison ac(ZONE);
     ListOfObjects zones;
-    FindAllDescendantByComparison(&zones, &ac);
+    FindAllDescendantsByComparison(&zones, &ac);
     for (auto iter = zones.begin(); iter != zones.end(); ++iter) {
         Zone *zone = vrv_cast<Zone *>(*iter);
         assert(zone);

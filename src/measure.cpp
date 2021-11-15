@@ -373,7 +373,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     // First get all the staffGrps
     ClassIdComparison matchType(STAFFGRP);
     ListOfObjects staffGrps;
-    scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
+    scoreDef->FindAllDescendantsByComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
     for (auto &staffGrp : staffGrps) {
@@ -400,7 +400,7 @@ Staff *Measure::GetTopVisibleStaff()
     Staff *staff = NULL;
     ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    this->FindAllDescendantsByComparison(&staves, &matchType, 1);
     for (auto &child : staves) {
         staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -417,7 +417,7 @@ Staff *Measure::GetBottomVisibleStaff()
     Staff *bottomStaff = NULL;
     ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    this->FindAllDescendantsByComparison(&staves, &matchType, 1);
     for (const auto child : staves) {
         Staff *staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -627,7 +627,7 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 {
     ListOfObjects children;
     ClassIdComparison comp(TIE);
-    this->FindAllDescendantByComparison(&children, &comp);
+    this->FindAllDescendantsByComparison(&children, &comp);
 
     std::vector<std::pair<LayerElement *, LayerElement *>> endpoints;
     for (Object *object : children) {

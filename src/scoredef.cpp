@@ -434,7 +434,7 @@ StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
     // First get all the staffGrps
     ClassIdComparison matchType(STAFFGRP);
     ListOfObjects staffGrps;
-    this->FindAllDescendantByComparison(&staffGrps, &matchType);
+    this->FindAllDescendantsByComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
     for (auto &item : staffGrps) {

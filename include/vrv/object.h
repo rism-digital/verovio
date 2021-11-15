@@ -396,21 +396,21 @@ public:
     /**
      * Return all the objects with specified type
      */
-    ListOfObjects FindAllDescendantByType(
+    ListOfObjects FindAllDescendantsByType(
         ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH);
 
     /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllDescendantByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantsByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantBetween(
+    void FindAllDescendantsBetween(
         ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**

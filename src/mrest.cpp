@@ -98,7 +98,7 @@ int MRest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocati
 
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
-    parentStaff->FindAllDescendantByComparison(&layers, &matchType);
+    parentStaff->FindAllDescendantsByComparison(&layers, &matchType);
     const bool isTopLayer = (vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
 
     ListOfObjects::iterator otherLayerIter = isTopLayer ? std::prev(layers.end()) : layers.begin();
