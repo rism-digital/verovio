@@ -25,6 +25,7 @@
 #include "multirest.h"
 #include "page.h"
 #include "pedal.h"
+#include "section.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "syl.h"
@@ -1168,9 +1169,17 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
+    Object *object = this->GetParent()->GetPrevious(this);
+    if (object && object->Is(SECTION)) {
+        Section *section = vrv_cast<Section *>(object);
+        if (section && (section->GetRestart() == BOOLEAN_true)) {
+            params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
+        }
+    }
+
     SetDrawingXRel(params->m_shift);
 
-    params->m_shift += this->GetWidth() + m_sectionRestartOffset;
+    params->m_shift += this->GetWidth();
     params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
 
     return FUNCTOR_SIBLINGS;

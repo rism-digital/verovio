@@ -44,7 +44,6 @@
 #include "pageboundary.h"
 #include "pageelement.h"
 #include "reh.h"
-#include "section.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -1528,14 +1527,6 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
         if (current->Is(MEASURE)) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
-            Object *object = current->GetParent()->GetPrevious(current);
-            if (object->Is(SECTION)) {
-                Measure *previousMeasure = vrv_cast<Measure *>(system->GetPrevious(current, MEASURE));
-                Section *section = vrv_cast<Section *>(object);
-                if (section && previousMeasure && (section->GetRestart() == BOOLEAN_true)) {
-                    previousMeasure->SetSectionRestartOffset(5 * m_doc->GetDrawingDoubleUnit(100));
-                }
-            }
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is(SCOREDEF)) {
@@ -1546,10 +1537,6 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             Measure *nextMeasure = dynamic_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
             if (nextMeasure && scoreDef->DrawLabels()) {
                 DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
-            }
-            else if (scoreDef->IsSectionRestart()) {
-                Measure *previousMeasure = vrv_cast<Measure *>(system->GetPrevious(scoreDef, MEASURE));
-                if (previousMeasure) previousMeasure->SetSectionRestartOffset(5 * m_doc->GetDrawingDoubleUnit(100));
             }
 
             SetScoreDefDrawingWidth(dc, scoreDef);

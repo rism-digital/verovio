@@ -414,7 +414,7 @@ void Page::LayOutHorizontally()
     this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
 
     // Adjust measure X position
-    AlignMeasuresParams alignMeasuresParams;
+    AlignMeasuresParams alignMeasuresParams(doc);
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
