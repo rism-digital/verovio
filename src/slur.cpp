@@ -841,6 +841,8 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     const bool isGraceToNoteSlur
         = !start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && start->IsGraceNote() && !end->IsGraceNote();
 
+    const PortatoSlurType portatoSlurType = this->IsPortatoSlur(doc, startNote, startChord, drawingCurveDir);
+
     int x1, x2, y1, y2;
     std::tie(x1, x2, y1, y2) = std::tie(points.first.x, points.second.x, points.first.y, points.second.y);
 
@@ -871,11 +873,21 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         // slur is up
         if (drawingCurveDir == curvature_CURVEDIR_above) {
             // P(^)
-            if (startStemDir == STEMDIRECTION_down || startStemLen == 0)
+            if (startStemDir == STEMDIRECTION_down || startStemLen == 0) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            }
             //  d(^)d
             else if (isShortSlur) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            }
+            // portato slurs
+            else if (portatoSlurType != PortatoSlurType::None) {
+                y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                Note *refNote = startChord ? startChord->GetBottomNote() : startNote;
+                x1 = refNote->GetDrawingX() + startRadius;
+                if (portatoSlurType == PortatoSlurType::StemSide) {
+                    x1 += startRadius;
+                }
             }
             // same but in beam - adjust the x too
             else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
@@ -907,11 +919,21 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 }
             }
             // d(_)
-            else if (startStemDir == STEMDIRECTION_up || startStemLen == 0)
+            else if (startStemDir == STEMDIRECTION_up || startStemLen == 0) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            }
             // P(_)P
             else if (isShortSlur) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            }
+            // portato slurs
+            else if (portatoSlurType != PortatoSlurType::None) {
+                y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                Note *refNote = startChord ? startChord->GetTopNote() : startNote;
+                x1 = refNote->GetDrawingX();
+                if (portatoSlurType == PortatoSlurType::Centered) {
+                    x1 += startRadius;
+                }
             }
             // same but in beam
             else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
@@ -940,18 +962,12 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         // slur is up
         if (drawingCurveDir == curvature_CURVEDIR_above) {
             // (^)P
-            if (endStemDir == STEMDIRECTION_down || endStemLen == 0)
+            if (endStemDir == STEMDIRECTION_down || endStemLen == 0) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            }
             // d(^)d
             else if (isShortSlur) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
-            }
-            // same but in beam - adjust the x too
-            else if ((((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                         || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end)))
-                && !isGraceToNoteSlur) {
-                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
-                x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
                 if (start->IsInBeam()) {
@@ -975,6 +991,21 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
+            // portato slurs
+            else if (portatoSlurType != PortatoSlurType::None) {
+                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                Note *refNote = endChord ? endChord->GetBottomNote() : endNote;
+                x2 = refNote->GetDrawingX() + endRadius;
+                if (portatoSlurType == PortatoSlurType::StemSide) {
+                    x2 += endRadius;
+                }
+            }
+            // same but in beam - adjust the x too
+            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
+                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
             // (^)d
             else {
                 // put it on the side, no need to move it right
@@ -995,14 +1026,6 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             else if (isShortSlur && !isGraceToNoteSlur) {
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
-            // same but in beam
-            else if ((((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                         || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end)))
-                && !isGraceToNoteSlur) {
-
-                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-                x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            }
             else if (isGraceToNoteSlur) {
                 if (start->IsInBeam()) {
                     x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -1021,6 +1044,22 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                     x2 -= endRadius;
                 }
+            }
+            // portato slurs
+            else if (portatoSlurType != PortatoSlurType::None) {
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                Note *refNote = endChord ? endChord->GetTopNote() : endNote;
+                x2 = refNote->GetDrawingX();
+                if (portatoSlurType == PortatoSlurType::Centered) {
+                    x2 += endRadius;
+                }
+            }
+            // same but in beam
+            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
+
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // (_)P
             else {
@@ -1084,6 +1123,39 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     }
 
     return std::make_pair(Point(x1, y1), Point(x2, y2));
+}
+
+PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const
+{
+    ListOfObjects artics;
+    ClassIdComparison cmp(ARTIC);
+    if (startChord) {
+        startChord->FindAllDescendantByComparison(&artics, &cmp, 1);
+    }
+    else if (startNote) {
+        startNote->FindAllDescendantByComparison(&artics, &cmp, 1);
+    }
+
+    PortatoSlurType type = PortatoSlurType::None;
+    if (!artics.empty()) {
+        type = PortatoSlurType::Centered;
+        Artic *artic = vrv_cast<Artic *>(artics.front());
+        // Various cases where portato slurs shouldn't be applied
+        if (!artic->IsInsideArtic()
+            || ((artic->GetDrawingPlace() == STAFFREL_above) && (curveDir == curvature_CURVEDIR_below))
+            || ((artic->GetDrawingPlace() == STAFFREL_below) && (curveDir == curvature_CURVEDIR_above))) {
+            return PortatoSlurType::None;
+        }
+        // Check for stem side staccato
+        // Stem direction is not considered here => this must be checked on client side
+        if (!doc->GetOptions()->m_staccatoCenter.GetValue()) {
+            const data_ARTICULATION articType = artic->GetArticFirst();
+            if ((articType == ARTICULATION_stacc) || (articType == ARTICULATION_stacciss)) {
+                type = PortatoSlurType::StemSide;
+            }
+        }
+    }
+    return type;
 }
 
 //----------------------------------------------------------------------------

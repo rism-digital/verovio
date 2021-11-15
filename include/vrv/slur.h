@@ -13,8 +13,10 @@
 
 namespace vrv {
 
+class Chord;
 class Doc;
 class Layer;
+class Note;
 class Staff;
 
 //----------------------------------------------------------------------------
@@ -29,6 +31,9 @@ struct ControlPointConstraint {
     double b;
     double c;
 };
+
+// Helper enum classes
+enum class PortatoSlurType { None, StemSide, Centered };
 
 //----------------------------------------------------------------------------
 // Slur
@@ -113,6 +118,14 @@ public:
     int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
+    /**
+     * Helper for calculating the initial slur start and end points
+     */
+    ///@{
+    // Check if the slur resembles portato
+    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const;
+    ///@}
+
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
      */
