@@ -87,11 +87,15 @@ std::wstring Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
             case NOTATIONTYPE_mensural:
             case NOTATIONTYPE_mensural_black:
             case NOTATIONTYPE_mensural_white:
-                code = (GetAccid() == ACCIDENTAL_WRITTEN_f)? SMUFL_E9E0_medRenFlatSoftB : SMUFL_E9E3_medRenSharpCroix;
+                switch (GetAccid()) {
+                    case ACCIDENTAL_WRITTEN_s: code = SMUFL_E9E3_medRenSharpCroix; break;
+                    case ACCIDENTAL_WRITTEN_f: code = SMUFL_E9E0_medRenFlatSoftB; break;
+                    case ACCIDENTAL_WRITTEN_n: code = SMUFL_E9E2_medRenNatural; break;
+                    // we do not want to ignore non-mensural accidentals
+                    default: code = GetAccidGlyph(GetAccid()); break;
+                }
                 break;
-                
-            default:
-                code = GetAccidGlyph(GetAccid()); break;
+            default: code = GetAccidGlyph(GetAccid()); break;
         }
     }
 
@@ -159,7 +163,7 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     if (element->Is(ACCID) && (this->GetDrawingY() == element->GetDrawingY())) {
         Accid *accid = vrv_cast<Accid *>(element);
         assert(accid);
-        if (this->GetSymbolStr() == accid->GetSymbolStr()) {
+        if (this->GetSymbolStr(NOTATIONTYPE_NONE) == accid->GetSymbolStr(NOTATIONTYPE_NONE)) {
             // There is the same accidental, so we leave it a the same place
             // This should also work for the chords on multiple layers by setting unison accidental
             accid->SetDrawingUnisonAccid(this);
