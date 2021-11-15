@@ -62,7 +62,7 @@ public:
     /**
      * Retrieves the appropriate SMuFL code for a data_CLEFSHAPE
      */
-    wchar_t GetClefGlyph(data_NOTATIONTYPE) const;
+    wchar_t GetClefGlyph(const data_NOTATIONTYPE) const;
 
     //----------//
     // Functors //
