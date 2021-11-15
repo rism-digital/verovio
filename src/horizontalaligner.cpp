@@ -479,6 +479,8 @@ bool Alignment::IsSupportedChild(Object *child)
 
 bool Alignment::HasAccidVerticalOverlap(Alignment *otherAlignment, int staffN)
 {
+    if (!otherAlignment) return false;
+
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     // get alignment references for both alignments
     AlignmentReference *currentRef = vrv_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
@@ -992,8 +994,8 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             const int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
             std::vector<ClassId> exclude;
-            if (HasGraceAligner(graceAlignerId)) {
-                GraceAligner *graceAligner = GetGraceAligner(graceAlignerId);
+            if (this->HasGraceAligner(graceAlignerId) && params->m_rightDefaultAlignment) {
+                GraceAligner *graceAligner = this->GetGraceAligner(graceAlignerId);
                 // last alignment of GraceAligner is rightmost one, so get it
                 Alignment *alignment = vrv_cast<Alignment *>(graceAligner->GetLast(ALIGNMENT));
                 // if there is no overlap with accidentals, exclude them when getting left-right margins of alignment
