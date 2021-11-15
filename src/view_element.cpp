@@ -714,16 +714,8 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int sym = 0;
     // Select glyph to use for this custos
-    switch (staff->m_drawingNotationType) {
-        case NOTATIONTYPE_neume:
-            sym = SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
-            break;
-        default:
-            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
-            break;
-    }
+    const int sym = custos->GetCustosGlyph(staff->m_drawingNotationType);
 
     int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {

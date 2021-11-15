@@ -1759,6 +1759,7 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
+    custos->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -5352,6 +5353,7 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
+    vrvCustos->ReadExtSym(custos);
 
     ReadAccidAttr(custos, vrvCustos);
 
