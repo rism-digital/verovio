@@ -492,7 +492,7 @@ void Page::LayOutVertically()
     AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
     this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
 
-    // Adjust the overlap of the staff alignments by looking at the overflow bounding boxes
+    // Adjust the overlap of the staff aligments by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
     AdjustStaffOverlapParams adjustStaffOverlapParams(doc, &adjustStaffOverlap);
     this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
