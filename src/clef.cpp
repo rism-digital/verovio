@@ -282,7 +282,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
 
     // This should never happen because we always have at least barline alignments - even empty
     if (!previousAlignment || !nextAlignment) {
-        LogDebug("No aligment found before and after the clef change");
+        LogDebug("No alignment found before and after the clef change");
         return FUNCTOR_CONTINUE;
     }
 
