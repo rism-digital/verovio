@@ -66,7 +66,7 @@ void Accid::Reset()
     m_drawingUnison = NULL;
 }
 
-std::wstring Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
+std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
 {
     if (!this->HasAccid()) return L"";
 
