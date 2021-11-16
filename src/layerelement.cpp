@@ -1189,17 +1189,23 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             else
                 m_alignment->AddToAccidSpace(accid);
         }
+        else if (this->GetFirstAncestor(CUSTOS)) {
+            m_alignment->AddToAccidSpace(
+                accid); // If this is not added, the accidental is drawn an octave below the custos
+        }
         else {
-            Custos *custos = vrv_cast<Custos *>(this->GetFirstAncestor(CUSTOS));
-            if (custos) {
-                m_alignment->AddToAccidSpace(
-                    accid); // If this is not added, the custos is drawn an octave below the custos
-            }
-            else {
-                // do something for accid that are not children of a note - e.g., mensural?
-                this->SetDrawingYRel(
-                    staffY->CalcPitchPosYRel(params->m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
-            }
+            // do something for accid that are not children of a note - e.g., mensural?
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
+        }
+        // override if staff position is set explicitly
+        if (accid->HasPloc() && accid->HasOloc()) {
+            accid->SetDrawingLoc(
+                PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY)));
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->GetDrawingLoc()));
+        }
+        else if (accid->HasLoc()) {
+            accid->SetDrawingLoc(accid->GetLoc());
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->GetLoc()));
         }
     }
     else if (this->Is(CHORD)) {
@@ -1821,7 +1827,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
-    // Nested alignment of bounding boxes is performed only when both the previous alignment and
+    // Nested aligment of bounding boxes is performed only when both the previous alignment and
     // the current one allow it. For example, when one of them is a barline, we do not look how
     // bounding boxes can be nested but instead only look at the horizontal position
     bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
