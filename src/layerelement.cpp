@@ -152,6 +152,8 @@ LayerElement *LayerElement::ThisOrSameasAsLink()
 
 bool LayerElement::IsGraceNote()
 {
+    // First, regardless of the type, check whether it's part of GRACEGRP
+    if (this->GetFirstAncestor(GRACEGRP)) return true;
     // For note, we need to look at it or at the parent chord
     if (this->Is(NOTE)) {
         Note const *note = vrv_cast<Note const *>(this);
@@ -1104,6 +1106,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         assert(note);
         m_alignment = note->GetAlignment();
     }
+    else if (this->Is(GRACEGRP)) {
+        return FUNCTOR_CONTINUE;
+    }
     else if (this->IsGraceNote()) {
         type = ALIGNMENT_GRACENOTE;
     }
@@ -1966,7 +1971,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 {
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->IsGraceNote() || this->GetFirstAncestor(GRACEGRP)) {
+    if (this->IsGraceNote()) {
         m_drawingCueSize = true;
     }
     // This cover the case when the @size is given on the element
