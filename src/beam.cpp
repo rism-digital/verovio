@@ -931,8 +931,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
     // make adjustments for the grace notes length
     for (auto coord : m_beamElementCoordRefs) {
         if (coord->m_element) {
-            const bool isInGraceGroup = coord->m_element->GetFirstAncestor(GRACEGRP);
-            if (coord->m_element->IsGraceNote() || isInGraceGroup) {
+            if (coord->m_element->IsGraceNote()) {
                 m_uniformStemLength *= 0.75;
                 break;
             }
@@ -1127,14 +1126,13 @@ void Beam::FilterList(ArrayOfObjects *childList)
             // if we are at the beginning of the beam
             // and the note is cueSize
             // assume all the beam is of grace notes
-            const bool isInGraceGroup = element->GetFirstAncestor(GRACEGRP);
             if (childList->begin() == iter) {
-                if (element->IsGraceNote() || isInGraceGroup) firstNoteGrace = true;
+                if (element->IsGraceNote()) firstNoteGrace = true;
             }
             // if the first note in beam was NOT a grace
             // we have grace notes embedded in a beam
             // drop them
-            if (!firstNoteGrace && (element->IsGraceNote() || isInGraceGroup)) {
+            if (!firstNoteGrace && (element->IsGraceNote())) {
                 iter = childList->erase(iter);
                 continue;
             }
@@ -1181,7 +1179,9 @@ void Beam::FilterList(ArrayOfObjects *childList)
     */
 
     this->InitCoords(childList, beamStaff, this->GetPlace());
-    this->InitCue(this->GetCue() == BOOLEAN_true);
+
+    const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
+    this->InitCue(isCue);
 }
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
@@ -1278,8 +1278,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
     m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
-    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
-    if (m_element->IsGraceNote() || isInGraceGroup) return;
+    if (m_element->IsGraceNote()) return;
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
