@@ -2387,6 +2387,20 @@ public:
     int modifications = 0;
 };
 
+//----------------------------------------------------------------------------
+// PrepareSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ **/
+
+class PrepareSlursParams : public FunctorParams {
+public:
+    PrepareSlursParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
 } // namespace vrv
 
 #endif

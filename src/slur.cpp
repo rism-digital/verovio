@@ -1239,4 +1239,12 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Slur::PrepareSlurs(FunctorParams *functorParams)
+{
+    PrepareSlursParams *params = vrv_params_cast<PrepareSlursParams *>(functorParams);
+    assert(params);
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
