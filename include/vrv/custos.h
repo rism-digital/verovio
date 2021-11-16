@@ -21,7 +21,7 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-class Custos : public LayerElement, public PitchInterface, public PositionInterface, public AttColor {
+class Custos : public LayerElement, public PitchInterface, public PositionInterface, public AttColor, public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -49,6 +49,11 @@ public:
      * Add an accid to a custos.
      */
     bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Return a SMuFL code for the custos
+     */
+    wchar_t GetCustosGlyph(const data_NOTATIONTYPE notationType) const;
 
     //----------//
     // Functors //

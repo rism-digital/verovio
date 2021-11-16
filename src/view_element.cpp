@@ -249,9 +249,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    /************** editorial accidental **************/
-
-    std::wstring accidStr = accid->GetSymbolStr();
+    const data_NOTATIONTYPE notationType = staff->m_drawingNotationType;
+    std::wstring accidStr = accid->GetSymbolStr(notationType);
 
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
@@ -271,7 +270,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         }
         TextExtend extend;
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
-        dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
+        dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
         y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
@@ -715,16 +714,8 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int sym = 0;
     // Select glyph to use for this custos
-    switch (staff->m_drawingNotationType) {
-        case NOTATIONTYPE_neume:
-            sym = SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
-            break;
-        default:
-            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
-            break;
-    }
+    const int sym = custos->GetCustosGlyph(staff->m_drawingNotationType);
 
     int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {

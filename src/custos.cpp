@@ -23,11 +23,12 @@ namespace vrv {
 
 static const ClassRegistrar<Custos> s_factory("custos", CUSTOS);
 
-Custos::Custos() : LayerElement(CUSTOS, "custos-"), PitchInterface(), PositionInterface(), AttColor()
+Custos::Custos() : LayerElement(CUSTOS, "custos-"), PitchInterface(), PositionInterface(), AttColor(), AttExtSym()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -40,6 +41,7 @@ void Custos::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
+    ResetExtSym();
 }
 
 bool Custos::IsSupportedChild(Object *child)
@@ -51,6 +53,29 @@ bool Custos::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+wchar_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
+{
+    // If there is glyph.num, prioritize it
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    switch (notationtype) {
+        case NOTATIONTYPE_neume:
+            return SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
+            break;
+        default:
+            return SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
+            break;
+    }
 }
 
 //----------------------------------------------------------------------------
