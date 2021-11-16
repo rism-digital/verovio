@@ -53,7 +53,7 @@ public:
     /**
      * Return a SMuFL code for the custos
      */
-    wchar_t GetCustosGlyph(const data_NOTATIONTYPE) const;
+    wchar_t GetCustosGlyph(const data_NOTATIONTYPE notationType) const;
 
     //----------//
     // Functors //
