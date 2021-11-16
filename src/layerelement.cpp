@@ -2512,4 +2512,9 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::PrepareSlurs(FunctorParams *)
+{
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv

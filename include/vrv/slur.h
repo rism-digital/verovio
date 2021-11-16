@@ -117,6 +117,11 @@ public:
      */
     int ResetDrawing(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::PrepareSlurs
+     */
+    int PrepareSlurs(FunctorParams *functorParams) override;
+
 private:
     /**
      * Helper for calculating the initial slur start and end points

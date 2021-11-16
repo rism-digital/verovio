@@ -803,6 +803,11 @@ public:
      */
     virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Calculate the slur direction
+     */
+    virtual int PrepareSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     ///@}
 
     /**
