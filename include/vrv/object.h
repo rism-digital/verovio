@@ -1116,7 +1116,7 @@ public:
     /**
      * Functor for setting enlosure for the dynamics by adding corresponding text children to it
      */
-    virtual int PrepareDynamEnclosure(FunctorParams *functoParams) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareDynamEnclosure(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting Measure of Ending
