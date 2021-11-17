@@ -1169,6 +1169,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
+    assert(this->GetParent());
     Object *object = this->GetParent()->GetPrevious(this);
     if (object && object->Is(SECTION)) {
         Section *section = vrv_cast<Section *>(object);
