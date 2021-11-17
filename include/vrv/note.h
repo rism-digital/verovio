@@ -201,6 +201,11 @@ public:
     wchar_t GetNoteheadGlyph(const int duration) const;
 
     /**
+     * Check whether current note is enharmonic with another
+     */
+    bool IsEnharmonicWith(Note *note);
+
+    /**
      * Check if a note or its parent chord are visible
      */
     bool IsVisible() const;
