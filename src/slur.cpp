@@ -804,10 +804,6 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(
     else if (isGraceToNoteSlur && layer && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
         drawingCurveDir = this->GetGraceCurveDirection(doc);
     }
-    // the normal case
-    else if (this->HasDrawingCurvedir()) {
-        drawingCurveDir = this->GetDrawingCurvedir();
-    }
     // then layer direction trumps note direction
     else if (layer && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
@@ -1289,6 +1285,14 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
     PrepareSlursParams *params = vrv_params_cast<PrepareSlursParams *>(functorParams);
     assert(params);
 
+    // If curve direction is prescribed or was calculated before, use it
+    if (this->HasCurvedir()) {
+        this->SetDrawingCurvedir(
+            (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below);
+    }
+    if (this->HasDrawingCurvedir()) return FUNCTOR_CONTINUE;
+
+    // Retrieve boundary and handle timestamps
     LayerElement *start = this->GetStart();
     LayerElement *end = this->GetEnd();
     std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
@@ -1298,22 +1302,45 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    if (start->Is(TIMESTAMP_ATTR) || end->Is(TIMESTAMP_ATTR)) {
+        this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Retrieve layers, staves, system
+    Layer *layer = NULL;
+    LayerElement *layerElement = NULL;
+    std::tie(layer, layerElement) = this->GetBoundaryLayer();
+
     Staff *staff = staffList.at(0);
     Staff *crossStaff = this->GetBoundaryCrossStaff();
 
-    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR)) {
-        System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
-        assert(system);
+    System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
+    assert(system);
 
-        if (system->HasMixedDrawingStemDir(start, end)) {
-            if (crossStaff) {
-                curvature_CURVEDIR curveDir = system->GetPreferredCurveDirection(start, end, this);
-                this->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
-            }
-            else {
-                this->SetDrawingCurvedir(curvature_CURVEDIR_above);
-            }
+    if (system->HasMixedDrawingStemDir(start, end)) {
+        // Handle mixed stem direction
+        if (crossStaff) {
+            const curvature_CURVEDIR curveDir = system->GetPreferredCurveDirection(start, end, this);
+            this->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
         }
+        else {
+            this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+        }
+    }
+    else {
+        // Handle uniform stem direction
+        StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(start);
+        data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
+        if (startStemDrawInterface) {
+            startStemDir = startStemDrawInterface->GetDrawingStemDir();
+        }
+
+        const int center = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
+        const bool isAboveStaffCenter = (start->GetDrawingY() > center);
+        const curvature_CURVEDIR curveDir
+            = this->GetPreferredCurveDirection(params->m_doc, layer, layerElement, startStemDir, isAboveStaffCenter);
+        this->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
     }
 
     return FUNCTOR_CONTINUE;
