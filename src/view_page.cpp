@@ -823,7 +823,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 }
 
 void View::DrawBarLine(
-    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form, bool eraseIntersections)
+    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, const data_BARRENDITION form, bool eraseIntersections)
 {
     assert(dc);
     assert(barLine);
@@ -835,7 +835,7 @@ void View::DrawBarLine(
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
     const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = m_doc->GetDrawingUnit(staffSize) * m_options->m_barLineSeparation.GetValue();
-    const int barLinesGap = barLineThickWidth + barLineWidth;
+    const int barLinesSum = barLineThickWidth + barLineWidth;
     int x2 = x + barLineSeparation;
 
     // optimized for five line staves
@@ -848,20 +848,18 @@ void View::DrawBarLine(
         System *system = dynamic_cast<System *>(barLine->GetFirstAncestor(SYSTEM));
         if (system) {
             int minX = x - barLineWidth / 2;
-            int maxX = x2 + barLineWidth / 2;
+            int maxX = x + barLineWidth / 2;
             if ((form == BARRENDITION_rptend) || (form == BARRENDITION_end)) {
-                minX = x - barLineWidth / 2;
-                maxX = x2 + barLineThickWidth / 2;
+                maxX = x2 + barLinesSum / 2;
             }
             else if (form == BARRENDITION_rptboth) {
-                maxX = x2 + barLineWidth / 2;
+                maxX = x + barLinesSum + barLineSeparation * 2;
             }
             else if (form == BARRENDITION_rptstart) {
                 minX = x - barLineThickWidth / 2;
-                maxX = x2 + barLineWidth / 2;
+                maxX = x2 + barLinesSum / 2;
             }
-            else if ((form == BARRENDITION_dbl) || (form == BARRENDITION_dbldashed)) {
-                minX = x - barLineWidth / 2;
+            else if ((form == BARRENDITION_dbl) || (form == BARRENDITION_dbldashed)  || (form == BARRENDITION_dbldotted)) {
                 maxX = x2 + barLineWidth / 2;
             }
             Object lines;
@@ -873,52 +871,47 @@ void View::DrawBarLine(
         }
     }
 
-    if (form == BARRENDITION_single) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_dashed) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
-    }
-    else if (form == BARRENDITION_dotted) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-    }
-    else if (form == BARRENDITION_rptend) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
-    }
-    else if (form == BARRENDITION_rptboth) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLineSeparation + barLinesGap, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_rptstart) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth / 2, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_invis) {
-        barLine->SetEmptyBB();
-    }
-    else if (form == BARRENDITION_end) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
-    }
-    else if (form == BARRENDITION_dbl) {
-        // Narrow the bars a little bit - should be centered?
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_dbldashed) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
-        DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength);
-    }
-    else if (form == BARRENDITION_dbldotted) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-        DrawVerticalSegmentedLine(dc, x2, line, barLineWidth, dotLength);
-    }
-    else {
-        // Use solid barline as fallback
-        LogWarning("%s bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()).c_str());
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+    switch (form) {
+        case BARRENDITION_single: DrawVerticalSegmentedLine(dc, x, line, barLineWidth); break;
+        case BARRENDITION_dashed: DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength); break;
+        case BARRENDITION_dotted: DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength); break;
+        case BARRENDITION_rptend:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineThickWidth);
+            break;
+        case BARRENDITION_rptboth:
+            x2 = x + barLinesSum + barLineSeparation * 2;
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, (x + x2) / 2, line, barLineThickWidth);
+            DrawVerticalSegmentedLine(dc, x2, line, barLineWidth);
+            break;
+        case BARRENDITION_rptstart:
+            DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineWidth);
+            break;
+        case BARRENDITION_invis: barLine->SetEmptyBB(); break;
+        case BARRENDITION_end:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineThickWidth);
+            break;
+        case BARRENDITION_dbl:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
+            break;
+        case BARRENDITION_dbldashed:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
+            DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength);
+            break;
+        case BARRENDITION_dbldotted:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
+            DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dotLength);
+            break;
+        default:
+            // Use solid barline as fallback
+            LogWarning(
+                "%s bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()).c_str());
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            break;
     }
 }
 
