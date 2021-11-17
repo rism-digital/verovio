@@ -808,14 +808,16 @@ public:
 
 class AlignMeasuresParams : public FunctorParams {
 public:
-    AlignMeasuresParams()
+    AlignMeasuresParams(Doc *doc)
     {
         m_shift = 0;
         m_justifiableWidth = 0;
+        m_doc = doc;
     }
 
     int m_shift;
     int m_justifiableWidth;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
