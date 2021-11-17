@@ -119,44 +119,11 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     Layer *layer = NULL;
     LayerElement *layerElement = NULL;
-    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    if (!start->Is(TIMESTAMP_ATTR)) {
-        layer = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
-        layerElement = start;
-    }
-    else if (!end->Is(TIMESTAMP_ATTR)) {
-        layer = dynamic_cast<Layer *>(end->GetFirstAncestor(LAYER));
-        layerElement = end;
-    }
-    if (layerElement && layerElement->m_crossStaff) layer = layerElement->m_crossLayer;
+    std::tie(layer, layerElement) = slur->GetBoundaryLayer();
 
     // At this stage layer can still be NULL for slurs with @tstamp and @tstamp2
-
-    if (start->m_crossStaff != end->m_crossStaff) {
-        curve->SetCrossStaff(end->m_crossStaff);
-    }
-    // Check if the two elements are in different staves (but themselves not cross-staff)
-    else {
-        Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
-        Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
-        if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) curve->SetCrossStaff(endStaff);
-    }
-
-    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
-        System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
-        assert(system);
-        // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
-        // situations
-        if (system->HasMixedDrawingStemDir(start, end)) {
-            if (!curve->IsCrossStaff()) {
-                slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
-            }
-            else {
-                curvature_CURVEDIR curveDir = system->GetPreferredCurveDirection(start, end, slur);
-                slur->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
-            }
-        }
-    }
+    Staff *crossStaff = slur->GetBoundaryCrossStaff();
+    if (crossStaff) curve->SetCrossStaff(crossStaff);
 
     /************** note stem dir **************/
 
