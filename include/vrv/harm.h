@@ -38,25 +38,25 @@ public:
     ///@{
     Harm();
     virtual ~Harm();
-    virtual Object *Clone() const { return new Harm(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Harm"; }
+    Object *Clone() const override { return new Harm(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Harm"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a harm.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Transposition related. The int tracks where we have iterated through the string.
@@ -73,17 +73,17 @@ public:
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustHarmGrpsSpacing
      */
-    virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
+    int AdjustHarmGrpsSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *functorParams);
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     //

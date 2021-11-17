@@ -108,7 +108,7 @@ MusicXmlInput::~MusicXmlInput() {}
 
 #ifndef NO_MUSICXML_SUPPORT
 
-bool MusicXmlInput::Import(std::string const &musicxml)
+bool MusicXmlInput::Import(const std::string &musicxml)
 {
     try {
         m_doc->Reset();

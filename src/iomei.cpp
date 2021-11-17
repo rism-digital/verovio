@@ -1368,6 +1368,7 @@ void MEIOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteEnclosingChars(currentNode);
     dynam->WriteExtender(currentNode);
     dynam->WriteLineRendBase(currentNode);
     dynam->WriteMidiValue(currentNode);
@@ -1534,6 +1535,7 @@ void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
     slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
     slur->WriteCurveRend(currentNode);
+    slur->WriteLayerIdent(currentNode);
 }
 
 void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
@@ -1758,6 +1760,7 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
+    custos->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -4584,6 +4587,7 @@ bool MEIInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadEnclosingChars(dynam);
     vrvDynam->ReadExtender(dynam);
     vrvDynam->ReadLineRendBase(dynam);
     vrvDynam->ReadMidiValue(dynam);
@@ -4770,6 +4774,7 @@ bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
     vrvPhrase->ReadColor(phrase);
     vrvPhrase->ReadCurvature(phrase);
     vrvPhrase->ReadCurveRend(phrase);
+    vrvPhrase->ReadLayerIdent(phrase);
 
     parent->AddChild(vrvPhrase);
     ReadUnsupportedAttr(phrase, vrvPhrase);
@@ -4813,6 +4818,7 @@ bool MEIInput::ReadSlur(Object *parent, pugi::xml_node slur)
     vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
     vrvSlur->ReadCurveRend(slur);
+    vrvSlur->ReadLayerIdent(slur);
 
     parent->AddChild(vrvSlur);
     ReadUnsupportedAttr(slur, vrvSlur);
@@ -5349,6 +5355,7 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
+    vrvCustos->ReadExtSym(custos);
 
     ReadAccidAttr(custos, vrvCustos);
 

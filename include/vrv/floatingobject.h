@@ -36,20 +36,20 @@ public:
     FloatingObject(ClassId classId);
     FloatingObject(ClassId classId, const std::string &classIdStr);
     virtual ~FloatingObject();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
-    virtual void UpdateContentBBoxX(int x1, int x2);
-    virtual void UpdateContentBBoxY(int y1, int y2);
-    virtual void UpdateSelfBBoxX(int x1, int x2);
-    virtual void UpdateSelfBBoxY(int y1, int y2);
+    void UpdateContentBBoxX(int x1, int x2) override;
+    void UpdateContentBBoxY(int y1, int y2) override;
+    void UpdateSelfBBoxX(int x1, int x2) override;
+    void UpdateSelfBBoxY(int y1, int y2) override;
 
     /**
      * @name Get and set the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
@@ -92,42 +92,42 @@ public:
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
+    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimePointing
      */
-    virtual int PrepareTimePointing(FunctorParams *functorParams);
+    int PrepareTimePointing(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
+    int PrepareTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int PrepareTimestamps(FunctorParams *functorParams);
+    int PrepareTimestamps(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
      */
-    virtual int UnCastOff(FunctorParams *functorParams);
+    int UnCastOff(FunctorParams *functorParams) override;
 
 private:
     //
@@ -166,7 +166,7 @@ public:
     // constructors and destructors
     FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
     virtual ~FloatingPositioner(){};
-    virtual ClassId GetClassId() const { return FLOATING_POSITIONER; }
+    ClassId GetClassId() const override { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
 
@@ -174,12 +174,12 @@ public:
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
-    virtual void ResetCachedDrawingX() const;
-    virtual void ResetCachedDrawingY() const;
+    void ResetCachedDrawingX() const override;
+    void ResetCachedDrawingY() const override;
 
     /**
      * @name Setter and getters for the objectX and Y
@@ -270,9 +270,9 @@ public:
     // constructors and destructors
     FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
     virtual ~FloatingCurvePositioner();
-    virtual ClassId GetClassId() const { return FLOATING_CURVE_POSITIONER; }
+    ClassId GetClassId() const override { return FLOATING_CURVE_POSITIONER; }
 
-    virtual void ResetPositioner();
+    void ResetPositioner() override;
 
     /**
      * Reset the curve parameters in FloatingCurvePositioner::FloatingCurvePositioner and in

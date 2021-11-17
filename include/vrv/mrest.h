@@ -38,16 +38,16 @@ public:
     ///@{
     MRest();
     virtual ~MRest();
-    virtual Object *Clone() const { return new MRest(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MRest"; }
+    Object *Clone() const override { return new MRest(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MRest"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
     ///@}
 
     /**
@@ -62,17 +62,17 @@ public:
     /**
      * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
+    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
 private:
     //

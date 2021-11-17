@@ -107,10 +107,10 @@ public:
     bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam
     int m_verticalCenter;
-    int m_avgY;
     int m_ledgerLinesAbove;
     int m_ledgerLinesBelow;
     int m_uniformStemLength;
+    data_BEAMPLACE m_weightedPlace;
 
     BeamElementCoord *m_firstNoteOrChord;
     BeamElementCoord *m_lastNoteOrChord;
@@ -139,9 +139,9 @@ public:
     ///@{
     Beam();
     virtual ~Beam();
-    virtual Object *Clone() const { return new Beam(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Beam"; }
+    Object *Clone() const override { return new Beam(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Beam"; }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }
@@ -150,7 +150,7 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      *
@@ -164,29 +164,29 @@ public:
     /**
      * See Object::AdjustBeams
      */
-    virtual int AdjustBeams(FunctorParams *);
+    int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustBeamsEnd
      */
-    virtual int AdjustBeamsEnd(FunctorParams *);
+    int AdjustBeamsEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only Note and Chords elements.
      * This also initializes the m_beamElementCoords vector
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
     /**
      * Helper function to calculate overlap with layer elements that

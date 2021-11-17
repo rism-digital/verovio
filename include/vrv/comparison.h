@@ -60,7 +60,7 @@ class ClassIdComparison : public Comparison {
 public:
     ClassIdComparison(ClassId classId) { m_classId = classId; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (object->Is(m_classId)) {
             return true;
@@ -70,7 +70,7 @@ public:
 
     ClassId GetType() { return m_classId; }
 
-    bool MatchesType(Object *object)
+    bool MatchesType(Object *object) override
     {
         if (object->Is(m_classId)) {
             return true;
@@ -95,7 +95,7 @@ public:
         m_supportReverse = true;
     }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (object->Is(m_classIds)) {
             return Result(true);
@@ -103,7 +103,7 @@ public:
         return Result(false);
     }
 
-    bool MatchesType(Object *object) { return true; }
+    bool MatchesType(Object *object) override { return true; }
 
 protected:
     std::vector<ClassId> m_classIds;
@@ -118,7 +118,7 @@ class InterfaceComparison : public Comparison {
 public:
     InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (object->HasInterface(m_interfaceId)) {
             return true;
@@ -126,7 +126,7 @@ public:
         return false;
     }
 
-    bool MatchesType(Object *object) { return true; }
+    bool MatchesType(Object *object) override { return true; }
 
 protected:
     InterfaceId m_interfaceId;
@@ -144,7 +144,7 @@ public:
         m_pointingTo = pointingTo;
     }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         TimePointInterface *interface = object->GetTimePointInterface();
@@ -168,7 +168,7 @@ public:
         m_pointingTo = pointingTo;
     }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
@@ -192,13 +192,13 @@ class IsEditorialElementComparison : public Comparison {
 public:
     IsEditorialElementComparison() : Comparison() { m_supportReverse = true; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (object->IsEditorialElement()) return Result(true);
         return Result(false);
     }
 
-    bool MatchesType(Object *object) { return true; }
+    bool MatchesType(Object *object) override { return true; }
 };
 
 //----------------------------------------------------------------------------
@@ -213,7 +213,7 @@ class IsEmptyComparison : public ClassIdComparison {
 public:
     IsEmptyComparison(ClassId classId) : ClassIdComparison(classId) { m_supportReverse = true; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         if (object->GetChildCount() == 0) {
@@ -237,7 +237,7 @@ class IsAttributeComparison : public ClassIdComparison {
 public:
     IsAttributeComparison(ClassId classId) : ClassIdComparison(classId) {}
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         if (object->IsAttribute()) return true;
@@ -259,7 +259,7 @@ public:
 
     void SetN(int n) { m_n = n; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
@@ -288,7 +288,7 @@ public:
     void SetNs(std::vector<int> ns) { m_ns = ns; }
     void AppendN(int n) { m_ns.push_back(n); }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
@@ -316,7 +316,7 @@ public:
 
     void SetN(std::string n) { m_n = n; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
@@ -351,7 +351,7 @@ public:
             m_extremeDur = VRV_UNSET;
     }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!object->HasInterface(INTERFACE_DURATION)) return false;
         DurationInterface *interface = dynamic_cast<DurationInterface *>(object);
@@ -388,7 +388,7 @@ public:
         m_isVisible = isVisible;
     };
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         if (!object->HasAttClass(ATT_VISIBILITY)) return false;
@@ -415,7 +415,7 @@ public:
 
     void SetType(AlignmentType type) { m_type = type; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         Alignment *alignment = vrv_cast<Alignment *>(object);
@@ -441,7 +441,7 @@ public:
 
     void SetTime(int time) { m_time = time; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         Measure *measure = vrv_cast<Measure *>(object);
@@ -467,7 +467,7 @@ public:
 
     void SetTime(int time) { m_time = time; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         Note *note = vrv_cast<Note *>(object);
@@ -493,7 +493,7 @@ public:
 
     void SetUuid(const std::string &uuid) { m_uuid = uuid; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
         return object->GetUuid() == m_uuid;
@@ -517,7 +517,7 @@ public:
 
     void Skip(const Object *objectToExclude) { m_objectToExclude = objectToExclude; }
 
-    virtual bool operator()(Object *object)
+    bool operator()(Object *object) override
     {
         if (object == m_objectToExclude || !ClassIdsComparison::operator()(object)) return false;
 

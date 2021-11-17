@@ -40,15 +40,18 @@ public:
     ///@{
     Accid();
     virtual ~Accid();
-    virtual Object *Clone() const { return new Accid(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Accid"; }
+    Object *Clone() const override { return new Accid(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Accid"; }
     ///@}
 
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    /** Override the method since it is align to the staff */
+    bool IsRelativeToStaff() const override { return (this->HasLoc() || (this->HasOloc() && this->HasPloc())); }
+
+    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * @name Set and get drawing octave flag
@@ -72,7 +75,7 @@ public:
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSymbolStr() const;
+    std::wstring GetSymbolStr(const data_NOTATIONTYPE notationType) const;
 
     /**
      * Adjust X position of accid in relation to other element
@@ -101,12 +104,12 @@ public:
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
 private:
     //

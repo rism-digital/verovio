@@ -342,7 +342,6 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
     wchar_t flagGlyph = SMUFL_E242_flag16thUp;
     if (duration < DURATION_16) flagGlyph = flag->GetFlagGlyph(stemDirection);
     const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
-    const int relevantGlyphHeight = (stemDirection == STEMDIRECTION_up) ? glyphHeight / 2 : glyphHeight;
 
     // Make sure that flags don't overlap with notehead. Upward flags cannot overlap with noteheads so check
     // only downward ones
@@ -374,7 +373,7 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
 
     // Make sure that flags don't overlap with first (top or bottom) ledger line (effectively avoiding all ledgers)
     const int directionBias = (stemDirection == STEMDIRECTION_down) ? -1 : 1;
-    const int position = GetDrawingY() - GetDrawingStemLen() - directionBias * relevantGlyphHeight;
+    const int position = GetDrawingY() - GetDrawingStemLen() - directionBias * glyphHeight;
     const int ledgerPosition = verticalCenter - 6 * directionBias * adjustmentStep;
     const int displacementMargin = (position - ledgerPosition) * directionBias;
 

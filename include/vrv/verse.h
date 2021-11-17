@@ -29,16 +29,16 @@ public:
     ///@{
     Verse();
     virtual ~Verse();
-    virtual Object *Clone() const { return new Verse(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Verse"; }
+    Object *Clone() const override { return new Verse(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Verse"; }
     ///@}
 
     /**
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Calculate the adjustment according to the overlap and the free space available before.
@@ -54,22 +54,22 @@ public:
     /**
      * See Object::AlignVertically
      */
-    virtual int AlignVertically(FunctorParams *functorParams);
+    int AlignVertically(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustSylSpacing
      */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
+    int AdjustSylSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareProcessingLists
      */
-    virtual int PrepareProcessingLists(FunctorParams *functorParams);
+    int PrepareProcessingLists(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

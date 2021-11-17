@@ -51,12 +51,12 @@ public:
     /**
      * Add a page to the document
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Clear the content of the document.
      */
-    virtual void Reset();
+    void Reset() override;
 
     /**
      * Refreshes the views from Doc.
@@ -417,12 +417,12 @@ public:
     /**
      * See Object::PrepareLyricsEnd
      */
-    virtual int PrepareLyricsEnd(FunctorParams *functorParams);
+    int PrepareLyricsEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimestampsEnd
      */
-    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
+    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
 
 private:
     /**

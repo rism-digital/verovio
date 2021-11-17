@@ -734,32 +734,4 @@ int Layer::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-/*
-int Layer::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
- }
- */
-
 } // namespace vrv

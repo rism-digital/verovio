@@ -34,14 +34,14 @@ public:
     ControlElement(ClassId classId);
     ControlElement(ClassId classId, const std::string &classIdStr);
     virtual ~ControlElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual LinkingInterface *GetLinkingInterface() { return dynamic_cast<LinkingInterface *>(this); }
+    LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
     ///@}
 
     /**
@@ -63,12 +63,12 @@ public:
     /**
      * See Object::AdjustXOverflow
      */
-    virtual int AdjustXOverflow(FunctorParams *functorParams);
+    int AdjustXOverflow(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

@@ -310,6 +310,7 @@ void Page::LayOutHorizontally()
     // Render it for filling the bounding box
     View view;
     view.SetDoc(doc);
+    view.SetSlurHandling(SlurHandling::Ignore);
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
@@ -476,7 +477,7 @@ void Page::LayOutVertically()
     this->Process(&adjustSlurs, &adjustSlursParams);
 
     // At this point slurs must not be reinitialized, otherwise the adjustment we just did was in vain
-    view.ActivateSlurInitialization(false);
+    view.SetSlurHandling(SlurHandling::Drawing);
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
@@ -491,7 +492,7 @@ void Page::LayOutVertically()
     AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
     this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
 
-    // Adjust the overlap of the staff aligments by looking at the overflow bounding boxes params.clear();
+    // Adjust the overlap of the staff alignments by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
     AdjustStaffOverlapParams adjustStaffOverlapParams(doc, &adjustStaffOverlap);
     this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
@@ -509,13 +510,12 @@ void Page::LayOutVertically()
     this->Process(&adjustFloatingPositionersBetween, &adjustFloatingPositionersBetweenParams);
 
     Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
-    Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);
-    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
+    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams);
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlursParams.m_crossStaffSlurs) {
-        view.ActivateSlurInitialization(true);
+        view.SetSlurHandling(SlurHandling::Initialize);
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(&adjustSlurs, &adjustSlursParams);

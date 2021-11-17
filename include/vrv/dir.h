@@ -39,30 +39,30 @@ public:
     ///@{
     Dir();
     virtual ~Dir();
-    virtual Object *Clone() const { return new Dir(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Dir"; }
+    Object *Clone() const override { return new Dir(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Dir"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a dir.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * See FloatingObject::IsExtenderElement
      */
-    virtual bool IsExtenderElement() const { return GetExtender() == BOOLEAN_true; }
+    bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
 
     /**
      * Check whether one of the children has hAlign attribute set to `alignment` value
@@ -76,7 +76,7 @@ public:
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
 protected:
     //

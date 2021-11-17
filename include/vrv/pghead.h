@@ -28,8 +28,8 @@ public:
     ///@{
     PgHead();
     virtual ~PgHead();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "PgHead"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "PgHead"; }
     ///@}
 
     bool GenerateFromMEIHeader(pugi::xml_document &header);
