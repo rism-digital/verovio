@@ -15,7 +15,7 @@
         "lyricLineThickness": 0.16,
         "octaveLineThickness": 0.16,
         "pedalLineThickness": 0.16,
-        "repeatBarlineDotSeparation": 0.16,
+        "repeatBarlineDotSeparation": 0.18,
         "repeatEndingLineThickness": 0.16,
         "slurEndpointThickness": 0.1,
         "slurMidpointThickness": 0.22,
@@ -24,13 +24,13 @@
         "subBracketThickness": 0.16,
         "textEnclosureThickness": 0.16,
         "thickBarlineThickness": 0.5,
-        "thinBarlineThickness": 0.16,
+        "thinBarlineThickness": 0.15,
         "tieEndpointThickness": 0.1,
         "tieMidpointThickness": 0.22,
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.62",
+    "fontVersion": "5.2.63",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -502,6 +502,36 @@
                 -0.668
             ]
         },
+        "barlineHeavy": {
+            "bBoxNE": [
+                0.5,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "barlineHeavyHeavy": {
+            "bBoxNE": [
+                1.4,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "barlineTick": {
+            "bBoxNE": [
+                0.152,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                3.0
+            ]
+        },
         "bracketBottom": {
             "bBoxNE": [
                 1.596,
@@ -602,6 +632,66 @@
                 -2.008
             ]
         },
+        "chantCustosStemDownPosHigh": {
+            "bBoxNE": [
+                0.256,
+                0.38
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.752
+            ]
+        },
+        "chantCustosStemDownPosHighest": {
+            "bBoxNE": [
+                0.256,
+                0.38
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.244
+            ]
+        },
+        "chantCustosStemDownPosMiddle": {
+            "bBoxNE": [
+                0.256,
+                0.38
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.26
+            ]
+        },
+        "chantCustosStemUpPosLow": {
+            "bBoxNE": [
+                0.256,
+                1.76
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.384
+            ]
+        },
+        "chantCustosStemUpPosLowest": {
+            "bBoxNE": [
+                0.256,
+                2.268
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.384
+            ]
+        },
+        "chantCustosStemUpPosMiddle": {
+            "bBoxNE": [
+                0.256,
+                1.256
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.384
+            ]
+        },
         "clef15": {
             "bBoxNE": [
                 0.92,
@@ -620,6 +710,16 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "codaSquare": {
+            "bBoxNE": [
+                2.148,
+                2.32
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.292
             ]
         },
         "dynamicFF": {
@@ -1352,6 +1452,16 @@
                 -0.056
             ]
         },
+        "leftRepeatSmall": {
+            "bBoxNE": [
+                1.86,
+                3.5
+            ],
+            "bBoxSW": [
+                0.0,
+                0.5
+            ]
+        },
         "luteDuration16th": {
             "bBoxNE": [
                 1.568,
@@ -1770,6 +1880,36 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "mensuralCustosCheckmark": {
+            "bBoxNE": [
+                2.24,
+                1.856
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "mensuralCustosDown": {
+            "bBoxNE": [
+                3.088,
+                0.968
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.616
+            ]
+        },
+        "mensuralCustosUp": {
+            "bBoxNE": [
+                3.088,
+                1.576
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
             ]
         },
         "mensuralFclefPetrucci": {
@@ -2602,6 +2742,26 @@
                 0.0
             ]
         },
+        "repeatDot": {
+            "bBoxNE": [
+                0.4,
+                0.2
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.2
+            ]
+        },
+        "repeatRightLeft": {
+            "bBoxNE": [
+                3.124,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "rest1024th": {
             "bBoxNE": [
                 3.176,
@@ -2670,6 +2830,16 @@
             "bBoxSW": [
                 0.0,
                 -1.04
+            ]
+        },
+        "rightRepeatSmall": {
+            "bBoxNE": [
+                1.86,
+                3.5
+            ],
+            "bBoxSW": [
+                0.0,
+                0.5
             ]
         },
         "segnoSerpent2": {
@@ -3040,6 +3210,86 @@
             "bBoxSW": [
                 0.0004,
                 0.0046
+            ]
+        },
+        "uniE030": {
+            "bBoxNE": [
+                0.152,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE031": {
+            "bBoxNE": [
+                0.704,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE032": {
+            "bBoxNE": [
+                1.052,
+                4.0
+            ],
+            "bBoxSW": [
+                0.004,
+                0.0
+            ]
+        },
+        "uniE033": {
+            "bBoxNE": [
+                1.052,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE038": {
+            "bBoxNE": [
+                0.152,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                2.0
+            ]
+        },
+        "uniE040": {
+            "bBoxNE": [
+                1.812,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE041": {
+            "bBoxNE": [
+                1.812,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE043": {
+            "bBoxNE": [
+                0.4,
+                2.7
+            ],
+            "bBoxSW": [
+                0.0,
+                1.3
             ]
         },
         "uniE045": {
@@ -4542,26 +4792,6 @@
             "stemUpSE": [
                 1.4,
                 -0.0
-            ]
-        },
-        "noteheadDoubleWhole": {
-            "stemDownNW": [
-                0.0,
-                0.0
-            ],
-            "stemUpSE": [
-                2.18,
-                0.0
-            ]
-        },
-        "noteheadDoubleWholeSquare": {
-            "stemDownNW": [
-                0.0,
-                0.0
-            ],
-            "stemUpSE": [
-                1.392,
-                0.0
             ]
         },
         "noteheadHalfWithX": {
