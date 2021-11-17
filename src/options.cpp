@@ -815,7 +815,7 @@ const jsonxx::Object *OptionJson::FindNodeByName(
             if (result) {
                 jsonNodePath.emplace_front(mapEntry.first);
                 return result;
-            } 
+            }
         }
     }
 
