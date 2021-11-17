@@ -72,9 +72,9 @@ def get_version():
             version += '.dev'
     if version.endswith(".dev"):
         init_sha = subprocess.getoutput(
-            "git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
+            'git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version')
         count = subprocess.getoutput(
-            "git rev-list --count HEAD \"^{}\"".format(init_sha))
+            'git rev-list --count HEAD \"^{}\"'.format(init_sha))
         version += count
     print(version)
     return version
