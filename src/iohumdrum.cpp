@@ -8737,7 +8737,7 @@ void HumdrumInput::checkForVerseLabels(hum::HTp token)
         current = current->getNextFieldToken();
     }
     while (current && !current->isStaff()) {
-        if (!current->isDataTypeLike("**text")) {
+        if (!(current->isDataTypeLike("**text") || current->isDataTypeLike("**vdata"))) {
             current = current->getNextFieldToken();
             continue;
         }
