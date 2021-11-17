@@ -78,6 +78,14 @@ public:
     ///@}
 
     /**
+     * @name Get layer / cross staff by only considering the slur boundary
+     */
+    ///@{
+    std::pair<Layer *, LayerElement *> GetBoundaryLayer();
+    Staff *GetBoundaryCrossStaff();
+    ///@}
+
+    /**
      * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
      */
     std::pair<Point, Point> AdjustCoordinates(

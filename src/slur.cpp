@@ -100,7 +100,52 @@ void Slur::Reset()
     ResetLayerIdent();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
-    // m_isCrossStaff = false;
+}
+
+std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
+{
+    LayerElement *start = this->GetStart();
+    LayerElement *end = this->GetEnd();
+
+    if (!start || !end) return { NULL, NULL };
+
+    Layer *layer = NULL;
+    LayerElement *layerElement = NULL;
+    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
+    if (!start->Is(TIMESTAMP_ATTR)) {
+        layer = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
+        layerElement = start;
+    }
+    else if (!end->Is(TIMESTAMP_ATTR)) {
+        layer = dynamic_cast<Layer *>(end->GetFirstAncestor(LAYER));
+        layerElement = end;
+    }
+    if (layerElement && layerElement->m_crossStaff) layer = layerElement->m_crossLayer;
+
+    return { layer, layerElement };
+}
+
+Staff *Slur::GetBoundaryCrossStaff()
+{
+    LayerElement *start = this->GetStart();
+    LayerElement *end = this->GetEnd();
+
+    if (!start || !end) return NULL;
+
+    if (start->m_crossStaff != end->m_crossStaff) {
+        return end->m_crossStaff;
+    }
+    else {
+        // Check if the two elements are in different staves (but themselves not cross-staff)
+        Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
+        Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+        if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) {
+            return endStaff;
+        }
+        else {
+            return NULL;
+        }
+    }
 }
 
 std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType)
@@ -1243,6 +1288,33 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
 {
     PrepareSlursParams *params = vrv_params_cast<PrepareSlursParams *>(functorParams);
     assert(params);
+
+    LayerElement *start = this->GetStart();
+    LayerElement *end = this->GetEnd();
+    std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
+
+    if (!start || !end || staffList.empty()) {
+        this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+        return FUNCTOR_CONTINUE;
+    }
+
+    Staff *staff = staffList.at(0);
+    Staff *crossStaff = this->GetBoundaryCrossStaff();
+
+    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR)) {
+        System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
+        assert(system);
+
+        if (system->HasMixedDrawingStemDir(start, end)) {
+            if (crossStaff) {
+                curvature_CURVEDIR curveDir = system->GetPreferredCurveDirection(start, end, this);
+                this->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
+            }
+            else {
+                this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+            }
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }
