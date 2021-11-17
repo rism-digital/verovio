@@ -922,32 +922,32 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     assert(barLine);
 
     const int x = barLine->GetDrawingX();
-    // HARDCODED - should be half the width of the proper glyph
-    const int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 5), 2);
     const int dotSeparation
-        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_repeatBarLineDotSeparation.GetValue();
+        = m_doc->GetDrawingUnit(100) * m_options->m_repeatBarLineDotSeparation.GetValue();
     const int barLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_barLineWidth.GetValue();
     const int thickBarLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = m_doc->GetDrawingUnit(100) * m_options->m_barLineSeparation.GetValue();
-    const int xShift = thickBarLineWidth + dotSeparation + barLineSeparation + r + barLineWidth;
+    const int xShift = thickBarLineWidth + dotSeparation + barLineSeparation + barLineWidth;
+    const int staffSize = staff->m_drawingStaffSize;
+    const int dotWidth = m_doc->GetGlyphWidth(SMUFL_E044_repeatDot, staffSize, false);
 
-    const int x1 = x - (dotSeparation + r) - barLineWidth;
+    const int x1 = x - barLineWidth / 2 - (dotSeparation + dotWidth);
     const int x2 = x + xShift;
 
-    const int yBottom = staff->GetDrawingY() - staff->m_drawingLines * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int yBottom = staff->GetDrawingY() - staff->m_drawingLines * m_doc->GetDrawingUnit(staffSize);
+    const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staffSize);
 
     if (barLine->GetForm() == BARRENDITION_rptstart) {
-        DrawDot(dc, x2 - thickBarLineWidth / 2, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x2 - thickBarLineWidth / 2, yTop, staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x2 - thickBarLineWidth / 2, yTop, SMUFL_E044_repeatDot, staffSize, false);
+        DrawSmuflCode(dc, x2 - thickBarLineWidth / 2, yBottom, SMUFL_E044_repeatDot, staffSize, false);
     }
     if (barLine->GetForm() == BARRENDITION_rptboth) {
-        DrawDot(dc, x2 + barLineSeparation + barLineWidth, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x2 + barLineSeparation + barLineWidth, yTop, staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x2 + barLineSeparation + barLineWidth / 2, yTop, SMUFL_E044_repeatDot, staffSize, false);
+        DrawSmuflCode(dc, x2 + barLineSeparation + barLineWidth / 2, yBottom, SMUFL_E044_repeatDot, staffSize, false);
     }
     if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_rptboth)) {
-        DrawDot(dc, x1, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x1, yTop, staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x1, yTop, SMUFL_E044_repeatDot, staffSize, false);
+        DrawSmuflCode(dc, x1, yBottom, SMUFL_E044_repeatDot, staffSize, false);
     }
 
     return;
