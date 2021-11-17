@@ -66,13 +66,13 @@
             <!--<glyph glyph-code="E040" smufl-name="repeatLeft" />-->
             <!--<glyph glyph-code="E041" smufl-name="repeatRight" />-->
             <!--<glyph glyph-code="E042" smufl-name="repeatRightLeft" />-->
-            <!--<glyph glyph-code="E043" smufl-name="repeatDots" />-->
-            <!--<glyph glyph-code="E044" smufl-name="repeatDot" />-->
+            <glyph glyph-code="E043" smufl-name="repeatDots" />
+            <glyph glyph-code="E044" smufl-name="repeatDot" />
             <glyph glyph-code="E045" smufl-name="dalSegno" />
             <glyph glyph-code="E046" smufl-name="daCapo" />
             <glyph glyph-code="E047" smufl-name="segno" />
             <glyph glyph-code="E048" smufl-name="coda" />
-            <!--<glyph glyph-code="E049" smufl-name="codaSquare" />-->
+            <glyph glyph-code="E049" smufl-name="codaSquare" />
             <!--<glyph glyph-code="E04A" smufl-name="segnoSerpent1" />-->
             <glyph glyph-code="E04B" smufl-name="segnoSerpent2" />
             <!--<glyph glyph-code="E04C" smufl-name="leftRepeatSmall" />-->
