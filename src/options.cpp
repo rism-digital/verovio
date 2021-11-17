@@ -762,8 +762,6 @@ std::set<std::string> OptionJson::GetKeysByNode(const std::string &nodeName, std
     for (const auto &mapEntry : node->kv_map()) {
         keys.insert(mapEntry.first);
     }
-    // reverse path for json node, since it has been saved in inverted order
-    jsonNodePath.reverse();
 
     return keys;
 }
@@ -815,7 +813,7 @@ const jsonxx::Object *OptionJson::FindNodeByName(
             const jsonxx::Object *result
                 = FindNodeByName(mapEntry.second->get<jsonxx::Object>(), jsonNodeName, jsonNodePath);
             if (result) {
-                jsonNodePath.emplace_back(mapEntry.first);
+                jsonNodePath.emplace_front(mapEntry.first);
                 return result;
             } 
         }
