@@ -95,62 +95,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
 void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType)
 {
-    /************** parent layers **************/
-
     LayerElement *start = slur->GetStart();
     LayerElement *end = slur->GetEnd();
 
-    if (!start || !end) {
-        // no start and end, obviously nothing to do...
-        return;
-    }
+    if (!start || !end) return;
 
-    StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(start);
-    StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(end);
-
-    data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
-    if (startStemDrawInterface) {
-        startStemDir = startStemDrawInterface->GetDrawingStemDir();
-    }
-    data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
-    if (endStemDrawInterface) {
-        endStemDir = endStemDrawInterface->GetDrawingStemDir();
-    }
-
-    Layer *layer = NULL;
-    LayerElement *layerElement = NULL;
-    std::tie(layer, layerElement) = slur->GetBoundaryLayer();
-
-    // At this stage layer can still be NULL for slurs with @tstamp and @tstamp2
-    Staff *crossStaff = slur->GetBoundaryCrossStaff();
-    if (crossStaff) curve->SetCrossStaff(crossStaff);
-
-    /************** note stem dir **************/
-
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-    if (spanningType == SPANNING_START_END) {
-        stemDir = startStemDir;
-    }
-    // This is the case when the slur is split over two system of two pages.
-    // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
-    else if (spanningType == SPANNING_START) {
-        stemDir = startStemDir;
-    }
-    // Now this is the case when the slur is split but we are drawing the end of it
-    else if (spanningType == SPANNING_END) {
-        stemDir = endStemDir;
-    }
-    // Finally, slur accross an entire system; use the staff position and up (see below)
-    else {
-        stemDir = STEMDIRECTION_down;
-    }
-
-    /************** direction **************/
-
-    const int center = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
-    const bool isAboveStaffCenter = start->GetDrawingY() > center;
-    curvature_CURVEDIR drawingCurveDir
-        = slur->GetPreferredCurveDirection(m_doc, layer, layerElement, stemDir, isAboveStaffCenter);
+    const curvature_CURVEDIR drawingCurveDir = slur->GetDrawingCurvedir();
 
     /************** adjusting y position **************/
 
@@ -219,8 +169,6 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             }
         }
     }
-
-    return;
 }
 
 float View::CalcInitialSlur(
