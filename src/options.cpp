@@ -1243,7 +1243,7 @@ Options::Options()
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
-    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    m_repeatBarLineDotSeparation.Init(0.36, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
