@@ -859,7 +859,8 @@ void View::DrawBarLine(
                 minX = x - barLineThickWidth / 2;
                 maxX = x2 + barLinesSum / 2;
             }
-            else if ((form == BARRENDITION_dbl) || (form == BARRENDITION_dbldashed)  || (form == BARRENDITION_dbldotted)) {
+            else if ((form == BARRENDITION_dbl) || (form == BARRENDITION_dbldashed)
+                || (form == BARRENDITION_dbldotted)) {
                 maxX = x2 + barLineWidth / 2;
             }
             Object lines;
@@ -922,8 +923,7 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     assert(barLine);
 
     const int x = barLine->GetDrawingX();
-    const int dotSeparation
-        = m_doc->GetDrawingUnit(100) * m_options->m_repeatBarLineDotSeparation.GetValue();
+    const int dotSeparation = m_doc->GetDrawingUnit(100) * m_options->m_repeatBarLineDotSeparation.GetValue();
     const int barLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_barLineWidth.GetValue();
     const int thickBarLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = m_doc->GetDrawingUnit(100) * m_options->m_barLineSeparation.GetValue();
