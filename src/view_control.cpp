@@ -41,6 +41,7 @@
 #include "note.h"
 #include "octave.h"
 #include "options.h"
+#include "page.h"
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
@@ -188,7 +189,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     if (!start || !end) return;
     if (!interface->IsOrdered(start, end)) {
         // To avoid showing the same warning multiple times, display a warning only during actual drawing
-        if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
+        if (!dc->Is(BBOX_DEVICE_CONTEXT) && (m_currentPage == vrv_cast<Page *>(start->GetFirstAncestor(PAGE)))) {
             LogWarning("%s '%s' is ignored, since start '%s' does not occur temporally before end '%s'.",
                 element->GetClassName().c_str(), element->GetUuid().c_str(), start->GetUuid().c_str(),
                 end->GetUuid().c_str());
