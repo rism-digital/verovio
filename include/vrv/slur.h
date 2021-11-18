@@ -78,14 +78,6 @@ public:
     ///@}
 
     /**
-     * @name Get layer / cross staff by only considering the slur boundary
-     */
-    ///@{
-    std::pair<Layer *, LayerElement *> GetBoundaryLayer();
-    Staff *GetBoundaryCrossStaff();
-    ///@}
-
-    /**
      * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
      */
     std::pair<Point, Point> AdjustCoordinates(
@@ -110,12 +102,6 @@ public:
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
     ///@}
 
-    /**
-     * Get preferred curve direction based on number of conditions: presence of other layers, stem direction, etc.
-     */
-    curvature_CURVEDIR GetPreferredCurveDirection(
-        Doc *doc, Layer *layer, LayerElement *layerElement, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
-
     //----------//
     // Functors //
     //----------//
@@ -131,6 +117,18 @@ public:
     int PrepareSlurs(FunctorParams *functorParams) override;
 
 private:
+    /**
+     * Helper for calculating the slur direction
+     */
+    ///@{
+    // Get layer by only considering the slur boundary
+    std::pair<Layer *, LayerElement *> GetBoundaryLayer();
+    // Get cross staff by only considering the slur boundary
+    Staff *GetBoundaryCrossStaff();
+    // Get preferred curve direction based on various conditions
+    curvature_CURVEDIR GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
+    ///@}
+
     /**
      * Helper for calculating the initial slur start and end points
      */

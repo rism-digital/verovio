@@ -779,10 +779,8 @@ curvature_CURVEDIR Slur::GetGraceCurveDirection(Doc *doc)
     return curvature_CURVEDIR_below;
 }
 
-curvature_CURVEDIR Slur::GetPreferredCurveDirection(
-    Doc *doc, Layer *layer, LayerElement *layerElement, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter)
+curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter)
 {
-    assert(layerElement);
     const bool isGraceToNoteSlur = !this->GetStart()->Is(TIMESTAMP_ATTR) && !this->GetEnd()->Is(TIMESTAMP_ATTR)
         && this->GetStart()->IsGraceNote() && !this->GetEnd()->IsGraceNote();
     Note *startNote = NULL;
@@ -793,7 +791,11 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(
         startParentChord = startNote->IsChordTone();
     }
 
-    data_STEMDIRECTION layerStemDir;
+    Layer *layer = NULL;
+    LayerElement *layerElement = NULL;
+    std::tie(layer, layerElement) = this->GetBoundaryLayer();
+    data_STEMDIRECTION layerStemDir = STEMDIRECTION_NONE;
+
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     // first should be the slur @curvedir
     if (this->HasCurvedir()) {
@@ -801,11 +803,12 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(
             = (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // grace notes - always below unless we have a drawing stem direction on the layer
-    else if (isGraceToNoteSlur && layer && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
+    else if (isGraceToNoteSlur && layer && layerElement
+        && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
         drawingCurveDir = this->GetGraceCurveDirection(doc);
     }
     // then layer direction trumps note direction
-    else if (layer && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
+    else if (layer && layerElement && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
@@ -1292,7 +1295,7 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
     }
     if (this->HasDrawingCurvedir()) return FUNCTOR_CONTINUE;
 
-    // Retrieve boundary and handle timestamps
+    // Retrieve boundary, staves and system
     LayerElement *start = this->GetStart();
     LayerElement *end = this->GetEnd();
     std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
@@ -1302,23 +1305,13 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (start->Is(TIMESTAMP_ATTR) || end->Is(TIMESTAMP_ATTR)) {
-        this->SetDrawingCurvedir(curvature_CURVEDIR_above);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Retrieve layers, staves, system
-    Layer *layer = NULL;
-    LayerElement *layerElement = NULL;
-    std::tie(layer, layerElement) = this->GetBoundaryLayer();
-
     Staff *staff = staffList.at(0);
     Staff *crossStaff = this->GetBoundaryCrossStaff();
 
     System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
     assert(system);
 
-    if (system->HasMixedDrawingStemDir(start, end)) {
+    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && system->HasMixedDrawingStemDir(start, end)) {
         // Handle mixed stem direction
         if (crossStaff) {
             const curvature_CURVEDIR curveDir = system->GetPreferredCurveDirection(start, end, this);
@@ -1329,7 +1322,7 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
         }
     }
     else {
-        // Handle uniform stem direction
+        // Handle uniform stem direction and time stamp boundaries
         StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(start);
         data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
         if (startStemDrawInterface) {
@@ -1339,7 +1332,7 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
         const int center = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
         const bool isAboveStaffCenter = (start->GetDrawingY() > center);
         const curvature_CURVEDIR curveDir
-            = this->GetPreferredCurveDirection(params->m_doc, layer, layerElement, startStemDir, isAboveStaffCenter);
+            = this->GetPreferredCurveDirection(params->m_doc, startStemDir, isAboveStaffCenter);
         this->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
     }
 
