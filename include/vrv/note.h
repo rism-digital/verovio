@@ -313,7 +313,7 @@ protected:
     /**
      * The note locations w.r.t. each staff
      */
-    MapOfNoteLocs CalcNoteLocations() override;
+    MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) override;
 
     /**
      * The dot locations w.r.t. each staff
