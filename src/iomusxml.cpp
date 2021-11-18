@@ -3495,9 +3495,7 @@ void MusicXmlInput::ReadMusicXmlTies(
 
     const std::string tieType = xmlTie.node().attribute("type").as_string();
     if ("stop" == tieType) { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
-        if (!m_tieStack.empty()
-            && ((note->GetDiatonicPitch() - m_tieStack.back().second->GetDiatonicPitch() == 0)
-                || (note->IsEnharmonicWith(m_tieStack.back().second)))) {
+        if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().second)) {
             m_tieStack.back().first->SetEndid("#" + note->GetUuid());
             m_tieStack.pop_back();
         }
