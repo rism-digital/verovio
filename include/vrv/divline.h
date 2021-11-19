@@ -18,9 +18,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <barLine> element.
+ * This class models the MEI <divLine> element.
  */
-class DivLine : public LayerElement, public AttBarLineLog, public AttColor, public AttVisibility {
+class DivLine : public LayerElement, public AttDivLineLog, public AttColor, public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -45,9 +45,19 @@ public:
     bool SetAlignment(Alignment *alignment);
 
     /*
-     * Return true if the barLine type requires repetition dots to be drawn.
+     * Return true if the divLine type requires repetition dots to be drawn.
      */
-    bool HasRepetitionDots() const;
+    // bool HasRepetitionDots() const;
+
+    /**
+     * Retrieve SMuFL string for the divline.
+     */
+    std::wstring GetSymbolStr() const;
+
+    /**
+     * @name Method used for drawing divline on ornaments
+     */
+    static wchar_t GetDivLineGlyph(data_DIVLINE);
 
     //----------//
     // Functors //
@@ -56,7 +66,18 @@ public:
     /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
+    // virtual int ConvertToCastOffMensural(FunctorParams *params);
+    // static wchar_t GetDivLineGlyph(data_DIVISIO);
+    
+    /**
+     * See Object::ResetDrawing
+     */
+    // virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    // virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
 private:
     //
@@ -83,10 +104,10 @@ public:
     virtual ~DivLineAttr();
     virtual Object *Clone() const { return new DivLineAttr(*this); }
     virtual std::string GetClassName() const { return "DivLineAttr"; }
-    virtual ClassId GetClassId() const { return (m_isLeft ? DIVLINE_ATTR_LEFT : DIVLINE_ATTR_RIGHT); }
+    virtual ClassId GetClassId() const { return DIVLINE; }
     ///@}
 
-    void SetLeft() { m_isLeft = true; }
+    // void SetLeft() { m_isLeft = true; }
 
 private:
     //
@@ -94,7 +115,7 @@ public:
     //
 private:
     /** A flag for left barlines (right if false) */
-    bool m_isLeft;
+    // bool m_isLeft;
 };
 
 } // namespace vrv

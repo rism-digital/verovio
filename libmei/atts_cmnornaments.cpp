@@ -311,37 +311,37 @@ void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
         const AttMordentLog *att = dynamic_cast<const AttMordentLog *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->MordentLogFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->MordentLogFormToStr(att->GetForm()) });
         }
         if (att->HasLong()) {
-            attributes->push_back(std::make_pair("long", att->BooleanToStr(att->GetLong())));
+            attributes->push_back({ "long", att->BooleanToStr(att->GetLong()) });
         }
     }
     if (element->HasAttClass(ATT_ORNAMPRESENT)) {
         const AttOrnamPresent *att = dynamic_cast<const AttOrnamPresent *>(element);
         assert(att);
         if (att->HasOrnam()) {
-            attributes->push_back(std::make_pair("ornam", att->StrToStr(att->GetOrnam())));
+            attributes->push_back({ "ornam", att->StrToStr(att->GetOrnam()) });
         }
     }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {
         const AttOrnamentAccid *att = dynamic_cast<const AttOrnamentAccid *>(element);
         assert(att);
         if (att->HasAccidupper()) {
-            attributes->push_back(std::make_pair("accidupper", att->AccidentalWrittenToStr(att->GetAccidupper())));
+            attributes->push_back({ "accidupper", att->AccidentalWrittenToStr(att->GetAccidupper()) });
         }
         if (att->HasAccidlower()) {
-            attributes->push_back(std::make_pair("accidlower", att->AccidentalWrittenToStr(att->GetAccidlower())));
+            attributes->push_back({ "accidlower", att->AccidentalWrittenToStr(att->GetAccidlower()) });
         }
     }
     if (element->HasAttClass(ATT_TURNLOG)) {
         const AttTurnLog *att = dynamic_cast<const AttTurnLog *>(element);
         assert(att);
         if (att->HasDelayed()) {
-            attributes->push_back(std::make_pair("delayed", att->BooleanToStr(att->GetDelayed())));
+            attributes->push_back({ "delayed", att->BooleanToStr(att->GetDelayed()) });
         }
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->TurnLogFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->TurnLogFormToStr(att->GetForm()) });
         }
     }
 }

@@ -173,6 +173,7 @@ enum ClassId {
     CHORD,
     CLEF,
     CUSTOS,
+    DIVLINE,
     DOT,
     DOTS,
     FLAG,
@@ -259,6 +260,7 @@ class BeamElementCoord;
 class BoundingBox;
 class Comparison;
 class CurveSpannedElement;
+class DivLine;
 class FloatingPositioner;
 class GraceAligner;
 class InterfaceComparison;
