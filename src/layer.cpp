@@ -19,6 +19,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
+#include "divline.h"
 #include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"

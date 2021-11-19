@@ -22,6 +22,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
+#include "divline.h"
 #include "doc.h"
 #include "dot.h"
 #include "ftrem.h"
@@ -730,6 +731,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is(BARLINE)) {
         type = ALIGNMENT_BARLINE;
+    }
+    else if (this->Is(DIVLINE)) {
+        type = ALIGNMENT_DIVLINE;
     }
     else if (this->Is(CLEF)) {
         if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
@@ -1524,6 +1528,7 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
         params->m_lastDot->m_drawingNextElement = this;
         params->m_lastDot = NULL;
     }
+    // if (this->Is(BARLINE) || this->Is(DIVLINE)) {
     if (this->Is(BARLINE)) {
         // Do not attach a note when a barline is passed
         params->m_currentNote = NULL;

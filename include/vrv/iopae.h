@@ -43,6 +43,7 @@ class Tie;
 class Tuplet;
 class KeySig;
 class BarLine;
+class DivLine;
 
 //----------------------------------------------------------------------------
 // namespace for local Plain and Easy classes
@@ -301,6 +302,7 @@ private:
     void WriteBeamEnd(Beam *beam);
     void WriteChord(Chord *chord);
     void WriteClef(Clef *clef);
+    void WriteDivLine(DivLine *divLine);
     void WriteGraceGrp(GraceGrp *graceGrp);
     void WriteKeyAccid(KeyAccid *keyAccid);
     void WriteKeySig(KeySig *keySig);
@@ -395,6 +397,7 @@ private:
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
     int getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index = 0);
     int getOctave(const char *incipit, char *octave, int index = 0);
+    int getDivLine(const char *incipit, data_BARRENDITION *output, int index);
     int getDurations(const char *incipit, pae::Measure *measure, int index = 0);
     int getDuration(const char *incipit, data_DURATION *duration, int *dot, int index);
     int getTupletFermata(const char *incipit, pae::Note *note, int index = 0);

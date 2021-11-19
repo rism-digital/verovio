@@ -111,10 +111,10 @@ void Att::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
         const AttTabular *att = dynamic_cast<const AttTabular *>(element);
         assert(att);
         if (att->HasColspan()) {
-            attributes->push_back(std::make_pair("colspan", att->IntToStr(att->GetColspan())));
+            attributes->push_back({ "colspan", att->IntToStr(att->GetColspan()) });
         }
         if (att->HasRowspan()) {
-            attributes->push_back(std::make_pair("rowspan", att->IntToStr(att->GetRowspan())));
+            attributes->push_back({ "rowspan", att->IntToStr(att->GetRowspan()) });
         }
     }
 }

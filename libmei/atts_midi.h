@@ -253,8 +253,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMidiBpm(data_MIDIBPM midiBpm_) { m_midiBpm = midiBpm_; }
-    data_MIDIBPM GetMidiBpm() const { return m_midiBpm; }
+    void SetMidiBpm(double midiBpm_) { m_midiBpm = midiBpm_; }
+    double GetMidiBpm() const { return m_midiBpm; }
     bool HasMidiBpm() const;
     //
     void SetMidiMspb(data_MIDIMSPB midiMspb_) { m_midiMspb = midiMspb_; }
@@ -268,7 +268,7 @@ private:
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
-    data_MIDIBPM m_midiBpm;
+    double m_midiBpm;
     /**
      * Records the number of microseconds per *quarter note*.
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the

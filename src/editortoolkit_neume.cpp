@@ -21,6 +21,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
+#include "divline.h"
 #include "layer.h"
 #include "liquescent.h"
 #include "nc.h"
@@ -558,6 +559,20 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             fi->GetZone()->ShiftByXY(x, -y);
         }
     }
+    else if (element->Is(DIVLINE)) {
+        DivLine *divline = dynamic_cast<DivLine *>(element);
+        if (!divline->HasFacs()) {
+            LogError("Divline dragging is only supported for divline with facsimiles!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Divline dragging is only supported for divline with facsimiles.");
+            return false;
+        }
+        FacsimileInterface *fi = (*divline).GetFacsimileInterface();
+        assert(fi);
+        if (fi->GetZone() != NULL) {
+            fi->GetZone()->ShiftByXY(x, -y);
+        }
+    }
     else {
         LogWarning("Unsupported element for dragging.");
         m_infoObject.import("status", "FAILURE");
@@ -941,6 +956,58 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             return false;
         }
         m_infoObject.import("uuid", custos->GetUuid());
+    }
+    else if(elementType == "divline"){
+        DivLine *divline = new DivLine();
+        data_DIVLINE divlineTypeW = DIVLINE_NONE;
+
+        for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+            if (it->first == "form"){
+                if (it->second == "maxima"){
+                    divlineTypeW = DIVLINE_maxima;
+                    break;
+                } else if (it->second == "maior"){
+                    divlineTypeW = DIVLINE_maior;
+                    break;
+                } else if (it->second == "minima"){
+                    divlineTypeW = DIVLINE_minima;
+                    break;
+                } else if (it->second == "finalis"){
+                    divlineTypeW = DIVLINE_finalis;
+                    break;
+                }
+            }
+        }
+        if (divlineTypeW == DIVLINE_NONE) {
+            LogError("A divline type must be specified.");
+            delete divline;
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "A divline type must be specified.");
+            return false;
+        }
+
+        divline->SetForm(divlineTypeW);
+        zone->SetUlx(ulx);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        surface->AddChild(zone);
+        divline->SetZone(zone);
+        layer->AddChild(divline);
+        
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        ulx -= noteWidth / 2;
+        uly -= noteHeight / 2;
+
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth);
+        zone->SetLry(uly + noteHeight);
+        layer->ReorderByXPos();
+
+        m_infoObject.import("uuid", divline->GetUuid());
+        
     }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
@@ -2400,8 +2467,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
-        LogError("Element is of type %s, but only Syllables, Custos, and Clefs can change staves.",
+    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(DIVLINE))) {
+        LogError("Element is of type %s, but only Syllables, Custos, Clefs, and Divlines can change staves.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",

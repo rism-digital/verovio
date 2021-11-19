@@ -146,14 +146,14 @@ void Att::GetEdittrans(const Object *element, ArrayOfStrAttr *attributes)
         const AttAgentIdent *att = dynamic_cast<const AttAgentIdent *>(element);
         assert(att);
         if (att->HasAgent()) {
-            attributes->push_back(std::make_pair("agent", att->StrToStr(att->GetAgent())));
+            attributes->push_back({ "agent", att->StrToStr(att->GetAgent()) });
         }
     }
     if (element->HasAttClass(ATT_REASONIDENT)) {
         const AttReasonIdent *att = dynamic_cast<const AttReasonIdent *>(element);
         assert(att);
         if (att->HasReason()) {
-            attributes->push_back(std::make_pair("reason", att->StrToStr(att->GetReason())));
+            attributes->push_back({ "reason", att->StrToStr(att->GetReason()) });
         }
     }
 }

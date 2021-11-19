@@ -92,7 +92,7 @@ void Att::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
         const AttCrit *att = dynamic_cast<const AttCrit *>(element);
         assert(att);
         if (att->HasCause()) {
-            attributes->push_back(std::make_pair("cause", att->StrToStr(att->GetCause())));
+            attributes->push_back({ "cause", att->StrToStr(att->GetCause()) });
         }
     }
 }
