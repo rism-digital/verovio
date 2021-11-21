@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATTS_FACSIMILE_H__
-#define __VRV_ATTS_FACSIMILE_H__
+#ifndef __VRV_ATTS_MSDESC_H__
+#define __VRV_ATTS_MSDESC_H__
 
 #include "att.h"
 #include "attdef.h"
@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttFacsimile
+// AttComponentType
 //----------------------------------------------------------------------------
 
-class AttFacsimile : public Att {
+class AttComponentType : public Att {
 public:
-    AttFacsimile();
-    virtual ~AttFacsimile();
+    AttComponentType();
+    virtual ~AttComponentType();
 
     /** Reset the default values for the attribute class **/
-    void ResetFacsimile();
+    void ResetComponentType();
 
     /** Read the values for the attribute class **/
-    bool ReadFacsimile(pugi::xml_node element);
+    bool ReadComponentType(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteFacsimile(pugi::xml_node element);
+    bool WriteComponentType(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,21 +49,18 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFacs(std::string facs_) { m_facs = facs_; }
-    std::string GetFacs() const { return m_facs; }
-    bool HasFacs() const;
+    void SetComptype(componentType_COMPTYPE comptype_) { m_comptype = comptype_; }
+    componentType_COMPTYPE GetComptype() const { return m_comptype; }
+    bool HasComptype() const;
     ///@}
 
 private:
-    /**
-     * Permits the current element to reference a facsimile surface or image zone which
-     * corresponds to it.
-     **/
-    std::string m_facs;
+    /** --- **/
+    componentType_COMPTYPE m_comptype;
 
-    /* include <attfacs> */
+    /* include <attcomptype> */
 };
 
 } // vrv namespace
 
-#endif // __VRV_ATTS_FACSIMILE_H__
+#endif // __VRV_ATTS_MSDESC_H__

@@ -31,7 +31,7 @@ Mensur::Mensur()
     , AttCue()
     , AttDurationRatio()
     , AttMensuralShared()
-    , AttMensurLog()
+    , AttMensuralLog()
     , AttMensurVis()
     , AttSlashCount()
     , AttStaffLoc()
@@ -40,7 +40,7 @@ Mensur::Mensur()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_MENSURALSHARED);
-    RegisterAttClass(ATT_MENSURLOG);
+    RegisterAttClass(ATT_MENSURALLOG);
     RegisterAttClass(ATT_MENSURVIS);
     RegisterAttClass(ATT_SLASHCOUNT);
     RegisterAttClass(ATT_STAFFLOC);
@@ -57,7 +57,7 @@ void Mensur::Reset()
     ResetCue();
     ResetDurationRatio();
     ResetMensuralShared();
-    ResetMensurLog();
+    ResetMensuralLog();
     ResetMensurVis();
     ResetSlashCount();
     ResetStaffLoc();

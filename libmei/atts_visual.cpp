@@ -1018,6 +1018,52 @@ bool AttKeySigDefaultVis::HasKeysigShowchange() const
 /* include <attkeysig.showchange> */
 
 //----------------------------------------------------------------------------
+// AttLigatureVis
+//----------------------------------------------------------------------------
+
+AttLigatureVis::AttLigatureVis() : Att()
+{
+    ResetLigatureVis();
+}
+
+AttLigatureVis::~AttLigatureVis()
+{
+}
+
+void AttLigatureVis::ResetLigatureVis()
+{
+    m_form = LIGATUREFORM_NONE;
+}
+
+bool AttLigatureVis::ReadLigatureVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("form")) {
+        this->SetForm(StrToLigatureform(element.attribute("form").value()));
+        element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttLigatureVis::WriteLigatureVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasForm()) {
+        element.append_attribute("form") = LigatureformToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttLigatureVis::HasForm() const
+{
+    return (m_form != LIGATUREFORM_NONE);
+}
+
+/* include <attform> */
+
+//----------------------------------------------------------------------------
 // AttLineVis
 //----------------------------------------------------------------------------
 
@@ -1214,13 +1260,20 @@ AttMensurVis::~AttMensurVis()
 
 void AttMensurVis::ResetMensurVis()
 {
+    m_dot = BOOLEAN_NONE;
     m_form = mensurVis_FORM_NONE;
     m_orient = ORIENTATION_NONE;
+    m_sign = MENSURATIONSIGN_NONE;
 }
 
 bool AttMensurVis::ReadMensurVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
+    if (element.attribute("dot")) {
+        this->SetDot(StrToBoolean(element.attribute("dot").value()));
+        element.remove_attribute("dot");
+        hasAttribute = true;
+    }
     if (element.attribute("form")) {
         this->SetForm(StrToMensurVisForm(element.attribute("form").value()));
         element.remove_attribute("form");
@@ -1231,12 +1284,21 @@ bool AttMensurVis::ReadMensurVis(pugi::xml_node element)
         element.remove_attribute("orient");
         hasAttribute = true;
     }
+    if (element.attribute("sign")) {
+        this->SetSign(StrToMensurationsign(element.attribute("sign").value()));
+        element.remove_attribute("sign");
+        hasAttribute = true;
+    }
     return hasAttribute;
 }
 
 bool AttMensurVis::WriteMensurVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
+    if (this->HasDot()) {
+        element.append_attribute("dot") = BooleanToStr(this->GetDot()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasForm()) {
         element.append_attribute("form") = MensurVisFormToStr(this->GetForm()).c_str();
         wroteAttribute = true;
@@ -1245,7 +1307,16 @@ bool AttMensurVis::WriteMensurVis(pugi::xml_node element)
         element.append_attribute("orient") = OrientationToStr(this->GetOrient()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasSign()) {
+        element.append_attribute("sign") = MensurationsignToStr(this->GetSign()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
+}
+
+bool AttMensurVis::HasDot() const
+{
+    return (m_dot != BOOLEAN_NONE);
 }
 
 bool AttMensurVis::HasForm() const
@@ -1258,7 +1329,12 @@ bool AttMensurVis::HasOrient() const
     return (m_orient != ORIENTATION_NONE);
 }
 
-/* include <attorient> */
+bool AttMensurVis::HasSign() const
+{
+    return (m_sign != MENSURATIONSIGN_NONE);
+}
+
+/* include <attsign> */
 
 //----------------------------------------------------------------------------
 // AttMensuralVis
@@ -1276,10 +1352,13 @@ AttMensuralVis::~AttMensuralVis()
 void AttMensuralVis::ResetMensuralVis()
 {
     m_mensurColor = "";
+    m_mensurDot = BOOLEAN_NONE;
     m_mensurForm = mensuralVis_MENSURFORM_NONE;
     m_mensurLoc = 0;
     m_mensurOrient = ORIENTATION_NONE;
+    m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSize = data_FONTSIZE();
+    m_mensurSlash = 0;
 }
 
 bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
@@ -1288,6 +1367,11 @@ bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
     if (element.attribute("mensur.color")) {
         this->SetMensurColor(StrToStr(element.attribute("mensur.color").value()));
         element.remove_attribute("mensur.color");
+        hasAttribute = true;
+    }
+    if (element.attribute("mensur.dot")) {
+        this->SetMensurDot(StrToBoolean(element.attribute("mensur.dot").value()));
+        element.remove_attribute("mensur.dot");
         hasAttribute = true;
     }
     if (element.attribute("mensur.form")) {
@@ -1305,9 +1389,19 @@ bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
         element.remove_attribute("mensur.orient");
         hasAttribute = true;
     }
+    if (element.attribute("mensur.sign")) {
+        this->SetMensurSign(StrToMensurationsign(element.attribute("mensur.sign").value()));
+        element.remove_attribute("mensur.sign");
+        hasAttribute = true;
+    }
     if (element.attribute("mensur.size")) {
         this->SetMensurSize(StrToFontsize(element.attribute("mensur.size").value()));
         element.remove_attribute("mensur.size");
+        hasAttribute = true;
+    }
+    if (element.attribute("mensur.slash")) {
+        this->SetMensurSlash(StrToInt(element.attribute("mensur.slash").value()));
+        element.remove_attribute("mensur.slash");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1318,6 +1412,10 @@ bool AttMensuralVis::WriteMensuralVis(pugi::xml_node element)
     bool wroteAttribute = false;
     if (this->HasMensurColor()) {
         element.append_attribute("mensur.color") = StrToStr(this->GetMensurColor()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMensurDot()) {
+        element.append_attribute("mensur.dot") = BooleanToStr(this->GetMensurDot()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMensurForm()) {
@@ -1332,8 +1430,16 @@ bool AttMensuralVis::WriteMensuralVis(pugi::xml_node element)
         element.append_attribute("mensur.orient") = OrientationToStr(this->GetMensurOrient()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasMensurSign()) {
+        element.append_attribute("mensur.sign") = MensurationsignToStr(this->GetMensurSign()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasMensurSize()) {
         element.append_attribute("mensur.size") = FontsizeToStr(this->GetMensurSize()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMensurSlash()) {
+        element.append_attribute("mensur.slash") = IntToStr(this->GetMensurSlash()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1342,6 +1448,11 @@ bool AttMensuralVis::WriteMensuralVis(pugi::xml_node element)
 bool AttMensuralVis::HasMensurColor() const
 {
     return (m_mensurColor != "");
+}
+
+bool AttMensuralVis::HasMensurDot() const
+{
+    return (m_mensurDot != BOOLEAN_NONE);
 }
 
 bool AttMensuralVis::HasMensurForm() const
@@ -1359,12 +1470,22 @@ bool AttMensuralVis::HasMensurOrient() const
     return (m_mensurOrient != ORIENTATION_NONE);
 }
 
+bool AttMensuralVis::HasMensurSign() const
+{
+    return (m_mensurSign != MENSURATIONSIGN_NONE);
+}
+
 bool AttMensuralVis::HasMensurSize() const
 {
     return (m_mensurSize.HasValue());
 }
 
-/* include <attmensur.size> */
+bool AttMensuralVis::HasMensurSlash() const
+{
+    return (m_mensurSlash != 0);
+}
+
+/* include <attmensur.slash> */
 
 //----------------------------------------------------------------------------
 // AttMeterSigVis
@@ -2328,6 +2449,14 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
+    if (element->HasAttClass(ATT_LIGATUREVIS)) {
+        AttLigatureVis *att = dynamic_cast<AttLigatureVis *>(element);
+        assert(att);
+        if (attrType == "form") {
+            att->SetForm(att->StrToLigatureform(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_LINEVIS)) {
         AttLineVis *att = dynamic_cast<AttLineVis *>(element);
         assert(att);
@@ -2371,6 +2500,10 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
     if (element->HasAttClass(ATT_MENSURVIS)) {
         AttMensurVis *att = dynamic_cast<AttMensurVis *>(element);
         assert(att);
+        if (attrType == "dot") {
+            att->SetDot(att->StrToBoolean(attrValue));
+            return true;
+        }
         if (attrType == "form") {
             att->SetForm(att->StrToMensurVisForm(attrValue));
             return true;
@@ -2379,12 +2512,20 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             att->SetOrient(att->StrToOrientation(attrValue));
             return true;
         }
+        if (attrType == "sign") {
+            att->SetSign(att->StrToMensurationsign(attrValue));
+            return true;
+        }
     }
     if (element->HasAttClass(ATT_MENSURALVIS)) {
         AttMensuralVis *att = dynamic_cast<AttMensuralVis *>(element);
         assert(att);
         if (attrType == "mensur.color") {
             att->SetMensurColor(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "mensur.dot") {
+            att->SetMensurDot(att->StrToBoolean(attrValue));
             return true;
         }
         if (attrType == "mensur.form") {
@@ -2399,8 +2540,16 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             att->SetMensurOrient(att->StrToOrientation(attrValue));
             return true;
         }
+        if (attrType == "mensur.sign") {
+            att->SetMensurSign(att->StrToMensurationsign(attrValue));
+            return true;
+        }
         if (attrType == "mensur.size") {
             att->SetMensurSize(att->StrToFontsize(attrValue));
+            return true;
+        }
+        if (attrType == "mensur.slash") {
+            att->SetMensurSlash(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -2558,346 +2707,368 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttAnnotVis *att = dynamic_cast<const AttAnnotVis *>(element);
         assert(att);
         if (att->HasPlace()) {
-            attributes->push_back(std::make_pair("place", att->PlacementToStr(att->GetPlace())));
+            attributes->push_back({ "place", att->PlacementToStr(att->GetPlace()) });
         }
     }
     if (element->HasAttClass(ATT_ARPEGVIS)) {
         const AttArpegVis *att = dynamic_cast<const AttArpegVis *>(element);
         assert(att);
         if (att->HasArrow()) {
-            attributes->push_back(std::make_pair("arrow", att->BooleanToStr(att->GetArrow())));
+            attributes->push_back({ "arrow", att->BooleanToStr(att->GetArrow()) });
         }
         if (att->HasArrowShape()) {
-            attributes->push_back(std::make_pair("arrow.shape", att->LinestartendsymbolToStr(att->GetArrowShape())));
+            attributes->push_back({ "arrow.shape", att->LinestartendsymbolToStr(att->GetArrowShape()) });
         }
         if (att->HasArrowSize()) {
-            attributes->push_back(std::make_pair("arrow.size", att->IntToStr(att->GetArrowSize())));
+            attributes->push_back({ "arrow.size", att->IntToStr(att->GetArrowSize()) });
         }
         if (att->HasArrowColor()) {
-            attributes->push_back(std::make_pair("arrow.color", att->StrToStr(att->GetArrowColor())));
+            attributes->push_back({ "arrow.color", att->StrToStr(att->GetArrowColor()) });
         }
         if (att->HasArrowFillcolor()) {
-            attributes->push_back(std::make_pair("arrow.fillcolor", att->StrToStr(att->GetArrowFillcolor())));
+            attributes->push_back({ "arrow.fillcolor", att->StrToStr(att->GetArrowFillcolor()) });
         }
         if (att->HasLineForm()) {
-            attributes->push_back(std::make_pair("line.form", att->LineformToStr(att->GetLineForm())));
+            attributes->push_back({ "line.form", att->LineformToStr(att->GetLineForm()) });
         }
         if (att->HasLineWidth()) {
-            attributes->push_back(std::make_pair("line.width", att->LinewidthToStr(att->GetLineWidth())));
+            attributes->push_back({ "line.width", att->LinewidthToStr(att->GetLineWidth()) });
         }
     }
     if (element->HasAttClass(ATT_BARLINEVIS)) {
         const AttBarLineVis *att = dynamic_cast<const AttBarLineVis *>(element);
         assert(att);
         if (att->HasLen()) {
-            attributes->push_back(std::make_pair("len", att->DblToStr(att->GetLen())));
+            attributes->push_back({ "len", att->DblToStr(att->GetLen()) });
         }
         if (att->HasMethod()) {
-            attributes->push_back(std::make_pair("method", att->BarmethodToStr(att->GetMethod())));
+            attributes->push_back({ "method", att->BarmethodToStr(att->GetMethod()) });
         }
         if (att->HasPlace()) {
-            attributes->push_back(std::make_pair("place", att->IntToStr(att->GetPlace())));
+            attributes->push_back({ "place", att->IntToStr(att->GetPlace()) });
         }
     }
     if (element->HasAttClass(ATT_BEAMINGVIS)) {
         const AttBeamingVis *att = dynamic_cast<const AttBeamingVis *>(element);
         assert(att);
         if (att->HasBeamColor()) {
-            attributes->push_back(std::make_pair("beam.color", att->StrToStr(att->GetBeamColor())));
+            attributes->push_back({ "beam.color", att->StrToStr(att->GetBeamColor()) });
         }
         if (att->HasBeamRend()) {
-            attributes->push_back(std::make_pair("beam.rend", att->BeamingVisBeamrendToStr(att->GetBeamRend())));
+            attributes->push_back({ "beam.rend", att->BeamingVisBeamrendToStr(att->GetBeamRend()) });
         }
         if (att->HasBeamSlope()) {
-            attributes->push_back(std::make_pair("beam.slope", att->DblToStr(att->GetBeamSlope())));
+            attributes->push_back({ "beam.slope", att->DblToStr(att->GetBeamSlope()) });
         }
     }
     if (element->HasAttClass(ATT_BEATRPTVIS)) {
         const AttBeatRptVis *att = dynamic_cast<const AttBeatRptVis *>(element);
         assert(att);
         if (att->HasSlash()) {
-            attributes->push_back(std::make_pair("slash", att->BeatrptRendToStr(att->GetSlash())));
+            attributes->push_back({ "slash", att->BeatrptRendToStr(att->GetSlash()) });
         }
     }
     if (element->HasAttClass(ATT_CHORDVIS)) {
         const AttChordVis *att = dynamic_cast<const AttChordVis *>(element);
         assert(att);
         if (att->HasCluster()) {
-            attributes->push_back(std::make_pair("cluster", att->ClusterToStr(att->GetCluster())));
+            attributes->push_back({ "cluster", att->ClusterToStr(att->GetCluster()) });
         }
     }
     if (element->HasAttClass(ATT_CLEFFINGVIS)) {
         const AttCleffingVis *att = dynamic_cast<const AttCleffingVis *>(element);
         assert(att);
         if (att->HasClefColor()) {
-            attributes->push_back(std::make_pair("clef.color", att->StrToStr(att->GetClefColor())));
+            attributes->push_back({ "clef.color", att->StrToStr(att->GetClefColor()) });
         }
         if (att->HasClefVisible()) {
-            attributes->push_back(std::make_pair("clef.visible", att->BooleanToStr(att->GetClefVisible())));
+            attributes->push_back({ "clef.visible", att->BooleanToStr(att->GetClefVisible()) });
         }
     }
     if (element->HasAttClass(ATT_EPISEMAVIS)) {
         const AttEpisemaVis *att = dynamic_cast<const AttEpisemaVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->EpisemaVisFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->EpisemaVisFormToStr(att->GetForm()) });
         }
         if (att->HasPlace()) {
-            attributes->push_back(std::make_pair("place", att->EventrelToStr(att->GetPlace())));
+            attributes->push_back({ "place", att->EventrelToStr(att->GetPlace()) });
         }
     }
     if (element->HasAttClass(ATT_FTREMVIS)) {
         const AttFTremVis *att = dynamic_cast<const AttFTremVis *>(element);
         assert(att);
         if (att->HasBeams()) {
-            attributes->push_back(std::make_pair("beams", att->IntToStr(att->GetBeams())));
+            attributes->push_back({ "beams", att->IntToStr(att->GetBeams()) });
         }
         if (att->HasBeamsFloat()) {
-            attributes->push_back(std::make_pair("beams.float", att->IntToStr(att->GetBeamsFloat())));
+            attributes->push_back({ "beams.float", att->IntToStr(att->GetBeamsFloat()) });
         }
         if (att->HasFloatGap()) {
-            attributes->push_back(std::make_pair("float.gap", att->MeasurementabsToStr(att->GetFloatGap())));
+            attributes->push_back({ "float.gap", att->MeasurementabsToStr(att->GetFloatGap()) });
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
         const AttFermataVis *att = dynamic_cast<const AttFermataVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->FermataVisFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->FermataVisFormToStr(att->GetForm()) });
         }
         if (att->HasShape()) {
-            attributes->push_back(std::make_pair("shape", att->FermataVisShapeToStr(att->GetShape())));
+            attributes->push_back({ "shape", att->FermataVisShapeToStr(att->GetShape()) });
         }
     }
     if (element->HasAttClass(ATT_FINGGRPVIS)) {
         const AttFingGrpVis *att = dynamic_cast<const AttFingGrpVis *>(element);
         assert(att);
         if (att->HasOrient()) {
-            attributes->push_back(std::make_pair("orient", att->FingGrpVisOrientToStr(att->GetOrient())));
+            attributes->push_back({ "orient", att->FingGrpVisOrientToStr(att->GetOrient()) });
         }
     }
     if (element->HasAttClass(ATT_HAIRPINVIS)) {
         const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
         assert(att);
         if (att->HasOpening()) {
-            attributes->push_back(std::make_pair("opening", att->MeasurementabsToStr(att->GetOpening())));
+            attributes->push_back({ "opening", att->MeasurementabsToStr(att->GetOpening()) });
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
         const AttHarmVis *att = dynamic_cast<const AttHarmVis *>(element);
         assert(att);
         if (att->HasRendgrid()) {
-            attributes->push_back(std::make_pair("rendgrid", att->HarmVisRendgridToStr(att->GetRendgrid())));
+            attributes->push_back({ "rendgrid", att->HarmVisRendgridToStr(att->GetRendgrid()) });
         }
     }
     if (element->HasAttClass(ATT_HISPANTICKVIS)) {
         const AttHispanTickVis *att = dynamic_cast<const AttHispanTickVis *>(element);
         assert(att);
         if (att->HasPlace()) {
-            attributes->push_back(std::make_pair("place", att->EventrelToStr(att->GetPlace())));
+            attributes->push_back({ "place", att->EventrelToStr(att->GetPlace()) });
         }
         if (att->HasTilt()) {
-            attributes->push_back(std::make_pair("tilt", att->CompassdirectionToStr(att->GetTilt())));
+            attributes->push_back({ "tilt", att->CompassdirectionToStr(att->GetTilt()) });
         }
     }
     if (element->HasAttClass(ATT_KEYSIGVIS)) {
         const AttKeySigVis *att = dynamic_cast<const AttKeySigVis *>(element);
         assert(att);
         if (att->HasSigShowchange()) {
-            attributes->push_back(std::make_pair("sig.showchange", att->BooleanToStr(att->GetSigShowchange())));
+            attributes->push_back({ "sig.showchange", att->BooleanToStr(att->GetSigShowchange()) });
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTVIS)) {
         const AttKeySigDefaultVis *att = dynamic_cast<const AttKeySigDefaultVis *>(element);
         assert(att);
         if (att->HasKeysigShow()) {
-            attributes->push_back(std::make_pair("keysig.show", att->BooleanToStr(att->GetKeysigShow())));
+            attributes->push_back({ "keysig.show", att->BooleanToStr(att->GetKeysigShow()) });
         }
         if (att->HasKeysigShowchange()) {
-            attributes->push_back(std::make_pair("keysig.showchange", att->BooleanToStr(att->GetKeysigShowchange())));
+            attributes->push_back({ "keysig.showchange", att->BooleanToStr(att->GetKeysigShowchange()) });
+        }
+    }
+    if (element->HasAttClass(ATT_LIGATUREVIS)) {
+        const AttLigatureVis *att = dynamic_cast<const AttLigatureVis *>(element);
+        assert(att);
+        if (att->HasForm()) {
+            attributes->push_back({ "form", att->LigatureformToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_LINEVIS)) {
         const AttLineVis *att = dynamic_cast<const AttLineVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->LineformToStr(att->GetForm())));
+            attributes->push_back({ "form", att->LineformToStr(att->GetForm()) });
         }
         if (att->HasWidth()) {
-            attributes->push_back(std::make_pair("width", att->LinewidthToStr(att->GetWidth())));
+            attributes->push_back({ "width", att->LinewidthToStr(att->GetWidth()) });
         }
         if (att->HasEndsym()) {
-            attributes->push_back(std::make_pair("endsym", att->LinestartendsymbolToStr(att->GetEndsym())));
+            attributes->push_back({ "endsym", att->LinestartendsymbolToStr(att->GetEndsym()) });
         }
         if (att->HasEndsymSize()) {
-            attributes->push_back(std::make_pair("endsym.size", att->IntToStr(att->GetEndsymSize())));
+            attributes->push_back({ "endsym.size", att->IntToStr(att->GetEndsymSize()) });
         }
         if (att->HasStartsym()) {
-            attributes->push_back(std::make_pair("startsym", att->LinestartendsymbolToStr(att->GetStartsym())));
+            attributes->push_back({ "startsym", att->LinestartendsymbolToStr(att->GetStartsym()) });
         }
         if (att->HasStartsymSize()) {
-            attributes->push_back(std::make_pair("startsym.size", att->IntToStr(att->GetStartsymSize())));
+            attributes->push_back({ "startsym.size", att->IntToStr(att->GetStartsymSize()) });
         }
     }
     if (element->HasAttClass(ATT_LIQUESCENTVIS)) {
         const AttLiquescentVis *att = dynamic_cast<const AttLiquescentVis *>(element);
         assert(att);
         if (att->HasCurve()) {
-            attributes->push_back(std::make_pair("curve", att->LiquescentVisCurveToStr(att->GetCurve())));
+            attributes->push_back({ "curve", att->LiquescentVisCurveToStr(att->GetCurve()) });
         }
         if (att->HasLooped()) {
-            attributes->push_back(std::make_pair("looped", att->BooleanToStr(att->GetLooped())));
+            attributes->push_back({ "looped", att->BooleanToStr(att->GetLooped()) });
         }
     }
     if (element->HasAttClass(ATT_MENSURVIS)) {
         const AttMensurVis *att = dynamic_cast<const AttMensurVis *>(element);
         assert(att);
+        if (att->HasDot()) {
+            attributes->push_back({ "dot", att->BooleanToStr(att->GetDot()) });
+        }
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->MensurVisFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->MensurVisFormToStr(att->GetForm()) });
         }
         if (att->HasOrient()) {
-            attributes->push_back(std::make_pair("orient", att->OrientationToStr(att->GetOrient())));
+            attributes->push_back({ "orient", att->OrientationToStr(att->GetOrient()) });
+        }
+        if (att->HasSign()) {
+            attributes->push_back({ "sign", att->MensurationsignToStr(att->GetSign()) });
         }
     }
     if (element->HasAttClass(ATT_MENSURALVIS)) {
         const AttMensuralVis *att = dynamic_cast<const AttMensuralVis *>(element);
         assert(att);
         if (att->HasMensurColor()) {
-            attributes->push_back(std::make_pair("mensur.color", att->StrToStr(att->GetMensurColor())));
+            attributes->push_back({ "mensur.color", att->StrToStr(att->GetMensurColor()) });
+        }
+        if (att->HasMensurDot()) {
+            attributes->push_back({ "mensur.dot", att->BooleanToStr(att->GetMensurDot()) });
         }
         if (att->HasMensurForm()) {
-            attributes->push_back(std::make_pair("mensur.form", att->MensuralVisMensurformToStr(att->GetMensurForm())));
+            attributes->push_back({ "mensur.form", att->MensuralVisMensurformToStr(att->GetMensurForm()) });
         }
         if (att->HasMensurLoc()) {
-            attributes->push_back(std::make_pair("mensur.loc", att->IntToStr(att->GetMensurLoc())));
+            attributes->push_back({ "mensur.loc", att->IntToStr(att->GetMensurLoc()) });
         }
         if (att->HasMensurOrient()) {
-            attributes->push_back(std::make_pair("mensur.orient", att->OrientationToStr(att->GetMensurOrient())));
+            attributes->push_back({ "mensur.orient", att->OrientationToStr(att->GetMensurOrient()) });
+        }
+        if (att->HasMensurSign()) {
+            attributes->push_back({ "mensur.sign", att->MensurationsignToStr(att->GetMensurSign()) });
         }
         if (att->HasMensurSize()) {
-            attributes->push_back(std::make_pair("mensur.size", att->FontsizeToStr(att->GetMensurSize())));
+            attributes->push_back({ "mensur.size", att->FontsizeToStr(att->GetMensurSize()) });
+        }
+        if (att->HasMensurSlash()) {
+            attributes->push_back({ "mensur.slash", att->IntToStr(att->GetMensurSlash()) });
         }
     }
     if (element->HasAttClass(ATT_METERSIGVIS)) {
         const AttMeterSigVis *att = dynamic_cast<const AttMeterSigVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->MeterformToStr(att->GetForm())));
+            attributes->push_back({ "form", att->MeterformToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_METERSIGDEFAULTVIS)) {
         const AttMeterSigDefaultVis *att = dynamic_cast<const AttMeterSigDefaultVis *>(element);
         assert(att);
         if (att->HasMeterForm()) {
-            attributes->push_back(std::make_pair("meter.form", att->MeterformToStr(att->GetMeterForm())));
+            attributes->push_back({ "meter.form", att->MeterformToStr(att->GetMeterForm()) });
         }
         if (att->HasMeterShowchange()) {
-            attributes->push_back(std::make_pair("meter.showchange", att->BooleanToStr(att->GetMeterShowchange())));
+            attributes->push_back({ "meter.showchange", att->BooleanToStr(att->GetMeterShowchange()) });
         }
     }
     if (element->HasAttClass(ATT_MULTIRESTVIS)) {
         const AttMultiRestVis *att = dynamic_cast<const AttMultiRestVis *>(element);
         assert(att);
         if (att->HasBlock()) {
-            attributes->push_back(std::make_pair("block", att->BooleanToStr(att->GetBlock())));
+            attributes->push_back({ "block", att->BooleanToStr(att->GetBlock()) });
         }
     }
     if (element->HasAttClass(ATT_PBVIS)) {
         const AttPbVis *att = dynamic_cast<const AttPbVis *>(element);
         assert(att);
         if (att->HasFolium()) {
-            attributes->push_back(std::make_pair("folium", att->PbVisFoliumToStr(att->GetFolium())));
+            attributes->push_back({ "folium", att->PbVisFoliumToStr(att->GetFolium()) });
         }
     }
     if (element->HasAttClass(ATT_PEDALVIS)) {
         const AttPedalVis *att = dynamic_cast<const AttPedalVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->PedalVisFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->PedalVisFormToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_QUILISMAVIS)) {
         const AttQuilismaVis *att = dynamic_cast<const AttQuilismaVis *>(element);
         assert(att);
         if (att->HasWaves()) {
-            attributes->push_back(std::make_pair("waves", att->IntToStr(att->GetWaves())));
+            attributes->push_back({ "waves", att->IntToStr(att->GetWaves()) });
         }
     }
     if (element->HasAttClass(ATT_SBVIS)) {
         const AttSbVis *att = dynamic_cast<const AttSbVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->SbVisFormToStr(att->GetForm())));
+            attributes->push_back({ "form", att->SbVisFormToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_SCOREDEFVIS)) {
         const AttScoreDefVis *att = dynamic_cast<const AttScoreDefVis *>(element);
         assert(att);
         if (att->HasVuHeight()) {
-            attributes->push_back(std::make_pair("vu.height", att->StrToStr(att->GetVuHeight())));
+            attributes->push_back({ "vu.height", att->StrToStr(att->GetVuHeight()) });
         }
     }
     if (element->HasAttClass(ATT_SECTIONVIS)) {
         const AttSectionVis *att = dynamic_cast<const AttSectionVis *>(element);
         assert(att);
         if (att->HasRestart()) {
-            attributes->push_back(std::make_pair("restart", att->BooleanToStr(att->GetRestart())));
+            attributes->push_back({ "restart", att->BooleanToStr(att->GetRestart()) });
         }
     }
     if (element->HasAttClass(ATT_SIGNIFLETVIS)) {
         const AttSignifLetVis *att = dynamic_cast<const AttSignifLetVis *>(element);
         assert(att);
         if (att->HasPlace()) {
-            attributes->push_back(std::make_pair("place", att->EventrelToStr(att->GetPlace())));
+            attributes->push_back({ "place", att->EventrelToStr(att->GetPlace()) });
         }
     }
     if (element->HasAttClass(ATT_SPACEVIS)) {
         const AttSpaceVis *att = dynamic_cast<const AttSpaceVis *>(element);
         assert(att);
         if (att->HasCompressable()) {
-            attributes->push_back(std::make_pair("compressable", att->BooleanToStr(att->GetCompressable())));
+            attributes->push_back({ "compressable", att->BooleanToStr(att->GetCompressable()) });
         }
     }
     if (element->HasAttClass(ATT_STAFFDEFVIS)) {
         const AttStaffDefVis *att = dynamic_cast<const AttStaffDefVis *>(element);
         assert(att);
         if (att->HasGridShow()) {
-            attributes->push_back(std::make_pair("grid.show", att->BooleanToStr(att->GetGridShow())));
+            attributes->push_back({ "grid.show", att->BooleanToStr(att->GetGridShow()) });
         }
         if (att->HasLayerscheme()) {
-            attributes->push_back(std::make_pair("layerscheme", att->LayerschemeToStr(att->GetLayerscheme())));
+            attributes->push_back({ "layerscheme", att->LayerschemeToStr(att->GetLayerscheme()) });
         }
         if (att->HasLinesColor()) {
-            attributes->push_back(std::make_pair("lines.color", att->StrToStr(att->GetLinesColor())));
+            attributes->push_back({ "lines.color", att->StrToStr(att->GetLinesColor()) });
         }
         if (att->HasLinesVisible()) {
-            attributes->push_back(std::make_pair("lines.visible", att->BooleanToStr(att->GetLinesVisible())));
+            attributes->push_back({ "lines.visible", att->BooleanToStr(att->GetLinesVisible()) });
         }
         if (att->HasSpacing()) {
-            attributes->push_back(std::make_pair("spacing", att->MeasurementrelToStr(att->GetSpacing())));
+            attributes->push_back({ "spacing", att->MeasurementrelToStr(att->GetSpacing()) });
         }
     }
     if (element->HasAttClass(ATT_STAFFGRPVIS)) {
         const AttStaffGrpVis *att = dynamic_cast<const AttStaffGrpVis *>(element);
         assert(att);
         if (att->HasBarThru()) {
-            attributes->push_back(std::make_pair("bar.thru", att->BooleanToStr(att->GetBarThru())));
+            attributes->push_back({ "bar.thru", att->BooleanToStr(att->GetBarThru()) });
         }
     }
     if (element->HasAttClass(ATT_TUPLETVIS)) {
         const AttTupletVis *att = dynamic_cast<const AttTupletVis *>(element);
         assert(att);
         if (att->HasBracketPlace()) {
-            attributes->push_back(std::make_pair("bracket.place", att->StaffrelBasicToStr(att->GetBracketPlace())));
+            attributes->push_back({ "bracket.place", att->StaffrelBasicToStr(att->GetBracketPlace()) });
         }
         if (att->HasBracketVisible()) {
-            attributes->push_back(std::make_pair("bracket.visible", att->BooleanToStr(att->GetBracketVisible())));
+            attributes->push_back({ "bracket.visible", att->BooleanToStr(att->GetBracketVisible()) });
         }
         if (att->HasDurVisible()) {
-            attributes->push_back(std::make_pair("dur.visible", att->BooleanToStr(att->GetDurVisible())));
+            attributes->push_back({ "dur.visible", att->BooleanToStr(att->GetDurVisible()) });
         }
         if (att->HasNumFormat()) {
-            attributes->push_back(std::make_pair("num.format", att->TupletVisNumformatToStr(att->GetNumFormat())));
+            attributes->push_back({ "num.format", att->TupletVisNumformatToStr(att->GetNumFormat()) });
         }
     }
 }

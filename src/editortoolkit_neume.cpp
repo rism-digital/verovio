@@ -22,6 +22,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
+#include "divline.h"
 #include "layer.h"
 #include "liquescent.h"
 #include "nc.h"
@@ -573,6 +574,20 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             fi->GetZone()->ShiftByXY(x, -y);
         }
     }
+    else if (element->Is(DIVLINE)) {
+        DivLine *divline = dynamic_cast<DivLine *>(element);
+        if (!divline->HasFacs()) {
+            LogError("Divline dragging is only supported for divline with facsimiles!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Divline dragging is only supported for divline with facsimiles.");
+            return false;
+        }
+        FacsimileInterface *fi = (*divline).GetFacsimileInterface();
+        assert(fi);
+        if (fi->GetZone() != NULL) {
+            fi->GetZone()->ShiftByXY(x, -y);
+        }
+    }
     else {
         LogWarning("Unsupported element for dragging.");
         m_infoObject.import("status", "FAILURE");
@@ -969,11 +984,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 else if (it->second == "n") {
                     accidTypeW = ACCIDENTAL_WRITTEN_n;
-                    break;
                 }
             }
         }
-        if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
+         if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
             LogError("A accid type must be specified.");
             delete accid;
 
@@ -988,7 +1002,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         surface->AddChild(zone);
         accid->SetZone(zone);
         layer->AddChild(accid);
-        
+
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
@@ -1002,6 +1016,57 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         layer->ReorderByXPos();
 
         m_infoObject.import("uuid", accid->GetUuid());
+    }
+    else if(elementType == "divline"){
+        DivLine *divline = new DivLine();
+        data_DIVLINE divlineTypeW = DIVLINE_NONE;
+
+        for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+            if (it->first == "form"){
+                if (it->second == "maxima"){
+                    divlineTypeW = DIVLINE_maxima;
+                    break;
+                } else if (it->second == "maior"){
+                    divlineTypeW = DIVLINE_maior;
+                    break;
+                } else if (it->second == "minima"){
+                    divlineTypeW = DIVLINE_minima;
+                    break;
+                } else if (it->second == "finalis"){
+                    divlineTypeW = DIVLINE_finalis;
+                    break;
+                }
+            }
+        }
+        if (divlineTypeW == DIVLINE_NONE) {
+            LogError("A divline type must be specified.");
+            delete divline;
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "A divline type must be specified.");
+            return false;
+        }
+
+        divline->SetForm(divlineTypeW);
+        zone->SetUlx(ulx);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        surface->AddChild(zone);
+        divline->SetZone(zone);
+        layer->AddChild(divline);
+        
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        ulx -= noteWidth / 2;
+        uly -= noteHeight / 2;
+
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth);
+        zone->SetLry(uly + noteHeight);
+        layer->ReorderByXPos();
+
+        m_infoObject.import("uuid", divline->GetUuid());
         
     }
     else {
@@ -2486,21 +2551,13 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    // if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(ACCID))) {
-    //     LogError("Element is of type %s, but only Syllables, Custos, Clefs, and Accids can change staves.",
-    //         element->GetClassName().c_str());
-    //     m_infoObject.import("status", "FAILURE");
-    //     m_infoObject.import("message",
-    //         "Element is of type " + element->GetClassName()
-    //             + ", but only Syllables, Custos, Clefs, and Accids can change staves.");
-    //     return false;
-        if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
-        LogError("Element is of type %s, but only Syllables, Custos, Clefs, and Accids can change staves.",
+    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(DIVLINE) || element->Is(ACCID))) {
+        LogError("Element is of type %s, but only Syllables, Custos, Clefs, Divlines, and Accids can change staves.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",
             "Element is of type " + element->GetClassName()
-                + ", but only Syllables, Custos, Clefs, and Accids can change staves.");
+                + ", but only Syllables, Custos, Clefs, Divlines, and Accids can change staves.");
         return false;
     }
 

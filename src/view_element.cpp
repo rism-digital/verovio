@@ -26,6 +26,7 @@
 #include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
+#include "divline.h"
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
@@ -119,6 +120,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(CUSTOS)) {
         DrawCustos(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(DIVLINE)) {
+        DrawDivLine(dc, element, layer, staff, measure);
     }
     else if (element->Is(DOT)) {
         DrawDot(dc, element, layer, staff, measure);
@@ -851,6 +855,76 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     dc->EndGraphic(element, this);
+}
+
+void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    DivLine *divline = dynamic_cast<DivLine *>(element);
+    assert(divline);
+
+    // int x = divLine->GetDrawingX();
+    // int y = divLine->GetDrawingY();
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    int sym = 0;
+
+    switch (divline->GetForm()) {
+        case DIVLINE_maxima:
+            sym = SMUFL_E8F5_chantDivisioMaxima;
+            break;
+        case DIVLINE_minima:
+            sym = SMUFL_E8F3_chantDivisioMinima;
+            break;
+        case DIVLINE_maior:
+            sym = SMUFL_E8F4_chantDivisioMaior;
+            break;
+        case DIVLINE_finalis:
+            sym = SMUFL_E8F6_chantDivisioFinalis;
+            break;
+        default:
+            break;
+    }
+    
+    int x,y;
+    if ((m_doc->GetType() == Facs) && (divline->HasFacs())){
+        x = divline->GetDrawingX();
+        y = ToLogicalY(staff->GetDrawingY());
+    }
+    else{
+        x = element->GetDrawingX();
+        y = element->GetDrawingY();
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+
+    y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
+
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
+
+    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        fi->GetZone()->SetUlx(x);
+        fi->GetZone()->SetUly(y);
+        fi->GetZone()->SetLrx(x + noteWidth);
+        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
+    }
+
+    dc->EndGraphic(element, this);
+    // std::wstring divlineStr = divline->GetSymbolStr();
+    // // int y = staff->GetDrawingY();
+    // // DrawSmuflCode(dc, x, y, SMUFL_E8F5_chantDivisioMaxima, staff->m_drawingStaffSize, divLine->GetDrawingCueSize());   dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), divLine);
+    // DrawSmuflString(dc, x, y, divLineStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, divLine->GetDrawingCueSize(), true);
+
+    // dc->EndGraphic(element, this);
 }
 
 void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
