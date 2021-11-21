@@ -320,6 +320,10 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "tuplet8", SMUFL_E888_tuplet8 },
     { "tuplet9", SMUFL_E889_tuplet9 },
     { "tupletColon", SMUFL_E88A_tupletColon },
+    { "chantDivisioMinima", SMUFL_E8F3_chantDivisioMinima },
+    { "chantDivisioMaior", SMUFL_E8F4_chantDivisioMaior },
+    { "chantDivisioMaxima", SMUFL_E8F5_chantDivisioMaxima },
+    { "chantDivisioFinalis", SMUFL_E8F6_chantDivisioFinalis },
     { "mensuralGclefPetrucci", SMUFL_E901_mensuralGclefPetrucci },
     { "chantFclef", SMUFL_E902_chantFclef },
     { "mensuralFclefPetrucci", SMUFL_E904_mensuralFclefPetrucci },
@@ -436,6 +440,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 410
+// 414
 
 } // namespace vrv
