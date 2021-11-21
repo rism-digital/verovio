@@ -836,7 +836,7 @@ public:
     int GetLry() const { return m_lry; }
     bool HasLry() const;
     //
-    void SetRotate(double rotate) { m_rotate = rotate; }
+    void SetRotate(double rotate_) { m_rotate = rotate_; }
     double GetRotate() const { return m_rotate; }
     bool HasRotate() const;
     ///@}
@@ -850,10 +850,15 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
-    /** Indicates the rotate of the bounding box. **/
+    /**
+     * Indicates the amount by which the contents of this element have been rotated
+     * clockwise or, if applicable, how the orientation of the element self should be
+     * interpreted, with respect to the normal orientation of the parent surface.
+     * The orientation is expressed in arc degrees.
+     **/
     double m_rotate;
 
-    /* include <attlry> */
+    /* include <attrotate> */
 };
 
 //----------------------------------------------------------------------------
@@ -1178,6 +1183,41 @@ private:
     /* include <atttext.dist> */
 };
 
+//----------------------------------------------------------------------------
+// AttDivLineLog
+//----------------------------------------------------------------------------
+
+class AttDivLineLog : public Att {
+public:
+    AttDivLineLog();
+    virtual ~AttDivLineLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetDivLineLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadDivLineLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteDivLineLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetForm(data_DIVLINE form_) { m_form = form_; }
+    data_DIVLINE GetForm() const { return m_form; }
+    bool HasForm() const;
+    ///@}
+
+private:
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    data_DIVLINE m_form;
+
+    /* include <attform> */
+};
 //----------------------------------------------------------------------------
 // AttDotLog
 //----------------------------------------------------------------------------
@@ -2641,48 +2681,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMensurLog
-//----------------------------------------------------------------------------
-
-class AttMensurLog : public Att {
-public:
-    AttMensurLog();
-    virtual ~AttMensurLog();
-
-    /** Reset the default values for the attribute class **/
-    void ResetMensurLog();
-
-    /** Read the values for the attribute class **/
-    bool ReadMensurLog(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteMensurLog(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetDot(data_BOOLEAN dot_) { m_dot = dot_; }
-    data_BOOLEAN GetDot() const { return m_dot; }
-    bool HasDot() const;
-    //
-    void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; }
-    data_MENSURATIONSIGN GetSign() const { return m_sign; }
-    bool HasSign() const;
-    ///@}
-
-private:
-    /** Specifies whether a dot is to be added to the base symbol. **/
-    data_BOOLEAN m_dot;
-    /** The base symbol in the mensuration sign/time signature of mensural notation. **/
-    data_MENSURATIONSIGN m_sign;
-
-    /* include <attsign> */
-};
-
-//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 
@@ -2945,8 +2943,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMm(int mm_) { m_mm = mm_; }
-    int GetMm() const { return m_mm; }
+    void SetMm(double mm_) { m_mm = mm_; }
+    double GetMm() const { return m_mm; }
     bool HasMm() const;
     //
     void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; }
@@ -2962,11 +2960,11 @@ private:
     /**
      * Used to describe tempo in terms of beats (often the meter signature denominator)
      * per minute, ala M.M.
-     * (Maezel's Metronome). Do not confuse this attribute with midi.bpm or midi.mspb.
+     * (Maelzel's Metronome). Do not confuse this attribute with midi.bpm or midi.mspb.
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
-    int m_mm;
+    double m_mm;
     /** Captures the metronomic unit. **/
     data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
@@ -4108,6 +4106,45 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttRestdurationLogical
+//----------------------------------------------------------------------------
+
+class AttRestdurationLogical : public Att {
+public:
+    AttRestdurationLogical();
+    virtual ~AttRestdurationLogical();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRestdurationLogical();
+
+    /** Read the values for the attribute class **/
+    bool ReadRestdurationLogical(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRestdurationLogical(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetDur(data_DURATIONRESTS dur_) { m_dur = dur_; }
+    data_DURATIONRESTS GetDur() const { return m_dur; }
+    bool HasDur() const;
+    ///@}
+
+private:
+    /**
+     * When a duration cannot be represented as a single power-of-two value, multiple
+     * space-separated values that add up to the total duration may be used.
+     **/
+    data_DURATIONRESTS m_dur;
+
+    /* include <attdur> */
+};
+
+//----------------------------------------------------------------------------
 // AttScalable
 //----------------------------------------------------------------------------
 
@@ -4758,6 +4795,10 @@ public:
     data_STEMPOSITION GetStemPos() const { return m_stemPos; }
     bool HasStemPos() const;
     //
+    void SetStemSameas(std::string stemSameas_) { m_stemSameas = stemSameas_; }
+    std::string GetStemSameas() const { return m_stemSameas; }
+    bool HasStemSameas() const;
+    //
     void SetStemVisible(data_BOOLEAN stemVisible_) { m_stemVisible = stemVisible_; }
     data_BOOLEAN GetStemVisible() const { return m_stemVisible; }
     bool HasStemVisible() const;
@@ -4783,6 +4824,12 @@ private:
     data_STEMMODIFIER m_stemMod;
     /** Records the position of the stem in relation to the note head(s). **/
     data_STEMPOSITION m_stemPos;
+    /**
+     * Points to a note element in a different layer whose stem is shared.
+     * The linked notes should be rendered like a chord though they are part of
+     * different layers.
+     **/
+    std::string m_stemSameas;
     /** Determines whether a stem should be displayed. **/
     data_BOOLEAN m_stemVisible;
     /** Records the output x coordinate of the stem's attachment point. **/
@@ -4917,9 +4964,9 @@ public:
 
 private:
     /**
-     * Indicates whether the staves are joined at the left by a continuous line.
-     * The default value is "true". Do not confuse this with the heavy vertical line
-     * used as a grouping symbol.
+     * Indicates whether the system starts with a continuous line connecting all
+     * staves, including single-staff systems.
+     * Do not confuse this with the heavy vertical line used as a grouping symbol.
      **/
     data_BOOLEAN m_systemLeftline;
     /**
@@ -5625,10 +5672,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Records a timestamp adjustment of a feature's programmatically-determined
-     * location in terms of musical time; that is, beats.
-     **/
+    /** Specifies the end-point of the location in a normalized form. **/
     double m_to;
 
     /* include <attto> */

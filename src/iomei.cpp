@@ -33,6 +33,7 @@
 #include "clef.h"
 #include "corr.h"
 #include "custos.h"
+#include "divline.h"
 #include "damage.h"
 #include "del.h"
 #include "dir.h"
@@ -494,6 +495,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(CUSTOS)) {
         m_currentNode = m_currentNode.append_child("custos");
         WriteCustos(m_currentNode, dynamic_cast<Custos *>(object));
+    }
+    else if (object->Is(DIVLINE)) {
+        m_currentNode = m_currentNode.append_child("divline");
+        WriteDivLine(m_currentNode, dynamic_cast<DivLine *>(object));
     }
     else if (object->Is(DOT)) {
         m_currentNode = m_currentNode.append_child("dot");
@@ -1552,6 +1557,17 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     custos->WriteColor(currentNode);
 }
 
+void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divline)
+{
+    assert(divline);
+
+    WriteLayerElement(currentNode, divline);
+    WriteFacsimileInterface(currentNode, divline);
+    divline->WriteDivLineLog(currentNode);
+    divline->WriteColor(currentNode);
+    divline->WriteVisibility(currentNode);
+}
+
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
 {
     assert(dot);
@@ -1677,7 +1693,7 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteCue(currentNode);
     mensur->WriteDurationRatio(currentNode);
     mensur->WriteMensuralShared(currentNode);
-    mensur->WriteMensurLog(currentNode);
+    mensur->WriteMensuralLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashCount(currentNode);
     mensur->WriteStaffLoc(currentNode);
@@ -4439,6 +4455,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "custos") {
             success = ReadCustos(parent, xmlElement);
         }
+        else if (elementName == "divLine") {
+            success = ReadDivLine(parent, xmlElement);
+        }
         else if (elementName == "dot") {
             success = ReadDot(parent, xmlElement);
         }
@@ -4699,6 +4718,21 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     return true;
 }
 
+bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divline)
+{
+    DivLine *vrvDivLine = new DivLine();
+    ReadLayerElement(divline, vrvDivLine);
+
+    ReadFacsimileInterface(divline, vrvDivLine);
+    vrvDivLine->ReadDivLineLog(divline);
+    vrvDivLine->ReadColor(divline);
+    vrvDivLine->ReadVisibility(divline);
+
+    parent->AddChild(vrvDivLine);
+    ReadUnsupportedAttr(divline, vrvDivLine);
+    return true;
+}
+
 bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
 {
     Dot *vrvDot = new Dot();
@@ -4807,7 +4841,7 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
     vrvMensur->ReadMensuralShared(mensur);
-    vrvMensur->ReadMensurLog(mensur);
+    vrvMensur->ReadMensuralLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
     vrvMensur->ReadSlashCount(mensur);
     vrvMensur->ReadStaffLoc(mensur);
