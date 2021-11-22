@@ -1298,13 +1298,16 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
     // Retrieve boundary, staves and system
     LayerElement *start = this->GetStart();
     LayerElement *end = this->GetEnd();
-    std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
-
-    if (!start || !end || staffList.empty()) {
+    if (!start || !end) {
         this->SetDrawingCurvedir(curvature_CURVEDIR_above);
         return FUNCTOR_CONTINUE;
     }
 
+    std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
+    if (staffList.empty()) {
+        this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+        return FUNCTOR_CONTINUE;
+    }
     Staff *staff = staffList.at(0);
     Staff *crossStaff = this->GetBoundaryCrossStaff();
 
