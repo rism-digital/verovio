@@ -211,9 +211,10 @@ public:
     static Point CalcPointAtBezier(const Point bezier[4], double t);
 
     /**
-     * Calculate thickness coeficient to be applient for bezier curve to fit MEI units thickness
+     * Calculate thickness coefficient to be applient for bezier curve to fit MEI units thickness
      */
-    static double GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle, int penWidth);
+    static double GetBezierThicknessCoefficient(
+        const Point bezier[4], int currentThickness, double angle, int penWidth);
 
     /**
      * Calculate the point bezier point position for a t between 0.0 and 1.0
@@ -241,6 +242,12 @@ public:
     static int RectTopOverlap(const Point rect1[2], const Point rect2[2], int margin, int hMargin);
     static int RectBottomOverlap(const Point rect1[2], const Point rect2[2], int margin, int hMargin);
     ///@}
+
+    /**
+     * Solve the cubic equation ax^3 + bx^2 + cx + d = 0
+     * Returns up to three real roots
+     */
+    static std::set<double> SolveCubicPolynomial(double a, double b, double c, double d);
 
 private:
     /**

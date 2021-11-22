@@ -31,8 +31,8 @@ public:
     ///@{
     TextDirInterface();
     virtual ~TextDirInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TEXT_DIR; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_TEXT_DIR; }
     ///@}
 
     /**

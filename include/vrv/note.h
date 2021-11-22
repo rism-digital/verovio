@@ -69,18 +69,18 @@ public:
     ///@{
     Note();
     virtual ~Note();
-    virtual Object *Clone() const { return new Note(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Note"; }
+    Object *Clone() const override { return new Note(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Note"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
-    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
@@ -90,18 +90,18 @@ public:
      * Override the method since alignment is required.
      * For notes we want not to align notes within a ligature (except first and last)
      */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for note
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * Align dots shift for two notes. Should be used for unison notes to align dots positioning
@@ -185,9 +185,9 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
-    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir);
+    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
+    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
+    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
     ///@}
 
     /**
@@ -242,85 +242,85 @@ public:
     /**
      * See Object::AdjustArtic
      */
-    virtual int AdjustArtic(FunctorParams *functorParams);
+    int AdjustArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
+    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcArtic
      */
-    virtual int CalcArtic(FunctorParams *functorParams);
+    int CalcArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcChordNoteHeads
      */
-    virtual int CalcChordNoteHeads(FunctorParams *functorParams);
+    int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcDots
      */
-    virtual int CalcDots(FunctorParams *functorParams);
+    int CalcDots(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcLedgerLines
      */
-    virtual int CalcLedgerLines(FunctorParams *functorParams);
+    int CalcLedgerLines(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+    int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareLyrics
      */
-    virtual int PrepareLyrics(FunctorParams *functorParams);
+    int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
      */
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateTimemap
      */
-    virtual int GenerateTimemap(FunctorParams *functorParams);
+    int GenerateTimemap(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *);
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**
      * The note locations w.r.t. each staff
      */
-    virtual MapOfNoteLocs CalcNoteLocations();
+    MapOfNoteLocs CalcNoteLocations() override;
 
     /**
      * The dot locations w.r.t. each staff
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary);
+    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
 
 private:
     /**

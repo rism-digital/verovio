@@ -36,13 +36,13 @@ public:
     BarLine();
     BarLine(ClassId classId);
     virtual ~BarLine();
-    virtual Object *Clone() const { return new BarLine(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "BarLine"; }
+    Object *Clone() const override { return new BarLine(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "BarLine"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Use to set the alignment for the Measure BarLine members.
@@ -68,7 +68,7 @@ public:
     /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
+    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
 private:
     //

@@ -13,6 +13,12 @@
 
 namespace vrv {
 
+class Chord;
+class Doc;
+class Layer;
+class Note;
+class Staff;
+
 //----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
@@ -26,6 +32,9 @@ struct ControlPointConstraint {
     double c;
 };
 
+// Helper enum classes
+enum class PortatoSlurType { None, StemSide, Centered };
+
 //----------------------------------------------------------------------------
 // Slur
 //----------------------------------------------------------------------------
@@ -34,7 +43,8 @@ class Slur : public ControlElement,
              public TimeSpanningInterface,
              public AttColor,
              public AttCurvature,
-             public AttCurveRend {
+             public AttCurveRend,
+             public AttLayerIdent {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -45,17 +55,17 @@ public:
     Slur(ClassId classId);
     Slur(ClassId classId, const std::string &classIdStr);
     virtual ~Slur();
-    virtual Object *Clone() const { return new Slur(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Slur"; }
+    Object *Clone() const override { return new Slur(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Slur"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
@@ -67,9 +77,30 @@ public:
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
 
+    /**
+     * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
+     */
+    std::pair<Point, Point> AdjustCoordinates(
+        Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir);
+
+    /**
+     * Determine layer elements spanned by the slur
+     */
+    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType);
+
+    /**
+     * Calculate the staff where the slur's floating curve positioner lives
+     */
+    Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType);
+
+    /**
+     * Slur adjustment
+     */
+    ///@{
     void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
+    ///@}
 
     //----------//
     // Functors //
@@ -78,14 +109,39 @@ public:
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustCrossStaffContent
+     * See Object::PrepareSlurs
      */
-    virtual int AdjustCrossStaffContent(FunctorParams *functorParams);
+    int PrepareSlurs(FunctorParams *functorParams) override;
 
 private:
+    /**
+     * Helper for calculating the slur direction
+     */
+    ///@{
+    // Get layer by only considering the slur boundary
+    std::pair<Layer *, LayerElement *> GetBoundaryLayer();
+    // Get cross staff by only considering the slur boundary
+    Staff *GetBoundaryCrossStaff();
+    // Get preferred curve direction based on various conditions
+    curvature_CURVEDIR GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
+    ///@}
+
+    /**
+     * Helper for calculating the initial slur start and end points
+     */
+    ///@{
+    // Retrieve the start and end note locations of the slur
+    std::pair<int, int> GetStartEndLocs(
+        Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, curvature_CURVEDIR dir) const;
+    // Calculate the break location at system start/end and the pitch difference
+    std::pair<int, int> CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const;
+    // Check if the slur resembles portato
+    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const;
+    ///@}
+
     /**
      * Adjust slur position based on overlapping objects within its spanning elements
      */
@@ -103,6 +159,9 @@ private:
     // Calculate the vertical control point shift
     std::pair<int, int> CalcControlPointVerticalShift(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Helper function to determine curve direction for the slurs that start at grace note
+    curvature_CURVEDIR GetGraceCurveDirection(Doc *doc);
 
     // Solve the constraints for vertical control point adjustment
     std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);

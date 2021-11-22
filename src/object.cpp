@@ -378,14 +378,23 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetCmn(this, attributes);
     Att::GetCmnornaments(this, attributes);
     Att::GetCritapp(this, attributes);
-    Att::GetGestural(this, attributes);
+    // Att::GetEdittrans(this, attributes);
     Att::GetExternalsymbols(this, attributes);
+    Att::GetFrettab(this, attributes);
+    Att::GetFacsimile(this, attributes);
+    // Att::GetFigtable(this, attributes);
+    // Att::GetFingering(this, attributes);
+    Att::GetGestural(this, attributes);
+    // Att::GetHarmony(this, attributes);
+    // Att::GetHeader(this, attributes);
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
     Att::GetNeumes(this, attributes);
     Att::GetPagebased(this, attributes);
+    // Att::GetPerformance(this, attributes);
     Att::GetShared(this, attributes);
+    // Att::GetUsersymbols(this, attributes);
     Att::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
@@ -1679,11 +1688,13 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         }
         if (scoreDef->IsSectionRestart()) {
             // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
-            params->m_drawLabels = true;
+            const bool hasLabel = (NULL != scoreDef->FindDescendantByType(LABEL))
+                || (NULL != scoreDef->FindDescendantByType(LABELABBR));
+            params->m_drawLabels = hasLabel;
             params->m_restart = true;
             // Redraw the labels only if we already have a mesure in the system. Otherwise this will be
             // done through the system scoreDef
-            scoreDef->SetDrawLabels(params->m_hasMeasure);
+            scoreDef->SetDrawLabels(params->m_hasMeasure && hasLabel);
             // If we have a previous measure, we need to set the cautionary scoreDef indenpendently from the
             // presence of a system break
             if (params->m_previousMeasure) {
@@ -1882,6 +1893,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            above->SetOverflowBBoxAbove(current, overflowAbove);
             above->SetOverflowAbove(overflowAbove);
             above->AddBBoxAbove(current);
         }
@@ -1892,6 +1904,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            below->SetOverflowBBoxBelow(current, overflowBelow);
             below->SetOverflowBelow(overflowBelow);
             below->AddBBoxBelow(current);
         }

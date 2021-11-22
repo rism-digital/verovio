@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "rend.h"
 #include "smufl.h"
 #include "text.h"
 #include "verticalaligner.h"
@@ -39,6 +40,7 @@ Dynam::Dynam()
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()
+    , AttEnclosingChars()
     , AttExtender()
     , AttLineRendBase()
     , AttMidiValue()
@@ -47,6 +49,7 @@ Dynam::Dynam()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_ENCLOSINGCHARS);
     RegisterAttClass(ATT_EXTENDER);
     RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_MIDIVALUE);
@@ -63,6 +66,7 @@ void Dynam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
+    ResetEnclosingChars();
     ResetExtender();
     ResetLineRendBase();
     ResetVerticalGroup();
@@ -70,7 +74,7 @@ void Dynam::Reset()
 
 bool Dynam::IsSupportedChild(Object *child)
 {
-    if (child->Is({ REND, LB, TEXT })) {
+    if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -96,6 +100,46 @@ bool Dynam::IsSymbolOnly()
 std::wstring Dynam::GetSymbolStr() const
 {
     return Dynam::GetSymbolStr(m_symbolStr);
+}
+
+int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
+{
+    if (this->HasEnclose()) {
+        std::wstring openElement, closeElement;
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: {
+                openElement.assign(L"[");
+                closeElement.assign(L"]");
+                break;
+            }
+            case ENCLOSURE_paren: {
+                openElement.assign(L"(");
+                closeElement.assign(L")");
+                break;
+            }
+            default: break;
+        }
+        // If both opening/closing element are set - add them to the start and end of the dynam. Apply normal fontstyle
+        // to both, so that brackets are not inclined
+        if (!openElement.empty() && !closeElement.empty()) {
+            Rend *open = new Rend();
+            Rend *close = new Rend();
+            // Add opening bracket to the start of the dynam
+            Text *leftBracket = new Text();
+            leftBracket->SetText(openElement);
+            open->AddChild(leftBracket);
+            open->SetParent(this);
+            open->SetFontstyle(FONTSTYLE_normal);
+            this->InsertChild(open, 0);
+            // Add closing bracket at the end
+            Text *rightBracket = new Text();
+            rightBracket->SetText(closeElement);
+            close->AddChild(rightBracket);
+            close->SetFontstyle(FONTSTYLE_normal);
+            this->AddChild(close);
+        }
+    }
+    return FUNCTOR_SIBLINGS;
 }
 
 //----------------------------------------------------------------------------

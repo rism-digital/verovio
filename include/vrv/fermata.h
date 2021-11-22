@@ -40,16 +40,16 @@ public:
     ///@{
     Fermata();
     virtual ~Fermata();
-    virtual Object *Clone() const { return new Fermata(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Fermata"; }
+    Object *Clone() const override { return new Fermata(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Fermata"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     /**

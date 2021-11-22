@@ -26,9 +26,9 @@ public:
     ///@{
     Plica();
     virtual ~Plica();
-    virtual Object *Clone() const { return new Plica(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Plica"; }
+    Object *Clone() const override { return new Plica(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Plica"; }
 
     //----------//
     // Functors //

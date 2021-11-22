@@ -751,6 +751,21 @@ std::set<std::string> OptionJson::GetKeys() const
     return keys;
 }
 
+std::set<std::string> OptionJson::GetKeysByNode(const std::string &nodeName, std::list<std::string> &jsonNodePath) const
+{
+    std::set<std::string> keys;
+
+    // Try to find node by the name, otherwise use root node
+    const jsonxx::Object *node = FindNodeByName(m_values, nodeName, jsonNodePath);
+    if (!node) node = &m_values;
+
+    for (const auto &mapEntry : node->kv_map()) {
+        keys.insert(mapEntry.first);
+    }
+
+    return keys;
+}
+
 OptionJson::JsonPath OptionJson::StringPath2NodePath(
     const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
 {
@@ -780,6 +795,31 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
     }
 
     return path;
+}
+
+const jsonxx::Object *OptionJson::FindNodeByName(
+    const jsonxx::Object &obj, const std::string &jsonNodeName, std::list<std::string> &jsonNodePath) const
+{
+    for (const auto &mapEntry : obj.kv_map()) {
+        // skip non-objects
+        if (!mapEntry.second->is<jsonxx::Object>()) continue;
+        // return current object if name matches
+        if (mapEntry.first == jsonNodeName) {
+            jsonNodePath.emplace_back(mapEntry.first);
+            return &mapEntry.second->get<jsonxx::Object>();
+        }
+        // otherwise recursively process current object
+        else {
+            const jsonxx::Object *result
+                = FindNodeByName(mapEntry.second->get<jsonxx::Object>(), jsonNodeName, jsonNodePath);
+            if (result) {
+                jsonNodePath.emplace_front(mapEntry.first);
+                return result;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1121,6 +1161,10 @@ Options::Options()
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
+    m_fingeringScale.SetInfo("Fingering scale", "The scale of fingering font compared to default font size");
+    m_fingeringScale.Init(0.75, 0.25, 1);
+    this->Register(&m_fingeringScale, "fingeringScale", &m_generalLayout);
+
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
@@ -1239,33 +1283,20 @@ Options::Options()
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
-    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    m_repeatBarLineDotSeparation.Init(0.36, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
     m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
 
-    m_slurControlPoints.SetInfo(
-        "Slur control points", "Slur control points - higher value means more curved at the end");
-    m_slurControlPoints.Init(5, 1, 10);
-    this->Register(&m_slurControlPoints, "slurControlPoints", &m_generalLayout);
-
     m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
-    m_slurCurveFactor.Init(10, 1, 100);
+    m_slurCurveFactor.Init(1.0, 0.2, 5.0);
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
-    m_slurHeightFactor.SetInfo("Slur height factor", "Slur height factor -  high value means flatter slurs");
-    m_slurHeightFactor.Init(5, 1, 100);
-    this->Register(&m_slurHeightFactor, "slurHeightFactor", &m_generalLayout);
-
-    m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
-    m_slurMinHeight.Init(1.2, 0.3, 2.0);
-    this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
-
-    m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
-    m_slurMaxHeight.Init(3.0, 2.0, 6.0);
-    this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
+    m_slurMargin.SetInfo("Slur margin", "Slur safety distance in MEI units to obstacles");
+    m_slurMargin.Init(1.0, 0.1, 4.0);
+    this->Register(&m_slurMargin, "slurMargin", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
     m_slurMaxSlope.Init(40, 0, 80);
@@ -1640,7 +1671,8 @@ void Options::Sync()
 
     // We track all unmatched keys to generate appropriate errors later on
     std::set<std::string> unmatchedKeys = m_engravingDefaults.GetKeys();
-    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeys();
+    std::list<std::string> engravingDefaultsPath;
+    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeysByNode("engravingDefaults", engravingDefaultsPath);
     std::set_union(unmatchedKeys.begin(), unmatchedKeys.end(), otherKeys.begin(), otherKeys.end(),
         std::inserter(unmatchedKeys, unmatchedKeys.end()));
 
@@ -1670,13 +1702,15 @@ void Options::Sync()
     };
 
     for (const auto &pair : engravingDefaults) {
-        const std::vector<std::string> jsonNodePath = { pair.first };
+        std::vector<std::string> jsonNodePath = { engravingDefaultsPath.begin(), engravingDefaultsPath.end() };
+        jsonNodePath.emplace_back(pair.first);
+
         double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
             jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
         }
-        else if (m_engravingDefaults.HasValue(jsonNodePath)) {
-            jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
+        else if (m_engravingDefaults.HasValue({ pair.first })) {
+            jsonValue = m_engravingDefaults.GetDoubleValue({ pair.first });
         }
         else
             continue;

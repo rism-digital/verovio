@@ -42,7 +42,8 @@ public:
      * The implementation is implemented by LibMEI in each module corresponding file
      * Use in the toolkit for applying attribute modification to unspecified elements
      * See Toolkit::Set method
-     * Files to be uncommented according to the inclusion of the corresponding LibMEI files
+     * Files to be uncommented according to the inclusion of the corresponding LibMEI files.
+     * When uncommentting a file also uncomment corresponding calls in Object::GetAttributes
      */
     ///@{
     static bool SetAnalytical(Object *element, const std::string &attrType, const std::string &attrValue);
@@ -275,10 +276,16 @@ public:
     std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; }
 
     /**
+     * Virtual reset method.
+     * Needs to be overridden in child classes.
+     */
+    virtual void Reset() {}
+
+    /**
      * Virtual method returning the InterfaceId of the interface.
      * Needs to be overridden in child classes.
      */
-    virtual InterfaceId IsInterface() { return INTERFACE; }
+    virtual InterfaceId IsInterface() const { return INTERFACE; }
 
 private:
     /**

@@ -32,8 +32,8 @@ public:
     ///@{
     PageElementEnd(Object *start);
     virtual ~PageElementEnd();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "PageElementEnd"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "PageElementEnd"; }
     ///@}
 
     // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -54,22 +54,22 @@ public:
     /**
      * See Object::CastOffSystems
      */
-    virtual int CastOffSystems(FunctorParams *functorParams);
+    int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffPages
      */
-    virtual int CastOffPages(FunctorParams *functorParams);
+    int CastOffPages(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffEncoding
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
      */
-    virtual int UnCastOff(FunctorParams *functorParams);
+    int UnCastOff(FunctorParams *functorParams) override;
 
 protected:
     //

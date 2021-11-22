@@ -527,6 +527,12 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         default: break;
     }
 
+    switch (GetHeadMod()) {
+        case NOTEHEADMODIFIER_dblwhole: return SMUFL_E0A0_noteheadDoubleWhole;
+        default: break;
+    }
+
+    if (DUR_BR == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
     if (DUR_1 == duration) return SMUFL_E0A2_noteheadWhole;
     if (DUR_2 == duration) return SMUFL_E0A3_noteheadHalf;
     return SMUFL_E0A4_noteheadBlack;

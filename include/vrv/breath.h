@@ -30,16 +30,16 @@ public:
     ///@{
     Breath();
     virtual ~Breath();
-    virtual Object *Clone() const { return new Breath(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Breath"; }
+    Object *Clone() const override { return new Breath(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Breath"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     //----------//

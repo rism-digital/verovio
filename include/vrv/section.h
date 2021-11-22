@@ -34,15 +34,15 @@ public:
     ///@{
     Section();
     virtual ~Section();
-    virtual Object *Clone() const { return new Section(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Section"; }
+    Object *Clone() const override { return new Section(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Section"; }
     ///@}
 
     /**
      * Method for adding allowed content
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //
@@ -52,24 +52,24 @@ public:
      * See Object::ConvertToPageBased
      */
     ///@{
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
+    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::ConvertToUnCastOffMensural
      */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareBoundaries
      */
-    virtual int PrepareBoundaries(FunctorParams *functorParams);
+    int PrepareBoundaries(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

@@ -31,16 +31,16 @@ public:
     ///@{
     Mdiv();
     virtual ~Mdiv();
-    virtual Object *Clone() const { return new Mdiv(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Mdiv"; }
+    Object *Clone() const override { return new Mdiv(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Mdiv"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -57,16 +57,16 @@ public:
      * Invisible Mdiv elements are not saved in page-based MEI
      */
     ///@{
-    virtual int Save(FunctorParams *functorParams);
-    virtual int SaveEnd(FunctorParams *functorParams);
+    int Save(FunctorParams *functorParams) override;
+    int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::ConvertToPageBased
      */
     ///@{
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
+    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
     ///@}
 
 private:

@@ -35,8 +35,8 @@ public:
     ///@{
     Zone();
     virtual ~Zone();
-    virtual Object *Clone() const { return new Zone(*this); }
-    virtual void Reset();
+    Object *Clone() const override { return new Zone(*this); }
+    void Reset() override;
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly();

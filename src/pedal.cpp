@@ -155,19 +155,11 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
 
     if (!this->HasDir()) return FUNCTOR_CONTINUE;
 
-    if (params->m_pedalLine && (this->GetDir() != pedalLog_DIR_down)) {
-        params->m_pedalLine->SetEnd(this->GetStart());
-        if (this->GetDir() == pedalLog_DIR_bounce) {
-            params->m_pedalLine->EndsWithBounce(true);
-        }
-        params->m_pedalLine = NULL;
-    }
-
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     pedalVis_FORM form = this->GetPedalForm(params->m_doc, system);
-    if ((this->GetDir() != pedalLog_DIR_up) && (form == pedalVis_FORM_line)) {
-        params->m_pedalLine = this;
+    if (form == pedalVis_FORM_line) {
+        params->m_pedalLines.push_back(this);
     }
 
     return FUNCTOR_CONTINUE;

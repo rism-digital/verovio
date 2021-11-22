@@ -157,16 +157,16 @@ public:
     // constructors and destructors
     OptionBool() { m_defaultValue = false; }
     virtual ~OptionBool() {}
-    virtual void CopyTo(Option *option);
+    void CopyTo(Option *option) override;
     void Init(bool defaultValue);
 
-    virtual bool SetValueBool(bool value);
-    virtual bool SetValueDbl(double value);
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
+    bool SetValueBool(bool value) override;
+    bool SetValueDbl(double value) override;
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
 
-    virtual void Reset();
+    void Reset() override;
 
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
@@ -198,15 +198,15 @@ public:
         m_maxValue = 0.0;
     }
     virtual ~OptionDbl() {}
-    virtual void CopyTo(Option *option);
+    void CopyTo(Option *option) override;
     void Init(double defaultValue, double minValue, double maxValue);
 
-    virtual bool SetValueDbl(double value);
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
+    bool SetValueDbl(double value) override;
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
 
-    virtual void Reset();
+    void Reset() override;
 
     double GetValue() const { return m_value; }
     double GetDefault() const { return m_defaultValue; }
@@ -242,15 +242,15 @@ public:
         m_maxValue = 0;
     }
     virtual ~OptionInt() {}
-    virtual void CopyTo(Option *option);
+    void CopyTo(Option *option) override;
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
 
-    virtual bool SetValueDbl(double value);
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
+    bool SetValueDbl(double value) override;
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
 
-    virtual void Reset();
+    void Reset() override;
 
     int GetValue() const;
     int GetUnfactoredValue() const;
@@ -283,17 +283,17 @@ public:
     // constructors and destructors
     OptionString() {}
     virtual ~OptionString() {}
-    virtual void CopyTo(Option *option);
+    void CopyTo(Option *option) override;
     void Init(const std::string &defaultValue);
 
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const { return m_value; }
-    virtual std::string GetDefaultStrValue() const { return m_defaultValue; }
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override { return m_value; }
+    std::string GetDefaultStrValue() const override { return m_defaultValue; }
 
     std::string GetValue() const { return m_value; }
     std::string GetDefault() const { return m_defaultValue; }
 
-    virtual void Reset();
+    void Reset() override;
 
 private:
     //
@@ -316,19 +316,19 @@ public:
     // constructors and destructors
     OptionArray() {}
     virtual ~OptionArray() {}
-    virtual void CopyTo(Option *option);
+    void CopyTo(Option *option) override;
     void Init();
 
-    virtual bool SetValueArray(const std::vector<std::string> &values);
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
+    bool SetValueArray(const std::vector<std::string> &values) override;
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
 
     std::vector<std::string> GetValue() const { return m_values; }
     std::vector<std::string> GetDefault() const { return m_defaultValues; }
     bool SetValue(std::vector<std::string> const &values);
 
-    virtual void Reset();
+    void Reset() override;
 
 private:
     //
@@ -351,12 +351,12 @@ public:
     // constructors and destructors
     OptionIntMap();
     virtual ~OptionIntMap() {}
-    virtual void CopyTo(Option *option);
+    void CopyTo(Option *option) override;
     void Init(int defaultValue, const std::map<int, std::string> *values);
 
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
 
     int GetValue() const { return m_value; }
     int GetDefault() const { return m_defaultValue; }
@@ -365,7 +365,7 @@ public:
     std::vector<std::string> GetStrValues(bool withoutDefault) const;
     std::string GetStrValuesAsStr(bool withoutDefault) const;
 
-    virtual void Reset();
+    void Reset() override;
 
 private:
     //
@@ -389,15 +389,15 @@ public:
     // constructors and destructors
     OptionStaffrel(){};
     virtual ~OptionStaffrel(){};
-    virtual void CopyTo(Option *option);
+    void CopyTo(Option *option) override;
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
 
-    virtual bool SetValue(const std::string &value);
-    virtual std::string GetStrValue() const;
-    virtual std::string GetDefaultStrValue() const;
+    bool SetValue(const std::string &value) override;
+    std::string GetStrValue() const override;
+    std::string GetDefaultStrValue() const override;
 
-    virtual void Reset();
+    void Reset() override;
 
     // For alternate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
@@ -468,10 +468,17 @@ public:
     /**
      * Accessing all keys
      */
+    ///@{
     std::set<std::string> GetKeys() const;
+    std::set<std::string> GetKeysByNode(const std::string &nodeName, std::list<std::string> &jsonNodePath) const;
+    ///@}
 
 protected:
     JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
+
+    // Find node by recursively processing all elements within. Only nodes of OBJECT_ type are processed
+    const jsonxx::Object *FindNodeByName(
+        const jsonxx::Object &obj, const std::string &jsonNodeName, std::list<std::string> &jsonNodePath) const;
 
     /// Read json from string or file
     bool ReadJson(jsonxx::Object &output, const std::string &input) const;
@@ -636,6 +643,7 @@ public:
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
     OptionBool m_breaksNoWidow;
+    OptionDbl m_fingeringScale;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
@@ -665,12 +673,9 @@ public:
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
-    OptionInt m_slurControlPoints;
-    OptionInt m_slurCurveFactor;
-    OptionInt m_slurHeightFactor;
-    OptionDbl m_slurMaxHeight;
+    OptionDbl m_slurCurveFactor;
+    OptionDbl m_slurMargin;
     OptionInt m_slurMaxSlope;
-    OptionDbl m_slurMinHeight;
     OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMidpointThickness;
     OptionInt m_spacingBraceGroup;
