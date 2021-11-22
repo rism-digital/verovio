@@ -730,7 +730,8 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizontally (and, in case of extender
             // elements - vertically)
-            const int margin = ((*iter)->GetObject()->Is(DYNAM) && GetFirstAncestor(BEAM))
+            LayerElement *element = dynamic_cast<LayerElement *>(*i);
+            const int margin = ((*iter)->GetObject()->Is({ DYNAM, FING }) && element && element->GetFirstAncestor(BEAM))
                 ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize)
                 : 0;
             i = std::find_if(i, end, [iter, drawingUnit, margin](BoundingBox *elem) {
