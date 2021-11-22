@@ -97,16 +97,23 @@ bool Tie::AdjustEnharmonicTies(FloatingCurvePositioner *curve, Point bezier[4], 
     bezier[0].x = startNote->GetDrawingX() + drawingRadius;
     bezier[3].x = endNote->GetDrawingX() + drawingRadius;
     if (drawingCurveDir == curvature_CURVEDIR_below) {
-        if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc())
+        if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc()) {
             bezier[0].y += overlap / 2;
-        else if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc())
+            bezier[3].y = bezier[0].y;
+        }
+        else if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc()) {
             bezier[3].y += overlap / 2;
+            bezier[0].y = bezier[3].y;
+        }
     }
     else if (drawingCurveDir == curvature_CURVEDIR_above) {
-        if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc())
-            bezier[3].y -= overlap;
-        else if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc())
+        if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc()) {
+            bezier[3].y = bezier[0].y;
+        }
+        else if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc()) {
             bezier[3].y += overlap / 2;
+            bezier[0].y = bezier[3].y;
+        }
     }
 
     // adjust control points of the curve
