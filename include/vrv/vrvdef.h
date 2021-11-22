@@ -357,6 +357,8 @@ typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructor
 
 typedef std::map<std::string, ClassId> MapOfStrClassIds;
 
+typedef bool (*NotePredicate)(Note *);
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff
