@@ -110,6 +110,7 @@
 #import <VerovioFramework/sic.h>
 #import <VerovioFramework/grpsym.h>
 #import <VerovioFramework/fig.h>
+#import <VerovioFramework/runtimeclock.h>
 #import <VerovioFramework/ioabc.h>
 #import <VerovioFramework/fb.h>
 #import <VerovioFramework/iomei.h>
