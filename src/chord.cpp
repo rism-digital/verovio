@@ -431,15 +431,11 @@ bool Chord::HasNoteWithDots()
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
-    for (auto &iter : *notes) {
-        Note *note = vrv_cast<Note *>(iter);
+    return std::any_of(notes->cbegin(), notes->cend(), [](Object *object) {
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
-        if (note->GetDots() > 0) {
-            return true;
-        }
-    }
-
-    return false;
+        return (note->GetDots() > 0);
+    });
 }
 
 int Chord::AdjustOverlappingLayers(
@@ -678,7 +674,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-MapOfNoteLocs Chord::CalcNoteLocations()
+MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate)
 {
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
@@ -687,6 +683,8 @@ MapOfNoteLocs Chord::CalcNoteLocations()
     for (Object *obj : *notes) {
         Note *note = vrv_cast<Note *>(obj);
         assert(note);
+
+        if (predicate && !predicate(note)) continue;
 
         Layer *layer = NULL;
         Staff *staff = note->GetCrossStaff(layer);
@@ -701,8 +699,8 @@ MapOfNoteLocs Chord::CalcNoteLocations()
 MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary)
 {
     const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
-    const bool useReverseOrder = (isUpwardDirection && !primary) || (!isUpwardDirection && primary);
-    MapOfNoteLocs noteLocs = this->CalcNoteLocations();
+    const bool useReverseOrder = (isUpwardDirection != primary);
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations([](Note *note) { return !note->HasDots(); });
     MapOfDotLocs dotLocs;
     for (const auto &mapEntry : noteLocs) {
         if (useReverseOrder)
