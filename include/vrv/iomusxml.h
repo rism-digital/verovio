@@ -192,8 +192,8 @@ private:
      */
     ///@{
     bool ReadMusicXmlPart(pugi::xml_node node, Section *section, short int nbStaves, const short int staffOffset);
-    bool ReadMusicXmlMeasure(
-        pugi::xml_node node, Section *section, Measure *measure, short int nbStaves, const short int staffOffset, int index);
+    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, short int nbStaves,
+        const short int staffOffset, int index);
     ///@}
 
     /*
@@ -209,7 +209,8 @@ private:
     void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset);
+    void ReadMusicXmlDirection(
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset);
     void ReadMusicXmlFigures(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
