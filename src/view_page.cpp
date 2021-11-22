@@ -43,6 +43,7 @@
 #include "page.h"
 #include "pageboundary.h"
 #include "pageelement.h"
+#include "reh.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -459,14 +460,12 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
         }
         case staffGroupingSym_SYMBOL_bracket: {
             DrawBracket(dc, x, yTop, yBottom, staffSize);
-            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue()
-                + m_doc->GetDrawingUnit(staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize) * (1.0 + m_options->m_bracketThickness.GetValue());
             break;
         }
         case staffGroupingSym_SYMBOL_bracketsq: {
-            DrawBracketsq(dc, x, yTop, yBottom, staffSize);
-            x -= m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue()
-                + m_doc->GetDrawingUnit(staffSize);
+            DrawBracketSq(dc, x, yTop, yBottom, staffSize);
+            x -= m_doc->GetDrawingUnit(staffSize);
             break;
         }
         default: break;
@@ -562,25 +561,19 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     DrawSmuflCode(dc, x1, y2 - offset - bracketThickness / 2, SMUFL_E004_bracketBottom, staffSize, false);
 
     DrawFilledRectangle(dc, x1, y1 + 2 * offset + bracketThickness / 2, x2, y2 - 2 * offset - bracketThickness / 2);
-
-    return;
 }
 
-void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
 
-    const int offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
-    const int basicDist = m_doc->GetDrawingUnit(staffSize);
+    const int y = std::min(y1, y2);
+    const int height = std::abs(y2 - y1);
+    const int horizontalThickness = m_doc->GetDrawingStaffLineWidth(staffSize);
+    const int verticalThickness = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
+    const int width = m_doc->GetDrawingUnit(staffSize);
 
-    const int bracketWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_subBracketThickness.GetValue();
-    x -= basicDist;
-
-    DrawFilledRectangle(dc, x, y1 + offset, x - bracketWidth, y2 - offset); // left
-    DrawFilledRectangle(dc, x, y1 + offset, x + basicDist, y1 - offset); // top
-    DrawFilledRectangle(dc, x, y2 + offset, x + basicDist, y2 - offset); // bottom
-
-    return;
+    DrawSquareBracket(dc, true, x - width, y, height, width, horizontalThickness, verticalThickness);
 }
 
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
@@ -830,7 +823,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 }
 
 void View::DrawBarLine(
-    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form, bool eraseIntersections)
+    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, const data_BARRENDITION form, bool eraseIntersections)
 {
     assert(dc);
     assert(barLine);
@@ -842,7 +835,7 @@ void View::DrawBarLine(
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
     const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = m_doc->GetDrawingUnit(staffSize) * m_options->m_barLineSeparation.GetValue();
-    const int barLinesGap = barLineThickWidth + barLineWidth;
+    const int barLinesSum = barLineThickWidth + barLineWidth;
     int x2 = x + barLineSeparation;
 
     // optimized for five line staves
@@ -855,20 +848,19 @@ void View::DrawBarLine(
         System *system = dynamic_cast<System *>(barLine->GetFirstAncestor(SYSTEM));
         if (system) {
             int minX = x - barLineWidth / 2;
-            int maxX = x2 + barLineWidth / 2;
+            int maxX = x + barLineWidth / 2;
             if ((form == BARRENDITION_rptend) || (form == BARRENDITION_end)) {
-                minX = x - barLineWidth / 2;
-                maxX = x2 + barLineThickWidth / 2;
+                maxX = x2 + barLinesSum / 2;
             }
             else if (form == BARRENDITION_rptboth) {
-                maxX = x2 + barLineWidth / 2;
+                maxX = x + barLinesSum + barLineSeparation * 2;
             }
             else if (form == BARRENDITION_rptstart) {
                 minX = x - barLineThickWidth / 2;
-                maxX = x2 + barLineWidth / 2;
+                maxX = x2 + barLinesSum / 2;
             }
-            else if ((form == BARRENDITION_dbl) || (form == BARRENDITION_dbldashed)) {
-                minX = x - barLineWidth / 2;
+            else if ((form == BARRENDITION_dbl) || (form == BARRENDITION_dbldashed)
+                || (form == BARRENDITION_dbldotted)) {
                 maxX = x2 + barLineWidth / 2;
             }
             Object lines;
@@ -880,52 +872,55 @@ void View::DrawBarLine(
         }
     }
 
-    if (form == BARRENDITION_single) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_dashed) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
-    }
-    else if (form == BARRENDITION_dotted) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-    }
-    else if (form == BARRENDITION_rptend) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
-    }
-    else if (form == BARRENDITION_rptboth) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLineSeparation + barLinesGap, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_rptstart) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth / 2, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_invis) {
-        barLine->SetEmptyBB();
-    }
-    else if (form == BARRENDITION_end) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLinesGap / 2, line, barLineThickWidth);
-    }
-    else if (form == BARRENDITION_dbl) {
-        // Narrow the bars a little bit - should be centered?
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
-        DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
-    }
-    else if (form == BARRENDITION_dbldashed) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
-        DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength);
-    }
-    else if (form == BARRENDITION_dbldotted) {
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-        DrawVerticalSegmentedLine(dc, x2, line, barLineWidth, dotLength);
-    }
-    else {
-        // Use solid barline as fallback
-        LogWarning("%s bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()).c_str());
-        DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+    switch (form) {
+        case BARRENDITION_single: //
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            break;
+        case BARRENDITION_dashed: //
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
+            break;
+        case BARRENDITION_dotted: //
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
+            break;
+        case BARRENDITION_rptend:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineThickWidth);
+            break;
+        case BARRENDITION_rptboth:
+            x2 = x + barLinesSum + barLineSeparation * 2;
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, (x + x2) / 2, line, barLineThickWidth);
+            DrawVerticalSegmentedLine(dc, x2, line, barLineWidth);
+            break;
+        case BARRENDITION_rptstart:
+            DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineWidth);
+            break;
+        case BARRENDITION_invis: //
+            barLine->SetEmptyBB();
+            break;
+        case BARRENDITION_end:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineThickWidth);
+            break;
+        case BARRENDITION_dbl:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
+            break;
+        case BARRENDITION_dbldashed:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
+            DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength);
+            break;
+        case BARRENDITION_dbldotted:
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
+            DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dotLength);
+            break;
+        default:
+            // Use solid barline as fallback
+            LogWarning(
+                "%s bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()).c_str());
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            break;
     }
 }
 
@@ -936,32 +931,31 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     assert(barLine);
 
     const int x = barLine->GetDrawingX();
-    // HARDCODED - should be half the width of the proper glyph
-    const int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 5), 2);
-    const int dotSeparation
-        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_repeatBarLineDotSeparation.GetValue();
+    const int dotSeparation = m_doc->GetDrawingUnit(100) * m_options->m_repeatBarLineDotSeparation.GetValue();
     const int barLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_barLineWidth.GetValue();
     const int thickBarLineWidth = m_doc->GetDrawingUnit(100) * m_options->m_thickBarlineThickness.GetValue();
     const int barLineSeparation = m_doc->GetDrawingUnit(100) * m_options->m_barLineSeparation.GetValue();
-    const int xShift = thickBarLineWidth + dotSeparation + barLineSeparation + r + barLineWidth;
+    const int xShift = thickBarLineWidth + dotSeparation + barLineSeparation + barLineWidth;
+    const int staffSize = staff->m_drawingStaffSize;
+    const int dotWidth = m_doc->GetGlyphWidth(SMUFL_E044_repeatDot, staffSize, false);
 
-    const int x1 = x - (dotSeparation + r) - barLineWidth;
+    const int x1 = x - barLineWidth / 2 - (dotSeparation + dotWidth);
     const int x2 = x + xShift;
 
-    const int yBottom = staff->GetDrawingY() - staff->m_drawingLines * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int yBottom = staff->GetDrawingY() - staff->m_drawingLines * m_doc->GetDrawingUnit(staffSize);
+    const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staffSize);
 
     if (barLine->GetForm() == BARRENDITION_rptstart) {
-        DrawDot(dc, x2 - thickBarLineWidth / 2, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x2 - thickBarLineWidth / 2, yTop, staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x2 - thickBarLineWidth / 2, yTop, SMUFL_E044_repeatDot, staffSize, false);
+        DrawSmuflCode(dc, x2 - thickBarLineWidth / 2, yBottom, SMUFL_E044_repeatDot, staffSize, false);
     }
     if (barLine->GetForm() == BARRENDITION_rptboth) {
-        DrawDot(dc, x2 + barLineSeparation + barLineWidth, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x2 + barLineSeparation + barLineWidth, yTop, staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x2 + barLineSeparation + barLineWidth / 2, yTop, SMUFL_E044_repeatDot, staffSize, false);
+        DrawSmuflCode(dc, x2 + barLineSeparation + barLineWidth / 2, yBottom, SMUFL_E044_repeatDot, staffSize, false);
     }
     if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_rptboth)) {
-        DrawDot(dc, x1, yBottom, staff->m_drawingStaffSize);
-        DrawDot(dc, x1, yTop, staff->m_drawingStaffSize);
+        DrawSmuflCode(dc, x1, yTop, SMUFL_E044_repeatDot, staffSize, false);
+        DrawSmuflCode(dc, x1, yBottom, SMUFL_E044_repeatDot, staffSize, false);
     }
 
     return;
@@ -984,7 +978,12 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
         MNum *mnum = dynamic_cast<MNum *>(measure->FindDescendantByType(MNUM));
-        if (mnum) {
+        Reh *reh = dynamic_cast<Reh *>(measure->FindDescendantByType(REH));
+        const bool hasRehearsal = reh
+            && ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
+                || (reh->GetStart()->Is(BARLINE)
+                    && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
+        if (mnum && !hasRehearsal) {
             // this should be an option
             Measure *systemStart = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE));
 
@@ -1051,25 +1050,21 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
         assert(meterSig);
 
-        dc->StartGraphic(meterSig, "", meterSig->GetUuid());
-        int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
-        int x = meterSig->GetDrawingX() + offset;
-
         if (meterSig->HasCount()) {
-            DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+            DrawMeterSig(dc, meterSig, staff, offset);
         }
 
-        dc->EndGraphic(meterSig, this);
-        int margin = unit / 2;
+        const int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
+        const int x = meterSig->GetDrawingX() + offset;
         const int width = meterSig->GetContentRight() - meterSig->GetContentLeft();
         if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))) {
             // draw plus sign here
-            const int plusX = x + width;
+            const int plusX = x + width + unit / 2;
             DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
-            offset += width + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
+            offset += width + unit + m_doc->GetGlyphWidth(SMUFL_E08C_timeSigPlus, staff->m_drawingStaffSize, false);
         }
         else {
-            offset += width + margin * 2;
+            offset += width + unit;
         }
     }
 

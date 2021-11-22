@@ -94,7 +94,6 @@ Object *Object::Clone() const
 
 Object::Object(const Object &object) : BoundingBox(object)
 {
-    ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
     m_classId = object.m_classId;
@@ -235,6 +234,21 @@ bool Object::IsBoundaryElement()
     return false;
 }
 
+Object *Object::GetBoundaryEnd()
+{
+    if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
+        SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
+        assert(interface);
+        return (interface->GetEnd());
+    }
+    else if (this->Is(MDIV) || this->Is(SCORE)) {
+        PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
+        assert(interface);
+        return (interface->GetEnd());
+    }
+    return NULL;
+}
+
 void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChange)
 {
     if (this == sourceParent) {
@@ -364,18 +378,27 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetCmn(this, attributes);
     Att::GetCmnornaments(this, attributes);
     Att::GetCritapp(this, attributes);
-    Att::GetGestural(this, attributes);
+    // Att::GetEdittrans(this, attributes);
     Att::GetExternalsymbols(this, attributes);
+    Att::GetFrettab(this, attributes);
+    Att::GetFacsimile(this, attributes);
+    // Att::GetFigtable(this, attributes);
+    // Att::GetFingering(this, attributes);
+    Att::GetGestural(this, attributes);
+    // Att::GetHarmony(this, attributes);
+    // Att::GetHeader(this, attributes);
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
     Att::GetNeumes(this, attributes);
     Att::GetPagebased(this, attributes);
+    // Att::GetPerformance(this, attributes);
     Att::GetShared(this, attributes);
+    // Att::GetUsersymbols(this, attributes);
     Att::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
-        attributes->push_back(std::make_pair(pair.first, pair.second));
+        attributes->push_back({ pair.first, pair.second });
     }
 
     return (int)attributes->size();
@@ -618,8 +641,9 @@ void Object::SetParent(Object *parent)
 bool Object::IsSupportedChild(Object *child)
 {
     // This should never happen because the method should be overridden
-    LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
-    assert(false);
+    LogDebug(
+        "Method for adding %s to %s should be overridden", child->GetClassName().c_str(), this->GetClassName().c_str());
+    // assert(false);
     return false;
 }
 
@@ -1229,6 +1253,21 @@ Object *ObjectFactory::Create(std::string name)
     }
 }
 
+ClassId ObjectFactory::GetClassId(std::string name)
+{
+    ClassId classId = OBJECT;
+
+    MapOfStrClassIds::iterator it = s_classIdsRegistry.find(name);
+    if (it != s_classIdsRegistry.end()) {
+        classId = it->second;
+    }
+    else {
+        LogError("ClassId for '%s' not found", name.c_str());
+    }
+
+    return classId;
+}
+
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
     for (auto str : classStrings) {
@@ -1649,11 +1688,13 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         }
         if (scoreDef->IsSectionRestart()) {
             // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
-            params->m_drawLabels = true;
+            const bool hasLabel = (NULL != scoreDef->FindDescendantByType(LABEL))
+                || (NULL != scoreDef->FindDescendantByType(LABELABBR));
+            params->m_drawLabels = hasLabel;
             params->m_restart = true;
             // Redraw the labels only if we already have a mesure in the system. Otherwise this will be
             // done through the system scoreDef
-            scoreDef->SetDrawLabels(params->m_hasMeasure);
+            scoreDef->SetDrawLabels(params->m_hasMeasure && hasLabel);
             // If we have a previous measure, we need to set the cautionary scoreDef indenpendently from the
             // presence of a system break
             if (params->m_previousMeasure) {
@@ -1852,6 +1893,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            above->SetOverflowBBoxAbove(current, overflowAbove);
             above->SetOverflowAbove(overflowAbove);
             above->AddBBoxAbove(current);
         }
@@ -1862,6 +1904,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            below->SetOverflowBBoxBelow(current, overflowBelow);
             below->SetOverflowBelow(overflowBelow);
             below->AddBBoxBelow(current);
         }

@@ -111,10 +111,10 @@ void Att::GetMei(const Object *element, ArrayOfStrAttr *attributes)
         const AttNotationType *att = dynamic_cast<const AttNotationType *>(element);
         assert(att);
         if (att->HasNotationtype()) {
-            attributes->push_back(std::make_pair("notationtype", att->NotationtypeToStr(att->GetNotationtype())));
+            attributes->push_back({ "notationtype", att->NotationtypeToStr(att->GetNotationtype()) });
         }
         if (att->HasNotationsubtype()) {
-            attributes->push_back(std::make_pair("notationsubtype", att->StrToStr(att->GetNotationsubtype())));
+            attributes->push_back({ "notationsubtype", att->StrToStr(att->GetNotationsubtype()) });
         }
     }
 }

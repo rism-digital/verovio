@@ -157,11 +157,10 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     DrawSmuflCode(dc, x, y, symc, glyphSize, true);
 
-    int i;
     if (tabGrp->HasDots()) {
         y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
         x += m_doc->GetDrawingUnit(glyphSize);
-        for (i = 0; i < tabGrp->GetDots(); ++i) {
+        for (int i = 0; i < tabGrp->GetDots(); ++i) {
             DrawDot(dc, x, y, glyphSize / 2);
             // HARDCODED
             x += m_doc->GetDrawingUnit(glyphSize) * 0.75;

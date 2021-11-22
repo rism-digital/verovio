@@ -38,24 +38,24 @@ public:
     ///@{
     Tempo();
     virtual ~Tempo();
-    virtual Object *Clone() const { return new Tempo(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Tempo"; }
+    Object *Clone() const override { return new Tempo(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Tempo"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Get the X drawing position
@@ -70,12 +70,12 @@ public:
     /**
      * See Object::AdjustTempoX
      */
-    virtual int AdjustTempo(FunctorParams *functorParams);
+    int AdjustTempo(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     //

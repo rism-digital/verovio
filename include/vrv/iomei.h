@@ -9,6 +9,7 @@
 #define __VRV_IOMEI_H__
 
 #include <sstream>
+#include <stack>
 
 //----------------------------------------------------------------------------
 
@@ -183,12 +184,12 @@ public:
     /**
      * The main method for write objects.
      */
-    virtual bool WriteObject(Object *object);
+    bool WriteObject(Object *object) override;
 
     /**
      * Writing object method that must be overridden in the child class.
      */
-    virtual bool WriteObjectEnd(Object *object);
+    bool WriteObjectEnd(Object *object) override;
 
     /**
      * Return the output as a string by writing it to the stringstream member.
@@ -196,9 +197,25 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Setter for score-based MEI output
+     * @name Setter and getter for score-based MEI output
      */
+    ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+    bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
+    ///@}
+
+    /**
+     * Return true when the MEIOutput object is currently saving single page
+     */
+    bool IsSavingSinglePage() const { return (m_page != -1); }
+
+    /**
+     * @name Gettersto improve code readability
+     */
+    ///@{
+    bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
+    bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
+    ///@}
 
     /**
      * Setter for indent for the MEI output (default is 3, -1 for tabs)
@@ -444,6 +461,7 @@ private:
     /** @name Current element */
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_nodeStack;
+    std::stack<Object *> m_boundaries;
     bool m_removeIds;
     ListOfObjects m_referredObjects;
 };
@@ -463,7 +481,7 @@ public:
     MEIInput(Doc *doc);
     virtual ~MEIInput();
 
-    virtual bool Import(const std::string &mei);
+    bool Import(const std::string &mei) override;
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -471,8 +489,20 @@ private:
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
-    bool ReadPages(Object *parent, pugi::xml_node parentNode);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    ///@}
+
+    /**
+     * @name Methods for reading MEI page-based elements
+     */
+    ///@{
+    bool ReadPages(Object *parent, pugi::xml_node parentNode);
+    bool ReadPage(Object *parent, pugi::xml_node parentNode);
+    bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd);
+    bool ReadSystem(Object *parent, pugi::xml_node system);
+    bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);
     ///@}
 
     /**
@@ -489,18 +519,13 @@ private:
 
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
-     * For each container (page, system, measure, staff and layer) there is one method for
+     * For each container (measure, staff and layer) there is one method for
      * reading the element and one method for reading its children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
      * for example. The filter object is optional and can be set for filtering the allowed
      * children (see MEIInput::IsAllowed)
      */
     ///@{
-    bool ReadPage(Object *parent, pugi::xml_node parentNode);
-    bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystem(Object *parent, pugi::xml_node system);
-    bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);
     bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
@@ -718,6 +743,8 @@ private:
      * @name Various methods for upgrading older MEI files
      */
     ///@{
+    // to MEI 5.0.0
+    void UpgradePageTo_5_0_0(Page *page);
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);

@@ -874,7 +874,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     if (linebreaki > 0) {
         hum::HTp token = infile[linebreaki].token(0);
         Sb *sb = new Sb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         setLocationId(sb, token);
         m_sections.back()->AddChild(sb);
         // Maybe allow other types of line breaks here, but
@@ -886,7 +886,7 @@ void HumdrumInput::checkForBreak(hum::HumdrumFile &infile, int line)
     else if (pagebreaki > 0) {
         hum::HTp token = infile[pagebreaki].token(0);
         Pb *pb = new Pb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         setLocationId(pb, token);
         m_sections.back()->AddChild(pb);
         // Maybe allow other types of line breaks here, but
@@ -5982,7 +5982,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
     if (!group.empty()) {
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         if (m_currentending) {
             m_currentending->AddChild(sb);
         }
@@ -5999,7 +5999,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
         std::string tstring = removeCommas(group);
         // Pb *pb = new Pb;
         Sb *pb = new Sb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         if (m_currentending) {
             m_currentending->AddChild(pb);
         }
@@ -10222,6 +10222,10 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             // use 7 slot in array for vertical strokes
             ch = 7;
         }
+        if (m_signifiers.lhpizz == ch) {
+            // use 8 slot in array for left-hand pizzicato symbol
+            ch = 8;
+        }
         articloc.at(ch) = i + 1;
 
         if (posch) {
@@ -10303,6 +10307,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         positions.push_back(articpos[7]);
         gestural.push_back(articges[7]);
         showingpositions.push_back(showpos[7]);
+    }
+    if (articloc[8]) {
+        artics.push_back(ARTICULATION_lhpizz);
+        positions.push_back(articpos[8]);
+        gestural.push_back(articges[8]);
+        showingpositions.push_back(showpos[8]);
     }
     if (articloc['^']) {
         artics.push_back(ARTICULATION_acc);
@@ -22509,7 +22519,7 @@ void HumdrumInput::setupMeiDocument()
         // breaks encoded in the file to be activated, so adding a
         // dummy page break here:
         Pb *pb = new Pb;
-        m_hasLayoutInformation = true;
+        m_layoutInformation = LAYOUT_ENCODED;
         section->AddChild(pb);
     }
 }
@@ -23390,6 +23400,21 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // !!!RDF**kern: | = vertical stroke
         if (value.find("vertical stroke", equals) != std::string::npos) {
             m_signifiers.verticalStroke = signifier;
+        }
+
+        // left-hand pizzicatos:
+        // !!!RDF**kern: + = l.h. pizz.
+        if (value.find("l.h. pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
+        }
+        else if (value.find("left hand pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
+        }
+        else if (value.find("left-hand pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
+        }
+        else if (value.find("lefthand pizz", equals) != std::string::npos) {
+            m_signifiers.lhpizz = signifier;
         }
 
         // terminal longs

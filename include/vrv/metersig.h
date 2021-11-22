@@ -23,7 +23,7 @@ class ScoreDefInterface;
 /**
  * This class models the MEI <meterSig> element.
  */
-class MeterSig : public LayerElement, public AttMeterSigLog, public AttMeterSigVis {
+class MeterSig : public LayerElement, public AttEnclosingChars, public AttMeterSigLog, public AttMeterSigVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -32,19 +32,25 @@ public:
     ///@{
     MeterSig();
     virtual ~MeterSig();
-    virtual Object *Clone() const { return new MeterSig(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MeterSig"; }
+    Object *Clone() const override { return new MeterSig(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MeterSig"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /** Override the method since check is required */
-    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
+    bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /** Evaluate additive meter counts */
     int GetTotalCount() const;
+
+    /** Retrieves the symbol glyph */
+    wchar_t GetSymbolGlyph() const;
+
+    /** Retrieve parentheses from the enclose attribute */
+    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs(bool smallGlpyh) const;
 
     //----------//
     // Functors //
@@ -53,7 +59,7 @@ public:
     /**
      * See Object::LayerCountInTimeSpan
      */
-    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
+    int LayerCountInTimeSpan(FunctorParams *functorParams) override;
 
 private:
     //

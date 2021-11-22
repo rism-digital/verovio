@@ -43,27 +43,27 @@ public:
     ///@{
     Syl();
     virtual ~Syl();
-    virtual Object *Clone() const { return new Syl(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Syl"; }
+    Object *Clone() const override { return new Syl(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Syl"; }
     ///@}
 
     /** Override the method since it is align to the staff */
-    virtual bool IsRelativeToStaff() const { return true; }
+    bool IsRelativeToStaff() const override { return true; }
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a syl.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Calculate the spacing needed depending on the @worpos and @con
@@ -80,17 +80,17 @@ public:
     /**
      * See Object::PrepareLyrics
      */
-    virtual int PrepareLyrics(FunctorParams *functorParams);
+    int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
+    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /** Create a default zone for a syl based on syllable. */
     bool CreateDefaultZone(Doc *doc);

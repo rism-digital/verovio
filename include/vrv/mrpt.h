@@ -32,9 +32,9 @@ public:
     ///@{
     MRpt();
     virtual ~MRpt();
-    virtual Object *Clone() const { return new MRpt(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MRpt"; }
+    Object *Clone() const override { return new MRpt(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MRpt"; }
     ///@}
 
     //----------//
@@ -45,13 +45,13 @@ public:
      * @name See Object::GenerateMIDI
      */
     ///@{
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::PrepareRpt
      */
-    virtual int PrepareRpt(FunctorParams *functorParams);
+    int PrepareRpt(FunctorParams *functorParams) override;
 
 private:
     //

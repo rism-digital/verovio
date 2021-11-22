@@ -197,7 +197,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
 
     Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
     assert(lastNote);
-    int curPitch, lastPitch = lastNote->GetDiatonicPitch();
+    int lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
 
     ++iter;
@@ -208,7 +208,7 @@ void Chord::FilterList(ArrayOfObjects *childList)
     while (iter != childList->end()) {
         curNote = vrv_cast<Note *>(*iter);
         assert(curNote);
-        curPitch = curNote->GetDiatonicPitch();
+        const int curPitch = curNote->GetDiatonicPitch();
 
         if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
             if (!lastNote->GetCluster()) {
@@ -407,6 +407,23 @@ bool Chord::IsVisible()
     }
 
     return false;
+}
+
+bool Chord::HasAdjacentNotesInStaff(Staff *staff)
+{
+    assert(staff);
+    MapOfNoteLocs locations = this->CalcNoteLocations();
+
+    if (locations[staff].empty() || locations[staff].size() == 1) return false;
+
+    std::vector<int> diff;
+    diff.resize(locations[staff].size());
+    // Find difference between adjacent notes in the chord. Since locations[staff] is multiset, elements are ordered and
+    // represent position of notes in chord. This way we can find whether there are notes with diatonic step difference
+    // of 1.
+    std::adjacent_difference(locations[staff].begin(), locations[staff].end(), diff.begin());
+
+    return (diff.end() != std::find(std::next(diff.begin()), diff.end(), 1));
 }
 
 bool Chord::HasNoteWithDots()
@@ -853,18 +870,24 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
 
         const int shift = getShift(extremalStaves.back()) - getShift(extremalStaves.front());
 
-        // Add the shift to the stem length of the chord.
+        // Add the shift to the stem length of the chord
         Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));
         if (!stem) return FUNCTOR_CONTINUE;
 
         const int stemLen = stem->GetDrawingStemLen();
         if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
             stem->SetDrawingStemLen(stemLen - shift);
-            stem->SetDrawingYRel(stem->GetDrawingYRel() - shift);
         }
         else {
             stem->SetDrawingStemLen(stemLen + shift);
         }
+
+        // Reposition the stem
+        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+        Staff *rootStaff
+            = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.back() : extremalStaves.front();
+        stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));
 
         // Add the shift to the flag position
         Flag *flag = vrv_cast<Flag *>(stem->FindDescendantByType(FLAG));

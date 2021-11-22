@@ -56,11 +56,11 @@ void BeamSegment::Reset()
     m_startingY = 0;
     m_beamSlope = 0.0;
     m_verticalCenter = 0;
-    m_avgY = 0;
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
     m_uniformStemLength = 0;
+    m_weightedPlace = BEAMPLACE_NONE;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -334,10 +334,8 @@ void BeamSegment::CalcBeamInit(
     /******************************************************************/
     // Calculate the extreme values
 
-    int yMax = 0, yMin = 0;
     int nbRests = 0;
 
-    m_avgY = 0;
     m_nbNotesOrChords = 0;
     m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
@@ -346,6 +344,13 @@ void BeamSegment::CalcBeamInit(
     // somebody might want to have a beam with only rest of space elements...
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
+
+    int yMax = m_verticalCenter;
+    int yMin = m_verticalCenter;
+    auto SetExtrema = [&yMax, &yMin](int currentY) {
+        yMax = std::max(currentY, yMax);
+        yMin = std::min(currentY, yMin);
+    };
 
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
@@ -359,11 +364,14 @@ void BeamSegment::CalcBeamInit(
         }
 
         if (coord->m_element->Is(CHORD)) {
+            int max = 0;
+            int min = 0;
             Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
-            chord->GetYExtremes(yMax, yMin);
+            chord->GetYExtremes(max, min);
 
-            m_avgY += ((yMax + yMin) / 2);
+            SetExtrema(max);
+            SetExtrema(min);
 
             int linesAbove = 0;
             int linesBelow = 0;
@@ -381,7 +389,7 @@ void BeamSegment::CalcBeamInit(
         else if (coord->m_element->Is(NOTE)) {
             Note *note = vrv_cast<Note *>(coord->m_element);
             assert(note);
-            m_avgY += note->GetDrawingY();
+            SetExtrema(note->GetDrawingY());
 
             int linesAbove = 0;
             int linesBelow = 0;
@@ -395,10 +403,7 @@ void BeamSegment::CalcBeamInit(
         }
     }
 
-    // Only if not only rests. (Will produce non-sense output anyway)
-    if (elementCount != nbRests) {
-        m_avgY /= (elementCount - nbRests);
-    }
+    m_weightedPlace = ((m_verticalCenter - yMin) > (yMax - m_verticalCenter)) ? BEAMPLACE_above : BEAMPLACE_below;
 }
 
 bool BeamSegment::CalcBeamSlope(
@@ -899,7 +904,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
                     = (m_ledgerLinesBelow > m_ledgerLinesAbove) ? BEAMPLACE_above : BEAMPLACE_below;
             }
             else {
-                beamInterface->m_drawingPlace = (m_avgY < m_verticalCenter) ? BEAMPLACE_above : BEAMPLACE_below;
+                beamInterface->m_drawingPlace = m_weightedPlace;
             }
         }
         // Look at the note position
@@ -926,8 +931,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place)
     // make adjustments for the grace notes length
     for (auto coord : m_beamElementCoordRefs) {
         if (coord->m_element) {
-            const bool isInGraceGroup = coord->m_element->GetFirstAncestor(GRACEGRP);
-            if (coord->m_element->IsGraceNote() || isInGraceGroup) {
+            if (coord->m_element->IsGraceNote()) {
                 m_uniformStemLength *= 0.75;
                 break;
             }
@@ -1038,11 +1042,12 @@ int BeamSegment::GetAdjacentElementsDuration(int elementX) const
 
 static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
-Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
+Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
 {
-    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
     RegisterAttClass(ATT_BEAMREND);
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
 
     Reset();
 }
@@ -1053,9 +1058,10 @@ void Beam::Reset()
 {
     LayerElement::Reset();
     BeamDrawingInterface::Reset();
-    ResetColor();
     ResetBeamedWith();
     ResetBeamRend();
+    ResetColor();
+    ResetCue();
 }
 
 bool Beam::IsSupportedChild(Object *child)
@@ -1120,14 +1126,13 @@ void Beam::FilterList(ArrayOfObjects *childList)
             // if we are at the beginning of the beam
             // and the note is cueSize
             // assume all the beam is of grace notes
-            const bool isInGraceGroup = element->GetFirstAncestor(GRACEGRP);
             if (childList->begin() == iter) {
-                if (element->IsGraceNote() || isInGraceGroup) firstNoteGrace = true;
+                if (element->IsGraceNote()) firstNoteGrace = true;
             }
             // if the first note in beam was NOT a grace
             // we have grace notes embedded in a beam
             // drop them
-            if (!firstNoteGrace && (element->IsGraceNote() || isInGraceGroup)) {
+            if (!firstNoteGrace && (element->IsGraceNote())) {
                 iter = childList->erase(iter);
                 continue;
             }
@@ -1173,7 +1178,10 @@ void Beam::FilterList(ArrayOfObjects *childList)
     }
     */
 
-    InitCoords(childList, beamStaff, this->GetPlace());
+    this->InitCoords(childList, beamStaff, this->GetPlace());
+
+    const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
+    this->InitCue(isCue);
 }
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
@@ -1252,6 +1260,14 @@ void BeamElementCoord::SetDrawingStemDir(
                                          : interface->m_stemXBelow[interface->m_cueSize];
     if (!m_closestNote) return;
 
+    if (!interface->m_cueSize && (m_element->IsGraceNote() || m_element->GetDrawingCueSize())
+        && !this->m_element->GetFirstAncestor(CHORD) && (STEMDIRECTION_up == stemDir)) {
+        const double cueScaling = doc->GetCueScaling();
+        const int diameter = 2 * m_element->GetDrawingRadius(doc);
+        const int cueShift = (1.0 / cueScaling - 1.0) * diameter;
+        m_x -= cueShift;
+    }
+
     m_yBeam = m_closestNote->GetDrawingY();
     if (stemDir == STEMDIRECTION_up) {
         m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
@@ -1262,8 +1278,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
     m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
-    const bool isInGraceGroup = m_element->GetFirstAncestor(GRACEGRP);
-    if (m_element->IsGraceNote() || isInGraceGroup) return;
+    if (m_element->IsGraceNote()) return;
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope

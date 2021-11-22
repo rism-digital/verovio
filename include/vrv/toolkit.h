@@ -20,6 +20,7 @@
 namespace vrv {
 
 class EditorToolkit;
+class RuntimeClock;
 
 enum FileFormat {
     UNKNOWN = 0,
@@ -162,6 +163,30 @@ public:
      * @return True if the data was successfully loaded
      */
     bool LoadZipDataBuffer(const unsigned char *data, int length);
+
+    /**
+     * Validate the Plaine and Easie file from the file system.
+     *
+     * The method calls Toolkit::ValidatePAE.
+     * This methods is not available in the JavaScript version of the toolkit.
+     *
+     * @param filename The filename to be validated
+     * @return A stringified JSON object with the validation warnings or errors
+     */
+    std::string ValidatePAEFile(const std::string &filename);
+
+    /**
+     * Validate the Plaine and Easie code passed in the string data.
+     *
+     * A single JSON object is returned when there is a global input error.
+     * When reading the input succeeds, validation is grouped by input keys.
+     * The methods always returns errors in PAE pedantic mode.
+     * No data remains loaded after the validation.
+     *
+     * @param data A string with the data in JSON or with PAE `@` keys
+     * @return A stringified JSON object with the validation warnings or errors
+     */
+    std::string ValidatePAE(const std::string &data);
 
     /**
      * Return the number of pages in the loaded document
@@ -654,6 +679,18 @@ public:
      */
     int GetOutputTo() { return m_outputTo; }
 
+    /**
+     * Measuring runtime.
+     *
+     * @ingroup nodoc
+     */
+    ///@{
+    void InitClock();
+    void ResetClock();
+    double GetRuntimeInSeconds() const;
+    void LogRuntime() const;
+    ///@}
+
     ///@}
 
 protected:
@@ -691,6 +728,11 @@ private:
     char *m_cString;
 
     EditorToolkit *m_editorToolkit;
+
+#ifndef NO_RUNTIME
+    /** Measuring runtime */
+    RuntimeClock *m_runtimeClock;
+#endif
 
     //----------------//
     // Static members //

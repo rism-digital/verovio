@@ -36,8 +36,8 @@ public:
     ///@{
     TimePointInterface();
     virtual ~TimePointInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_TIME_POINT; }
     ///@}
 
     /**
@@ -140,11 +140,9 @@ public:
     ///@{
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_TIME_SPANNING; }
     ///@}
-
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     /**
      * @name Set and get the first and second LayerElement
@@ -212,12 +210,12 @@ public:
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
+    int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    int InterfaceResetDrawing(FunctorParams *functorParams, Object *object) override;
 
 private:
     //

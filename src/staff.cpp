@@ -395,7 +395,7 @@ void LedgerLine::AddDash(int left, int right, int extension)
     for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
         if (iter->first > left) break;
     }
-    m_dashes.insert(iter, std::make_pair(left, right));
+    m_dashes.insert(iter, { left, right });
 
     // Merge dashes which overlap by more than 1.5 extensions
     // => Dashes belonging to the same chord overlap at least by two extensions and will get merged
@@ -591,6 +591,13 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
         ++iter;
     }
     return FUNCTOR_CONTINUE;
+}
+
+int Staff::CastOffEncoding(FunctorParams *functorParams)
+{
+    // Staff alignments must be reset, otherwise they would dangle whenever they belong to a deleted system
+    m_staffAlignment = NULL;
+    return FUNCTOR_SIBLINGS;
 }
 
 int Staff::ResetDrawing(FunctorParams *functorParams)

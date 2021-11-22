@@ -36,6 +36,9 @@ const std::map<int, std::string> Option::s_header
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
+const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTYLE_auto, "auto" }, { PEDALSTYLE_line, "line" },
+    { PEDALSTYLE_pedstar, "pedstar" }, { PEDALSTYLE_altpedstar, "altpedstar" } };
+
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
     { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
@@ -748,6 +751,21 @@ std::set<std::string> OptionJson::GetKeys() const
     return keys;
 }
 
+std::set<std::string> OptionJson::GetKeysByNode(const std::string &nodeName, std::list<std::string> &jsonNodePath) const
+{
+    std::set<std::string> keys;
+
+    // Try to find node by the name, otherwise use root node
+    const jsonxx::Object *node = FindNodeByName(m_values, nodeName, jsonNodePath);
+    if (!node) node = &m_values;
+
+    for (const auto &mapEntry : node->kv_map()) {
+        keys.insert(mapEntry.first);
+    }
+
+    return keys;
+}
+
 OptionJson::JsonPath OptionJson::StringPath2NodePath(
     const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
 {
@@ -777,6 +795,31 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
     }
 
     return path;
+}
+
+const jsonxx::Object *OptionJson::FindNodeByName(
+    const jsonxx::Object &obj, const std::string &jsonNodeName, std::list<std::string> &jsonNodePath) const
+{
+    for (const auto &mapEntry : obj.kv_map()) {
+        // skip non-objects
+        if (!mapEntry.second->is<jsonxx::Object>()) continue;
+        // return current object if name matches
+        if (mapEntry.first == jsonNodeName) {
+            jsonNodePath.emplace_back(mapEntry.first);
+            return &mapEntry.second->get<jsonxx::Object>();
+        }
+        // otherwise recursively process current object
+        else {
+            const jsonxx::Object *result
+                = FindNodeByName(mapEntry.second->get<jsonxx::Object>(), jsonNodeName, jsonNodePath);
+            if (result) {
+                jsonNodePath.emplace_front(mapEntry.first);
+                return result;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -994,6 +1037,10 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
+    m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
+    m_pedalStyle.Init(PEDALSTYLE_auto, &Option::s_pedalStyle);
+    this->Register(&m_pedalStyle, "pedalStyle", &m_general);
+
     m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
     m_preserveAnalyticalMarkup.Init(false);
     this->Register(&m_preserveAnalyticalMarkup, "preserveAnalyticalMarkup", &m_general);
@@ -1001,6 +1048,10 @@ Options::Options()
     m_removeIds.SetInfo("Remove IDs in MEI", "Remove XML IDs in the MEI output that are not referenced");
     m_removeIds.Init(false);
     this->Register(&m_removeIds, "removeIds", &m_general);
+
+    m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
+    m_showRuntime.Init(false);
+    this->Register(&m_showRuntime, "showRuntime", &m_general);
 
     m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
     m_shrinkToFit.Init(false);
@@ -1020,19 +1071,25 @@ Options::Options()
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
 
     m_svgHtml5.SetInfo("Output SVG for HTML5 embedding",
-        "Write data-id and data-class attributes for JS usage and id clash avoidance.");
+        "Write data-id and data-class attributes for JS usage and id clash avoidance");
     m_svgHtml5.Init(false);
     this->Register(&m_svgHtml5, "svgHtml5", &m_general);
 
     m_svgFormatRaw.SetInfo(
-        "Raw formatting for SVG output", "Writes SVG out with no line indenting or non-content newlines.");
+        "Raw formatting for SVG output", "Writes SVG out with no line indenting or non-content newlines");
     m_svgFormatRaw.Init(false);
     this->Register(&m_svgFormatRaw, "svgFormatRaw", &m_general);
 
     m_svgRemoveXlink.SetInfo("Remove xlink: from href attributes",
-        "Removes the xlink: prefix on href attributes for compatibility with some newer browsers.");
+        "Removes the xlink: prefix on href attributes for compatibility with some newer browsers");
     m_svgRemoveXlink.Init(false);
     this->Register(&m_svgRemoveXlink, "svgRemoveXlink", &m_general);
+
+    m_svgAdditionalAttribute.SetInfo("Add additional attribute in SVG",
+        "Add additional attribute for graphical elements in SVG as \"data-*\", for "
+        "example, \"note@pname\" would add a \"data-pname\" to all note elements");
+    m_svgAdditionalAttribute.Init();
+    this->Register(&m_svgAdditionalAttribute, "svgAdditionalAttribute", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
@@ -1104,6 +1161,10 @@ Options::Options()
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
+    m_fingeringScale.SetInfo("Fingering scale", "The scale of fingering font compared to default font size");
+    m_fingeringScale.Init(0.75, 0.25, 1);
+    this->Register(&m_fingeringScale, "fingeringScale", &m_generalLayout);
+
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
@@ -1131,6 +1192,11 @@ Options::Options()
     m_hairpinThickness.SetInfo("Hairpin thickness", "The thickness of the hairpin");
     m_hairpinThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_hairpinThickness, "hairpinThickness", &m_generalLayout);
+
+    m_handwrittenFont.SetInfo("Handwritten font", "Fonts that emulate hand writing and require special handling");
+    m_handwrittenFont.Init();
+    m_handwrittenFont.SetValue("Petaluma");
+    this->Register(&m_handwrittenFont, "handwrittenFont", &m_generalLayout);
 
     m_harmDist.SetInfo("Harm dist", "The default distance from the staff of harmonic indications");
     m_harmDist.Init(1.0, 0.5, 16.0);
@@ -1217,36 +1283,23 @@ Options::Options()
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
-    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    m_repeatBarLineDotSeparation.Init(0.36, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
     m_repeatEndingLineThickness.Init(0.15, 0.10, 2.0);
     this->Register(&m_repeatEndingLineThickness, "repeatEndingLineThickness", &m_generalLayout);
 
-    m_slurControlPoints.SetInfo(
-        "Slur control points", "Slur control points - higher value means more curved at the end");
-    m_slurControlPoints.Init(5, 1, 10);
-    this->Register(&m_slurControlPoints, "slurControlPoints", &m_generalLayout);
-
     m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
-    m_slurCurveFactor.Init(10, 1, 100);
+    m_slurCurveFactor.Init(1.0, 0.2, 5.0);
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
-    m_slurHeightFactor.SetInfo("Slur height factor", "Slur height factor -  high value means flatter slurs");
-    m_slurHeightFactor.Init(5, 1, 100);
-    this->Register(&m_slurHeightFactor, "slurHeightFactor", &m_generalLayout);
-
-    m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
-    m_slurMinHeight.Init(1.2, 0.3, 2.0);
-    this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
-
-    m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
-    m_slurMaxHeight.Init(3.0, 2.0, 6.0);
-    this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
+    m_slurMargin.SetInfo("Slur margin", "Slur safety distance in MEI units to obstacles");
+    m_slurMargin.Init(1.0, 0.1, 4.0);
+    this->Register(&m_slurMargin, "slurMargin", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
-    m_slurMaxSlope.Init(20, 0, 60);
+    m_slurMaxSlope.Init(40, 0, 80);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
     m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
@@ -1322,6 +1375,10 @@ Options::Options()
     m_tieMidpointThickness.SetInfo("Tie midpoint thickness", "The midpoint tie thickness in MEI units");
     m_tieMidpointThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieMidpointThickness, "tieMidpointThickness", &m_generalLayout);
+
+    m_tieMinLength.SetInfo("Tie minimum length", "The minimum length of tie in MEI units");
+    m_tieMinLength.Init(2.0, 0.0, 10.0);
+    this->Register(&m_tieMinLength, "tieMinLength", &m_generalLayout);
 
     m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
     m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
@@ -1614,7 +1671,8 @@ void Options::Sync()
 
     // We track all unmatched keys to generate appropriate errors later on
     std::set<std::string> unmatchedKeys = m_engravingDefaults.GetKeys();
-    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeys();
+    std::list<std::string> engravingDefaultsPath;
+    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeysByNode("engravingDefaults", engravingDefaultsPath);
     std::set_union(unmatchedKeys.begin(), unmatchedKeys.end(), otherKeys.begin(), otherKeys.end(),
         std::inserter(unmatchedKeys, unmatchedKeys.end()));
 
@@ -1644,13 +1702,15 @@ void Options::Sync()
     };
 
     for (const auto &pair : engravingDefaults) {
-        const std::vector<std::string> jsonNodePath = { pair.first };
+        std::vector<std::string> jsonNodePath = { engravingDefaultsPath.begin(), engravingDefaultsPath.end() };
+        jsonNodePath.emplace_back(pair.first);
+
         double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
             jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
         }
-        else if (m_engravingDefaults.HasValue(jsonNodePath)) {
-            jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
+        else if (m_engravingDefaults.HasValue({ pair.first })) {
+            jsonValue = m_engravingDefaults.GetDoubleValue({ pair.first });
         }
         else
             continue;

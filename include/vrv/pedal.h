@@ -16,6 +16,7 @@
 
 namespace vrv {
 
+class System;
 //----------------------------------------------------------------------------
 // Pedal
 //----------------------------------------------------------------------------
@@ -39,17 +40,17 @@ public:
     ///@{
     Pedal();
     virtual ~Pedal();
-    virtual Object *Clone() const { return new Pedal(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Pedal"; }
+    Object *Clone() const override { return new Pedal(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Pedal"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ////@}
 
     /**
@@ -65,6 +66,11 @@ public:
      */
     wchar_t GetPedalGlyph() const;
 
+    /**
+     * Get the pedal form based on the options and corresponding attributes from <pedal> and <scoreDef>
+     */
+    pedalVis_FORM GetPedalForm(Doc *doc, System *system) const;
+
     //----------//
     // Functors //
     //----------//
@@ -72,12 +78,12 @@ public:
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
      */
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
 private:
     /**

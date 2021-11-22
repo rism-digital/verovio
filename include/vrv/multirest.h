@@ -28,6 +28,7 @@ class MultiRest : public LayerElement,
                   public AttColor,
                   public AttMultiRestVis,
                   public AttNumbered,
+                  public AttNumberPlacement,
                   public AttWidth {
 public:
     /**
@@ -37,9 +38,9 @@ public:
     ///@{
     MultiRest();
     virtual ~MultiRest();
-    virtual Object *Clone() const { return new MultiRest(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MultiRest"; }
+    Object *Clone() const override { return new MultiRest(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MultiRest"; }
     ///@}
 
     /**

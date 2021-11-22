@@ -35,9 +35,9 @@ public:
     ///@{
     InstrDef();
     virtual ~InstrDef();
-    virtual Object *Clone() const { return new InstrDef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "InstrDef"; }
+    Object *Clone() const override { return new InstrDef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "InstrDef"; }
     ///@}
 
     //----------//

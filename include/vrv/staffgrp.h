@@ -44,16 +44,16 @@ public:
     ///@{
     StaffGrp();
     virtual ~StaffGrp();
-    virtual Object *Clone() const { return new StaffGrp(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffGrp"; }
+    Object *Clone() const override { return new StaffGrp(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "StaffGrp"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -109,13 +109,13 @@ public:
     /**
      * See Object::ScoreDefOptimize
      */
-    virtual int ScoreDefOptimizeEnd(FunctorParams *functorParams);
+    int ScoreDefOptimizeEnd(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
 private:
     //

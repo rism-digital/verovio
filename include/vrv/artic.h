@@ -32,16 +32,16 @@ public:
     ///@{
     Artic();
     virtual ~Artic();
-    virtual Object *Clone() const { return new Artic(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Artic"; }
+    Object *Clone() const override { return new Artic(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Artic"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /** Override the method since it is align to the staff */
-    virtual bool IsRelativeToStaff() const { return true; }
+    bool IsRelativeToStaff() const override { return true; }
 
     data_ARTICULATION GetArticFirst() const;
 
@@ -83,9 +83,9 @@ public:
     wchar_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
 
     /**
-     * Retrieves parentheses / brackets from the enclose attribute
+     * Retrieve parentheses / brackets from the enclose attribute
      */
-    wchar_t GetEnclosingGlyph(bool beforeArtic) const;
+    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs() const;
 
     //----------------//
     // Static methods //
@@ -110,32 +110,32 @@ public:
     /**
      * See Object::ConvertMarkupArtic
      */
-    virtual int ConvertMarkupArtic(FunctorParams *functorParams);
+    int ConvertMarkupArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcArtic
      */
-    virtual int CalcArtic(FunctorParams *functorParams);
+    int CalcArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArtic
      */
-    virtual int AdjustArtic(FunctorParams *functorParams);
+    int AdjustArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArticWithSlurs
      */
-    virtual int AdjustArticWithSlurs(FunctorParams *functorParams);
+    int AdjustArticWithSlurs(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;

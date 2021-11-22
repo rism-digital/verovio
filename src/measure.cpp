@@ -22,7 +22,10 @@
 #include "ending.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "multirest.h"
 #include "page.h"
+#include "pedal.h"
+#include "section.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "syl.h"
@@ -644,6 +647,34 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 // Measure functor methods
 //----------------------------------------------------------------------------
 
+int Measure::FindSpannedLayerElements(FunctorParams *functorParams)
+{
+    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_interface->GetStartMeasure() == this) {
+        params->m_inMeasureRange = true;
+    }
+
+    if (!params->m_inMeasureRange) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::FindSpannedLayerElementsEnd(FunctorParams *functorParams)
+{
+    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_interface->GetEndMeasure() == this) {
+        params->m_inMeasureRange = false;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
     ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
@@ -1036,6 +1067,20 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     else if ((this->FindDescendantByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
         minMeasureWidth = 0;
     }
+    // Adjust min width based on multirest attributes (@num and @width), but only if these values are larger than
+    // current min width
+    else if (this->FindDescendantByType(MULTIREST) != NULL) {
+        MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST));
+        const int num = multiRest->GetNum();
+        if (multiRest->HasWidth()) {
+            const int fixedWidth
+                = multiRest->AttWidth::GetWidth() * (params->m_doc->GetDrawingUnit(params->m_staffSize) + 4);
+            if (minMeasureWidth < fixedWidth) minMeasureWidth = fixedWidth;
+        }
+        else if (num > 10) {
+            minMeasureWidth *= log1p(num) / 2;
+        }
+    }
 
     int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
     if (currentMeasureWidth < minMeasureWidth) {
@@ -1124,6 +1169,15 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
+    assert(this->GetParent());
+    Object *object = this->GetParent()->GetPrevious(this);
+    if (object && object->Is(SECTION)) {
+        Section *section = vrv_cast<Section *>(object);
+        if (section && (section->GetRestart() == BOOLEAN_true)) {
+            params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
+        }
+    }
+
     SetDrawingXRel(params->m_shift);
 
     params->m_shift += this->GetWidth();
@@ -1205,7 +1259,7 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
 
     MoveItselfTo(params->m_currentSystem);
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
@@ -1306,6 +1360,33 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
         }
         else {
             ++iter;
+        }
+    }
+
+    // Match down and up pedal lines
+    using pedalIter = std::list<Pedal *>::iterator;
+    pedalIter pIter = params->m_pedalLines.begin();
+    while (pIter != params->m_pedalLines.end()) {
+        if ((*pIter)->GetDir() != pedalLog_DIR_down) {
+            ++pIter;
+            continue;
+        }
+        pedalIter up = std::find_if(params->m_pedalLines.begin(), params->m_pedalLines.end(), [&pIter](Pedal *pedal) {
+            if (((*pIter)->GetStaff() == pedal->GetStaff()) && (pedal->GetDir() != pedalLog_DIR_down)) {
+                return true;
+            }
+            return false;
+        });
+        if (up != params->m_pedalLines.end()) {
+            (*pIter)->SetEnd((*up)->GetStart());
+            if ((*up)->GetDir() == pedalLog_DIR_bounce) {
+                (*pIter)->EndsWithBounce(true);
+            }
+            params->m_pedalLines.erase(up);
+            pIter = params->m_pedalLines.erase(pIter);
+        }
+        else {
+            ++pIter;
         }
     }
 

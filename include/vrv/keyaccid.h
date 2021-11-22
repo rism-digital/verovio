@@ -34,12 +34,12 @@ public:
     ///@{
     KeyAccid();
     virtual ~KeyAccid();
-    virtual Object *Clone() const { return new KeyAccid(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "KeyAccid"; }
+    Object *Clone() const override { return new KeyAccid(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "KeyAccid"; }
     ///@}
 
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
 
     /**
      * Retrieve SMuFL string for the accidental.

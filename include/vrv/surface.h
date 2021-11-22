@@ -35,10 +35,10 @@ public:
     ///@{
     Surface();
     virtual ~Surface();
-    virtual Object *Clone() const { return new Surface(*this); }
-    virtual void Reset();
+    Object *Clone() const override { return new Surface(*this); }
+    void Reset() override;
     ///@}
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     int GetMaxX();
     int GetMaxY();

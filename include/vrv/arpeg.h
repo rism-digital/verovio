@@ -28,7 +28,8 @@ class Arpeg : public ControlElement,
               public TimePointInterface,
               public AttArpegLog,
               public AttArpegVis,
-              public AttColor {
+              public AttColor,
+              public AttEnclosingChars {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -37,16 +38,16 @@ public:
     ///@{
     Arpeg();
     virtual ~Arpeg();
-    virtual Object *Clone() const { return new Arpeg(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Arpeg"; }
+    Object *Clone() const override { return new Arpeg(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Arpeg"; }
     ///@}
 
     /**
      * @name Get the X drawing position (relative to the top note)
      */
     ///@{
-    virtual int GetDrawingX() const;
+    int GetDrawingX() const override;
     ///@}
 
     /**
@@ -64,8 +65,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ////@}
 
     /**
@@ -79,7 +80,7 @@ public:
     /**
      * Custom method for @plist validation
      */
-    virtual bool IsValidRef(Object *ref);
+    bool IsValidRef(Object *ref) const override;
 
     //----------//
     // Functors //
@@ -88,19 +89,19 @@ public:
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArpeg
      */
     ///@{
-    virtual int AdjustArpeg(FunctorParams *functorParams);
+    int AdjustArpeg(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     //

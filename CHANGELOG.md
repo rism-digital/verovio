@@ -1,5 +1,25 @@
 # Changelog
 
+## [unreleased]
+* Complete refactoring of the Plaine and Easie parser
+* Support for `arpeg@enclose` (@eNote-GmBH)
+* Support for `clef@enclose` (@eNote-GmBH)
+* Support for `metersig@enclose` (@eNote-GmBH)
+* Support for `multiRest@num.place` (@eNote-GmBH)
+* Support for `meterSig@enclose`, `clef@enclose` and `arpeg@enclose` (@eNote-GmBH)
+* Support for text circle enclosure (@eNote-GmBH)
+* Support for wavy glissandi (@eNote-GmBH)
+* Improved slurs in cross-staff context and with grace notes (@eNote-GmBH)
+* Preliminary support for tablature MIDI output (@paul-bayleaf)
+* Option --fingering-scale to control the size of fingering (@eNote-GmBH)
+* Option --handwritten-font for spcific glyph positioning (@eNote-GmBH)
+* Option --pedal-style (auto|line) to control styling (@eNote-GmBH)
+* Option --slur-margin to control positioning ofr slurs (@eNote-GmBH)
+* Option --show-runtime to display the total runtime on command-line (@eNote-GmBH)
+* Option --svg-additional-attribute to make MEI attributes appear in the SVG (@wergo)
+* Option --tie-min-length to control the minimum length of ties (@eNote-GmBH)
+* Fix MEI output for single page output and page-based MEI output
+
 ## [3.6.0] - 2021-08-24
 * Support for `section@restart`
 * Support for rendering multiple `mdiv/score`

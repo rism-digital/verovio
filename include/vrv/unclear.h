@@ -26,9 +26,9 @@ public:
     ///@{
     Unclear();
     virtual ~Unclear();
-    virtual Object *Clone() const { return new Unclear(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Unclear"; }
+    Object *Clone() const override { return new Unclear(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Unclear"; }
     ///@}
 
 private:

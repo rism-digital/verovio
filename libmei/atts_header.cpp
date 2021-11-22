@@ -330,40 +330,40 @@ void Att::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
         const AttBifoliumSurfaces *att = dynamic_cast<const AttBifoliumSurfaces *>(element);
         assert(att);
         if (att->HasOuterRecto()) {
-            attributes->push_back(std::make_pair("outer.recto", att->StrToStr(att->GetOuterRecto())));
+            attributes->push_back({ "outer.recto", att->StrToStr(att->GetOuterRecto()) });
         }
         if (att->HasInnerVerso()) {
-            attributes->push_back(std::make_pair("inner.verso", att->StrToStr(att->GetInnerVerso())));
+            attributes->push_back({ "inner.verso", att->StrToStr(att->GetInnerVerso()) });
         }
         if (att->HasInnerRecto()) {
-            attributes->push_back(std::make_pair("inner.recto", att->StrToStr(att->GetInnerRecto())));
+            attributes->push_back({ "inner.recto", att->StrToStr(att->GetInnerRecto()) });
         }
         if (att->HasOuterVerso()) {
-            attributes->push_back(std::make_pair("outer.verso", att->StrToStr(att->GetOuterVerso())));
+            attributes->push_back({ "outer.verso", att->StrToStr(att->GetOuterVerso()) });
         }
     }
     if (element->HasAttClass(ATT_FOLIUMSURFACES)) {
         const AttFoliumSurfaces *att = dynamic_cast<const AttFoliumSurfaces *>(element);
         assert(att);
         if (att->HasRecto()) {
-            attributes->push_back(std::make_pair("recto", att->StrToStr(att->GetRecto())));
+            attributes->push_back({ "recto", att->StrToStr(att->GetRecto()) });
         }
         if (att->HasVerso()) {
-            attributes->push_back(std::make_pair("verso", att->StrToStr(att->GetVerso())));
+            attributes->push_back({ "verso", att->StrToStr(att->GetVerso()) });
         }
     }
     if (element->HasAttClass(ATT_RECORDTYPE)) {
         const AttRecordType *att = dynamic_cast<const AttRecordType *>(element);
         assert(att);
         if (att->HasRecordtype()) {
-            attributes->push_back(std::make_pair("recordtype", att->RecordTypeRecordtypeToStr(att->GetRecordtype())));
+            attributes->push_back({ "recordtype", att->RecordTypeRecordtypeToStr(att->GetRecordtype()) });
         }
     }
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
         const AttRegularMethod *att = dynamic_cast<const AttRegularMethod *>(element);
         assert(att);
         if (att->HasMethod()) {
-            attributes->push_back(std::make_pair("method", att->RegularMethodMethodToStr(att->GetMethod())));
+            attributes->push_back({ "method", att->RegularMethodMethodToStr(att->GetMethod()) });
         }
     }
 }

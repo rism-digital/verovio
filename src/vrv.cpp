@@ -149,7 +149,7 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
         fontStyle = FONTSTYLE_normal;
     }
 
-    s_currentStyle = std::make_pair(fontWeight, fontStyle);
+    s_currentStyle = { fontWeight, fontStyle };
     if (s_textFont.count(s_currentStyle) == 0) {
         LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
         s_currentStyle = k_defaultStyle;

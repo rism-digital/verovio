@@ -26,9 +26,9 @@ public:
     App();
     App(EditorialLevel level);
     virtual ~App();
-    virtual Object *Clone() const { return new App(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "App"; }
+    Object *Clone() const override { return new App(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "App"; }
     ///@}
 
     /** Getter for level **/
@@ -37,7 +37,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
 protected:
     /** We store the level of the <app> for integrity check */

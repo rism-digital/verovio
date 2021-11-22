@@ -29,15 +29,15 @@ public:
     ///@{
     Lb();
     virtual ~Lb();
-    virtual Object *Clone() const { return new Lb(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Lb"; }
+    Object *Clone() const override { return new Lb(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Lb"; }
     ///@}
 
     /**
      * Lb is an empty element
      */
-    virtual void AddChild(Object *object){};
+    void AddChild(Object *object) override{};
 
 private:
     //

@@ -256,6 +256,8 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_overflowBelow = 0;
     m_staffHeight = 0;
     m_overlap = 0;
+    m_overflowBBoxAbove = NULL;
+    m_overflowBBoxBelow = NULL;
 }
 
 StaffAlignment::~StaffAlignment()
@@ -313,6 +315,13 @@ void StaffAlignment::SetOverflowAbove(int overflowAbove)
     }
 }
 
+void StaffAlignment::SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove)
+{
+    if (overflowAbove > m_overflowAbove) {
+        m_overflowBBoxAbove = bboxAbove;
+    }
+}
+
 void StaffAlignment::SetOverlap(int overlap)
 {
     if (overlap > m_overlap) {
@@ -324,6 +333,13 @@ void StaffAlignment::SetOverflowBelow(int overflowBottom)
 {
     if (overflowBottom > m_overflowBelow) {
         m_overflowBelow = overflowBottom;
+    }
+}
+
+void StaffAlignment::SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom)
+{
+    if (overflowBottom > m_overflowBelow) {
+        m_overflowBBoxBelow = bboxBelow;
     }
 }
 
@@ -490,6 +506,15 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
 
     // Add a margin
     overflowSum += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(GetStaffSize());
+
+    BoundingBox *previous = prevAlignment->GetOverflowBBoxBelow();
+    BoundingBox *current = GetOverflowBBoxAbove();
+    if (previous && current) {
+        if ((current->Is(ARTIC) && previous->Is(ARTIC)) || (previous->Is(ARTIC) && current->Is(NOTE))
+            || (current->Is(ARTIC) && previous->Is(NOTE))) {
+            if (current->HorizontalContentOverlap(previous)) overflowSum += doc->GetDrawingUnit(GetStaffSize());
+        }
+    }
 
     return overflowSum;
 }
@@ -836,7 +861,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
             [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
         // if not, then just add a new pair with the YRel of the current positioner
         if (i == grpIdYRel.end()) {
-            grpIdYRel.push_back(std::make_pair(currentGrpId, (*iter)->GetDrawingYRel()));
+            grpIdYRel.push_back({ currentGrpId, (*iter)->GetDrawingYRel() });
         }
         // else, adjust the min or max YRel of the pair if necessary
         else {
@@ -901,10 +926,8 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         if (!curve->HasContentBB()) continue;
         positioners.push_back(curve);
 
-        bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
-        if (adjusted) {
-            params->m_adjusted = true;
-        }
+        slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
+
         if (curve->IsCrossStaff()) {
             params->m_crossStaffSlurs = true;
         }

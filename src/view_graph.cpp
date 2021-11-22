@@ -81,6 +81,24 @@ void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine 
     }
 }
 
+void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThickness)
+{
+    assert(dc); // DC cannot be NULL
+
+    BoundingBox::Swap(y1, y2);
+
+    dc->SetPen(m_currentColour, lineThickness, AxSOLID);
+    dc->SetBrush(m_currentColour, AxTRANSPARENT);
+
+    int width = x2 - x1;
+    int height = y1 - y2;
+
+    dc->DrawEllipse(ToDeviceContextX(x1), ToDeviceContextY(y1), width, height);
+
+    dc->ResetPen();
+    dc->ResetBrush();
+}
+
 /*
  * Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
  * 4=right side; 0=don't fill in any part. FIXME: <fillSection> IS IGNORED.
@@ -104,13 +122,13 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
     return;
 }
 
-void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius = 0)
+void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThickness, int radius = 0)
 {
     assert(dc); // DC cannot be NULL
 
     BoundingBox::Swap(y1, y2);
 
-    const int penWidth = lineThinkness;
+    const int penWidth = lineThickness;
     dc->SetPen(m_currentColour, penWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 
@@ -216,6 +234,32 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
 
     dc->ResetPen();
     dc->ResetBrush();
+}
+
+void View::DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, int height, int width,
+    int horizontalThickness, int verticalThickness)
+{
+    assert(dc);
+
+    const int sign = leftBracket ? 1 : -1;
+
+    DrawFilledRectangle(dc, x, y - horizontalThickness / 2, x + sign * verticalThickness,
+        y + height + horizontalThickness / 2); // vertical
+    DrawFilledRectangle(
+        dc, x, y - horizontalThickness / 2, x + sign * width, y + horizontalThickness / 2); // horizontal bottom
+    DrawFilledRectangle(dc, x, y + height - horizontalThickness / 2, x + sign * width,
+        y + height + horizontalThickness / 2); // horizontal top
+}
+
+void View::DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
+    int horizontalThickness, int verticalThickness)
+{
+    assert(dc);
+
+    this->DrawSquareBracket(
+        dc, true, x - offset, y - offset, height + 2 * offset, bracketWidth, horizontalThickness, verticalThickness);
+    this->DrawSquareBracket(dc, false, x + width + offset, y - offset, height + 2 * offset, bracketWidth,
+        horizontalThickness, verticalThickness);
 }
 
 void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph)

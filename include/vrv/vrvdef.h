@@ -36,7 +36,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 6
+#define VERSION_MINOR 7
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
@@ -315,7 +315,7 @@ typedef std::vector<Note *> ChordCluster;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
 
-typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool>> ArrayOfAligmentArpegTuples;
+typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool>> ArrayOfAlignmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
@@ -578,6 +578,12 @@ enum {
     MARKUP_GRACE_ATTRIBUTE = 4,
     MARKUP_ARTIC_MULTIVAL = 8
 };
+
+//----------------------------------------------------------------------------
+// Layout information
+//----------------------------------------------------------------------------
+
+enum LayoutInformation { LAYOUT_NONE = 0, LAYOUT_ENCODED, LAYOUT_DONE };
 
 //----------------------------------------------------------------------------
 // Bounding box access

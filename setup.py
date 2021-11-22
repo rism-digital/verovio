@@ -31,11 +31,11 @@ class sdist(_sdist):
 
 def get_commit():
     """Utility function to call tools/get_git_commit.sh on any platform."""
-    if os.path.exists("./tools"):
-        print("Running tools/get_git_commit.sh")
-        os.system("bash -c 'cd tools; ./get_git_commit.sh'")
+    if os.path.exists('./tools'):
+        print('running tools/get_git_commit.sh')
+        os.system('bash -c "cd tools; ./get_git_commit.sh"')
     else:
-        print("Can't change to tools directory")
+        print('tools directory is missing')
 
 
 def get_readme():
@@ -46,7 +46,7 @@ def get_readme():
 
 def get_version():
     """Utility function to get the version from the header file and the git sha for dev versions."""
-    version = "0.0.0"
+    version = '0.0.0'
     # If we have a PKG-INFO (e.g., in a sdist) use that
     if os.path.exists('PKG-INFO'):
         with open('PKG-INFO', 'r') as f:
@@ -54,10 +54,10 @@ def get_version():
         for line in lines:
             if line.startswith('Version:'):
                 return line[8:].strip()
-    with open("./include/vrv/vrvdef.h") as header_file:
+    with open('./include/vrv/vrvdef.h') as header_file:
         defines = {}
         for line in header_file:
-            if not line.startswith("#define"):
+            if not line.startswith('#define'):
                 continue
             definition = line.strip().split()
             if len(definition) < 3:
@@ -70,11 +70,11 @@ def get_version():
             (defines['VERSION_MAJOR'], defines['VERSION_MINOR'], defines['VERSION_REVISION']))
         if defines['VERSION_DEV'] == 'true':
             version += '.dev'
-    if version.endswith(".dev"):
+    if version.endswith('.dev'):
         init_sha = subprocess.getoutput(
-            "git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version")
+            'git log -n 1 --pretty=format:%H -- bindings/python/.pypi-version')
         count = subprocess.getoutput(
-            "git rev-list --count HEAD \"^{}\"".format(init_sha))
+            'git rev-list --count HEAD "^{}"'.format(init_sha))
         version += count
     print(version)
     return version
@@ -84,7 +84,7 @@ def get_version():
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
     EXTRA_COMPILE_ARGS += ['-std=c++17',
-                           '-Wno-write-strings', '-Wno-overloaded-virtual']
+                           '-Wno-write-strings', '-Wno-overloaded-virtual', '-g0']
 else:
     EXTRA_COMPILE_ARGS += ['/std:c++17',
                            '-DNO_PAE_SUPPORT']
@@ -160,7 +160,7 @@ setup(name='verovio',
       package_dir={'verovio': './bindings/python',
                    'verovio.data': './data'},
       package_data={
-          'verovio.data': [f for f in os.listdir('./data') if f.endswith(".xml")],
+          'verovio.data': [f for f in os.listdir('./data') if f.endswith('.xml')],
           'verovio.data.Bravura': os.listdir('./data/Bravura'),
           'verovio.data.Gootville': os.listdir('./data/Gootville'),
           'verovio.data.Leipzig': os.listdir('./data/Leipzig'),

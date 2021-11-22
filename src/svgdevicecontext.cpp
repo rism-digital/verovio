@@ -183,6 +183,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     }
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, object->GetClassName(), gClass, primary);
+    AppendAdditionalAttributes(object);
 
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
@@ -292,6 +293,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
     m_currentNode = AppendChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, object->GetClassName(), gClass);
+    AppendAdditionalAttributes(object);
 
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
@@ -399,7 +401,7 @@ void SvgDeviceContext::StartPage()
                        //"g.page-margin{background: pink;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                       "g.ending, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                       "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
                        "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
     }
@@ -810,7 +812,7 @@ void SvgDeviceContext::EndText()
 
 // draw text element with optional parameters to specify the bounding box of the text
 // if the bounding box is specified then append a rect child
-void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
+void SvgDeviceContext::DrawText(const std::string &text, const std::wstring &wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 
@@ -972,6 +974,20 @@ void SvgDeviceContext::AppendIdAndClass(std::string gId, std::string baseClass, 
         baseClass.append(" " + addedClasses);
     }
     m_currentNode.append_attribute("class") = baseClass.c_str();
+}
+
+void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
+{
+    std::pair<std::multimap<ClassId, std::string>::iterator, std::multimap<ClassId, std::string>::iterator> range;
+    range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
+    for (std::multimap<ClassId, std::string>::iterator it = range.first; it != range.second; ++it) {
+        ArrayOfStrAttr attributes;
+        object->GetAttributes(&attributes);
+        for (ArrayOfStrAttr::iterator iter = attributes.begin(); iter != attributes.end(); ++iter) {
+            if (it->second == (*iter).first) // ...and attribute exists in class name, add it to SVG element
+                m_currentNode.append_attribute(("data-" + it->second).c_str()) = (*iter).second.c_str();
+        }
+    }
 }
 
 std::string SvgDeviceContext::GetColour(int colour)

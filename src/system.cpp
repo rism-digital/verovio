@@ -276,7 +276,8 @@ curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, Layer
     assert(layerStart);
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL);
+    Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
+    this->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
 
     curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
     for (auto element : findSpannedLayerElementsParams.m_elements) {

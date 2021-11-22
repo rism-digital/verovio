@@ -88,7 +88,7 @@ AttNoteGesTab::~AttNoteGesTab()
 void AttNoteGesTab::ResetNoteGesTab()
 {
     m_tabCourse = 0;
-    m_tabFret = 0;
+    m_tabFret = -1;
 }
 
 bool AttNoteGesTab::ReadNoteGesTab(pugi::xml_node element)
@@ -128,7 +128,7 @@ bool AttNoteGesTab::HasTabCourse() const
 
 bool AttNoteGesTab::HasTabFret() const
 {
-    return (m_tabFret != 0);
+    return (m_tabFret != -1);
 }
 
 /* include <atttab.fret> */
@@ -165,17 +165,17 @@ void Att::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
         const AttCourseLog *att = dynamic_cast<const AttCourseLog *>(element);
         assert(att);
         if (att->HasTuningStandard()) {
-            attributes->push_back(std::make_pair("tuning.standard", att->CoursetuningToStr(att->GetTuningStandard())));
+            attributes->push_back({ "tuning.standard", att->CoursetuningToStr(att->GetTuningStandard()) });
         }
     }
     if (element->HasAttClass(ATT_NOTEGESTAB)) {
         const AttNoteGesTab *att = dynamic_cast<const AttNoteGesTab *>(element);
         assert(att);
         if (att->HasTabCourse()) {
-            attributes->push_back(std::make_pair("tab.course", att->IntToStr(att->GetTabCourse())));
+            attributes->push_back({ "tab.course", att->IntToStr(att->GetTabCourse()) });
         }
         if (att->HasTabFret()) {
-            attributes->push_back(std::make_pair("tab.fret", att->IntToStr(att->GetTabFret())));
+            attributes->push_back({ "tab.fret", att->IntToStr(att->GetTabFret()) });
         }
     }
 }

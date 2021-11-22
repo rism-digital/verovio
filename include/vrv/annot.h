@@ -30,16 +30,16 @@ public:
     Annot();
     virtual ~Annot();
     // This fails because of the copy contructor in ObjectListInterface (TextListInterface parent)
-    // virtual Object *Clone() const { return new Annot(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Annot"; }
+    // Object *Clone() const override { return new Annot(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Annot"; }
     ///@}
 
     /**
      * Add a text element to an annotation.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //

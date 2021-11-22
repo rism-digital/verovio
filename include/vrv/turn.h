@@ -38,16 +38,16 @@ public:
     ///@{
     Turn();
     virtual ~Turn();
-    virtual Object *Clone() const { return new Turn(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Turn"; }
+    Object *Clone() const override { return new Turn(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Turn"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     /**
@@ -62,12 +62,12 @@ public:
     /**
      * See Object::PrepareDelayedTurns
      */
-    virtual int PrepareDelayedTurns(FunctorParams *functorParams);
+    int PrepareDelayedTurns(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     //
