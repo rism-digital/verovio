@@ -873,9 +873,15 @@ void View::DrawBarLine(
     }
 
     switch (form) {
-        case BARRENDITION_single: DrawVerticalSegmentedLine(dc, x, line, barLineWidth); break;
-        case BARRENDITION_dashed: DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength); break;
-        case BARRENDITION_dotted: DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength); break;
+        case BARRENDITION_single: //
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            break;
+        case BARRENDITION_dashed: //
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
+            break;
+        case BARRENDITION_dotted: //
+            DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
+            break;
         case BARRENDITION_rptend:
             DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineThickWidth);
@@ -890,7 +896,9 @@ void View::DrawBarLine(
             DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
             DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineWidth);
             break;
-        case BARRENDITION_invis: barLine->SetEmptyBB(); break;
+        case BARRENDITION_invis: //
+            barLine->SetEmptyBB();
+            break;
         case BARRENDITION_end:
             DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             DrawVerticalSegmentedLine(dc, x2 + barLinesSum / 2, line, barLineThickWidth);
