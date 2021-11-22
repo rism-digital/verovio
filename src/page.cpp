@@ -409,16 +409,21 @@ void Page::LayOutHorizontally()
     this->Process(&adjustTupletsX, &adjustTupletsXParams);
 
     // Prevent a margin overflow
-    Functor adjustXOverlfow(&Object::AdjustXOverflow);
-    Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
+    Functor adjustXOverflow(&Object::AdjustXOverflow);
+    Functor adjustXOverflowEnd(&Object::AdjustXOverflowEnd);
     AdjustXOverflowParams adjustXOverflowParams(doc->GetDrawingUnit(100));
-    this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
+    this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
 
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams(doc);
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+
+    // Calculate the slur direction
+    PrepareSlursParams prepareSlursParams(doc);
+    Functor prepareSlurs(&Object::PrepareSlurs);
+    this->Process(&prepareSlurs, &prepareSlursParams);
 }
 
 void Page::LayOutVertically()

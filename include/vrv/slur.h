@@ -102,12 +102,6 @@ public:
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
     ///@}
 
-    /**
-     * Get preferred curve direction based on number of conditions: presence of other layers, stem direction, etc.
-     */
-    curvature_CURVEDIR GetPreferredCurveDirection(
-        Doc *doc, Layer *layer, LayerElement *layerElement, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
-
     //----------//
     // Functors //
     //----------//
@@ -117,7 +111,24 @@ public:
      */
     int ResetDrawing(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::PrepareSlurs
+     */
+    int PrepareSlurs(FunctorParams *functorParams) override;
+
 private:
+    /**
+     * Helper for calculating the slur direction
+     */
+    ///@{
+    // Get layer by only considering the slur boundary
+    std::pair<Layer *, LayerElement *> GetBoundaryLayer();
+    // Get cross staff by only considering the slur boundary
+    Staff *GetBoundaryCrossStaff();
+    // Get preferred curve direction based on various conditions
+    curvature_CURVEDIR GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
+    ///@}
+
     /**
      * Helper for calculating the initial slur start and end points
      */
