@@ -2573,7 +2573,6 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         comp.x = element->GetFacsimileInterface()->GetZone()->GetUlx();
         comp.y = element->GetFacsimileInterface()->GetZone()->GetUly();
     }
-
     else if (element->Is(SYLLABLE)) {
         int ulx, uly, lrx, lry;
         LayerElement *layerElement = dynamic_cast<LayerElement *>(element);
