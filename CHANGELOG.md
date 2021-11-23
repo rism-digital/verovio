@@ -4,9 +4,6 @@
 
 ## [3.7.0] - 2021-11-22
 * Complete refactoring of the Plaine and Easie parser
-* Support for `arpeg@enclose` (@eNote-GmBH)
-* Support for `clef@enclose` (@eNote-GmBH)
-* Support for `metersig@enclose` (@eNote-GmBH)
 * Support for `multiRest@num.place` (@eNote-GmBH)
 * Support for `meterSig@enclose`, `clef@enclose` and `arpeg@enclose` (@eNote-GmBH)
 * Support for `accid@loc` and `accid@oloc`/`accid@ploc` (@eNote-GmBH)
