@@ -67,8 +67,8 @@ public:
 
 private:
     // Update tie positioning based overlaps with accidentals in cases with enharmonic ties
-    bool AdjustEnharmonicTies(FloatingCurvePositioner *curve, Point bezier[4], Note *startNote, Note *endNote,
-        curvature_CURVEDIR drawingCurveDir, int drawingRadius);
+    bool AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote,
+        Note *endNote, curvature_CURVEDIR drawingCurveDir);
 
     // Calculate initial position X position and return stem direction of the startNote
     void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
