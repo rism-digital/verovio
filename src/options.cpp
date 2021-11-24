@@ -1269,6 +1269,10 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
+    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in unit");
+    m_multiRestThickness.Init(2.0, 0.50, 6.00);
+    this->Register(&m_multiRestThickness, "multiRestThickness", &m_generalLayout);
+
     m_octaveAlternativeSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
     m_octaveAlternativeSymbols.Init(false);
     this->Register(&m_octaveAlternativeSymbols, "octaveAlternativeSymbols", &m_generalLayout);
@@ -1698,7 +1702,8 @@ void Options::Sync()
         { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
         { "lyricLineThickness", &m_lyricLineThickness }, //
         { "tupletBracketThickness", &m_tupletBracketThickness }, //
-        { "textEnclosureThickness", &m_textEnclosureThickness } //
+        { "textEnclosureThickness", &m_textEnclosureThickness }, //
+        { "hBarThickness", &m_multiRestThickness } //
     };
 
     for (const auto &pair : engravingDefaults) {
