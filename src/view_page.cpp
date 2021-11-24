@@ -1226,9 +1226,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
                 fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
                 fullLine.UpdateContentBBoxX(x1, x2);
                 int margin = m_doc->GetDrawingUnit(100) / 2;
-                ListOfObjects notes;
-                ClassIdComparison matchClassId(NOTE);
-                staff->FindAllDescendantsByComparison(&notes, &matchClassId);
+                ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
                 for (auto &note : notes) {
                     if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
                         line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);

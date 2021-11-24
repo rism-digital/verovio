@@ -833,9 +833,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
         // Find the first note on the other layer
         Alignment *alignment = this->GetAlignment();
         const int currentLayerN = abs(this->GetAlignmentLayerN());
-        ListOfObjects notes;
-        ClassIdComparison noteCmp(NOTE);
-        alignment->FindAllDescendantsByComparison(&notes, &noteCmp, 2);
+        ListOfObjects notes = alignment->FindAllDescendantsByType(NOTE, false);
         auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN](Object *obj) {
             const int otherLayerN = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
             return (currentLayerN != otherLayerN);

@@ -232,7 +232,7 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
-    int GetChildCount(const ClassId classId, int deepth);
+    int GetChildCount(const ClassId classId, int depth);
     ///@}
 
     /**
@@ -348,7 +348,7 @@ public:
     /**
      * Look for all Objects of a class and return its position (-1 if not found)
      */
-    int GetDescendantIndex(const Object *child, const ClassId classId, int deepth);
+    int GetDescendantIndex(const Object *child, const ClassId classId, int depth);
 
     /**
      * Insert an element at the idx position.

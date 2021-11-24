@@ -371,9 +371,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     std::vector<int> staffList;
 
     // First get all the staffGrps
-    ClassIdComparison matchType(STAFFGRP);
-    ListOfObjects staffGrps;
-    scoreDef->FindAllDescendantsByComparison(&staffGrps, &matchType);
+    ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &staffGrp : staffGrps) {
@@ -398,9 +396,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 Staff *Measure::GetTopVisibleStaff()
 {
     Staff *staff = NULL;
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantsByComparison(&staves, &matchType, 1);
+    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (auto &child : staves) {
         staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -415,9 +411,7 @@ Staff *Measure::GetTopVisibleStaff()
 Staff *Measure::GetBottomVisibleStaff()
 {
     Staff *bottomStaff = NULL;
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantsByComparison(&staves, &matchType, 1);
+    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (const auto child : staves) {
         Staff *staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -625,9 +619,7 @@ void Measure::SetInvisibleStaffBarlines(
 
 std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEndpoints()
 {
-    ListOfObjects children;
-    ClassIdComparison comp(TIE);
-    this->FindAllDescendantsByComparison(&children, &comp);
+    ListOfObjects children = this->FindAllDescendantsByType(TIE);
 
     std::vector<std::pair<LayerElement *, LayerElement *>> endpoints;
     for (Object *object : children) {

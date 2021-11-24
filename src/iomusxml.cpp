@@ -267,9 +267,7 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
 {
     // Since AddClef handles #sameas clef only for the future layers, we need to check any previous existing layers for
     // the same staff to see if we need to insert #sameas clef to them.
-    ListOfObjects staffLayers;
-    ClassIdComparison cmp(LAYER);
-    staff->FindAllDescendantsByComparison(&staffLayers, &cmp);
+    ListOfObjects staffLayers = staff->FindAllDescendantsByType(LAYER, false);
     for (const auto listLayer : staffLayers) {
         Layer *otherLayer = vrv_cast<Layer *>(listLayer);
         if (m_layerTimes.find(otherLayer) == m_layerTimes.end()) continue;

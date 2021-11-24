@@ -361,11 +361,9 @@ int Object::GetChildCount(const ClassId classId) const
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
-int Object::GetChildCount(const ClassId classId, int deepth)
+int Object::GetChildCount(const ClassId classId, int depth)
 {
-    ListOfObjects objects;
-    ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantsByComparison(&objects, &matchClassId);
+    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     return (int)objects.size();
 }
 
@@ -605,9 +603,7 @@ Object *Object::GetChild(int idx) const
 
 Object *Object::GetChild(int idx, const ClassId classId)
 {
-    ListOfObjects objects;
-    ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantsByComparison(&objects, &matchClassId, 1);
+    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
@@ -717,11 +713,9 @@ int Object::GetChildIndex(const Object *child)
     return -1;
 }
 
-int Object::GetDescendantIndex(const Object *child, const ClassId classId, int deepth)
+int Object::GetDescendantIndex(const Object *child, const ClassId classId, int depth)
 {
-    ListOfObjects objects;
-    ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantsByComparison(&objects, &matchClassId);
+    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     int i = 0;
     for (auto &object : objects) {
         if (child == object) return i;

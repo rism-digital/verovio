@@ -486,9 +486,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         Note *note = new Note();
         chord->AddChild(note);
 
-        ListOfObjects artics;
-        ClassIdComparison articComparison(ARTIC);
-        currentNote->FindAllDescendantsByComparison(&artics, &articComparison);
+        ListOfObjects artics = currentNote->FindAllDescendantsByType(ARTIC);
         for (auto &artic : artics) {
             artic->MoveItselfTo(chord);
         }
@@ -541,9 +539,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             chord->DetachChild(otherNote->GetIdx());
             parent->ReplaceChild(chord, otherNote);
 
-            ListOfObjects artics;
-            ClassIdComparison articComparison(ARTIC);
-            chord->FindAllDescendantsByComparison(&artics, &articComparison, 1);
+            ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
             for (auto &artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }

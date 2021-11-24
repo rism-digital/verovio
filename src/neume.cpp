@@ -90,9 +90,7 @@ bool Neume::IsLastInNeume(LayerElement *element)
 
 NeumeGroup Neume::GetNeumeGroup()
 {
-    ListOfObjects children;
-    ClassIdComparison ac(NC);
-    this->FindAllDescendantsByComparison(&children, &ac);
+    ListOfObjects children = this->FindAllDescendantsByType(NC);
 
     auto iter = children.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
@@ -129,9 +127,7 @@ NeumeGroup Neume::GetNeumeGroup()
 std::vector<int> Neume::GetPitchDifferences()
 {
     std::vector<int> pitchDifferences;
-    ListOfObjects ncChildren;
-    ClassIdComparison ac(NC);
-    this->FindAllDescendantsByComparison(&ncChildren, &ac);
+    ListOfObjects ncChildren = this->FindAllDescendantsByType(NC);
 
     pitchDifferences.reserve(ncChildren.size() - 1);
 
@@ -152,9 +148,7 @@ std::vector<int> Neume::GetPitchDifferences()
 
 bool Neume::GenerateChildMelodic()
 {
-    ListOfObjects children;
-    ClassIdComparison ac(NC);
-    this->FindAllDescendantsByComparison(&children, &ac);
+    ListOfObjects children = this->FindAllDescendantsByType(NC);
 
     // Get the first neume component of the neume
     auto iter = children.begin();

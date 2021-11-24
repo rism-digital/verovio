@@ -149,9 +149,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
     Beam *beam = this->GetBracketAlignedBeam();
     if (beam) {
         // Check for possible articulations
-        ListOfObjects artics;
-        ClassIdsComparison comparison({ ARTIC });
-        this->FindAllDescendantsByComparison(&artics, &comparison);
+        ListOfObjects artics = this->FindAllDescendantsByType(ARTIC);
 
         int articPadding = 0;
         for (auto &artic : artics) {
@@ -176,9 +174,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
 
         // Check for overlap with rest elements. This might happen when tuplet has rest and beam children that are
         // on the same level in encoding - there might be overlap of bracket with rest in that case
-        ListOfObjects descendants;
-        ClassIdsComparison rest({ REST });
-        this->FindAllDescendantsByComparison(&descendants, &rest);
+        ListOfObjects descendants = this->FindAllDescendantsByType(REST);
 
         int restAdjust = 0;
         const int bracketRel = tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin;

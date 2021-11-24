@@ -592,9 +592,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
     // Find closest valid staff
     if (staffId == "auto") {
-        ListOfObjects staves;
-        ClassIdComparison ac(STAFF);
-        m_doc->FindAllDescendantsByComparison(&staves, &ac);
+        ListOfObjects staves = m_doc->FindAllDescendantsByType(STAFF, false);
         std::vector<Object *> stavesVector(staves.begin(), staves.end());
 
         ClosestBB comp;
@@ -651,9 +649,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         newStaff->AddChild(newLayer);
 
         // Find index to insert new staff
-        ListOfObjects staves;
-        ClassIdComparison ac(STAFF);
-        parent->FindAllDescendantsByComparison(&staves, &ac);
+        ListOfObjects staves = parent->FindAllDescendantsByType(STAFF, false);
         std::vector<Object *> stavesVector(staves.begin(), staves.end());
         stavesVector.push_back(newStaff);
         StaffSort staffSort;
@@ -2179,9 +2175,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     Nc *prevNc = NULL;
 
     // Get children of neume. Keep the first child and delete the others.
-    ClassIdComparison ac(NC);
-    ListOfObjects children;
-    el->FindAllDescendantsByComparison(&children, &ac);
+    ListOfObjects children = el->FindAllDescendantsByType(NC);
     for (auto it = children.begin(); it != children.end(); ++it) {
         if (children.begin() == it) {
             firstChild = dynamic_cast<Nc *>(*it);
@@ -2386,9 +2380,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    ListOfObjects stavesList;
-    ClassIdComparison ac(STAFF);
-    m_doc->FindAllDescendantsByComparison(&stavesList, &ac);
+    ListOfObjects stavesList = m_doc->FindAllDescendantsByType(STAFF, false);
 
     std::vector<Object *> staves(stavesList.begin(), stavesList.end());
 

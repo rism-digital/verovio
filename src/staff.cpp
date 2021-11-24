@@ -475,9 +475,7 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
     matchTypeLayer.ReverseComparison();
     this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
 
-    ListOfObjects mRests;
-    ClassIdComparison matchTypeMRest(MREST);
-    this->FindAllDescendantsByComparison(&mRests, &matchTypeMRest);
+    ListOfObjects mRests = this->FindAllDescendantsByType(MREST);
 
     // Show the staff only if no layer with content or only mRests
     if (layers.empty() || (mRests.size() != layers.size())) {
@@ -649,10 +647,7 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
 
 int Staff::CalcStem(FunctorParams *)
 {
-    ClassIdComparison isLayer(LAYER);
-    ListOfObjects layers;
-    this->FindAllDescendantsByComparison(&layers, &isLayer);
-
+    ListOfObjects layers = this->FindAllDescendantsByType(LAYER, false);
     if (layers.empty()) {
         return FUNCTOR_CONTINUE;
     }

@@ -59,9 +59,7 @@ int Surface::GetMaxX()
 {
     if (HasLrx()) return GetLrx();
     int max = 0;
-    ClassIdComparison ac(ZONE);
-    ListOfObjects zones;
-    FindAllDescendantsByComparison(&zones, &ac);
+    ListOfObjects zones = this->FindAllDescendantsByType(ZONE);
     for (auto iter = zones.begin(); iter != zones.end(); ++iter) {
         Zone *zone = vrv_cast<Zone *>(*iter);
         assert(zone);
@@ -74,9 +72,7 @@ int Surface::GetMaxY()
 {
     if (HasLry()) return GetLry();
     int max = 0;
-    ClassIdComparison ac(ZONE);
-    ListOfObjects zones;
-    FindAllDescendantsByComparison(&zones, &ac);
+    ListOfObjects zones = this->FindAllDescendantsByType(ZONE);
     for (auto iter = zones.begin(); iter != zones.end(); ++iter) {
         Zone *zone = vrv_cast<Zone *>(*iter);
         assert(zone);
