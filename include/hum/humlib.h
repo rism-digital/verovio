@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Nov 16 20:30:13 PST 2021
+// Last Modified: Wed Nov 24 05:49:22 CET 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -7014,6 +7014,9 @@ class Tool_mei2hum : public HumTool {
 		void   parseReh             (xml_node reh, HumNum starttime);
 		HumNum parseLayer           (xml_node layer, HumNum starttime, vector<bool>& layerPresent);
 		HumNum parseLayer_mensural  (xml_node layer, HumNum starttime, vector<bool>& layerPresent);
+		HumNum parseCorr_mensural   (xml_node corr, HumNum starttime);
+		HumNum parseChoice_mensural (xml_node corr, HumNum starttime);
+		HumNum parseLigature        (xml_node staff, HumNum starttime);
 		int    extractStaffCountByFirstMeasure    (xml_node element);
 		int    extractStaffCountByScoreDef        (xml_node element);
 		HumNum parseRest            (xml_node chord, HumNum starttime);
@@ -7636,6 +7639,7 @@ class Tool_msearch : public HumTool {
 		                            vector<NoteCell*>& match);
 		void    markMatch          (HumdrumFile& infile,
 		                            vector<NoteCell*>& match);
+		void    storeMatch         (vector<NoteCell*>& match);
 		void    markTextMatch      (HumdrumFile& infile, TextInfo& word);
 		void    fillWords          (HumdrumFile& infile,
 		                            vector<TextInfo*>& words);
@@ -7644,6 +7648,7 @@ class Tool_msearch : public HumTool {
 		void    printQuery         (vector<MSearchQueryToken>& query);
 		void    addMusicSearchSummary(HumdrumFile& infile, int mcount, const std::string& marker);
 		void    addTextSearchSummary(HumdrumFile& infile, int mcount, const std::string& marker);
+		void    addMatch           (HumdrumFile& infile, vector<NoteCell*>& match);
 		int     makeBase40Interval (int diatonic, const std::string& alteration);
 		std::string convertPitchesToIntervals(const std::string& input);
 		void    markNote           (HTp token, int index);
@@ -7661,6 +7666,8 @@ class Tool_msearch : public HumTool {
 		bool        m_quietQ     = false;
 		bool        m_debugQ     = false;
 		bool        m_nooverlapQ = false;
+		std::vector<int> m_barnums;
+		std::vector<std::vector<NoteCell*>> m_matches;
 		std::vector<SonorityDatabase> m_sonorities;
 		std::vector<bool> m_sonoritiesChecked;
 		std::vector<pair<HTp, int>> m_tomark;

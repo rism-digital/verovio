@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Nov 16 20:30:13 PST 2021
+// Last Modified: Wed Nov 24 05:49:22 CET 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3399,7 +3399,7 @@ string Convert::getReferenceKeyMeaning(const string& token) {
 		key         = hre.getMatch(1);
 		translation = hre.getMatch(2);
 	}
-		
+
 	// extract number qualifier
 	if (hre.search(key, "^(.*)(\\d+)$")) {
 		key     = hre.getMatch(1);
@@ -3524,7 +3524,7 @@ string Convert::getReferenceKeyMeaning(const string& token) {
 			else if (key == "RNB") { meaning = "Encoding note"; }
 			else if (key == "RWG") { meaning = "Encoding warning"; }
 			break;
-		
+
 		case 'T':	// translator
 			if      (key == "TRN") { meaning = "Translator"; }
 			break;
@@ -48986,7 +48986,7 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 			return output;
 		}
 	}
-		
+
 	if (hasdigit) {
 		char rv[3] = {0};
 		char gv[3] = {0};
@@ -49164,7 +49164,7 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 //            http://netdancer.com/rgbblk.htm
 //            http://www.htmlhelp.com/cgi-bin/color.cgi?rgb=FFFFFF
 //            http://www.brobstsystems.com/colors1.htm
-	
+
 	return output;
 }
 
@@ -56245,7 +56245,7 @@ void Tool_colorgroups::initialize(void) {
 void Tool_colorgroups::processFile(HumdrumFile& infile) {
 	Tool_shed shed;
 	vector<string> argv;
-	
+
 	string command = "s/grp:A/color:";
 	command += getString("A");
 	command += "/I; ";
@@ -69161,7 +69161,7 @@ bool Tool_gasparize::insertEditText(const string& text, HumdrumFile& infile, int
 	}
 	token = infile.token(line, field);
 	token->setText(text);
-	
+
 	return true;
 }
 
@@ -75105,6 +75105,59 @@ HumNum Tool_mei2hum::parseStaff_mensural(xml_node staff, HumNum starttime) {
 
 //////////////////////////////
 //
+// Tool_mei2hum::parseLigature -- Process an MEI ligature element.
+//
+
+HumNum Tool_mei2hum::parseLigature(xml_node ligature, HumNum starttime) {
+	NODE_VERIFY(ligature, starttime);
+	MAKE_CHILD_LIST(children, ligature);
+
+	string dummy;
+
+	// Same parsing as layer:
+	xml_node layer = ligature;
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		if (nodename == "note") {
+			starttime = parseNote_mensural(children[i], xml_node(NULL), dummy, starttime, 0);
+		} else if (nodename == "ligature") {
+			starttime = parseLigature(children[i], starttime);
+		} else if (nodename == "choice") {
+			starttime = parseChoice_mensural(children[i], starttime);
+		} else if (nodename == "chord") {
+			// starttime = parseChord(children[i], starttime, 0);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "rest") {
+			starttime = parseRest_mensural(children[i], starttime);
+		} else if (nodename == "space") {
+			starttime = parseRest_mensural(children[i], starttime);
+		} else if (nodename == "mRest") {
+			// starttime = parseMRest(children[i], starttime);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "beam") {
+			// starttime = parseBeam(children[i], starttime);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "tuplet") {
+			// starttime = parseTuplet(children[i], starttime);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "clef") {
+			parseClef(children[i], starttime);
+		} else if (nodename == "barLine") {
+			parseBarline(children[i], starttime);
+		} else if (nodename == "dot") {
+			// dot is processed in parseNote_mensural;
+		} else {
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		}
+	}
+
+	return starttime;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_mei2hum::parseLayer --
 //
 
@@ -75258,6 +75311,10 @@ HumNum Tool_mei2hum::parseLayer_mensural(xml_node layer, HumNum starttime, vecto
 		string nodename = children[i].name();
 		if (nodename == "note") {
 			starttime = parseNote_mensural(children[i], xml_node(NULL), dummy, starttime, 0);
+		} else if (nodename == "ligature") {
+			starttime = parseLigature(children[i], starttime);
+		} else if (nodename == "choice") {
+			starttime = parseChoice_mensural(children[i], starttime);
 		} else if (nodename == "chord") {
 			// starttime = parseChord(children[i], starttime, 0);
 			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
@@ -75290,6 +75347,82 @@ HumNum Tool_mei2hum::parseLayer_mensural(xml_node layer, HumNum starttime, vecto
 	//}
 
 	m_currentLayer = 0;
+	return starttime;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseChoice_mensural -- Process an MEI choice element (within mensural music).
+//
+
+HumNum Tool_mei2hum::parseChoice_mensural(xml_node choice, HumNum starttime) {
+	NODE_VERIFY(choice, starttime);
+	MAKE_CHILD_LIST(children, choice);
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		if (nodename == "corr") {
+			starttime = parseCorr_mensural(children[i], starttime);
+		} else if (nodename == "sic") {
+			// Ignoring sic in conversion (at least for now)
+		} else {
+			cerr << DKHTP << choice.name() << "/" << nodename << CURRLOC << endl;
+		}
+	}
+	return starttime;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseCorr_mensural -- Process an MEI corr element (within mensural music).
+//
+
+HumNum Tool_mei2hum::parseCorr_mensural(xml_node corr, HumNum starttime) {
+	NODE_VERIFY(corr, starttime);
+	MAKE_CHILD_LIST(children, corr);
+
+	string dummy;
+
+	// Same parsing as layer:
+	xml_node layer = corr;
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		if (nodename == "note") {
+			starttime = parseNote_mensural(children[i], xml_node(NULL), dummy, starttime, 0);
+		} else if (nodename == "ligature") {
+			starttime = parseLigature(children[i], starttime);
+		} else if (nodename == "choice") {
+			starttime = parseChoice_mensural(children[i], starttime);
+		} else if (nodename == "chord") {
+			// starttime = parseChord(children[i], starttime, 0);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "rest") {
+			starttime = parseRest_mensural(children[i], starttime);
+		} else if (nodename == "space") {
+			starttime = parseRest_mensural(children[i], starttime);
+		} else if (nodename == "mRest") {
+			// starttime = parseMRest(children[i], starttime);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "beam") {
+			// starttime = parseBeam(children[i], starttime);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "tuplet") {
+			// starttime = parseTuplet(children[i], starttime);
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		} else if (nodename == "clef") {
+			parseClef(children[i], starttime);
+		} else if (nodename == "barLine") {
+			parseBarline(children[i], starttime);
+		} else if (nodename == "dot") {
+			// dot is processed in parseNote_mensural;
+		} else {
+			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
+		}
+	}
+
 	return starttime;
 }
 
@@ -79619,7 +79752,7 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 		// nothing to do
 		return;
 	}
-	
+
 	switchModernOriginal(infile);
 }
 
@@ -80009,7 +80142,7 @@ void SonorityDatabase::buildDatabase(HLp line) {
 	}
 	int lowesti = 0;
 	int lowest12 = 1000;
-	
+
 	for (int i=0; i<line->getFieldCount(); i++) {
 		HTp token = m_line->token(i);
 		if (!token->isKern()) {
@@ -80184,6 +80317,7 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 }
 
 
+
 //////////////////////////////
 //
 // Tool_msearch::initialize --
@@ -80339,6 +80473,7 @@ void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
 }
 
 
+
 //////////////////////////////
 //
 // Tool_msearch::printQuery --
@@ -80351,6 +80486,7 @@ void Tool_msearch::printQuery(vector<MSearchQueryToken>& query) {
 }
 
 
+
 //////////////////////////////
 //
 // Tool_msearch::doMusicSearch -- do a basic melodic search of all parts.
@@ -80358,6 +80494,8 @@ void Tool_msearch::printQuery(vector<MSearchQueryToken>& query) {
 
 void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 		vector<MSearchQueryToken>& query) {
+
+	m_matches.clear();
 
 	if (m_debugQ) {
 		printQuery(query);
@@ -80369,7 +80507,7 @@ void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 		grid.getNoteAndRestAttacks(attacks[i], i);
 	}
 
-	vector<NoteCell*>  match;
+	vector<NoteCell*> match;
 	int mcount = 0;
 	for (int i=0; i<(int)attacks.size(); i++) {
 		for (int j=0; j<(int)attacks[i].size(); j++) {
@@ -80381,6 +80519,7 @@ void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 			if (status && !match.empty()) {
 				mcount++;
 				markMatch(infile, match);
+				storeMatch(match);
 				// cerr << "FOUND MATCH AT " << i << ", " << j << endl;
 				// markNotes(attacks[i], j, (int)query.size());
 			}
@@ -80401,12 +80540,16 @@ void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 }
 
 
+
 //////////////////////////////
 //
 // Tool_msearch::addMusicSearchSummary --
 //
 
 void Tool_msearch::addMusicSearchSummary(HumdrumFile& infile, int mcount, const string& marker) {
+
+	m_barnums = infile.getMeasureNumbers();
+
 	infile.appendLine("!!@@BEGIN: MUSIC_SEARCH_RESULT");
 	string line;
 
@@ -80476,8 +80619,45 @@ void Tool_msearch::addMusicSearchSummary(HumdrumFile& infile, int mcount, const 
 		infile.appendLine(line);
 	}
 
-	// Print match location here.
+	// Print music match location here.
+	for (int i=0; i<(int)m_matches.size(); i++) {
+		addMatch(infile, m_matches[i]);
+	}
+
 	infile.appendLine("!!@@END: MUSIC_SEARCH_RESULT");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::addMatch --
+//
+// Todo:
+//		* add duration of match
+//
+
+void Tool_msearch::addMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
+	if (match.empty()) {
+		return;
+	}
+	int startIndex   = match.at(0)->getLineIndex();
+	int endIndex     = match.back()->getLineIndex();
+	int startMeasure = m_barnums.at(startIndex);
+	int endMeasure   = m_barnums.at(endIndex);
+
+	infile.appendLine("!!@@BEGIN:\tMATCH");
+
+	string measure = "!!@MEASURE: ";
+
+	measure += to_string(startMeasure);
+	if (startMeasure != endMeasure) {
+		measure += " ";
+		measure += to_string(endMeasure);
+	}
+	infile.appendLine(measure);
+
+	infile.appendLine("!!@@END:\tMATCH");
 }
 
 
@@ -80860,7 +81040,7 @@ bool Tool_msearch::checkForMusicMatch(vector<NoteCell*>& notes, int index,
 		//
 		// PITCH
 		//
-			
+
 		if (!query[i].anypitch) {
 			double qpitch = query[i].pc;
 			double npitch = 0;
@@ -80908,7 +81088,7 @@ bool Tool_msearch::checkForMusicMatch(vector<NoteCell*>& notes, int index,
 		// and continue to next note if needed.
 		match.push_back(notes[currindex]);
 	}
-	
+
 	// Add extra token for marking tied notes at end of match
 	if (index + (int)query.size() < (int)notes.size()) {
 		match.push_back(notes[index + (int)query.size() - c]);
@@ -81222,7 +81402,7 @@ void Tool_msearch::fillMusicQueryRhythm(vector<MSearchQueryToken>& query,
 		output += input[i];
 		output += ' ';
 	}
-	
+
 	// remove spaces to allow rhythms:
 	// 64 => 64
    // 32 => 32
@@ -81271,7 +81451,7 @@ string Tool_msearch::convertPitchesToIntervals(const string& input) {
 		}
 	}
 	vector<string> pitches;
-	
+
 	for (int i=0; i<(int)input.size(); i++) {
 		char ch = tolower(input[i]);
 		if (ch >= 'a' && ch <= 'g') {
@@ -81474,7 +81654,6 @@ void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 		query.push_back(temp);
 		temp.clear();
 	}
-
 
 }
 
@@ -81826,7 +82005,6 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 // checkVerticalOnly --
 //
 
-
 bool Tool_msearch::checkVerticalOnly(const string& input) {
 	if (input.empty()) {
 		return false;
@@ -81850,6 +82028,22 @@ bool Tool_msearch::checkVerticalOnly(const string& input) {
 		}
 	}
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::storeMatch -- Store a search result for later printing
+//    in the input file footer.
+//
+
+void Tool_msearch::storeMatch(vector<NoteCell*>& match) {
+	m_matches.resize(m_matches.size() + 1);
+	m_matches.back().resize(match.size());
+	for (int i=0; i<(int)match.size(); i++) {
+		m_matches.back().at(i) = match.at(i);
+	}
 }
 
 
@@ -82112,7 +82306,7 @@ bool Tool_musedata2hum::convertPart(HumGrid& outdata, MuseDataSet& mds, int inde
 	m_lastbarnum = -1;
 	m_part = index;
 	m_maxstaff = (int)mds.getPartCount();
-	
+
 	bool status = true;
 	int i = 0;
 	while (i < part.getLineCount()) {
@@ -82275,7 +82469,7 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 		// convert to an index:
 		layer = layer - 1;
 	}
-	
+
 	HumNum timestamp = mr.getAbsBeat();
 	// cerr << "CONVERTING LINE " << timestamp << "\t" << mr << endl;
 	string tok;
@@ -95157,7 +95351,7 @@ string Tool_shed::getExInterp(const string& value) {
 
 void Tool_shed::parseExpression(const string& expression) {
 	int state = 0;
-	
+
 	m_searches.clear();
 	m_replaces.clear();
 	m_options.clear();
@@ -95362,7 +95556,7 @@ void Tool_shed::searchAndReplaceBarline(HumdrumFile& infile) {
 		}
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp token = infile.token(i, j);
-			if (token->isNull()) {	
+			if (token->isNull()) {
 				// Don't mess with null interpretations
 				continue;
 			}
@@ -95406,7 +95600,7 @@ void Tool_shed::searchAndReplaceInterpretation(HumdrumFile& infile) {
 		}
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp token = infile.token(i, j);
-			if (token->isNull()) {	
+			if (token->isNull()) {
 				// Don't mess with null interpretations
 				continue;
 			}
@@ -95446,7 +95640,7 @@ void Tool_shed::searchAndReplaceLocalComment(HumdrumFile& infile) {
 		}
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp token = infile.token(i, j);
-			if (token->isNull()) {	
+			if (token->isNull()) {
 				// Don't mess with null interpretations
 				continue;
 			}
@@ -95611,7 +95805,7 @@ void Tool_shed::searchAndReplaceExinterp(HumdrumFile& infile) {
 		}
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp token = infile.token(i, j);
-			if (token->isNull()) {	
+			if (token->isNull()) {
 				// Don't mess with null interpretations
 				continue;
 			}
