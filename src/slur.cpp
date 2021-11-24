@@ -187,10 +187,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     }
     else {
         for (LayerElement *element : { this->GetStart(), this->GetEnd() }) {
-            int layerN = element->GetAlignmentLayerN();
-            if (layerN < 0) {
-                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
-            }
+            const int layerN = element->GetOriginalLayerN();
             layersN.insert(layerN);
         }
     }
@@ -200,10 +197,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     // Check whether outside layers exist
     const bool hasOutsideLayers = std::any_of(findSpannedLayerElementsParams.m_elements.cbegin(),
         findSpannedLayerElementsParams.m_elements.cend(), [minLayerN, maxLayerN](LayerElement *element) {
-            int layerN = element->GetAlignmentLayerN();
-            if (layerN < 0) {
-                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
-            }
+            const int layerN = element->GetOriginalLayerN();
             return ((layerN < minLayerN) || (layerN > maxLayerN));
         });
 
@@ -233,10 +227,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         for (Object *object : notes) {
             Note *note = vrv_cast<Note *>(object);
             assert(note);
-            int layerN = note->GetAlignmentLayerN();
-            if (layerN < 0) {
-                layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
-            }
+            const int layerN = note->GetOriginalLayerN();
             if (layerN == maxLayerN) {
                 minPitch = std::min(note->GetDiatonicPitch(), minPitch);
             }
@@ -249,10 +240,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         const bool layersAreSeparated
             = std::all_of(notes.cbegin(), notes.cend(), [minLayerN, maxLayerN, minPitch, maxPitch](Object *object) {
                   Note *note = vrv_cast<Note *>(object);
-                  int layerN = note->GetAlignmentLayerN();
-                  if (layerN < 0) {
-                      layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
-                  }
+                  const int layerN = note->GetOriginalLayerN();
                   if (layerN < minLayerN) {
                       return (note->GetDiatonicPitch() > maxPitch);
                   }
