@@ -575,14 +575,14 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
     }
     else if (element->Is(DIVLINE)) {
-        DivLine *divline = dynamic_cast<DivLine *>(element);
-        if (!divline->HasFacs()) {
-            LogError("Divline dragging is only supported for divline with facsimiles!");
+        DivLine *divLine = dynamic_cast<DivLine *>(element);
+        if (!divLine->HasFacs()) {
+            LogError("Divline dragging is only supported for divLine with facsimiles!");
             m_infoObject.import("status", "FAILURE");
-            m_infoObject.import("message", "Divline dragging is only supported for divline with facsimiles.");
+            m_infoObject.import("message", "DivLine dragging is only supported for divLine with facsimiles.");
             return false;
         }
-        FacsimileInterface *fi = (*divline).GetFacsimileInterface();
+        FacsimileInterface *fi = (*divLine).GetFacsimileInterface();
         assert(fi);
         if (fi->GetZone() != NULL) {
             fi->GetZone()->ShiftByXY(x, -y);
@@ -1017,42 +1017,42 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
         m_infoObject.import("uuid", accid->GetUuid());
     }
-    else if(elementType == "divline"){
-        DivLine *divline = new DivLine();
-        data_DIVLINE divlineTypeW = DIVLINE_NONE;
+    else if(elementType == "divLine"){
+        DivLine *divLine = new DivLine();
+        data_DIVLINE divLineTypeW = DIVLINE_NONE;
 
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "form"){
                 if (it->second == "maxima"){
-                    divlineTypeW = DIVLINE_maxima;
+                    divLineTypeW = DIVLINE_maxima;
                     break;
                 } else if (it->second == "maior"){
-                    divlineTypeW = DIVLINE_maior;
+                    divLineTypeW = DIVLINE_maior;
                     break;
                 } else if (it->second == "minima"){
-                    divlineTypeW = DIVLINE_minima;
+                    divLineTypeW = DIVLINE_minima;
                     break;
                 } else if (it->second == "finalis"){
-                    divlineTypeW = DIVLINE_finalis;
+                    divLineTypeW = DIVLINE_finalis;
                     break;
                 }
             }
         }
-        if (divlineTypeW == DIVLINE_NONE) {
-            LogError("A divline type must be specified.");
-            delete divline;
+        if (divLineTypeW == DIVLINE_NONE) {
+            LogError("A divLine type must be specified.");
+            delete divLine;
 
             m_infoObject.import("status", "FAILURE");
-            m_infoObject.import("message", "A divline type must be specified.");
+            m_infoObject.import("message", "A divLine type must be specified.");
             return false;
         }
 
-        divline->SetForm(divlineTypeW);
+        divLine->SetForm(divLineTypeW);
         zone->SetUlx(ulx);
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
-        divline->SetZone(zone);
-        layer->AddChild(divline);
+        divLine->SetZone(zone);
+        layer->AddChild(divLine);
         
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
@@ -1066,7 +1066,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLry(uly + noteHeight);
         layer->ReorderByXPos();
 
-        m_infoObject.import("uuid", divline->GetUuid());
+        m_infoObject.import("uuid", divLine->GetUuid());
         
     }
     else {

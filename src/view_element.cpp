@@ -865,8 +865,8 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(staff);
     assert(measure);
 
-    DivLine *divline = dynamic_cast<DivLine *>(element);
-    assert(divline);
+    DivLine *divLine = dynamic_cast<DivLine *>(element);
+    assert(divLine);
 
     // int x = divLine->GetDrawingX();
     // int y = divLine->GetDrawingY();
@@ -875,7 +875,7 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int sym = 0;
 
-    switch (divline->GetForm()) {
+    switch (divLine->GetForm()) {
         case DIVLINE_maxima:
             sym = SMUFL_E8F5_chantDivisioMaxima;
             break;
@@ -893,8 +893,8 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     
     int x,y;
-    if ((m_doc->GetType() == Facs) && (divline->HasFacs())){
-        x = divline->GetDrawingX();
+    if ((m_doc->GetType() == Facs) && (divLine->HasFacs())){
+        x = divLine->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());
     }
     else{
@@ -919,7 +919,7 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
 
     dc->EndGraphic(element, this);
-    // std::wstring divlineStr = divline->GetSymbolStr();
+    // std::wstring divLineStr = divLine->GetSymbolStr();
     // // int y = staff->GetDrawingY();
     // // DrawSmuflCode(dc, x, y, SMUFL_E8F5_chantDivisioMaxima, staff->m_drawingStaffSize, divLine->GetDrawingCueSize());   dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), divLine);
     // DrawSmuflString(dc, x, y, divLineStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, divLine->GetDrawingCueSize(), true);

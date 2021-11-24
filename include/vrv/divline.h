@@ -50,12 +50,12 @@ public:
     // bool HasRepetitionDots() const;
 
     /**
-     * Retrieve SMuFL string for the divline.
+     * Retrieve SMuFL string for the divLine.
      */
     std::wstring GetSymbolStr() const;
 
     /**
-     * @name Method used for drawing divline on ornaments
+     * @name Method used for drawing divLine on ornaments
      */
     static wchar_t GetDivLineGlyph(data_DIVLINE);
 
