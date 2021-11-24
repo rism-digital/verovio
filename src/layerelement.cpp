@@ -232,6 +232,15 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
+int LayerElement::GetOriginalLayerN()
+{
+    int layerN = this->GetAlignmentLayerN();
+    if (layerN < 0) {
+        layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
+    }
+    return layerN;
+}
+
 Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
     if (m_crossStaff) {
@@ -2341,10 +2350,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         }
 
         // Skip if layer number is outside given bounds
-        int layerN = this->GetAlignmentLayerN();
-        if (layerN < 0) {
-            layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
-        }
+        const int layerN = this->GetOriginalLayerN();
         if (params->m_minLayerN && (params->m_minLayerN > layerN)) {
             return FUNCTOR_CONTINUE;
         }
