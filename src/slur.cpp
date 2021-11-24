@@ -584,7 +584,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             float distanceRatio = float(xLeft - bezierCurve.p1.x) / float(dist);
             // Ignore obstacles close to the endpoints, because this would result in very large shifts
-            if (std::abs(0.5 - distanceRatio) < 0.45) {
+            if ((std::abs(0.5 - distanceRatio) < 0.45) && (intersectionLeft > 0)) {
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xLeft);
                 constraints.push_back(
                     { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionLeft) });
@@ -594,7 +594,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             distanceRatio = float(xRight - bezierCurve.p1.x) / float(dist);
             // Ignore obstacles close to the endpoints, because this would result in very large shifts
-            if (std::abs(0.5 - distanceRatio) < 0.45) {
+            if ((std::abs(0.5 - distanceRatio) < 0.45) && (intersectionRight > 0)) {
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xRight);
                 constraints.push_back(
                     { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionRight) });
