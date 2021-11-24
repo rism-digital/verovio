@@ -497,7 +497,7 @@ bool MEIOutput::WriteObject(Object *object)
         WriteCustos(m_currentNode, dynamic_cast<Custos *>(object));
     }
     else if (object->Is(DIVLINE)) {
-        m_currentNode = m_currentNode.append_child("divline");
+        m_currentNode = m_currentNode.append_child("divLine");
         WriteDivLine(m_currentNode, dynamic_cast<DivLine *>(object));
     }
     else if (object->Is(DOT)) {
@@ -1557,15 +1557,15 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     custos->WriteColor(currentNode);
 }
 
-void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divline)
+void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
 {
-    assert(divline);
+    assert(divLine);
 
-    WriteLayerElement(currentNode, divline);
-    WriteFacsimileInterface(currentNode, divline);
-    divline->WriteDivLineLog(currentNode);
-    divline->WriteColor(currentNode);
-    divline->WriteVisibility(currentNode);
+    WriteLayerElement(currentNode, divLine);
+    WriteFacsimileInterface(currentNode, divLine);
+    divLine->WriteDivLineLog(currentNode);
+    divLine->WriteColor(currentNode);
+    divLine->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -4720,18 +4720,18 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     return true;
 }
 
-bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divline)
+bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
 {
     DivLine *vrvDivLine = new DivLine();
-    ReadLayerElement(divline, vrvDivLine);
+    ReadLayerElement(divLine, vrvDivLine);
 
-    ReadFacsimileInterface(divline, vrvDivLine);
-    vrvDivLine->ReadDivLineLog(divline);
-    vrvDivLine->ReadColor(divline);
-    vrvDivLine->ReadVisibility(divline);
+    ReadFacsimileInterface(divLine, vrvDivLine);
+    vrvDivLine->ReadDivLineLog(divLine);
+    vrvDivLine->ReadColor(divLine);
+    vrvDivLine->ReadVisibility(divLine);
 
     parent->AddChild(vrvDivLine);
-    ReadUnsupportedAttr(divline, vrvDivLine);
+    ReadUnsupportedAttr(divLine, vrvDivLine);
     return true;
 }
 

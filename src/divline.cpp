@@ -83,10 +83,10 @@ std::wstring DivLine::GetSymbolStr() const
     return symbolStr;
 }
 
-wchar_t DivLine::GetDivLineGlyph(data_DIVLINE divline)
+wchar_t DivLine::GetDivLineGlyph(data_DIVLINE divLine)
 {
     int symc = SMUFL_E8F5_chantDivisioMaxima;
-    switch (divline) {
+    switch (divLine) {
         case DIVLINE_minima: symc = SMUFL_E8F3_chantDivisioMinima; break;
         case DIVLINE_maior: symc = SMUFL_E8F4_chantDivisioMaior; break;
         case DIVLINE_maxima: symc = SMUFL_E8F5_chantDivisioMaxima; break;
@@ -101,7 +101,7 @@ wchar_t DivLine::GetDivLineGlyph(data_DIVLINE divline)
 //----------------------------------------------------------------------------
 
 
-// wchar_t DivLine::GetDivLineGlyph(data_DIVISIO divline){
+// wchar_t DivLine::GetDivLineGlyph(data_DIVISIO divLine){
 //     int symc = SMUFL_E8F5_chantDivisioMaxima;
 // }
 // bool DivLine::HasRepetitionDots() const
