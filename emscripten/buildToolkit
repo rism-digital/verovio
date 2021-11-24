@@ -108,6 +108,7 @@ if ($wasmQ) {
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
 	$LFLAGS = " -s ASM_JS=1 -s WASM=0";
+	$LFLAGS .= " --memory-init-file 0";
 	$FLAGS_NAME = "-light";
 }
 
