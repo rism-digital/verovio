@@ -66,6 +66,10 @@ public:
     ///@}
 
 private:
+    // Update tie positioning based overlaps with accidentals in cases with enharmonic ties
+    bool AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote, Note *endNote,
+        curvature_CURVEDIR drawingCurveDir);
+
     // Calculate initial position X position and return stem direction of the startNote
     void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
         bool isOuterChordNote, Point &startPoint, Point &endPoint);
@@ -75,7 +79,7 @@ private:
     curvature_CURVEDIR GetPreferredCurveDirection(
         Layer *layer, Note *note, Chord *startParentChord, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
 
-    // Update tie positioning based on the overlaps with posible layerElements such as dots/flags
+    // Update tie positioning based on the overlaps with possible layerElements such as dots/flags
     void UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement,
         Note *startNote, int height, curvature_CURVEDIR drawingCurveDir);
 

@@ -75,6 +75,71 @@ void Tie::Reset()
     ResetCurveRend();
 }
 
+bool Tie::AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote,
+    Note *endNote, curvature_CURVEDIR drawingCurveDir)
+{
+    ListOfObjects objects;
+    ClassIdComparison cmp(ACCID);
+    endNote->FindAllDescendantByComparison(&objects, &cmp);
+    if (objects.empty()) return false;
+
+    int overlap = 0;
+    bool discard = false;
+    for (auto object : objects) {
+        overlap = curve->CalcAdjustment(object, discard);
+    }
+    if (!overlap) return false;
+
+    // adjust overlap with regards to direction
+    overlap *= (drawingCurveDir == curvature_CURVEDIR_below) ? -1 : 1;
+
+    const int drawingRadius = startNote->GetDrawingRadius(doc);
+    const int drawingUnit = doc->GetDrawingUnit(100);
+    // adjust endpoints of curve
+    if ((startNote->GetDrawingStemDir() == STEMDIRECTION_up) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+        bezier[0].x = startNote->GetDrawingX() + 2 * drawingRadius + drawingUnit / 2;
+    }
+    else {
+        bezier[0].x = startNote->GetDrawingX() + drawingRadius;
+    }
+    if ((startNote->GetDrawingStemDir() == STEMDIRECTION_down) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+        bezier[3].x = endNote->GetDrawingX() - drawingUnit / 2;
+        bezier[3].y += overlap / 2;
+    }
+    else {
+        bezier[3].x = endNote->GetDrawingX() + drawingRadius;
+    }
+
+    if (drawingCurveDir == curvature_CURVEDIR_below) {
+        if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc()) {
+            bezier[0].y += overlap / 2;
+            bezier[3].y = bezier[0].y;
+        }
+        else if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc()) {
+            bezier[3].y += overlap / 2;
+            bezier[0].y = bezier[3].y;
+        }
+    }
+    else if (drawingCurveDir == curvature_CURVEDIR_above) {
+        if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc()) {
+            bezier[3].y = bezier[0].y;
+        }
+        else if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc()) {
+            bezier[3].y += overlap / 2;
+            bezier[0].y = bezier[3].y;
+        }
+    }
+
+    // adjust control points of the curve
+    const int length = bezier[3].x - bezier[0].x;
+    bezier[1].x = bezier[0].x + 0.25 * length;
+    bezier[1].y += 1.2 * overlap;
+    bezier[2].x = bezier[0].x + 0.75 * length;
+    bezier[2].y += 1.2 * overlap;
+
+    return true;
+}
+
 bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4])
 {
     if (!doc || !staff) return false;
@@ -203,6 +268,11 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     if ((!startParentChord || isOuterChordNote) && durElement && (spanningType != SPANNING_END)) {
         UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
         curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+    }
+    if (!startParentChord && !endParentChord && note1 && note2 && (spanningType == SPANNING_START_END)) {
+        if (this->AdjustEnharmonicTies(doc, curve, bezier, note1, note2, drawingCurveDir)) {
+            curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+        }
     }
 
     return true;
