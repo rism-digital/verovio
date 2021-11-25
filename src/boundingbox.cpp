@@ -654,7 +654,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
-int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type) const
+int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, int additionalOffset) const
 {
     assert(beamInterface);
     assert(!beamInterface->m_beamElementCoords.empty());
@@ -712,12 +712,12 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type) 
     if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
         const int topY = std::max(leftIntersection.y, rightIntersection.y);
         const int shift = topY - this->GetBottomBy(type);
-        if (shift > 0) return shift;
+        if (shift > 0) return shift + additionalOffset;
     }
     else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
         const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
         const int shift = bottomY - this->GetTopBy(type);
-        if (shift < 0) return shift;
+        if (shift < 0) return shift - additionalOffset;
     }
 
     return 0;

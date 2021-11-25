@@ -167,7 +167,7 @@ public:
      * A segment of the beam that matches horizontal position of the bounding box is taken to find whether there is
      * intersection.
      */
-    int Intersects(BeamDrawingInterface *beamInterface, Accessor type) const;
+    int Intersects(BeamDrawingInterface *beamInterface, Accessor type, int additionalOffset = 0) const;
 
     //----------------//
     // Static methods //
