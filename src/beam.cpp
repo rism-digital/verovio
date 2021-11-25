@@ -965,6 +965,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
 
     for (auto coord : m_beamElementCoordRefs) {
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
+        if (!coord->m_closestNote) continue;
         if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) m_uniformStemLength = coordStemLength;
     }
     // make adjustments for the grace notes length
