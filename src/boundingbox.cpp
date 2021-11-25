@@ -14,6 +14,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
+#include "drawinginterface.h"
 #include "devicecontextbase.h"
 #include "doc.h"
 #include "floatingobject.h"
@@ -647,6 +649,75 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     }
     else {
         LogDebug("This should not happen");
+    }
+
+    return 0;
+}
+
+int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type) const
+{
+    assert(beamInterface);
+    assert(!beamInterface->m_beamElementCoords.empty());
+
+    const Point beamLeft(
+        beamInterface->m_beamElementCoords.front()->m_x, beamInterface->m_beamElementCoords.front()->m_yBeam);
+    const Point beamRight(
+        beamInterface->m_beamElementCoords.back()->m_x, beamInterface->m_beamElementCoords.back()->m_yBeam);
+
+    Point leftIntersection(0, 0);
+    Point rightIntersection(0, 0);
+    const double beamSlope = this->CalcSlope(beamLeft, beamRight);
+    if (this->GetLeftBy(type) <= beamLeft.x) {
+        // BB does not overlap horizontally with beam (left side of the beam)
+        if (this->GetRightBy(type) < beamLeft.x) {
+            
+            return 0;
+        }
+        // BB overlaps with left side of the beam
+        else if (this->GetRightBy(type) < beamRight.x) {
+            leftIntersection = beamLeft;
+            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+        // BB covers the whole beam
+        else {
+            leftIntersection = beamLeft;
+            rightIntersection = beamRight;
+        }
+    }
+    else {
+        if (this->GetRightBy(type) > beamRight.x) {
+            // BB overlaps with right side of the beam
+            if (this->GetLeftBy(type) <= beamRight.x) {
+                leftIntersection.x = this->GetLeftBy(type);
+                leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+                rightIntersection = beamRight;
+            }
+            // BB does not overlap horizontally with beam (right side of the beam)
+            else {
+                return 0;
+            }
+        }
+        // BB is inside of the beam
+        else {
+            leftIntersection.x = this->GetLeftBy(type);
+            leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+    }
+    // something went wrong if either for the points have X not set - return
+    if (!leftIntersection.x || !rightIntersection.x) return 0;
+    // calculate vertical overlap of the BB with beam section
+    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+        const int topY = std::max(leftIntersection.y, rightIntersection.y);
+        const int shift = topY - this->GetBottomBy(type);
+        if (shift > 0) return shift;
+    }
+    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+        const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
+        const int shift = bottomY - this->GetTopBy(type);
+        if (shift < 0) return shift;
     }
 
     return 0;
