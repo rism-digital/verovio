@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
 #include "bracketspan.h"
 #include "breath.h"
 #include "dir.h"
@@ -377,6 +378,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             assert(curve->m_object);
         }
         int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+        const bool isExtender = m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement();
 
         if (m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
@@ -386,9 +388,11 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            else if (m_object->Is({ DYNAM, FING, MORDENT, TURN }) && horizOverlapingBBox->Is(BEAM)) {
-                // Try to avoid comparing with BEAM BB since it might be much larger overlap while having a lot of
-                // whitespace. For such cases, DYNAM should be compared to individual elements of BEAM instead
+            else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
+                const int shift = this->Intersects(dynamic_cast<Beam *>(horizOverlapingBBox), CONTENT);
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+                }
                 return true;
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + this->GetContentY1() - margin;
@@ -396,7 +400,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement()) {
+            if (isExtender) {
                 m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
             }
@@ -417,13 +421,20 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
+            else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
+                const int shift = this->Intersects(dynamic_cast<Beam *>(horizOverlapingBBox), CONTENT);
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+                }
+                return true;
+            }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + this->GetContentY2() + margin;
 
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement()) {
+            if (isExtender) {
                 m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
             }

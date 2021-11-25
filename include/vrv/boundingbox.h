@@ -16,6 +16,7 @@ namespace vrv {
 
 #define BEZIER_APPROXIMATION 50.0
 
+class BeamDrawingInterface;
 class Doc;
 class FloatingCurvePositioner;
 class Glyph;
@@ -160,6 +161,13 @@ public:
      * The Object pointed by the FloatingPositioner is expected to be a SLUR or a TIE
      */
     int Intersects(FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
+
+    /**
+     * Return true if the bounding box intersects with the beam represented by the BeamDrawingInterface.
+     * A segment of the beam that matches horizontal position of the bounding box is taken to find whether there is
+     * intersection.
+     */
+    int Intersects(BeamDrawingInterface *beamInterface, Accessor type) const;
 
     //----------------//
     // Static methods //
