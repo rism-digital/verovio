@@ -131,6 +131,11 @@ public:
     ///@}
 
     /**
+     * @return (cross) layer number, parent layer number for cross staff elements
+     */
+    int GetOriginalLayerN();
+
+    /**
      * @name Get the X and Y drawing position
      */
     ///@{

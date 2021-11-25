@@ -232,6 +232,15 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
+int LayerElement::GetOriginalLayerN()
+{
+    int layerN = this->GetAlignmentLayerN();
+    if (layerN < 0) {
+        layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
+    }
+    return layerN;
+}
+
 Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
     if (m_crossStaff) {
@@ -2323,7 +2332,9 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         && (this->GetContentLeft() < params->m_maxPos)) {
 
         // We skip the start or end of the slur
-        if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
+        LayerElement *start = params->m_interface->GetStart();
+        LayerElement *end = params->m_interface->GetEnd();
+        if ((this == start) || (this == end)) {
             return FUNCTOR_CONTINUE;
         }
 
@@ -2341,15 +2352,34 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         }
 
         // Skip if layer number is outside given bounds
-        int layerN = this->GetAlignmentLayerN();
-        if (layerN < 0) {
-            layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
-        }
+        const int layerN = this->GetOriginalLayerN();
         if (params->m_minLayerN && (params->m_minLayerN > layerN)) {
             return FUNCTOR_CONTINUE;
         }
         if (params->m_maxLayerN && (params->m_maxLayerN < layerN)) {
             return FUNCTOR_CONTINUE;
+        }
+
+        // Skip elements aligned at start/end, but on a different staff
+        if (this->GetAlignment() == start->GetAlignment()) {
+            Layer *layer = NULL;
+            Staff *staff = this->GetCrossStaff(layer);
+            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            Staff *startStaff = start->GetCrossStaff(layer);
+            if (!startStaff) startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
+            if (staff->GetN() != startStaff->GetN()) {
+                return FUNCTOR_CONTINUE;
+            }
+        }
+        if (this->GetAlignment() == end->GetAlignment()) {
+            Layer *layer = NULL;
+            Staff *staff = this->GetCrossStaff(layer);
+            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            Staff *endStaff = end->GetCrossStaff(layer);
+            if (!endStaff) endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+            if (staff->GetN() != endStaff->GetN()) {
+                return FUNCTOR_CONTINUE;
+            }
         }
 
         params->m_elements.push_back(this);
