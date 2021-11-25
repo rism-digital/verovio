@@ -2208,18 +2208,13 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 continue;
             }
 
-            // if (firstIsLig) {
-            //     firstIsLig = false;
-            //     continue;
-            // }
-
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
                 // if (nc->HasLigated()) continue;
 
                 if (firstIsLig) {
-                    // ligNum++;
+                    // if 1st is ligature, neglect 2nd, go to the next nc
                     firstIsLig = false;
                     continue;
                 }
@@ -2227,29 +2222,14 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 if (nc->HasLigated()) ligNum++;
             }
 
-            // if (ligNum != 2) {
-            //     // no ligature or the first nc in the ligature
-            //     // init new parent
-            //     newParent = currentParent->Clone();
-            //     newParent->CloneReset();
-            //     assert(newParent);
-            //     newParent->ClearChildren();
-            // } else {
-            //     // if it is the second nc in the ligature, use saved parent
-            //     newParent = ligParent->Clone();
-            //     newParent->CloneReset();
-            //     assert(newParent);
-            //     ligNum = 0;
-            // }
-
             if (ligNum != 2) {
+                // if not 2nd ligature, create new parent
                 newParent = currentParent->Clone();
                 newParent->CloneReset();
                 assert(newParent);
                 newParent->ClearChildren();
-            } else {
-                ligNum = 0;
             }
+
 
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
@@ -2326,18 +2306,18 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     // syl->SetFacs(zone->GetUuid());
                 }
             }
-            uuidArray << newParent->GetUuid();
             
-            // if (ligNum == 1) {
-            //     // if it is the first nc in the ligature, save the parent
-            //     ligParent = newParent->Clone();
-            //     ligParent->CloneReset();
-            //     assert(ligParent);
-            //     continue;
-            // }
+            if (ligNum != 1) {
+                // if not 1st nc in ligature, add child
 
-            sparent->AddChild(newParent);
-            sparent->ReorderByXPos();
+                uuidArray << newParent->GetUuid();
+
+                sparent->AddChild(newParent);
+                sparent->ReorderByXPos();
+            }
+
+            // reset ligNum
+            if (ligNum == 2) ligNum = 0;
         }
     }
     if (syllables.size() != 0) {
