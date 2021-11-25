@@ -1272,7 +1272,7 @@ void BeamElementCoord::SetDrawingStemDir(
             stemLen *= -1;
         }
     }
-    m_centered = segment->m_uniformStemLength % 2;
+    m_centered = (segment->m_uniformStemLength % 2) || (m_element->IsGraceNote());
 
     if (m_element->Is({ REST, SPACE })) {
         m_x += m_element->GetDrawingRadius(doc);
