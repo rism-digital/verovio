@@ -15,9 +15,9 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
-#include "drawinginterface.h"
 #include "devicecontextbase.h"
 #include "doc.h"
+#include "drawinginterface.h"
 #include "floatingobject.h"
 #include "glyph.h"
 #include "vrv.h"
@@ -670,7 +670,7 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type) 
     if (this->GetLeftBy(type) <= beamLeft.x) {
         // BB does not overlap horizontally with beam (left side of the beam)
         if (this->GetRightBy(type) < beamLeft.x) {
-            
+
             return 0;
         }
         // BB overlaps with left side of the beam
