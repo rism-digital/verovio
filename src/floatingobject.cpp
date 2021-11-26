@@ -390,7 +390,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
-                const int shift = this->Intersects(dynamic_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
+                const int shift = this->Intersects(vrv_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
@@ -423,7 +423,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
-                const int shift = this->Intersects(dynamic_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
+                const int shift = this->Intersects(vrv_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }

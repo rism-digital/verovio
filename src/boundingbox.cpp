@@ -666,7 +666,7 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
 
     Point leftIntersection(0, 0);
     Point rightIntersection(0, 0);
-    const double beamSlope = this->CalcSlope(beamLeft, beamRight);
+    const double beamSlope = BoundingBox::CalcSlope(beamLeft, beamRight);
     if (this->GetLeftBy(type) <= beamLeft.x) {
         // BB does not overlap horizontally with beam (left side of the beam)
         if (this->GetRightBy(type) < beamLeft.x) {
@@ -705,8 +705,7 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
             rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
         }
     }
-    // something went wrong if either for the points have X not set - return
-    if (!leftIntersection.x || !rightIntersection.x) return 0;
+
     // calculate vertical overlap of the BB with beam section
     if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
         const int topY = std::max(leftIntersection.y, rightIntersection.y);
