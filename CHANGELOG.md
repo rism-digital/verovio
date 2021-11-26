@@ -1,6 +1,9 @@
 # Changelog
 
 ## [unreleased]
+* Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmBH)
+* Improve enharmonic tie overlap with accidentals (@eNote-GmBH)
+* Option --multi-rest-thickness to control the thickness of measure rests (@eNote-GmBH)
 
 ## [3.7.0] - 2021-11-22
 * Complete refactoring of the Plaine and Easie parser
