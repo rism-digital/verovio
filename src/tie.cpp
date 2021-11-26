@@ -78,9 +78,7 @@ void Tie::Reset()
 bool Tie::AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote,
     Note *endNote, curvature_CURVEDIR drawingCurveDir)
 {
-    ListOfObjects objects;
-    ClassIdComparison cmp(ACCID);
-    endNote->FindAllDescendantByComparison(&objects, &cmp);
+    ListOfObjects objects = endNote->FindAllDescendantsByType(ACCID);
     if (objects.empty()) return false;
 
     int overlap = 0;
