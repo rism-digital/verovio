@@ -966,7 +966,11 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
     for (auto coord : m_beamElementCoordRefs) {
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
         if (!coord->m_closestNote) continue;
-        if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) m_uniformStemLength = coordStemLength;
+        // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
+        // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
+        if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
+            || (!isHorizontal && (coord->m_dur > DUR_8) && (m_uniformStemLength < 13)))
+            m_uniformStemLength = coordStemLength;
     }
     // make adjustments for the grace notes length
     for (auto coord : m_beamElementCoordRefs) {
