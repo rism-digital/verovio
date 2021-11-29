@@ -1699,10 +1699,12 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
     if (flag) {
         const wchar_t glyph = flag->GetFlagGlyph(stemDir);
-        const int slashAdjust = (stemDir == STEMDIRECTION_up)
-            ? m_doc->GetGlyphTop(glyph, staff->m_drawingStaffSize, true)
-            : m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, true);
-        y += slashAdjust;
+        if (glyph) {
+            const int slashAdjust = (stemDir == STEMDIRECTION_up)
+                ? m_doc->GetGlyphTop(glyph, staff->m_drawingStaffSize, true)
+                : m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, true);
+            y += slashAdjust;
+        }
     }
     if ((stemDir == STEMDIRECTION_down) && (!flag || (flag->GetFlagGlyph(stemDir) == SMUFL_E241_flag8thDown))) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
