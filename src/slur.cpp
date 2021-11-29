@@ -212,13 +212,13 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
             notes.push_back(this->GetStart());
         }
         else {
-            this->GetStart()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+            this->GetStart()->FindAllDescendantsByComparison(&notes, &cmp, 1, FORWARD, false);
         }
         if (this->GetEnd()->Is(NOTE)) {
             notes.push_back(this->GetEnd());
         }
         else {
-            this->GetEnd()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+            this->GetEnd()->FindAllDescendantsByComparison(&notes, &cmp, 1, FORWARD, false);
         }
 
         // Determine the minimal and maximal diatonic pitch
@@ -1226,12 +1226,11 @@ std::pair<int, int> Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, 
 PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const
 {
     ListOfObjects artics;
-    ClassIdComparison cmp(ARTIC);
     if (startChord) {
-        startChord->FindAllDescendantByComparison(&artics, &cmp, 1);
+        artics = startChord->FindAllDescendantsByType(ARTIC, true, 1);
     }
     else if (startNote) {
-        startNote->FindAllDescendantByComparison(&artics, &cmp, 1);
+        artics = startNote->FindAllDescendantsByType(ARTIC, true, 1);
     }
 
     PortatoSlurType type = PortatoSlurType::None;

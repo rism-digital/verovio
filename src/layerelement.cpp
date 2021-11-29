@@ -439,7 +439,7 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticTy
     ClassIdComparison isArtic(ARTIC);
     ListOfObjects artics;
     // Process backward because we want the farest away artic
-    this->FindAllDescendantByComparison(&artics, &isArtic, UNLIMITED_DEPTH, BACKWARD);
+    this->FindAllDescendantsByComparison(&artics, &isArtic, UNLIMITED_DEPTH, BACKWARD);
 
     Artic *artic = NULL;
     for (auto &child : artics) {
@@ -739,7 +739,7 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
     *lry = INT_MIN;
     ListOfObjects childrenWithFacsimileInterface;
     InterfaceComparison ic(INTERFACE_FACSIMILE);
-    this->FindAllDescendantByComparison(&childrenWithFacsimileInterface, &ic);
+    this->FindAllDescendantsByComparison(&childrenWithFacsimileInterface, &ic);
     bool result = false;
     for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
@@ -833,9 +833,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
         // Find the first note on the other layer
         Alignment *alignment = this->GetAlignment();
         const int currentLayerN = abs(this->GetAlignmentLayerN());
-        ListOfObjects notes;
-        ClassIdComparison noteCmp(NOTE);
-        alignment->FindAllDescendantByComparison(&notes, &noteCmp, 2);
+        ListOfObjects notes = alignment->FindAllDescendantsByType(NOTE, false);
         auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN](Object *obj) {
             const int otherLayerN = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
             return (currentLayerN != otherLayerN);
@@ -2126,7 +2124,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
         // If yes, make them cross-staff themselves.
         ListOfObjects durations;
         InterfaceComparison hasInterface(INTERFACE_DURATION);
-        this->FindAllDescendantByComparison(&durations, &hasInterface);
+        this->FindAllDescendantsByComparison(&durations, &hasInterface);
         Staff *crossStaff = NULL;
         Layer *crossLayer = NULL;
         for (auto object : durations) {

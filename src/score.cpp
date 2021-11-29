@@ -143,9 +143,7 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense)
     bool optimize = (m_scoreDef.HasOptimize() && m_scoreDef.GetOptimize() == BOOLEAN_true);
     // if nothing specified, do not if there is only one grpSym
     if ((optionCondense == CONDENSE_auto) && !m_scoreDef.HasOptimize()) {
-        ListOfObjects symbols;
-        ClassIdComparison matchClassId(GRPSYM);
-        m_scoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
+        ListOfObjects symbols = m_scoreDef.FindAllDescendantsByType(GRPSYM);
         optimize = (symbols.size() > 1);
     }
 

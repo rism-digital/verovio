@@ -149,9 +149,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
     Beam *beam = this->GetBracketAlignedBeam();
     if (beam) {
         // Check for possible articulations
-        ListOfObjects artics;
-        ClassIdsComparison comparison({ ARTIC });
-        this->FindAllDescendantByComparison(&artics, &comparison);
+        ListOfObjects artics = this->FindAllDescendantsByType(ARTIC);
 
         int articPadding = 0;
         for (auto &artic : artics) {
@@ -176,9 +174,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
 
         // Check for overlap with rest elements. This might happen when tuplet has rest and beam children that are
         // on the same level in encoding - there might be overlap of bracket with rest in that case
-        ListOfObjects descendants;
-        ClassIdsComparison rest({ REST });
-        this->FindAllDescendantByComparison(&descendants, &rest);
+        ListOfObjects descendants = this->FindAllDescendantsByType(REST);
 
         int restAdjust = 0;
         const int bracketRel = tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin;
@@ -220,7 +216,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
         // Possible issue with beam above the tuplet - not sure this will be noticeable
         ListOfObjects descendants;
         ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
-        this->FindAllDescendantByComparison(&descendants, &comparison);
+        this->FindAllDescendantsByComparison(&descendants, &comparison);
 
         for (auto &descendant : descendants) {
             if (!descendant->HasSelfBB()) continue;
@@ -329,7 +325,7 @@ void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
     // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
     ListOfObjects descendants;
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
-    this->FindAllDescendantByComparison(&descendants, &comparison);
+    this->FindAllDescendantsByComparison(&descendants, &comparison);
 
     Staff *crossStaff = NULL;
     Layer *crossLayer = NULL;
