@@ -214,6 +214,9 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "repeat1Bar", SMUFL_E500_repeat1Bar },
     { "repeat2Bars", SMUFL_E501_repeat2Bars },
     { "repeat4Bars", SMUFL_E502_repeat4Bars },
+    { "repeatBarUpperDot", SMUFL_E503_repeatBarUpperDot },
+    { "repeatBarSlash", SMUFL_E504_repeatBarSlash },
+    { "repeatBarLowerDot", SMUFL_E505_repeatBarLowerDot },
     { "ottava", SMUFL_E510_ottava },
     { "ottavaAlta", SMUFL_E511_ottavaAlta },
     { "ottavaBassa", SMUFL_E512_ottavaBassa },
@@ -434,6 +437,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 408
+// 411
 
 } // namespace vrv

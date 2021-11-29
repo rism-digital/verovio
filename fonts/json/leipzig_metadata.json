@@ -9,6 +9,7 @@
         "dashedBarlineDashLength": 0.5,
         "dashedBarlineGapLength": 0.25,
         "dashedBarlineThickness": 0.16,
+        "hBarThickness": 1.0,
         "hairpinThickness": 0.16,
         "legerLineExtension": 0.27,
         "legerLineThickness": 0.16,
@@ -30,7 +31,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.63",
+    "fontVersion": "5.2.64",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -2732,14 +2733,34 @@
                 -0.968
             ]
         },
-        "repeatBarSlash": {
+        "repeatBarLowerDot": {
             "bBoxNE": [
-                0.0,
-                0.0
+                0.38,
+                -0.288
             ],
             "bBoxSW": [
                 0.0,
-                0.0
+                -0.664
+            ]
+        },
+        "repeatBarSlash": {
+            "bBoxNE": [
+                2.032,
+                0.968
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.968
+            ]
+        },
+        "repeatBarUpperDot": {
+            "bBoxNE": [
+                0.38,
+                0.668
+            ],
+            "bBoxSW": [
+                0.0,
+                0.292
             ]
         },
         "repeatDot": {
@@ -2792,6 +2813,56 @@
                 -3.82
             ]
         },
+        "restDoubleWholeLegerLine": {
+            "bBoxNE": [
+                1.044,
+                1.064
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.064
+            ]
+        },
+        "restHBarLeft": {
+            "bBoxNE": [
+                2.0,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "restHBarMiddle": {
+            "bBoxNE": [
+                2.16,
+                0.5
+            ],
+            "bBoxSW": [
+                -0.12,
+                -0.5
+            ]
+        },
+        "restHBarRight": {
+            "bBoxNE": [
+                2.0,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "restHalfLegerLine": {
+            "bBoxNE": [
+                1.744,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.064
+            ]
+        },
         "restLonga": {
             "bBoxNE": [
                 0.5,
@@ -2830,6 +2901,16 @@
             "bBoxSW": [
                 0.0,
                 -1.04
+            ]
+        },
+        "restWholeLegerLine": {
+            "bBoxNE": [
+                1.744,
+                0.064
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
             ]
         },
         "rightRepeatSmall": {
@@ -3890,6 +3971,16 @@
             "bBoxSW": [
                 0.028,
                 -2.936
+            ]
+        },
+        "uniE4EE": {
+            "bBoxNE": [
+                3.0,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
             ]
         },
         "uniE500": {
