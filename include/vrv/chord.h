@@ -228,6 +228,12 @@ protected:
     MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
 
     /**
+     * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
+     * the top-/bottommost and moving inward towards the center of the chord
+     */
+    data_STEMDIRECTION CalcStemDirection(int verticalCenter);
+
+    /**
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
