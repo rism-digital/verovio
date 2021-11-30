@@ -225,8 +225,8 @@ bool Resources::LoadFont(const std::string &fontName)
             }
             glyph = &s_font[smuflCode];
             if (glyph->GetUnitsPerEm() != unitsPerEm * 10) {
-                LogWarning("Glyph and bounding box units-per-em for code point U+%X miss-match (bounding box: %d)", smuflCode,
-                    unitsPerEm);
+                LogWarning("Glyph and bounding box units-per-em for code point U+%X miss-match (bounding box: %d)",
+                    smuflCode, unitsPerEm);
                 continue;
             }
             double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
