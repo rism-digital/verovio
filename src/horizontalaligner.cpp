@@ -767,14 +767,11 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
 
     Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
     const bool hasUnisonOverlap = std::any_of(children->begin(), children->end(), [parentNote](Object *object) {
-        if (object->Is(NOTE)) {
-            Note *otherNote = vrv_cast<Note *>(object);
-            // in case notes are in unison but have different accidentals
-            if (parentNote && parentNote->IsUnisonWith(otherNote, true)
-                && !parentNote->IsUnisonWith(otherNote, false)) {
-                return true;
-            }
-        }
+        if (!object->Is(NOTE)) return false;
+
+        Note *otherNote = vrv_cast<Note *>(object);
+        // in case notes are in unison but have different accidentals
+        return parentNote && parentNote->IsUnisonWith(otherNote, true) && !parentNote->IsUnisonWith(otherNote, false);
     });
 
     // bottom one

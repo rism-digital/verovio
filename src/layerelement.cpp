@@ -1773,7 +1773,11 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             }
         }
         else if (this->Is(ACCID) && otherElements.at(i)->Is(NOTE)) {
-            if (this->HorizontalContentOverlap(otherElements.at(i)))
+            Note *parentNote = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
+            Note *otherNote = vrv_cast<Note *>(otherElements.at(i));
+            const bool isUnisonOverlap = parentNote && parentNote->IsUnisonWith(otherNote, true)
+                && !parentNote->IsUnisonWith(otherNote, false);
+            if (isUnisonOverlap && this->HorizontalContentOverlap(otherElements.at(i)))
                 shift += this->HorizontalRightOverlap(
                     otherElements.at(i), doc, -doc->GetDrawingUnit(staff->m_drawingStaffSize));
         }
