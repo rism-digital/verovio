@@ -290,10 +290,14 @@ public:
     ///@}
 
     /**
-     * Moves bounding points vertically by a specified distance downward
+     * Moves bounding points horizontally or vertically by a specified distance
      */
+    ///@{
+    void MoveFrontHorizontal(int distance);
+    void MoveBackHorizontal(int distance);
     void MoveFrontVertical(int distance);
     void MoveBackVertical(int distance);
+    ///@}
 
     /**
      * Calculate the min or max Y for a set of points

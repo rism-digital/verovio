@@ -96,9 +96,7 @@ int BTrem::GenerateMIDI(FunctorParams *functorParams)
     // Apply expansion either to all notes in chord or to first note
     Chord *chord = vrv_cast<Chord *>(this->FindDescendantByType(CHORD));
     if (chord) {
-        ListOfObjects notes;
-        ClassIdComparison noteComparison(NOTE);
-        chord->FindAllDescendantByComparison(&notes, &noteComparison);
+        ListOfObjects notes = chord->FindAllDescendantsByType(NOTE, false);
         std::for_each(notes.begin(), notes.end(), expandNote);
     }
     else {

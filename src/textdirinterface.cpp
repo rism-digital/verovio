@@ -40,9 +40,7 @@ int TextDirInterface::GetNumberOfLines(Object *object)
 {
     assert(object);
 
-    ListOfObjects lbs;
-    ClassIdComparison matches(LB);
-    object->FindAllDescendantByComparison(&lbs, &matches);
+    ListOfObjects lbs = object->FindAllDescendantsByType(LB);
     return ((int)lbs.size() + 1);
 }
 

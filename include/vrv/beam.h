@@ -77,12 +77,15 @@ private:
 
     void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
 
+    // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
+    void CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
-    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place);
+    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
 
     // Helper to calculate relative position of the beam to for each of the coordinates
     void CalcMixedBeamPlace(Staff *staff);
@@ -233,7 +236,7 @@ public:
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
     void SetClosestNote(data_STEMDIRECTION stemDir);
 
-    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal);
 
     /**
      * Return stem length adjustment in half units, depending on the @stem.mode attribute

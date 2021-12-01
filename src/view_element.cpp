@@ -415,7 +415,7 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int x = element->GetDrawingX();
+    const int x = element->GetDrawingX();
     int xSymbol = x;
     int y = element->GetDrawingY();
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -424,14 +424,13 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
         DrawSmuflCode(dc, xSymbol, y, SMUFL_E501_repeat2Bars, staff->m_drawingStaffSize, false);
     }
     else {
-        DrawSmuflCode(dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false);
-        int additionalSlash = beatRpt->GetSlash() - BEATRPT_REND_1;
-        int halfWidth
-            = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
-        int i;
-        for (i = 0; i < additionalSlash; ++i) {
+        wchar_t slash = SMUFL_E504_repeatBarSlash;
+        DrawSmuflCode(dc, xSymbol, y, slash, staff->m_drawingStaffSize, false);
+        const int slashNum = beatRpt->GetSlash();
+        const int halfWidth = m_doc->GetGlyphWidth(slash, staff->m_drawingStaffSize, false) / 2;
+        for (int i = 0; i < (slashNum - 1); ++i) {
             xSymbol += halfWidth;
-            DrawSmuflCode(dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false);
+            DrawSmuflCode(dc, xSymbol, y, slash, staff->m_drawingStaffSize, false);
         }
     }
 
@@ -1700,10 +1699,12 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
     if (flag) {
         const wchar_t glyph = flag->GetFlagGlyph(stemDir);
-        const int slashAdjust = (stemDir == STEMDIRECTION_up)
-            ? m_doc->GetGlyphTop(glyph, staff->m_drawingStaffSize, true)
-            : m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, true);
-        y += slashAdjust;
+        if (glyph) {
+            const int slashAdjust = (stemDir == STEMDIRECTION_up)
+                ? m_doc->GetGlyphTop(glyph, staff->m_drawingStaffSize, true)
+                : m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, true);
+            y += slashAdjust;
+        }
     }
     if ((stemDir == STEMDIRECTION_down) && (!flag || (flag->GetFlagGlyph(stemDir) == SMUFL_E241_flag8thDown))) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;

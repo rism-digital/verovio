@@ -1419,7 +1419,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     ListOfObjects notes;
     ListOfObjects chords;
 
-    measure->FindAllDescendantByComparison(&notes, &matchNoteTime);
+    measure->FindAllDescendantsByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
     for (auto const item : notes) {

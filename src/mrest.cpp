@@ -96,9 +96,7 @@ int MRest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocati
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (parentStaff->GetChildCount(LAYER) != 2) return defaultLocation;
 
-    ListOfObjects layers;
-    ClassIdComparison matchType(LAYER);
-    parentStaff->FindAllDescendantByComparison(&layers, &matchType);
+    ListOfObjects layers = parentStaff->FindAllDescendantsByType(LAYER, false);
     const bool isTopLayer = (vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
 
     ListOfObjects::iterator otherLayerIter = isTopLayer ? std::prev(layers.end()) : layers.begin();

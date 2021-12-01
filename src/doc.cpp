@@ -155,9 +155,7 @@ bool Doc::GenerateDocumentScoreDef()
         return false;
     }
 
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    measure->FindAllDescendantByComparison(&staves, &matchType);
+    ListOfObjects staves = measure->FindAllDescendantsByType(STAFF, false);
 
     if (staves.empty()) {
         LogError("No staff found for generating a scoreDef");
@@ -226,9 +224,7 @@ bool Doc::GenerateHeader()
 
 bool Doc::GenerateMeasureNumbers()
 {
-    ClassIdComparison matchType(MEASURE);
-    ListOfObjects measures;
-    this->FindAllDescendantByComparison(&measures, &matchType);
+    ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
 
     // run through all measures and generate missing mNum from attribute
     for (auto &object : measures) {
@@ -805,9 +801,7 @@ void Doc::PrepareDrawing()
     */
 
     /************ Add default syl for syllables (if applicable) ************/
-    ListOfObjects syllables;
-    ClassIdComparison comp(SYLLABLE);
-    this->FindAllDescendantByComparison(&syllables, &comp);
+    ListOfObjects syllables = this->FindAllDescendantsByType(SYLLABLE);
     for (auto it = syllables.begin(); it != syllables.end(); ++it) {
         Syllable *syllable = dynamic_cast<Syllable *>(*it);
         syllable->MarkupAddSyl();
@@ -1107,9 +1101,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 
     contentPage->LayOutHorizontally();
 
-    ListOfObjects systems;
-    ClassIdComparison cmp(SYSTEM);
-    contentPage->FindAllDescendantByComparison(&systems, &cmp, 1);
+    ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
     for (const auto item : systems) {
         System *system = vrv_cast<System *>(item);
         assert(system);
@@ -1309,9 +1301,7 @@ bool Doc::HasPage(int pageIdx)
 std::list<Score *> Doc::GetScores()
 {
     std::list<Score *> scores;
-    ListOfObjects objects;
-    ClassIdComparison cmp(SCORE);
-    this->FindAllDescendantByComparison(&objects, &cmp, 3);
+    ListOfObjects objects = this->FindAllDescendantsByType(SCORE, false, 3);
     for (const auto object : objects) {
         Score *score = vrv_cast<Score *>(object);
         assert(score);
