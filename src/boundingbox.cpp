@@ -760,7 +760,12 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     return point;
 }
 
-double BoundingBox::CalcSlope(Point const &p1, Point const &p2)
+bool BoundingBox::ArePointsClose(const Point &p1, const Point &p2, int margin)
+{
+    return (hypot(p1.x - p2.x, p1.y - p2.y) <= margin);
+}
+
+double BoundingBox::CalcSlope(const Point &p1, const Point &p2)
 {
     if ((p1.y == p2.y) || (p1.x == p2.x)) return 0.0;
 

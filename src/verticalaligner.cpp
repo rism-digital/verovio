@@ -934,25 +934,36 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         }
     }
 
+    // Adjust positioning of slurs with common start/end
     Staff *staff = GetStaff();
     if (staff) {
-        const int slurShift = staff->m_drawingStaffSize / 2;
-        for (size_t i = 0; i + 1 < positioners.size(); i++) {
+        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        for (size_t i = 0; i + 1 < positioners.size(); ++i) {
             Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
-            for (auto j = i + 1; j < positioners.size(); j++) {
+            for (size_t j = i + 1; j < positioners.size(); ++j) {
                 Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
                 Point points1[4], points2[4];
                 positioners[i]->GetPoints(points1);
                 positioners[j]->GetPoints(points2);
-                if (firstSlur->GetStart() == secondSlur->GetStart()) {
-                    FloatingCurvePositioner *positioner = positioners[points1[2].x > points2[2].x ? i : j];
-                    positioner->MoveFrontVertical(
-                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                if ((firstSlur->GetStart() == secondSlur->GetStart())
+                    && BoundingBox::ArePointsClose(points1[0], points2[0], unit)) {
+                    FloatingCurvePositioner *positioner = positioners[points1[3].x > points2[3].x ? i : j];
+                    positioner->MoveFrontVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -unit : unit);
                 }
-                else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
+                else if ((firstSlur->GetEnd() == secondSlur->GetEnd())
+                    && BoundingBox::ArePointsClose(points1[3], points2[3], unit)) {
                     FloatingCurvePositioner *positioner = positioners[points1[0].x < points2[0].x ? i : j];
-                    positioner->MoveBackVertical(
-                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                    positioner->MoveBackVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -unit : unit);
+                }
+                else if ((firstSlur->GetStart() == secondSlur->GetEnd())
+                    && BoundingBox::ArePointsClose(points1[0], points2[3], unit)) {
+                    positioners[i]->MoveFrontHorizontal(unit / 2);
+                    positioners[j]->MoveBackHorizontal(-unit / 2);
+                }
+                else if ((firstSlur->GetEnd() == secondSlur->GetStart())
+                    && BoundingBox::ArePointsClose(points1[3], points2[0], unit)) {
+                    positioners[i]->MoveBackHorizontal(-unit / 2);
+                    positioners[j]->MoveFrontHorizontal(unit / 2);
                 }
             }
         }

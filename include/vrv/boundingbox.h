@@ -189,9 +189,14 @@ public:
         const Point bezier[4], bool isMaxExtrema, int approximationSteps = BEZIER_APPROXIMATION);
 
     /**
+     * @return true if the distance between the points does not exceed margin
+     */
+    static bool ArePointsClose(const Point &p1, const Point &p2, int margin);
+
+    /**
      * Calculate the slope represented by two points
      */
-    static double CalcSlope(Point const &p1, Point const &p2);
+    static double CalcSlope(const Point &p1, const Point &p2);
 
     /**
      * Calculate the position of a point after a rotation of alpha (in radian) around the center

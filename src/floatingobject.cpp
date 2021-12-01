@@ -544,6 +544,18 @@ void FloatingCurvePositioner::UpdatePoints(const BezierCurve &bezier)
     this->UpdateCurveParams(points, m_angle, m_thickness, m_dir);
 }
 
+void FloatingCurvePositioner::MoveFrontHorizontal(int distance)
+{
+    m_points[0].x += distance;
+    m_points[1].x += distance;
+}
+
+void FloatingCurvePositioner::MoveBackHorizontal(int distance)
+{
+    m_points[2].x += distance;
+    m_points[3].x += distance;
+}
+
 void FloatingCurvePositioner::MoveFrontVertical(int distance)
 {
     m_points[0].y += distance;
