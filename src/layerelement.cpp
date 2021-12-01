@@ -2359,7 +2359,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         }
 
         // Skip elements aligned at start/end, but on a different staff
-        if (this->GetAlignment() == start->GetAlignment()) {
+        if ((this->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
             Layer *layer = NULL;
             Staff *staff = this->GetCrossStaff(layer);
             if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
@@ -2369,7 +2369,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
                 return FUNCTOR_CONTINUE;
             }
         }
-        if (this->GetAlignment() == end->GetAlignment()) {
+        if ((this->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
             Layer *layer = NULL;
             Staff *staff = this->GetCrossStaff(layer);
             if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
