@@ -1652,7 +1652,8 @@ int LayerElement::AdjustOverlappingLayers(
     }
 
     if (this->Is({ ACCID, DOTS, STEM })) {
-        LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
+        LayerElement *parent
+            = vrv_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
         assert(parent);
         parent->SetDrawingXRel(parent->GetDrawingXRel() + margin);
     }
