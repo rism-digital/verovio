@@ -1651,9 +1651,7 @@ int LayerElement::AdjustOverlappingLayers(
         stemSameas = note->HasStemSameasNote();
     }
 
-    if (this->Is({ DOTS, STEM })) {
-        assert(this->GetParent());
-        assert(this->GetParent()->IsLayerElement());
+    if (this->Is({ ACCID, DOTS, STEM })) {
         LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
         assert(parent);
         parent->SetDrawingXRel(parent->GetDrawingXRel() + margin);
@@ -1772,6 +1770,11 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             else {
                 shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
             }
+        }
+        else if (this->Is(ACCID) && otherElements.at(i)->Is(NOTE)) {
+            if (this->HorizontalContentOverlap(otherElements.at(i)))
+                shift += this->HorizontalRightOverlap(
+                    otherElements.at(i), doc, -doc->GetDrawingUnit(staff->m_drawingStaffSize));
         }
 
         if (this->Is(NOTE) && !otherElements.at(i)->Is(STEM)) {

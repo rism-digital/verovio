@@ -763,9 +763,24 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
     Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
+    const ArrayOfObjects *children = this->GetChildren();
+
+    Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
+    const bool hasUnisonOverlap = std::any_of(children->begin(), children->end(), [parentNote](Object *object) {
+        if (object->Is(NOTE)) {
+            Note *otherNote = vrv_cast<Note *>(object);
+            // in case notes are in unison but have different accidentals
+            if (parentNote && parentNote->IsUnisonWith(otherNote, true)
+                && !parentNote->IsUnisonWith(otherNote, false)) {
+                return true;
+            }
+        }
+    });
 
     // bottom one
-    for (auto child : this->GetChildren()) {
+    for (auto child : *children) {
+        // if accidental has unison overlap, ignore elements on other layers for overlap
+        if (hasUnisonOverlap && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER))) continue;
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
 
