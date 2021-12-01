@@ -126,7 +126,7 @@ private:
     std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
 
     // Calculate positioning for the horizontal beams
-    void CalcHorizontalBeam(BeamDrawingInterface *beamInterface);
+    void CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
 
     // Helper to calculate relative position of the beam to for each of the coordinates
     void CalcMixedBeamPlace(Staff *staff);

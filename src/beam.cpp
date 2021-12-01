@@ -889,15 +889,15 @@ void BeamSegment::CalcBeamPosition(
     if (!isHorizontal) {
         bool shorten;
         int step;
-        if (CalcBeamSlope(layer, staff, doc, beamInterface, shorten, step)) {
-            CalcAdjustSlope(staff, doc, beamInterface, shorten, step);
+        if (this->CalcBeamSlope(layer, staff, doc, beamInterface, shorten, step)) {
+            this->CalcAdjustSlope(staff, doc, beamInterface, shorten, step);
         }
         else {
             this->CalcAdjustPosition(staff, doc, beamInterface);
         }
     }
     else {
-        CalcHorizontalBeam(beamInterface);
+        this->CalcHorizontalBeam(doc, staff, beamInterface);
     }
 
     if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
@@ -1164,15 +1164,11 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     int relevantNoteLoc = VRV_UNSET;
-    //data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     for (auto coord : m_beamElementCoordRefs) {
-        data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-        if (place != BEAMPLACE_mixed) {
-            stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
-        }
-        else {
-            stemDir = (coord->m_beamRelativePlace == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
-        }
+        const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
+            : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
+                                                                      : STEMDIRECTION_up;
         const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
         coord->SetClosestNote(stemDir);
         if (!coord->m_closestNote) continue;
@@ -1188,6 +1184,10 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
 
     int minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
+        const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
+            : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
+                                                                      : STEMDIRECTION_up;
+        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
         if (!coord->m_closestNote) continue;
         // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
         // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
@@ -1226,10 +1226,10 @@ std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) co
     return { highestPoint, lowestPoint };
 }
 
-void BeamSegment::CalcHorizontalBeam(BeamDrawingInterface* beamInterface) {
+void BeamSegment::CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface* beamInterface) {
     
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-        CalcMixedBeamStem(beamInterface, 0);
+        this->CalcMixedBeamStem(beamInterface, 0);
     }
     else {
         int maxLength = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? VRV_UNSET : -VRV_UNSET;
@@ -1251,7 +1251,7 @@ void BeamSegment::CalcHorizontalBeam(BeamDrawingInterface* beamInterface) {
         }
     }
 
-    CalcSetValues();
+    this->CalcAdjustPosition(staff, doc, beamInterface);
 }
 
 void BeamSegment::CalcMixedBeamPlace(Staff *staff)
