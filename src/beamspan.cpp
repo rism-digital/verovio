@@ -26,9 +26,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // BeamSpan
 //----------------------------------------------------------------------------
+static const ClassRegistrar<BeamSpan> s_factory("beamSpan", BEAMSPAN);
 
 BeamSpan::BeamSpan()
-    : ControlElement("beamspan-")
+    : ControlElement(BEAMSPAN, "beamspan-")
     , BeamDrawingInterface()
     , PlistInterface()
     , TimeSpanningInterface()
@@ -87,13 +88,13 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
     // find all elements between startId and endId of the beamSpan
     ClassIdsComparison classIds({ NOTE, CHORD });
     ListOfObjects objects;
-    layer->FindAllDescendantBetween(&objects, &classIds, GetStart(), GetEnd(), true, false);
+    layer->FindAllDescendantsBetween(&objects, &classIds, this->GetStart(), this->GetEnd(), true, false);
 
     ArrayOfObjects beamSpanElements(objects.begin(), objects.end());
     // If last element is not equal to the end, there is high chance that this beamSpan is cross-measure.
     // Look for the same N-staff N-layer in next measure and try finding end there
-    if (beamSpanElements.back() != GetEnd()) {
-        Measure *measure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
+    if (beamSpanElements.back() != this->GetEnd()) {
+        Measure *measure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
         Object *parent = measure->GetParent();
 
         const int index = parent->GetChildIndex(measure);
@@ -109,9 +110,10 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
                     ClassIdsComparison classIds({ NOTE, CHORD });
                     ListOfObjects nextLayerObjects;
                     // pass NULL as starting element to add all elements until end is reached
-                    nextStaffLayer->FindAllDescendantBetween(&nextLayerObjects, &classIds, NULL, GetEnd(), true, false);
+                    nextStaffLayer->FindAllDescendantsBetween(
+                        &nextLayerObjects, &classIds, NULL, this->GetEnd(), true, false);
                     // Handle only next measure for the time being
-                    if (nextLayerObjects.back() == GetEnd()) {
+                    if (nextLayerObjects.back() == this->GetEnd()) {
                         beamSpanElements.insert(
                             beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
                     }
@@ -171,13 +173,13 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (!GetStart()) return FUNCTOR_CONTINUE;
+    if (!this->GetStart()) return FUNCTOR_CONTINUE;
 
-    Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
-    Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
-    Measure *measure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
+    Layer *layer = vrv_cast<Layer *>(this->GetStart()->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+    Measure *measure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
 
-    InitCoords(&m_beamedElements, staff, GetPlace());
+    this->InitCoords(&m_beamedElements, staff, this->GetPlace());
 
     m_beamSegments.at(0)->InitPlacementInformation(measure, staff, layer);
     m_beamSegments.at(0)->m_placementInfo->m_begin = m_beamElementCoords.begin();
@@ -192,13 +194,13 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
 
 int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
 {
-    if (!m_beamedElements.empty() || !GetStart()) return FUNCTOR_CONTINUE;
+    if (!m_beamedElements.empty() || !this->GetStart()) return FUNCTOR_CONTINUE;
 
     Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
     if (!layer || !staff) return FUNCTOR_SIBLINGS;
 
-    m_beamedElements = HasPlist() ? *GetRefs() : GetBeamSpanElementList(layer, staff);
+    m_beamedElements = this->HasPlist() ? *this->GetRefs() : this->GetBeamSpanElementList(layer, staff);
 
     // set current beamSpan as referencedElement for all beamed elemenents (for the
     // sake of figuring if corresponding element is in beamSpan)
@@ -227,8 +229,8 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
 
     if (m_beamedElements.empty() || !GetStart() || !GetEnd()) return FUNCTOR_CONTINUE;
 
-    Object *startSystem = GetStart()->GetFirstAncestor(SYSTEM);
-    Object *endSystem = GetEnd()->GetFirstAncestor(SYSTEM);
+    Object *startSystem = this->GetStart()->GetFirstAncestor(SYSTEM);
+    Object *endSystem = this->GetEnd()->GetFirstAncestor(SYSTEM);
     assert(startSystem && endSystem);
     if (startSystem == endSystem) return FUNCTOR_CONTINUE;
 
@@ -250,16 +252,16 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
 
     // Iterator for the elements are based on the initial order of the elements, so skip current system when
     // found and process it separatelly in the end
-    Object *currentSystemn = GetFirstAncestor(SYSTEM);
+    Object *currentSystemn = this->GetFirstAncestor(SYSTEM);
     int currentSystemIndex = 0;
     for (int i = 0; i < elements.size() - 1; ++i) {
         if (elements.at(i).second == currentSystemn) {
             currentSystemIndex = i;
             continue;
         }
-        AddSpanningSegment(params->m_doc, elements, i);
+        this->AddSpanningSegment(params->m_doc, elements, i);
     }
-    AddSpanningSegment(params->m_doc, elements, currentSystemIndex, false);
+    this->AddSpanningSegment(params->m_doc, elements, currentSystemIndex, false);
 
     return FUNCTOR_CONTINUE;
 }

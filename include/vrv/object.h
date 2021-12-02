@@ -411,8 +411,8 @@ public:
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantsBetween(
-        ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
+    void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, Object *start, Object *end,
+        bool clear = true, bool includeChildren = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -1291,7 +1291,7 @@ public:
     ///@}
 
     /**
-     * Resolve spinning beamspans by breaking it into separate parts, each belonging to the corresponding
+     * Resolve spanning beamspans by breaking it into separate parts, each belonging to the corresponding
      * system/measure. BeamSpans get elements reassigned, so that each beamSpan can be drawn as control
      * element. This allows free placement of beamSpan in the MEI tree and ensures that beamSpan will be
      * drawn properly

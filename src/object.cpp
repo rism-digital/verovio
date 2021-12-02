@@ -583,13 +583,14 @@ void Object::FindAllDescendantsByComparison(
 }
 
 void Object::FindAllDescendantsBetween(
-    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
+    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear, bool includeChildren)
 {
     assert(objects);
     if (clear) objects->clear();
 
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
+    findAllBetweenParams.m_includeChildren = includeChildren;
     this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
 }
 

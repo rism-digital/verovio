@@ -247,6 +247,7 @@ int LayerElement::GetOriginalLayerN()
         layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
     }
     return layerN;
+}
 
 bool LayerElement::IsInBeamSpan() const
 {

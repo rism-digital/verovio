@@ -44,19 +44,18 @@ public:
     ///@{
     BeamSpan();
     virtual ~BeamSpan();
-    virtual Object *Clone() const { return new BeamSpan(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "BeamSpan"; }
-    virtual ClassId GetClassId() const { return BEAMSPAN; }
+    Object *Clone() const override { return new BeamSpan(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "BeamSpan"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ////@}
 
     // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
@@ -78,17 +77,17 @@ public:
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResolveBeamSpanElements
      */
-    virtual int ResolveBeamSpanElements(FunctorParams *);
+    int ResolveBeamSpanElements(FunctorParams *) override;
 
     /**
      * See Object::ResolveSpanningBeamSpans
      */
-    virtual int ResolveSpanningBeamSpans(FunctorParams *);
+    int ResolveSpanningBeamSpans(FunctorParams *) override;
 
 private:
     // Helper for breaking one big spanning beamSpan into smaller beamSpans
