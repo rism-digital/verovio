@@ -159,6 +159,9 @@ class Unclear;
 class Verse;
 class Zone;
 
+// Helper enums
+enum class MatchLocation { Before, Now, After };
+
 //----------------------------------------------------------------------------
 // MEIOutput
 //----------------------------------------------------------------------------
@@ -184,12 +187,18 @@ public:
     /**
      * The main method for write objects.
      */
+    ///@{
     bool WriteObject(Object *object) override;
+    bool WriteObject(Object *object, bool handleScoreBasedFilter);
+    ///@}
 
     /**
      * Writing object method that must be overridden in the child class.
      */
+    ///@{
     bool WriteObjectEnd(Object *object) override;
+    bool WriteObjectEnd(Object *object, bool handleScoreBasedFilter);
+    ///@}
 
     /**
      * Return the output as a string by writing it to the stringstream member.
@@ -202,6 +211,13 @@ public:
     ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
     bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
+    ///@}
+
+    /**
+     * Filtering by measure, page or mdiv
+     */
+    ///@{
+    bool HasFilter() const;
     ///@}
 
     /**
@@ -228,6 +244,22 @@ public:
     void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
 private:
+    /**
+     * Check if the filter is currently matching
+     */
+    bool IsMatchingFilter() const;
+
+    /**
+     * Writing stacked objects
+     */
+    ///@{
+    void WriteStackedObjects(bool ignoreTop);
+    void WriteStackedObjectsEnd(bool ignoreTop);
+    ///@}
+
+    /**
+     * Write the document
+     */
     bool WriteDoc(Doc *doc);
 
     /**
@@ -458,10 +490,21 @@ private:
     int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
-    /** @name Current element */
+
+    /** Current xml element */
     pugi::xml_node m_currentNode;
+    /** Xml node stack */
     std::list<pugi::xml_node> m_nodeStack;
+    /** Boundary objects which are merged into one xml element */
     std::stack<Object *> m_boundaries;
+    /** The object stack */
+    std::stack<Object *> m_objectStack;
+
+    /** Filtering */
+    ///@{
+    MatchLocation m_filterMatchLocation;
+    ///@}
+
     bool m_removeIds;
     ListOfObjects m_referredObjects;
 };

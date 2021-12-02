@@ -152,6 +152,7 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
     m_indent = 5;
     m_scoreBasedMEI = false;
     m_removeIds = false;
+    m_filterMatchLocation = MatchLocation::Before;
 }
 
 MEIOutput::~MEIOutput() {}
@@ -171,13 +172,23 @@ bool MEIOutput::Export()
     try {
         pugi::xml_document meiDoc;
 
+        if (this->HasFilter()) {
+            if (!this->IsScoreBasedMEI()) {
+                LogError("MEI output with filter is not possible in page-based MEI");
+                return false;
+            }
+            if (m_doc->IsMensuralMusicOnly()) {
+                LogError("MEI output with filter is not possible for mensural music");
+                return false;
+            }
+        }
+
         // Saving the entire document
         // * With score-based MEI, all mdivs are saved
         // * With page-based MEI, only visible mdivs are saved
-        if (!this->IsSavingSinglePage()) {
-            pugi::xml_node decl = meiDoc.prepend_child(pugi::node_declaration);
-            decl.append_attribute("version") = "1.0";
-            decl.append_attribute("encoding") = "UTF-8";
+        pugi::xml_node decl = meiDoc.prepend_child(pugi::node_declaration);
+        decl.append_attribute("version") = "1.0";
+        decl.append_attribute("encoding") = "UTF-8";
 
             // schema processing instruction
             const std::string schema = this->IsPageBasedMEI() ? "https://www.verovio.org/schema/dev/mei-verovio.rng"
@@ -201,51 +212,14 @@ bool MEIOutput::Export()
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
             m_mei.append_attribute("meiversion") = "5.0.0-dev";
 
-            // If the document is mensural, we have to undo the mensural (segments) cast off
-            m_doc->ConvertToCastOffMensuralDoc(false);
+        // If the document is mensural, we have to undo the mensural (segments) cast off
+        m_doc->ConvertToCastOffMensuralDoc(false);
 
-            // this starts the call of all the functors
-            m_doc->Save(this);
+        // this starts the call of all the functors
+        m_doc->Save(this);
 
-            // Redo the mensural segment cast of if necessary
-            m_doc->ConvertToCastOffMensuralDoc(true);
-        }
-        // Saving a single page
-        // * This score-based MEI only
-        // * A single <score> element is saved without an MEI header
-        // * Saving a single page with --mdiv-all is not possible
-        // * All hidden mdivs are not saved when saving a single page in score-based MEI
-        else if (this->IsScoreBasedMEI()) {
-            if (m_doc->IsMensuralMusicOnly()) {
-                LogError("MEI output by page is not possible for mensural music");
-                return false;
-            }
-            if (m_doc->GetOptions()->m_mdivAll.GetValue()) {
-                LogError("MEI output by page is not possible for with --mdiv-all enabled");
-                return false;
-            }
-            if (m_page >= m_doc->GetPageCount()) {
-                LogError("Page %d does not exist", m_page);
-                return false;
-            }
-            Pages *pages = m_doc->GetPages();
-            assert(pages);
-            Page *page = dynamic_cast<Page *>(pages->GetChild(m_page));
-            assert(page);
-
-            m_currentNode = meiDoc.append_child("score");
-            m_currentNode = m_currentNode.append_child("section");
-            m_nodeStack.push_back(m_currentNode);
-            // First save the main scoreDef
-            m_doc->GetCurrentScoreDef()->Save(this);
-
-            page->Save(this);
-        }
-        else {
-            LogError("MEI output by page is not possible in page-based MEI");
-            return false;
-        }
-
+        // Redo the mensural segment cast of if necessary
+        m_doc->ConvertToCastOffMensuralDoc(true);
         unsigned int output_flags = pugi::format_default;
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
             output_flags |= pugi::format_no_escapes;
@@ -276,6 +250,34 @@ std::string MEIOutput::GetOutput(int page)
 
 bool MEIOutput::WriteObject(Object *object)
 {
+    return this->WriteObject(object, true);
+}
+
+bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter)
+{
+    if (this->IsScoreBasedMEI() && handleScoreBasedFilter) {
+        if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_ELEMENT_END, PAGE_ELEMENT_END })) {
+            m_objectStack.push(object);
+        }
+        if (this->IsMatchingFilter()) {
+            // Transition Before => Now
+            if (m_filterMatchLocation == MatchLocation::Before) {
+                m_filterMatchLocation = MatchLocation::Now;
+                this->WriteStackedObjects(true);
+            }
+        }
+        else {
+            // Transition Now => After
+            if (m_filterMatchLocation == MatchLocation::Now) {
+                m_filterMatchLocation = MatchLocation::After;
+                this->WriteStackedObjectsEnd(true);
+            }
+        }
+        if (m_filterMatchLocation != MatchLocation::Now) {
+            return true;
+        }
+    }
+
     if (object->HasComment()) {
         m_currentNode.append_child(pugi::node_comment).set_value(object->GetComment().c_str());
     }
@@ -307,13 +309,8 @@ bool MEIOutput::WriteObject(Object *object)
         }
     }
     else if (object->Is(SCORE)) {
-        if (this->IsPageBasedMEI() || !this->IsSavingSinglePage()) {
-            m_currentNode = m_currentNode.append_child("score");
-            WriteScore(m_currentNode, dynamic_cast<Score *>(object));
-        }
-        else {
-            return true;
-        }
+        m_currentNode = m_currentNode.append_child("score");
+        WriteScore(m_currentNode, dynamic_cast<Score *>(object));
     }
 
     // Page and content
@@ -851,18 +848,14 @@ bool MEIOutput::WriteObject(Object *object)
 
 bool MEIOutput::WriteObjectEnd(Object *object)
 {
-    // Object representing an attribute have no node to pop
-    if (object->IsAttribute()) {
-        return true;
-    }
+    return this->WriteObjectEnd(object, true);
+}
 
-    if (this->IsScoreBasedMEI()) {
+bool MEIOutput::WriteObjectEnd(Object *object, bool handleScoreBasedFilter)
+{
+    if (this->IsScoreBasedMEI() && handleScoreBasedFilter) {
         // In score-based MEI, page, pages and system are not written.
         if (object->Is({ PAGE, PAGES, SYSTEM })) {
-            return true;
-        }
-        // When saving a single page, mdiv and score object are not written.
-        if (object->Is({ MDIV, SCORE }) && this->IsSavingSinglePage()) {
             return true;
         }
 
@@ -880,12 +873,26 @@ bool MEIOutput::WriteObjectEnd(Object *object)
                 return true;
             }
         }
+
+        // Pop current object or merged boundary from stack
+        if (!m_objectStack.empty()) {
+            m_objectStack.pop();
+        }
+
+        if (m_filterMatchLocation != MatchLocation::Now) {
+            return true;
+        }
     }
     else {
         // In page-based MEI, pb and sb are not written.
         if (object->Is({ PB, SB })) {
             return true;
         }
+    }
+
+    // Object representing an attribute have no node to pop
+    if (object->IsAttribute()) {
+        return true;
     }
 
     if (object->HasClosingComment()) {
@@ -896,6 +903,46 @@ bool MEIOutput::WriteObjectEnd(Object *object)
     m_currentNode = m_nodeStack.back();
 
     return true;
+}
+
+bool MEIOutput::HasFilter() const
+{
+    return false;
+}
+
+bool MEIOutput::IsMatchingFilter() const
+{
+    return true;
+}
+
+void MEIOutput::WriteStackedObjects(bool ignoreTop)
+{
+    // Copy the stack into a list, possibly ignoring the top element
+    ListOfObjects objects;
+    std::stack<Object *> tempStack = m_objectStack;
+    if (ignoreTop && !tempStack.empty()) tempStack.pop();
+    while (!tempStack.empty()) {
+        objects.push_front(tempStack.top());
+        tempStack.pop();
+    }
+
+    // Iterate over that list and write the objects
+    std::for_each(objects.begin(), objects.end(), [this](Object *object) { this->WriteObject(object, false); });
+}
+
+void MEIOutput::WriteStackedObjectsEnd(bool ignoreTop)
+{
+    // Copy the stack into a list, possibly ignoring the top element
+    ListOfObjects objects;
+    std::stack<Object *> tempStack = m_objectStack;
+    if (ignoreTop && !tempStack.empty()) tempStack.pop();
+    while (!tempStack.empty()) {
+        objects.push_front(tempStack.top());
+        tempStack.pop();
+    }
+
+    // Reverse iterate over that list and write the objects
+    std::for_each(objects.rbegin(), objects.rend(), [this](Object *object) { this->WriteObjectEnd(object, false); });
 }
 
 std::string MEIOutput::UuidToMeiStr(Object *element)
