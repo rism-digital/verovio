@@ -82,7 +82,8 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
         wchar_t code = Resources::GetGlyphCode(GetGlyphName());
         if (NULL == Resources::GetGlyph(code)) code = 0;
     }
-    else {
+
+    if (!code) {
         switch (notationType) {
             case NOTATIONTYPE_mensural:
             case NOTATIONTYPE_mensural_black:
