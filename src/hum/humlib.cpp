@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Nov 24 05:49:22 CET 2021
+// Last Modified: Fri Nov 26 22:38:47 CET 2021
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -27860,7 +27860,7 @@ bool HumdrumFileStructure::processLocalParametersForTrack(
 				// terminate if not most primary subspine
 				return true;
 			}
-		} else if (!(token->isNull() & token->isManipulator())) {
+		} else if (!(token->isNull() && token->isManipulator())) {
 			if (token->isCommentLocal()) {
 				checkForLocalParameters(token, current);
 			} else {
