@@ -250,7 +250,6 @@ public:
     int m_overlapMargin;
     int m_maxShortening; // maximum allowed shortening in half units
     bool m_centered; // beam is centered on the line
-    bool m_shortened; // stem is shortened because pointing oustide the staff
     data_BEAMPLACE m_beamRelativePlace;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;

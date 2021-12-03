@@ -969,7 +969,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
         // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
         if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-            || (!isHorizontal && (coord->m_dur > DUR_8) && (m_uniformStemLength < 13)))
+            || (!isHorizontal && (coord->m_dur > DUR_8) && (std::abs(m_uniformStemLength) < 13)))
             m_uniformStemLength = coordStemLength;
     }
     // make adjustments for the grace notes length
@@ -1295,10 +1295,6 @@ void BeamElementCoord::SetDrawingStemDir(
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     m_stem->SetDrawingStemDir(stemDir);
-    int ledgerLines = 0;
-    int ledgerLinesOpposite = 0;
-    m_shortened = false;
-
     m_yBeam = m_element->GetDrawingY();
     m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
                                          : interface->m_stemXBelow[interface->m_cueSize];
@@ -1313,13 +1309,6 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     m_yBeam = m_closestNote->GetDrawingY();
-    if (stemDir == STEMDIRECTION_up) {
-        m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
-    }
-    else {
-        m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
-    }
-
     m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
     if (m_element->IsGraceNote()) return;
@@ -1340,10 +1329,10 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (interface->m_shortestDur > DUR_32)) {
+    if ((interface->m_ledgerLines > 2) && (interface->m_shortestDur > DUR_32)) {
         m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
     }
-    else if ((ledgerLines > 1) && (interface->m_shortestDur > DUR_16)) {
+    else if ((interface->m_ledgerLines > 1) && (interface->m_shortestDur > DUR_16)) {
         m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
 
@@ -1366,7 +1355,6 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
         if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {
             stemLenInHalfUnits = standardStemLen - m_maxShortening;
         }
-        m_shortened = true;
         extend = false;
     }
 

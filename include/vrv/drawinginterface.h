@@ -128,6 +128,12 @@ public:
 
 protected:
     /**
+     * Set higher ledger number for the interface. Either top or bottom ledger lines are taken into account, based on
+     * the m_notesStemDir
+     */
+    void AdjustLedgerLineNumber(LayerElement *element);
+
+    /**
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
      */
@@ -142,6 +148,7 @@ public:
     Staff *m_crossStaffContent;
     data_STAFFREL_basic m_crossStaffRel;
     int m_shortestDur;
+    int m_ledgerLines;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
     Staff *m_beamStaff;
