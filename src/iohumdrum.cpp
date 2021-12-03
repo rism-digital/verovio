@@ -5585,9 +5585,29 @@ void HumdrumInput::setMensurationSymbol(
 
     if (metersig.find('C') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_C);
+        if (metersig.find("3/2") != std::string::npos) {
+            vrvmensur->SetNum(3);
+            vrvmensur->SetNumbase(2);
+        }
+        else if (metersig.find("C2") != std::string::npos) {
+            vrvmensur->SetNum(2);
+        }
+        else if (metersig.find("C3") != std::string::npos) {
+            vrvmensur->SetNum(3);
+        }
     }
     else if (metersig.find('O') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_O);
+        if (metersig.find("3/2") != std::string::npos) {
+            vrvmensur->SetNum(3);
+            vrvmensur->SetNumbase(2);
+        }
+        else if (metersig.find("O2") != std::string::npos) {
+            vrvmensur->SetNum(2);
+        }
+        else if (metersig.find("O3") != std::string::npos) {
+            vrvmensur->SetNum(3);
+        }
     }
     else {
         std::cerr << "Warning: do not understand mensuration " << metersig << std::endl;
