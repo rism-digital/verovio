@@ -545,7 +545,6 @@ std::list<Note *> Chord::GetAdjacentNotesList(Staff *staff, int loc)
         if ((std::abs(locDiff) <= 2) && (locDiff != 0)) {
             adjacentNotes.push_back(note);
         }
-
     }
     return adjacentNotes;
 }
