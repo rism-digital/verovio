@@ -646,7 +646,6 @@ int main(int argc, char **argv)
                 std::cout << toolkit.GetMEI(params);
             }
             else if (!toolkit.SaveFile(outfile, params)) {
-                std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
                 exit(1);
             }
             else {

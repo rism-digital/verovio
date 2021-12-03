@@ -203,7 +203,7 @@ public:
     /**
      * Return the output as a string by writing it to the stringstream member.
      */
-    std::string GetOutput(int page = -1);
+    std::string GetOutput();
 
     /**
      * @name Setter and getter for score-based MEI output
@@ -218,12 +218,9 @@ public:
      */
     ///@{
     bool HasFilter() const;
+    void SetFirstPage(int page);
+    void SetLastPage(int page);
     ///@}
-
-    /**
-     * Return true when the MEIOutput object is currently saving single page
-     */
-    bool IsSavingSinglePage() const { return (m_page != -1); }
 
     /**
      * @name Gettersto improve code readability
@@ -245,16 +242,20 @@ public:
 
 private:
     /**
-     * Check if the filter is currently matching
+     * Filtering
      */
+    ///@{
+    bool HasValidFilter() const;
     bool IsMatchingFilter() const;
+    void UpdateFilter(Object *object);
+    ///@}
 
     /**
      * Writing stacked objects
      */
     ///@{
-    void WriteStackedObjects(bool ignoreTop);
-    void WriteStackedObjectsEnd(bool ignoreTop);
+    void WriteStackedObjects();
+    void WriteStackedObjectsEnd();
     ///@}
 
     /**
@@ -487,7 +488,6 @@ public:
 private:
     std::ostringstream m_streamStringOutput;
     int m_indent;
-    int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
 
@@ -502,6 +502,10 @@ private:
 
     /** Filtering */
     ///@{
+    bool m_hasFilter;
+    int m_firstPage;
+    int m_currentPage;
+    int m_lastPage;
     MatchLocation m_filterMatchLocation;
     ///@}
 

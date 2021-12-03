@@ -764,8 +764,9 @@ bool Toolkit::LoadData(const std::string &data)
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
-    int pageNo = 0;
     bool removeIds = m_options->m_removeIds.GetValue();
+    int firstPage = 0;
+    int lastPage = 0;
 
     jsonxx::Object json;
 
@@ -776,19 +777,22 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
         }
         else {
             if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
-            if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
             if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+            if (json.has<jsonxx::Number>("firstPage")) firstPage = json.get<jsonxx::Number>("firstPage");
+            if (json.has<jsonxx::Number>("lastPage")) lastPage = json.get<jsonxx::Number>("lastPage");
+            if (json.has<jsonxx::Number>("pageNo")) {
+                firstPage = json.get<jsonxx::Number>("pageNo");
+                lastPage = firstPage;
+            }
         }
     }
 
-    if (GetPageCount() == 0) {
+    if (this->GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
     }
 
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
-    // Page number is one-based - correct it to 0-based first
-    pageNo--;
 
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
@@ -797,7 +801,10 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     meioutput.SetIndent(indent);
     meioutput.SetRemoveIds(removeIds);
 
-    std::string output = meioutput.GetOutput(pageNo);
+    if (firstPage > 0) meioutput.SetFirstPage(firstPage);
+    if (lastPage > 0) meioutput.SetLastPage(lastPage);
+
+    std::string output = meioutput.GetOutput();
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
@@ -823,12 +830,15 @@ std::string Toolkit::ValidatePAE(const std::string &data)
 bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptions)
 {
     std::string output = GetMEI(jsonOptions);
+    if (output.empty()) {
+        return false;
+    }
 
     std::ofstream outfile;
     outfile.open(filename.c_str());
 
     if (!outfile.is_open()) {
-        // add message?
+        LogError("Unable to write MEI to %s", filename.c_str());
         return false;
     }
 

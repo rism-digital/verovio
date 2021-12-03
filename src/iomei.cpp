@@ -148,10 +148,13 @@ const std::vector<std::string> MEIInput::s_editorialElementNames = { "abbr", "ad
 
 MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 {
-    m_page = -1;
     m_indent = 5;
     m_scoreBasedMEI = false;
     m_removeIds = false;
+    m_hasFilter = false;
+    m_firstPage = 1;
+    m_currentPage = 0;
+    m_lastPage = doc->GetPageCount();
     m_filterMatchLocation = MatchLocation::Before;
 }
 
@@ -179,6 +182,10 @@ bool MEIOutput::Export()
             }
             if (m_doc->IsMensuralMusicOnly()) {
                 LogError("MEI output with filter is not possible for mensural music");
+                return false;
+            }
+            if (!this->HasValidFilter()) {
+                LogError("Invalid filter, please check the input");
                 return false;
             }
         }
@@ -239,11 +246,9 @@ bool MEIOutput::Export()
     return true;
 }
 
-std::string MEIOutput::GetOutput(int page)
+std::string MEIOutput::GetOutput()
 {
-    m_page = page;
     this->Export();
-    m_page = -1;
 
     return m_streamStringOutput.str();
 }
@@ -256,23 +261,28 @@ bool MEIOutput::WriteObject(Object *object)
 bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter)
 {
     if (this->IsScoreBasedMEI() && handleScoreBasedFilter) {
-        if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_ELEMENT_END, PAGE_ELEMENT_END })) {
-            m_objectStack.push(object);
-        }
+        // Update current page etc.
+        this->UpdateFilter(object);
+
         if (this->IsMatchingFilter()) {
             // Transition Before => Now
             if (m_filterMatchLocation == MatchLocation::Before) {
                 m_filterMatchLocation = MatchLocation::Now;
-                this->WriteStackedObjects(true);
+                this->WriteStackedObjects();
             }
         }
         else {
             // Transition Now => After
             if (m_filterMatchLocation == MatchLocation::Now) {
                 m_filterMatchLocation = MatchLocation::After;
-                this->WriteStackedObjectsEnd(true);
+                this->WriteStackedObjectsEnd();
             }
         }
+
+        if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_ELEMENT_END, PAGE_ELEMENT_END })) {
+            m_objectStack.push(object);
+        }
+
         if (m_filterMatchLocation != MatchLocation::Now) {
             return true;
         }
@@ -907,20 +917,50 @@ bool MEIOutput::WriteObjectEnd(Object *object, bool handleScoreBasedFilter)
 
 bool MEIOutput::HasFilter() const
 {
-    return false;
+    return m_hasFilter;
+}
+
+void MEIOutput::SetFirstPage(int page)
+{
+    m_firstPage = page;
+    m_hasFilter = true;
+}
+
+void MEIOutput::SetLastPage(int page)
+{
+    m_lastPage = page;
+    m_hasFilter = true;
+}
+
+bool MEIOutput::HasValidFilter() const
+{
+    if ((m_firstPage < 1) || (m_lastPage > m_doc->GetPageCount()) || (m_firstPage > m_lastPage)) {
+        return false;
+    }
+    return true;
 }
 
 bool MEIOutput::IsMatchingFilter() const
 {
+    if (!this->HasFilter()) return true;
+
+    if ((m_currentPage < m_firstPage) || (m_currentPage > m_lastPage)) return false;
+
     return true;
 }
 
-void MEIOutput::WriteStackedObjects(bool ignoreTop)
+void MEIOutput::UpdateFilter(Object *object)
 {
-    // Copy the stack into a list, possibly ignoring the top element
+    if (object->Is(PAGE)) {
+        ++m_currentPage;
+    }
+}
+
+void MEIOutput::WriteStackedObjects()
+{
+    // Copy the stack into a list
     ListOfObjects objects;
     std::stack<Object *> tempStack = m_objectStack;
-    if (ignoreTop && !tempStack.empty()) tempStack.pop();
     while (!tempStack.empty()) {
         objects.push_front(tempStack.top());
         tempStack.pop();
@@ -930,12 +970,11 @@ void MEIOutput::WriteStackedObjects(bool ignoreTop)
     std::for_each(objects.begin(), objects.end(), [this](Object *object) { this->WriteObject(object, false); });
 }
 
-void MEIOutput::WriteStackedObjectsEnd(bool ignoreTop)
+void MEIOutput::WriteStackedObjectsEnd()
 {
     // Copy the stack into a list, possibly ignoring the top element
     ListOfObjects objects;
     std::stack<Object *> tempStack = m_objectStack;
-    if (ignoreTop && !tempStack.empty()) tempStack.pop();
     while (!tempStack.empty()) {
         objects.push_front(tempStack.top());
         tempStack.pop();
