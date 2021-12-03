@@ -160,7 +160,10 @@ class Verse;
 class Zone;
 
 // Helper enums
-enum class MatchLocation { Before, Now, After };
+///@{
+enum class MatchLocation { Before, Here, After };
+enum class RangeMatchLocation { BeforeStart, AtStart, BetweenStartEnd, AtEnd, AfterEnd };
+///@}
 
 //----------------------------------------------------------------------------
 // MEIOutput
@@ -220,6 +223,9 @@ public:
     bool HasFilter() const;
     void SetFirstPage(int page);
     void SetLastPage(int page);
+    void SetFirstMeasure(const std::string &uuid);
+    void SetLastMeasure(const std::string &uuid);
+    void ResetFilter();
     ///@}
 
     /**
@@ -241,6 +247,11 @@ public:
     void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
 private:
+    /**
+     * Reset
+     */
+    void Reset();
+
     /**
      * Filtering
      */
@@ -503,10 +514,13 @@ private:
     /** Filtering */
     ///@{
     bool m_hasFilter;
+    MatchLocation m_filterMatchLocation;
     int m_firstPage;
     int m_currentPage;
     int m_lastPage;
-    MatchLocation m_filterMatchLocation;
+    std::string m_firstMeasureUuid;
+    std::string m_lastMeasureUuid;
+    RangeMatchLocation m_measureFilterMatchLocation;
     ///@}
 
     bool m_removeIds;

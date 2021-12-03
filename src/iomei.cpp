@@ -151,11 +151,9 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
     m_indent = 5;
     m_scoreBasedMEI = false;
     m_removeIds = false;
-    m_hasFilter = false;
-    m_firstPage = 1;
-    m_currentPage = 0;
-    m_lastPage = doc->GetPageCount();
-    m_filterMatchLocation = MatchLocation::Before;
+
+    this->Reset();
+    this->ResetFilter();
 }
 
 MEIOutput::~MEIOutput() {}
@@ -250,7 +248,11 @@ std::string MEIOutput::GetOutput()
 {
     this->Export();
 
-    return m_streamStringOutput.str();
+    std::string output = m_streamStringOutput.str();
+
+    this->Reset();
+
+    return output;
 }
 
 bool MEIOutput::WriteObject(Object *object)
@@ -265,15 +267,15 @@ bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter)
         this->UpdateFilter(object);
 
         if (this->IsMatchingFilter()) {
-            // Transition Before => Now
+            // Transition Before => Here
             if (m_filterMatchLocation == MatchLocation::Before) {
-                m_filterMatchLocation = MatchLocation::Now;
+                m_filterMatchLocation = MatchLocation::Here;
                 this->WriteStackedObjects();
             }
         }
         else {
-            // Transition Now => After
-            if (m_filterMatchLocation == MatchLocation::Now) {
+            // Transition Here => After
+            if (m_filterMatchLocation == MatchLocation::Here) {
                 m_filterMatchLocation = MatchLocation::After;
                 this->WriteStackedObjectsEnd();
             }
@@ -283,7 +285,7 @@ bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter)
             m_objectStack.push(object);
         }
 
-        if (m_filterMatchLocation != MatchLocation::Now) {
+        if (m_filterMatchLocation != MatchLocation::Here) {
             return true;
         }
     }
@@ -889,7 +891,7 @@ bool MEIOutput::WriteObjectEnd(Object *object, bool handleScoreBasedFilter)
             m_objectStack.pop();
         }
 
-        if (m_filterMatchLocation != MatchLocation::Now) {
+        if (m_filterMatchLocation != MatchLocation::Here) {
             return true;
         }
     }
@@ -932,11 +934,61 @@ void MEIOutput::SetLastPage(int page)
     m_hasFilter = true;
 }
 
+void MEIOutput::SetFirstMeasure(const std::string &uuid)
+{
+    m_firstMeasureUuid = uuid;
+    m_hasFilter = true;
+}
+
+void MEIOutput::SetLastMeasure(const std::string &uuid)
+{
+    m_lastMeasureUuid = uuid;
+    m_hasFilter = true;
+}
+
+void MEIOutput::ResetFilter()
+{
+    m_hasFilter = false;
+    m_firstPage = 1;
+    m_lastPage = m_doc->GetPageCount();
+    m_firstMeasureUuid = "";
+    m_lastMeasureUuid = "";
+}
+
+void MEIOutput::Reset()
+{
+    m_filterMatchLocation = MatchLocation::Before;
+    m_currentPage = 0;
+    m_measureFilterMatchLocation = RangeMatchLocation::BeforeStart;
+
+    m_streamStringOutput.str("");
+    m_streamStringOutput.clear();
+}
+
 bool MEIOutput::HasValidFilter() const
 {
+    // Verify page filter
     if ((m_firstPage < 1) || (m_lastPage > m_doc->GetPageCount()) || (m_firstPage > m_lastPage)) {
         return false;
     }
+
+    // Verify measure filter
+    Object *firstMeasure = NULL;
+    if (!m_firstMeasureUuid.empty()) {
+        firstMeasure = m_doc->FindDescendantByUuid(m_firstMeasureUuid);
+        if (!firstMeasure || !firstMeasure->Is(MEASURE)) return false;
+    }
+    Object *lastMeasure = NULL;
+    if (!m_lastMeasureUuid.empty()) {
+        lastMeasure = m_doc->FindDescendantByUuid(m_lastMeasureUuid);
+        if (!lastMeasure || !lastMeasure->Is(MEASURE)) return false;
+    }
+    if (firstMeasure && lastMeasure && (firstMeasure != lastMeasure)) {
+        if (!Object::IsPreOrdered(firstMeasure, lastMeasure)) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -944,15 +996,58 @@ bool MEIOutput::IsMatchingFilter() const
 {
     if (!this->HasFilter()) return true;
 
+    // Check page filter
     if ((m_currentPage < m_firstPage) || (m_currentPage > m_lastPage)) return false;
+
+    // Check measure filter
+    if ((m_measureFilterMatchLocation == RangeMatchLocation::BeforeStart)
+        || (m_measureFilterMatchLocation == RangeMatchLocation::AfterEnd)) {
+        return false;
+    }
 
     return true;
 }
 
 void MEIOutput::UpdateFilter(Object *object)
 {
+    // Update page
     if (object->Is(PAGE)) {
         ++m_currentPage;
+    }
+
+    // Update measure range
+    if (m_firstMeasureUuid.empty() && (m_measureFilterMatchLocation == RangeMatchLocation::BeforeStart)) {
+        m_measureFilterMatchLocation = RangeMatchLocation::BetweenStartEnd;
+    }
+    if (object->Is(MEASURE)) {
+        switch (m_measureFilterMatchLocation) {
+            case RangeMatchLocation::BeforeStart:
+                if (!m_firstMeasureUuid.empty() && (object->GetUuid() == m_firstMeasureUuid)) {
+                    m_measureFilterMatchLocation = RangeMatchLocation::AtStart;
+                }
+                break;
+            case RangeMatchLocation::AtStart:
+                if (m_lastMeasureUuid.empty()) {
+                    m_measureFilterMatchLocation = RangeMatchLocation::BetweenStartEnd;
+                }
+                else if (object->GetUuid() == m_lastMeasureUuid) {
+                    m_measureFilterMatchLocation = RangeMatchLocation::AtEnd;
+                }
+                else if (m_firstMeasureUuid == m_lastMeasureUuid) {
+                    m_measureFilterMatchLocation = RangeMatchLocation::AfterEnd;
+                }
+                else {
+                    m_measureFilterMatchLocation = RangeMatchLocation::BetweenStartEnd;
+                }
+                break;
+            case RangeMatchLocation::BetweenStartEnd:
+                if (!m_lastMeasureUuid.empty() && (object->GetUuid() == m_lastMeasureUuid)) {
+                    m_measureFilterMatchLocation = RangeMatchLocation::AtEnd;
+                }
+                break;
+            case RangeMatchLocation::AtEnd: m_measureFilterMatchLocation = RangeMatchLocation::AfterEnd; break;
+            default: break;
+        }
     }
 }
 
