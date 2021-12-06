@@ -94,8 +94,7 @@ void BeamDrawingInterface::Reset()
     m_beamWidthWhite = 0;
 }
 
-
-void BeamDrawingInterface::AdjustLedgerLineNumber(LayerElement *element) 
+void BeamDrawingInterface::AdjustLedgerLineNumber(LayerElement *element)
 {
     Note *note = NULL;
     if (element->Is(NOTE)) {
