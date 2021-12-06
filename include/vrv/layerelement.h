@@ -450,7 +450,7 @@ protected:
      * their unison notes or if they should be placed separately.
      * Returns true if all elements can safely overlap.
      */
-    virtual int CountElementsInUnison(
+    virtual std::vector<int> GetElementsInUnison(
         const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
 
     /**
