@@ -765,19 +765,11 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
     std::vector<Accid *> leftAccids;
     const ArrayOfObjects *children = this->GetChildren();
 
-    Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
-    const bool hasUnisonOverlap = std::any_of(children->begin(), children->end(), [parentNote](Object *object) {
-        if (!object->Is(NOTE)) return false;
-
-        Note *otherNote = vrv_cast<Note *>(object);
-        // in case notes are in unison but have different accidentals
-        return parentNote && parentNote->IsUnisonWith(otherNote, true) && !parentNote->IsUnisonWith(otherNote, false);
-    });
-
     // bottom one
     for (auto child : *children) {
         // if accidental has unison overlap, ignore elements on other layers for overlap
-        if (hasUnisonOverlap && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER))) continue;
+        if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
+            continue;
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
 
@@ -799,6 +791,38 @@ bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
         }
     }
     return false;
+}
+
+void AlignmentReference::SetAccidLayerAlignment()
+{
+    const ArrayOfObjects *children = this->GetChildren();
+    for (Accid *accid : m_accidSpace) {
+        if (accid->IsAlignedWithSameLayer()) continue;
+
+        Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
+        const bool hasUnisonOverlap = std::any_of(children->begin(), children->end(), [parentNote](Object *object) {
+            if (!object->Is(NOTE)) return false;
+            Note *otherNote = vrv_cast<Note *>(object);
+            // in case notes are in unison but have different accidentals
+            return parentNote && parentNote->IsUnisonWith(otherNote, true)
+                && !parentNote->IsUnisonWith(otherNote, false);
+        });
+
+        if (!hasUnisonOverlap) continue;
+
+        Chord *chord = vrv_cast<Chord *>(accid->GetFirstAncestor(CHORD));
+        // no chord, so align only parent note
+        if (!chord) {
+            accid->IsAlignedWithSameLayer(true);
+            continue;
+        }
+        // we have chord ancestor, so need to align all of its accidentals
+        ListOfObjects accidentals = chord->FindAllDescendantsByType(ACCID);
+        std::for_each(accidentals.begin(), accidentals.end(), [](Object *object) {
+            Accid *accid = vrv_cast<Accid *>(object);
+            accid->IsAlignedWithSameLayer(true);
+        });
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1421,6 +1445,8 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 
     std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());
+    // process accid layer alignment
+    this->SetAccidLayerAlignment();
 
     // Detect the octave and mark them
     std::vector<Accid *>::iterator iter, octaveIter;

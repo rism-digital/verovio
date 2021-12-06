@@ -64,6 +64,7 @@ void Accid::Reset()
     this->ResetExtSym();
 
     m_drawingUnison = NULL;
+    m_alignedWithSameLayer = false;
 }
 
 std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const

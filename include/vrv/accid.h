@@ -87,6 +87,14 @@ public:
      * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
      */
     void AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize);
+    
+    /**
+     * @name Set and get same layer alignment
+     */
+    ///@{
+    void IsAlignedWithSameLayer(bool alignWithSameLayer) { m_alignedWithSameLayer = alignWithSameLayer; }
+    bool IsAlignedWithSameLayer() const { return m_alignedWithSameLayer; }
+    ///@}
 
     //----------------//
     // Static methods //
@@ -119,6 +127,7 @@ private:
     Accid *m_drawingOctave;
     Accid *m_drawingUnison;
     bool m_isDrawingOctave;
+    bool m_alignedWithSameLayer;
 };
 
 //----------------------------------------------------------------------------
