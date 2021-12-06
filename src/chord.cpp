@@ -499,7 +499,7 @@ int Chord::AdjustOverlappingLayers(
         assert(note);
         chordElementLocations.insert(note->GetDrawingLoc());
     }
-    
+
     std::vector<int> locationsInUnison
         = this->GetElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
     const size_t expectedElementsInUnison = locationsInUnison.size();
@@ -518,10 +518,27 @@ int Chord::AdjustOverlappingLayers(
         if (isInUnison) ++actualElementsInUnison;
     }
 
+    // if there are accidentals that are aligned for the layer separately, we need to have additional margin for them
+    int accidMargin = 0;
+    for (const auto iter : otherElements) {
+        if (!iter->Is(NOTE)) continue;
+        Note *note = vrv_cast<Note *>(iter);
+        Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
+        if (accid && accid->IsAlignedWithSameLayer()) {
+            accidMargin += accid->GetContentRight() - accid->GetContentLeft();
+        }
+    }
+    if (accidMargin) {
+        // add padding for the accidentals (1.5 unit)
+        accidMargin += 1.5 * doc->GetDrawingUnit(100);
+    }
+
     if (expectedElementsInUnison && (expectedElementsInUnison == actualElementsInUnison)) {
         isUnison = true;
     }
     else if (margin) {
+        // adjust margin by accidental margin
+        margin -= accidMargin;
         this->SetDrawingXRel(this->GetDrawingXRel() + margin);
         return margin;
     }
