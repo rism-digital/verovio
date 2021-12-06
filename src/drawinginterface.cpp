@@ -84,6 +84,7 @@ void BeamDrawingInterface::Reset()
     m_crossStaffContent = NULL;
     m_crossStaffRel = STAFFREL_basic_NONE;
     m_shortestDur = 0;
+    m_ledgerLines = 0;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
     m_beamStaff = NULL;
