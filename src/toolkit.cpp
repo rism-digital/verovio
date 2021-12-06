@@ -769,6 +769,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     int lastPage = 0;
     std::string firstMeasure;
     std::string lastMeasure;
+    std::string mdiv;
 
     jsonxx::Object json;
 
@@ -788,6 +789,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
             }
             if (json.has<jsonxx::String>("firstMeasure")) firstMeasure = json.get<jsonxx::String>("firstMeasure");
             if (json.has<jsonxx::String>("lastMeasure")) lastMeasure = json.get<jsonxx::String>("lastMeasure");
+            if (json.has<jsonxx::String>("mdiv")) mdiv = json.get<jsonxx::String>("mdiv");
         }
     }
 
@@ -809,6 +811,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (lastPage > 0) meioutput.SetLastPage(lastPage);
     if (!firstMeasure.empty()) meioutput.SetFirstMeasure(firstMeasure);
     if (!lastMeasure.empty()) meioutput.SetLastMeasure(lastMeasure);
+    if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
 
     std::string output = meioutput.GetOutput();
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);

@@ -946,6 +946,12 @@ void MEIOutput::SetLastMeasure(const std::string &uuid)
     m_hasFilter = true;
 }
 
+void MEIOutput::SetMdiv(const std::string &uuid)
+{
+    m_mdivUuid = uuid;
+    m_hasFilter = true;
+}
+
 void MEIOutput::ResetFilter()
 {
     m_hasFilter = false;
@@ -953,6 +959,7 @@ void MEIOutput::ResetFilter()
     m_lastPage = m_doc->GetPageCount();
     m_firstMeasureUuid = "";
     m_lastMeasureUuid = "";
+    m_mdivUuid = "";
 }
 
 void MEIOutput::Reset()
@@ -960,6 +967,7 @@ void MEIOutput::Reset()
     m_filterMatchLocation = MatchLocation::Before;
     m_currentPage = 0;
     m_measureFilterMatchLocation = RangeMatchLocation::BeforeStart;
+    m_mdivFilterMatchLocation = MatchLocation::Before;
 
     m_streamStringOutput.str("");
     m_streamStringOutput.clear();
@@ -989,6 +997,12 @@ bool MEIOutput::HasValidFilter() const
         }
     }
 
+    // Verify mdiv filter
+    if (!m_mdivUuid.empty()) {
+        Object *mdiv = m_doc->FindDescendantByUuid(m_mdivUuid);
+        if (!mdiv || !mdiv->Is(MDIV)) return false;
+    }
+
     return true;
 }
 
@@ -1004,6 +1018,9 @@ bool MEIOutput::IsMatchingFilter() const
         || (m_measureFilterMatchLocation == RangeMatchLocation::AfterEnd)) {
         return false;
     }
+
+    // Check mdiv filter
+    if (m_mdivFilterMatchLocation != MatchLocation::Here) return false;
 
     return true;
 }
@@ -1046,6 +1063,41 @@ void MEIOutput::UpdateFilter(Object *object)
                 }
                 break;
             case RangeMatchLocation::AtEnd: m_measureFilterMatchLocation = RangeMatchLocation::AfterEnd; break;
+            default: break;
+        }
+    }
+
+    // Update mdiv
+    if (m_mdivUuid.empty() && (m_mdivFilterMatchLocation == MatchLocation::Before)) {
+        m_mdivFilterMatchLocation = MatchLocation::Here;
+    }
+    if (object->Is(MDIV)) {
+        switch (m_mdivFilterMatchLocation) {
+            case MatchLocation::Before:
+                if (!m_mdivUuid.empty() && (object->GetUuid() == m_mdivUuid)) {
+                    m_mdivFilterMatchLocation = MatchLocation::Here;
+                }
+                break;
+            case MatchLocation::Here:
+                // Mdivs can contain mdivs as children
+                // => have to check whether we are still in the subtree of the filtered mdiv
+                if (!m_mdivUuid.empty()) {
+                    // Copy the start elements of the boundary stack
+                    ListOfObjects startElements;
+                    std::stack<Object *> tempStack = m_boundaries;
+                    while (!tempStack.empty()) {
+                        PageElementEnd *end = dynamic_cast<PageElementEnd *>(tempStack.top());
+                        if (end) startElements.push_front(end->GetStart());
+                        tempStack.pop();
+                    }
+                    // Check that none of those matches the filtered mdiv
+                    const bool noneMatchingStartElements = std::none_of(startElements.cbegin(), startElements.cend(),
+                        [this](Object *object) { return (object->GetUuid() == m_mdivUuid); });
+                    if (noneMatchingStartElements) {
+                        m_mdivFilterMatchLocation = MatchLocation::After;
+                    }
+                }
+                break;
             default: break;
         }
     }

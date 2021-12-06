@@ -217,7 +217,7 @@ public:
     ///@}
 
     /**
-     * Filtering by measure, page or mdiv
+     * Score based filtering by measure, page or mdiv
      */
     ///@{
     bool HasFilter() const;
@@ -225,6 +225,7 @@ public:
     void SetLastPage(int page);
     void SetFirstMeasure(const std::string &uuid);
     void SetLastMeasure(const std::string &uuid);
+    void SetMdiv(const std::string &uuid);
     void ResetFilter();
     ///@}
 
@@ -253,7 +254,7 @@ private:
     void Reset();
 
     /**
-     * Filtering
+     * Score based filtering
      */
     ///@{
     bool HasValidFilter() const;
@@ -511,7 +512,7 @@ private:
     /** The object stack */
     std::stack<Object *> m_objectStack;
 
-    /** Filtering */
+    /** Score based filtering */
     ///@{
     bool m_hasFilter;
     MatchLocation m_filterMatchLocation;
@@ -521,6 +522,8 @@ private:
     std::string m_firstMeasureUuid;
     std::string m_lastMeasureUuid;
     RangeMatchLocation m_measureFilterMatchLocation;
+    std::string m_mdivUuid;
+    MatchLocation m_mdivFilterMatchLocation;
     ///@}
 
     bool m_removeIds;
