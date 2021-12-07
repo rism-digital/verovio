@@ -300,7 +300,7 @@ void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInt
         if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
             const int topPosition = coord->m_yBeam + beamInterface->GetTotalBeamWidth();
             const int topMargin = staffTop - doubleUnit / 2;
-            if (topPosition > topMargin) {
+            if (topPosition >= topMargin) {
                 adjust = ((topPosition - topMargin) / doubleUnit + 1) * doubleUnit;
                 break;
             }
@@ -308,7 +308,7 @@ void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInt
         else if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             const int bottomPosition = coord->m_yBeam - beamInterface->GetTotalBeamWidth();
             const int bottomMargin = staffTop - staffHeight + doubleUnit / 2;
-            if (bottomPosition < bottomMargin) {
+            if (bottomPosition <= bottomMargin) {
                 adjust = ((bottomPosition - bottomMargin) / doubleUnit - 1) * doubleUnit;
                 break;
             }
@@ -691,8 +691,6 @@ void BeamSegment::CalcBeamPosition(
         }
     }
 
-    this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
-
     /******************************************************************/
     // Calculate the slope is necessary
 
@@ -737,6 +735,8 @@ void BeamSegment::CalcBeamPosition(
 
         this->CalcAdjustPosition(staff, doc, beamInterface);
     }
+
+    this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
 }
 
 void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step)
