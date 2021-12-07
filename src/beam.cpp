@@ -290,6 +290,37 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     return true;
 }
 
+void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
+{
+    int adjust = 0;
+    const int staffTop = staff->GetDrawingY();
+    const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    const int doubleUnit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    for (auto coord : m_beamElementCoordRefs) {
+        if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+            const int topPosition = coord->m_yBeam + beamInterface->GetTotalBeamWidth();
+            const int topMargin = staffTop - doubleUnit / 2;
+            if (topPosition > topMargin) {
+                adjust = ((topPosition - topMargin) / doubleUnit + 1) * doubleUnit;
+                break;
+            }
+        }
+        else if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+            const int bottomPosition = coord->m_yBeam - beamInterface->GetTotalBeamWidth();
+            const int bottomMargin = staffTop - staffHeight + doubleUnit / 2;
+            if (bottomPosition < bottomMargin) {
+                adjust = ((bottomPosition - bottomMargin) / doubleUnit - 1) * doubleUnit;
+                break;
+            }
+        }
+    }
+    // make sure there is at least one staff space between beams and staff ends (i.e. ledger lines)
+    if (adjust) {
+        std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [adjust](BeamElementCoord *coord) { coord->m_yBeam -= adjust; });
+    }
+}
+
 void BeamSegment::CalcBeamInit(
     Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
@@ -659,6 +690,8 @@ void BeamSegment::CalcBeamPosition(
             }
         }
     }
+
+    this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
 
     /******************************************************************/
     // Calculate the slope is necessary
@@ -1326,14 +1359,6 @@ void BeamElementCoord::SetDrawingStemDir(
     }
     else {
         segment->m_extendedToCenter = false;
-    }
-
-    // Make sure there is a at least one staff space before the ledger lines
-    if ((interface->m_ledgerLines > 2) && (interface->m_shortestDur > DUR_32)) {
-        m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
-    }
-    else if ((interface->m_ledgerLines > 1) && (interface->m_shortestDur > DUR_16)) {
-        m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
 
     m_yBeam += m_overlapMargin;

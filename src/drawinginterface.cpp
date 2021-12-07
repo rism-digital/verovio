@@ -84,7 +84,6 @@ void BeamDrawingInterface::Reset()
     m_crossStaffContent = NULL;
     m_crossStaffRel = STAFFREL_basic_NONE;
     m_shortestDur = 0;
-    m_ledgerLines = 0;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
     m_beamStaff = NULL;
@@ -94,25 +93,9 @@ void BeamDrawingInterface::Reset()
     m_beamWidthWhite = 0;
 }
 
-void BeamDrawingInterface::AdjustLedgerLineNumber(LayerElement *element)
+int BeamDrawingInterface::GetTotalBeamWidth() const
 {
-    Note *note = NULL;
-    if (element->Is(NOTE)) {
-        note = vrv_cast<Note *>(element);
-    }
-    else if (element->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(element);
-        note = (STEMDIRECTION_up == m_notesStemDir) ? chord->GetTopNote() : chord->GetBottomNote();
-    }
-    if (!note) return;
-
-    int ledgerLines = 0;
-    int ignore = 0;
-    if (m_notesStemDir == STEMDIRECTION_up)
-        note->HasLedgerLines(ignore, ledgerLines);
-    else
-        note->HasLedgerLines(ledgerLines, ignore);
-    m_ledgerLines = std::max(m_ledgerLines, ledgerLines);
+    return m_beamWidthBlack + (m_shortestDur - DUR_8) * m_beamWidth;
 }
 
 void BeamDrawingInterface::ClearCoords()
@@ -220,7 +203,6 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
             }
             // keep the shortest dur in the beam
             m_shortestDur = std::max(currentDur, m_shortestDur);
-            this->AdjustLedgerLineNumber(current);
         }
         // check if we have more than duration in the beam
         if (!m_changingDur && currentDur != lastDur) m_changingDur = true;
