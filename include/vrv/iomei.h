@@ -281,6 +281,7 @@ private:
     ///@{
     void WriteCustomScoreDef();
     void AdjustStaffDef(StaffDef *staffDef, Measure *measure);
+    bool AdjustLabel(Label *label);
     ///@}
 
     /**

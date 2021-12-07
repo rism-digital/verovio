@@ -1159,9 +1159,26 @@ void MEIOutput::WriteCustomScoreDef()
         ScoreDef *measureScoreDef = measure->GetDrawingScoreDef();
         ScoreDef *scoreDef = vrv_cast<ScoreDef *>(measureScoreDef->Clone());
         ListOfObjects staffDefs = scoreDef->FindAllDescendantsByType(STAFFDEF);
-        for (Object *object : staffDefs) {
-            this->AdjustStaffDef(vrv_cast<StaffDef *>(object), measure);
+        for (Object *staffDef : staffDefs) {
+            this->AdjustStaffDef(vrv_cast<StaffDef *>(staffDef), measure);
         }
+
+        // Check if labels should be drawn
+        bool drawLabels = false;
+        System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        if (system && system->GetDrawingScoreDef()) {
+            drawLabels = system->GetDrawingScoreDef()->DrawLabels();
+        }
+        if (!drawLabels) {
+            // If not, replace labels by abbreviation or delete them
+            ListOfObjects labels = scoreDef->FindAllDescendantsByType(LABEL);
+            for (Object *label : labels) {
+                if (!this->AdjustLabel(vrv_cast<Label *>(label))) {
+                    label->GetParent()->DeleteChild(label);
+                }
+            }
+        }
+
         // Save the adjusted score def and delete it afterwards
         scoreDef->Save(this);
         delete scoreDef;
@@ -1221,6 +1238,24 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
         }
         staffDef->AddChild(layer->GetStaffDefMeterSig()->Clone());
     }
+}
+
+bool MEIOutput::AdjustLabel(Label *label)
+{
+    assert(label);
+
+    // Check if there is a label abbreviation sibling
+    LabelAbbr *abbr = vrv_cast<LabelAbbr *>(label->GetParent()->GetChild(0, LABELABBR));
+
+    // If so, use its text
+    if (abbr && (label->GetChildCount(TEXT) == 1)) {
+        Text *text = vrv_cast<Text *>(label->GetChild(0, TEXT));
+        if (text) {
+            text->SetText(abbr->GetText(abbr));
+            return true;
+        }
+    }
+    return false;
 }
 
 std::string MEIOutput::UuidToMeiStr(Object *element)
