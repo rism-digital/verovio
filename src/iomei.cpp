@@ -31,6 +31,7 @@
 #include "choice.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "corr.h"
 #include "course.h"
 #include "custos.h"
@@ -257,10 +258,10 @@ std::string MEIOutput::GetOutput()
 
 bool MEIOutput::WriteObject(Object *object)
 {
-    return this->WriteObject(object, true);
+    return this->WriteObject(object, true, false);
 }
 
-bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter)
+bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter, bool useCustomScoreDef)
 {
     if (this->IsScoreBasedMEI() && handleScoreBasedFilter) {
         // Update current page etc.
@@ -270,6 +271,7 @@ bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter)
             // Transition Before => Here
             if (m_filterMatchLocation == MatchLocation::Before) {
                 m_filterMatchLocation = MatchLocation::Here;
+                m_firstFilterMatch = object;
                 this->WriteStackedObjects();
             }
         }
@@ -849,8 +851,13 @@ bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter)
     if (!object->IsAttribute()) m_nodeStack.push_back(m_currentNode);
 
     if (object->Is(SCORE)) {
-        // First save the main scoreDef
-        m_doc->GetCurrentScoreDef()->Save(this);
+        if (useCustomScoreDef) {
+            this->WriteCustomScoreDef();
+        }
+        else {
+            // Save the main scoreDef
+            m_doc->GetCurrentScoreDef()->Save(this);
+        }
     }
 
     WriteUnsupportedAttr(m_currentNode, object);
@@ -965,6 +972,7 @@ void MEIOutput::ResetFilter()
 void MEIOutput::Reset()
 {
     m_filterMatchLocation = MatchLocation::Before;
+    m_firstFilterMatch = NULL;
     m_currentPage = 0;
     m_measureFilterMatchLocation = RangeMatchLocation::BeforeStart;
     m_mdivFilterMatchLocation = MatchLocation::Before;
@@ -1114,7 +1122,7 @@ void MEIOutput::WriteStackedObjects()
     }
 
     // Iterate over that list and write the objects
-    std::for_each(objects.begin(), objects.end(), [this](Object *object) { this->WriteObject(object, false); });
+    std::for_each(objects.begin(), objects.end(), [this](Object *object) { this->WriteObject(object, false, true); });
 }
 
 void MEIOutput::WriteStackedObjectsEnd()
@@ -1129,6 +1137,89 @@ void MEIOutput::WriteStackedObjectsEnd()
 
     // Reverse iterate over that list and write the objects
     std::for_each(objects.rbegin(), objects.rend(), [this](Object *object) { this->WriteObjectEnd(object, false); });
+}
+
+void MEIOutput::WriteCustomScoreDef()
+{
+    // Determine the first measure with respect to the first filter match
+    Measure *measure = NULL;
+    if (m_firstFilterMatch) {
+        if (m_firstFilterMatch->Is(MEASURE)) {
+            measure = vrv_cast<Measure *>(m_firstFilterMatch);
+        }
+        else {
+            measure = vrv_cast<Measure *>(m_firstFilterMatch->FindDescendantByType(MEASURE));
+        }
+    }
+
+    if (measure) {
+        // Create a copy of the measure scoredef and adjust it to keep track of clef changes, key signature changes,
+        // etc.
+        ScoreDef *measureScoreDef = measure->GetDrawingScoreDef();
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(measureScoreDef->Clone());
+        ListOfObjects staffDefs = scoreDef->FindAllDescendantsByType(STAFFDEF);
+        for (Object *object : staffDefs) {
+            this->AdjustStaffDef(vrv_cast<StaffDef *>(object), measure);
+        }
+        // Save the adjusted score def and delete it afterwards
+        scoreDef->Save(this);
+        delete scoreDef;
+    }
+    else {
+        m_doc->GetCurrentScoreDef()->Save(this);
+    }
+}
+
+void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
+{
+    assert(staffDef);
+    assert(measure);
+
+    // Retrieve the first layer of the corresponding staff: this stores the current
+    // drawing elements for clef, key signature, etc.
+    AttNIntegerComparison matchN(STAFF, staffDef->GetN());
+    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&matchN, 1));
+    if (!staff) return;
+    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
+    if (!layer || !layer->HasStaffDef()) return;
+    // Replace any element (clef, keysig, metersig, ...) by its current drawing element
+    if (layer->GetStaffDefClef()) {
+        Object *clef = staffDef->GetChild(0, CLEF);
+        if (clef) staffDef->DeleteChild(clef);
+        staffDef->AddChild(layer->GetStaffDefClef()->Clone());
+    }
+    if (layer->GetStaffDefKeySig()) {
+        Object *keySig = staffDef->GetChild(0, KEYSIG);
+        if (keySig) staffDef->DeleteChild(keySig);
+        staffDef->AddChild(layer->GetStaffDefKeySig()->Clone());
+    }
+    if (layer->GetStaffDefMensur()) {
+        Object *mensur = staffDef->GetChild(0, MENSUR);
+        if (mensur) staffDef->DeleteChild(mensur);
+        staffDef->AddChild(layer->GetStaffDefMensur()->Clone());
+    }
+    if (layer->GetStaffDefMeterSigGrp()) {
+        Object *meterSigGrp = staffDef->GetChild(0, METERSIGGRP);
+        if (meterSigGrp) {
+            staffDef->DeleteChild(meterSigGrp);
+        }
+        else {
+            Object *meterSig = staffDef->GetChild(0, METERSIG);
+            if (meterSig) staffDef->DeleteChild(meterSig);
+        }
+        staffDef->AddChild(layer->GetStaffDefMeterSigGrp()->Clone());
+    }
+    if (layer->GetStaffDefMeterSig()) {
+        Object *meterSig = staffDef->GetChild(0, METERSIG);
+        if (meterSig) {
+            staffDef->DeleteChild(meterSig);
+        }
+        else {
+            Object *meterSigGrp = staffDef->GetChild(0, METERSIGGRP);
+            if (meterSigGrp) staffDef->DeleteChild(meterSigGrp);
+        }
+        staffDef->AddChild(layer->GetStaffDefMeterSig()->Clone());
+    }
 }
 
 std::string MEIOutput::UuidToMeiStr(Object *element)
@@ -2590,7 +2681,7 @@ void MEIOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
     for (auto &pair : object->m_unsupported) {
         if (element.attribute(pair.first.c_str())) {
-            LogDebug("Attribute '%s' for '%s' is supported", pair.first.c_str(), object->GetClassName().c_str());
+            LogDebug("Attribute '%s' for '%s' is not supported", pair.first.c_str(), object->GetClassName().c_str());
         }
         else {
             element.append_attribute(pair.first.c_str()) = pair.second.c_str();

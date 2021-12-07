@@ -192,7 +192,7 @@ public:
      */
     ///@{
     bool WriteObject(Object *object) override;
-    bool WriteObject(Object *object, bool handleScoreBasedFilter);
+    bool WriteObject(Object *object, bool handleScoreBasedFilter, bool useCustomScoreDef);
     ///@}
 
     /**
@@ -268,6 +268,14 @@ private:
     ///@{
     void WriteStackedObjects();
     void WriteStackedObjectsEnd();
+    ///@}
+
+    /**
+     * Scoredef manipulation
+     */
+    ///@{
+    void WriteCustomScoreDef();
+    void AdjustStaffDef(StaffDef *staffDef, Measure *measure);
     ///@}
 
     /**
@@ -516,6 +524,7 @@ private:
     ///@{
     bool m_hasFilter;
     MatchLocation m_filterMatchLocation;
+    Object *m_firstFilterMatch;
     int m_firstPage;
     int m_currentPage;
     int m_lastPage;
