@@ -977,10 +977,7 @@ public:
 private:
     /**
      * Indicates whether the octave displacement should be performed simultaneously
-     * with the written notes, i.e., "coll' ottava".
-     * Unlike other octave signs which are indicated by broken lines, coll' ottava
-     * typically uses an unbroken line or a series of longer broken lines, ending with
-     * a short vertical stroke. See Read, p. 47-48.
+     * with the written notes,
      **/
     octaveLog_COLL m_coll;
 

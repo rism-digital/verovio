@@ -1089,6 +1089,7 @@ std::string AttConverter::CoursetuningToStr(data_COURSETUNING data) const
         case COURSETUNING_guitar_open_A: value = "guitar.open.A"; break;
         case COURSETUNING_lute_renaissance_6: value = "lute.renaissance.6"; break;
         case COURSETUNING_lute_baroque_d_major: value = "lute.baroque.d.major"; break;
+        case COURSETUNING_lute_baroque_d_minor: value = "lute.baroque.d.minor"; break;
         default:
             LogWarning("Unknown value '%d' for data.COURSETUNING", data);
             value = "";
@@ -1106,6 +1107,7 @@ data_COURSETUNING AttConverter::StrToCoursetuning(const std::string &value, bool
     if (value == "guitar.open.A") return COURSETUNING_guitar_open_A;
     if (value == "lute.renaissance.6") return COURSETUNING_lute_renaissance_6;
     if (value == "lute.baroque.d.major") return COURSETUNING_lute_baroque_d_major;
+    if (value == "lute.baroque.d.minor") return COURSETUNING_lute_baroque_d_minor;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.COURSETUNING", value.c_str());
     return COURSETUNING_NONE;
