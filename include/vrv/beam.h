@@ -68,6 +68,9 @@ public:
     int GetAdjacentElementsDuration(int elementX) const;
 
 private:
+    // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
+    void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
+
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     bool CalcBeamSlope(
@@ -79,8 +82,6 @@ private:
 
     // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
     void CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
-
-    void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
@@ -250,7 +251,6 @@ public:
     int m_overlapMargin;
     int m_maxShortening; // maximum allowed shortening in half units
     bool m_centered; // beam is centered on the line
-    bool m_shortened; // stem is shortened because pointing oustide the staff
     data_BEAMPLACE m_beamRelativePlace;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;

@@ -290,6 +290,37 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     return true;
 }
 
+void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
+{
+    int adjust = 0;
+    const int staffTop = staff->GetDrawingY();
+    const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    const int doubleUnit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    for (auto coord : m_beamElementCoordRefs) {
+        if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+            const int topPosition = coord->m_yBeam + beamInterface->GetTotalBeamWidth();
+            const int topMargin = staffTop - doubleUnit / 2;
+            if (topPosition >= topMargin) {
+                adjust = ((topPosition - topMargin) / doubleUnit + 1) * doubleUnit;
+                break;
+            }
+        }
+        else if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+            const int bottomPosition = coord->m_yBeam - beamInterface->GetTotalBeamWidth();
+            const int bottomMargin = staffTop - staffHeight + doubleUnit / 2;
+            if (bottomPosition <= bottomMargin) {
+                adjust = ((bottomPosition - bottomMargin) / doubleUnit - 1) * doubleUnit;
+                break;
+            }
+        }
+    }
+    // make sure there is at least one staff space between beams and staff ends (i.e. ledger lines)
+    if (adjust) {
+        std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [adjust](BeamElementCoord *coord) { coord->m_yBeam -= adjust; });
+    }
+}
+
 void BeamSegment::CalcBeamInit(
     Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
@@ -704,6 +735,8 @@ void BeamSegment::CalcBeamPosition(
 
         this->CalcAdjustPosition(staff, doc, beamInterface);
     }
+
+    if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
 }
 
 void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step)
@@ -969,7 +1002,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
         // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
         if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-            || (!isHorizontal && (coord->m_dur > DUR_8) && (m_uniformStemLength < 13)))
+            || (!isHorizontal && (coord->m_dur > DUR_8) && (std::abs(m_uniformStemLength) < 13)))
             m_uniformStemLength = coordStemLength;
     }
     // make adjustments for the grace notes length
@@ -1295,10 +1328,6 @@ void BeamElementCoord::SetDrawingStemDir(
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     m_stem->SetDrawingStemDir(stemDir);
-    int ledgerLines = 0;
-    int ledgerLinesOpposite = 0;
-    m_shortened = false;
-
     m_yBeam = m_element->GetDrawingY();
     m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
                                          : interface->m_stemXBelow[interface->m_cueSize];
@@ -1313,13 +1342,6 @@ void BeamElementCoord::SetDrawingStemDir(
     }
 
     m_yBeam = m_closestNote->GetDrawingY();
-    if (stemDir == STEMDIRECTION_up) {
-        m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
-    }
-    else {
-        m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
-    }
-
     m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
     if (m_element->IsGraceNote()) return;
@@ -1337,14 +1359,6 @@ void BeamElementCoord::SetDrawingStemDir(
     }
     else {
         segment->m_extendedToCenter = false;
-    }
-
-    // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (interface->m_shortestDur > DUR_32)) {
-        m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
-    }
-    else if ((ledgerLines > 1) && (interface->m_shortestDur > DUR_16)) {
-        m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
 
     m_yBeam += m_overlapMargin;
@@ -1366,7 +1380,6 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
         if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {
             stemLenInHalfUnits = standardStemLen - m_maxShortening;
         }
-        m_shortened = true;
         extend = false;
     }
 
