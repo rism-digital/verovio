@@ -151,6 +151,7 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 {
     m_indent = 5;
     m_scoreBasedMEI = false;
+    m_ignoreHeader = false;
     m_removeIds = false;
 
     this->Reset();
@@ -1246,7 +1247,7 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
     // ---- header ----
 
-    if (m_doc->m_header.first_child()) {
+    if (!m_ignoreHeader && m_doc->m_header.first_child()) {
         m_mei.append_copy(m_doc->m_header.first_child());
     }
     else {

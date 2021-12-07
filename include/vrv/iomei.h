@@ -243,7 +243,12 @@ public:
     void SetIndent(int indent) { m_indent = indent; }
 
     /**
-     * Setter for remove Ids flag for the MEI output (default is false)
+     * Setter for ignore header flag for the MEI output (default is false)
+     */
+    void SetIgnoreHeader(bool ignoreHeader) { m_ignoreHeader = ignoreHeader; }
+
+    /**
+     * Setter for remove ids flag for the MEI output (default is false)
      */
     void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
@@ -535,6 +540,7 @@ private:
     MatchLocation m_mdivFilterMatchLocation;
     ///@}
 
+    bool m_ignoreHeader;
     bool m_removeIds;
     ListOfObjects m_referredObjects;
 };

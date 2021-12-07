@@ -764,6 +764,7 @@ bool Toolkit::LoadData(const std::string &data)
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
+    bool ignoreHeader = false;
     bool removeIds = m_options->m_removeIds.GetValue();
     int firstPage = 0;
     int lastPage = 0;
@@ -780,6 +781,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
         }
         else {
             if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+            if (json.has<jsonxx::Boolean>("ignoreHeader")) ignoreHeader = json.get<jsonxx::Boolean>("ignoreHeader");
             if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
             if (json.has<jsonxx::Number>("firstPage")) firstPage = json.get<jsonxx::Number>("firstPage");
             if (json.has<jsonxx::Number>("lastPage")) lastPage = json.get<jsonxx::Number>("lastPage");
@@ -805,6 +807,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
     meioutput.SetIndent(indent);
+    meioutput.SetIgnoreHeader(ignoreHeader);
     meioutput.SetRemoveIds(removeIds);
 
     if (firstPage > 0) meioutput.SetFirstPage(firstPage);
