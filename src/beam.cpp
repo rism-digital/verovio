@@ -736,7 +736,7 @@ void BeamSegment::CalcBeamPosition(
         this->CalcAdjustPosition(staff, doc, beamInterface);
     }
 
-    this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
+    if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
 }
 
 void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step)
