@@ -227,9 +227,9 @@ bool Object::IsBoundaryElement()
         return (interface->IsSystemMs());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
-        PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
+        PageMsInterface *interface = dynamic_cast<PageMsInterface *>(this);
         assert(interface);
-        return (interface->IsPageBoundary());
+        return (interface->IsPageMs());
     }
     return false;
 }
@@ -242,7 +242,7 @@ Object *Object::GetBoundaryEnd()
         return (interface->GetEnd());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
-        PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
+        PageMsInterface *interface = dynamic_cast<PageMsInterface *>(this);
         assert(interface);
         return (interface->GetEnd());
     }

@@ -40,29 +40,29 @@ void PageMsEnd::Reset()
 }
 
 //----------------------------------------------------------------------------
-// PageElementStartInterface
+// PageMsInterface
 //----------------------------------------------------------------------------
 
-PageElementStartInterface::PageElementStartInterface()
+PageMsInterface::PageMsInterface()
 {
     Reset();
 }
 
-PageElementStartInterface::~PageElementStartInterface() {}
+PageMsInterface::~PageMsInterface() {}
 
-void PageElementStartInterface::Reset()
+void PageMsInterface::Reset()
 {
     m_end = NULL;
     // m_drawingMeasure = NULL;
 }
 
-void PageElementStartInterface::SetEnd(PageMsEnd *end)
+void PageMsInterface::SetEnd(PageMsEnd *end)
 {
     assert(!m_end);
     m_end = end;
 }
 
-void PageElementStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+void PageMsInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
 {
     assert(object);
     assert(parent);

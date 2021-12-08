@@ -86,21 +86,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// PageElementStartInterface
+// PageMsInterface
 //----------------------------------------------------------------------------
 
 /**
  * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
-class PageElementStartInterface {
+class PageMsInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    PageElementStartInterface();
-    virtual ~PageElementStartInterface();
+    PageMsInterface();
+    virtual ~PageMsInterface();
     virtual void Reset();
     ///@}
 
@@ -111,7 +111,7 @@ public:
     ///@{
     void SetEnd(PageMsEnd *end);
     PageMsEnd *GetEnd() { return m_end; }
-    bool IsPageBoundary() { return (m_end != NULL); }
+    bool IsPageMs() { return (m_end != NULL); }
     ///@}
 
     /**

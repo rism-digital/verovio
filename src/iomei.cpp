@@ -3333,7 +3333,7 @@ bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node elementEnd)
     }
 
     // Check that it is a page boundary
-    PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(start);
+    PageMsInterface *interface = dynamic_cast<PageMsInterface *>(start);
     if (!interface) {
         LogError("The start element  '%s' is not a page boundary element", startUuid.c_str());
         return false;

@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class represent a <mdiv> in page-based MEI.
  */
-class Mdiv : public PageElement, public PageElementStartInterface, public AttLabelled, public AttNNumberLike {
+class Mdiv : public PageElement, public PageMsInterface, public AttLabelled, public AttNNumberLike {
 
 public:
     /**
