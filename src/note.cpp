@@ -1400,6 +1400,11 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    // Skip cue notes
+    if (this->GetCue() == BOOLEAN_true) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     // If the note is a secondary tied note, then ignore it
     if (this->GetScoreTimeTiedDuration() < 0.0) {
         return FUNCTOR_SIBLINGS;
