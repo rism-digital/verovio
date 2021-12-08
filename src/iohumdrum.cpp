@@ -11294,7 +11294,15 @@ void HumdrumInput::processTerminalLong(hum::HTp token)
     if (token->find(m_signifiers.terminallong) == std::string::npos) {
         return;
     }
-    token->setValue("LO", "N", "vis", "00");
+    string doublelong;
+    doublelong += m_signifiers.terminallong;
+    doublelong += m_signifiers.terminallong;
+    if (token->find(doublelong) != std::string::npos) {
+        token->setValue("LO", "N", "vis", "000");
+    }
+    else {
+        token->setValue("LO", "N", "vis", "00");
+    }
     if ((token->find('[') != std::string::npos) || (token->find('_') != std::string::npos)) {
         removeCharacter(token, '[');
         removeCharacter(token, '_');
