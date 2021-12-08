@@ -167,12 +167,12 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
     }
     else if (element->Is(MDIV)) {
         // When the mdiv is not visible, then there is no start / end element
-        std::string elementStart = (element->IsBoundaryElement()) ? "pageElementStart" : "";
+        std::string elementStart = (element->IsMsElement()) ? "pageMs" : "";
         dc->StartGraphic(element, elementStart, element->GetUuid());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SCORE)) {
-        dc->StartGraphic(element, "pageElementStart", element->GetUuid());
+        dc->StartGraphic(element, "pageMs", element->GetUuid());
         dc->EndGraphic(element, this);
     }
 }
@@ -1718,7 +1718,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
     std::string elementStart;
-    if (element->IsBoundaryElement()) elementStart = "systemeElementStart";
+    if (element->IsMsElement()) elementStart = "systemeElementStart";
 
     dc->StartGraphic(element, elementStart, element->GetUuid());
     // EditorialElements at the system level that are visible have no children

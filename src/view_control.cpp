@@ -2460,7 +2460,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         // Create placeholder - A graphic for the end boundary will be created
         // but only if it is on a different system - See View::DrawEnding
         // The Ending is added to the System drawing list by View::DrawMeasure
-        dc->StartGraphic(element, "systemElementStart", element->GetUuid());
+        dc->StartGraphic(element, "systemMs", element->GetUuid());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(PB)) {
@@ -2472,7 +2472,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SECTION)) {
-        dc->StartGraphic(element, "systemElementStart", element->GetUuid());
+        dc->StartGraphic(element, "systemMs", element->GetUuid());
         dc->EndGraphic(element, this);
     }
 }

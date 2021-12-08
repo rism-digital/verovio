@@ -68,9 +68,9 @@ void SystemMsInterface::ConvertToPageBasedBoundary(Object *object, Object *paren
     assert(parent);
 
     // Then add a SystemMsEnd
-    SystemMsEnd *systemElementEnd = new SystemMsEnd(object);
-    this->SetEnd(systemElementEnd);
-    parent->AddChild(systemElementEnd);
+    SystemMsEnd *systemMsEnd = new SystemMsEnd(object);
+    this->SetEnd(systemMsEnd);
+    parent->AddChild(systemMsEnd);
 
     // Also clear the relinquished children
     object->ClearRelinquishedChildren();
@@ -165,7 +165,7 @@ int SystemMsInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    // We have to be in a boundary start element
+    // We have to be in a milestone start element
     assert(m_end);
 
     params->m_startBoundaries.push_back(this);

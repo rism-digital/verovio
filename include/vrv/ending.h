@@ -22,7 +22,7 @@ class Measure;
 
 /**
  * This class represents a MEI ending.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
+ * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
 class Ending : public SystemElement, public SystemMsInterface, public AttLineRend, public AttNNumberLike {

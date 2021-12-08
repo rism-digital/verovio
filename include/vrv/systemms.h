@@ -40,7 +40,7 @@ public:
     Measure *GetMeasure() { return m_drawingMeasure; }
 
     /**
-     * @name Get the corresponding boundary start
+     * @name Get the corresponding milestone start
      */
     ///@{
     Object *GetStart() { return m_start; }

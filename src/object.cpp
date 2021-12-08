@@ -219,7 +219,7 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
     m_interfaces.push_back(interfaceId);
 }
 
-bool Object::IsBoundaryElement()
+bool Object::IsMsElement()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(this);
@@ -234,7 +234,7 @@ bool Object::IsBoundaryElement()
     return false;
 }
 
-Object *Object::GetBoundaryEnd()
+Object *Object::GetMsEnd()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(this);

@@ -849,8 +849,8 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         }
 
         // Merging boundaries into one xml element
-        if (object->IsBoundaryElement()) {
-            m_boundaries.push(object->GetBoundaryEnd());
+        if (object->IsMsElement()) {
+            m_boundaries.push(object->GetMsEnd());
             return true;
         }
         if (object->Is({ PAGE_MS_END, SYSTEM_MS_END })) {
@@ -1011,13 +1011,13 @@ void MEIOutput::WritePageElement(pugi::xml_node currentNode, PageElement *pageEl
     pageElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *elementEnd)
+void MEIOutput::WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *msEnd)
 {
-    assert(elementEnd && elementEnd->GetStart());
+    assert(msEnd && msEnd->GetStart());
 
-    WritePageElement(currentNode, elementEnd);
-    currentNode.append_attribute("startid") = UuidToMeiStr(elementEnd->GetStart()).c_str();
-    std::string meiElementName = elementEnd->GetStart()->GetClassName();
+    WritePageElement(currentNode, msEnd);
+    currentNode.append_attribute("startid") = UuidToMeiStr(msEnd->GetStart()).c_str();
+    std::string meiElementName = msEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
 }
@@ -1047,13 +1047,13 @@ void MEIOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *sy
     systemElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WriteSystemMsEnd(pugi::xml_node currentNode, SystemMsEnd *elementEnd)
+void MEIOutput::WriteSystemMsEnd(pugi::xml_node currentNode, SystemMsEnd *msEnd)
 {
-    assert(elementEnd && elementEnd->GetStart());
+    assert(msEnd && msEnd->GetStart());
 
-    WriteSystemElement(currentNode, elementEnd);
-    currentNode.append_attribute("startid") = UuidToMeiStr(elementEnd->GetStart()).c_str();
-    std::string meiElementName = elementEnd->GetStart()->GetClassName();
+    WriteSystemElement(currentNode, msEnd);
+    currentNode.append_attribute("startid") = UuidToMeiStr(msEnd->GetStart()).c_str();
+    std::string meiElementName = msEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
 }
@@ -3314,33 +3314,33 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
     return true;
 }
 
-bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node elementEnd)
+bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node msEnd)
 {
     assert(dynamic_cast<Page *>(parent));
 
     // Check that we have a @startid
-    if (!elementEnd.attribute("startid")) {
+    if (!msEnd.attribute("startid")) {
         LogError("Missing @startid on  msEnd");
         return false;
     }
 
     // Find the element pointing to it
-    std::string startUuid = elementEnd.attribute("startid").value();
+    std::string startUuid = msEnd.attribute("startid").value();
     Object *start = m_doc->FindDescendantByUuid(startUuid);
     if (!start) {
         LogError("Could not find start element '%s' for msEnd", startUuid.c_str());
         return false;
     }
 
-    // Check that it is a page boundary
+    // Check that it is a page milestone
     PageMsInterface *interface = dynamic_cast<PageMsInterface *>(start);
     if (!interface) {
-        LogError("The start element  '%s' is not a page boundary element", startUuid.c_str());
+        LogError("The start element  '%s' is not a page milestone element", startUuid.c_str());
         return false;
     }
 
     PageMsEnd *vrvElementEnd = new PageMsEnd(start);
-    SetMeiUuid(elementEnd, vrvElementEnd);
+    SetMeiUuid(msEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
@@ -3665,9 +3665,9 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "section") {
             success = ReadSection(parent, current);
         }
-        // elementEnd
-        else if (std::string(current.name()) == "systemElementEnd") {
-            success = ReadSystemElementEnd(parent, current);
+        // msEnd
+        else if (std::string(current.name()) == "msEnd") {
+            success = ReadSystemMsEnd(parent, current);
         }
         // content
         else if (std::string(current.name()) == "scoreDef") {
@@ -3711,33 +3711,33 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd)
+bool MEIInput::ReadSystemMsEnd(Object *parent, pugi::xml_node msEnd)
 {
     assert(dynamic_cast<System *>(parent));
 
     // Check that we have a @startid
-    if (!elementEnd.attribute("startid")) {
-        LogError("Missing @startid on  systemElementEnd");
+    if (!msEnd.attribute("startid")) {
+        LogError("Missing @startid on  msEnd");
         return false;
     }
 
     // Find the element pointing to it
-    std::string startUuid = elementEnd.attribute("startid").value();
+    std::string startUuid = msEnd.attribute("startid").value();
     Object *start = m_doc->FindDescendantByUuid(startUuid);
     if (!start) {
-        LogError("Could not find start element '%s' for systemElementEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for msEnd", startUuid.c_str());
         return false;
     }
 
-    // Check that it is a page boundary
+    // Check that it is a page milestone
     SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(start);
     if (!interface) {
-        LogError("The start element  '%s' is not a system boundary element", startUuid.c_str());
+        LogError("The start element  '%s' is not a system milestone element", startUuid.c_str());
         return false;
     }
 
     SystemMsEnd *vrvElementEnd = new SystemMsEnd(start);
-    SetMeiUuid(elementEnd, vrvElementEnd);
+    SetMeiUuid(msEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);

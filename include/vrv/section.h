@@ -23,7 +23,7 @@ class Section;
 
 /**
  * This class represents a MEI section.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI)
+ * It can be both a container (in score-based MEI) and a milestone (in page-based MEI)
  */
 class Section : public SystemElement, public SystemMsInterface, public AttNNumberLike, public AttSectionVis {
 public:

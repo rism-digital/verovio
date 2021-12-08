@@ -33,7 +33,7 @@ class TextElement;
  * This class is a base class for the editorial element containing musical
  * content, for example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
+ * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  */
 class EditorialElement : public Object, public SystemMsInterface, public AttLabelled, public AttTyped {
 public:
