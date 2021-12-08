@@ -859,9 +859,9 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         assert(score);
         score->SetAsCurrent();
     }
-    // We need to do the same in backward direction through the PageElementEnd::m_start
-    else if (direction == BACKWARD && this->Is(PAGE_ELEMENT_END)) {
-        PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(this);
+    // We need to do the same in backward direction through the PageMsEnd::m_start
+    else if (direction == BACKWARD && this->Is(PAGE_MS_END)) {
+        PageMsEnd *elementEnd = vrv_cast<PageMsEnd *>(this);
         assert(elementEnd);
         if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
             Score *score = vrv_cast<Score *>(elementEnd->GetStart());

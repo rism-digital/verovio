@@ -22,19 +22,19 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// PageElementEnd
+// PageMsEnd
 //----------------------------------------------------------------------------
 
-PageElementEnd::PageElementEnd(Object *start) : PageElement(PAGE_ELEMENT_END, "page-element-end-")
+PageMsEnd::PageMsEnd(Object *start) : PageElement(PAGE_MS_END, "page-ms-end-")
 {
     Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
 
-PageElementEnd::~PageElementEnd() {}
+PageMsEnd::~PageMsEnd() {}
 
-void PageElementEnd::Reset()
+void PageMsEnd::Reset()
 {
     m_start = NULL;
 }
@@ -56,7 +56,7 @@ void PageElementStartInterface::Reset()
     // m_drawingMeasure = NULL;
 }
 
-void PageElementStartInterface::SetEnd(PageElementEnd *end)
+void PageElementStartInterface::SetEnd(PageMsEnd *end)
 {
     assert(!m_end);
     m_end = end;
@@ -67,20 +67,20 @@ void PageElementStartInterface::ConvertToPageBasedBoundary(Object *object, Objec
     assert(object);
     assert(parent);
 
-    // Then add a PageElementEnd
-    PageElementEnd *pageElementEnd = new PageElementEnd(object);
-    this->SetEnd(pageElementEnd);
-    parent->AddChild(pageElementEnd);
+    // Then add a PageMsEnd
+    PageMsEnd *pageMsEnd = new PageMsEnd(object);
+    this->SetEnd(pageMsEnd);
+    parent->AddChild(pageMsEnd);
 
     // Also clear the relinquished children
     object->ClearRelinquishedChildren();
 }
 
 //----------------------------------------------------------------------------
-// PageElementEnd functor methods
+// PageMsEnd functor methods
 //----------------------------------------------------------------------------
 
-int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
+int PageMsEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -91,14 +91,14 @@ int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElementEnd::CastOffPages(FunctorParams *functorParams)
+int PageMsEnd::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
     assert(params);
 
     assert(params->m_currentPage);
 
-    PageElementEnd *endBoundary = dynamic_cast<PageElementEnd *>(params->m_contentPage->Relinquish(this->GetIdx()));
+    PageMsEnd *endBoundary = dynamic_cast<PageMsEnd *>(params->m_contentPage->Relinquish(this->GetIdx()));
     // End boundaries can be added to the page only if the pending list is empty
     // Otherwise we are going to mess up the order
     if (params->m_pendingPageElements.empty()) {
@@ -111,7 +111,7 @@ int PageElementEnd::CastOffPages(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElementEnd::CastOffEncoding(FunctorParams *functorParams)
+int PageMsEnd::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
@@ -129,7 +129,7 @@ int PageElementEnd::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElementEnd::UnCastOff(FunctorParams *functorParams)
+int PageMsEnd::UnCastOff(FunctorParams *functorParams)
 {
     UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
     assert(params);

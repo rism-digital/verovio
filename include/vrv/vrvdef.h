@@ -147,7 +147,7 @@ enum ClassId : uint16_t {
     RUNNING_ELEMENT_max,
     // Ids for PageElement child classes
     PAGE_ELEMENT,
-    PAGE_ELEMENT_END,
+    PAGE_MS_END,
     MDIV,
     SCORE,
     PAGE_ELEMENT_max,

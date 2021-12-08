@@ -801,11 +801,11 @@ bool MEIOutput::WriteObject(Object *object)
             return true;
         }
     }
-    // PageElementEnd - nothing to add - only
-    else if (object->Is(PAGE_ELEMENT_END)) {
+    // PageMsEnd - nothing to add - only
+    else if (object->Is(PAGE_MS_END)) {
         if (this->IsPageBasedMEI()) {
-            m_currentNode = m_currentNode.append_child("pageElementEnd");
-            WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
+            m_currentNode = m_currentNode.append_child("msEnd");
+            WritePageMsEnd(m_currentNode, dynamic_cast<PageMsEnd *>(object));
         }
         else {
             return true;
@@ -853,7 +853,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
             m_boundaries.push(object->GetBoundaryEnd());
             return true;
         }
-        if (object->Is({ PAGE_ELEMENT_END, SYSTEM_MS_END })) {
+        if (object->Is({ PAGE_MS_END, SYSTEM_MS_END })) {
             if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
                 m_boundaries.pop();
             }
@@ -1011,7 +1011,7 @@ void MEIOutput::WritePageElement(pugi::xml_node currentNode, PageElement *pageEl
     pageElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd)
+void MEIOutput::WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *elementEnd)
 {
     assert(elementEnd && elementEnd->GetStart());
 
@@ -3299,8 +3299,8 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "system") {
             ReadSystem(parent, current);
         }
-        else if (std::string(current.name()) == "pageElementEnd") {
-            ReadPageElementEnd(parent, current);
+        else if (std::string(current.name()) == "msEnd") {
+            ReadPageMsEnd(parent, current);
         }
         // xml comment
         else if (std::string(current.name()) == "") {
@@ -3314,13 +3314,13 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
     return true;
 }
 
-bool MEIInput::ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd)
+bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node elementEnd)
 {
     assert(dynamic_cast<Page *>(parent));
 
     // Check that we have a @startid
     if (!elementEnd.attribute("startid")) {
-        LogError("Missing @startid on  pageElementEnd");
+        LogError("Missing @startid on  msEnd");
         return false;
     }
 
@@ -3328,7 +3328,7 @@ bool MEIInput::ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd)
     std::string startUuid = elementEnd.attribute("startid").value();
     Object *start = m_doc->FindDescendantByUuid(startUuid);
     if (!start) {
-        LogError("Could not find start element '%s' for pageElementEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for msEnd", startUuid.c_str());
         return false;
     }
 
@@ -3339,7 +3339,7 @@ bool MEIInput::ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd)
         return false;
     }
 
-    PageElementEnd *vrvElementEnd = new PageElementEnd(start);
+    PageMsEnd *vrvElementEnd = new PageMsEnd(start);
     SetMeiUuid(elementEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
@@ -6903,14 +6903,14 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     score->SetParent(page);
     page->InsertChild(score, 0);
 
-    PageElementEnd *scoreEnd = new PageElementEnd(score);
+    PageMsEnd *scoreEnd = new PageMsEnd(score);
     page->AddChild(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
     mdiv->SetParent(page);
     page->InsertChild(mdiv, 0);
 
-    PageElementEnd *mdivEnd = new PageElementEnd(mdiv);
+    PageMsEnd *mdivEnd = new PageMsEnd(mdiv);
     page->AddChild(mdivEnd);
 }
 

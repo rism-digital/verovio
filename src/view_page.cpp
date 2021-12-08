@@ -158,8 +158,8 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
     assert(dc);
     assert(element);
 
-    if (element->Is(PAGE_ELEMENT_END)) {
-        PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(element);
+    if (element->Is(PAGE_MS_END)) {
+        PageMsEnd *elementEnd = vrv_cast<PageMsEnd *>(element);
         assert(elementEnd);
         assert(elementEnd->GetStart());
         dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());

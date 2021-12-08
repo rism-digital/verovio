@@ -100,7 +100,7 @@ class Octave;
 class Orig;
 class Page;
 class PageElement;
-class PageElementEnd;
+class PageMsEnd;
 class Pages;
 class Pb;
 class Pedal;
@@ -261,7 +261,7 @@ private:
     ///@{
     void WritePage(pugi::xml_node currentNode, Page *page);
     void WritePageElement(pugi::xml_node element, PageElement *object);
-    void WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd);
+    void WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *elementEnd);
     void WriteSystem(pugi::xml_node currentNode, System *system);
     void WriteSystemMsEnd(pugi::xml_node currentNode, SystemMsEnd *elementEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
@@ -499,7 +499,7 @@ private:
     bool ReadPages(Object *parent, pugi::xml_node parentNode);
     bool ReadPage(Object *parent, pugi::xml_node parentNode);
     bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd);
+    bool ReadPageMsEnd(Object *parent, pugi::xml_node elementEnd);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);

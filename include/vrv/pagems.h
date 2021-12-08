@@ -17,23 +17,23 @@ class Measure;
 class Object;
 
 //----------------------------------------------------------------------------
-// PageElementEnd
+// PageMsEnd
 //----------------------------------------------------------------------------
 
 /**
  * This class models an end milestone element and has no MEI equivalent.
  */
-class PageElementEnd : public PageElement {
+class PageMsEnd : public PageElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    PageElementEnd(Object *start);
-    virtual ~PageElementEnd();
+    PageMsEnd(Object *start);
+    virtual ~PageMsEnd();
     void Reset() override;
-    std::string GetClassName() const override { return "PageElementEnd"; }
+    std::string GetClassName() const override { return "PageMsEnd"; }
     ///@}
 
     // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -109,8 +109,8 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetEnd(PageElementEnd *end);
-    PageElementEnd *GetEnd() { return m_end; }
+    void SetEnd(PageMsEnd *end);
+    PageMsEnd *GetEnd() { return m_end; }
     bool IsPageBoundary() { return (m_end != NULL); }
     ///@}
 
@@ -133,7 +133,7 @@ protected:
     /**
      * The corresponding end element
      */
-    PageElementEnd *m_end;
+    PageMsEnd *m_end;
 
 private:
 };
