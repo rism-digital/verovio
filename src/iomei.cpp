@@ -283,7 +283,8 @@ bool MEIOutput::WriteObject(Object *object)
 
     if (object->Is(MDIV)) {
         if (this->IsPageBasedMEI() || !this->IsSavingSinglePage()) {
-            m_currentNode = m_currentNode.append_child("mdiv");
+            const std::string name = (this->IsPageBasedMEI()) ? "mdivb" : "mdiv";
+            m_currentNode = m_currentNode.append_child(name.c_str());
             WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
         }
         else {
@@ -347,7 +348,8 @@ bool MEIOutput::WriteObject(Object *object)
         WriteSb(m_currentNode, dynamic_cast<Sb *>(object));
     }
     else if (object->Is(SECTION)) {
-        m_currentNode = m_currentNode.append_child("section");
+        const std::string name = (this->IsPageBasedMEI()) ? "secb" : "section";
+        m_currentNode = m_currentNode.append_child(name.c_str());
         WriteSection(m_currentNode, dynamic_cast<Section *>(object));
     }
 
