@@ -120,8 +120,8 @@
 #import <VerovioFramework/options.h>
 #import <VerovioFramework/orig.h>
 #import <VerovioFramework/page.h>
-#import <VerovioFramework/pageboundary.h>
 #import <VerovioFramework/pageelement.h>
+#import <VerovioFramework/pagems.h>
 #import <VerovioFramework/pages.h>
 #import <VerovioFramework/pb.h>
 #import <VerovioFramework/pedal.h>

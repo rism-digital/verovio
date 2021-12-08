@@ -9,8 +9,8 @@
 #define __VRV_MDIV_H__
 
 #include "atts_shared.h"
-#include "pageboundary.h"
 #include "pageelement.h"
+#include "pagems.h"
 
 namespace vrv {
 

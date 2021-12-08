@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pageboundary.cpp
+// Name:        pagems.cpp
 // Author:      Laurent Pugin
 // Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "pageboundary.h"
+#include "pagems.h"
 
 //----------------------------------------------------------------------------
 

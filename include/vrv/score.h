@@ -10,8 +10,8 @@
 
 #include "atts_shared.h"
 #include "options.h"
-#include "pageboundary.h"
 #include "pageelement.h"
+#include "pagems.h"
 #include "scoredef.h"
 
 namespace vrv {

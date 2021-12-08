@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pageboundary.h
+// Name:        pagems.h
 // Author:      Laurent Pugin
 // Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_PAGE_BOUNDARY_H__
-#define __VRV_PAGE_BOUNDARY_H__
+#ifndef __VRV_PAGE_MS_H__
+#define __VRV_PAGE_MS_H__
 
 #include "pageelement.h"
 #include "vrvdef.h"
