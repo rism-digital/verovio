@@ -102,7 +102,7 @@ if ($wasmQ) {
 	# SAFEHEAP=1 :: Adds additional memory access checks,
 	# and will give clear errors for problems like
 	# dereferencing 0 and memory alignment issues.
-	$LFLAGS .= " -s SAFEHEAP=1";
+	#$LFLAGS .= " -s SAFEHEAP=1";
 
 	# For now, trapping them (followign option does not work with Safari)
 	#$FLAGS .= " -mnontrapping-fptoint";
