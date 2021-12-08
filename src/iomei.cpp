@@ -3301,6 +3301,10 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "system") {
             ReadSystem(parent, current);
         }
+        // mdiv in page-based MEI
+        else if (std::string(current.name()) == "mdivb") {
+            ReadMdiv(parent, current, true);
+        }
         else if (std::string(current.name()) == "msEnd") {
             ReadPageMsEnd(parent, current);
         }
@@ -3667,7 +3671,10 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "section") {
             success = ReadSection(parent, current);
         }
-        // msEnd
+        // section in page-based MEI
+        else if (std::string(current.name()) == "secb") {
+            success = ReadSection(parent, current);
+        }
         else if (std::string(current.name()) == "msEnd") {
             success = ReadSystemMsEnd(parent, current);
         }
