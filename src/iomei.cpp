@@ -3336,7 +3336,7 @@ bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node msEnd)
 
     // Find the element pointing to it
     std::string startUuid = msEnd.attribute("startid").value();
-    Object *start = m_doc->FindDescendantByUuid(startUuid);
+    Object *start = m_doc->FindDescendantByUuid(ExtractUuidFragment(startUuid));
     if (!start) {
         LogError("Could not find start element '%s' for msEnd", startUuid.c_str());
         return false;
@@ -3736,7 +3736,7 @@ bool MEIInput::ReadSystemMsEnd(Object *parent, pugi::xml_node msEnd)
 
     // Find the element pointing to it
     std::string startUuid = msEnd.attribute("startid").value();
-    Object *start = m_doc->FindDescendantByUuid(startUuid);
+    Object *start = m_doc->FindDescendantByUuid(ExtractUuidFragment(startUuid));
     if (!start) {
         LogError("Could not find start element '%s' for msEnd", startUuid.c_str());
         return false;
