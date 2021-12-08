@@ -1128,7 +1128,7 @@ void MEIOutput::WriteStackedObjects()
 
 void MEIOutput::WriteStackedObjectsEnd()
 {
-    // Copy the stack into a list, possibly ignoring the top element
+    // Copy the stack into a list
     ListOfObjects objects;
     std::stack<Object *> tempStack = m_objectStack;
     while (!tempStack.empty()) {
