@@ -1022,7 +1022,7 @@ void MEIOutput::WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *msEnd)
     assert(msEnd && msEnd->GetStart());
 
     WritePageElement(currentNode, msEnd);
-    currentNode.append_attribute("startid") = UuidToMeiStr(msEnd->GetStart()).c_str();
+    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(msEnd->GetStart())).c_str();
     std::string meiElementName = msEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
@@ -1058,7 +1058,7 @@ void MEIOutput::WriteSystemMsEnd(pugi::xml_node currentNode, SystemMsEnd *msEnd)
     assert(msEnd && msEnd->GetStart());
 
     WriteSystemElement(currentNode, msEnd);
-    currentNode.append_attribute("startid") = UuidToMeiStr(msEnd->GetStart()).c_str();
+    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(msEnd->GetStart())).c_str();
     std::string meiElementName = msEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
