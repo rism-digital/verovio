@@ -1153,11 +1153,21 @@ void MEIOutput::WriteCustomScoreDef()
         }
     }
 
+    // Detect the scoredef which is used as reference
+    ScoreDef *refScoreDef = NULL;
     if (measure) {
-        // Create a copy of the measure scoredef and adjust it to keep track of clef changes, key signature changes,
+        refScoreDef = measure->GetDrawingScoreDef();
+        if (!refScoreDef) {
+            // Use the system scoredef as fallback
+            System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+            if (system) refScoreDef = system->GetDrawingScoreDef();
+        }
+    }
+
+    if (measure && refScoreDef) {
+        // Create a copy of the reference scoredef and adjust it to keep track of clef changes, key signature changes,
         // etc.
-        ScoreDef *measureScoreDef = measure->GetDrawingScoreDef();
-        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(measureScoreDef->Clone());
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(refScoreDef->Clone());
         ListOfObjects staffDefs = scoreDef->FindAllDescendantsByType(STAFFDEF);
         for (Object *staffDef : staffDefs) {
             this->AdjustStaffDef(vrv_cast<StaffDef *>(staffDef), measure);
