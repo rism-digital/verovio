@@ -29,7 +29,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "syl.h"
-#include "systemboundary.h"
+#include "systemms.h"
 #include "trill.h"
 #include "verse.h"
 #include "vrv.h"

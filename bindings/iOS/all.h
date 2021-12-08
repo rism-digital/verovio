@@ -165,8 +165,8 @@
 #import <VerovioFramework/syl.h>
 #import <VerovioFramework/syllable.h>
 #import <VerovioFramework/system.h>
-#import <VerovioFramework/systemboundary.h>
 #import <VerovioFramework/systemelement.h>
+#import <VerovioFramework/systemms.h>
 #import <VerovioFramework/tabdursym.h>
 #import <VerovioFramework/tabgrp.h>
 #import <VerovioFramework/tempo.h>

@@ -2449,8 +2449,8 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
     assert(element);
     assert(system);
 
-    if (element->Is(SYSTEM_ELEMENT_END)) {
-        SystemElementEnd *elementEnd = vrv_cast<SystemElementEnd *>(element);
+    if (element->Is(SYSTEM_MS_END)) {
+        SystemMsEnd *elementEnd = vrv_cast<SystemMsEnd *>(element);
         assert(elementEnd);
         assert(elementEnd->GetStart());
         dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
@@ -2491,7 +2491,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         }
     }
 
-    SystemElementEnd *endingEndBoundary = ending->GetEnd();
+    SystemMsEnd *endingEndBoundary = ending->GetEnd();
 
     // We need to make sure we have the end boudary and a measure (first and last) in each of them
     assert(endingEndBoundary);

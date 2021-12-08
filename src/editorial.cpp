@@ -33,8 +33,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement()
-    : Object(EDITORIAL_ELEMENT, "ee-"), SystemElementStartInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT, "ee-"), SystemMsInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -43,7 +42,7 @@ EditorialElement::EditorialElement()
 }
 
 EditorialElement::EditorialElement(ClassId classId)
-    : Object(classId, "ee-"), SystemElementStartInterface(), AttLabelled(), AttTyped()
+    : Object(classId, "ee-"), SystemMsInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -52,7 +51,7 @@ EditorialElement::EditorialElement(ClassId classId)
 }
 
 EditorialElement::EditorialElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), SystemElementStartInterface(), AttLabelled(), AttTyped()
+    : Object(classId, classIdStr), SystemMsInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -63,7 +62,7 @@ EditorialElement::EditorialElement(ClassId classId, const std::string &classIdSt
 void EditorialElement::Reset()
 {
     Object::Reset();
-    SystemElementStartInterface::Reset();
+    SystemMsInterface::Reset();
     ResetLabelled();
     ResetTyped();
 
@@ -140,8 +139,8 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
 int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 {
-    if (this->IsSystemBoundary()) {
-        this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
+    if (this->IsSystemMs()) {
+        this->SystemMsInterface::InterfacePrepareBoundaries(functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -149,8 +148,8 @@ int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 
 int EditorialElement::ResetDrawing(FunctorParams *functorParams)
 {
-    if (this->IsSystemBoundary()) {
-        this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
+    if (this->IsSystemMs()) {
+        this->SystemMsInterface::InterfaceResetDrawing(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

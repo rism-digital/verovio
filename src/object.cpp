@@ -45,7 +45,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
-#include "systemboundary.h"
+#include "systemms.h"
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
@@ -222,9 +222,9 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
 bool Object::IsBoundaryElement()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
+        SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(this);
         assert(interface);
-        return (interface->IsSystemBoundary());
+        return (interface->IsSystemMs());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
         PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(this);
@@ -237,7 +237,7 @@ bool Object::IsBoundaryElement()
 Object *Object::GetBoundaryEnd()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(this);
+        SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(this);
         assert(interface);
         return (interface->GetEnd());
     }

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        systemboundary.cpp
+// Name:        systemms.cpp
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "systemboundary.h"
+#include "systemms.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,54 +21,54 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// SystemElementEnd
+// SystemMsEnd
 //----------------------------------------------------------------------------
 
-SystemElementEnd::SystemElementEnd(Object *start) : SystemElement(SYSTEM_ELEMENT_END, "system-element-end-")
+SystemMsEnd::SystemMsEnd(Object *start) : SystemElement(SYSTEM_MS_END, "system-ms-end-")
 {
     Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
 
-SystemElementEnd::~SystemElementEnd() {}
+SystemMsEnd::~SystemMsEnd() {}
 
-void SystemElementEnd::Reset()
+void SystemMsEnd::Reset()
 {
     m_start = NULL;
     m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
-// SystemElementStartInterface
+// SystemMsInterface
 //----------------------------------------------------------------------------
 
-SystemElementStartInterface::SystemElementStartInterface()
+SystemMsInterface::SystemMsInterface()
 {
     Reset();
 }
 
-SystemElementStartInterface::~SystemElementStartInterface() {}
+SystemMsInterface::~SystemMsInterface() {}
 
-void SystemElementStartInterface::Reset()
+void SystemMsInterface::Reset()
 {
     m_end = NULL;
     m_drawingMeasure = NULL;
 }
 
-void SystemElementStartInterface::SetEnd(SystemElementEnd *end)
+void SystemMsInterface::SetEnd(SystemMsEnd *end)
 {
     assert(!m_end);
     m_end = end;
 }
 
-void SystemElementStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+void SystemMsInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
 {
     assert(object);
     assert(parent);
 
-    // Then add a SystemElementEnd
-    SystemElementEnd *systemElementEnd = new SystemElementEnd(object);
+    // Then add a SystemMsEnd
+    SystemMsEnd *systemElementEnd = new SystemMsEnd(object);
     this->SetEnd(systemElementEnd);
     parent->AddChild(systemElementEnd);
 
@@ -77,10 +77,10 @@ void SystemElementStartInterface::ConvertToPageBasedBoundary(Object *object, Obj
 }
 
 //----------------------------------------------------------------------------
-// SystemElementEnd functor methods
+// SystemMsEnd functor methods
 //----------------------------------------------------------------------------
 
-int SystemElementEnd::PrepareBoundaries(FunctorParams *functorParams)
+int SystemMsEnd::PrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -101,7 +101,7 @@ int SystemElementEnd::PrepareBoundaries(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementEnd::ResetDrawing(FunctorParams *functorParams)
+int SystemMsEnd::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
@@ -110,7 +110,7 @@ int SystemElementEnd::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
+int SystemMsEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -122,8 +122,7 @@ int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    SystemElementEnd *endBoundary
-        = dynamic_cast<SystemElementEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    SystemMsEnd *endBoundary = dynamic_cast<SystemMsEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
     // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
     if (params->m_pendingElements.empty()) {
@@ -136,7 +135,7 @@ int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int SystemElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
+int SystemMsEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
@@ -161,7 +160,7 @@ int SystemElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int SystemElementStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
+int SystemMsInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -174,7 +173,7 @@ int SystemElementStartInterface::InterfacePrepareBoundaries(FunctorParams *funct
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
+int SystemMsInterface::InterfaceResetDrawing(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 

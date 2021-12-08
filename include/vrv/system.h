@@ -16,7 +16,7 @@
 
 namespace vrv {
 
-class SystemElementEnd;
+class SystemMsEnd;
 class DeviceContext;
 class Ending;
 class Measure;

@@ -9,8 +9,8 @@
 #define __VRV_ENDING_H__
 
 #include "atts_shared.h"
-#include "systemboundary.h"
 #include "systemelement.h"
+#include "systemms.h"
 
 namespace vrv {
 
@@ -25,7 +25,7 @@ class Measure;
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public SystemElementStartInterface, public AttLineRend, public AttNNumberLike {
+class Ending : public SystemElement, public SystemMsInterface, public AttLineRend, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

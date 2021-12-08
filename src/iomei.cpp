@@ -122,7 +122,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
-#include "systemboundary.h"
+#include "systemms.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
 #include "tempo.h"
@@ -791,11 +791,11 @@ bool MEIOutput::WriteObject(Object *object)
         WriteUnclear(m_currentNode, dynamic_cast<Unclear *>(object));
     }
 
-    // SystemElementEnd - nothing to add - only
-    else if (object->Is(SYSTEM_ELEMENT_END)) {
+    // SystemMsEnd - nothing to add - only
+    else if (object->Is(SYSTEM_MS_END)) {
         if (this->IsPageBasedMEI()) {
-            m_currentNode = m_currentNode.append_child("systemElementEnd");
-            WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
+            m_currentNode = m_currentNode.append_child("msEnd");
+            WriteSystemMsEnd(m_currentNode, dynamic_cast<SystemMsEnd *>(object));
         }
         else {
             return true;
@@ -853,7 +853,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
             m_boundaries.push(object->GetBoundaryEnd());
             return true;
         }
-        if (object->Is({ PAGE_ELEMENT_END, SYSTEM_ELEMENT_END })) {
+        if (object->Is({ PAGE_ELEMENT_END, SYSTEM_MS_END })) {
             if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
                 m_boundaries.pop();
             }
@@ -1047,7 +1047,7 @@ void MEIOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *sy
     systemElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WriteSystemElementEnd(pugi::xml_node currentNode, SystemElementEnd *elementEnd)
+void MEIOutput::WriteSystemMsEnd(pugi::xml_node currentNode, SystemMsEnd *elementEnd)
 {
     assert(elementEnd && elementEnd->GetStart());
 
@@ -3730,13 +3730,13 @@ bool MEIInput::ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd)
     }
 
     // Check that it is a page boundary
-    SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(start);
+    SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(start);
     if (!interface) {
         LogError("The start element  '%s' is not a system boundary element", startUuid.c_str());
         return false;
     }
 
-    SystemElementEnd *vrvElementEnd = new SystemElementEnd(start);
+    SystemMsEnd *vrvElementEnd = new SystemMsEnd(start);
     SetMeiUuid(elementEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
