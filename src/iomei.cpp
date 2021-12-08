@@ -178,22 +178,26 @@ bool MEIOutput::Export()
             decl.append_attribute("encoding") = "UTF-8";
 
             // schema processing instruction
+            const std::string schema = this->IsPageBasedMEI() ? "https://www.verovio.org/schema/dev/mei-verovio.rng"
+                                                              : "https://music-encoding.org/schema/dev/mei-all.rng";
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = schema.c_str();
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
-            // schematron processing instruction
-            decl = meiDoc.append_child(pugi::node_declaration);
-            decl.set_name("xml-model");
-            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
-            decl.append_attribute("type") = "application/xml";
-            decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
+            // schematron processing instruction - currently not working for page-based MEI
+            if (!this->IsPageBasedMEI()) {
+                decl = meiDoc.append_child(pugi::node_declaration);
+                decl.set_name("xml-model");
+                decl.append_attribute("href") = "https://music-encoding.org/schema/dev/mei-all.rng";
+                decl.append_attribute("type") = "application/xml";
+                decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
+            }
 
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "4.0.0";
+            m_mei.append_attribute("meiversion") = "5.0.0-dev";
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
             m_doc->ConvertToCastOffMensuralDoc(false);
