@@ -874,6 +874,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
 
+    params->m_classId = FING;
+    m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
 
@@ -898,9 +901,6 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = FERMATA;
-    m_systemAligner.Process(params->m_functor, params);
-
-    params->m_classId = FING;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = DIR;
