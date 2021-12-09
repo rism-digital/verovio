@@ -626,7 +626,7 @@ private:
      * @name Some logging methods specific to the PAE parser
      */
     ///@{
-    void LogPAE(std::string msg, pae::Token &token);
+    void LogPAE(int errCode, pae::Token &token, std::string value = "");
     void LogDebugTokens(bool vertical = false);
     ///@}
 
@@ -639,7 +639,8 @@ private:
     void ClearTokenObjects();
 
 public:
-    //
+    static const std::map<int, std::string> s_errCodes;
+
 private:
     /**
      * The list of tokens representing the incipit
