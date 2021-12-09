@@ -232,7 +232,7 @@ void BeamSegment::CalcBeam(
                 if (FTrem *fTrem = dynamic_cast<FTrem *>(beamInterface);
                     fTrem && (coord->GetStemDir() == STEMDIRECTION_down)) {
                     const int beamsCount = fTrem->GetBeams();
-                    stemOffset = (beamsCount - 1) * beamInterface->m_beamWidth;
+                    stemOffset = beamsCount * beamInterface->m_beamWidth;
                 }
 
                 if (coord->m_beamRelativePlace == BEAMPLACE_below) {
