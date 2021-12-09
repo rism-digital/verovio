@@ -802,7 +802,7 @@ int System::JustifyX(FunctorParams *functorParams)
     if (this->IsLastOfMdiv()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
-            return FUNCTOR_STOP;
+            return FUNCTOR_SIBLINGS;
         }
     }
 
