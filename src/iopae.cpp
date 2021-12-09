@@ -2249,7 +2249,7 @@ enum {
     ERR_047_TIMESIG_INCOMPLETE,
     ERR_048_TIMESIG_INVALID,
     ERR_049_TIMESIG_MENS,
-    ERR_050_, // UNUSED
+    ERR_050_INVALID_CHAR,
     ERR_051_BARLINE,
     ERR_052_DURATION,
     ERR_053_DURATION_MENS3,
@@ -2311,6 +2311,7 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_047_TIMESIG_INCOMPLETE, "Incomplete time signature cannot be parsed (Setting to 4/4 if running in non-pedantic mode)" },
     { ERR_048_TIMESIG_INVALID, "Unsupported time signature: '%s'" },
     { ERR_049_TIMESIG_MENS, "Mensuration content cannot be parsed (Setting to 'O' if running in non-pedantic mode)" },
+    { ERR_050_INVALID_CHAR, "Invalid character(s) '%s'" },
     { ERR_051_BARLINE, "Unsupported barline: '%s'" },
     { ERR_052_DURATION, "Duration content cannot be parsed (Setting to quarter note if running in non-pedantic mode)" },
     { ERR_053_DURATION_MENS3, "Duration '3' unsupported with mensural notation" },
@@ -2327,6 +2328,18 @@ const std::map<int, std::string> PAEInput::s_errCodes{
 //----------------------------------------------------------------------------
 
 namespace pae {
+
+    static std::vector<char> PAEChars{
+        //
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, // 0-15
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 16-31
+        1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, // 32-47
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, // 48-63
+        1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, // 64-79
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, // 80-95
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, // 96-111
+        0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0 // 112-127
+    };
 
     static const char CONTAINER_END = '~';
     static const char VOID = '_';
@@ -2604,6 +2617,26 @@ jsonxx::Object PAEInput::InputKeysToJson(const std::string &inputKeys)
     return jsonInput;
 }
 
+bool PAEInput::CheckPAEChars(const std::string &input, std::string &invalidChars, const std::string &validChars)
+{
+    invalidChars = "";
+    bool status = true;
+    for (const char &ch : input) {
+        if (ch < 0) {
+            invalidChars.push_back(ch);
+            status = false;
+            continue;
+        }
+        // Use the entire pae::PAEChars set unless we are testing against another one
+        bool invalid = (validChars.empty()) ? (!pae::PAEChars[ch]) : (validChars.find(ch) == std::string::npos);
+        if (invalid) {
+            invalidChars.push_back(ch);
+            status = false;
+        }
+    }
+    return status;
+}
+
 bool PAEInput::Import(const std::string &input)
 {
     this->ClearTokenObjects();
@@ -2689,13 +2722,20 @@ bool PAEInput::Import(const std::string &input)
         return false;
     }
 
+    std::string data = jsonInput.get<jsonxx::String>("data");
+
+    std::string invalidChars;
+    if (!this->CheckPAEChars(data, invalidChars)) {
+        pae::Token inputToken(0, pae::INPUT_POS);
+        LogPAE(ERR_050_INVALID_CHAR, inputToken, invalidChars);
+        return false;
+    }
+
     // Add a measure at the beginning of the data because there is always at least one measure
     Measure *measure = new Measure(true, 1);
     // By default there is no end barline on an incipit
     measure->SetRight(BARRENDITION_invis);
     m_pae.push_back(pae::Token(0, pae::UNKOWN_POS, measure));
-
-    std::string data = jsonInput.get<jsonxx::String>("data");
 
     // Remove non PAE internal characters
     for (char c : pae::INTERNAL_CHARS) {
@@ -4205,6 +4245,12 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
 
     keySig->Reset();
 
+    std::string invalidChars;
+    if (!this->CheckPAEChars(paeStr, invalidChars, pae::KEYSIG)) {
+        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        if (m_pedanticMode) return false;
+    }
+
     int altNumber = 0;
     bool endOfKeysig = false;
     bool enclosed = false;
@@ -4285,6 +4331,12 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
 
     clef->Reset();
 
+    std::string invalidChars;
+    if (!this->CheckPAEChars(paeStr, invalidChars, pae::CLEF)) {
+        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        if (m_pedanticMode) return false;
+    }
+
     if (paeStr.size() < 3) {
         LogPAE(ERR_042_CLEF_INCOMPLETE, token);
         if (m_pedanticMode) return false;
@@ -4292,6 +4344,11 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
         clef->SetShape(CLEFSHAPE_G);
         if (mensuralScoreDef) *mensuralScoreDef = false;
         return true;
+    }
+
+    if (paeStr.size() > 3) {
+        LogPAE(ERR_046_CLEF_INVALID, token, paeStr);
+        if (m_pedanticMode) return false;
     }
 
     char clefShape = paeStr.at(0);
@@ -4350,6 +4407,12 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
 
     meterSig->Reset();
 
+    std::string invalidChars;
+    if (!this->CheckPAEChars(paeStr, invalidChars, pae::METERSIG)) {
+        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        if (m_pedanticMode) return false;
+    }
+
     if (paeStr.size() < 1) {
         LogPAE(ERR_047_TIMESIG_INCOMPLETE, token);
         if (m_pedanticMode) return false;
@@ -4399,6 +4462,12 @@ bool PAEInput::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token
     assert(mensur);
 
     mensur->Reset();
+
+    std::string invalidChars;
+    if (!this->CheckPAEChars(paeStr, invalidChars, pae::METERSIG)) {
+        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        if (m_pedanticMode) return false;
+    }
 
     if (paeStr.size() < 1) {
         LogPAE(ERR_049_TIMESIG_MENS, token);

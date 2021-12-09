@@ -598,6 +598,15 @@ private:
     ///@}
 
     /**
+     * @name Check if the input string contains any invalid characters.
+     * Invalid characters are put in invalidChars.
+     * Return false if invalid characters are found.
+     */
+    ///@{
+    bool CheckPAEChars(const std::string &input, std::string &invalidChars, const std::string &validChars = "");
+    ///@}
+
+    /**
      * When repeated content is inserted we set the position of all token
      * to the one of the repetition marker (f or i).
      * We also need to clone all objects in the tokens
@@ -620,7 +629,7 @@ private:
     /**
      * A helper to remove a token when checking the hierarchy and it is not valid
      */
-    void RemoveContainerToken(Object *);
+    void RemoveContainerToken(Object *object);
 
     /**
      * @name Some logging methods specific to the PAE parser
