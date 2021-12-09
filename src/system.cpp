@@ -757,7 +757,9 @@ int System::AlignSystems(FunctorParams *functorParams)
     if (systemMargin) {
         const int margin
             = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
-        params->m_shift -= margin > 0 ? margin : 0;
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = params->m_doc->GetDrawingUnit(100);
+        params->m_shift -= std::max(margin, 2 * unit);
     }
 
     SetDrawingYRel(params->m_shift);
