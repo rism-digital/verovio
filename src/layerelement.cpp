@@ -207,30 +207,24 @@ FTrem *LayerElement::IsInFTrem()
 Beam *LayerElement::IsInBeam()
 {
     if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
-    Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
+        if (!this->IsGraceNote()) return beamParent;
         // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
         // beamed grace notes
-        if (this->IsGraceNote()) {
-            LayerElement *graceNote = this;
-            if (this->Is(STEM)) {
-                graceNote = dynamic_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_BEAM_DEPTH));
-                if (!graceNote) graceNote = dynamic_cast<LayerElement *>(this->GetFirstAncestor(CHORD, MAX_BEAM_DEPTH));
-            }
-            // Make sure the object list is set
-            beamParent->GetList(beamParent);
-            // If the note is part of the beam parent, this means we have a beam of graced notes
-            if (beamParent->GetListIndex(graceNote) > -1) {
-                return beamParent;
-            }
-            // otherwise it is a non-beamed grace note within a beam - return NULL
-            else {
-                return NULL;
-            }
+        LayerElement *graceElement = this;
+        if (this->Is(STEM)) {
+            graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(NOTE));
+            if (!graceElement) graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(CHORD));
+            assert(graceElement);
         }
-        else {
+        // Make sure the object list is set
+        beamParent->GetList(beamParent);
+        // If the note is part of the beam parent, this means we have a beam of graced notes
+        if (beamParent->GetListIndex(graceElement) > -1) {
             return beamParent;
         }
+        // otherwise it is a non-beamed grace note within a beam - return NULL
     }
     return NULL;
 }
