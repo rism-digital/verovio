@@ -2728,7 +2728,7 @@ bool PAEInput::Import(const std::string &input)
     if (!this->CheckPAEChars(data, invalidChars)) {
         pae::Token inputToken(0, pae::INPUT_POS);
         LogPAE(ERR_050_INVALID_CHAR, inputToken, invalidChars);
-        return false;
+        if (m_pedanticMode) return false;
     }
 
     // Add a measure at the beginning of the data because there is always at least one measure
