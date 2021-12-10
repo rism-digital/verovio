@@ -2726,7 +2726,7 @@ bool PAEInput::Import(const std::string &input)
 
     std::string invalidChars;
     if (!this->CheckPAEChars(data, invalidChars)) {
-        pae::Token inputToken(0, pae::INPUT_POS);
+        pae::Token inputToken(0, pae::UNKOWN_POS);
         LogPAE(ERR_050_INVALID_CHAR, inputToken, invalidChars);
         if (m_pedanticMode) return false;
     }
