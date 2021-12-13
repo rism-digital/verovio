@@ -1464,6 +1464,10 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
         if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR))
             params->m_elements->push_back(interface->GetEnd());
     }
+    // These will also be referred to as milestones in page-based MEI
+    if (params->m_milestoneReferences && this->IsMsElement()) {
+        params->m_elements->push_back(this);
+    }
 
     // continue until the end
     return FUNCTOR_CONTINUE;

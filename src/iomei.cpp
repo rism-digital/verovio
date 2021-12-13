@@ -161,6 +161,8 @@ bool MEIOutput::Export()
 
     if (m_removeIds) {
         FindAllReferencedObjectsParams findAllReferencedObjectsParams(&m_referredObjects);
+        // When saving page-based MEI we also want to keep IDs for milestone elements
+        findAllReferencedObjectsParams.m_milestoneReferences = this->IsPageBasedMEI();
         Functor findAllReferencedObjects(&Object::FindAllReferencedObjects);
         m_doc->Process(&findAllReferencedObjects, &findAllReferencedObjectsParams);
         m_referredObjects.unique();

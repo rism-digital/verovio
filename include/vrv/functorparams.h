@@ -1367,12 +1367,18 @@ public:
 
 /**
  * member 0: an array of all matching objects
+ * member 1: a flag indicating if milestone references should be included as well
  **/
 
 class FindAllReferencedObjectsParams : public FunctorParams {
 public:
-    FindAllReferencedObjectsParams(ListOfObjects *elements) { m_elements = elements; }
+    FindAllReferencedObjectsParams(ListOfObjects *elements)
+    {
+        m_elements = elements;
+        m_milestoneReferences = false;
+    }
     ListOfObjects *m_elements;
+    bool m_milestoneReferences;
 };
 
 //----------------------------------------------------------------------------

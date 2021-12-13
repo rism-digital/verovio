@@ -1718,7 +1718,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
     std::string elementStart;
-    if (element->IsMsElement()) elementStart = "systemeElementStart";
+    if (element->IsMsElement()) elementStart = "systemElementStart";
 
     dc->StartGraphic(element, elementStart, element->GetUuid());
     // EditorialElements at the system level that are visible have no children
