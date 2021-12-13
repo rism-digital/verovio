@@ -344,12 +344,22 @@ bool MEIOutput::WriteObject(Object *object)
         WriteExpansion(m_currentNode, dynamic_cast<Expansion *>(object));
     }
     else if (object->Is(PB)) {
-        m_currentNode = m_currentNode.append_child("pb");
-        WritePb(m_currentNode, dynamic_cast<Pb *>(object));
+        if (this->IsScoreBasedMEI()) {
+            m_currentNode = m_currentNode.append_child("pb");
+            WritePb(m_currentNode, dynamic_cast<Pb *>(object));
+        }
+        else {
+            return true;
+        }
     }
     else if (object->Is(SB)) {
-        m_currentNode = m_currentNode.append_child("sb");
-        WriteSb(m_currentNode, dynamic_cast<Sb *>(object));
+        if (this->IsScoreBasedMEI()) {
+            m_currentNode = m_currentNode.append_child("sb");
+            WriteSb(m_currentNode, dynamic_cast<Sb *>(object));
+        }
+        else {
+            return true;
+        }
     }
     else if (object->Is(SECTION)) {
         const std::string name = (this->IsPageBasedMEI()) ? "secb" : "section";
@@ -864,8 +874,15 @@ bool MEIOutput::WriteObjectEnd(Object *object)
                 m_boundaries.pop();
             }
             else {
+                assert(false);
                 return true;
             }
+        }
+    }
+    else {
+        // In page-based MEI, pb and sb are not written.
+        if (object->Is({ PB, SB })) {
+            return true;
         }
     }
 
