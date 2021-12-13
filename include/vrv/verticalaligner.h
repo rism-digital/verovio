@@ -383,7 +383,7 @@ private:
     ///@}
 
     // Value to store required beam adjustment for cross-staff beams
-    int m_beamAdjust;
+    int m_beamAdjust = 0;
 
     /**
      * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)
