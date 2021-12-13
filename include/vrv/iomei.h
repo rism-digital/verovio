@@ -188,19 +188,11 @@ public:
     bool Export();
 
     /**
-     * The main method for write objects.
+     * The main method for writing objects.
      */
     ///@{
     bool WriteObject(Object *object) override;
-    bool WriteObject(Object *object, bool handleScoreBasedFilter, bool useCustomScoreDef);
-    ///@}
-
-    /**
-     * Writing object method that must be overridden in the child class.
-     */
-    ///@{
     bool WriteObjectEnd(Object *object) override;
-    bool WriteObjectEnd(Object *object, bool handleScoreBasedFilter);
     ///@}
 
     /**
@@ -265,12 +257,16 @@ private:
     bool HasValidFilter() const;
     bool IsMatchingFilter() const;
     void UpdateFilter(Object *object);
+    bool ProcessScoreBasedFilter(Object *object);
+    bool ProcessScoreBasedFilterEnd(Object *object);
     ///@}
 
     /**
-     * Writing stacked objects
+     * Writing objects
      */
     ///@{
+    bool WriteObjectInternal(Object *object, bool useCustomScoreDef);
+    bool WriteObjectInternalEnd(Object *object);
     void WriteStackedObjects();
     void WriteStackedObjectsEnd();
     ///@}
@@ -524,7 +520,7 @@ private:
     /** Boundary objects which are merged into one xml element */
     std::stack<Object *> m_boundaries;
     /** The object stack */
-    std::stack<Object *> m_objectStack;
+    std::deque<Object *> m_objectStack;
 
     /** Score based filtering */
     ///@{

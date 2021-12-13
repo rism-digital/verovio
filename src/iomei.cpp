@@ -259,40 +259,16 @@ std::string MEIOutput::GetOutput()
 
 bool MEIOutput::WriteObject(Object *object)
 {
-    return this->WriteObject(object, true, false);
-}
-
-bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter, bool useCustomScoreDef)
-{
-    if (this->IsScoreBasedMEI() && handleScoreBasedFilter) {
-        // Update current page etc.
-        this->UpdateFilter(object);
-
-        if (this->IsMatchingFilter()) {
-            // Transition Before => Here
-            if (m_filterMatchLocation == MatchLocation::Before) {
-                m_filterMatchLocation = MatchLocation::Here;
-                m_firstFilterMatch = object;
-                this->WriteStackedObjects();
-            }
-        }
-        else {
-            // Transition Here => After
-            if (m_filterMatchLocation == MatchLocation::Here) {
-                m_filterMatchLocation = MatchLocation::After;
-                this->WriteStackedObjectsEnd();
-            }
-        }
-
-        if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_ELEMENT_END, PAGE_ELEMENT_END })) {
-            m_objectStack.push(object);
-        }
-
-        if (m_filterMatchLocation != MatchLocation::Here) {
+    if (this->IsScoreBasedMEI()) {
+        if (!this->ProcessScoreBasedFilter(object)) {
             return true;
         }
     }
+    return this->WriteObjectInternal(object, false);
+}
 
+bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
+{
     if (object->HasComment()) {
         m_currentNode.append_child(pugi::node_comment).set_value(object->GetComment().c_str());
     }
@@ -868,48 +844,16 @@ bool MEIOutput::WriteObject(Object *object, bool handleScoreBasedFilter, bool us
 
 bool MEIOutput::WriteObjectEnd(Object *object)
 {
-    return this->WriteObjectEnd(object, true);
+    if (this->IsScoreBasedMEI()) {
+        if (!this->ProcessScoreBasedFilterEnd(object)) {
+            return true;
+        }
+    }
+    return this->WriteObjectInternalEnd(object);
 }
 
-bool MEIOutput::WriteObjectEnd(Object *object, bool handleScoreBasedFilter)
+bool MEIOutput::WriteObjectInternalEnd(Object *object)
 {
-    if (this->IsScoreBasedMEI() && handleScoreBasedFilter) {
-        // In score-based MEI, page, pages and system are not written.
-        if (object->Is({ PAGE, PAGES, SYSTEM })) {
-            return true;
-        }
-
-        // Merging boundaries into one xml element
-        if (object->IsMilestoneElement()) {
-            m_boundaries.push(object->GetMilestoneEnd());
-            return true;
-        }
-        if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
-            if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
-                m_boundaries.pop();
-            }
-            else {
-                assert(false);
-                return true;
-            }
-        }
-
-        // Pop current object or merged boundary from stack
-        if (!m_objectStack.empty()) {
-            m_objectStack.pop();
-        }
-
-        if (m_filterMatchLocation != MatchLocation::Here) {
-            return true;
-        }
-    }
-    else {
-        // In page-based MEI, pb and sb are not written.
-        if (object->Is({ PB, SB })) {
-            return true;
-        }
-    }
-
     // Object representing an attribute have no node to pop
     if (object->IsAttribute()) {
         return true;
@@ -1112,32 +1056,75 @@ void MEIOutput::UpdateFilter(Object *object)
     }
 }
 
-void MEIOutput::WriteStackedObjects()
+bool MEIOutput::ProcessScoreBasedFilter(Object *object)
 {
-    // Copy the stack into a list
-    ListOfObjects objects;
-    std::stack<Object *> tempStack = m_objectStack;
-    while (!tempStack.empty()) {
-        objects.push_front(tempStack.top());
-        tempStack.pop();
+    // Update current page etc.
+    this->UpdateFilter(object);
+
+    if (this->IsMatchingFilter()) {
+        // Transition Before => Here
+        if (m_filterMatchLocation == MatchLocation::Before) {
+            m_filterMatchLocation = MatchLocation::Here;
+            m_firstFilterMatch = object;
+            this->WriteStackedObjects();
+        }
+    }
+    else {
+        // Transition Here => After
+        if (m_filterMatchLocation == MatchLocation::Here) {
+            m_filterMatchLocation = MatchLocation::After;
+            this->WriteStackedObjectsEnd();
+        }
     }
 
-    // Iterate over that list and write the objects
-    std::for_each(objects.begin(), objects.end(), [this](Object *object) { this->WriteObject(object, false, true); });
+    if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_ELEMENT_END, PAGE_ELEMENT_END })) {
+        m_objectStack.push_back(object);
+    }
+
+    return (m_filterMatchLocation == MatchLocation::Here);
+}
+
+bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
+{
+    // In score-based MEI, page, pages and system are not written.
+    if (object->Is({ PAGE, PAGES, SYSTEM })) {
+        return false;
+    }
+
+    // Merging boundaries into one xml element
+    if (object->IsBoundaryElement()) {
+        m_boundaries.push(object->GetBoundaryEnd());
+        return false;
+    }
+    if (object->Is({ PAGE_ELEMENT_END, SYSTEM_ELEMENT_END })) {
+        if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
+            m_boundaries.pop();
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Pop current object or merged boundary from stack
+    if (!m_objectStack.empty()) {
+        m_objectStack.pop_back();
+    }
+
+    return (m_filterMatchLocation == MatchLocation::Here);
+}
+
+void MEIOutput::WriteStackedObjects()
+{
+    // Write the objects from the stack
+    std::for_each(m_objectStack.cbegin(), m_objectStack.cend(),
+        [this](Object *object) { this->WriteObjectInternal(object, true); });
 }
 
 void MEIOutput::WriteStackedObjectsEnd()
 {
-    // Copy the stack into a list
-    ListOfObjects objects;
-    std::stack<Object *> tempStack = m_objectStack;
-    while (!tempStack.empty()) {
-        objects.push_front(tempStack.top());
-        tempStack.pop();
-    }
-
-    // Reverse iterate over that list and write the objects
-    std::for_each(objects.rbegin(), objects.rend(), [this](Object *object) { this->WriteObjectEnd(object, false); });
+    // Write the objects from the stack in reverse order
+    std::for_each(m_objectStack.crbegin(), m_objectStack.crend(),
+        [this](Object *object) { this->WriteObjectInternalEnd(object); });
 }
 
 void MEIOutput::WriteCustomScoreDef()
