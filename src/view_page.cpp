@@ -789,9 +789,15 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         int yTop = first->GetDrawingY();
+        if (firstDef->GetLines() <= 1) {
+            yTop += m_doc->GetDrawingDoubleUnit(first->m_drawingStaffSize);
+        }
         // for the bottom position we need to take into account the number of lines and the staff size
         int yBottom
             = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        if (lastDef->GetLines() <= 1) {
+            yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        }
 
         // erase intersections only if we have more than one staff
         bool eraseIntersections = (first != last) ? true : false;
