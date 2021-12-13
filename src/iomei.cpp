@@ -980,11 +980,21 @@ bool MEIOutput::IsMatchingFilter() const
 
 void MEIOutput::UpdateFilter(Object *object)
 {
+    this->UpdatePageFilter(object);
+    this->UpdateMeasureFilter(object);
+    this->UpdateMdivFilter(object);
+}
+
+void MEIOutput::UpdatePageFilter(Object *object)
+{
     // Update page
     if (object->Is(PAGE)) {
         ++m_currentPage;
     }
+}
 
+void MEIOutput::UpdateMeasureFilter(Object *object)
+{
     // Update measure range
     if (m_firstMeasureUuid.empty() && (m_measureFilterMatchLocation == RangeMatchLocation::BeforeStart)) {
         m_measureFilterMatchLocation = RangeMatchLocation::BetweenStartEnd;
@@ -1019,7 +1029,10 @@ void MEIOutput::UpdateFilter(Object *object)
             default: break;
         }
     }
+}
 
+void MEIOutput::UpdateMdivFilter(Object *object)
+{
     // Update mdiv
     if (m_mdivUuid.empty() && (m_mdivFilterMatchLocation == MatchLocation::Before)) {
         m_mdivFilterMatchLocation = MatchLocation::Here;

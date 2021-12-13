@@ -257,6 +257,9 @@ private:
     bool HasValidFilter() const;
     bool IsMatchingFilter() const;
     void UpdateFilter(Object *object);
+    void UpdatePageFilter(Object *object);
+    void UpdateMeasureFilter(Object *object);
+    void UpdateMdivFilter(Object *object);
     bool ProcessScoreBasedFilter(Object *object);
     bool ProcessScoreBasedFilterEnd(Object *object);
     ///@}
