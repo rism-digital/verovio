@@ -2780,6 +2780,8 @@ bool PAEInput::Parse()
 
     if (success) success = this->ConvertMRestOrMultiRest();
 
+    if (success) success = this->ConvertRest();
+
     if (success) success = this->ConvertPitch();
 
     if (success) success = this->ConvertOctave();
@@ -2789,8 +2791,6 @@ bool PAEInput::Parse()
     if (success) success = this->ConvertFermata();
 
     if (success) success = this->ConvertAccidental();
-
-    if (success) success = this->ConvertRest();
 
     if (success) success = this->ConvertChord();
 
