@@ -41,8 +41,10 @@ namespace vrv {
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 
-Staff::Staff(int n) : Object(STAFF, "staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n)
+    : Object(STAFF, "staff-"), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
 {
+    RegisterAttClass(ATT_COORDY1);
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
@@ -58,6 +60,7 @@ void Staff::Reset()
 {
     Object::Reset();
     FacsimileInterface::Reset();
+    ResetCoordY1();
     ResetNInteger();
     ResetTyped();
     ResetVisibility();

@@ -1578,7 +1578,8 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
 
     // y position
     if (staff->m_yAbs != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", staff->m_yAbs / DEFINITION_FACTOR).c_str();
+        staff->SetCoordY1(staff->m_yAbs / DEFINITION_FACTOR);
+        staff->WriteCoordY1(currentNode);
     }
 }
 
@@ -4979,9 +4980,9 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if (staff.attribute("uly") && (m_doc->GetType() == Transcription)) {
-        vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
-        staff.remove_attribute("uly");
+    if (staff.attribute("coord.y1") && (m_doc->GetType() == Transcription)) {
+        vrvStaff->ReadCoordY1(staff);
+        vrvStaff->m_yAbs = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
     }
 
     if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
