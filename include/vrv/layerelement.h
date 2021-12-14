@@ -40,6 +40,7 @@ class StaffAlignment;
 class LayerElement : public Object,
                      public FacsimileInterface,
                      public LinkingInterface,
+                     public AttCoordX1,
                      public AttLabelled,
                      public AttTyped {
 public:
