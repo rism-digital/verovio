@@ -1329,8 +1329,18 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // For now just ignore grace notes
+    // Handle grace notes
     if (this->IsGraceNote()) {
+        this->CalcMIDIPitch(params->m_transSemi);
+        const char pitch = this->GetMIDIPitch();
+
+        double quarterDuration = 0.0;
+        const data_DURATION dur = this->GetDur();
+        if ((dur >= DURATION_long) && (dur <= DURATION_1024)) {
+            quarterDuration = pow(2.0, (DURATION_4 - dur));
+        }
+
+        params->m_graceNotes.push_back({ { pitch }, quarterDuration });
         return FUNCTOR_SIBLINGS;
     }
 
