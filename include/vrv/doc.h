@@ -402,7 +402,7 @@ public:
      * @name Setter and getter for the current Score/ScoreDef.
      * If not set, then looks for the first Score in the Document and use that.
      * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
-     * When processing backward, the ScoreDef is changed when reaching the corresponding PageMsEnd
+     * When processing backward, the ScoreDef is changed when reaching the corresponding PageMilestoneEnd
      */
     ///@{
     Score *GetCurrentScore();

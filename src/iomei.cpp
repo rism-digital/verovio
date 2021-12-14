@@ -87,7 +87,7 @@
 #include "octave.h"
 #include "orig.h"
 #include "page.h"
-#include "pagems.h"
+#include "pagemilestone.h"
 #include "pages.h"
 #include "pb.h"
 #include "pedal.h"
@@ -819,11 +819,11 @@ bool MEIOutput::WriteObject(Object *object)
             return true;
         }
     }
-    // PageMsEnd - nothing to add - only
-    else if (object->Is(PAGE_MS_END)) {
+    // PageMilestoneEnd - nothing to add - only
+    else if (object->Is(PAGE_MILESTONE_END)) {
         if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("milestoneEnd");
-            WritePageMsEnd(m_currentNode, dynamic_cast<PageMsEnd *>(object));
+            WritePageMilestoneEnd(m_currentNode, dynamic_cast<PageMilestoneEnd *>(object));
         }
         else {
             return true;
@@ -867,11 +867,11 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         }
 
         // Merging boundaries into one xml element
-        if (object->IsMsElement()) {
-            m_boundaries.push(object->GetMsEnd());
+        if (object->IsMilestoneElement()) {
+            m_boundaries.push(object->GetMilestoneEnd());
             return true;
         }
-        if (object->Is({ PAGE_MS_END, SYSTEM_MILESTONE_END })) {
+        if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
             if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
                 m_boundaries.pop();
             }
@@ -1036,7 +1036,7 @@ void MEIOutput::WritePageElement(pugi::xml_node currentNode, PageElement *pageEl
     pageElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *milestoneEnd)
+void MEIOutput::WritePageMilestoneEnd(pugi::xml_node currentNode, PageMilestoneEnd *milestoneEnd)
 {
     assert(milestoneEnd && milestoneEnd->GetStart());
 
@@ -3329,7 +3329,7 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
             ReadMdiv(parent, current, true);
         }
         else if (std::string(current.name()) == "milestoneEnd") {
-            ReadPageMsEnd(parent, current);
+            ReadPageMilestoneEnd(parent, current);
         }
         // xml comment
         else if (std::string(current.name()) == "") {
@@ -3343,7 +3343,7 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
     return true;
 }
 
-bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node milestoneEnd)
+bool MEIInput::ReadPageMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd)
 {
     assert(dynamic_cast<Page *>(parent));
 
@@ -3362,13 +3362,13 @@ bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node milestoneEnd)
     }
 
     // Check that it is a page milestone
-    PageMsInterface *interface = dynamic_cast<PageMsInterface *>(start);
+    PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(start);
     if (!interface) {
         LogError("The start element  '%s' is not a page milestone element", startUuid.c_str());
         return false;
     }
 
-    PageMsEnd *vrvElementEnd = new PageMsEnd(start);
+    PageMilestoneEnd *vrvElementEnd = new PageMilestoneEnd(start);
     SetMeiUuid(milestoneEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
@@ -6935,14 +6935,14 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     score->SetParent(page);
     page->InsertChild(score, 0);
 
-    PageMsEnd *scoreEnd = new PageMsEnd(score);
+    PageMilestoneEnd *scoreEnd = new PageMilestoneEnd(score);
     page->AddChild(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
     mdiv->SetParent(page);
     page->InsertChild(mdiv, 0);
 
-    PageMsEnd *mdivEnd = new PageMsEnd(mdiv);
+    PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
 }
 

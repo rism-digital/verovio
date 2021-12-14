@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pagems.h
+// Name:        pagemilestone.h
 // Author:      Laurent Pugin
 // Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_PAGE_MS_H__
-#define __VRV_PAGE_MS_H__
+#ifndef __VRV_PAGE_MILESTONE_H__
+#define __VRV_PAGE_MILESTONE_H__
 
 #include "pageelement.h"
 #include "vrvdef.h"
@@ -17,23 +17,23 @@ class Measure;
 class Object;
 
 //----------------------------------------------------------------------------
-// PageMsEnd
+// PageMilestoneEnd
 //----------------------------------------------------------------------------
 
 /**
  * This class models an end milestone element and has no MEI equivalent.
  */
-class PageMsEnd : public PageElement {
+class PageMilestoneEnd : public PageElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    PageMsEnd(Object *start);
-    virtual ~PageMsEnd();
+    PageMilestoneEnd(Object *start);
+    virtual ~PageMilestoneEnd();
     void Reset() override;
-    std::string GetClassName() const override { return "PageMsEnd"; }
+    std::string GetClassName() const override { return "PageMilestoneEnd"; }
     ///@}
 
     // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -86,21 +86,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// PageMsInterface
+// PageMilestoneInterface
 //----------------------------------------------------------------------------
 
 /**
  * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
-class PageMsInterface {
+class PageMilestoneInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    PageMsInterface();
-    virtual ~PageMsInterface();
+    PageMilestoneInterface();
+    virtual ~PageMilestoneInterface();
     virtual void Reset();
     ///@}
 
@@ -109,15 +109,15 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetEnd(PageMsEnd *end);
-    PageMsEnd *GetEnd() { return m_end; }
-    bool IsPageMs() { return (m_end != NULL); }
+    void SetEnd(PageMilestoneEnd *end);
+    PageMilestoneEnd *GetEnd() { return m_end; }
+    bool IsPageMilestone() { return (m_end != NULL); }
     ///@}
 
     /**
      *
      */
-    void ConvertToPageBasedBoundary(Object *object, Object *parent);
+    void ConvertToPageBasedMilestone(Object *object, Object *parent);
 
     //-----------------//
     // Pseudo functors //
@@ -133,7 +133,7 @@ protected:
     /**
      * The corresponding end element
      */
-    PageMsEnd *m_end;
+    PageMilestoneEnd *m_end;
 
 private:
 };

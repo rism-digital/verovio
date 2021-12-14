@@ -42,7 +42,7 @@
 #include "options.h"
 #include "page.h"
 #include "pageelement.h"
-#include "pagems.h"
+#include "pagemilestone.h"
 #include "reh.h"
 #include "smufl.h"
 #include "staff.h"
@@ -158,8 +158,8 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
     assert(dc);
     assert(element);
 
-    if (element->Is(PAGE_MS_END)) {
-        PageMsEnd *elementEnd = vrv_cast<PageMsEnd *>(element);
+    if (element->Is(PAGE_MILESTONE_END)) {
+        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(element);
         assert(elementEnd);
         assert(elementEnd->GetStart());
         dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
@@ -167,12 +167,12 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
     }
     else if (element->Is(MDIV)) {
         // When the mdiv is not visible, then there is no start / end element
-        std::string elementStart = (element->IsMsElement()) ? "pageMs" : "";
+        std::string elementStart = (element->IsMilestoneElement()) ? "pageMilestone" : "";
         dc->StartGraphic(element, elementStart, element->GetUuid());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SCORE)) {
-        dc->StartGraphic(element, "pageMs", element->GetUuid());
+        dc->StartGraphic(element, "pageMilestone", element->GetUuid());
         dc->EndGraphic(element, this);
     }
 }
@@ -1718,7 +1718,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
     std::string elementStart;
-    if (element->IsMsElement()) elementStart = "systemElementStart";
+    if (element->IsMilestoneElement()) elementStart = "systemElementStart";
 
     dc->StartGraphic(element, elementStart, element->GetUuid());
     // EditorialElements at the system level that are visible have no children

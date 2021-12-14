@@ -219,7 +219,7 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
     m_interfaces.push_back(interfaceId);
 }
 
-bool Object::IsMsElement()
+bool Object::IsMilestoneElement()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(this);
@@ -227,14 +227,14 @@ bool Object::IsMsElement()
         return (interface->IsSystemMilestone());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
-        PageMsInterface *interface = dynamic_cast<PageMsInterface *>(this);
+        PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(this);
         assert(interface);
-        return (interface->IsPageMs());
+        return (interface->IsPageMilestone());
     }
     return false;
 }
 
-Object *Object::GetMsEnd()
+Object *Object::GetMilestoneEnd()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(this);
@@ -242,7 +242,7 @@ Object *Object::GetMsEnd()
         return (interface->GetEnd());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
-        PageMsInterface *interface = dynamic_cast<PageMsInterface *>(this);
+        PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(this);
         assert(interface);
         return (interface->GetEnd());
     }
@@ -859,9 +859,9 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         assert(score);
         score->SetAsCurrent();
     }
-    // We need to do the same in backward direction through the PageMsEnd::m_start
-    else if (direction == BACKWARD && this->Is(PAGE_MS_END)) {
-        PageMsEnd *elementEnd = vrv_cast<PageMsEnd *>(this);
+    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
+    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
+        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
         assert(elementEnd);
         if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
             Score *score = vrv_cast<Score *>(elementEnd->GetStart());
@@ -1465,7 +1465,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
             params->m_elements->push_back(interface->GetEnd());
     }
     // These will also be referred to as milestones in page-based MEI
-    if (params->m_milestoneReferences && this->IsMsElement()) {
+    if (params->m_milestoneReferences && this->IsMilestoneElement()) {
         params->m_elements->push_back(this);
     }
 

@@ -751,8 +751,8 @@ void Doc::PrepareDrawing()
     /************ Resolve endings ************/
 
     // Prepare the endings (pointers to the measure after and before the boundaries
-    PrepareBoundariesParams prepareEndingsParams;
-    Functor prepareEndings(&Object::PrepareBoundaries);
+    PrepareMilestonesParams prepareEndingsParams;
+    Functor prepareEndings(&Object::PrepareMilestones);
     this->Process(&prepareEndings, &prepareEndingsParams);
 
     /************ Resolve floating groups for vertical alignment ************/

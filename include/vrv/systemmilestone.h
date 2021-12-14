@@ -21,7 +21,7 @@ class Object;
 //----------------------------------------------------------------------------
 
 /**
- * This class models an end milestone element MsEnd at the system level.
+ * This class models an end milestone element milesoneEnd at the system level.
  */
 class SystemMilestoneEnd : public SystemElement {
 public:
@@ -52,9 +52,9 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    int PrepareBoundaries(FunctorParams *functorParams) override;
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
@@ -122,17 +122,17 @@ public:
     /**
      *
      */
-    void ConvertToPageBasedBoundary(Object *object, Object *parent);
+    void ConvertToPageBasedMilestone(Object *object, Object *parent);
 
     //-----------------//
     // Pseudo functors //
     //-----------------//
 
     /**
-     * See Object::PrepareBoundaries
-     * Called from Ending::PrepareBoundaries and EditorialElement::PrepareBoundaries
+     * See Object::PrepareMilestones
+     * Called from Ending::PrepareMilestones and EditorialElement::PrepareMilestones
      */
-    virtual int InterfacePrepareBoundaries(FunctorParams *functorParams);
+    virtual int InterfacePrepareMilestones(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.

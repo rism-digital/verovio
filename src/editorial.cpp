@@ -33,7 +33,8 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement()
+    : Object(EDITORIAL_ELEMENT, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -132,15 +133,15 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    if (m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_currentSystem);
+    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
 
-int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
+int EditorialElement::PrepareMilestones(FunctorParams *functorParams)
 {
     if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareBoundaries(functorParams);
+        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

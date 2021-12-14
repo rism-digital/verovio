@@ -2457,7 +2457,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         dc->EndGraphic(element, this);
     }
     else if (element->Is(ENDING)) {
-        // Create placeholder - A graphic for the end boundary will be created
+        // Create placeholder - A graphic for the end milestone will be created
         // but only if it is on a different system - See View::DrawEnding
         // The Ending is added to the System drawing list by View::DrawMeasure
         dc->StartGraphic(element, "systemMilestone", element->GetUuid());
@@ -2491,18 +2491,18 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         }
     }
 
-    SystemMilestoneEnd *endingEndBoundary = ending->GetEnd();
+    SystemMilestoneEnd *endingEndMilestone = ending->GetEnd();
 
     // We need to make sure we have the end boudary and a measure (first and last) in each of them
-    assert(endingEndBoundary);
-    assert(ending->GetMeasure() && endingEndBoundary->GetMeasure());
+    assert(endingEndMilestone);
+    assert(ending->GetMeasure() && endingEndMilestone->GetMeasure());
     // in non debug mode
-    if (!endingEndBoundary) return;
-    if (!ending->GetMeasure() || !endingEndBoundary->GetMeasure()) return;
+    if (!endingEndMilestone) return;
+    if (!ending->GetMeasure() || !endingEndMilestone->GetMeasure()) return;
 
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System *>(ending->GetFirstAncestor(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(endingEndBoundary->GetFirstAncestor(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(endingEndMilestone->GetFirstAncestor(SYSTEM));
 
     assert(parentSystem1 && parentSystem2);
     // in non debug mode
@@ -2520,8 +2520,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == measure) x1 += measure->GetLeftBarLineXRel();
-        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel()
-            + endingEndBoundary->GetMeasure()->GetRightBarLineWidth(m_doc);
+        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel()
+            + endingEndMilestone->GetMeasure()->GetRightBarLineWidth(m_doc);
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
@@ -2542,8 +2542,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel()
-            + endingEndBoundary->GetMeasure()->GetRightBarLineWidth(m_doc);
+        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel()
+            + endingEndMilestone->GetMeasure()->GetRightBarLineWidth(m_doc);
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector

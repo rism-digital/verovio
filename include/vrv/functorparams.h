@@ -1802,27 +1802,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareBoundariesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the last measure
- * member 1: the current boundary
- **/
-
-class PrepareBoundariesParams : public FunctorParams {
-public:
-    PrepareBoundariesParams()
-    {
-        m_lastMeasure = NULL;
-        m_currentEnding = NULL;
-    }
-    Measure *m_lastMeasure;
-    Ending *m_currentEnding;
-    std::vector<SystemMilestoneInterface *> m_startBoundaries;
-};
-
-//----------------------------------------------------------------------------
 // PrepareDelayedTurnsParams
 //----------------------------------------------------------------------------
 
@@ -1948,6 +1927,27 @@ public:
     MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
     MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
+};
+
+//----------------------------------------------------------------------------
+// PrepareMilestonesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the last measure
+ * member 1: the current milestone
+ **/
+
+class PrepareMilestonesParams : public FunctorParams {
+public:
+    PrepareMilestonesParams()
+    {
+        m_lastMeasure = NULL;
+        m_currentEnding = NULL;
+    }
+    Measure *m_lastMeasure;
+    Ending *m_currentEnding;
+    std::vector<SystemMilestoneInterface *> m_startMilestones;
 };
 
 //----------------------------------------------------------------------------

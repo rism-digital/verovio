@@ -20,7 +20,6 @@
 #import <VerovioFramework/beatrpt.h>
 #import <VerovioFramework/expansionmap.h>
 #import <VerovioFramework/page.h>
-#import <VerovioFramework/pagems.h>
 #import <VerovioFramework/bracketspan.h>
 #import <VerovioFramework/reg.h>
 #import <VerovioFramework/multirest.h>
@@ -107,6 +106,7 @@
 #import <VerovioFramework/iomusxml.h>
 #import <VerovioFramework/git_commit.h>
 #import <VerovioFramework/rend.h>
+#import <VerovioFramework/pagemilestone.h>
 #import <VerovioFramework/sic.h>
 #import <VerovioFramework/grpsym.h>
 #import <VerovioFramework/fig.h>
@@ -119,7 +119,6 @@
 #import <VerovioFramework/mensur.h>
 #import <VerovioFramework/slur.h>
 #import <VerovioFramework/mrpt.h>
-#import <VerovioFramework/systemmilestone.h>
 #import <VerovioFramework/io.h>
 #import <VerovioFramework/course.h>
 #import <VerovioFramework/pghead.h>
@@ -134,6 +133,7 @@
 #import <VerovioFramework/object.h>
 #import <VerovioFramework/orig.h>
 #import <VerovioFramework/artic.h>
+#import <VerovioFramework/systemmilestone.h>
 #import <VerovioFramework/pedal.h>
 #import <VerovioFramework/iopae.h>
 #import <VerovioFramework/instrdef.h>

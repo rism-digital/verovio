@@ -90,7 +90,7 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_currentSystem);
+    ConvertToPageBasedMilestone(this, params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
@@ -106,10 +106,10 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Section::PrepareBoundaries(FunctorParams *functorParams)
+int Section::PrepareMilestones(FunctorParams *functorParams)
 {
     if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareBoundaries(functorParams);
+        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

@@ -84,8 +84,8 @@ public:
      * Wrapper for checking if an element has a milestone start interface and also if is set as a milestone element
      */
     ///@{
-    bool IsMsElement();
-    Object *GetMsEnd();
+    bool IsMilestoneElement();
+    Object *GetMilestoneEnd();
     ///@}
 
     /**
@@ -1142,7 +1142,7 @@ public:
     /**
      * Functor for setting Measure of Ending
      */
-    virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareMilestones(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * @name Functor for grouping FloatingObject by drawingGrpId.

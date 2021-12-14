@@ -36,7 +36,7 @@ namespace vrv {
 
 static const ClassRegistrar<Score> s_factory("score", SCORE);
 
-Score::Score() : PageElement(SCORE, "score-"), PageMsInterface(), AttLabelled(), AttNNumberLike()
+Score::Score() : PageElement(SCORE, "score-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -213,7 +213,7 @@ int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_page);
+    ConvertToPageBasedMilestone(this, params->m_page);
     params->m_currentSystem = NULL;
 
     return FUNCTOR_CONTINUE;

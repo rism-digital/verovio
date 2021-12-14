@@ -67,9 +67,9 @@ public:
     int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    int PrepareBoundaries(FunctorParams *functorParams) override;
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
