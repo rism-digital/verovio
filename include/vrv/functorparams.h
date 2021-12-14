@@ -1555,12 +1555,23 @@ struct MIDINote {
 using MIDINoteSequence = std::list<MIDINote>;
 
 /**
+ * Helper struct to store chord sequences in MIDI output due to grace notes
+ */
+struct MIDIChord {
+    std::set<char> pitches;
+    double duration;
+};
+
+using MIDIChordSequence = std::list<MIDIChord>;
+
+/**
  * member 0: MidiFile*: the MidiFile we are writing to
  * member 1: int: the midi track number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
  * member 5: double with the current tempo
  * member 6: expanded notes due to ornaments and tremolandi
+ * member 7: grace note sequence
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1582,6 +1593,7 @@ public:
     int m_transSemi;
     double m_currentTempo;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
+    MIDIChordSequence m_graceNotes;
     Functor *m_functor;
 };
 
