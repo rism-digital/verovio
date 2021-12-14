@@ -28,7 +28,7 @@ namespace vrv {
 
 static const ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
 
-Mdiv::Mdiv() : PageElement(MDIV, "mdiv-"), PageElementStartInterface(), AttLabelled(), AttNNumberLike()
+Mdiv::Mdiv() : PageElement(MDIV, "mdiv-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -116,7 +116,7 @@ int Mdiv::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    if (m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_page);
+    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_page);
 
     return FUNCTOR_CONTINUE;
 }

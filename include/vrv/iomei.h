@@ -34,7 +34,6 @@ class Artic;
 class BarLine;
 class Beam;
 class BeatRpt;
-class SystemElementEnd;
 class BracketSpan;
 class Breath;
 class BTrem;
@@ -101,7 +100,7 @@ class Octave;
 class Orig;
 class Page;
 class PageElement;
-class PageElementEnd;
+class PageMilestoneEnd;
 class Pages;
 class Pb;
 class Pedal;
@@ -142,6 +141,7 @@ class Syl;
 class Syllable;
 class System;
 class SystemElement;
+class SystemMilestoneEnd;
 class TabDurSym;
 class TabGrp;
 class Tempo;
@@ -261,9 +261,9 @@ private:
     ///@{
     void WritePage(pugi::xml_node currentNode, Page *page);
     void WritePageElement(pugi::xml_node element, PageElement *object);
-    void WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd);
+    void WritePageMilestoneEnd(pugi::xml_node currentNode, PageMilestoneEnd *milestoneEnd);
     void WriteSystem(pugi::xml_node currentNode, System *system);
-    void WriteSystemElementEnd(pugi::xml_node currentNode, SystemElementEnd *elementEnd);
+    void WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilestoneEnd *milestoneEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteGrpSym(pugi::xml_node currentNode, GrpSym *grmSym);
     void WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot);
@@ -499,10 +499,10 @@ private:
     bool ReadPages(Object *parent, pugi::xml_node parentNode);
     bool ReadPage(Object *parent, pugi::xml_node parentNode);
     bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd);
+    bool ReadPageMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);
+    bool ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
     ///@}
 
     /**

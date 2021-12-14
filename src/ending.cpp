@@ -29,7 +29,7 @@ namespace vrv {
 
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
-Ending::Ending() : SystemElement(ENDING, "ending-"), SystemElementStartInterface(), AttLineRend(), AttNNumberLike()
+Ending::Ending() : SystemElement(ENDING, "ending-"), SystemMilestoneInterface(), AttLineRend(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_NINTEGER);
@@ -42,7 +42,7 @@ Ending::~Ending() {}
 void Ending::Reset()
 {
     SystemElement::Reset();
-    SystemElementStartInterface::Reset();
+    SystemMilestoneInterface::Reset();
     ResetLineRend();
     ResetNNumberLike();
 }
@@ -91,20 +91,20 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_currentSystem);
+    ConvertToPageBasedMilestone(this, params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Ending::PrepareBoundaries(FunctorParams *functorParams)
+int Ending::PrepareMilestones(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
     assert(params);
 
-    // Endings should always have an SystemElementEnd
-    assert(this->IsSystemBoundary());
+    // Endings should always have an SystemMilestoneEnd
+    assert(this->IsSystemMilestone());
 
-    this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
+    this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
 
     params->m_currentEnding = this;
 
@@ -115,7 +115,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
-    this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
+    this->SystemMilestoneInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

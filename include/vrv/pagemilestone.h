@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pageboundary.h
+// Name:        pagemilestone.h
 // Author:      Laurent Pugin
 // Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_PAGE_BOUNDARY_H__
-#define __VRV_PAGE_BOUNDARY_H__
+#ifndef __VRV_PAGE_MILESTONE_H__
+#define __VRV_PAGE_MILESTONE_H__
 
 #include "pageelement.h"
 #include "vrvdef.h"
@@ -17,30 +17,30 @@ class Measure;
 class Object;
 
 //----------------------------------------------------------------------------
-// PageElementEnd
+// PageMilestoneEnd
 //----------------------------------------------------------------------------
 
 /**
  * This class models an end milestone element and has no MEI equivalent.
  */
-class PageElementEnd : public PageElement {
+class PageMilestoneEnd : public PageElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    PageElementEnd(Object *start);
-    virtual ~PageElementEnd();
+    PageMilestoneEnd(Object *start);
+    virtual ~PageMilestoneEnd();
     void Reset() override;
-    std::string GetClassName() const override { return "PageElementEnd"; }
+    std::string GetClassName() const override { return "PageMilestoneEnd"; }
     ///@}
 
     // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
     // Measure *GetMeasure() { return m_drawingMeasure; }
 
     /**
-     * @name Get the corresponding boundary start
+     * @name Get the corresponding milestone start
      */
     ///@{
     Object *GetStart() { return m_start; }
@@ -86,21 +86,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// PageElementStartInterface
+// PageMilestoneInterface
 //----------------------------------------------------------------------------
 
 /**
  * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
-class PageElementStartInterface {
+class PageMilestoneInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    PageElementStartInterface();
-    virtual ~PageElementStartInterface();
+    PageMilestoneInterface();
+    virtual ~PageMilestoneInterface();
     virtual void Reset();
     ///@}
 
@@ -109,15 +109,15 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetEnd(PageElementEnd *end);
-    PageElementEnd *GetEnd() { return m_end; }
-    bool IsPageBoundary() { return (m_end != NULL); }
+    void SetEnd(PageMilestoneEnd *end);
+    PageMilestoneEnd *GetEnd() { return m_end; }
+    bool IsPageMilestone() { return (m_end != NULL); }
     ///@}
 
     /**
      *
      */
-    void ConvertToPageBasedBoundary(Object *object, Object *parent);
+    void ConvertToPageBasedMilestone(Object *object, Object *parent);
 
     //-----------------//
     // Pseudo functors //
@@ -133,7 +133,7 @@ protected:
     /**
      * The corresponding end element
      */
-    PageElementEnd *m_end;
+    PageMilestoneEnd *m_end;
 
 private:
 };

@@ -11,7 +11,7 @@
 #include "atts_critapp.h"
 #include "atts_shared.h"
 #include "object.h"
-#include "systemboundary.h"
+#include "systemmilestone.h"
 
 namespace vrv {
 
@@ -33,9 +33,9 @@ class TextElement;
  * This class is a base class for the editorial element containing musical
  * content, for example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
+ * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  */
-class EditorialElement : public Object, public SystemElementStartInterface, public AttLabelled, public AttTyped {
+class EditorialElement : public Object, public SystemMilestoneInterface, public AttLabelled, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -67,9 +67,9 @@ public:
     int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    int PrepareBoundaries(FunctorParams *functorParams) override;
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing

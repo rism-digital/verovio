@@ -87,7 +87,7 @@
 #include "octave.h"
 #include "orig.h"
 #include "page.h"
-#include "pageboundary.h"
+#include "pagemilestone.h"
 #include "pages.h"
 #include "pb.h"
 #include "pedal.h"
@@ -122,7 +122,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
-#include "systemboundary.h"
+#include "systemmilestone.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
 #include "tempo.h"
@@ -161,6 +161,8 @@ bool MEIOutput::Export()
 
     if (m_removeIds) {
         FindAllReferencedObjectsParams findAllReferencedObjectsParams(&m_referredObjects);
+        // When saving page-based MEI we also want to keep IDs for milestone elements
+        findAllReferencedObjectsParams.m_milestoneReferences = this->IsPageBasedMEI();
         Functor findAllReferencedObjects(&Object::FindAllReferencedObjects);
         m_doc->Process(&findAllReferencedObjects, &findAllReferencedObjectsParams);
         m_referredObjects.unique();
@@ -178,22 +180,26 @@ bool MEIOutput::Export()
             decl.append_attribute("encoding") = "UTF-8";
 
             // schema processing instruction
+            const std::string schema = this->IsPageBasedMEI() ? "https://www.verovio.org/schema/dev/mei-verovio.rng"
+                                                              : "https://music-encoding.org/schema/dev/mei-all.rng";
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = schema.c_str();
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
-            // schematron processing instruction
-            decl = meiDoc.append_child(pugi::node_declaration);
-            decl.set_name("xml-model");
-            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
-            decl.append_attribute("type") = "application/xml";
-            decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
+            // schematron processing instruction - currently not working for page-based MEI
+            if (!this->IsPageBasedMEI()) {
+                decl = meiDoc.append_child(pugi::node_declaration);
+                decl.set_name("xml-model");
+                decl.append_attribute("href") = "https://music-encoding.org/schema/dev/mei-all.rng";
+                decl.append_attribute("type") = "application/xml";
+                decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
+            }
 
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "4.0.0";
+            m_mei.append_attribute("meiversion") = "5.0.0-dev";
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
             m_doc->ConvertToCastOffMensuralDoc(false);
@@ -283,7 +289,8 @@ bool MEIOutput::WriteObject(Object *object)
 
     if (object->Is(MDIV)) {
         if (this->IsPageBasedMEI() || !this->IsSavingSinglePage()) {
-            m_currentNode = m_currentNode.append_child("mdiv");
+            const std::string name = (this->IsPageBasedMEI()) ? "mdivb" : "mdiv";
+            m_currentNode = m_currentNode.append_child(name.c_str());
             WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
         }
         else {
@@ -339,15 +346,26 @@ bool MEIOutput::WriteObject(Object *object)
         WriteExpansion(m_currentNode, dynamic_cast<Expansion *>(object));
     }
     else if (object->Is(PB)) {
-        m_currentNode = m_currentNode.append_child("pb");
-        WritePb(m_currentNode, dynamic_cast<Pb *>(object));
+        if (this->IsScoreBasedMEI()) {
+            m_currentNode = m_currentNode.append_child("pb");
+            WritePb(m_currentNode, dynamic_cast<Pb *>(object));
+        }
+        else {
+            return true;
+        }
     }
     else if (object->Is(SB)) {
-        m_currentNode = m_currentNode.append_child("sb");
-        WriteSb(m_currentNode, dynamic_cast<Sb *>(object));
+        if (this->IsScoreBasedMEI()) {
+            m_currentNode = m_currentNode.append_child("sb");
+            WriteSb(m_currentNode, dynamic_cast<Sb *>(object));
+        }
+        else {
+            return true;
+        }
     }
     else if (object->Is(SECTION)) {
-        m_currentNode = m_currentNode.append_child("section");
+        const std::string name = (this->IsPageBasedMEI()) ? "secb" : "section";
+        m_currentNode = m_currentNode.append_child(name.c_str());
         WriteSection(m_currentNode, dynamic_cast<Section *>(object));
     }
 
@@ -791,21 +809,21 @@ bool MEIOutput::WriteObject(Object *object)
         WriteUnclear(m_currentNode, dynamic_cast<Unclear *>(object));
     }
 
-    // SystemElementEnd - nothing to add - only
-    else if (object->Is(SYSTEM_ELEMENT_END)) {
+    // SystemMilestoneEnd - nothing to add - only
+    else if (object->Is(SYSTEM_MILESTONE_END)) {
         if (this->IsPageBasedMEI()) {
-            m_currentNode = m_currentNode.append_child("systemElementEnd");
-            WriteSystemElementEnd(m_currentNode, dynamic_cast<SystemElementEnd *>(object));
+            m_currentNode = m_currentNode.append_child("milestoneEnd");
+            WriteSystemMilestoneEnd(m_currentNode, dynamic_cast<SystemMilestoneEnd *>(object));
         }
         else {
             return true;
         }
     }
-    // PageElementEnd - nothing to add - only
-    else if (object->Is(PAGE_ELEMENT_END)) {
+    // PageMilestoneEnd - nothing to add - only
+    else if (object->Is(PAGE_MILESTONE_END)) {
         if (this->IsPageBasedMEI()) {
-            m_currentNode = m_currentNode.append_child("pageElementEnd");
-            WritePageElementEnd(m_currentNode, dynamic_cast<PageElementEnd *>(object));
+            m_currentNode = m_currentNode.append_child("milestoneEnd");
+            WritePageMilestoneEnd(m_currentNode, dynamic_cast<PageMilestoneEnd *>(object));
         }
         else {
             return true;
@@ -849,17 +867,24 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         }
 
         // Merging boundaries into one xml element
-        if (object->IsBoundaryElement()) {
-            m_boundaries.push(object->GetBoundaryEnd());
+        if (object->IsMilestoneElement()) {
+            m_boundaries.push(object->GetMilestoneEnd());
             return true;
         }
-        if (object->Is({ PAGE_ELEMENT_END, SYSTEM_ELEMENT_END })) {
+        if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
             if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
                 m_boundaries.pop();
             }
             else {
+                assert(false);
                 return true;
             }
+        }
+    }
+    else {
+        // In page-based MEI, pb and sb are not written.
+        if (object->Is({ PB, SB })) {
+            return true;
         }
     }
 
@@ -1011,13 +1036,13 @@ void MEIOutput::WritePageElement(pugi::xml_node currentNode, PageElement *pageEl
     pageElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd)
+void MEIOutput::WritePageMilestoneEnd(pugi::xml_node currentNode, PageMilestoneEnd *milestoneEnd)
 {
-    assert(elementEnd && elementEnd->GetStart());
+    assert(milestoneEnd && milestoneEnd->GetStart());
 
-    WritePageElement(currentNode, elementEnd);
-    currentNode.append_attribute("startid") = UuidToMeiStr(elementEnd->GetStart()).c_str();
-    std::string meiElementName = elementEnd->GetStart()->GetClassName();
+    WritePageElement(currentNode, milestoneEnd);
+    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(milestoneEnd->GetStart())).c_str();
+    std::string meiElementName = milestoneEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
 }
@@ -1047,13 +1072,13 @@ void MEIOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *sy
     systemElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WriteSystemElementEnd(pugi::xml_node currentNode, SystemElementEnd *elementEnd)
+void MEIOutput::WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilestoneEnd *milestoneEnd)
 {
-    assert(elementEnd && elementEnd->GetStart());
+    assert(milestoneEnd && milestoneEnd->GetStart());
 
-    WriteSystemElement(currentNode, elementEnd);
-    currentNode.append_attribute("startid") = UuidToMeiStr(elementEnd->GetStart()).c_str();
-    std::string meiElementName = elementEnd->GetStart()->GetClassName();
+    WriteSystemElement(currentNode, milestoneEnd);
+    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(milestoneEnd->GetStart())).c_str();
+    std::string meiElementName = milestoneEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
 }
@@ -3299,8 +3324,12 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "system") {
             ReadSystem(parent, current);
         }
-        else if (std::string(current.name()) == "pageElementEnd") {
-            ReadPageElementEnd(parent, current);
+        // mdiv in page-based MEI
+        else if (std::string(current.name()) == "mdivb") {
+            ReadMdiv(parent, current, true);
+        }
+        else if (std::string(current.name()) == "milestoneEnd") {
+            ReadPageMilestoneEnd(parent, current);
         }
         // xml comment
         else if (std::string(current.name()) == "") {
@@ -3314,33 +3343,33 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
     return true;
 }
 
-bool MEIInput::ReadPageElementEnd(Object *parent, pugi::xml_node elementEnd)
+bool MEIInput::ReadPageMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd)
 {
     assert(dynamic_cast<Page *>(parent));
 
     // Check that we have a @startid
-    if (!elementEnd.attribute("startid")) {
-        LogError("Missing @startid on  pageElementEnd");
+    if (!milestoneEnd.attribute("startid")) {
+        LogError("Missing @startid on  milestoneEnd");
         return false;
     }
 
     // Find the element pointing to it
-    std::string startUuid = elementEnd.attribute("startid").value();
-    Object *start = m_doc->FindDescendantByUuid(startUuid);
+    std::string startUuid = milestoneEnd.attribute("startid").value();
+    Object *start = m_doc->FindDescendantByUuid(ExtractUuidFragment(startUuid));
     if (!start) {
-        LogError("Could not find start element '%s' for pageElementEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for milestoneEnd", startUuid.c_str());
         return false;
     }
 
-    // Check that it is a page boundary
-    PageElementStartInterface *interface = dynamic_cast<PageElementStartInterface *>(start);
+    // Check that it is a page milestone
+    PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(start);
     if (!interface) {
-        LogError("The start element  '%s' is not a page boundary element", startUuid.c_str());
+        LogError("The start element  '%s' is not a page milestone element", startUuid.c_str());
         return false;
     }
 
-    PageElementEnd *vrvElementEnd = new PageElementEnd(start);
-    SetMeiUuid(elementEnd, vrvElementEnd);
+    PageMilestoneEnd *vrvElementEnd = new PageMilestoneEnd(start);
+    SetMeiUuid(milestoneEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
@@ -3665,9 +3694,12 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "section") {
             success = ReadSection(parent, current);
         }
-        // elementEnd
-        else if (std::string(current.name()) == "systemElementEnd") {
-            success = ReadSystemElementEnd(parent, current);
+        // section in page-based MEI
+        else if (std::string(current.name()) == "secb") {
+            success = ReadSection(parent, current);
+        }
+        else if (std::string(current.name()) == "milestoneEnd") {
+            success = ReadSystemMilestoneEnd(parent, current);
         }
         // content
         else if (std::string(current.name()) == "scoreDef") {
@@ -3711,33 +3743,33 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd)
+bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd)
 {
     assert(dynamic_cast<System *>(parent));
 
     // Check that we have a @startid
-    if (!elementEnd.attribute("startid")) {
-        LogError("Missing @startid on  systemElementEnd");
+    if (!milestoneEnd.attribute("startid")) {
+        LogError("Missing @startid on  milestoneEnd");
         return false;
     }
 
     // Find the element pointing to it
-    std::string startUuid = elementEnd.attribute("startid").value();
-    Object *start = m_doc->FindDescendantByUuid(startUuid);
+    std::string startUuid = milestoneEnd.attribute("startid").value();
+    Object *start = m_doc->FindDescendantByUuid(ExtractUuidFragment(startUuid));
     if (!start) {
-        LogError("Could not find start element '%s' for systemElementEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for milestoneEnd", startUuid.c_str());
         return false;
     }
 
-    // Check that it is a page boundary
-    SystemElementStartInterface *interface = dynamic_cast<SystemElementStartInterface *>(start);
+    // Check that it is a page milestone
+    SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(start);
     if (!interface) {
-        LogError("The start element  '%s' is not a system boundary element", startUuid.c_str());
+        LogError("The start element  '%s' is not a system milestone element", startUuid.c_str());
         return false;
     }
 
-    SystemElementEnd *vrvElementEnd = new SystemElementEnd(start);
-    SetMeiUuid(elementEnd, vrvElementEnd);
+    SystemMilestoneEnd *vrvElementEnd = new SystemMilestoneEnd(start);
+    SetMeiUuid(milestoneEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
@@ -6903,14 +6935,14 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     score->SetParent(page);
     page->InsertChild(score, 0);
 
-    PageElementEnd *scoreEnd = new PageElementEnd(score);
+    PageMilestoneEnd *scoreEnd = new PageMilestoneEnd(score);
     page->AddChild(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
     mdiv->SetParent(page);
     page->InsertChild(mdiv, 0);
 
-    PageElementEnd *mdivEnd = new PageElementEnd(mdiv);
+    PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
 }
 

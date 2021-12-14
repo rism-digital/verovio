@@ -430,9 +430,9 @@ public:
     int PrepareTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    int PrepareBoundaries(FunctorParams *functorParams) override;
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::GenerateMIDI
@@ -515,7 +515,7 @@ private:
     ScoreDef *m_drawingScoreDef;
 
     /**
-     * A pointer to the ending to which the measure belongs. Set by PrepareBoundaries and passed to the System drawing
+     * A pointer to the ending to which the measure belongs. Set by PrepareMilestones and passed to the System drawing
      * list
      * in DrawMeasure
      */

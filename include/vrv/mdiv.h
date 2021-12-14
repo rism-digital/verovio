@@ -9,8 +9,8 @@
 #define __VRV_MDIV_H__
 
 #include "atts_shared.h"
-#include "pageboundary.h"
 #include "pageelement.h"
+#include "pagemilestone.h"
 
 namespace vrv {
 
@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class represent a <mdiv> in page-based MEI.
  */
-class Mdiv : public PageElement, public PageElementStartInterface, public AttLabelled, public AttNNumberLike {
+class Mdiv : public PageElement, public PageMilestoneInterface, public AttLabelled, public AttNNumberLike {
 
 public:
     /**

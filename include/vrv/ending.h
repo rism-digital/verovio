@@ -9,8 +9,8 @@
 #define __VRV_ENDING_H__
 
 #include "atts_shared.h"
-#include "systemboundary.h"
 #include "systemelement.h"
+#include "systemmilestone.h"
 
 namespace vrv {
 
@@ -22,10 +22,10 @@ class Measure;
 
 /**
  * This class represents a MEI ending.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
+ * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public SystemElementStartInterface, public AttLineRend, public AttNNumberLike {
+class Ending : public SystemElement, public SystemMilestoneInterface, public AttLineRend, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -57,9 +57,9 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    int PrepareBoundaries(FunctorParams *functorParams) override;
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing

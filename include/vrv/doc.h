@@ -306,7 +306,7 @@ public:
 
     /**
      * Convert the doc from score-based to page-based MEI.
-     * Containers will be converted to systemElementStart / systemElementEnd.
+     * Containers will be converted to systemMilestone / systemMilestoneEnd.
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();
@@ -402,7 +402,7 @@ public:
      * @name Setter and getter for the current Score/ScoreDef.
      * If not set, then looks for the first Score in the Document and use that.
      * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
-     * When processing backward, the ScoreDef is changed when reaching the corresponding PageElementEnd
+     * When processing backward, the ScoreDef is changed when reaching the corresponding PageMilestoneEnd
      */
     ///@{
     Score *GetCurrentScore();
