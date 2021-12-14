@@ -1285,9 +1285,12 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WriteNNumberLike(currentNode);
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
+    // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
     if ((measure->m_xAbs != VRV_UNSET) && (measure->m_xAbs2 != VRV_UNSET)) {
-        currentNode.append_attribute("ulx") = StringFormat("%d", measure->m_xAbs / DEFINITION_FACTOR).c_str();
-        currentNode.append_attribute("lrx") = StringFormat("%d", measure->m_xAbs2 / DEFINITION_FACTOR).c_str();
+        measure->SetCoordX1(measure->m_xAbs / DEFINITION_FACTOR);
+        measure->SetCoordX2(measure->m_xAbs2 / DEFINITION_FACTOR);
+        measure->WriteCoordX1(currentNode);
+        measure->WriteCoordX2(currentNode);
     }
 }
 
@@ -4348,11 +4351,11 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if (measure.attribute("ulx") && measure.attribute("lrx") && (m_doc->GetType() == Transcription)) {
-        vrvMeasure->m_xAbs = atoi(measure.attribute("ulx").value()) * DEFINITION_FACTOR;
-        vrvMeasure->m_xAbs2 = atoi(measure.attribute("lrx").value()) * DEFINITION_FACTOR;
-        measure.remove_attribute("ulx");
-        measure.remove_attribute("lrx");
+    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && (m_doc->GetType() == Transcription)) {
+        vrvMeasure->ReadCoordX1(measure);
+        vrvMeasure->ReadCoordX2(measure);
+        vrvMeasure->m_xAbs = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
+        vrvMeasure->m_xAbs2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
     }
 
     parent->AddChild(vrvMeasure);

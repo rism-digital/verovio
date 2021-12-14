@@ -52,6 +52,8 @@ static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object(MEASURE, "measure-")
     , AttBarring()
+    , AttCoordX1()
+    , AttCoordX2()
     , AttMeasureLog()
     , AttMeterConformanceBar()
     , AttNNumberLike()
@@ -59,6 +61,8 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     , AttTyped()
 {
     RegisterAttClass(ATT_BARRING);
+    RegisterAttClass(ATT_COORDX1);
+    RegisterAttClass(ATT_COORDX2);
     RegisterAttClass(ATT_MEASURELOG);
     RegisterAttClass(ATT_METERCONFORMANCEBAR);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -111,6 +115,8 @@ void Measure::CloneReset()
 void Measure::Reset()
 {
     Object::Reset();
+    ResetCoordX1();
+    ResetCoordX2();
     ResetMeasureLog();
     ResetMeterConformanceBar();
     ResetNNumberLike();
