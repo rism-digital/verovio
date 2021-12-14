@@ -1325,8 +1325,6 @@ void BeamElementCoord::SetDrawingStemDir(
     m_stem = stemInterface->GetDrawingStem();
     assert(m_stem);
 
-    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
     m_stem->SetDrawingStemDir(stemDir);
     m_yBeam = m_element->GetDrawingY();
     m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]

@@ -757,7 +757,9 @@ int System::AlignSystems(FunctorParams *functorParams)
     if (systemMargin) {
         const int margin
             = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
-        params->m_shift -= margin > 0 ? margin : 0;
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = params->m_doc->GetDrawingUnit(100);
+        params->m_shift -= std::max(margin, 2 * unit);
     }
 
     SetDrawingYRel(params->m_shift);
@@ -800,7 +802,7 @@ int System::JustifyX(FunctorParams *functorParams)
     if (this->IsLastOfMdiv()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
-            return FUNCTOR_STOP;
+            return FUNCTOR_SIBLINGS;
         }
     }
 
