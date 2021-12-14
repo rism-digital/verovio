@@ -35,6 +35,8 @@ class TimestampAttr;
  */
 class Measure : public Object,
                 public AttBarring,
+                public AttCoordX1,
+                public AttCoordX2,
                 public AttMeasureLog,
                 public AttMeterConformanceBar,
                 public AttNNumberLike,
