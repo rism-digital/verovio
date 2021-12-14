@@ -45,7 +45,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
-#include "systemms.h"
+#include "systemmilestone.h"
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
@@ -222,9 +222,9 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
 bool Object::IsMsElement()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(this);
+        SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(this);
         assert(interface);
-        return (interface->IsSystemMs());
+        return (interface->IsSystemMilestone());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
         PageMsInterface *interface = dynamic_cast<PageMsInterface *>(this);
@@ -237,7 +237,7 @@ bool Object::IsMsElement()
 Object *Object::GetMsEnd()
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(this);
+        SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(this);
         assert(interface);
         return (interface->GetEnd());
     }

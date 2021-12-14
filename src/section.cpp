@@ -32,7 +32,7 @@ namespace vrv {
 
 static const ClassRegistrar<Section> s_factory("section", SECTION);
 
-Section::Section() : SystemElement(SECTION, "section-"), SystemMsInterface(), AttNNumberLike(), AttSectionVis()
+Section::Section() : SystemElement(SECTION, "section-"), SystemMilestoneInterface(), AttNNumberLike(), AttSectionVis()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_SECTIONVIS);
@@ -45,7 +45,7 @@ Section::~Section() {}
 void Section::Reset()
 {
     SystemElement::Reset();
-    SystemMsInterface::Reset();
+    SystemMilestoneInterface::Reset();
     ResetNNumberLike();
     ResetSectionVis();
 }
@@ -108,8 +108,8 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
 int Section::PrepareBoundaries(FunctorParams *functorParams)
 {
-    if (this->IsSystemMs()) {
-        this->SystemMsInterface::InterfacePrepareBoundaries(functorParams);
+    if (this->IsSystemMilestone()) {
+        this->SystemMilestoneInterface::InterfacePrepareBoundaries(functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -119,8 +119,8 @@ int Section::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
-    if (this->IsSystemMs()) {
-        this->SystemMsInterface::InterfaceResetDrawing(functorParams);
+    if (this->IsSystemMilestone()) {
+        this->SystemMilestoneInterface::InterfaceResetDrawing(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

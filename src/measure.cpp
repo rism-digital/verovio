@@ -30,7 +30,7 @@
 #include "staffdef.h"
 #include "syl.h"
 #include "system.h"
-#include "systemms.h"
+#include "systemmilestone.h"
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
@@ -1296,7 +1296,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    std::vector<SystemMsInterface *>::iterator iter;
+    std::vector<SystemMilestoneInterface *>::iterator iter;
     for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); ++iter) {
         (*iter)->SetMeasure(this);
     }
@@ -1307,7 +1307,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
         m_drawingEnding = params->m_currentEnding;
     }
 
-    // Keep a pointer to the measure for when we are reaching the end (see SystemMsEnd::PrepareBoundaries)
+    // Keep a pointer to the measure for when we are reaching the end (see SystemMilestoneEnd::PrepareBoundaries)
     params->m_lastMeasure = this;
 
     return FUNCTOR_CONTINUE;

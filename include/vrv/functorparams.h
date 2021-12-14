@@ -20,7 +20,7 @@ class MidiFile;
 namespace vrv {
 
 class Artic;
-class SystemMsInterface;
+class SystemMilestoneInterface;
 class Chord;
 class ClassIdComparison;
 class Clef;
@@ -1819,7 +1819,7 @@ public:
     }
     Measure *m_lastMeasure;
     Ending *m_currentEnding;
-    std::vector<SystemMsInterface *> m_startBoundaries;
+    std::vector<SystemMilestoneInterface *> m_startBoundaries;
 };
 
 //----------------------------------------------------------------------------

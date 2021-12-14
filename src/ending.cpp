@@ -29,7 +29,7 @@ namespace vrv {
 
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
-Ending::Ending() : SystemElement(ENDING, "ending-"), SystemMsInterface(), AttLineRend(), AttNNumberLike()
+Ending::Ending() : SystemElement(ENDING, "ending-"), SystemMilestoneInterface(), AttLineRend(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_NINTEGER);
@@ -42,7 +42,7 @@ Ending::~Ending() {}
 void Ending::Reset()
 {
     SystemElement::Reset();
-    SystemMsInterface::Reset();
+    SystemMilestoneInterface::Reset();
     ResetLineRend();
     ResetNNumberLike();
 }
@@ -101,10 +101,10 @@ int Ending::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    // Endings should always have an SystemMsEnd
-    assert(this->IsSystemMs());
+    // Endings should always have an SystemMilestoneEnd
+    assert(this->IsSystemMilestone());
 
-    this->SystemMsInterface::InterfacePrepareBoundaries(functorParams);
+    this->SystemMilestoneInterface::InterfacePrepareBoundaries(functorParams);
 
     params->m_currentEnding = this;
 
@@ -115,7 +115,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
-    this->SystemMsInterface::InterfaceResetDrawing(functorParams);
+    this->SystemMilestoneInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

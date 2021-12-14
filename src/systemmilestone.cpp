@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        systemms.cpp
+// Name:        systemmilestone.cpp
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "systemms.h"
+#include "systemmilestone.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,66 +21,66 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// SystemMsEnd
+// SystemMilestoneEnd
 //----------------------------------------------------------------------------
 
-SystemMsEnd::SystemMsEnd(Object *start) : SystemElement(SYSTEM_MS_END, "system-ms-end-")
+SystemMilestoneEnd::SystemMilestoneEnd(Object *start) : SystemElement(SYSTEM_MILESTONE_END, "system-milestone-end-")
 {
     Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
 
-SystemMsEnd::~SystemMsEnd() {}
+SystemMilestoneEnd::~SystemMilestoneEnd() {}
 
-void SystemMsEnd::Reset()
+void SystemMilestoneEnd::Reset()
 {
     m_start = NULL;
     m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
-// SystemMsInterface
+// SystemMilestoneInterface
 //----------------------------------------------------------------------------
 
-SystemMsInterface::SystemMsInterface()
+SystemMilestoneInterface::SystemMilestoneInterface()
 {
     Reset();
 }
 
-SystemMsInterface::~SystemMsInterface() {}
+SystemMilestoneInterface::~SystemMilestoneInterface() {}
 
-void SystemMsInterface::Reset()
+void SystemMilestoneInterface::Reset()
 {
     m_end = NULL;
     m_drawingMeasure = NULL;
 }
 
-void SystemMsInterface::SetEnd(SystemMsEnd *end)
+void SystemMilestoneInterface::SetEnd(SystemMilestoneEnd *end)
 {
     assert(!m_end);
     m_end = end;
 }
 
-void SystemMsInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+void SystemMilestoneInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
 {
     assert(object);
     assert(parent);
 
-    // Then add a SystemMsEnd
-    SystemMsEnd *systemMsEnd = new SystemMsEnd(object);
-    this->SetEnd(systemMsEnd);
-    parent->AddChild(systemMsEnd);
+    // Then add a SystemMilestoneEnd
+    SystemMilestoneEnd *systemMilestoneEnd = new SystemMilestoneEnd(object);
+    this->SetEnd(systemMilestoneEnd);
+    parent->AddChild(systemMilestoneEnd);
 
     // Also clear the relinquished children
     object->ClearRelinquishedChildren();
 }
 
 //----------------------------------------------------------------------------
-// SystemMsEnd functor methods
+// SystemMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-int SystemMsEnd::PrepareBoundaries(FunctorParams *functorParams)
+int SystemMilestoneEnd::PrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -101,7 +101,7 @@ int SystemMsEnd::PrepareBoundaries(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemMsEnd::ResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneEnd::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
@@ -110,7 +110,7 @@ int SystemMsEnd::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemMsEnd::CastOffSystems(FunctorParams *functorParams)
+int SystemMilestoneEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -122,7 +122,7 @@ int SystemMsEnd::CastOffSystems(FunctorParams *functorParams)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    SystemMsEnd *endBoundary = dynamic_cast<SystemMsEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    SystemMilestoneEnd *endBoundary = dynamic_cast<SystemMilestoneEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
     // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
     if (params->m_pendingElements.empty()) {
@@ -135,7 +135,7 @@ int SystemMsEnd::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int SystemMsEnd::PrepareFloatingGrps(FunctorParams *functorParams)
+int SystemMilestoneEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
@@ -160,7 +160,7 @@ int SystemMsEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int SystemMsInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
+int SystemMilestoneInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
@@ -173,7 +173,7 @@ int SystemMsInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemMsInterface::InterfaceResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneInterface::InterfaceResetDrawing(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 

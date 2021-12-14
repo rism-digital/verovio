@@ -141,7 +141,7 @@ class Syl;
 class Syllable;
 class System;
 class SystemElement;
-class SystemMsEnd;
+class SystemMilestoneEnd;
 class TabDurSym;
 class TabGrp;
 class Tempo;
@@ -263,7 +263,7 @@ private:
     void WritePageElement(pugi::xml_node element, PageElement *object);
     void WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *msEnd);
     void WriteSystem(pugi::xml_node currentNode, System *system);
-    void WriteSystemMsEnd(pugi::xml_node currentNode, SystemMsEnd *msEnd);
+    void WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilestoneEnd *msEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteGrpSym(pugi::xml_node currentNode, GrpSym *grmSym);
     void WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot);
@@ -502,7 +502,7 @@ private:
     bool ReadPageMsEnd(Object *parent, pugi::xml_node msEnd);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystemMsEnd(Object *parent, pugi::xml_node msEnd);
+    bool ReadSystemMilestoneEnd(Object *parent, pugi::xml_node msEnd);
     ///@}
 
     /**

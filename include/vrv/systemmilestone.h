@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        systemms.h
+// Name:        systemmilestone.h
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SYSTEM_MS_H__
-#define __VRV_SYSTEM_MS_H__
+#ifndef __VRV_SYSTEM_MILESTONE_H__
+#define __VRV_SYSTEM_MILESTONE_H__
 
 #include "systemelement.h"
 #include "vrvdef.h"
@@ -17,23 +17,23 @@ class Measure;
 class Object;
 
 //----------------------------------------------------------------------------
-// SystemMsEnd
+// SystemMilestoneEnd
 //----------------------------------------------------------------------------
 
 /**
  * This class models an end milestone element MsEnd at the system level.
  */
-class SystemMsEnd : public SystemElement {
+class SystemMilestoneEnd : public SystemElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    SystemMsEnd(Object *start);
-    virtual ~SystemMsEnd();
+    SystemMilestoneEnd(Object *start);
+    virtual ~SystemMilestoneEnd();
     void Reset() override;
-    std::string GetClassName() const override { return "SystemMsEnd"; }
+    std::string GetClassName() const override { return "SystemMilestoneEnd"; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -88,21 +88,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// SystemMsInterface
+// SystemMilestoneInterface
 //----------------------------------------------------------------------------
 
 /**
  * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
-class SystemMsInterface {
+class SystemMilestoneInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    SystemMsInterface();
-    virtual ~SystemMsInterface();
+    SystemMilestoneInterface();
+    virtual ~SystemMilestoneInterface();
     virtual void Reset();
     ///@}
 
@@ -114,9 +114,9 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetEnd(SystemMsEnd *end);
-    SystemMsEnd *GetEnd() { return m_end; }
-    bool IsSystemMs() { return (m_end != NULL); }
+    void SetEnd(SystemMilestoneEnd *end);
+    SystemMilestoneEnd *GetEnd() { return m_end; }
+    bool IsSystemMilestone() { return (m_end != NULL); }
     ///@}
 
     /**
@@ -147,7 +147,7 @@ private:
 public:
     //
 protected:
-    SystemMsEnd *m_end;
+    SystemMilestoneEnd *m_end;
 
 private:
     /** The first measure child of the element */

@@ -122,7 +122,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
-#include "systemms.h"
+#include "systemmilestone.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
 #include "tempo.h"
@@ -809,11 +809,11 @@ bool MEIOutput::WriteObject(Object *object)
         WriteUnclear(m_currentNode, dynamic_cast<Unclear *>(object));
     }
 
-    // SystemMsEnd - nothing to add - only
-    else if (object->Is(SYSTEM_MS_END)) {
+    // SystemMilestoneEnd - nothing to add - only
+    else if (object->Is(SYSTEM_MILESTONE_END)) {
         if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("msEnd");
-            WriteSystemMsEnd(m_currentNode, dynamic_cast<SystemMsEnd *>(object));
+            WriteSystemMilestoneEnd(m_currentNode, dynamic_cast<SystemMilestoneEnd *>(object));
         }
         else {
             return true;
@@ -871,7 +871,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
             m_boundaries.push(object->GetMsEnd());
             return true;
         }
-        if (object->Is({ PAGE_MS_END, SYSTEM_MS_END })) {
+        if (object->Is({ PAGE_MS_END, SYSTEM_MILESTONE_END })) {
             if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
                 m_boundaries.pop();
             }
@@ -1072,7 +1072,7 @@ void MEIOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *sy
     systemElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WriteSystemMsEnd(pugi::xml_node currentNode, SystemMsEnd *msEnd)
+void MEIOutput::WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilestoneEnd *msEnd)
 {
     assert(msEnd && msEnd->GetStart());
 
@@ -3699,7 +3699,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadSection(parent, current);
         }
         else if (std::string(current.name()) == "msEnd") {
-            success = ReadSystemMsEnd(parent, current);
+            success = ReadSystemMilestoneEnd(parent, current);
         }
         // content
         else if (std::string(current.name()) == "scoreDef") {
@@ -3743,7 +3743,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadSystemMsEnd(Object *parent, pugi::xml_node msEnd)
+bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node msEnd)
 {
     assert(dynamic_cast<System *>(parent));
 
@@ -3762,13 +3762,13 @@ bool MEIInput::ReadSystemMsEnd(Object *parent, pugi::xml_node msEnd)
     }
 
     // Check that it is a page milestone
-    SystemMsInterface *interface = dynamic_cast<SystemMsInterface *>(start);
+    SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(start);
     if (!interface) {
         LogError("The start element  '%s' is not a system milestone element", startUuid.c_str());
         return false;
     }
 
-    SystemMsEnd *vrvElementEnd = new SystemMsEnd(start);
+    SystemMilestoneEnd *vrvElementEnd = new SystemMilestoneEnd(start);
     SetMeiUuid(msEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 

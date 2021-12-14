@@ -10,7 +10,7 @@
 
 #include "atts_shared.h"
 #include "systemelement.h"
-#include "systemms.h"
+#include "systemmilestone.h"
 
 namespace vrv {
 
@@ -25,7 +25,7 @@ class Measure;
  * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public SystemMsInterface, public AttLineRend, public AttNNumberLike {
+class Ending : public SystemElement, public SystemMilestoneInterface, public AttLineRend, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

@@ -33,7 +33,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT, "ee-"), SystemMsInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -42,7 +42,7 @@ EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT, "ee-"), SystemM
 }
 
 EditorialElement::EditorialElement(ClassId classId)
-    : Object(classId, "ee-"), SystemMsInterface(), AttLabelled(), AttTyped()
+    : Object(classId, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -51,7 +51,7 @@ EditorialElement::EditorialElement(ClassId classId)
 }
 
 EditorialElement::EditorialElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), SystemMsInterface(), AttLabelled(), AttTyped()
+    : Object(classId, classIdStr), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -62,7 +62,7 @@ EditorialElement::EditorialElement(ClassId classId, const std::string &classIdSt
 void EditorialElement::Reset()
 {
     Object::Reset();
-    SystemMsInterface::Reset();
+    SystemMilestoneInterface::Reset();
     ResetLabelled();
     ResetTyped();
 
@@ -139,8 +139,8 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
 int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 {
-    if (this->IsSystemMs()) {
-        this->SystemMsInterface::InterfacePrepareBoundaries(functorParams);
+    if (this->IsSystemMilestone()) {
+        this->SystemMilestoneInterface::InterfacePrepareBoundaries(functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -148,8 +148,8 @@ int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 
 int EditorialElement::ResetDrawing(FunctorParams *functorParams)
 {
-    if (this->IsSystemMs()) {
-        this->SystemMsInterface::InterfaceResetDrawing(functorParams);
+    if (this->IsSystemMilestone()) {
+        this->SystemMilestoneInterface::InterfaceResetDrawing(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

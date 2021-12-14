@@ -2449,8 +2449,8 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
     assert(element);
     assert(system);
 
-    if (element->Is(SYSTEM_MS_END)) {
-        SystemMsEnd *elementEnd = vrv_cast<SystemMsEnd *>(element);
+    if (element->Is(SYSTEM_MILESTONE_END)) {
+        SystemMilestoneEnd *elementEnd = vrv_cast<SystemMilestoneEnd *>(element);
         assert(elementEnd);
         assert(elementEnd->GetStart());
         dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
@@ -2460,7 +2460,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         // Create placeholder - A graphic for the end boundary will be created
         // but only if it is on a different system - See View::DrawEnding
         // The Ending is added to the System drawing list by View::DrawMeasure
-        dc->StartGraphic(element, "systemMs", element->GetUuid());
+        dc->StartGraphic(element, "systemMilestone", element->GetUuid());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(PB)) {
@@ -2472,7 +2472,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SECTION)) {
-        dc->StartGraphic(element, "systemMs", element->GetUuid());
+        dc->StartGraphic(element, "systemMilestone", element->GetUuid());
         dc->EndGraphic(element, this);
     }
 }
@@ -2491,7 +2491,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         }
     }
 
-    SystemMsEnd *endingEndBoundary = ending->GetEnd();
+    SystemMilestoneEnd *endingEndBoundary = ending->GetEnd();
 
     // We need to make sure we have the end boudary and a measure (first and last) in each of them
     assert(endingEndBoundary);

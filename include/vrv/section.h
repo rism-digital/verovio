@@ -11,7 +11,7 @@
 #include "atts_shared.h"
 #include "atts_visual.h"
 #include "systemelement.h"
-#include "systemms.h"
+#include "systemmilestone.h"
 
 namespace vrv {
 
@@ -25,7 +25,7 @@ class Section;
  * This class represents a MEI section.
  * It can be both a container (in score-based MEI) and a milestone (in page-based MEI)
  */
-class Section : public SystemElement, public SystemMsInterface, public AttNNumberLike, public AttSectionVis {
+class Section : public SystemElement, public SystemMilestoneInterface, public AttNNumberLike, public AttSectionVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
