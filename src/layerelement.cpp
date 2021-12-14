@@ -70,10 +70,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 LayerElement::LayerElement()
-    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -81,10 +82,11 @@ LayerElement::LayerElement()
 }
 
 LayerElement::LayerElement(ClassId classId)
-    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -92,10 +94,11 @@ LayerElement::LayerElement(ClassId classId)
 }
 
 LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -107,6 +110,7 @@ void LayerElement::Reset()
     Object::Reset();
     FacsimileInterface::Reset();
     LinkingInterface::Reset();
+    ResetCoordX1();
     ResetLabelled();
     ResetTyped();
 

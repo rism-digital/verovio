@@ -1652,7 +1652,8 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
     if (element->m_xAbs != VRV_UNSET) {
-        currentNode.attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
+        element->SetCoordX1(element->m_xAbs / DEFINITION_FACTOR);
+        element->WriteCoordX1(currentNode);
     }
 }
 
@@ -5197,9 +5198,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 
 bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
-    if (element.attribute("ulx") && (m_doc->GetType() == Transcription)) {
-        object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
-        element.remove_attribute("ulx");
+    if (element.attribute("coord.x1") && (m_doc->GetType() == Transcription)) {
+        object->ReadCoordX1(element);
+        object->m_xAbs = object->GetCoordX1() * DEFINITION_FACTOR;
     }
 
     SetMeiUuid(element, object);
