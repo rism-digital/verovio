@@ -812,7 +812,7 @@ bool MEIOutput::WriteObject(Object *object)
     // SystemMilestoneEnd - nothing to add - only
     else if (object->Is(SYSTEM_MILESTONE_END)) {
         if (this->IsPageBasedMEI()) {
-            m_currentNode = m_currentNode.append_child("msEnd");
+            m_currentNode = m_currentNode.append_child("milestoneEnd");
             WriteSystemMilestoneEnd(m_currentNode, dynamic_cast<SystemMilestoneEnd *>(object));
         }
         else {
@@ -822,7 +822,7 @@ bool MEIOutput::WriteObject(Object *object)
     // PageMsEnd - nothing to add - only
     else if (object->Is(PAGE_MS_END)) {
         if (this->IsPageBasedMEI()) {
-            m_currentNode = m_currentNode.append_child("msEnd");
+            m_currentNode = m_currentNode.append_child("milestoneEnd");
             WritePageMsEnd(m_currentNode, dynamic_cast<PageMsEnd *>(object));
         }
         else {
@@ -1036,13 +1036,13 @@ void MEIOutput::WritePageElement(pugi::xml_node currentNode, PageElement *pageEl
     pageElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *msEnd)
+void MEIOutput::WritePageMsEnd(pugi::xml_node currentNode, PageMsEnd *milestoneEnd)
 {
-    assert(msEnd && msEnd->GetStart());
+    assert(milestoneEnd && milestoneEnd->GetStart());
 
-    WritePageElement(currentNode, msEnd);
-    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(msEnd->GetStart())).c_str();
-    std::string meiElementName = msEnd->GetStart()->GetClassName();
+    WritePageElement(currentNode, milestoneEnd);
+    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(milestoneEnd->GetStart())).c_str();
+    std::string meiElementName = milestoneEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
 }
@@ -1072,13 +1072,13 @@ void MEIOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *sy
     systemElement->WriteTyped(currentNode);
 }
 
-void MEIOutput::WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilestoneEnd *msEnd)
+void MEIOutput::WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilestoneEnd *milestoneEnd)
 {
-    assert(msEnd && msEnd->GetStart());
+    assert(milestoneEnd && milestoneEnd->GetStart());
 
-    WriteSystemElement(currentNode, msEnd);
-    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(msEnd->GetStart())).c_str();
-    std::string meiElementName = msEnd->GetStart()->GetClassName();
+    WriteSystemElement(currentNode, milestoneEnd);
+    currentNode.append_attribute("startid") = ("#" + UuidToMeiStr(milestoneEnd->GetStart())).c_str();
+    std::string meiElementName = milestoneEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
 }
@@ -3328,7 +3328,7 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "mdivb") {
             ReadMdiv(parent, current, true);
         }
-        else if (std::string(current.name()) == "msEnd") {
+        else if (std::string(current.name()) == "milestoneEnd") {
             ReadPageMsEnd(parent, current);
         }
         // xml comment
@@ -3343,21 +3343,21 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
     return true;
 }
 
-bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node msEnd)
+bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node milestoneEnd)
 {
     assert(dynamic_cast<Page *>(parent));
 
     // Check that we have a @startid
-    if (!msEnd.attribute("startid")) {
-        LogError("Missing @startid on  msEnd");
+    if (!milestoneEnd.attribute("startid")) {
+        LogError("Missing @startid on  milestoneEnd");
         return false;
     }
 
     // Find the element pointing to it
-    std::string startUuid = msEnd.attribute("startid").value();
+    std::string startUuid = milestoneEnd.attribute("startid").value();
     Object *start = m_doc->FindDescendantByUuid(ExtractUuidFragment(startUuid));
     if (!start) {
-        LogError("Could not find start element '%s' for msEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for milestoneEnd", startUuid.c_str());
         return false;
     }
 
@@ -3369,7 +3369,7 @@ bool MEIInput::ReadPageMsEnd(Object *parent, pugi::xml_node msEnd)
     }
 
     PageMsEnd *vrvElementEnd = new PageMsEnd(start);
-    SetMeiUuid(msEnd, vrvElementEnd);
+    SetMeiUuid(milestoneEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
@@ -3698,7 +3698,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "secb") {
             success = ReadSection(parent, current);
         }
-        else if (std::string(current.name()) == "msEnd") {
+        else if (std::string(current.name()) == "milestoneEnd") {
             success = ReadSystemMilestoneEnd(parent, current);
         }
         // content
@@ -3743,21 +3743,21 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node msEnd)
+bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd)
 {
     assert(dynamic_cast<System *>(parent));
 
     // Check that we have a @startid
-    if (!msEnd.attribute("startid")) {
-        LogError("Missing @startid on  msEnd");
+    if (!milestoneEnd.attribute("startid")) {
+        LogError("Missing @startid on  milestoneEnd");
         return false;
     }
 
     // Find the element pointing to it
-    std::string startUuid = msEnd.attribute("startid").value();
+    std::string startUuid = milestoneEnd.attribute("startid").value();
     Object *start = m_doc->FindDescendantByUuid(ExtractUuidFragment(startUuid));
     if (!start) {
-        LogError("Could not find start element '%s' for msEnd", startUuid.c_str());
+        LogError("Could not find start element '%s' for milestoneEnd", startUuid.c_str());
         return false;
     }
 
@@ -3769,7 +3769,7 @@ bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node msEnd)
     }
 
     SystemMilestoneEnd *vrvElementEnd = new SystemMilestoneEnd(start);
-    SetMeiUuid(msEnd, vrvElementEnd);
+    SetMeiUuid(milestoneEnd, vrvElementEnd);
     interface->SetEnd(vrvElementEnd);
 
     parent->AddChild(vrvElementEnd);
