@@ -4353,6 +4353,10 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradeMeasureTo_5_0_0(measure);
+    }
+
     if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && (m_doc->GetType() == Transcription)) {
         vrvMeasure->ReadCoordX1(measure);
         vrvMeasure->ReadCoordX2(measure);
@@ -4980,6 +4984,10 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradeStaffTo_5_0_0(staff);
+    }
+
     if (staff.attribute("coord.y1") && (m_doc->GetType() == Transcription)) {
         vrvStaff->ReadCoordY1(staff);
         vrvStaff->m_yAbs = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
@@ -5199,15 +5207,19 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 
 bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
-    if (element.attribute("coord.x1") && (m_doc->GetType() == Transcription)) {
-        object->ReadCoordX1(element);
-        object->m_xAbs = object->GetCoordX1() * DEFINITION_FACTOR;
-    }
-
     SetMeiUuid(element, object);
     ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
+
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradeLayerElementTo_5_0_0(element);
+    }
+
+    if (element.attribute("coord.x1") && (m_doc->GetType() == Transcription)) {
+        object->ReadCoordX1(element);
+        object->m_xAbs = object->GetCoordX1() * DEFINITION_FACTOR;
+    }
 
     return true;
 }
@@ -6949,6 +6961,30 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
+}
+
+void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
+{
+    if (measure.attribute("ulx")) {
+        measure.attribute("ulx").set_name("coord.x1");
+    }
+    if (measure.attribute("lrx")) {
+        measure.attribute("lrx").set_name("coord.x2");
+    }
+}
+
+void MEIInput::UpgradeStaffTo_5_0_0(pugi::xml_node staff)
+{
+    if (staff.attribute("uly")) {
+        staff.attribute("uly").set_name("coord.y1");
+    }
+}
+
+void MEIInput::UpgradeLayerElementTo_5_0_0(pugi::xml_node element)
+{
+    if (element.attribute("ulx")) {
+        element.attribute("ulx").set_name("coord.x1");
+    }
 }
 
 void MEIInput::UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt)
