@@ -1571,7 +1571,9 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 4: int: the semi tone transposition for the current track
  * member 5: double with the current tempo
  * member 6: expanded notes due to ornaments and tremolandi
- * member 7: grace note sequence
+ * member 7: deferred notes which start slightly later
+ * member 8: grace note sequence
+ * member 9: the functor
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1593,6 +1595,7 @@ public:
     int m_transSemi;
     double m_currentTempo;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
+    std::map<Note *, double> m_deferredNotes;
     MIDIChordSequence m_graceNotes;
     Functor *m_functor;
 };

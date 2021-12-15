@@ -343,6 +343,16 @@ private:
      */
     bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted);
 
+    /**
+     * Register deferred notes for MIDI
+     */
+    void DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings);
+
+    /**
+     * Create the MIDI output of the grace note sequence stored in params
+     */
+    void GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity);
+
 public:
     //
 private:

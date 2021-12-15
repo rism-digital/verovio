@@ -740,6 +740,57 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     return dotMargin < 0;
 }
 
+void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // Recursive call for chords
+    Chord *chord = this->IsChordTone();
+    if (chord && includeChordSiblings) {
+        const ArrayOfObjects *notes = chord->GetList(chord);
+        assert(notes);
+
+        for (Object *obj : *notes) {
+            Note *note = vrv_cast<Note *>(obj);
+            assert(note);
+            note->DeferMIDINote(functorParams, shift, false);
+        }
+        return;
+    }
+
+    // Register the shift
+    if (shift < this->GetScoreTimeDuration() + this->GetScoreTimeTiedDuration()) {
+        params->m_deferredNotes[this] = shift;
+    }
+}
+
+void Note::GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // Unaccented grace notes have a duration of 27 ms
+    constexpr int ms = 27;
+    const double unaccGraceNoteDur = ms * params->m_currentTempo / 60000.0;
+    const double totalDur = unaccGraceNoteDur * params->m_graceNotes.size();
+    if (startTime >= totalDur) {
+        startTime -= totalDur;
+    }
+    else {
+        this->DeferMIDINote(functorParams, totalDur, true);
+    }
+
+    for (const MIDIChord &chord : params->m_graceNotes) {
+        const double stopTime = startTime + unaccGraceNoteDur;
+        for (char pitch : chord.pitches) {
+            params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
+            params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
+        }
+        startTime = stopTime;
+    }
+}
+
 //----------------//
 // Static methods //
 //----------------//
@@ -1344,34 +1395,45 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    int channel = params->m_midiChannel;
+    const int channel = params->m_midiChannel;
     int velocity = MIDI_VELOCITY;
     if (this->HasVel()) velocity = this->GetVel();
 
-    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
+    double startTime = params->m_totalTime + this->GetScoreTimeOnset();
+    const int tpq = params->m_midiFile->getTPQ();
 
-    int tpq = params->m_midiFile->getTPQ();
+    // Check if some grace notes must be performed
+    if (!params->m_graceNotes.empty()) {
+        this->GenerateGraceNoteMIDI(functorParams, startTime, tpq, channel, velocity);
+        params->m_graceNotes.clear();
+    }
+
+    // Check if note is deferred
+    if (params->m_deferredNotes.find(this) != params->m_deferredNotes.end()) {
+        startTime += params->m_deferredNotes.at(this);
+        params->m_deferredNotes.erase(this);
+    }
 
     // Check if note was expanded into sequence of short notes due to trills/tremolandi
     // Play either the expanded note sequence or a single note
     if (params->m_expandedNotes.find(this) != params->m_expandedNotes.end()) {
         for (const auto &midiNote : params->m_expandedNotes[this]) {
-            double stoptime = starttime + midiNote.duration;
+            const double stopTime = startTime + midiNote.duration;
 
-            params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, midiNote.pitch, velocity);
-            params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, midiNote.pitch);
+            params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, midiNote.pitch, velocity);
+            params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, midiNote.pitch);
 
-            starttime = stoptime;
+            startTime = stopTime;
         }
     }
     else {
-        double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
+        const double stopTime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
 
         this->CalcMIDIPitch(params->m_transSemi);
-        char pitch = this->GetMIDIPitch();
+        const char pitch = this->GetMIDIPitch();
 
-        params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
-        params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+        params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
+        params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
     }
 
     return FUNCTOR_SIBLINGS;
