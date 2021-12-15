@@ -60,10 +60,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         // Check if the note is tied to a previous one and skip it if yes
         if (note->GetScoreTimeTiedDuration() == -1.0) return;
 
-        note->CalcMIDIPitch(0);
-
         std::stringstream pitch;
-
         data_OCTAVE oct = note->GetOct();
         char octSign = (oct > 3) ? '\'' : ',';
         int signCount = (oct > 3) ? (oct - 3) : (4 - oct);
@@ -105,7 +102,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
 
         // We have a previous note, so we can calculate an interval
         if (m_previousNote) {
-            std::string interval = StringFormat("%d", note->GetMIDIPitch() - m_previousNote->GetMIDIPitch());
+            std::string interval = StringFormat("%d", note->GetMIDIPitch(0) - m_previousNote->GetMIDIPitch(0));
             m_intervals << interval;
             jsonxx::Array intervalsIds;
             intervalsIds << m_previousNote->GetUuid();

@@ -122,8 +122,6 @@ void Note::Reset()
     m_realTimeOnsetMilliseconds = 0;
     m_realTimeOffsetMilliseconds = 0;
     m_scoreTimeTiedDuration = 0.0;
-
-    m_MIDIPitch = -1;
 }
 
 bool Note::IsSupportedChild(Object *child)
@@ -554,10 +552,7 @@ bool Note::IsVisible() const
 
 bool Note::IsEnharmonicWith(Note *note)
 {
-    this->CalcMIDIPitch(0);
-    note->CalcMIDIPitch(0);
-
-    return (this->GetMIDIPitch() == note->GetMIDIPitch());
+    return (this->GetMIDIPitch(0) == note->GetMIDIPitch(0));
 }
 
 void Note::SetScoreTimeOnset(double scoreTime)
@@ -587,10 +582,10 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-void Note::CalcMIDIPitch(int shift)
+int Note::GetMIDIPitch(int shift)
 {
     if (this->HasPnum()) {
-        m_MIDIPitch = this->GetPnum();
+        return this->GetPnum();
     }
     else if (this->HasPname() || this->HasPnameGes()) {
         int midiBase = 0;
@@ -616,7 +611,7 @@ void Note::CalcMIDIPitch(int shift)
         int oct = this->GetOct();
         if (this->HasOctGes()) oct = this->GetOctGes();
 
-        m_MIDIPitch = midiBase + (oct + 1) * 12;
+        return midiBase + (oct + 1) * 12;
     }
     else if (this->HasTabCourse()) {
         // tablature
@@ -660,11 +655,6 @@ double Note::GetScoreTimeTiedDuration() const
 double Note::GetScoreTimeDuration() const
 {
     return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
-}
-
-char Note::GetMIDIPitch() const
-{
-    return m_MIDIPitch;
 }
 
 int Note::GetChromaticAlteration()
@@ -1382,8 +1372,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
 
     // Handle grace notes
     if (this->IsGraceNote()) {
-        this->CalcMIDIPitch(params->m_transSemi);
-        const char pitch = this->GetMIDIPitch();
+        const int pitch = this->GetMIDIPitch(params->m_transSemi);
 
         double quarterDuration = 0.0;
         const data_DURATION dur = this->GetDur();
@@ -1428,9 +1417,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
     else {
         const double stopTime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
-
-        this->CalcMIDIPitch(params->m_transSemi);
-        const char pitch = this->GetMIDIPitch();
+        const int pitch = this->GetMIDIPitch(params->m_transSemi);
 
         params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
         params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);

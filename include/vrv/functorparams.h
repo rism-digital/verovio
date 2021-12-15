@@ -1548,7 +1548,7 @@ public:
  * Helper struct to store note sequences which replace notes in MIDI output due to expanded ornaments and tremolandi
  */
 struct MIDINote {
-    char pitch;
+    int pitch;
     double duration;
 };
 
@@ -1558,7 +1558,7 @@ using MIDINoteSequence = std::list<MIDINote>;
  * Helper struct to store chord sequences in MIDI output due to grace notes
  */
 struct MIDIChord {
-    std::set<char> pitches;
+    std::set<int> pitches;
     double duration;
 };
 
