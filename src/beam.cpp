@@ -1169,7 +1169,6 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
                                                                       : STEMDIRECTION_up;
-        const int stemDirBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
         coord->SetClosestNote(stemDir);
         if (!coord->m_closestNote) continue;
         if (relevantNoteLoc == VRV_UNSET) {
