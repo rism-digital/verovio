@@ -231,7 +231,8 @@ void BeamSegment::CalcBeam(
                 // handle cross-staff fTrem cases
                 if (FTrem *fTrem = dynamic_cast<FTrem *>(beamInterface);
                     fTrem && (coord->GetStemDir() == STEMDIRECTION_down)) {
-                    const int beamsCount = fTrem->GetBeams();
+                    int beamsCount = std::max(fTrem->GetBeams(), fTrem->GetBeamsFloat());
+                    if (!fTrem->HasBeamsFloat()) beamsCount--;
                     stemOffset = beamsCount * beamInterface->m_beamWidth;
                 }
 
