@@ -550,7 +550,7 @@ bool BeamSegment::CalcBeamSlope(
     }
     else {
         // A fourth or smaller - reduce to a short step
-        if (noteStep <= unit * 3) {
+        if (noteStep < unit * 3) {
             step = unit / 2;
             shortStep = true;
         }
