@@ -1573,7 +1573,8 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 6: expanded notes due to ornaments and tremolandi
  * member 7: deferred notes which start slightly later
  * member 8: grace note sequence
- * member 9: the functor
+ * member 9: flag indicating whether the last grace note/chord was accented
+ * member 10: the functor
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1586,6 +1587,7 @@ public:
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120.0;
+        m_accentedGraceNote = false;
         m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
@@ -1597,6 +1599,7 @@ public:
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
     std::map<Note *, double> m_deferredNotes;
     MIDIChordSequence m_graceNotes;
+    bool m_accentedGraceNote;
     Functor *m_functor;
 };
 

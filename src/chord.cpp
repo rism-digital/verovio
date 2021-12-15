@@ -24,6 +24,7 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "note.h"
@@ -993,6 +994,12 @@ int Chord::GenerateMIDI(FunctorParams *functorParams)
         }
 
         params->m_graceNotes.push_back({ pitches, quarterDuration });
+
+        bool accented = (this->GetGrace() == GRACE_acc);
+        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->GetFirstAncestor(GRACEGRP));
+        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
+        params->m_accentedGraceNote = accented;
+
         return FUNCTOR_SIBLINGS;
     }
 

@@ -22,6 +22,7 @@
 #include "fermata.h"
 #include "functorparams.h"
 #include "glyph.h"
+#include "gracegrp.h"
 #include "layer.h"
 #include "ligature.h"
 #include "plica.h"
@@ -760,19 +761,27 @@ void Note::GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime,
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    // Unaccented grace notes have a duration of 27 ms
-    constexpr int ms = 27;
-    const double unaccGraceNoteDur = ms * params->m_currentTempo / 60000.0;
-    const double totalDur = unaccGraceNoteDur * params->m_graceNotes.size();
-    if (startTime >= totalDur) {
-        startTime -= totalDur;
+    double graceNoteDur = 0.0;
+    if (params->m_accentedGraceNote && !params->m_graceNotes.empty()) {
+        const double totalDur = this->GetScoreTimeDuration() / 2.0;
+        this->DeferMIDINote(functorParams, totalDur, true);
+        graceNoteDur = totalDur / params->m_graceNotes.size();
     }
     else {
-        this->DeferMIDINote(functorParams, totalDur, true);
+        // Unaccented grace notes obtain a fixed duration of 27 ms
+        constexpr int ms = 27;
+        graceNoteDur = ms * params->m_currentTempo / 60000.0;
+        const double totalDur = graceNoteDur * params->m_graceNotes.size();
+        if (startTime >= totalDur) {
+            startTime -= totalDur;
+        }
+        else {
+            this->DeferMIDINote(functorParams, totalDur, true);
+        }
     }
 
     for (const MIDIChord &chord : params->m_graceNotes) {
-        const double stopTime = startTime + unaccGraceNoteDur;
+        const double stopTime = startTime + graceNoteDur;
         for (char pitch : chord.pitches) {
             params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
             params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
@@ -1381,6 +1390,12 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         }
 
         params->m_graceNotes.push_back({ { pitch }, quarterDuration });
+
+        bool accented = (this->GetGrace() == GRACE_acc);
+        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->GetFirstAncestor(GRACEGRP));
+        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
+        params->m_accentedGraceNote = accented;
+
         return FUNCTOR_SIBLINGS;
     }
 
