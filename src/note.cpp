@@ -768,9 +768,7 @@ void Note::GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime,
         graceNoteDur = totalDur / params->m_graceNotes.size();
     }
     else {
-        // Unaccented grace notes obtain a fixed duration of 27 ms
-        constexpr int ms = 27;
-        graceNoteDur = ms * params->m_currentTempo / 60000.0;
+        graceNoteDur = UNACC_GRACENOTE_DUR * params->m_currentTempo / 60000.0;
         const double totalDur = graceNoteDur * params->m_graceNotes.size();
         if (startTime >= totalDur) {
             startTime -= totalDur;
@@ -1437,6 +1435,9 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
         params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
     }
+
+    // Store reference, i.e. for Nachschlag
+    params->m_lastNote = this;
 
     return FUNCTOR_SIBLINGS;
 }
