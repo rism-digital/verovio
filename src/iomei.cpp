@@ -1066,18 +1066,9 @@ void MEIOutput::UpdateMdivFilter(Object *object)
                 // Mdivs can contain mdivs as children
                 // => have to check whether we are still in the subtree of the filtered mdiv
                 if (!m_mdivUuid.empty()) {
-                    // Copy the start elements of the boundary stack
-                    ListOfObjects startElements;
-                    std::stack<Object *> tempStack = m_boundaries;
-                    while (!tempStack.empty()) {
-                        PageMilestoneEnd *end = dynamic_cast<PageMilestoneEnd *>(tempStack.top());
-                        if (end) startElements.push_front(end->GetStart());
-                        tempStack.pop();
-                    }
-                    // Check that none of those matches the filtered mdiv
-                    const bool noneMatchingStartElements = std::none_of(startElements.cbegin(), startElements.cend(),
+                    const bool noneMatchingStackElements = std::none_of(m_objectStack.cbegin(), m_objectStack.cend(),
                         [this](Object *object) { return (object->GetUuid() == m_mdivUuid); });
-                    if (noneMatchingStartElements) {
+                    if (noneMatchingStackElements) {
                         m_mdivFilterMatchLocation = MatchLocation::After;
                     }
                 }
