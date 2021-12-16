@@ -132,6 +132,16 @@ public:
      */
     void ClearCoords();
 
+    /**
+     * Helper to find number of additional beams. Return { additional beams above main beam, additional beams below }
+     */
+    virtual std::pair<int, int> GetAdditionalBeamCount() const { return { 0, 0 }; }
+
+    /**
+     * Helper to get number of beams represented by attributes @beam and @beam.float
+     */
+    virtual std::pair<int, int> GetFloatingBeamCount() const { return { 0, 0 }; }
+
 protected:
     /**
      * Return the position of the element in the beam.

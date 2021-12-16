@@ -140,9 +140,6 @@ private:
     // Helper to check wheter beam fits within certain bounds
     bool DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff = false);
 
-    // Helper to find number of additional beams. Return { additional beams above main beam, additional beams below }
-    std::pair<int, int> GetAdditionalBeamCount(BeamDrawingInterface *beamInterface);
-
     // Helper to check mixed beam positioning compared to other elements (ledger lines, staff) and adjust it accordingly
     bool NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
@@ -216,6 +213,7 @@ public:
     const ArrayOfBeamElementCoords *GetElementCoords();
 
     /**
+
      * Return true if the beam has a tabGrp child.
      * In that case, the ObjectList will only have tabGrp elements. See Beam::FilterList
      */
@@ -229,6 +227,12 @@ public:
     Beam *GetStemSameasBeam() const { return m_stemSameas; }
     void SetStemSameasBeam(Beam *stemSameas) { m_stemSameas = stemSameas; }
     ///@}
+	
+    /**
+     * See DrawingInterface::GetAdditionalBeamCount
+     */
+    std::pair<int, int> GetAdditionalBeamCount() const override;
+
 
     //----------//
     // Functors //

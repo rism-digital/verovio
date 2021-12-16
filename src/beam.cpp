@@ -20,7 +20,6 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "functorparams.h"
-#include "ftrem.h"
 #include "gracegrp.h"
 #include "layer.h"
 #include "measure.h"
@@ -229,10 +228,10 @@ void BeamSegment::CalcBeam(
                     stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
                 }
                 // handle cross-staff fTrem cases
-                if (FTrem *fTrem = dynamic_cast<FTrem *>(beamInterface);
-                    fTrem && (coord->GetStemDir() == STEMDIRECTION_down)) {
-                    int beamsCount = std::max(fTrem->GetBeams(), fTrem->GetBeamsFloat());
-                    if (!fTrem->HasBeamsFloat()) beamsCount--;
+                const auto [beams, beamsFloat] = beamInterface->GetFloatingBeamCount();
+                if ((coord->GetStemDir() == STEMDIRECTION_down) && ((beams > 0) || (beamsFloat > 0))) {
+                    int beamsCount = std::max(beams, beamsFloat);
+                    if (beamsFloat <= 0) beamsCount--;
                     stemOffset = beamsCount * beamInterface->m_beamWidth;
                 }
 
@@ -298,32 +297,13 @@ bool BeamSegment::DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, 
     return (overlapping != m_beamElementCoordRefs.end());
 }
 
-std::pair<int, int> BeamSegment::GetAdditionalBeamCount(BeamDrawingInterface *beamInterface)
-{
-    // In case we're dealing with fTrem - take @beams attribute into consideration
-    if (FTrem *fTrem = dynamic_cast<FTrem *>(beamInterface); fTrem) {
-        return { fTrem->GetBeams(), 0 };
-    }
-
-    int topShortestDur = DUR_8;
-    int bottomShortestDur = DUR_8;
-    std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-        if (coord->m_partialFlagPlace == BEAMPLACE_above) {
-            topShortestDur = std::max(topShortestDur, coord->m_dur);
-        }
-        else if (coord->m_partialFlagPlace == BEAMPLACE_below) {
-            bottomShortestDur = std::max(bottomShortestDur, coord->m_dur);
-        }
-    });
-
-    return { topShortestDur - DUR_8, bottomShortestDur - DUR_8 };
-}
-
 bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
 {
     const int unit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    const auto [topBeams, bottomBeams] = this->GetAdditionalBeamCount(beamInterface);
-    const int topOffset = topBeams * beamInterface->m_beamWidth + unit / 2;
+    const auto [topBeams, bottomBeams] = beamInterface->GetAdditionalBeamCount();
+    double multiplier = 1;
+    if (Object *obj = dynamic_cast<Object *>(beamInterface); obj && obj->Is(FTREM)) multiplier = 0.5;
+    const int topOffset = multiplier * topBeams * beamInterface->m_beamWidth + unit / 2;
     const int bottomOffset = bottomBeams * beamInterface->m_beamWidth + unit / 2;
 
     // find top and bottom of the staff
@@ -838,7 +818,7 @@ void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int ste
     const int lowestPoint = (belowMin != VRV_UNSET) ? belowMin : aboveMin;
 
     // This helps with general beams but breaks trems
-    const auto [up, down] = this->GetAdditionalBeamCount(beamInterface);
+    const auto [up, down] = beamInterface->GetAdditionalBeamCount();
 
     // Calculate midpoint for the beam, taking into account highest and lowest points, as well as number of additional
     // beams above and below main beam. Start position of the beam is then further adjusted based on the step size to
@@ -1794,6 +1774,22 @@ int Beam::CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, in
             [maxShorteningInHalfUnits](BeamElementCoord *coord) { coord->m_maxShortening = maxShorteningInHalfUnits; });
     }
     return overlap;
+}
+
+std::pair<int, int> Beam::GetAdditionalBeamCount() const 
+{
+    int topShortestDur = DUR_8;
+    int bottomShortestDur = DUR_8;
+    std::for_each(m_beamElementCoords.begin(), m_beamElementCoords.end(), [&](BeamElementCoord *coord) {
+        if (coord->m_partialFlagPlace == BEAMPLACE_above) {
+            topShortestDur = std::max(topShortestDur, coord->m_dur);
+        }
+        else if (coord->m_partialFlagPlace == BEAMPLACE_below) {
+            bottomShortestDur = std::max(bottomShortestDur, coord->m_dur);
+        }
+    });
+
+    return { topShortestDur - DUR_8, bottomShortestDur - DUR_8 };
 }
 
 //----------------------------------------------------------------------------
