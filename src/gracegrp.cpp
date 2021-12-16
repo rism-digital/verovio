@@ -84,6 +84,7 @@ int GraceGrp::GenerateMIDIEnd(FunctorParams *functorParams)
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
+    // Handling of Nachschlag
     if (!params->m_graceNotes.empty() && (this->GetAttach() == graceGrpLog_ATTACH_pre) && !params->m_accentedGraceNote
         && params->m_lastNote) {
         double startTime = params->m_totalTime + params->m_lastNote->GetScoreTimeOffset();
