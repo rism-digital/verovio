@@ -197,27 +197,27 @@ bool MEIOutput::Export()
         decl.append_attribute("version") = "1.0";
         decl.append_attribute("encoding") = "UTF-8";
 
-            // schema processing instruction
-            const std::string schema = this->IsPageBasedMEI() ? "https://www.verovio.org/schema/dev/mei-verovio.rng"
-                                                              : "https://music-encoding.org/schema/dev/mei-all.rng";
+        // schema processing instruction
+        const std::string schema = this->IsPageBasedMEI() ? "https://www.verovio.org/schema/dev/mei-verovio.rng"
+                                                          : "https://music-encoding.org/schema/dev/mei-all.rng";
+        decl = meiDoc.append_child(pugi::node_declaration);
+        decl.set_name("xml-model");
+        decl.append_attribute("href") = schema.c_str();
+        decl.append_attribute("type") = "application/xml";
+        decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
+
+        // schematron processing instruction - currently not working for page-based MEI
+        if (!this->IsPageBasedMEI()) {
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = schema.c_str();
+            decl.append_attribute("href") = "https://music-encoding.org/schema/dev/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
-            decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
+            decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
+        }
 
-            // schematron processing instruction - currently not working for page-based MEI
-            if (!this->IsPageBasedMEI()) {
-                decl = meiDoc.append_child(pugi::node_declaration);
-                decl.set_name("xml-model");
-                decl.append_attribute("href") = "https://music-encoding.org/schema/dev/mei-all.rng";
-                decl.append_attribute("type") = "application/xml";
-                decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
-            }
-
-            m_mei = meiDoc.append_child("mei");
-            m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "5.0.0-dev";
+        m_mei = meiDoc.append_child("mei");
+        m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
+        m_mei.append_attribute("meiversion") = "5.0.0-dev";
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
         m_doc->ConvertToCastOffMensuralDoc(false);
@@ -281,14 +281,9 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     }
 
     if (object->Is(MDIV)) {
-        if (this->IsPageBasedMEI() || !this->IsSavingSinglePage()) {
-            const std::string name = (this->IsPageBasedMEI()) ? "mdivb" : "mdiv";
-            m_currentNode = m_currentNode.append_child(name.c_str());
-            WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
-        }
-        else {
-            return true;
-        }
+        const std::string name = (this->IsPageBasedMEI()) ? "mdivb" : "mdiv";
+        m_currentNode = m_currentNode.append_child(name.c_str());
+        this->WriteMdiv(m_currentNode, vrv_cast<Mdiv *>(object));
     }
     else if (object->Is(PAGES)) {
         if (this->IsPageBasedMEI()) {
@@ -336,7 +331,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(PB)) {
         if (this->IsScoreBasedMEI()) {
             m_currentNode = m_currentNode.append_child("pb");
-            WritePb(m_currentNode, dynamic_cast<Pb *>(object));
+            this->WritePb(m_currentNode, vrv_cast<Pb *>(object));
         }
         else {
             return true;
@@ -345,7 +340,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(SB)) {
         if (this->IsScoreBasedMEI()) {
             m_currentNode = m_currentNode.append_child("sb");
-            WriteSb(m_currentNode, dynamic_cast<Sb *>(object));
+            this->WriteSb(m_currentNode, vrv_cast<Sb *>(object));
         }
         else {
             return true;
@@ -354,7 +349,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(SECTION)) {
         const std::string name = (this->IsPageBasedMEI()) ? "secb" : "section";
         m_currentNode = m_currentNode.append_child(name.c_str());
-        WriteSection(m_currentNode, dynamic_cast<Section *>(object));
+        this->WriteSection(m_currentNode, vrv_cast<Section *>(object));
     }
 
     // ScoreDef related
@@ -801,7 +796,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(SYSTEM_MILESTONE_END)) {
         if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("milestoneEnd");
-            WriteSystemMilestoneEnd(m_currentNode, dynamic_cast<SystemMilestoneEnd *>(object));
+            this->WriteSystemMilestoneEnd(m_currentNode, vrv_cast<SystemMilestoneEnd *>(object));
         }
         else {
             return true;
@@ -811,7 +806,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(PAGE_MILESTONE_END)) {
         if (this->IsPageBasedMEI()) {
             m_currentNode = m_currentNode.append_child("milestoneEnd");
-            WritePageMilestoneEnd(m_currentNode, dynamic_cast<PageMilestoneEnd *>(object));
+            this->WritePageMilestoneEnd(m_currentNode, vrv_cast<PageMilestoneEnd *>(object));
         }
         else {
             return true;
@@ -845,10 +840,33 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
 bool MEIOutput::WriteObjectEnd(Object *object)
 {
     if (this->IsScoreBasedMEI()) {
-        if (!this->ProcessScoreBasedFilterEnd(object)) {
+        // In score-based MEI, page, pages and system are not written.
+        if (object->Is({ PAGE, PAGES, SYSTEM })) {
+            return true;
+        }
+
+        // Merging boundaries into one xml element
+        if (object->IsMilestoneElement()) {
+            m_boundaries.push(object->GetMilestoneEnd());
+            return true;
+        }
+        if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
+            assert(!m_boundaries.empty() && (m_boundaries.top() == object));
+
+            m_boundaries.pop();
+        }
+    }
+    else {
+        // In page-based MEI, pb and sb are not written.
+        if (object->Is({ PB, SB })) {
             return true;
         }
     }
+
+    if (this->IsScoreBasedMEI() && !this->ProcessScoreBasedFilterEnd(object)) {
+        return true;
+    }
+
     return this->WriteObjectInternalEnd(object);
 }
 
@@ -1052,7 +1070,7 @@ void MEIOutput::UpdateMdivFilter(Object *object)
                     ListOfObjects startElements;
                     std::stack<Object *> tempStack = m_boundaries;
                     while (!tempStack.empty()) {
-                        PageElementEnd *end = dynamic_cast<PageElementEnd *>(tempStack.top());
+                        PageMilestoneEnd *end = dynamic_cast<PageMilestoneEnd *>(tempStack.top());
                         if (end) startElements.push_front(end->GetStart());
                         tempStack.pop();
                     }
@@ -1090,7 +1108,7 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
         }
     }
 
-    if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_ELEMENT_END, PAGE_ELEMENT_END })) {
+    if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_MILESTONE_END, PAGE_MILESTONE_END })) {
         m_objectStack.push_back(object);
     }
 
@@ -1099,25 +1117,6 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
 
 bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
 {
-    // In score-based MEI, page, pages and system are not written.
-    if (object->Is({ PAGE, PAGES, SYSTEM })) {
-        return false;
-    }
-
-    // Merging boundaries into one xml element
-    if (object->IsBoundaryElement()) {
-        m_boundaries.push(object->GetBoundaryEnd());
-        return false;
-    }
-    if (object->Is({ PAGE_ELEMENT_END, SYSTEM_ELEMENT_END })) {
-        if (!m_boundaries.empty() && (m_boundaries.top() == object)) {
-            m_boundaries.pop();
-        }
-        else {
-            return false;
-        }
-    }
-
     // Pop current object or merged boundary from stack
     if (!m_objectStack.empty()) {
         m_objectStack.pop_back();
