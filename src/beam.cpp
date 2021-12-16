@@ -263,7 +263,6 @@ void BeamSegment::CalcBeam(
             // This is the case with fTrem on whole notes
             if (!stem) continue;
 
-            // stem->SetDrawingStemDir(beamInterface->m_stemDir);
             // Since the value were calculated relatively to the element position, adjust them
             stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
             stem->SetDrawingYRel(y2 - el->GetDrawingY());
@@ -303,7 +302,7 @@ std::pair<int, int> BeamSegment::GetAdditionalBeamCount(BeamDrawingInterface *be
 {
     // In case we're dealing with fTrem - take @beams attribute into consideration
     if (FTrem *fTrem = dynamic_cast<FTrem *>(beamInterface); fTrem) {
-        return { fTrem->GetBeams() / 2, 0 };
+        return { fTrem->GetBeams(), 0 };
     }
 
     int topShortestDur = DUR_8;
@@ -323,7 +322,7 @@ std::pair<int, int> BeamSegment::GetAdditionalBeamCount(BeamDrawingInterface *be
 bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
 {
     const int unit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    const auto [topBeams, bottomBeams] = GetAdditionalBeamCount(beamInterface);
+    const auto [topBeams, bottomBeams] = this->GetAdditionalBeamCount(beamInterface);
     const int topOffset = topBeams * beamInterface->m_beamWidth + unit / 2;
     const int bottomOffset = bottomBeams * beamInterface->m_beamWidth + unit / 2;
 
@@ -341,7 +340,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
             return true;
         }
     }
-    if (!DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset, beamInterface->m_crossStaffContent)) {
+    if (!this->DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset, beamInterface->m_crossStaffContent)) {
         return false;
     }
         
@@ -362,7 +361,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
                 = (m_beamElementCoordRefs.front()->m_yBeam + m_beamElementCoordRefs.back()->m_yBeam - 2 * midpoint) / 2;
             std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
                 [midpointOffset](BeamElementCoord *coord) { coord->m_yBeam += midpointOffset; });
-            if (!DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
+            if (!this->DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
         }
         // If midpoint if above the staff, try to place beam at the top edge of the staff
         if (!isMidpointWithinBounds && (midpoint > staffBottom)) {
@@ -380,7 +379,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
             std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
                 [offset](BeamElementCoord *coord) { coord->m_yBeam += offset; });
         }
-        if (!DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
+        if (!this->DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
 
         // If none of the positions work - there's no space for us to draw a mixed beam (or there is space but it would
         // overlap with ledger line). Adjust beam placement based on the most frequent stem direction
@@ -801,7 +800,7 @@ bool BeamSegment::CalcBeamSlope(
         else if (step > unit * 2) {
             step = unit * 2;
         } 
-        CalcMixedBeamStem(beamInterface, step);
+        this->CalcMixedBeamStem(beamInterface, step);
     }
 
     m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
@@ -833,18 +832,18 @@ void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int ste
         return;
     }
 
-    auto [aboveMax, aboveMin] = CalcBeamRelativeMinMax(BEAMPLACE_above);
-    auto [belowMax, belowMin] = CalcBeamRelativeMinMax(BEAMPLACE_below);
+    const auto [aboveMax, aboveMin] = this->CalcBeamRelativeMinMax(BEAMPLACE_above);
+    const auto [belowMax, belowMin] = this->CalcBeamRelativeMinMax(BEAMPLACE_below);
     const int highestPoint = (aboveMax != VRV_UNSET) ? aboveMax : belowMax;
     const int lowestPoint = (belowMin != VRV_UNSET) ? belowMin : aboveMin;
 
     // This helps with general beams but breaks trems
-    auto [up, down] = GetAdditionalBeamCount(beamInterface);
+    const auto [up, down] = this->GetAdditionalBeamCount(beamInterface);
 
     // Calculate midpoint for the beam, taking into account highest and lowest points, as well as number of additional
     // beams above and below main beam. Start position of the beam is then further adjusted based on the step size to
     // make sure that beam is truly centered
-    int midPoint = (highestPoint + lowestPoint + (up - down) * beamInterface->m_beamWidth) / 2;
+    const int midPoint = (highestPoint + lowestPoint + (up - down) * beamInterface->m_beamWidth) / 2;
     m_firstNoteOrChord->m_yBeam
         = (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below) ? midPoint - step / 2 : midPoint + step / 2;
     m_lastNoteOrChord->m_yBeam = (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below)
