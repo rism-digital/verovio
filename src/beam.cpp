@@ -323,7 +323,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     if (!this->DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset, beamInterface->m_crossStaffContent)) {
         return false;
     }
-        
+
     if (!beamInterface->m_crossStaffContent) {
         // Calculate midpoint for the beam with mixed placement
         int min = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
@@ -589,7 +589,6 @@ bool BeamSegment::CalcBeamSlope(
     m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
         Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
 
-
     int noteStep = 0;
     double noteSlope = 0.0;
     if (m_firstNoteOrChord->m_closestNote && m_lastNoteOrChord->m_closestNote) {
@@ -776,10 +775,10 @@ bool BeamSegment::CalcBeamSlope(
     else if (place == BEAMPLACE_mixed) {
         if (step <= unit) {
             step = 0;
-        }            
+        }
         else if (step > unit * 2) {
             step = unit * 2;
-        } 
+        }
         this->CalcMixedBeamStem(beamInterface, step);
     }
 
@@ -797,12 +796,12 @@ bool BeamSegment::CalcBeamSlope(
     return true;
 }
 
-
 void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step)
 {
     // In cases, when both first and last notes/chords of the beam have same relative places (i.e. they have same stem
     // direction and/or same staff), - we don't need additional calculations
-    if ((m_firstNoteOrChord->m_beamRelativePlace == m_lastNoteOrChord->m_beamRelativePlace) && (!beamInterface->m_crossStaffContent)) {
+    if ((m_firstNoteOrChord->m_beamRelativePlace == m_lastNoteOrChord->m_beamRelativePlace)
+        && (!beamInterface->m_crossStaffContent)) {
         if (m_beamSlope < 0.0) {
             m_firstNoteOrChord->m_yBeam = m_lastNoteOrChord->m_yBeam + step;
         }
@@ -1194,8 +1193,7 @@ std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) co
     int lowestPoint = VRV_UNSET;
     std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
         if (coord->m_beamRelativePlace == place) {
-            if ((highestPoint == VRV_UNSET) || (coord->m_yBeam > highestPoint))
-                highestPoint = coord->m_yBeam;
+            if ((highestPoint == VRV_UNSET) || (coord->m_yBeam > highestPoint)) highestPoint = coord->m_yBeam;
             if ((lowestPoint == VRV_UNSET) || (coord->m_yBeam < lowestPoint)) {
                 lowestPoint = coord->m_yBeam;
             }
@@ -1205,8 +1203,9 @@ std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) co
     return { highestPoint, lowestPoint };
 }
 
-void BeamSegment::CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface* beamInterface) {
-    
+void BeamSegment::CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
+{
+
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
         this->CalcMixedBeamStem(beamInterface, 0);
     }
@@ -1776,7 +1775,7 @@ int Beam::CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, in
     return overlap;
 }
 
-std::pair<int, int> Beam::GetAdditionalBeamCount() const 
+std::pair<int, int> Beam::GetAdditionalBeamCount() const
 {
     int topShortestDur = DUR_8;
     int bottomShortestDur = DUR_8;

@@ -313,8 +313,7 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
     }
 }
 
-template <class BeamType>
-void LayerElement::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
+template <class BeamType> void LayerElement::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
 {
     if (!this->Is({ BEAM, FTREM })) return;
 
