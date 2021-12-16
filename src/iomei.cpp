@@ -1285,9 +1285,12 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WriteNNumberLike(currentNode);
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
+    // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
     if ((measure->m_xAbs != VRV_UNSET) && (measure->m_xAbs2 != VRV_UNSET)) {
-        currentNode.append_attribute("ulx") = StringFormat("%d", measure->m_xAbs / DEFINITION_FACTOR).c_str();
-        currentNode.append_attribute("lrx") = StringFormat("%d", measure->m_xAbs2 / DEFINITION_FACTOR).c_str();
+        measure->SetCoordX1(measure->m_xAbs / DEFINITION_FACTOR);
+        measure->SetCoordX2(measure->m_xAbs2 / DEFINITION_FACTOR);
+        measure->WriteCoordX1(currentNode);
+        measure->WriteCoordX2(currentNode);
     }
 }
 
@@ -1575,7 +1578,8 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
 
     // y position
     if (staff->m_yAbs != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", staff->m_yAbs / DEFINITION_FACTOR).c_str();
+        staff->SetCoordY1(staff->m_yAbs / DEFINITION_FACTOR);
+        staff->WriteCoordY1(currentNode);
     }
 }
 
@@ -1649,7 +1653,8 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
     if (element->m_xAbs != VRV_UNSET) {
-        currentNode.attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
+        element->SetCoordX1(element->m_xAbs / DEFINITION_FACTOR);
+        element->WriteCoordX1(currentNode);
     }
 }
 
@@ -4348,11 +4353,15 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if (measure.attribute("ulx") && measure.attribute("lrx") && (m_doc->GetType() == Transcription)) {
-        vrvMeasure->m_xAbs = atoi(measure.attribute("ulx").value()) * DEFINITION_FACTOR;
-        vrvMeasure->m_xAbs2 = atoi(measure.attribute("lrx").value()) * DEFINITION_FACTOR;
-        measure.remove_attribute("ulx");
-        measure.remove_attribute("lrx");
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradeMeasureTo_5_0_0(measure);
+    }
+
+    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && (m_doc->GetType() == Transcription)) {
+        vrvMeasure->ReadCoordX1(measure);
+        vrvMeasure->ReadCoordX2(measure);
+        vrvMeasure->m_xAbs = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
+        vrvMeasure->m_xAbs2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
     }
 
     parent->AddChild(vrvMeasure);
@@ -4975,9 +4984,13 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if (staff.attribute("uly") && (m_doc->GetType() == Transcription)) {
-        vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
-        staff.remove_attribute("uly");
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradeStaffTo_5_0_0(staff);
+    }
+
+    if (staff.attribute("coord.y1") && (m_doc->GetType() == Transcription)) {
+        vrvStaff->ReadCoordY1(staff);
+        vrvStaff->m_yAbs = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
     }
 
     if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
@@ -5194,15 +5207,19 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 
 bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
-    if (element.attribute("ulx") && (m_doc->GetType() == Transcription)) {
-        object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
-        element.remove_attribute("ulx");
-    }
-
     SetMeiUuid(element, object);
     ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
+
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        UpgradeLayerElementTo_5_0_0(element);
+    }
+
+    if (element.attribute("coord.x1") && (m_doc->GetType() == Transcription)) {
+        object->ReadCoordX1(element);
+        object->m_xAbs = object->GetCoordX1() * DEFINITION_FACTOR;
+    }
 
     return true;
 }
@@ -6944,6 +6961,30 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
+}
+
+void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
+{
+    if (measure.attribute("ulx")) {
+        measure.attribute("ulx").set_name("coord.x1");
+    }
+    if (measure.attribute("lrx")) {
+        measure.attribute("lrx").set_name("coord.x2");
+    }
+}
+
+void MEIInput::UpgradeStaffTo_5_0_0(pugi::xml_node staff)
+{
+    if (staff.attribute("uly")) {
+        staff.attribute("uly").set_name("coord.y1");
+    }
+}
+
+void MEIInput::UpgradeLayerElementTo_5_0_0(pugi::xml_node element)
+{
+    if (element.attribute("ulx")) {
+        element.attribute("ulx").set_name("coord.x1");
+    }
 }
 
 void MEIInput::UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt)

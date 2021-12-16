@@ -33,7 +33,12 @@ class Tuning;
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
  */
-class Staff : public Object, public FacsimileInterface, public AttNInteger, public AttTyped, public AttVisibility {
+class Staff : public Object,
+              public FacsimileInterface,
+              public AttCoordY1,
+              public AttNInteger,
+              public AttTyped,
+              public AttVisibility {
 
 public:
     /**
