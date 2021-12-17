@@ -210,7 +210,7 @@ bool MEIOutput::Export()
         if (!this->IsPageBasedMEI()) {
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "https://music-encoding.org/schema/dev/mei-all.rng";
+            decl.append_attribute("href") = schema.c_str();
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
         }
