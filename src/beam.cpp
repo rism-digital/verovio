@@ -55,7 +55,6 @@ void BeamSegment::Reset()
 
     m_beamSlope = 0.0;
     m_verticalCenter = 0;
-    m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
     m_uniformStemLength = 0;
@@ -405,7 +404,6 @@ void BeamSegment::CalcBeamInit(
     int nbRests = 0;
 
     m_nbNotesOrChords = 0;
-    m_extendedToCenter = false;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
 
@@ -525,11 +523,7 @@ bool BeamSegment::CalcBeamSlope(
     // Indicates if we have a short step of half a unit
     // This occurs with 8th and 16th only and with a reduced distance of 3 stave-spaces (6 units)
     bool shortStep = false;
-    if (m_extendedToCenter) {
-        step = unit / 2;
-        shortStep = true;
-    }
-    else if (m_nbNotesOrChords == 2) {
+    if (m_nbNotesOrChords == 2) {
         step = unit * 2;
         // Short distance
         if (dist <= unit * 6) {
@@ -1412,17 +1406,12 @@ void BeamElementCoord::SetDrawingStemDir(
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (interface->m_crossStaffContent || (BEAMPLACE_mixed == interface->m_drawingPlace)) {
-        segment->m_extendedToCenter = false;
-    }
-    else if (((stemDir == STEMDIRECTION_up) && (m_yBeam <= segment->m_verticalCenter))
-        || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= m_yBeam))) {
-        m_yBeam = segment->m_verticalCenter;
-        segment->m_extendedToCenter = true;
-        m_centered = false;
-    }
-    else {
-        segment->m_extendedToCenter = false;
+    if (!interface->m_crossStaffContent && (BEAMPLACE_mixed != interface->m_drawingPlace)) {
+        if (((stemDir == STEMDIRECTION_up) && (m_yBeam <= segment->m_verticalCenter))
+            || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= m_yBeam))) {
+            m_yBeam = segment->m_verticalCenter;
+            m_centered = false;
+        }
     }
 
     m_yBeam += m_overlapMargin;
