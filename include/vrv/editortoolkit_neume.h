@@ -130,7 +130,7 @@ struct ClosestBB {
 
 struct StaffSort {
     // Sort staves left-to-right and top-to-bottom
-    // Sort by y if there is no intersection, by x if there is
+    // Sort by y if there is no intersection, by x if there is x intersection is smaller than half length of staff line
     bool operator()(Object *a, Object *b)
     {
         if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
@@ -156,8 +156,11 @@ struct StaffSort {
             : zoneB->GetUly() - (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetRotate() * M_PI / 180.0);
 
         // Check for y intersection
-        if ((aLowest <= bLowest && aLowest >= bHighest) || (aHighest <= bLowest && aHighest >= bHighest)
-            || (bLowest <= aLowest && bLowest >= aHighest) || (bHighest <= aLowest && bHighest >= aHighest)) {
+        // if the x intersection part is smaller than half of length of staffA
+        // sort by x coordinate
+        if (((aLowest <= bLowest && aLowest >= bHighest) || (aHighest <= bLowest && aHighest >= bHighest)
+            || (bLowest <= aLowest && bLowest >= aHighest) || (bHighest <= aLowest && bHighest >= aHighest))
+            && (zoneA->GetLrx() - zoneB->GetUlx() <= 0.5*(zoneA->GetLrx() - zoneA->GetUlx()))) {
             // sort by x center
             return (zoneA->GetUlx() < zoneB->GetUlx());
         }
