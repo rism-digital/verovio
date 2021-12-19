@@ -259,7 +259,7 @@ std::string MEIOutput::GetOutput()
 
 bool MEIOutput::WriteObject(Object *object)
 {
-    if (this->IsScoreBasedMEI()) {
+    if (this->IsScoreBasedMEI() && this->HasFilter()) {
         if (!this->ProcessScoreBasedFilter(object)) {
             return true;
         }
@@ -863,8 +863,10 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         }
     }
 
-    if (this->IsScoreBasedMEI() && !this->ProcessScoreBasedFilterEnd(object)) {
-        return true;
+    if (this->IsScoreBasedMEI() && this->HasFilter()) {
+        if (!this->ProcessScoreBasedFilterEnd(object)) {
+            return true;
+        }
     }
 
     return this->WriteObjectInternalEnd(object);
