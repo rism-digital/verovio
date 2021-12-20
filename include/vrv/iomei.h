@@ -159,6 +159,12 @@ class Unclear;
 class Verse;
 class Zone;
 
+// Helper enums
+///@{
+enum class MatchLocation { Before, Here, After };
+enum class RangeMatchLocation { BeforeStart, AtStart, BetweenStartEnd, AtEnd, AfterEnd };
+///@}
+
 //----------------------------------------------------------------------------
 // MEIOutput
 //----------------------------------------------------------------------------
@@ -182,19 +188,17 @@ public:
     bool Export();
 
     /**
-     * The main method for write objects.
+     * The main method for writing objects.
      */
+    ///@{
     bool WriteObject(Object *object) override;
-
-    /**
-     * Writing object method that must be overridden in the child class.
-     */
     bool WriteObjectEnd(Object *object) override;
+    ///@}
 
     /**
      * Return the output as a string by writing it to the stringstream member.
      */
-    std::string GetOutput(int page = -1);
+    std::string GetOutput();
 
     /**
      * @name Setter and getter for score-based MEI output
@@ -205,9 +209,17 @@ public:
     ///@}
 
     /**
-     * Return true when the MEIOutput object is currently saving single page
+     * Score based filtering by measure, page or mdiv
      */
-    bool IsSavingSinglePage() const { return (m_page != -1); }
+    ///@{
+    bool HasFilter() const;
+    void SetFirstPage(int page);
+    void SetLastPage(int page);
+    void SetFirstMeasure(const std::string &uuid);
+    void SetLastMeasure(const std::string &uuid);
+    void SetMdiv(const std::string &uuid);
+    void ResetFilter();
+    ///@}
 
     /**
      * @name Gettersto improve code readability
@@ -223,11 +235,57 @@ public:
     void SetIndent(int indent) { m_indent = indent; }
 
     /**
-     * Setter for remove Ids flag for the MEI output (default is false)
+     * Setter for ignore header flag for the MEI output (default is false)
+     */
+    void SetIgnoreHeader(bool ignoreHeader) { m_ignoreHeader = ignoreHeader; }
+
+    /**
+     * Setter for remove ids flag for the MEI output (default is false)
      */
     void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
 private:
+    /**
+     * Reset
+     */
+    void Reset();
+
+    /**
+     * Score based filtering
+     */
+    ///@{
+    bool HasValidFilter() const;
+    bool IsMatchingFilter() const;
+    void UpdateFilter(Object *object);
+    void UpdatePageFilter(Object *object);
+    void UpdateMeasureFilter(Object *object);
+    void UpdateMdivFilter(Object *object);
+    bool ProcessScoreBasedFilter(Object *object);
+    bool ProcessScoreBasedFilterEnd(Object *object);
+    ///@}
+
+    /**
+     * Writing objects
+     */
+    ///@{
+    bool WriteObjectInternal(Object *object, bool useCustomScoreDef);
+    bool WriteObjectInternalEnd(Object *object);
+    void WriteStackedObjects();
+    void WriteStackedObjectsEnd();
+    ///@}
+
+    /**
+     * Scoredef manipulation
+     */
+    ///@{
+    void WriteCustomScoreDef();
+    void AdjustStaffDef(StaffDef *staffDef, Measure *measure);
+    bool AdjustLabel(Label *label);
+    ///@}
+
+    /**
+     * Write the document
+     */
     bool WriteDoc(Doc *doc);
 
     /**
@@ -455,13 +513,34 @@ public:
 private:
     std::ostringstream m_streamStringOutput;
     int m_indent;
-    int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
-    /** @name Current element */
+
+    /** Current xml element */
     pugi::xml_node m_currentNode;
+    /** Xml node stack */
     std::list<pugi::xml_node> m_nodeStack;
+    /** Boundary objects which are merged into one xml element */
     std::stack<Object *> m_boundaries;
+    /** The object stack */
+    std::deque<Object *> m_objectStack;
+
+    /** Score based filtering */
+    ///@{
+    bool m_hasFilter;
+    MatchLocation m_filterMatchLocation;
+    Object *m_firstFilterMatch;
+    int m_firstPage;
+    int m_currentPage;
+    int m_lastPage;
+    std::string m_firstMeasureUuid;
+    std::string m_lastMeasureUuid;
+    RangeMatchLocation m_measureFilterMatchLocation;
+    std::string m_mdivUuid;
+    MatchLocation m_mdivFilterMatchLocation;
+    ///@}
+
+    bool m_ignoreHeader;
     bool m_removeIds;
     ListOfObjects m_referredObjects;
 };
