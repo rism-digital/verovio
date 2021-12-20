@@ -300,6 +300,17 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // DrawSmuflString(
     //     dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+    int rotateOffset;
+    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+        double deg = staff->GetDrawingRotate();
+        int xDiff = x - staff->GetDrawingX();
+        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+    }
+    else {
+        rotateOffset = 0;
+    }
+
+    y -= rotateOffset;
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
@@ -904,6 +915,18 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
 
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
+    
+    int rotateOffset;
+    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+        double deg = staff->GetDrawingRotate();
+        int xDiff = x - staff->GetDrawingX();
+        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+    }
+    else {
+        rotateOffset = 0;
+    }
+
+    y -= rotateOffset;
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
