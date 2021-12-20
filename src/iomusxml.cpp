@@ -2303,7 +2303,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Tempo
-    pugi::xpath_node metronome = node.select_node("direction-type/metronome");
     if (containsTempo) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
@@ -2314,6 +2313,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
         tempo->SetPlace(tempo->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
         if (words.size() != 0) TextRendition(words, tempo);
+        pugi::xpath_node metronome = node.select_node("direction-type/metronome[not(@print-object='no')]");
         if (metronome) PrintMetronome(metronome.node(), tempo);
         if (soundNode.attribute("tempo")) {
             tempo->SetMidiBpm(soundNode.attribute("tempo").as_double());
@@ -2328,8 +2328,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (!containsWords && !containsDynamics && !xmlCoda && !bracket && !lead && !metronome && !xmlSegno && !xmlShift
-        && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
+    if (!containsDynamics && !containsTempo && !containsWords && !xmlCoda && !bracket && !lead && !xmlSegno && !xmlShift && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
     }
 }
