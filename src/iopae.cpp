@@ -2311,7 +2311,7 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_047_TIMESIG_INCOMPLETE, "The time signature cannot be parsed (Setting to 4/4 if running in non-pedantic mode)." },
     { ERR_048_TIMESIG_INVALID, "The time signature '%s' is invalid." },
     { ERR_049_TIMESIG_MENS, "The mensur sign content cannot be parsed (Setting to 'O' if running in non-pedantic mode)." },
-    { ERR_050_INVALID_CHAR, "The character(s) '%s' are invalid." },
+    { ERR_050_INVALID_CHAR, "The input contains one or more character(s) '%s'." },
     { ERR_051_BARLINE, "The barline '%s' is invalid." },
     { ERR_052_DURATION, "The duration content cannot be parsed (Setting to quarter note if running in non-pedantic mode)." },
     { ERR_053_DURATION_MENS3, "The duration cannot be '3' with mensural notation." },
