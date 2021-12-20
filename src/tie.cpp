@@ -293,7 +293,7 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
                 return defaultX;
             }
             Stem *stem = parentChord->GetDrawingStem();
-            if (stem) {
+            if (stem && !stem->IsVirtual()) {
                 return stem->GetContentRight() + 2 * radius + drawingUnit / 2;
             }
             else {
@@ -328,7 +328,7 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
                 return defaultX;
             }
             Stem *stem = parentChord->GetDrawingStem();
-            if (stem) {
+            if (stem && !stem->IsVirtual()) {
                 return stem->GetContentLeft() - 2 * radius - drawingUnit / 2;
             }
             else {
@@ -423,7 +423,13 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             r1 = startNote->GetDrawingRadius(doc);
         }
         if (!isShortTie) {
-            startPoint.x += r1 + drawingUnit / 2;
+            if (startParentChord && startParentChord->HasAdjacentNotesInStaff(staff)) {
+                startPoint.x = this->CalculateAdjacentChordXOffset(
+                    doc, staff, startParentChord, startNote, drawingCurveDir, startPoint.x, true);
+            }
+            else {
+                startPoint.x += r1 + drawingUnit / 2;
+            }
             if (startNote && startNote->GetDots() > 0) {
                 startPoint.x += drawingUnit * startNote->GetDots() * 3 / 2;
             }
