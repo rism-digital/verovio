@@ -2262,7 +2262,7 @@ enum {
 
 // clang-format off
 const std::map<int, std::string> PAEInput::s_errCodes{
-    { ERR_001_EMPTY, "The input is empty" },
+    { ERR_001_EMPTY, "The input is empty." },
     { ERR_002_JSON_PARSE, "The JSON input cannot be parsed." },
     { ERR_003_JSON_KEY, "There is no 'data' key in the JSON input." },
     { ERR_004_KEY_SPACE, "A key signature change must be followed by a space." },
