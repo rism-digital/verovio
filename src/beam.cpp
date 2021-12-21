@@ -52,8 +52,6 @@ void BeamSegment::Reset()
 {
     this->ClearCoordRefs();
 
-    m_startingX = 0;
-    m_startingY = 0;
     m_beamSlope = 0.0;
     m_verticalCenter = 0;
     m_extendedToCenter = false;
@@ -1092,11 +1090,11 @@ void BeamSegment::CalcPartialFlagPlace()
 
 void BeamSegment::CalcSetValues()
 {
-    m_startingX = m_beamElementCoordRefs.at(0)->m_x;
-    m_startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
+    int startingX = m_beamElementCoordRefs.at(0)->m_x;
+    int startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
 
     for (auto coord : m_beamElementCoordRefs) {
-        coord->m_yBeam = m_startingY + m_beamSlope * (coord->m_x - m_startingX);
+        coord->m_yBeam = startingY + m_beamSlope * (coord->m_x - startingX);
     }
 }
 
@@ -1111,6 +1109,16 @@ int BeamSegment::GetAdjacentElementsDuration(int elementX) const
         }
     }
     return DUR_8;
+}
+
+int BeamSegment::GetStartingX() const
+{
+    return (m_beamElementCoordRefs.empty() ? 0 : m_beamElementCoordRefs.at(0)->m_x);
+}
+
+int BeamSegment::GetStartingY() const
+{
+    return (m_beamElementCoordRefs.empty() ? 0 : m_beamElementCoordRefs.at(0)->m_yBeam);
 }
 
 //----------------------------------------------------------------------------

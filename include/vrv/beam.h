@@ -67,6 +67,14 @@ public:
      */
     int GetAdjacentElementsDuration(int elementX) const;
 
+    /**
+     * @name Getters for the X and Y starting value of the beam;
+     */
+    ///@{
+    int GetStartingX() const;
+    int GetStartingY() const;
+    ///@}
+
 private:
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
     void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
@@ -105,8 +113,6 @@ private:
 
 public:
     // values set by CalcBeam
-    int m_startingX; // the initial X position of the beam
-    int m_startingY; // the initial Y position of the beam
     int m_nbNotesOrChords;
     bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam

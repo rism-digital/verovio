@@ -173,8 +173,8 @@ int TupletBracket::GetDrawingYLeft()
     if (beam) {
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
-        return beam->m_beamSegment.m_startingY
-            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.m_startingX) + this->GetDrawingYRel();
+        return beam->m_beamSegment.GetStartingY()
+            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel();
     }
     else {
         return this->GetDrawingY();
@@ -190,8 +190,8 @@ int TupletBracket::GetDrawingYRight()
     if (beam) {
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
-        return beam->m_beamSegment.m_startingY
-            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.m_startingX) + this->GetDrawingYRel();
+        return beam->m_beamSegment.GetStartingY()
+            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel();
     }
     else {
         return this->GetDrawingY();
