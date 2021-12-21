@@ -552,6 +552,13 @@ bool BeamSegment::CalcBeamSlope(
         else if (noteStep <= unit * 4) {
             step = unit * 2;
         }
+        else if (m_nbNotesOrChords == 4) {
+            if ((m_beamElementCoordRefs.at(1)->m_yBeam == m_beamElementCoordRefs.at(2)->m_yBeam)
+                && ((m_firstNoteOrChord->m_yBeam == m_beamElementCoordRefs.at(1)->m_yBeam)
+                    || (m_lastNoteOrChord->m_yBeam == m_beamElementCoordRefs.at(2)->m_yBeam))) {
+                step = unit * 2;
+            }
+        }
     }
 
     // Prevent short step with values not shorter than a 16th
