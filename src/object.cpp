@@ -1730,14 +1730,11 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
             params->m_upcomingScoreDef.m_insertScoreDef = true;
         }
         if (scoreDef->IsSectionRestart()) {
-            // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
-            const bool hasLabel = (NULL != scoreDef->FindDescendantByType(LABEL))
-                || (NULL != scoreDef->FindDescendantByType(LABELABBR));
-            params->m_drawLabels = hasLabel;
+            params->m_drawLabels = true;
             params->m_restart = true;
             // Redraw the labels only if we already have a mesure in the system. Otherwise this will be
             // done through the system scoreDef
-            scoreDef->SetDrawLabels(params->m_hasMeasure && hasLabel);
+            scoreDef->SetDrawLabels(params->m_hasMeasure);
             // If we have a previous measure, we need to set the cautionary scoreDef indenpendently from the
             // presence of a system break
             if (params->m_previousMeasure) {
