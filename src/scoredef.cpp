@@ -593,8 +593,12 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
 
     // SetDrawingXRel(m_systemLeftMar + this->GetDrawingWidth());
     params->m_shift += m_drawingLabelsWidth;
-    if (!this->DrawLabels() && this->IsSectionRestart()) {
-        params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
+    if (this->IsSectionRestart()) {
+        const bool hasLabel
+            = (NULL != this->FindDescendantByType(LABEL)) || (NULL != this->FindDescendantByType(LABELABBR));
+        const bool hasGrpSym = (NULL != this->FindDescendantByType(GRPSYM));
+        // Add space if we have no label/labelAbbr and no grpSym
+        if (!hasLabel && !hasGrpSym) params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
     }
 
     return FUNCTOR_CONTINUE;
