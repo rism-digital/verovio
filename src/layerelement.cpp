@@ -300,7 +300,7 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
             this->GetBeamChildOverflow<Beam>(above, below, beam);
         }
         else if (this->GetFirstAncestor(FTREM)) {
-            FTrem *fTrem = vrv_cast<FTrem *>(this->GetFirstAncestor(BEAM));
+            FTrem *fTrem = vrv_cast<FTrem *>(this->GetFirstAncestor(FTREM));
             this->GetBeamChildOverflow<FTrem>(above, below, fTrem);
         }
     }
